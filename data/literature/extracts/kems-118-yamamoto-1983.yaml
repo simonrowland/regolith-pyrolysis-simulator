@@ -1001,6 +1001,12 @@ species:
       - 1883.0
       standard_state: Raoultian a_i, gamma_i; pure liquid Fe and Sn. Heats kJ/mol at 1550~1610 C
       units: dimensionless a, gamma; kJ/mol for heats
+      derived_from:
+      - 'kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios'
+      derivation:
+        relation: Belton-Fruehan/Gibbs-Duhem integration of the Table 2 ion-current ratios using equations (1)-(3); partial molar heats from R d ln(I+)/d(1/T) integration using Figure 4 and equations (2), (10).
+        inputs:
+        - 'kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios'
       values:
         quantity: activity_gamma_and_partial_molar_heats
         method_class: model_derived

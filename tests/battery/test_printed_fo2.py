@@ -239,7 +239,8 @@ def test_holzheid_table3_rows_land_printed_log_per_run(tmp_path: Path) -> None:
         for obs in result.observations.values()
         if "fO2_log" in (obs.point_conditions or {})
     ]
-    assert len(landed) == 33
+    # 33 + 65 new FeO rows that carry a printed log fO2 = 98.
+    assert len(landed) == 98
     # The printed log resolves the oxygen_condition waypoint as PRINTED.
     experiment = result.experiments[first.experiment_id]
     bench = result.benches[experiment.bench_id]

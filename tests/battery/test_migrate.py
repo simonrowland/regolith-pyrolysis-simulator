@@ -11,6 +11,7 @@ import re
 import subprocess
 import sys
 import unicodedata
+from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -66,6 +67,7 @@ from simulator.battery.migrate import (
     dump_yaml,
     iter_observation_store_paths,
     lineage_parents_from_source,
+    source_derivation_from_source,
     load_migrated_context,
     map_phase,
     map_quantity,
@@ -85,6 +87,7 @@ from simulator.battery.migrate import (
     expand_queue_entries,
     group_queue_entries,
     migrate,
+    observation_from_plain,
     migration_queue_document,
     reference_state_from_extract,
     _mole_fraction_composition_from_values,
@@ -469,6 +472,559 @@ def _extract_observations(name: str) -> list[dict]:
             if isinstance(row, dict):
                 found.append(row)
     return found
+
+
+def _raw_inputs_extract(method_class: str, *, include_locator: bool = True) -> dict:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observation = extract["species"]["Na"]["observations"][0]
+    observation["values"]["method_class"] = method_class
+    raw_inputs = {"state": {"tag": "value", "value": "not_printed"}}
+    if include_locator:
+        raw_inputs["locator"] = {"page": 2, "section": "3.3"}
+    observation["values"]["derivation"] = {
+        "relation": "calculated from measured quantities",
+        "output_unit": "Pa",
+        "raw_inputs": raw_inputs,
+    }
+    return extract
+
+
+def test_production_migration_keeps_located_unprinted_raw_input_declaration(
+    tmp_path: Path,
+) -> None:
+    result = migrate(
+        _write_min_tree(tmp_path, _raw_inputs_extract("measured_reduced")),
+        write=False,
+    )
+    observation = next(iter(result.observations.values()))
+
+    assert observation.derivation is not None
+    assert observation.derivation.inputs == ()
+    assert observation.derivation.raw_inputs is not None
+    assert observation.derivation.raw_inputs.state.value.value == "not_printed"
+    assert observation.derivation.raw_inputs.locator is not None
+    assert result.validation.hard_issues == ()
+
+    reloaded = observation_from_plain(
+        yaml.safe_load(yaml.safe_dump(to_plain(observation)))
+    )
+    assert reloaded.derivation == observation.derivation
+
+
+def test_null_derivation_inputs_are_invalid_even_with_raw_input_declaration(
+    tmp_path: Path,
+) -> None:
+    extract = _raw_inputs_extract("measured_reduced")
+    extract["species"]["Na"]["observations"][0]["values"]["derivation"][
+        "inputs"
+    ] = None
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert any(
+        issue.path.endswith(".values.derivation")
+        and issue.reason is RefusalReason.INVALID_SOURCE
+        and "Derivation.inputs" in issue.detail
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_production_migration_rejects_unlocated_unprinted_raw_input_declaration(
+    tmp_path: Path,
+) -> None:
+    result = migrate(
+        _write_min_tree(
+            tmp_path, _raw_inputs_extract("measured_reduced", include_locator=False)
+        ),
+        write=False,
+    )
+    assert any(
+        issue.path.endswith(".derived_from")
+        and issue.detail == "derived observation requires derived_from"
+        for issue in result.validation.hard_issues
+    )
+
+
+@pytest.mark.parametrize(
+    ("inputs", "raw_inputs", "expected_path", "expected_detail"),
+    [
+        (
+            ["pdf:fixture-source"],
+            {"state": {"tag": "value", "value": "not_printed"}},
+            ".derivation.raw_inputs",
+            "requires a locator",
+        ),
+        (
+            [],
+            {"state": {"tag": "value", "value": "not_printed"}},
+            ".values.derivation",
+            "requires a locator",
+        ),
+        (
+            ["pdf:fixture-source"],
+            {
+                "state": {"tag": "unknown", "reason": "not known"},
+                "locator": {"page": 2},
+            },
+            ".derivation.raw_inputs",
+            "must be not_printed",
+        ),
+        (
+            None,
+            {"state": {"tag": "value", "value": "not_printed"}},
+            ".values.derivation",
+            "requires a locator",
+        ),
+    ],
+    ids=["unlocated-pdf-input", "unlocated-empty", "located-unknown", "omitted-input"],
+)
+def test_invalid_raw_input_declarations_return_typed_issues(
+    tmp_path: Path,
+    inputs: object,
+    raw_inputs: dict,
+    expected_path: str,
+    expected_detail: str,
+) -> None:
+    extract = _raw_inputs_extract("measured_reduced", include_locator=False)
+    annotation = extract["species"]["Na"]["observations"][0]["values"][
+        "derivation"
+    ]
+    if inputs is not None:
+        annotation["inputs"] = inputs
+    annotation["raw_inputs"] = raw_inputs
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert result.validation.hard_issues
+    assert any(
+        issue.path.endswith(expected_path) and expected_detail in issue.detail
+        for issue in result.validation.hard_issues
+    )
+
+
+@pytest.mark.parametrize("location", ["values.derivation", "derivation"])
+@pytest.mark.parametrize(
+    ("raw_inputs", "detail"),
+    [
+        (
+            {"state": {"tag": "value", "value": "printed"}, "locator": {"page": 2}},
+            "printed",
+        ),
+        (
+            {"state": {"tag": "value", "value": 7}, "locator": {"page": 2}},
+            "RawInputStatus",
+        ),
+        ({"locator": {"page": 2}}, "contain a state"),
+    ],
+    ids=["unknown-literal", "wrong-type", "missing-state"],
+)
+def test_invalid_raw_input_parse_is_a_typed_issue_at_each_annotation_location(
+    tmp_path: Path, location: str, raw_inputs: dict, detail: str
+) -> None:
+    extract = _raw_inputs_extract("measured_reduced")
+    observation = extract["species"]["Na"]["observations"][0]
+    if location == "values.derivation":
+        annotation = observation["values"]["derivation"]
+    else:
+        annotation = dict(observation["values"]["derivation"])
+        observation["derivation"] = annotation
+    annotation["raw_inputs"] = raw_inputs
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(f".{location}")
+        and detail in issue.detail
+        for issue in result.registry_issues
+    )
+
+
+def _malformed_derivation_annotation(shape: str) -> object:
+    annotation: dict = {
+        "relation": "author_calculation",
+        "inputs": ["pdf:fixture-source"],
+        "output_unit": "Pa",
+    }
+    valid_raw_inputs = {
+        "state": {"tag": "value", "value": "not_printed"},
+        "locator": {"page": 2},
+    }
+    malformed_raw_inputs = {
+        "state-tag": {
+            "state": {"tag": "printed", "value": "not_printed"},
+            "locator": {"page": 2},
+        },
+        "empty-locator": {
+            "state": {"tag": "value", "value": "not_printed"},
+            "locator": {"page": ""},
+        },
+        "enum-literal": {
+            "state": {"tag": "value", "value": "printed"},
+            "locator": {"page": 2},
+        },
+        "missing-state": {"locator": {"page": 2}},
+        "missing-value": {
+            "state": {"tag": "value"},
+            "locator": {"page": 2},
+        },
+        "missing-reason": {
+            "state": {"tag": "unknown"},
+            "locator": {"page": 2},
+        },
+    }
+    if shape in malformed_raw_inputs:
+        annotation["raw_inputs"] = malformed_raw_inputs[shape]
+        if shape == "empty-locator":
+            annotation["inputs"] = []
+        return annotation
+    if shape.startswith("state-type-"):
+        annotation["raw_inputs"] = {
+            "state": {"int": 7, "list": [], "none": None}[shape.removeprefix("state-type-")],
+            "locator": {"page": 2},
+        }
+        return annotation
+    if shape.startswith("locator-type-"):
+        annotation["raw_inputs"] = {
+            "state": valid_raw_inputs["state"],
+            "locator": {"int": 7, "list": [], "none": None}[shape.removeprefix("locator-type-")],
+        }
+        return annotation
+    if shape.startswith("value-type-"):
+        annotation["raw_inputs"] = {
+            "state": {
+                "tag": "value",
+                "value": {"int": 7, "list": [], "none": None}[shape.removeprefix("value-type-")],
+            },
+            "locator": {"page": 2},
+        }
+        return annotation
+    if shape.startswith("tag-type-"):
+        annotation["raw_inputs"] = {
+            "state": {
+                "tag": {"int": 7, "list": [], "none": None}[shape.removeprefix("tag-type-")],
+                "value": "not_printed",
+            },
+            "locator": {"page": 2},
+        }
+        return annotation
+    if shape.startswith("reason-type-"):
+        annotation["raw_inputs"] = {
+            "state": {
+                "tag": "unknown",
+                "reason": {"int": 7, "list": [], "none": None}[shape.removeprefix("reason-type-")],
+            },
+            "locator": {"page": 2},
+        }
+        return annotation
+    if shape in {"inputs-int", "inputs-list", "inputs-none", "inputs-mapping"}:
+        annotation["inputs"] = {
+            "inputs-int": 7,
+            "inputs-list": [7],
+            "inputs-none": None,
+            "inputs-mapping": {"source": "pdf:fixture-source"},
+        }[shape]
+        return annotation
+    if shape in {"parameters-int", "parameters-list", "parameters-none"}:
+        annotation["parameters"] = {
+            "parameters-int": 7,
+            "parameters-list": ["not-a-pair"],
+            "parameters-none": None,
+        }[shape]
+        return annotation
+    if shape in {"relation-int", "relation-list", "relation-none"}:
+        annotation["relation"] = {
+            "relation-int": 7,
+            "relation-list": [],
+            "relation-none": None,
+        }[shape]
+        return annotation
+    if shape in {"output-unit-int", "output-unit-list", "output-unit-none"}:
+        annotation["output_unit"] = {
+            "output-unit-int": 7,
+            "output-unit-list": [],
+            "output-unit-none": None,
+        }[shape]
+        return annotation
+    if shape in {"pure-reference-int", "pure-reference-list"}:
+        annotation["pure_substance_reference"] = {
+            "pure-reference-int": 7,
+            "pure-reference-list": [],
+        }[shape]
+        return annotation
+    if shape == "missing-inputs":
+        annotation.pop("inputs")
+        return annotation
+    if shape in {"annotation-int", "annotation-list", "annotation-none", "annotation-string"}:
+        return {
+            "annotation-int": 7,
+            "annotation-list": [],
+            "annotation-none": None,
+            "annotation-string": "not a mapping",
+        }[shape]
+    raise AssertionError(shape)
+
+
+def _fixture_registry_experiment(inference: object) -> dict:
+    return {
+        "experiment_id": "fixture-experiment",
+        "sample": {
+            "initial_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "basis": "printed_oxides",
+                        "amount_basis": "mole_fraction",
+                        "components": [["SiO2", "1"]],
+                    },
+                },
+                "locator": {"page": 2},
+                "inference": inference,
+            }
+        },
+    }
+
+
+_MALFORMED_ANNOTATION_SHAPES = [
+    "state-tag",
+    "empty-locator",
+    "enum-literal",
+    "state-type-int",
+    "state-type-list",
+    "state-type-none",
+    "locator-type-int",
+    "locator-type-list",
+    "locator-type-none",
+    "tag-type-int",
+    "tag-type-list",
+    "tag-type-none",
+    "value-type-int",
+    "value-type-list",
+    "value-type-none",
+    "reason-type-int",
+    "reason-type-list",
+    "reason-type-none",
+    "missing-state",
+    "missing-value",
+    "missing-reason",
+    "inputs-int",
+    "inputs-list",
+    "inputs-none",
+    "inputs-mapping",
+    "parameters-int",
+    "parameters-list",
+    "parameters-none",
+    "relation-int",
+    "relation-list",
+    "relation-none",
+    "output-unit-int",
+    "output-unit-list",
+    "output-unit-none",
+    "pure-reference-int",
+    "pure-reference-list",
+    "missing-inputs",
+    "annotation-int",
+    "annotation-list",
+    "annotation-none",
+    "annotation-string",
+]
+
+
+def test_production_annotation_boundary_reports_malformed_shapes(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row_template = extract["species"]["Na"]["observations"][0]
+    locations = (
+        "values.derivation",
+        "derivation",
+        "values.inference",
+        "inference",
+        "registry.inference",
+    )
+    expected_paths = []
+    observation_rows = []
+    registry_experiments = []
+    ordinal = 0
+    for location in locations:
+        for shape in _MALFORMED_ANNOTATION_SHAPES:
+            annotation = _malformed_derivation_annotation(shape)
+            if location == "registry.inference":
+                experiment = _fixture_registry_experiment(annotation)
+                local_experiment_id = f"fixture-experiment-{ordinal}"
+                experiment["experiment_id"] = local_experiment_id
+                expected_paths.append(
+                    (
+                        location,
+                        shape,
+                        f"::experiment::{local_experiment_id}].sample.initial_composition",
+                    )
+                )
+                registry_experiments.append(experiment)
+            else:
+                row = deepcopy(row_template)
+                observation_id = f"annotation-{ordinal}"
+                row["observation_id"] = observation_id
+                field = location.rsplit(".", 1)[-1]
+                target = row["values"] if location.startswith("values.") else row
+                target[field] = annotation
+                expected_paths.append(
+                    (
+                        location,
+                        shape,
+                        f"observations.fixture-source::{observation_id}.{location}",
+                    )
+                )
+                observation_rows.append(row)
+            ordinal += 1
+
+    extract["species"]["Na"]["observations"] = observation_rows
+    extract["experiments"] = registry_experiments
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    issues = [*result.registry_issues, *result.validation.hard_issues]
+    for location, shape, expected_path in expected_paths:
+        matching = [
+            issue
+            for issue in issues
+            if (
+                issue.path.endswith(expected_path)
+                if location == "registry.inference"
+                else issue.path == expected_path
+            )
+            and issue.reason is RefusalReason.INVALID_SOURCE
+        ]
+        assert matching, (location, shape)
+        if shape == "state-tag":
+            assert any("not a valid StateTag" in issue.detail for issue in matching)
+        if shape == "empty-locator":
+            assert any(
+                "Locator requires at least one nonempty location key" in issue.detail
+                for issue in matching
+            )
+        if shape == "enum-literal":
+            assert any(
+                "not a valid RawInputStatus" in issue.detail for issue in matching
+            )
+        if location == "registry.inference":
+            local_experiment_id = expected_path.split("::experiment::", 1)[1].split("]", 1)[0]
+            experiment_id = next(
+                identifier
+                for identifier in result.experiments
+                if identifier.endswith(f"::experiment::{local_experiment_id}")
+            )
+            sample = result.experiments[experiment_id].sample
+            assert sample.initial_composition is not None
+            assert sample.initial_composition.state.is_value
+        else:
+            assert result.observations
+
+
+@pytest.mark.parametrize("location", ["values.derivation", "registry.inference"])
+def test_string_derivation_inputs_keep_their_existing_meaning(
+    tmp_path: Path, location: str
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    annotation = {
+        "relation": "author_calculation",
+        "inputs": "pdf:fixture-source",
+        "output_unit": "Pa",
+    }
+    if location == "registry.inference":
+        extract["experiments"] = [_fixture_registry_experiment(annotation)]
+        expected_path = "experiment[fixture-experiment].sample.initial_composition"
+    else:
+        extract["species"]["Na"]["observations"][0]["values"]["derivation"] = annotation
+        expected_path = "observations.fixture-source::na_psat.values.derivation"
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert not any(
+        issue.path == expected_path and issue.reason is RefusalReason.INVALID_SOURCE
+        for issue in [*result.registry_issues, *result.validation.hard_issues]
+    )
+
+
+def test_not_printed_declaration_conflicts_with_listed_inputs_and_preserves_them(
+    tmp_path: Path,
+) -> None:
+    extract = _raw_inputs_extract("measured_reduced")
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"]["derivation"]["inputs"] = ["pdf:fixture-source"]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(iter(result.observations.values()))
+    assert observation.derivation is not None
+    assert observation.derivation.inputs == ("pdf:fixture-source",)
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        and "conflicts with listed derivation inputs" in issue.detail
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_registry_composition_accepts_existing_mapping_inference_inputs() -> None:
+    from simulator.battery.migrate import _experiment_from_plain
+
+    extract_path = (
+        Path(__file__).parents[2]
+        / "data/literature/extracts/ta-badro-2021.yaml"
+    )
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    registry_experiment = extract["experiments"][0]
+    experiment = _experiment_from_plain(
+        registry_experiment, registry_issues=[]
+    )
+
+    assert experiment.sample.initial_composition is not None
+    assert experiment.sample.initial_composition.inference is not None
+    assert experiment.sample.initial_composition.inference.inputs[0] == str(
+        extract["experiments"][0]["sample"]["initial_composition"]["inference"][
+            "inputs"
+        ][0]
+    )
+
+
+def test_malformed_registry_inference_records_issue_without_dropping_value() -> None:
+    from simulator.battery.migrate import _experiment_from_plain
+
+    extract_path = (
+        Path(__file__).parents[2]
+        / "data/literature/extracts/ta-badro-2021.yaml"
+    )
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    registry_experiment = extract["experiments"][0]
+    registry_experiment["sample"]["initial_composition"]["inference"][
+        "inputs"
+    ] = 42
+    issues = []
+    experiment = _experiment_from_plain(
+        registry_experiment, registry_issues=issues
+    )
+
+    assert experiment.sample.initial_composition is not None
+    assert experiment.sample.initial_composition.state.is_value
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.INVALID_SOURCE
+    assert issues[0].path == (
+        "experiment[vp-series].sample.initial_composition"
+    )
+
+
+def test_production_migration_rejects_model_derived_raw_input_declaration(
+    tmp_path: Path,
+) -> None:
+    result = migrate(
+        _write_min_tree(tmp_path, _raw_inputs_extract("model_derived")),
+        write=False,
+    )
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        and "invalid for model_derived" in issue.detail
+        for issue in result.validation.hard_issues
+    )
 
 
 def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
@@ -1164,6 +1720,30 @@ def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
         for p in points
     )
     assert all(p.derivation.output_unit == "Pa" for p in points)
+
+
+def test_series_explosion_keeps_parent_confidence_level(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["uncertainty"] = {
+        "note": "Table I standard deviation",
+        "confidence_level": "one_sigma",
+    }
+    for point in row["values"]["series"]:
+        point["sigma"] = 0.1
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    points = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith("fixture-source::na_psat")
+    ]
+
+    assert len(points) == 2
+    assert all(
+        observation.uncertainty.verbatim["confidence_level"] == "one_sigma"
+        for observation in points
+    )
 
 
 @pytest.mark.parametrize("phase", ["", "not_a_phase", "condensed_solid"])
@@ -2634,6 +3214,231 @@ def test_j02_source_stated_derived_from_is_stored(tmp_path: Path) -> None:
     )
     assert child_obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     assert child_obs.derived_from == ("fixture-source::raw_parent",)
+
+
+@pytest.mark.parametrize("annotation", ["derivation", "inference"])
+@pytest.mark.parametrize("location", ["values", "observation"])
+@pytest.mark.parametrize(
+    ("inputs", "invalid"),
+    [([], True), (None, True), (7, True), (["source measurement"], False)],
+)
+def test_source_derivation_and_inference_inputs_are_validated(
+    tmp_path: Path,
+    annotation: str,
+    location: str,
+    inputs: object,
+    invalid: bool,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    target = row["values"] if location == "values" else row
+    field = "values." + annotation if location == "values" else annotation
+    target[annotation] = {
+        "relation": "author_calculation",
+        "inputs": inputs,
+        "output_unit": "Pa",
+    }
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+
+    path = f"observations.fixture-source::na_psat.{field}"
+    issues = [issue for issue in result.validation.hard_issues if issue.path == path]
+    if invalid:
+        assert len(issues) == 1
+        assert issues[0].reason is RefusalReason.INVALID_SOURCE
+        assert "Derivation.inputs" in issues[0].detail
+    else:
+        assert not issues
+
+
+def test_source_derivation_reports_relation_and_inputs_independently() -> None:
+    _, missing_both = source_derivation_from_source(
+        {}, {"derivation": {"output_unit": "Pa"}}
+    )
+    assert {detail for _, detail in missing_both} == {
+        "Derivation.inputs is required unless raw_inputs is located not_printed",
+        "derivation relation (author method) is required",
+    }
+
+    _, missing_relation = source_derivation_from_source(
+        {}, {"derivation": {"inputs": ["pdf:fixture"], "output_unit": "Pa"}}
+    )
+    assert [detail for _, detail in missing_relation] == [
+        "derivation relation (author method) is required"
+    ]
+
+    _, missing_inputs = source_derivation_from_source(
+        {},
+        {
+            "derivation": {
+                "relation": "author calculation",
+                "output_unit": "Pa",
+            }
+        },
+    )
+    assert [detail for _, detail in missing_inputs] == [
+        "Derivation.inputs is required unless raw_inputs is located not_printed"
+    ]
+
+    accepted_with_lineage, no_lineage_errors = source_derivation_from_source(
+        {
+            "derivation": {
+                "relation": "author calculation",
+                "output_unit": "Pa",
+            }
+        },
+        {},
+        has_resolved_lineage=True,
+    )
+    assert accepted_with_lineage is not None
+    assert accepted_with_lineage.inputs == ()
+    assert no_lineage_errors == ()
+
+
+@pytest.mark.parametrize(
+    ("extract_name", "observation_id", "expected_details"),
+    [
+        (
+            "shornikov-1994-mullite-kems.yaml",
+            "shornikov_1994_al2o3_activity_1833k",
+            (),
+        ),
+        (
+            "wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml",
+            "wimpenny_2019_zn_fractionation_summary",
+            (),
+        ),
+        (
+            "no27-fegley-cameron-1987-epsl.yaml",
+            "fegley_cameron_1987_model_setup_initial_oxide_magma",
+            (),
+        ),
+        (
+            "kems-012-sossi-2019.yaml",
+            "sossi_2019_k_table5_experimental",
+            (
+                "invalid derivation annotation: derivation relation (author method) is required",
+                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
+            ),
+        ),
+        (
+            "kems-ms2000-044.yaml",
+            "ms2000_044_sio2_activity_na_system_xsio2_0805_t1473_class_quote_r2",
+            (
+                "invalid derivation annotation: derivation relation (author method) is required",
+                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
+            ),
+        ),
+        (
+            "okazaki-2022-ryugu-gas-treasure-box.yaml",
+            "okazaki_2022_fragmentation_assumptions_and_model_output",
+            (
+                "invalid derivation annotation: derivation relation (author method) is required",
+                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
+            ),
+        ),
+        (
+            "busemann-2024-noble-gases-ryugu-bennu.yaml",
+            "busemann_2024_preliminary_ryugu_exposure_ages",
+            (
+                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
+            ),
+        ),
+    ],
+)
+def test_offer7_derivation_issue_classification_is_pinned(
+    tmp_path: Path,
+    extract_name: str,
+    observation_id: str,
+    expected_details: tuple[str, ...],
+) -> None:
+    result = _migrate_real_extract(tmp_path, extract_name)
+    source_id = extract_name.removesuffix(".yaml")
+    path_prefix = f"observations.{source_id}::{observation_id}."
+    details = tuple(
+        issue.detail
+        for issue in result.validation.hard_issues
+        if issue.path.startswith(path_prefix)
+        and issue.reason is RefusalReason.INVALID_SOURCE
+    )
+
+    assert details == expected_details
+
+
+@pytest.mark.parametrize("location", ["values", "observation"])
+@pytest.mark.parametrize("relation", ["missing", None, ""])
+def test_calculated_child_without_author_relation_stays_unknown(
+    tmp_path: Path, location: str, relation: object
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    template = extract["species"]["Na"]["observations"][0]
+    parent = yaml.safe_load(yaml.safe_dump(template))
+    parent["observation_id"] = "measured_parent"
+    parent["values"]["pressure_atm"] = 1.0
+    parent["values"]["method_class"] = "measured_direct"
+    parent["values"].pop("series", None)
+
+    child = yaml.safe_load(yaml.safe_dump(template))
+    child["observation_id"] = "calculated_child"
+    child["values"]["method_class"] = "calculated"
+    child["values"]["derived_from"] = "measured_parent"
+    child["values"].pop("series", None)
+    child["values"]["pressure_atm"] = 1.0
+    derivation = {
+        "inputs": ["measured_parent"],
+        "output_unit": "Pa",
+    }
+    if relation != "missing":
+        derivation["relation"] = relation
+    target = child["values"] if location == "values" else child
+    target["derivation"] = derivation
+    extract["species"]["Na"]["observations"] = [parent, child]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = result.observations["fixture-source::calculated_child"]
+    assert observation.evidence.class_.is_unknown
+    path = (
+        "observations.fixture-source::calculated_child."
+        + ("values.derivation" if location == "values" else "derivation")
+    )
+    issues = [issue for issue in result.validation.hard_issues if issue.path == path]
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.INVALID_SOURCE
+    assert issues[0].detail.endswith(
+        "derivation relation (author method) is required"
+    )
+
+
+@pytest.mark.parametrize("location", ["values", "observation"])
+def test_located_not_printed_does_not_replace_author_relation(
+    tmp_path: Path, location: str
+) -> None:
+    extract = _raw_inputs_extract("calculated")
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series", None)
+    row["values"]["pressure_atm"] = 1.0
+    derivation = row["values"].pop("derivation")
+    derivation.pop("relation")
+    derivation["inputs"] = []
+    target = row["values"] if location == "values" else row
+    target["derivation"] = derivation
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = result.observations["fixture-source::na_psat"]
+    assert observation.evidence.class_.is_unknown
+    path = (
+        "observations.fixture-source::na_psat."
+        + ("values.derivation" if location == "values" else "derivation")
+    )
+    issues = [issue for issue in result.validation.hard_issues if issue.path == path]
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.INVALID_SOURCE
+    assert issues[0].detail.endswith(
+        "derivation relation (author method) is required"
+    )
 
 
 def test_calculated_composition_requires_measured_lineage(tmp_path: Path) -> None:
@@ -4331,6 +5136,7 @@ _CENSUS_CLOSED_QUANTITIES = {
     "p_sat",
     "p_partial",
     "p_reference",
+    "fugacity",
     "log10_Kf",
     "log10_K_star",
     "activity",
@@ -4525,6 +5331,8 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         if "value" in item:
             return _num(item.get("value"))
         return None
+    if q_token == "fugacity":
+        return _num(item.get("fugacity_Pa")) if "fugacity_Pa" in item else None
     if q_token in {"p_sat", "p_partial"}:
         for key, unit in _CENSUS_PRESSURE_FIELDS:
             if key not in item:
@@ -4737,7 +5545,7 @@ def _series_census(
     return census, mismatches, n_numeric, n_unavailable, per_source
 
 
-def test_j01_store_census_series_numeric_matches_declared_field() -> None:
+def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) -> None:
     extracts = REPO_ROOT / "data" / "literature" / "extracts"
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not extracts_v2.is_dir():
@@ -4745,8 +5553,35 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     census, mismatches, n_numeric, n_unavailable, per_source = _series_census(
         extracts, extracts_v2
     )
-    assert not mismatches, mismatches[:20]
+    sato = _migrate_real_extract(
+        tmp_path,
+        "sato-1976-lunar-fo2-apollo-17.yaml",
+        write=True,
+    )
+    sato_literature = tmp_path / "tree" / "data" / "literature"
+    (
+        sato_census,
+        sato_mismatches,
+        sato_numeric,
+        _sato_unavailable,
+        sato_per_source,
+    ) = _series_census(
+        sato_literature / "extracts",
+        sato_literature / "extracts-v2",
+    )
+    assert len(sato.observations) == 115
+    assert sato_census == {"activity": 54, "fugacity": 55}
+    assert sato_numeric == 109
+    assert _sato_unavailable == 6
+    assert sato_mismatches == []
+    assert sato_per_source == {
+        "sato-1976-lunar-fo2-apollo-17": {"activity": 54, "fugacity": 55}
+    }
     assert n_numeric == sum(census.values())
+    assert per_source.get("sato-1976-lunar-fo2-apollo-17") == sato_per_source[
+        "sato-1976-lunar-fo2-apollo-17"
+    ]
+    assert not mismatches, mismatches[:20]
     # Re-pinned for the reviewed Holzheid 1997 correction: its 33 Table 3 gamma cells
     # now migrate as model_derived numeric activity_coefficient series (author
     # calculations, not measurements). Per-source delta: holzheid-1997 0->33;
@@ -4758,7 +5593,12 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # oneill-2002-feo-activity-coefficients-cmas 0->91; activity_coefficient 161->252.
     # The count moved because data became visible, not because a check was relaxed -
     # mismatches stays 0.
-    assert census.get("activity_coefficient") == 252
+    # Offer 7 adds 65 printed Holzheid gamma points to the 33 already present:
+    # the source now contributes 98 points and the store count moves 252->317.
+    assert per_source.get("holzheid-1997-feo-nio-coo-activity-metal-saturated") == {
+        "activity_coefficient": 98
+    }
+    assert census.get("activity_coefficient") == 317
     # Re-pinned with data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml
     # (51 p_partial points, 2026-09-24): p_partial 18->69 and n_numeric 223->274.
     # The counts moved because data became visible, not because a check was relaxed - mismatches stays 0.
@@ -4776,6 +5616,9 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # cells, evaporation_coefficient_alpha 30->34 and n_numeric 450->454.
     assert census.get("p_partial") == 149
     assert census.get("p_sat") == 21
+    # Sato (1976) contributes 54 numeric Table 2/3 activity cells and 55 numeric
+    # Table 1 oxygen-fugacity cells (109 total), already included by the fresh store.
+    assert census.get("fugacity") == 55
     # Twelve repeated Fedkin table cells are no longer counted through the retired
     # mirror; the KEMS owner extract retains the cells (Fedkin et al. 2006, Table 3,
     # p. 212, DOI 10.1016/j.gca.2005.08.014).
@@ -4825,7 +5668,9 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # No check was relaxed and mismatches stay 0.
     assert census.get("H_minus_H298") == 13
     assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
-    assert n_numeric == 1891, (n_numeric, census, n_unavailable)
+    # The merged store adds 65 Holzheid points and 109 Sato points to the green
+    # baseline's 1891 numeric series points: 1891 + 65 + 109 = 2065.
+    assert n_numeric == 2065, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
@@ -7580,27 +8425,25 @@ def test_unregistered_table_derivation_input_is_not_retained(
 def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
     tmp_path: Path,
 ) -> None:
-    name = "stebbins-carmichael-weill-1983.yaml"
-    source = REPO_ROOT / "data" / "literature" / "extracts" / name
-    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
-    extract["source_id"] = "fixture-source"
-    raw = next(
-        row
-        for block in extract["species"].values()
-        for row in block["observations"]
-        if row.get("observation_id") == "stebbins_1983_diopside_table_4_fit"
-    )
-    assert raw["values"]["derivation"]["inputs"] == [
-        "Table 2 DSC Cp points",
-        "Table 3 drop-calorimetric heat contents",
-    ]
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    raw = extract["species"]["Na"]["observations"][0]
+    raw["values"]["method_class"] = "measured_reduced"
+    raw["values"]["derivation"] = {
+        "relation": "calculated from measured quantities",
+        "inputs": [
+            "Table 2 DSC Cp points",
+            "Table 3 drop-calorimetric heat contents",
+        ],
+        "output_unit": "atm",
+    }
 
     result = migrate(_write_min_tree(tmp_path, extract), write=True)
     observation = next(
         obs
         for obs in result.observations.values()
-        if obs.observation_id.endswith("::stebbins_1983_diopside_table_4_fit")
+        if obs.observation_id.startswith("fixture-source::na_psat::T=1200.0")
     )
+    assert observation.derived_from is None
     queued = [
         entry
         for entry in result.queue

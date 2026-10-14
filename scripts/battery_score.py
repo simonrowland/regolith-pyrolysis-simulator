@@ -46,6 +46,7 @@ from simulator.battery.score import (  # noqa: E402
     render_score_report_from_payloads,
     _score_store_to_jsonl,
     status_diff_rows,
+    update_decision_band_ratchet,
     write_headline_summary_from_payloads_json,
     _write_headline_summary_from_accumulator_json,
 )
@@ -172,7 +173,18 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="rebuild score-report.md from existing residuals.jsonl",
     )
+    parser.add_argument(
+        "--update-band-ratchet",
+        action="store_true",
+        help="accept current source-derived decision-band minima into the ratchet file",
+    )
     args = parser.parse_args(argv)
+
+    if args.update_band_ratchet:
+        context = load_score_context(args.root)
+        groups = update_decision_band_ratchet(context)
+        print(f"decision-band ratchet groups={groups}")
+        return 0
 
     engines = engines_from_names([p for p in args.engines.split(",") if p.strip()])
     rail = None if args.rail is None else canonicalize_rail(args.rail)

@@ -194,6 +194,10 @@ species:
         published_page: 553
         pdf_page_index: 5
         note: Table 3 partial molar quantities of Fe-W at 1773 K; Fe(s) standard
+      derived_from: [ueshima_1984_table1_activity_equations]
+      derivation:
+        inputs: [ueshima_1984_table1_activity_equations]
+        relation: Partial molar quantities calculated from the Table 1 activity curves using the Gibbs-Duhem relation and the printed thermodynamic equations (3)-(7).
       T_range_K:
       - 1773.0
       - 1773.0
@@ -409,6 +413,10 @@ species:
         published_page: 553
         pdf_page_index: 5
         note: Table 2 partial molar quantities of Fe-W at 1873 K; Fe(l) and W(s) standards
+      derived_from: [ueshima_1984_table1_activity_equations]
+      derivation:
+        inputs: [ueshima_1984_table1_activity_equations]
+        relation: Partial molar quantities calculated from the Table 1 activity curves using the Gibbs-Duhem relation and the printed thermodynamic equations (3)-(7).
       T_range_K:
       - 1873.0
       - 1873.0
@@ -509,6 +517,10 @@ species:
         published_page: 549
         pdf_page_index: 1
         note: Synopsis gamma0_W(s)=7.6(+/-1.1), epsilon_W^W=-2.2(+/-0.8) at 1873 K
+      derived_from: [ueshima_1984_table1_activity_equations]
+      derivation:
+        inputs: [ueshima_1984_table1_activity_equations]
+        relation: Infinite-dilution activity coefficient taken from the intercept of Table 1 equation (XII), as printed in the synopsis and Table 2.
       T_range_K:
       - 1873.0
       - 1873.0

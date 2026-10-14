@@ -48,7 +48,7 @@ from enum import Enum
 from fractions import Fraction
 from pathlib import Path
 from types import UnionType
-from typing import Any, Iterable, Iterator, Mapping, Sequence, Union, get_args, get_origin, get_type_hints
+from typing import Any, Callable, Iterable, Iterator, Mapping, Sequence, Union, get_args, get_origin, get_type_hints
 
 import yaml
 
@@ -75,6 +75,7 @@ from simulator.battery.enums import (
     Phase,
     Polymorph,
     Quantity,
+    RawInputStatus,
     Rail,
     ReferenceStateConvention,
     RefusalReason,
@@ -883,6 +884,41 @@ def _state_from_plain(payload: object, cast) -> State:
     return State.unknown(reason)  # type: ignore[arg-type]
 
 
+class _InvalidDerivationAnnotation(ValueError):
+    """A malformed author annotation that should become an INVALID_SOURCE issue."""
+
+
+def _decode_author_annotation(
+    payload: object, decoder: Callable[[object], Any]
+) -> tuple[Any | None, str | None]:
+    try:
+        return decoder(payload), None
+    except (TypeError, ValueError) as exc:
+        return None, str(exc)
+
+
+def _raw_inputs_from_plain(payload: object) -> Located[RawInputStatus]:
+    if not isinstance(payload, Mapping) or "state" not in payload:
+        raise _InvalidDerivationAnnotation(
+            "raw_inputs declaration must contain a state"
+        )
+    state = payload["state"]
+    if not isinstance(state, (Mapping, State)):
+        raise _InvalidDerivationAnnotation("raw_inputs state must be an object")
+    if (
+        isinstance(state, Mapping)
+        and "tag" in state
+        and not isinstance(state["tag"], str)
+    ):
+        raise _InvalidDerivationAnnotation("raw_inputs state tag must be a string")
+    locator = payload.get("locator")
+    if "locator" in payload and not isinstance(locator, (Mapping, Locator)):
+        raise _InvalidDerivationAnnotation("raw_inputs locator must be an object")
+    return _located_from_plain(
+        payload, lambda value: _enum(RawInputStatus, value)
+    )
+
+
 def _locator_from_plain(payload: object) -> Locator | None:
     if payload is None:
         return None
@@ -896,25 +932,95 @@ def _locator_from_plain(payload: object) -> Locator | None:
     return Locator(**kwargs)
 
 
-def _derivation_from_plain(payload: object) -> Derivation | None:
+def _derivation_inputs_requirement_error(
+    derivation: Derivation, *, has_resolved_lineage: bool = False
+) -> str | None:
+    if (
+        not derivation.inputs
+        and derivation.declares_unprinted_raw_inputs
+        and not derivation.has_located_unprinted_raw_inputs
+    ):
+        return "raw_inputs not_printed declaration requires a locator"
+    if (
+        not derivation.inputs
+        and derivation.raw_inputs is None
+        and not has_resolved_lineage
+    ):
+        return "Derivation.inputs is required unless raw_inputs is located not_printed"
+    return None
+
+
+def _derivation_from_plain(
+    payload: object,
+    *,
+    require_sequence_inputs: bool = False,
+    require_relation: bool = False,
+    allow_mapping_inputs: bool = False,
+    require_inputs: bool = True,
+) -> Derivation | None:
     if not isinstance(payload, Mapping):
-        return None
-    params_raw = payload.get("parameters") or ()
+        raise _InvalidDerivationAnnotation("Derivation annotation must be a mapping")
+    params_raw = payload.get("parameters", ())
+    if not isinstance(params_raw, (list, tuple)):
+        raise _InvalidDerivationAnnotation(
+            "Derivation.parameters must be a sequence of name/value pairs"
+        )
     parameters: list[tuple[str, Located[Decimal]]] = []
     for item in params_raw:
-        if isinstance(item, (list, tuple)) and len(item) == 2:
-            parameters.append((str(item[0]), _located_from_plain(item[1], as_decimal)))
-    inputs = payload.get("inputs") or ()
-    if isinstance(inputs, str):
+        if not isinstance(item, (list, tuple)) or len(item) != 2:
+            raise _InvalidDerivationAnnotation(
+                "Derivation.parameters must contain name/value pairs"
+            )
+        if not isinstance(item[0], str):
+            raise _InvalidDerivationAnnotation(
+                "Derivation parameter names must be strings"
+            )
+        parameters.append((item[0], _located_from_plain(item[1], as_decimal)))
+    inputs = payload.get("inputs", ())
+    if isinstance(inputs, str) and not require_sequence_inputs:
         inputs = (inputs,)
+    if allow_mapping_inputs and isinstance(inputs, (list, tuple)):
+        if any(not isinstance(item, (str, Mapping)) for item in inputs):
+            raise _InvalidDerivationAnnotation(
+                "Derivation.inputs must contain only strings or mappings"
+            )
+        inputs = tuple(str(item) for item in inputs)
+    if not isinstance(inputs, (list, tuple)) or any(
+        not isinstance(item, str) for item in inputs
+    ):
+        raise _InvalidDerivationAnnotation(
+            "Derivation.inputs must contain only strings"
+        )
     raw_marker = payload.get("pure_substance_reference")
-    return Derivation(
-        relation=str(payload.get("relation") or "identity"),
-        inputs=tuple(str(x) for x in inputs),
-        parameters=tuple(parameters),
-        output_unit=str(payload.get("output_unit") or "as_published"),
-        pure_substance_reference=raw_marker if isinstance(raw_marker, bool) else None,
+    raw_inputs = payload.get("raw_inputs")
+    parsed_raw_inputs = (
+        _raw_inputs_from_plain(raw_inputs) if raw_inputs is not None else None
     )
+    relation = payload.get("relation", "identity")
+    if relation is None or relation == "":
+        if require_relation:
+            raise _InvalidDerivationAnnotation(
+                "Derivation.relation must be a nonempty string"
+            )
+        relation = "identity"
+    if not isinstance(relation, str):
+        raise _InvalidDerivationAnnotation("Derivation.relation must be a string")
+    output_unit = payload.get("output_unit", "as_published")
+    if not isinstance(output_unit, str):
+        raise _InvalidDerivationAnnotation("Derivation.output_unit must be a string")
+    derivation = Derivation(
+        relation=relation,
+        inputs=tuple(inputs),
+        parameters=tuple(parameters),
+        output_unit=output_unit,
+        pure_substance_reference=raw_marker,
+        raw_inputs=parsed_raw_inputs,
+    )
+    if require_inputs:
+        requirement_error = _derivation_inputs_requirement_error(derivation)
+        if requirement_error is not None:
+            raise ValueError(requirement_error)
+    return derivation
 
 
 def _mass_percent_pairs(payload: object) -> list[tuple[str, Decimal]] | None:
@@ -1126,7 +1232,9 @@ def _located_from_plain(payload: object, cast) -> Located:
     inference = None
     raw_inference = payload.get("inference")
     if isinstance(raw_inference, Mapping):
-        inference = _derivation_from_plain(raw_inference)
+        inference = _derivation_from_plain(
+            raw_inference, allow_mapping_inputs=True
+        )
     elif payload.get("inferred") is True:
         inference = _inferred_derivation_from_plain(payload)
     else:
@@ -1643,7 +1751,12 @@ def work_from_plain(payload: object) -> Work:
     )
 
 
-def _sample_from_plain(payload: object) -> Sample:
+def _sample_from_plain(
+    payload: object,
+    *,
+    experiment_id: str | None = None,
+    registry_issues: list[ValidationIssue] | None = None,
+) -> Sample:
     if not isinstance(payload, Mapping) or not payload:
         return Sample()
     mass = payload.get("mass_kg")
@@ -1656,14 +1769,61 @@ def _sample_from_plain(payload: object) -> Sample:
     characterization = payload.get("characterization")
     surface_area = payload.get("surface_area_m2")
     pretreatment = payload.get("pretreatment")
-    printed_located = (
-        None
-        if printed is None
-        else _mass_percent_printed_from_plain(printed)
-        or _located_from_plain(printed, lambda value: value)
-    )
+    issues = registry_issues if registry_issues is not None else []
+
+    def parse_registry_value(field: str, raw: object, parse):
+        try:
+            return parse(raw)
+        except (ArithmeticError, TypeError, ValueError) as exc:
+            issues.append(
+                ValidationIssue(
+                    path=f"experiment[{experiment_id}].sample.{field}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=f"invalid registry inference: {exc}",
+                )
+            )
+            raise
+
+    def parse_registry_located(field: str, raw: object, parse):
+        if not isinstance(raw, Mapping) or "inference" not in raw:
+            return parse_registry_value(field, raw, parse)
+        inference, error = _decode_author_annotation(
+            raw["inference"],
+            lambda value: _derivation_from_plain(
+                value, allow_mapping_inputs=True, require_relation=True
+            ),
+        )
+        if error is not None:
+            issues.append(
+                ValidationIssue(
+                    path=f"experiment[{experiment_id}].sample.{field}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=f"invalid registry inference: {error}",
+                )
+            )
+        value = parse_registry_value(
+            field,
+            {key: item for key, item in raw.items() if key != "inference"},
+            parse,
+        )
+        if value is not None and value.inference is None and inference is not None:
+            return replace(value, inference=inference)
+        return value
+
+    printed_located = None
+    if printed is not None:
+        printed_located = parse_registry_located(
+            "printed_composition",
+            printed,
+            lambda value: _mass_percent_printed_from_plain(value)
+            or _located_from_plain(value, lambda item: item),
+        )
     initial_located = (
-        None if initial is None else _composition_located_from_plain(initial)
+        None
+        if initial is None
+        else parse_registry_located(
+            "initial_composition", initial, _composition_located_from_plain
+        )
     )
     printed_from_initial = printed_located is None and initial is not None
     if printed_from_initial:
@@ -2030,6 +2190,12 @@ def _thermal_schedule_from_plain(payload: object) -> ThermalSchedule | None:
 
 
 def experiment_from_plain(payload: object) -> Experiment:
+    return _experiment_from_plain(payload, registry_issues=None)
+
+
+def _experiment_from_plain(
+    payload: object, *, registry_issues: list[ValidationIssue] | None
+) -> Experiment:
     assert isinstance(payload, Mapping)
     conditions = {}
     for key, value in (payload.get("conditions") or {}).items():
@@ -2067,7 +2233,11 @@ def experiment_from_plain(payload: object) -> Experiment:
         experiment_id=str(payload["experiment_id"]),
         kind=ExperimentKind(str(payload.get("kind") or "literature")),
         method=_state_from_plain(payload["method"], lambda v: MethodToken(str(v))),
-        sample=_sample_from_plain(payload.get("sample")),
+        sample=_sample_from_plain(
+            payload.get("sample"),
+            experiment_id=str(payload["experiment_id"]),
+            registry_issues=registry_issues,
+        ),
         conditions=conditions,
         pressure_environment=_pressure_env_from_plain(payload["pressure_environment"]),
         work_id=payload.get("work_id"),
@@ -5447,6 +5617,9 @@ class CompilationColumnSeries:
     value: Value
     temperature_K: State[Decimal]
     unit_trail: str | None = None
+    raw_tokens: tuple[str | None, ...] = ()
+    source_units: tuple[str | None, ...] = ()
+    cell_uncertainties: tuple[Decimal | None, ...] = ()
 
 
 def _normalize_compilation_column_label(label: str) -> str:
@@ -5524,6 +5697,46 @@ def _cell_numeric_amount(cell: object) -> Decimal | None:
     return _as_dec_or_none(cell)
 
 
+def _printed_cell_token(cell: object) -> str | None:
+    if isinstance(cell, Mapping):
+        token = cell.get("as_published")
+        return str(token) if token not in (None, "") else None
+    return str(cell) if isinstance(cell, str) and cell.strip() else None
+
+
+def _source_unit_for_cell(cell: object, default: str | None) -> str | None:
+    if isinstance(cell, Mapping):
+        unit = (
+            cell.get("units_as_published") or cell.get("units") or cell.get("unit")
+        )
+        if unit not in (None, ""):
+            return str(unit)
+    return default
+
+
+def _printed_rounding_allowance(token: str | None) -> Decimal | None:
+    if token is None:
+        return None
+    try:
+        printed = Decimal(token.strip())
+    except (InvalidOperation, ValueError):
+        return None
+    quantum = Decimal(1).scaleb(printed.as_tuple().exponent)
+    return abs(quantum) / Decimal(2)
+
+
+def _projected_cell_metadata(
+    cell: object, quantity: Quantity, default_unit: str | None
+) -> tuple[str | None, str | None, Decimal | None]:
+    token = _printed_cell_token(cell)
+    unit = _source_unit_for_cell(cell, default_unit)
+    allowance = _printed_rounding_allowance(token)
+    if allowance is None:
+        return token, unit, None
+    converted = _convert_compilation_amount(allowance, quantity, unit)
+    return token, unit, converted[0] if converted is not None else None
+
+
 def _compilation_rows(doc: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     rows = doc.get("rows")
     if not isinstance(rows, list):
@@ -5565,9 +5778,20 @@ def _emit_series_or_point(
     *,
     point_temperature: Decimal | None = None,
     unit_trail: str | None = None,
+    raw_tokens: Sequence[str | None] = (),
+    source_units: Sequence[str | None] = (),
+    cell_uncertainties: Sequence[Decimal | None] = (),
 ) -> CompilationColumnSeries | None:
     if not points:
         return None
+    count = len(points)
+    raw = tuple(raw_tokens) if raw_tokens else (None,) * count
+    units = tuple(source_units) if source_units else (None,) * count
+    uncertainties = (
+        tuple(cell_uncertainties) if cell_uncertainties else (None,) * count
+    )
+    if len(raw) != count or len(units) != count or len(uncertainties) != count:
+        raise ValueError(f"{series_key}: cell metadata must align with series values")
     if len(points) == 1 and point_temperature is not None:
         return CompilationColumnSeries(
             quantity=quantity,
@@ -5575,6 +5799,9 @@ def _emit_series_or_point(
             value=Value.point_of(points[0][1]),
             temperature_K=State.of(point_temperature),
             unit_trail=unit_trail,
+            raw_tokens=raw,
+            source_units=units,
+            cell_uncertainties=uncertainties,
         )
     return CompilationColumnSeries(
         quantity=quantity,
@@ -5582,6 +5809,9 @@ def _emit_series_or_point(
         value=Value(ValueKind.SERIES, series=tuple(points)),
         temperature_K=_series_temperature_state(series_key),
         unit_trail=unit_trail,
+        raw_tokens=raw,
+        source_units=units,
+        cell_uncertainties=uncertainties,
     )
 
 
@@ -5615,6 +5845,9 @@ def _column_series_from_list_cells(
         unit = next(item[3] for item in headings if item[0] == index)
         points: list[tuple[Decimal, Decimal]] = []
         trails: list[str] = []
+        raw_tokens: list[str | None] = []
+        source_units: list[str | None] = []
+        uncertainties: list[Decimal | None] = []
         for row in rows:
             cells = row.get("cells")
             if not isinstance(cells, list):
@@ -5625,18 +5858,28 @@ def _column_series_from_list_cells(
             v_amt = _cell_numeric_amount(cells[index])
             if t_amt is None or v_amt is None:
                 continue
-            converted = _convert_compilation_amount(v_amt, quantity, unit)
+            cell = cells[index]
+            token, source_unit, uncertainty = _projected_cell_metadata(
+                cell, quantity, unit
+            )
+            converted = _convert_compilation_amount(v_amt, quantity, source_unit)
             if converted is None:
                 points = []
                 break
             v_amt, trail = converted
             points.append((t_amt, v_amt))
             trails.append(trail)
+            raw_tokens.append(token)
+            source_units.append(source_unit)
+            uncertainties.append(uncertainty)
         series = _emit_series_or_point(
             quantity,
             heading,
             points,
             unit_trail=_consistent_series_trail(trails),
+            raw_tokens=raw_tokens,
+            source_units=source_units,
+            cell_uncertainties=uncertainties,
         )
         if series is not None:
             emitted.append(series)
@@ -5667,10 +5910,14 @@ def _column_series_from_named_cells(
     # Kelley-style: Cp at temperatures encoded in column keys + entropy columns.
     cp_points: list[tuple[Decimal, Decimal]] = []
     cp_trails: list[str] = []
+    cp_metadata: list[tuple[str | None, str | None, Decimal | None]] = []
     entropy_series: list[CompilationColumnSeries] = []
     grid_points: dict[Quantity, list[tuple[Decimal, Decimal]]] = {}
     grid_keys: dict[Quantity, str] = {}
     grid_trails: dict[Quantity, list[str]] = {}
+    grid_metadata: dict[
+        Quantity, list[tuple[str | None, str | None, Decimal | None]]
+    ] = {}
 
     for row in rows:
         cells = row_cells(row)
@@ -5693,19 +5940,31 @@ def _column_series_from_named_cells(
                 continue
             cp_t = _temperature_from_cp_column_key(key)
             if cp_t is not None:
+                source_unit = _source_unit_for_cell(
+                    cell, _printed_unit_for_field(doc, key)
+                )
                 converted = _convert_compilation_amount(
-                    amount, Quantity.CP, _printed_unit_for_field(doc, key)
+                    amount, Quantity.CP, source_unit
                 )
                 if converted is not None:
                     cp_points.append((cp_t, converted[0]))
                     cp_trails.append(converted[1])
+                    cp_metadata.append(
+                        _projected_cell_metadata(cell, Quantity.CP, source_unit)
+                    )
                 continue
             if key in _KELLEY_ENTROPY_COLUMNS:
+                source_unit = _source_unit_for_cell(
+                    cell, _printed_unit_for_field(doc, key)
+                )
                 converted = _convert_compilation_amount(
-                    amount, Quantity.S, _printed_unit_for_field(doc, key)
+                    amount, Quantity.S, source_unit
                 )
                 if converted is None:
                     continue
+                token, source_unit, uncertainty = _projected_cell_metadata(
+                    cell, Quantity.S, source_unit
+                )
                 series = _emit_series_or_point(
                     Quantity.S,
                     key,
@@ -5715,6 +5974,9 @@ def _column_series_from_named_cells(
                     if not converted[1].startswith("identity")
                     and converted[1] != "as_published"
                     else None,
+                    raw_tokens=(token,),
+                    source_units=(source_unit,),
+                    cell_uncertainties=(uncertainty,),
                 )
                 if series is not None:
                     entropy_series.append(series)
@@ -5724,33 +5986,46 @@ def _column_series_from_named_cells(
             )
             if quantity is None or t_amt is None:
                 continue
+            source_unit = _source_unit_for_cell(
+                cell, _printed_unit_for_field(doc, key)
+            )
             converted = _convert_compilation_amount(
-                amount, quantity, _printed_unit_for_field(doc, key)
+                amount, quantity, source_unit
             )
             if converted is not None:
                 grid_points.setdefault(quantity, []).append((t_amt, converted[0]))
                 grid_trails.setdefault(quantity, []).append(converted[1])
+                grid_metadata.setdefault(quantity, []).append(
+                    _projected_cell_metadata(cell, quantity, source_unit)
+                )
             grid_keys.setdefault(quantity, key)
 
     emitted: list[CompilationColumnSeries] = []
     if cp_points:
         # Stable order by printed temperature.
-        cp_points.sort(key=lambda item: item[0])
+        ordered_cp = sorted(zip(cp_points, cp_metadata), key=lambda item: item[0][0])
         series = _emit_series_or_point(
             Quantity.CP,
             "cp_temperature_grid",
-            cp_points,
+            [point for point, _metadata in ordered_cp],
             unit_trail=_consistent_series_trail(cp_trails),
+            raw_tokens=[metadata[0] for _point, metadata in ordered_cp],
+            source_units=[metadata[1] for _point, metadata in ordered_cp],
+            cell_uncertainties=[metadata[2] for _point, metadata in ordered_cp],
         )
         if series is not None:
             emitted.append(series)
     emitted.extend(entropy_series)
     for quantity, points in grid_points.items():
+        metadata = grid_metadata.get(quantity, [])
         series = _emit_series_or_point(
             quantity,
             grid_keys.get(quantity, quantity.value),
             points,
             unit_trail=_consistent_series_trail(grid_trails.get(quantity, ())),
+            raw_tokens=[cell[0] for cell in metadata],
+            source_units=[cell[1] for cell in metadata],
+            cell_uncertainties=[cell[2] for cell in metadata],
         )
         if series is not None:
             emitted.append(series)
@@ -5790,6 +6065,15 @@ def compilation_column_series_from_record(
     omitted; the caller falls back to the single-quantity refusal path when
     this returns empty.
     """
+
+    table = doc.get("table")
+    if isinstance(table, Mapping) and isinstance(table.get("values"), list):
+        projected = dict(doc)
+        projected["rows"] = [
+            {"cells": row} for row in table["values"] if isinstance(row, Mapping)
+        ]
+        projected["units_as_published"] = table.get("units_as_published")
+        return _column_series_from_named_cells(projected)
 
     kind = str(doc.get("record_kind") or "")
     table_kind = str(doc.get("table_kind") or "")
@@ -5917,21 +6201,60 @@ _CONDITIONAL_REDUCED_METHODS = frozenset({"calculated", "author_derived"})
 
 
 def source_derivation_from_source(
-    obs: Mapping[str, Any], values: Mapping[str, Any]
-) -> Derivation | None:
+    obs: Mapping[str, Any],
+    values: Mapping[str, Any],
+    *,
+    has_resolved_lineage: bool = False,
+) -> tuple[Derivation | None, tuple[tuple[str, str], ...]]:
     """Read an author-supplied derivation without inventing one."""
 
-    for payload in (values, obs):
-        raw = payload.get("derivation")
-        if not isinstance(raw, Mapping):
-            continue
-        if not raw.get("relation") or not raw.get("inputs"):
-            continue
-        try:
-            return _derivation_from_plain(raw)
-        except (TypeError, ValueError):
-            continue
-    return None
+    derivation: Derivation | None = None
+    invalid: list[tuple[str, str]] = []
+    if "derivation" in obs:
+        payload, field = obs, "derivation"
+    elif "derivation" in values:
+        payload, field = values, "values.derivation"
+    else:
+        return None, ()
+
+    raw = payload["derivation"]
+    # SCHEMA.md lines 187-209 place normalized lineage on the observation and
+    # allow inputs to be omitted when derived_from resolves. A nested
+    # values.derivation map is descriptive in that case, not a second record.
+    if (
+        field == "values.derivation"
+        and has_resolved_lineage
+        and isinstance(raw, Mapping)
+        and not ("inputs" in raw or "raw_inputs" in raw)
+    ):
+        return None, ()
+
+    relation = raw.get("relation") if isinstance(raw, Mapping) else None
+    relation_missing = isinstance(raw, Mapping) and (
+        not isinstance(relation, str) or not relation.strip()
+    )
+    parsed, error = _decode_author_annotation(
+        raw,
+        lambda value: _derivation_from_plain(value, require_inputs=False),
+    )
+    if error is not None:
+        invalid.append((field, error))
+    if relation_missing:
+        invalid.append((field, "derivation relation (author method) is required"))
+    if error is None and parsed is not None:
+        requirement_error = _derivation_inputs_requirement_error(
+            parsed, has_resolved_lineage=has_resolved_lineage
+        )
+        if requirement_error is not None:
+            invalid.append(
+                (
+                    field,
+                    requirement_error,
+                )
+            )
+        if not relation_missing:
+            derivation = parsed
+    return derivation, tuple(invalid)
 
 
 def conditional_reduced_lineage_is_measured(
@@ -7876,7 +8199,15 @@ def _convert_compilation_amount(
         return amount, "as_published"
     with localcontext() as ctx:
         ctx.prec = 80
-        if heat and token in {"cal/mol/k", "cal/molk", "cal/deg-mole", "cal/degmole"}:
+        if heat and token in {
+            "cal/mol/k",
+            "cal/molk",
+            "cal/deg-mole",
+            "cal/degmole",
+            "calmol^-1k^-1",
+            "caldeg^-1gfw^-1",
+            "caldeg-1gfw-1",
+        }:
             return amount * Decimal("4.184"), "thermochemical_calorie_to_J_exact"
         if heat and (
             token
@@ -7885,6 +8216,8 @@ def _convert_compilation_amount(
                 "j/molk",
                 "j/deg-mole",
                 "j/degmole",
+                "jk^-1mol^-1",
+                "jmol^-1k^-1",
             }
             or (
                 quantity is Quantity.ENTROPY_OF_FUSION
@@ -7892,11 +8225,21 @@ def _convert_compilation_amount(
             )
         ):
             return amount, "identity:J_per_mol_K"
-        if energy and token in {"kcal/mol", "kcal/mole"}:
+        if energy and token in {
+            "kcal/mol",
+            "kcal/mole",
+            "kcalgfw^-1",
+            "kcalgfw-1",
+        }:
             return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
         if energy and token in {"j/mol", "j/mole"}:
             return amount / Decimal("1000"), "J_to_kJ_exact"
-        if energy and token in {"kj/mol", "kj/mole", "kjpermol"}:
+        if energy and token in {
+            "kj/mol",
+            "kj/mole",
+            "kjpermol",
+            "kjmol^-1",
+        }:
             return amount, "identity:kJ_per_mol"
     return None
 
@@ -12379,7 +12722,9 @@ class Migrator:
                     "locator": to_plain(locator),
                 }
             )
-            experiment = experiment_from_plain(payload)
+            experiment = _experiment_from_plain(
+                payload, registry_issues=self.result.registry_issues
+            )
             existing_experiment = self.result.experiments.get(
                 experiment.experiment_id
             )
@@ -13300,7 +13645,17 @@ class Migrator:
                 detail=str(exc),
             ))
         derived_from = derived_parents or None
-        source_derivation = source_derivation_from_source(obs, values)
+        source_derivation, invalid_derivations = source_derivation_from_source(
+            obs, values, has_resolved_lineage=bool(derived_parents)
+        )
+        for field_path, detail in invalid_derivations:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observations.{obs_id}.{field_path}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=f"invalid derivation annotation: {detail}",
+                )
+            )
         if source_derivation is not None:
             derivation_parents, derivation_prose = lineage_parents_from_source(
                 {"derived_from": source_derivation.inputs},
@@ -13310,11 +13665,13 @@ class Migrator:
                 source_asset_ids,
             )
             derived_prose = tuple(dict.fromkeys((*derived_prose, *derivation_prose)))
-            source_derivation = (
-                replace(source_derivation, inputs=derivation_parents)
-                if derivation_parents
-                else None
-            )
+            if derivation_parents:
+                source_derivation = replace(
+                    source_derivation, inputs=derivation_parents
+                )
+            elif source_derivation.raw_inputs is None:
+                source_derivation = None
+            # Invalid declarations stay attached for validate_corpus to report.
             if not derived_prose:
                 if source_derivation is not None:
                     self._author_derivations[obs_id] = source_derivation
@@ -13349,11 +13706,25 @@ class Migrator:
         }:
             source_derivation = None
         for payload in (values, obs):
-            if not isinstance(payload.get("inference"), Mapping):
+            if "inference" not in payload:
                 continue
-            try:
-                extractor_derivation = _derivation_from_plain(payload["inference"])
-            except (TypeError, ValueError):
+            field_path = "values.inference" if payload is values else "inference"
+            extractor_derivation, error = _decode_author_annotation(
+                payload["inference"],
+                lambda value: _derivation_from_plain(
+                    value, require_sequence_inputs=True, require_relation=True
+                ),
+            )
+            if error is not None:
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=f"observations.{obs_id}.{field_path}",
+                        reason=RefusalReason.INVALID_SOURCE,
+                        detail=error,
+                    )
+                )
+                continue
+            if extractor_derivation is None:
                 continue
             if source_derivation is None:
                 source_derivation = _merge_source_conversion_derivation(
@@ -15141,6 +15512,10 @@ class Migrator:
         unc = uncertainty
         if extra_unc is not None:
             verbatim = {"sigma": extra_unc, "parent": parent_id}
+            if isinstance(uncertainty.verbatim, Mapping):
+                confidence_level = uncertainty.verbatim.get("confidence_level")
+                if confidence_level is not None:
+                    verbatim["confidence_level"] = confidence_level
             if extra_unc_k is not None:
                 verbatim["k"] = extra_unc_k
                 numeric_extra_unc = _as_dec_or_none(extra_unc)

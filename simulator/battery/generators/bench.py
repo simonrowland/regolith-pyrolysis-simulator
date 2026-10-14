@@ -176,6 +176,12 @@ _ENGINE_REPORTED_ACTIVITY["openimcc"] = EngineReportedActivity(
     Phase.L,
     _PARENT_OXIDE_COMPONENT_BASES,
 )
+_ENGINE_REPORTED_ACTIVITY["internal-analytical"] = EngineReportedActivity(
+    "raoultian_pure_liquid_endmember",
+    ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+    Phase.L,
+    _PARENT_OXIDE_COMPONENT_BASES,
+)
 
 
 def _oxide_lookup_key(name: str) -> str:
@@ -282,6 +288,12 @@ def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
         return _melts_reports_oxide_endmember(formula)
     if engine == "openimcc":
         return _imcc_reports_parent_oxide(formula)
+    if engine == "internal-analytical":
+        from simulator.chemistry.melt_activity import MELT_OXIDE_CATIONS_PER_FORMULA
+
+        if formula in MELT_OXIDE_CATIONS_PER_FORMULA:
+            return True, "raoultian_pure_liquid_endmember"
+        return False, f"typed-refusal:unsupported_internal_analytical_oxide:{formula}"
     return False, "typed-refusal:engine_does_not_report_parent_oxide_activity"
 
 
@@ -521,6 +533,10 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
     gap_tuple = tuple(dict.fromkeys(gaps))
     results = []
     for engine in MELT_ACTIVITY_ENGINES:
+        if engine == "internal-analytical" and inputs.activity_quantity != "activity":
+            results.append(_not_applicable(provenance, engine))
+            continue
+        readiness = ConsumerReadiness("melt_activity", status, gap_tuple, engine)
         reported_activity = _ENGINE_REPORTED_ACTIVITY[engine]
         single_cation = (
             inputs.activity_quantity == "activity_coefficient"
@@ -540,7 +556,22 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
             engine_side = reported_activity.reported
         else:
             matches, engine_side = _reference_matches(state, reported_activity, engine)
-        if not matches:
+        # A missing internal-analytical oxygen input is terminal and precedes
+        # this known solid/liquid reference mismatch. Leave fO2 out of the
+        # payload so predict_with_engine's shared oxygen gate returns it.
+        internal_analytical_missing_oxygen = (
+            engine == "internal-analytical"
+            and inputs.waypoints["oxygen_condition"].selected is None
+            and not matches
+            and composition.selected is not None
+            and temperature.selected is not None
+            and all(gap.waypoint == "oxygen_condition" for gap in gap_tuple)
+            and state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+            and phase_token(state.endmember) is Phase.CR
+            and state.component_basis == state.endmember.formula
+            and inputs.measured_species == state.endmember.formula
+        )
+        if not matches and not internal_analytical_missing_oxygen:
             # Henrian, 1 wt%, a pure solid, a gas endmember, an unadmitted
             # single-cation basis, or an endmember formula this engine does not report.
             # Name both sides. Do not convert.
@@ -550,11 +581,13 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
                 (_reference_gap(state, engine_side),),
             ))
             continue
-        readiness = ConsumerReadiness("melt_activity", status, gap_tuple, engine)
-        if status is not ReadinessStatus.READY:
+        if status is not ReadinessStatus.READY and not internal_analytical_missing_oxygen:
             results.append(GeneratedInput(readiness, None, provenance))
             continue
-        if inputs.measured_species != state.endmember.formula:
+        if (
+            not internal_analytical_missing_oxygen
+            and inputs.measured_species != state.endmember.formula
+        ):
             gap = ReadinessGap(
                 "reference_state",
                 GapReason.REFERENCE_STATE_MISMATCH,
@@ -597,10 +630,15 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
                     "engine_reports": reported,
                 },
             }
-            if redox:
-                oxygen_log = _point(inputs, "oxygen_condition")
-                payload["fO2_log"] = float(oxygen_log)
-                routes["fO2_log"] = {"waypoint": "oxygen_condition", "because": list(redox)}
+            if redox or engine == "internal-analytical":
+                oxygen_waypoint = inputs.waypoints["oxygen_condition"].selected
+                if oxygen_waypoint is not None:
+                    oxygen_log = _point(inputs, "oxygen_condition")
+                    payload["fO2_log"] = float(oxygen_log)
+                    routes["fO2_log"] = {
+                        "waypoint": "oxygen_condition",
+                        "because": list(redox),
+                    }
             results.append(GeneratedInput(readiness, payload, {**provenance, "output_routes": routes}))
         except UnsupportedValue as exc:
             results.append(_refused(readiness, provenance, str(exc)))

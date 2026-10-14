@@ -57,7 +57,8 @@ species:
       values:
         quantity: equilibrium_partial_pressure
         gas_species: SiO(g)
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Turkdogan (1984), Table 1; authors' assumed local-equilibrium thermodynamic calculations for gas-slag and gas-coke ash at 1500 °C and 1 bar CO
         model_or_data_source: 'assumed local equilibrium at 1500 C for gas-slag and gas-coke ash; 1 bar
           pressure of CO. Authors: calculations are made for assumed local equilibrium.'
         T_C_as_printed: 1500
@@ -102,7 +103,8 @@ species:
       values:
         quantity: equilibrium_partial_pressure
         gas_species: SiS(g)
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Turkdogan (1984), Table 1; authors' assumed local-equilibrium thermodynamic calculations for gas-slag and gas-coke ash at 1500 °C and 1 bar CO
         model_or_data_source: 'assumed local equilibrium at 1500 C for gas-slag and gas-coke ash; 1 bar
           pressure of CO. Authors: calculations are made for assumed local equilibrium.'
         T_C_as_printed: 1500
@@ -147,7 +149,8 @@ species:
       values:
         quantity: equilibrium_partial_pressure
         gas_species: S2(g)
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Turkdogan (1984), Table 1; authors' assumed local-equilibrium thermodynamic calculations for gas-slag and gas-coke ash at 1500 °C and 1 bar CO
         model_or_data_source: 'assumed local equilibrium at 1500 C for gas-slag and gas-coke ash; 1 bar
           pressure of CO. Authors: calculations are made for assumed local equilibrium.'
         T_C_as_printed: 1500
@@ -192,7 +195,8 @@ species:
       values:
         quantity: equilibrium_partial_pressure
         gas_species: CS(g)
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Turkdogan (1984), Table 1; authors' assumed local-equilibrium thermodynamic calculations for gas-slag and gas-coke ash at 1500 °C and 1 bar CO
         model_or_data_source: 'assumed local equilibrium at 1500 C for gas-slag and gas-coke ash; 1 bar
           pressure of CO. Authors: calculations are made for assumed local equilibrium.'
         T_C_as_printed: 1500
@@ -237,7 +241,8 @@ species:
       values:
         quantity: equilibrium_partial_pressure
         gas_species: COS(g)
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Turkdogan (1984), Table 1; authors' assumed local-equilibrium thermodynamic calculations for gas-slag and gas-coke ash at 1500 °C and 1 bar CO
         model_or_data_source: 'assumed local equilibrium at 1500 C for gas-slag and gas-coke ash; 1 bar
           pressure of CO. Authors: calculations are made for assumed local equilibrium.'
         T_C_as_printed: 1500
@@ -281,7 +286,8 @@ species:
       values:
         quantity: equilibrium_partial_pressure
         gas_species: K(g)
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Turkdogan (1984), Table 2; reaction (53) equilibrium calculation using thermochemical data and K2O activity data from Steiler (Ref. 68)
         model_or_data_source: Reaction (53) (K2O)+C = 2K(g)+CO(g). K is the equilibrium constant from
           the thermochemical data; a(K2O) is the activity of K2O in the slag, relative to the hypothetical
           solid K2O, from the experimental data of Steiler (ref. 68).
@@ -315,9 +321,9 @@ species:
 deepening:
   dispatch_id: grok-resume-91959-1789251912
   date: '2026-09-12'
-  note: Review paper. Author's own KEMS rows are absent. Tables 1–2 recorded as model_derived calculated
-    vapor pressures from printed p. 607. a(K2O) in Table 2 is quoted from Steiler; K is from thermochemical
-    data. Figures 1–14 not digitised.
+  note: Review paper. Author's own KEMS rows are absent. Tables 1–2 are attributed calculated vapor
+    pressures from printed p. 607. a(K2O) in Table 2 is from Steiler; K is from thermochemical data.
+    Figures 1–14 not digitised.
   primary_sources_cited:
   - system: K2O activity in blast-furnace slag (Table 2 a_K2O column)
     method: experimental activity (as cited)
@@ -350,7 +356,7 @@ deepening:
     completeness: full
     note: Four temperature rows 1200–1500 C; K, a_K2O, p_K.
   class_ledger:
-    model:
+    quoted_attributed:
     - turkdogan_1984_table1_SiO_calculated_p
     - turkdogan_1984_table1_SiS_calculated_p
     - turkdogan_1984_table1_S2_calculated_p

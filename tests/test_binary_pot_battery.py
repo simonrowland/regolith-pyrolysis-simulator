@@ -1411,6 +1411,42 @@ def test_equilibrate_cell_payload_round_trip_keeps_flags() -> None:
     ].startswith("antoine_fallback_from_vaporock")
 
 
+def test_equilibrate_cell_payload_shape_includes_activity_metadata() -> None:
+    payload = _ok_cell(engine="internal-analytical", gas={}).as_payload()
+    assert set(payload) == {
+        "pot_id",
+        "engine",
+        "temperature_K",
+        "po2",
+        "status",
+        "refusal_reason",
+        "engine_status",
+        "engine_reason",
+        "engine_annotation",
+        "melt_activities",
+        "melt_activity_coefficients",
+        "melt_activity_coefficient_details",
+        "activities_standard_state",
+        "gas_partial_pressures_Pa",
+        "invalid_gas_partial_pressure_components",
+        "liquid_fraction",
+        "wall_s",
+        "cpu_s",
+        "hostname",
+        "vapor_pressures_source",
+        "vapor_pressure_backend_status",
+        "vapor_pressure_backend_status_reason",
+        "authoritative_for_requested_vapor_pressure",
+        "arm",
+        "notices",
+        "authority",
+        "certified_band",
+        "exit_signal",
+        "exit_code",
+        "model_id",
+    }
+
+
 def test_openimcc_cell_round_trips_through_harness() -> None:
     pot = BinaryPot(
         pot_id="mgo_sio2_40_60",
@@ -1633,6 +1669,7 @@ for line in sys.stdin:
         )
         child = subprocess.Popen([sys.executable, "-c", child_code])
         marker.with_suffix(".pid").write_text(str(child.pid))
+    if mode == "hang":
         time.sleep(30)
     po2_raw = request["po2"]
     cell = EquilibrateCell(
@@ -1765,15 +1802,23 @@ def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
     battery = _install_fake_isolated_cell_worker(monkeypatch)
     marker = tmp_path / "grandchild.sentinel"
     try:
+        started = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-timeout-grandchild-ready",
+            simulate_crash="grandchild",
+            why=str(marker),
+        )
+        assert started.status == "ok"
+        assert marker.with_suffix(".pid").is_file()
+
         timed_out = _run_fake_isolated_cell(
             battery,
             pot_id="worker-timeout",
-            simulate_crash="grandchild",
+            simulate_crash="hang",
             why=str(marker),
             timeout_s=0.001,
         )
         assert timed_out.refusal_reason == REFUSAL_TIMEOUT
-        assert marker.with_suffix(".pid").is_file()
         time.sleep(1.0)
         assert not marker.exists(), "worker timeout left its sleeping grandchild alive"
         recovered = _run_fake_isolated_cell(battery, pot_id="worker-after-timeout")

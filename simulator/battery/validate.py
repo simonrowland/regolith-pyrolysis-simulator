@@ -1040,6 +1040,31 @@ def validate_observation(
                 issues,
             )
     ev = observation.evidence.class_
+    derivation = observation.derivation
+    raw_inputs = derivation.raw_inputs if derivation is not None else None
+    if raw_inputs is not None and not (
+        ev.is_value and ev.value is EvidenceClass.MEASURED_REDUCED
+    ):
+        detail = (
+            "raw_inputs not_printed declaration is invalid for model_derived evidence"
+            if ev.is_value and ev.value is EvidenceClass.MODEL_DERIVED
+            else "raw_inputs declaration is valid only for measured_reduced evidence"
+        )
+        issues.append(
+            _issue(
+                f"{path}.derivation.raw_inputs",
+                RefusalReason.CONDITIONAL_FIELD,
+                detail,
+            )
+        )
+    if raw_inputs is not None and derivation is not None and derivation.inputs:
+        issues.append(
+            _issue(
+                f"{path}.derivation.raw_inputs",
+                RefusalReason.CONDITIONAL_FIELD,
+                "raw_inputs declaration conflicts with listed derivation inputs",
+            )
+        )
     if ev.is_value and ev.value is EvidenceClass.ENGINE_PREDICTION:
         if observation.engine is None:
             issues.append(
@@ -1078,8 +1103,44 @@ def validate_observation(
             == "source admission_status=figure_only is not a closed v2.1 token"
             and not _value_has_numeric_value(observation.value)
         )
+        declares_unprinted_raw_inputs = (
+            derivation is not None and derivation.declares_unprinted_raw_inputs
+        )
+        if raw_inputs is not None:
+            if not declares_unprinted_raw_inputs:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.raw_inputs",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "raw_inputs declaration must be not_printed",
+                    )
+                )
+            if raw_inputs.locator is None:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.raw_inputs",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "raw_inputs not_printed declaration requires a locator",
+                    )
+                )
+        if (
+            ev.value is EvidenceClass.MEASURED_REDUCED
+            and declares_unprinted_raw_inputs
+            and observation.derived_from
+        ):
+            issues.append(
+                _issue(
+                    f"{path}.derivation.raw_inputs",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "raw_inputs not_printed declaration contradicts derived_from",
+                )
+            )
         if not figure_only_without_value:
-            if not observation.derived_from:
+            if not observation.derived_from and not (
+                ev.value is EvidenceClass.MEASURED_REDUCED
+                and derivation is not None
+                and derivation.has_located_unprinted_raw_inputs
+            ):
                 issues.append(
                     _issue(
                         f"{path}.derived_from",

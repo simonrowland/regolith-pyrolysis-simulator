@@ -642,6 +642,125 @@ def test_norris_split_runs_retain_shared_sample_and_quench_facts() -> None:
         )
 
 
+def test_sato_1976_migrates_all_numeric_table_cells() -> None:
+    """Every printed numeric cell in the three tables becomes a numeric observation."""
+    source = EXTRACTS / "sato-1976-lunar-fo2-apollo-17.yaml"
+    extract = yaml.safe_load(source.read_text())
+    table1 = extract["species"]["O2"]["observations"]
+    assert len(table1) == 11
+    assert all("condition_as_published" in row["values"] for row in table1)
+
+    migrator = battery_migrate.Migrator(root=REPO_ROOT)
+    migrator._migrate_extract(source)
+    migrator.finalize()
+    observations = list(migrator.result.observations.values())
+    counts = {}
+    for table in ("table1", "table2", "table3"):
+        table_observations = [obs for obs in observations if table in obs.observation_id]
+        counts[table] = sum(obs.value.kind.value == "point" for obs in table_observations)
+    assert counts == {"table1": 55, "table2": 25, "table3": 29}
+    assert sum(counts.values()) == 109
+    assert len([obs for obs in observations if "table3" in obs.observation_id]) == 35
+    activity_rows = (
+        extract["species"]["FeO"]["observations"]
+        + extract["species"]["Fe"]["observations"]
+    )
+    assert len(activity_rows) == 10
+    assert all("phase" not in row for row in activity_rows)
+    activity_observations = [
+        obs
+        for obs in observations
+        if "table2" in obs.observation_id or "table3" in obs.observation_id
+    ]
+    assert all(
+        obs.identity.species.phase.is_unknown
+        and obs.identity.species.phase.reason == "source does not state phase"
+        for obs in activity_observations
+    )
+    table2_70017 = next(
+        row for row in extract["species"]["FeO"]["observations"]
+        if row["observation_id"] == "sato_1976_table2_70017"
+    )
+    assert "subsolidus" in table2_70017["phase_context_as_published"]
+    assert "phase_context_locator" in table2_70017
+
+    natural = next(
+        obs for obs in observations if "table1_70017_31::T=1273.15" in obs.observation_id
+    )
+    added_fe = next(
+        obs for obs in observations if "table1_added_fe_70017_31::T=1273.15" in obs.observation_id
+    )
+    assert natural.identity.temperature_K == added_fe.identity.temperature_K
+    assert "row=70017,31" in natural.locator.note
+    assert "row=70017,31" in added_fe.locator.note
+    assert natural.experiment_id != added_fe.experiment_id
+    assert migrator.result.experiments[natural.experiment_id].method.value.value == "emf_cell"
+    assert migrator.result.experiments[added_fe.experiment_id].method.value.value == "emf_cell"
+
+    from decimal import Decimal
+
+    from simulator.battery.waypoints import oxygen_condition
+    from tests.battery.test_waypoints import _bench
+
+    source_cells = {}
+    bench = _bench()
+    for row in table1:
+        condition = "added_Fe" if "added_fe" in row["observation_id"] else "natural"
+        printed_key = (
+            "minus_log_fO2_atm_with_added_Fe"
+            if condition == "added_Fe"
+            else "minus_log_fO2_atm"
+        )
+        sample = row["values"]["sample_number_as_printed"]
+        for point in row["values"]["series"]:
+            printed_minus_log = Decimal(point[printed_key])
+            expected_log = -printed_minus_log
+            assert point["log_fO2"] == {
+                "value": str(expected_log),
+                "units": "log10(atm)",
+            }
+            key = (
+                sample,
+                Decimal(str(point["T_C"])) + Decimal("273.15"),
+                condition,
+            )
+            assert key not in source_cells
+            source_cells[key] = (row, point, expected_log)
+
+    assert len(source_cells) == 55
+    for key, (row, point, expected_log) in source_cells.items():
+        sample, temperature, condition = key
+        fugacity_pa = Decimal(point["fugacity_Pa"])
+        expected_pa = Decimal("101325") * (Decimal(10) ** expected_log)
+        relative_error = abs(fugacity_pa / expected_pa - Decimal(1))
+        assert relative_error <= Decimal("1e-6"), (sample, temperature, condition)
+        matches = [
+            obs
+            for obs in observations
+            if row["observation_id"] in obs.observation_id
+            and obs.identity.temperature_K.value == temperature
+        ]
+        assert len(matches) == 1, (sample, temperature, condition)
+        observation = matches[0]
+        assert observation.experiment_id.endswith(f"::{row['experiment']}")
+        assert f"row={sample}" in observation.locator.note
+        experiment = migrator.result.experiments[observation.experiment_id]
+        assert experiment.sample.form is not None
+        assert experiment.sample.form.state.value == "bulk rock"
+        phase = observation.identity.species.phase
+        assert phase.is_unknown
+        assert phase.reason == "source does not state phase"
+        assert observation.value.point == fugacity_pa
+        located_log = observation.point_conditions["fO2_log"]
+        assert located_log.state.value == expected_log
+        route = oxygen_condition(
+            experiment, bench, observation
+        )
+        assert route.selected is not None
+        assert route.selected.route == "observation_fO2_log"
+        assert route.selected.value.point == expected_log
+
+
 def test_van_limpt_k2o_series_uses_section_and_figure_provenance() -> None:
     doc = yaml.safe_load((EXTRACTS / "kems-046-van-limpt-2007.yaml").read_text())
     observation = next(
@@ -2384,6 +2503,204 @@ def test_halwax_pure_solid_formation_enthalpies_are_symmetric():
         assert observation["values"]["activity_pin_eligible"] is False
 
 
+def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
+    """Pin Halwax's six isothermal observations and their source locators."""
+    expected = {
+        "Ca": ("cao-series", "Ca(g)", "pure CaO(s)", 2077.0),
+        "O": ("cao-series", "O(g)", "pure CaO(s)", 2077.0),
+        "O2": ("cao-series", "O2(g)", "pure CaO(s)", 2077.0),
+        "Mg": ("mgo-series", "Mg(g)", "pure MgO(s)", 1926.0),
+    }
+    pressure_rows = [
+        (species, row)
+        for species in ("Ca", "Mg")
+        for row in doc["species"][species]["observations"]
+        if row["type"] == "partial_pressure"
+    ]
+    assert len(pressure_rows) == 6
+    rows = {row["observation_id"]: (species, row) for species, row in pressure_rows}
+    assert len(rows) == 6
+    expected_rows = {
+        ("Ca", "Ca(g)"): expected["Ca"],
+        ("Ca", "O(g)"): expected["O"],
+        ("Ca", "O2(g)"): expected["O2"],
+        ("Mg", "Mg(g)"): expected["Mg"],
+        ("Mg", "O(g)"): ("mgo-series", "O(g)", "pure MgO(s)", 1926.0),
+        ("Mg", "O2(g)"): ("mgo-series", "O2(g)", "pure MgO(s)", 1926.0),
+    }
+    restored_ids = {
+        "halwax_2024_cao_isothermal_o2_pressure_figure_only": ("O2(g)", "O2", "pure CaO(s)"),
+        "halwax_2024_cao_isothermal_o_pressure_figure_only": ("O(g)", "O", "pure CaO(s)"),
+        "halwax_2024_mgo_isothermal_mg_pressure_figure_only": ("Mg(g)", "Mg", "pure MgO(s)"),
+        "halwax_2024_mgo_isothermal_o2_pressure_figure_only": ("O2(g)", "O2", "pure MgO(s)"),
+    }
+    legacy_ids = {
+        ("Ca", "Ca(g)"): "halwax_2024_cao_isothermal_ca_pressure_figure_only",
+        ("Mg", "O(g)"): "halwax_2024_mgo_isothermal_o_pressure_figure_only",
+    }
+    assert set(rows) == set(restored_ids) | set(legacy_ids.values())
+    for observation_id, (gas_species, formula, condensed_phase) in restored_ids.items():
+        species, row = rows[observation_id]
+        temperature = 2077.0 if species == "Ca" else 1926.0
+        values = row["values"]
+        assert values["quantity"] == "partial_pressure"
+        assert values.get("gas_species") == gas_species
+        assert values.get("formula") == formula
+        assert values.get("condensed_phase") == condensed_phase
+        assert row["T_range_K"] == [temperature, temperature]
+        assert row["locator"]["page"] == 826
+        assert row["locator"]["published_page"] == 826
+        assert row["locator"]["pdf_page_index"] == 5
+        assert row["locator"]["figure"] == "7"
+        assert row["values"]["admission_status"] == "figure_only"
+        assert row["values"]["caption"] == "Fig. 7—Isothermal measurement of CaO and MgO."
+        assert "points" not in values
+        assert "temperature_K" not in values
+        assert "partial_pressure_pa" not in values
+    for key, observation_id in legacy_ids.items():
+        assert (rows[observation_id][0], rows[observation_id][1]["values"]["gas_species"]) == key
+    for (species, gas_species), observation_id in legacy_ids.items():
+        experiment, gas, oxide, temperature = expected_rows[(species, gas_species)]
+        row = rows[observation_id][1]
+        values = row["values"]
+        assert row["experiment"] == experiment
+        assert gas == gas_species
+        assert values["condensed_phase"] == oxide
+        assert row["T_range_K"] == [temperature, temperature]
+        assert values["evidence_class"] == "figure_only"
+        assert row["locator"] == {
+            "page": 826,
+            "published_page": 826,
+            "pdf_page_index": 5,
+            "figure": "7",
+            "note": row["locator"]["note"],
+        }
+        panel = "upper" if species == "Ca" else "lower"
+        assert row["locator"]["note"] == f"d-129; {panel} panel"
+        assert row["units"] == "p_i [Pa] versus Time [h]"
+        assert values["admission_status"] == "figure_only"
+        assert values["caption"] == "Fig. 7—Isothermal measurement of CaO and MgO."
+        assert values["note"].endswith("Not digitised.")
+        assert "points" not in values
+        assert "temperature_K" not in values
+        assert "partial_pressure_pa" not in values
+
+    geometry = next(
+        row["values"]
+        for species in doc["species"].values()
+        for row in species["observations"]
+        if "polythermal_pressure_figures" in row.get("values", {})
+    )
+    assert [
+        (figure["figure"], figure["locator"])
+        for figure in geometry["polythermal_pressure_figures"]
+    ] == [
+        ("8", {"page": 827, "pdf_page_index": 6}),
+        ("9", {"page": 827, "pdf_page_index": 6}),
+        ("10", {"page": 827, "pdf_page_index": 6}),
+        ("11", {"page": 827, "pdf_page_index": 6}),
+        ("12", {"page": 828, "pdf_page_index": 7}),
+        ("13", {"page": 828, "pdf_page_index": 7}),
+    ]
+
+    cross_sections = next(
+        row for row in doc["species"]["CaO"]["observations"]
+        if row["observation_id"] == "halwax_2024_table_iii_ionization_cross_sections"
+    )
+    assert cross_sections["locator"]["page"] == 826
+    assert cross_sections["locator"]["pdf_page_index"] == 5
+    cross_sections = cross_sections["values"]
+    assert cross_sections["pressure_equation_locator"] == {
+        "page": 824, "pdf_page_index": 3, "equation": "1"
+    }
+    assert cross_sections["oxygen_molecular_cross_section_equation_locator"] == {
+        "page": 826, "pdf_page_index": 5, "equation": "12"
+    }
+    for species in ("CaO", "MgO"):
+        table_i = next(
+            row for row in doc["species"][species]["observations"]
+            if row["observation_id"].endswith(
+                "table_i_" + species.lower() + "_sample_masses"
+            )
+        )
+        assert table_i["locator"]["page"] == 825
+        assert table_i["locator"]["pdf_page_index"] == 4
+        assert all(
+            item["locator"] == {"page": 825, "table": "I", "pdf_page_index": 4}
+            for item in table_i["values"]["series"]
+        )
+    ni = next(
+        row for row in doc["species"]["Ni"]["observations"]
+        if row["observation_id"] == "halwax_2024_table_ii_ni_sublimation_this_study"
+    )
+    assert ni["locator"]["page"] == 826
+    assert ni["locator"]["pdf_page_index"] == 5
+    assert ni["uncertainty"]["locator"] == {
+        "page": 826, "pdf_page_index": 5, "table": "II"
+    }
+    assert ni["values"]["pressure_calibration_factor"] == 7.6414e-9
+    factor_pin = next(
+        sample for sample in doc["fidelity_samples"]
+        if sample.get("path", "").endswith("pressure_calibration_factor_as_printed")
+    )
+    assert factor_pin["value"] == "7.6414·10⁻⁹"
+    assert factor_pin["locator"]["page"] == 826
+    assert factor_pin["locator"]["pdf_page_index"] == 5
+
+
+def test_halwax_isothermal_pressures_are_pinned_to_pdf_figures_and_identities():
+    """Page 826 Fig. 7 pressure identities and pages 827–828 figures 8–13."""
+    path = EXTRACTS / "kems-031-halwax-2024.yaml"
+    doc = yaml.safe_load(path.read_text())
+    _assert_halwax_figure_only_pressure_transcription(doc)
+
+    # Prove the primary row set, Ca temperature, and numeric calibration are guarded.
+    deleted = copy.deepcopy(doc)
+    for species in ("Ca", "Mg"):
+        deleted["species"][species]["observations"] = [
+            row for row in deleted["species"][species]["observations"]
+            if row["type"] != "partial_pressure"
+        ]
+    with pytest.raises(AssertionError):
+        _assert_halwax_figure_only_pressure_transcription(deleted)
+
+    wrong_temperature = copy.deepcopy(doc)
+    ca_row = next(
+        row for row in wrong_temperature["species"]["Ca"]["observations"]
+        if row["type"] == "partial_pressure"
+    )
+    ca_row["values"]["temperature_K"] = 1926.0
+    with pytest.raises(AssertionError):
+        _assert_halwax_figure_only_pressure_transcription(wrong_temperature)
+
+    wrong_factor = copy.deepcopy(doc)
+    ni_row = next(
+        row for row in wrong_factor["species"]["Ni"]["observations"]
+        if row["observation_id"] == "halwax_2024_table_ii_ni_sublimation_this_study"
+    )
+    ni_row["values"]["pressure_calibration_factor"] = 7.6414e-8
+    with pytest.raises(AssertionError):
+        _assert_halwax_figure_only_pressure_transcription(wrong_factor)
+
+    null_points = copy.deepcopy(doc)
+    o2_row = next(
+        row for row in null_points["species"]["Ca"]["observations"]
+        if row["observation_id"] == "halwax_2024_cao_isothermal_o2_pressure_figure_only"
+    )
+    o2_row["values"]["points"] = []
+    with pytest.raises(AssertionError):
+        _assert_halwax_figure_only_pressure_transcription(null_points)
+
+    missing_gas = copy.deepcopy(doc)
+    o2_row = next(
+        row for row in missing_gas["species"]["Ca"]["observations"]
+        if row["observation_id"] == "halwax_2024_cao_isothermal_o2_pressure_figure_only"
+    )
+    del o2_row["values"]["gas_species"]
+    with pytest.raises(AssertionError):
+        _assert_halwax_figure_only_pressure_transcription(missing_gas)
+
+
 def test_source_priority_file_present_and_valid():
     errs = vle.validate_source_priority_file()
     assert errs == []
@@ -2616,6 +2933,19 @@ def test_uncertainty_propagated_to_by_species(tmp_extracts: Path):
     assert group["winner_uncertainty"] == obs["uncertainty"]
     assert group["uncertainties"]
     assert group["uncertainties"][0]["uncertainty"]["relative"] == 0.1
+
+
+def test_confidence_level_vocabulary_is_closed_and_optional() -> None:
+    doc = _minimal_extract()
+    observation = doc["species"]["Fe"]["observations"][0]
+    assert vle.validate_extract_document(doc) == []
+
+    observation["uncertainty"]["confidence_level"] = "one_sigma"
+    assert vle.validate_extract_document(doc) == []
+
+    observation["uncertainty"]["confidence_level"] = "one standard deviation"
+    errors = vle.validate_extract_document(doc)
+    assert any("uncertainty.confidence_level" in error for error in errors)
 
 
 def test_consistency_report_auto_computes_disagreement(tmp_extracts: Path):
@@ -4121,7 +4451,50 @@ def test_richet_bottinga_1986_review_fixes_migrate_and_pin_table4() -> None:
         with pytest.raises(AssertionError):
             assert_widths(migrate(mutated))
 
+def test_matzen_run_2_3_duration_seconds_matches_table_2():
+    """Table 2 prints 41.2 h; pin its seconds conversion against unit drift."""
+    path = EXTRACTS / "matzen-2022-martian-basalt-redox.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    run = next(
+        row for row in doc["experiments"]
+        if row["experiment_id"] == "matzen-run-2-3"
+    )
+    assert run["conditions"]["duration_h"]["state"]["value"] == "41.2"
+    assert run["thermal_schedule"]["total_duration_s"]["state"]["value"] == "148320"
 
+
+def test_matzen_observations_resolve_printed_log_fo2():
+    """Each Table 2 log fO2 lands on its observation and routes as printed."""
+    from decimal import Decimal
+
+    from simulator.battery.migrate import Migrator
+    from simulator.battery.waypoints import oxygen_condition
+
+    path = EXTRACTS / "matzen-2022-martian-basalt-redox.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    expected = {
+        f"{doc['source_id']}::{row['observation_id']}": Decimal(
+            row["values"]["log_fO2"]
+        )
+        for row in doc["species"]["Fe"]["observations"]
+    }
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+    observation_ids = result.observations_by_source[path.relative_to(REPO_ROOT).as_posix()]
+
+    assert len(observation_ids) == len(expected) == 24
+    for observation_id in observation_ids:
+        observation = result.observations[observation_id]
+        experiment = result.experiments[observation.experiment_id]
+        bench = result.benches[experiment.bench_id]
+        resolved = oxygen_condition(experiment, bench, observation).selected
+        assert resolved is not None, observation_id
+        assert resolved.route == "observation_fO2_log", observation_id
+        assert resolved.value.point == expected[observation.observation_id], observation_id
+        located = observation.point_conditions["fO2_log"]
+        assert located.locator.page == 39 and located.locator.table == 2
 def test_bencze_supplement_fidelity_sample_rejects_mutated_value():
     path = EXTRACTS / "bencze-yazhenskikh-2016.yaml"
     doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))

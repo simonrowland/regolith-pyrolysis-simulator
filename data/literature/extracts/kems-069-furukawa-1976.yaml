@@ -447,6 +447,12 @@ species:
       uncertainty:
         note: Selected gamma cells carry +/- from drawing several curves in the +/-3 sigma band of the
           Fig. 2(b) integration plot. Not every row has a printed envelope.
+      derived_from: [furukawa_1976_ion_current_ratios_table2]
+      derivation:
+        relation: Belton-Fruehan modified Gibbs-Duhem integration of this-work Table 2 ion-current ratios
+        inputs: [furukawa_1976_ion_current_ratios_table2]
+        locator: {equation: '4', table: '2', published_page: 384}
+        output_unit: dimensionless
       values:
         quantity: activity_and_activity_coefficient
         method_class: model_derived
@@ -704,6 +710,15 @@ species:
         figure: '7'
         note: eqs (6)-(7) and conclusion; synopsis p. 382 prints +0.58 for log gamma_Ti intercept vs +0.53
           in the body
+      derived_from:
+      - furukawa_1976_ti_activity_table4_1600C
+      - furukawa_1976_fe_activity_table4_1600C
+      derivation:
+        relation: Linear log-gamma versus squared-composition relations fitted to the Table 4 activities
+        inputs:
+        - furukawa_1976_ti_activity_table4_1600C
+        - furukawa_1976_fe_activity_table4_1600C
+        locator: {equation: '6-7', figure: '7', published_page: 386}
       T_range_K:
       - 1873.15
       - 1873.15
@@ -739,6 +754,12 @@ species:
         figure: '6'
         note: infinite-dilution heats of solution and maximum H^M from integration of Table 2 slopes via
           eq (5)
+      derived_from: [furukawa_1976_ion_current_ratios_table2]
+      derivation:
+        relation: Graphical integration of Table 2 d log(I+_Ti/I+_Fe)/d(1/T) slopes
+        inputs: [furukawa_1976_ion_current_ratios_table2]
+        locator: {equation: '5', figure: '6', published_page: 386}
+        output_unit: kcal/mol
       T_range_K:
       - 1873.15
       - 1873.15
@@ -903,6 +924,11 @@ species:
         published_page: 385
         pdf_page_index: 4
         note: Fig. 5. Integration curve for the heats of solution in the Fe-Ti system at 1600 C
+      derived_from: [furukawa_1976_ion_current_ratios_table2]
+      derivation:
+        relation: Integration of Table 2 d log(I+_Ti/I+_Fe)/d(1/T) slopes
+        inputs: [furukawa_1976_ion_current_ratios_table2]
+        locator: {equation: '5', figure: '5', published_page: 385}
       T_range_K:
       - 1823.15
       - 1873.15
@@ -933,6 +959,17 @@ species:
         published_page: 386
         pdf_page_index: 5
         note: Fig. 6. Thermodynamic properties on the mixing of Fe-Ti alloys at 1600 C
+      derived_from:
+      - furukawa_1976_ti_activity_table4_1600C
+      - furukawa_1976_fe_activity_table4_1600C
+      - furukawa_1976_heats_of_solution
+      derivation:
+        relation: Mixing thermodynamic properties calculated from the Table 4 activities and integrated heats of solution
+        inputs:
+        - furukawa_1976_ti_activity_table4_1600C
+        - furukawa_1976_fe_activity_table4_1600C
+        - furukawa_1976_heats_of_solution
+        locator: {figure: '6', published_page: 386}
       T_range_K:
       - 1823.15
       - 1873.15
@@ -963,6 +1000,15 @@ species:
         published_page: 386
         pdf_page_index: 5
         note: Fig. 7. Relation between log gamma_i and (1-N_i)^2 for the Fe-Ti system at 1600 C
+      derived_from:
+      - furukawa_1976_ti_activity_table4_1600C
+      - furukawa_1976_fe_activity_table4_1600C
+      derivation:
+        relation: Linear relations fitted to the Table 4 activities
+        inputs:
+        - furukawa_1976_ti_activity_table4_1600C
+        - furukawa_1976_fe_activity_table4_1600C
+        locator: {equation: '6-7', figure: '7', published_page: 386}
       T_range_K:
       - 1823.15
       - 1873.15
@@ -1041,6 +1087,12 @@ species:
       units: dimensionless; N_Ti mole fraction
       uncertainty:
         note: Selected gamma_Fe cells carry printed +/- from the +/-3 sigma integration envelope.
+      derived_from: [furukawa_1976_ion_current_ratios_table2]
+      derivation:
+        relation: Belton-Fruehan modified Gibbs-Duhem integration of this-work Table 2 ion-current ratios
+        inputs: [furukawa_1976_ion_current_ratios_table2]
+        locator: {equation: '4', table: '2', published_page: 384}
+        output_unit: dimensionless
       values:
         quantity: activity_and_activity_coefficient
         method_class: model_derived

@@ -5543,7 +5543,7 @@ species:
         method_class: derived_from_figure_8_linear_portion
         semantics: mol_s_rate_not_hkl_area_flux
         system_class: silicate_melt
-        derivation: Table 5 F is obtained from eqns (1)' and (2) with the experimental vaporization
+        derivation_note: Table 5 F is obtained from eqns (1)' and (2) with the experimental vaporization
           rate at the initial stage of vaporization (the maximum vaporization rate). That rate is the
           slope of the linear portion of Fig. 8 (figure-only points not digitised this round). F is
           mol/s for the ~100 mg spherule, not mol m^-2 s^-1; no area conversion is applied.
@@ -5658,7 +5658,7 @@ species:
         E_kcal_mol_range:
         - 93.7
         - 107.9
-        derivation: Slope of linear regression on ln J_i vs 1/T at constant C_i (Fig. 10). Endpoints
+        derivation_note: Slope of linear regression on ln J_i vs 1/T at constant C_i (Fig. 10). Endpoints
           93.7 and 107.9 kcal/mol are printed in the text (p. 123-124). Intermediate printed-on-figure
           values 97.1 and 100.1 kcal/mol are figure-only and are not transcribed as data this round.
           Trend - E increases with lowering molar concentration of FeO.
@@ -5687,7 +5687,7 @@ species:
         system_class: silicate_melt
         nu_FeO_at_1700C: 1.204
         nu_FeO_at_2000C: 0.798
-        derivation: Slope of linear regression on ln J_i vs ln C_i (Fig. 9 / eqn 10). Only the text-printed
+        derivation_note: Slope of linear regression on ln J_i vs ln C_i (Fig. 9 / eqn 10). Only the text-printed
           endpoints 1.204 (1700 C) and 0.798 (2000 C) are stored. Intermediate figure-only slopes are
           not transcribed this round.
         figure_9_points: figure-only
@@ -5717,7 +5717,7 @@ species:
         Hertz_Knudsen_equation: '14'
         relative_volatility_equation: '16'
         physical_alpha_upper_bound: 1.0
-        derivation: 'Eqn (14) J_i = alpha_i P_i / sqrt(2 pi M_i R T) with alpha_i <= 1 (Lee and Sata
+        derivation_note: 'Eqn (14) J_i = alpha_i P_i / sqrt(2 pi M_i R T) with alpha_i <= 1 (Lee and Sata
           1977). Eqn (16) relative volatility uses alpha_i/alpha_j = 1, stated as assumed at Stage II
           (MgO/SiO2) and Stage IV (CaO/SiO2). Hashimoto 1983 does not tabulate a measured alpha series.
           Numeric Fe/Mg/SiO Langmuir alphas used on the rail (e.g. 0.23-0.25 at 1973-2273 K) are Fedkin
@@ -6434,7 +6434,7 @@ species:
         E_kcal_mol_range:
         - 93.7
         - 107.9
-        derivation: Slope of linear regression on ln J_i vs 1/T at constant C_i (Fig. 10). Endpoints 93.7
+        derivation_note: Slope of linear regression on ln J_i vs 1/T at constant C_i (Fig. 10). Endpoints 93.7
           and 107.9 kcal/mol are printed in the text (p. 123-124). Intermediate printed-on-figure values 97.1
           and 100.1 kcal/mol are figure-only and are not transcribed as data this round. Trend - E increases
           with lowering molar concentration of FeO.
@@ -18413,7 +18413,7 @@ species:
         semantics: second_law_fit_not_measured_rate
         system_class: silicate_melt
         E_kcal_mol: 123.6
-        derivation: Slope of ln J_i vs 1/T at constant C_i (Fig. 10). Value 123.6 kcal/mol is printed
+        derivation_note: Slope of ln J_i vs 1/T at constant C_i (Fig. 10). Value 123.6 kcal/mol is printed
           in the text (p. 123). Compared by the author to Table 6 reaction (20) Delta H / z = 121.392
           kcal/mol (MgO(l) -> MgO(g), JANAF 2000 K).
         figure_10_points: figure-only
@@ -18865,7 +18865,7 @@ species:
         semantics: second_law_fit_not_measured_rate
         system_class: silicate_melt
         E_kcal_mol: 123.6
-        derivation: Slope of ln J_i vs 1/T at constant C_i (Fig. 10). Value 123.6 kcal/mol is printed in the
+        derivation_note: Slope of ln J_i vs 1/T at constant C_i (Fig. 10). Value 123.6 kcal/mol is printed in the
           text (p. 123). Compared by the author to Table 6 reaction (20) Delta H / z = 121.392 kcal/mol (MgO(l)
           -> MgO(g), JANAF 2000 K).
         figure_10_points: figure-only
@@ -23396,7 +23396,7 @@ species:
         semantics: second_law_fit_not_measured_rate
         system_class: silicate_melt
         E_kcal_mol: 131.6
-        derivation: Slope of ln J_i vs 1/T at constant C_i (Fig. 10). Value 131.6 kcal/mol is printed
+        derivation_note: Slope of ln J_i vs 1/T at constant C_i (Fig. 10). Value 131.6 kcal/mol is printed
           in the text (p. 123). Compared by the author to Table 6 reaction (15) Delta H / z = 137.071
           kcal/mol (SiO2(l) -> SiO2(g), JANAF 2000 K).
         figure_10_points: figure-only
@@ -23859,7 +23859,7 @@ species:
         semantics: second_law_fit_not_measured_rate
         system_class: silicate_melt
         E_kcal_mol: 131.6
-        derivation: Slope of ln J_i vs 1/T at constant C_i (Fig. 10). Value 131.6 kcal/mol is printed in the
+        derivation_note: Slope of ln J_i vs 1/T at constant C_i (Fig. 10). Value 131.6 kcal/mol is printed in the
           text (p. 123). Compared by the author to Table 6 reaction (15) Delta H / z = 137.071 kcal/mol (SiO2(l)
           -> SiO2(g), JANAF 2000 K).
         figure_10_points: figure-only
@@ -33436,7 +33436,7 @@ metadata:
     method_class: model_derived
     semantics: mol_s_rate_not_hkl_area_flux
     system_class: silicate_melt
-    derivation: Table 5 F is obtained from eqns (1)' and (2) with the experimental vaporization rate at
+    derivation_note: Table 5 F is obtained from eqns (1)' and (2) with the experimental vaporization rate at
       the initial stage of vaporization (the maximum vaporization rate). That rate is the slope of the
       linear portion of Fig. 8 (figure-only points not digitised this round). F is mol/s for the ~100
       mg spherule, not mol m^-2 s^-1; no area conversion is applied.
@@ -33567,7 +33567,7 @@ metadata:
     system_class: silicate_melt
     nu_FeO_at_1700C: 1.204
     nu_FeO_at_2000C: 0.798
-    derivation: Slope of linear regression on ln J_i vs ln C_i (Fig. 9 / eqn 10). Only the text-printed
+    derivation_note: Slope of linear regression on ln J_i vs ln C_i (Fig. 9 / eqn 10). Only the text-printed
       endpoints 1.204 (1700 C) and 0.798 (2000 C) are stored. Intermediate figure-only slopes are not
       transcribed this round.
     figure_9_points: figure-only

@@ -3615,8 +3615,9 @@ species:
       units: degC
       values:
         quantity: MELTS_liquidus_model_output
-        evidence_class: model
-        method_class: model_derived
+        evidence_class: quoted_attributed
+        method_class: quoted_attributed
+        attribution: Sauerborn (2005), p. 17; MELTS simulation for JSC-1 cited as [melt 03]
         semantics: bound_not_point_ordering
         liquidus_C: 1264
         note: Schema rate_series pointer with bound-not-point semantics; not a measured rate or transition. Model

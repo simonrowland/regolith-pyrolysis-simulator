@@ -34,15 +34,13 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    attribution: The major outgassed volatiles from ordinary chondritic material are CH4, H2, H2O, N2, and NH3 (the latter
-      at conditions where hydrous minerals form). Contrary to widely held assumptions, CO is never the major C-bearing gas
-      during ordinary chondrite metamorphism.
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Schaefer and Fegley (2007), Gibbs energy minimization calculations using a code of the type described by
+      Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
   admission:
     status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
@@ -82,12 +80,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    attribution: The major outgassed volatiles from ordinary chondritic material are CH4, H2, H2O, N2, and NH3 (the latter
-      at conditions where hydrous minerals form). Contrary to widely held assumptions, CO is never the major C-bearing gas
-      during ordinary chondrite metamorphism.
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Schaefer and Fegley (2007), Gibbs energy minimization calculations using a code of the type described by
+      Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
   admission:
     status: rejected
     reason: Gas speciation, elemental distribution, fO2, mineralogy, and sensitivity panels exist only as Figs 2–17. No printed

@@ -669,9 +669,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
   admission:
     status: pending
     reason: source admission_status=figure_only is not a closed v2.1 token
@@ -772,6 +772,15 @@ observations:
     figure: '8'
     paragraph: At the experimentally-obtained yield, a mass of 80 kg of regolith is required
   read_from: pdf:kems-044-robinot-2026
+  derived_from:
+  - kems-044-robinot-2026::robinot_2026_o2_yield_measured::field:mass_yield_percent
+  derivation:
+    relation: Required regolith mass = daily O2 mass / measured oxygen mass yield; the paper reports 0.84 kg O2/day and 80
+      kg at the experimentally obtained 1.05% yield (Figure 8, p. 12).
+    inputs:
+    - kems-044-robinot-2026::robinot_2026_o2_yield_measured::field:mass_yield_percent
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-044-robinot-2026::robinot_2026_mass_balance_fig4c_bar_labels
   experiment_id: 10.1016/j.asr.2026.02.003::experiment::solar-pyrolysis-series
   identity:
@@ -1031,9 +1040,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
   admission:
     status: pending
     reason: source admission_status=model_output_not_measurement is not a closed v2.1 token

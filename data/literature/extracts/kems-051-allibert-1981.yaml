@@ -409,7 +409,7 @@ species:
         admission_status: figure_only
         status: typed_refusal
         reason: Digitized figure-only activity curve retained for provenance; it is not an admitted direct measurement.
-        derivation: figure curves combine 2060 K mass-spectrometric activities with Sharma and Richardson values at 1773 K;
+        derivation_note: figure curves combine 2060 K mass-spectrometric activities with Sharma and Richardson values at 1773 K;
           plotted points are not all direct Allibert measurements
         source_csv: tables/kems-051-allibert-1981/f6.csv
         point_count: 24
@@ -725,7 +725,7 @@ species:
         status: typed_refusal
         reason: Table III Delta mu equations are transcribed but chemical-potential change is not an openimcc battery quantity.
         measurement_status: author_calculated_from_measured_emf
-        derivation: Delta mu_CaO = -nFE; values are the author-published chemical-potential equations corresponding to Table
+        derivation_note: Delta mu_CaO = -nFE; values are the author-published chemical-potential equations corresponding to Table
           III emf equations
         rows:
         - cell: I
@@ -772,7 +772,7 @@ species:
         status: typed_refusal
         reason: Table IV Gibbs-energy equations are transcribed but this quantity is not an openimcc battery quantity.
         measurement_status: author_derived_from_emf_chemical_potentials
-        derivation: Table IV is explicitly obtained from emf measurements; no refit was performed.
+        derivation_note: Table IV is explicitly obtained from emf measurements; no refit was performed.
         rows:
         - compound_as_printed: CaO·6Al2O3
           delta_G_J_per_mol: -17 430 - 37.2T (± 1350)
@@ -815,7 +815,7 @@ species:
         status: typed_refusal
         reason: Table V phase-equilibrium Gibbs entries are transcribed but this quantity is not an openimcc battery quantity.
         measurement_status: author_derived_from_liquid_activities_and_phase_diagrams
-        derivation: Table V calculations use liquid-phase activities and the consulted phase diagram; no composition conversion
+        derivation_note: Table V calculations use liquid-phase activities and the consulted phase diagram; no composition conversion
           was applied.
         rows:
         - temperature_K: 2103
@@ -1100,7 +1100,7 @@ species:
         quantity: activity
         method_class: derived
         measurement_status: derived_gibbs_duhem_integration
-        derivation: The paper states that the curve is obtained by Gibbs-Duhem integration of the smooth curve through all
+        derivation_note: The paper states that the curve is obtained by Gibbs-Duhem integration of the smooth curve through all
           experimental CaO activity points.
         admission_status: figure_only
         status: typed_refusal
@@ -1212,7 +1212,7 @@ species:
         admission_status: figure_only
         status: typed_refusal
         reason: Digitized figure-only activity curve retained for provenance; it is not an admitted direct measurement.
-        derivation: Figure 6 combines the 2060 K mass-spectrometric activities with 1773 K values cited in the text and is
+        derivation_note: Figure 6 combines the 2060 K mass-spectrometric activities with 1773 K values cited in the text and is
           used to obtain partial enthalpies; plotted values are not all direct Allibert measurements.
         source_csv: tables/kems-051-allibert-1981/f6.csv
         point_count: 24

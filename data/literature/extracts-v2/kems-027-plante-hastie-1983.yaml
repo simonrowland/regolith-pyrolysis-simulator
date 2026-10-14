@@ -4740,10 +4740,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    attribution: Calculated Equilibrium Composition (mole fraction) of Off-gas Mixture at 1 atm
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: NASA CEC 76, Gordon and McBride (1971), Table 4
   admission:
     status: pending
     reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
@@ -4927,9 +4926,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model
-    model: model
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: NASA CEC 76, Gordon and McBride (1971), Table 4
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract

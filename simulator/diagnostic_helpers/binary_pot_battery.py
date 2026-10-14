@@ -306,6 +306,7 @@ class EquilibrateCell:
         default_factory=dict
     )
     invalid_gas_partial_pressure_components: tuple[str, ...] = ()
+    activities_standard_state: dict[str, Any] | None = None
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -324,6 +325,11 @@ class EquilibrateCell:
                 str(name): dict(row)
                 for name, row in self.melt_activity_coefficient_details.items()
             },
+            "activities_standard_state": (
+                None
+                if self.activities_standard_state is None
+                else dict(self.activities_standard_state)
+            ),
             "gas_partial_pressures_Pa": dict(self.gas_partial_pressures_Pa),
             "invalid_gas_partial_pressure_components": list(
                 self.invalid_gas_partial_pressure_components
@@ -403,6 +409,11 @@ class EquilibrateCell:
                 ).items()
                 if isinstance(value, Mapping)
             },
+            activities_standard_state=(
+                dict(payload["activities_standard_state"])
+                if isinstance(payload.get("activities_standard_state"), Mapping)
+                else None
+            ),
             liquid_fraction=_finite_float(payload.get("liquid_fraction")),
             wall_s=float(payload.get("wall_s") or 0.0),
             cpu_s=float(payload.get("cpu_s") or 0.0),
@@ -2482,11 +2493,60 @@ def _internal_analytical_vapor_pressure_adapter(
         "vapor_pressure_diagnostic": core_diagnostic,
         "imcc_notices": oxygen_notices,
     }
+    activities = dict(core_diagnostic.get("activities") or {})
+    from simulator.chemistry.melt_activity import (
+        MELT_OXIDE_CATIONS_PER_FORMULA,
+        melt_oxide_activity,
+    )
+
+    if composition_mol:
+        activity_composition_mol = composition_mol
+    else:
+        _composition_kg, activity_composition_mol = composition_kg_and_mol(
+            {
+                name: amount * 100.0
+                for name, amount in validated_melt_mass_kg_by_species.items()
+            }
+        )
+    parent_activity_by_component: dict[str, tuple[str, float] | None] = {}
+    for provenance in dict(
+        core_diagnostic.get("vapor_pressure_numerator_provenance") or {}
+    ).values():
+        if not isinstance(provenance, Mapping):
+            continue
+        component = provenance.get("melt_oxide_component")
+        if not isinstance(component, str) or not component:
+            continue
+        if component not in parent_activity_by_component:
+            for parent_formula in MELT_OXIDE_CATIONS_PER_FORMULA:
+                oxide_activity = melt_oxide_activity(
+                    parent_formula,
+                    activity_composition_mol,
+                    temperature_K=temperature + CELSIUS_TO_KELVIN_OFFSET,
+                )
+                if (
+                    oxide_activity is not None
+                    and oxide_activity.single_cation_component == component
+                ):
+                    resolved = (
+                        parent_formula,
+                        oxide_activity.thermodynamic_parent_activity(),
+                    )
+                    parent_activity_by_component[component] = resolved
+                    break
+            else:
+                parent_activity_by_component[component] = None
+        resolved = parent_activity_by_component[component]
+        if resolved is not None:
+            activities[resolved[0]] = resolved[1]
+
     return SimpleNamespace(
         status="ok",
         diagnostics=diagnostics,
         warnings=[],
-        activity_coefficients=dict(core_diagnostic.get("activities") or {}),
+        # This core diagnostic is an activity map (a_i), despite the
+        # historical EquilibriumResult field name; gamma lives separately.
+        activity_coefficients=activities,
         vapor_pressures_Pa=dict(equilibrium.vapor_pressures_Pa or {}),
         vapor_pressures_source=dict(equilibrium.vapor_pressures_source or {}),
         vapor_pressure_backend_status=diagnostics["vapor_pressure_backend_status"],
@@ -3573,6 +3633,13 @@ def equilibrate_cell(
         activities, pressures, invalid_pressure_components = (
             extract_reported_quantities(result)
         )
+        activity_standard_state = None
+        if handle.name == "internal-analytical":
+            vapor_diagnostic = diagnostics.get("vapor_pressure_diagnostic")
+            if isinstance(vapor_diagnostic, Mapping):
+                standard_state = vapor_diagnostic.get("activities_standard_state")
+                if isinstance(standard_state, Mapping):
+                    activity_standard_state = dict(standard_state)
         coefficients = reported_activity_coefficients(result)
         coefficient_details = dict(
             getattr(result, "activity_coefficient_details", None) or {}
@@ -3593,6 +3660,7 @@ def equilibrate_cell(
             engine_reason=engine_reason,
             engine_annotation=engine_annotation,
             melt_activities=activities,
+            activities_standard_state=activity_standard_state,
             melt_activity_coefficients=coefficients,
             melt_activity_coefficient_details=coefficient_details,
             gas_partial_pressures_Pa=pressures,

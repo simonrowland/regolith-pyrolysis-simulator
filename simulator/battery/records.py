@@ -46,6 +46,7 @@ from simulator.battery.enums import (
     Phase,
     Polymorph,
     Quantity,
+    RawInputStatus,
     Rail,
     ReferenceStateConvention,
     RefusalReason,
@@ -377,12 +378,28 @@ class Derivation:
     # pure-substance reference and engine_point does not apply. Absent means
     # not declared — never a stamped false.
     pure_substance_reference: bool | None = None
+    raw_inputs: Located[RawInputStatus] | None = None
+
+    @property
+    def declares_unprinted_raw_inputs(self) -> bool:
+        raw_inputs = self.raw_inputs
+        return (
+            raw_inputs is not None
+            and raw_inputs.state.is_value
+            and raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+        )
+
+    @property
+    def has_located_unprinted_raw_inputs(self) -> bool:
+        return (
+            self.declares_unprinted_raw_inputs
+            and self.raw_inputs is not None
+            and self.raw_inputs.locator is not None
+        )
 
     def __post_init__(self) -> None:
         if not self.relation:
             raise ValueError("Derivation.relation is required")
-        if not self.inputs:
-            raise ValueError("Derivation.inputs is required")
         if not self.output_unit:
             raise ValueError("Derivation.output_unit is required")
         if self.pure_substance_reference is not None and not isinstance(

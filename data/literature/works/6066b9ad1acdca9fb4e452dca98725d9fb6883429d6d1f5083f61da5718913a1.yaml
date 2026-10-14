@@ -1,0 +1,190 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1
+  citation: Sato, M. (1976), Oxygen fugacity and other thermochemical parameters of Apollo 17 high-Ti basalts and their implications
+    on the reduction mechanism, Proceedings of the Lunar Science Conference, 7th, 1323-1344.
+  source_ids:
+  - sato-1976-lunar-fo2-apollo-17
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:sato-1976-lunar-fo2-apollo-17
+      role: pdf
+      path: raw/sato-1976-lunar-fo2-apollo-17/sato-1976-lunar-fo2-apollo-17.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:sato-1976-lunar-fo2-apollo-17
+      role: pdftotext
+      path: text/sato-1976-lunar-fo2-apollo-17
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:sato-1976-lunar-fo2-apollo-17
+      role: table_csv
+      path: tables/sato-1976-lunar-fo2-apollo-17
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:sato-1976-lunar-fo2-apollo-17
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    form:
+      state:
+        tag: value
+        value: bulk rock
+      locator:
+        page: 1326
+        table: '1'
+        note: Daggered Table 1 values report oxygen fugacity of bulk-rock samples
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1
+  locator:
+    page: 1326
+    table: '1'
+    note: daggered measurements attributed to Sato et al. (1973); method not restated
+- experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1976_Fe_activity_calculation
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1
+  locator:
+    page: 1326
+    section: discussion following Table 1
+    note: Fe activity calculated from natural-sample and sample-plus-Fe curves
+- experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1976_added_Fe_fO2
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    form:
+      state:
+        tag: value
+        value: bulk rock
+      locator:
+        page: 1326
+        table: '1'
+        note: Table 1 reports sample-plus-iron oxygen fugacity values for bulk-rock samples
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1
+  locator:
+    page: 1324
+    section: Experimental Method
+    note: measurements after addition of pure iron in the iron capsule
+- experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1976_natural_fO2
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    form:
+      state:
+        tag: value
+        value: bulk rock
+      locator:
+        page: 1326
+        table: '1'
+        note: Table 1 reports natural-sample oxygen fugacity values for bulk-rock samples
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1
+  locator:
+    page: 1324
+    section: Experimental Method
+    note: natural-sample measurements in the silica-glass capsule

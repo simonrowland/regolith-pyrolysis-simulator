@@ -687,6 +687,10 @@ species:
         because the tridymite–cristobalite enthalpy of transition is
         considered very small.
       units: dimensionless a_SiO2 (tridymite)
+      derivation:
+        relation: Gibbs-Duhem integration of the Table 1 Na2O activities via equation (7), followed by the printed -log10(a_SiO2)=A_prime/T+B_prime fit.
+        inputs:
+        - 'yam1983::yam1983_na2o_table1_minus_log10_a_AT_B'
       values:
         quantity: activity_gibbs_duhem_from_Na2O
         log_base: 10

@@ -112,8 +112,9 @@ species:
       units: K and qualitative gas ranking as printed
       values:
         quantity: equilibrium_gas_species
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Zahnle et al. (2010), summarizing Schaefer and Fegley (2007) chemical-equilibrium calculations"
         generator: Schaefer and Fegley (2007) chemical equilibrium calculations
         temperature_context: approximately 1225 K, where Fe-Ni sulfide begins to melt
         major_gases_as_printed:
@@ -136,8 +137,9 @@ species:
       units: K, bar, and mole ratio as printed
       values:
         quantity: CO_to_CH4_ratio
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Zahnle et al. (2010), summarizing Schaefer and Fegley (2007) chemical-equilibrium calculations"
         generator: Schaefer and Fegley (2007) chemical equilibrium calculations
         rows:
         - total_pressure_bar_as_printed: 1
@@ -162,8 +164,9 @@ species:
       units: qualitative abundance statement as printed
       values:
         quantity: abundant_gas_species
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Zahnle et al. (2010), summarizing Schaefer and Fegley (2009) silicate-atmosphere calculations"
         generator: Schaefer and Fegley (2009) silicate-atmosphere calculations
         species_as_printed:
         - SiO
@@ -185,8 +188,9 @@ species:
       units: years, Myr, K, and bar as printed
       values:
         quantity: Hadean_thermal_atmospheric_history
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Zahnle et al. (2010), Figure 3 after Zahnle et al. (2006)"
         generator: Zahnle et al. (2006) model as summarized in Figure 3
         stages:
         - stage: rock_vapor

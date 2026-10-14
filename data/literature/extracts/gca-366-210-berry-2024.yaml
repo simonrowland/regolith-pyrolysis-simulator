@@ -1,0 +1,197 @@
+schema_version: literature_extract.v1
+source_id: gca-366-210-berry-2024
+source:
+  citation: Berry, A.J., Doyle, P.M., Schofield, P.F., Miller, L.A., Le Losq, C., Burnham, A.D., & Mosselmans, J.F.W. (2024). The oxidation state of titanium in silicate melts. Geochimica et Cosmochimica Acta, 366, 210–220.
+  doi: 10.1016/j.gca.2023.11.014
+  url: https://doi.org/10.1016/j.gca.2023.11.014
+  year: 2024
+extraction:
+  method: Manual transcription from rendered publisher-version PDF pages; Table 2 read by rows and columns.
+  date: '2026-10-10'
+  worker: berry24
+review_status: draft
+fidelity_samples:
+  - species: Ti
+    observation_id: berry_2024_ti3_sumti_table2
+    observable: as_printed_table
+    field: quantity_as_printed
+    value: Ti3+/ΣTi
+    locator: {page: 214, table: '2'}
+  - species: Ti
+    observation_id: berry_2024_ti3_sumti_table2
+    observable: as_printed_table
+    field: rows
+    value:
+      - logfO2_nom: '−3.1'
+        logfO2_cal: '−3.10'
+        delta_FMQ_cal: '3.29'
+        Ti3+_over_SumTi: {AD: '0.000', AD+Fo: '0.000', AD+Wo: '0.000', AD+En: '0.000', AD+Qz: '0.000'}
+        method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+      - logfO2_nom: '−9.4'
+        logfO2_cal: '−9.40'
+        delta_FMQ_cal: '−3.01'
+        Ti3+_over_SumTi: {AD: '0.019', AD+Fo: '0.023', AD+Wo: '0.020', AD+En: '0.032', AD+Qz: '0.014'}
+        method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+      - logfO2_nom: '−11.0'
+        logfO2_cal: '−10.99'
+        delta_FMQ_cal: '−4.60'
+        Ti3+_over_SumTi: {AD: '0.042', AD+Fo: '0.042', AD+Wo: '0.040', AD+En: '0.058', AD+Qz: '0.069'}
+        method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+      - logfO2_nom: '−12.0'
+        logfO2_cal: '−12.01'
+        delta_FMQ_cal: '−5.62'
+        Ti3+_over_SumTi: {AD: '0.094', AD+Fo: '0.087', AD+Wo: '0.073', AD+En: '0.109', AD+Qz: '0.129'}
+        method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+      - logfO2_nom: '−13.0'
+        logfO2_cal: '−13.01'
+        delta_FMQ_cal: '−6.62'
+        Ti3+_over_SumTi: {AD: '0.156', AD+Fo: '0.150', AD+Wo: '0.125', AD+En: {as_printed: '–', state: {tag: unknown, reason: not_published}}, AD+Qz: {as_printed: '–', state: {tag: unknown, reason: not_published}}}
+        method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+      - logfO2_nom: '−13.5'
+        logfO2_cal: '−13.52'
+        delta_FMQ_cal: '−7.13'
+        Ti3+_over_SumTi: {AD: '0.185', AD+Fo: '0.190', AD+Wo: '0.165', AD+En: '0.226', AD+Qz: '0.262'}
+        method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+      - logfO2_nom: '−14.0'
+        logfO2_cal: '−13.98'
+        delta_FMQ_cal: '−7.59'
+        Ti3+_over_SumTi: {AD: '0.243', AD+Fo: '0.239', AD+Wo: '0.198', AD+En: '0.248', AD+Qz: '0.293'}
+        method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+      - logfO2_nom: '−16.1'
+        logfO2_cal: '−16.10'
+        delta_FMQ_cal: '−9.71'
+        Ti3+_over_SumTi: {AD: '0.511', AD+Fo: '0.500', AD+Wo: '0.451', AD+En: '0.558', AD+Qz: '0.622'}
+        method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+      - logfO2_nom: '−18.0'
+        logfO2_cal: '−16.35'
+        delta_FMQ_cal: '−9.96'
+        Ti3+_over_SumTi: {AD: '0.551', AD+Fo: '0.551', AD+Wo: '0.498', AD+En: '0.592', AD+Qz: '0.605'}
+        method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+      - logfO2_nom: '−20.0'
+        logfO2_cal: '−16.62'
+        delta_FMQ_cal: '−10.23'
+        Ti3+_over_SumTi: {AD: '0.591', AD+Fo: '0.579', AD+Wo: '0.539', AD+En: '0.613', AD+Qz: '0.674'}
+        method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+    locator: {page: 214, table: '2'}
+  - species: Ti
+    observation_id: berry_2024_glass_compositions_table1
+    observable: composition
+    field: compositions
+    value:
+      AD: {SiO2: '49.96(49)', Al2O3: '15.44(17)', MgO: '10.59(9)', CaO: '23.27(30)', TiO2: '1.03(1)', Total: '100.29(61)'}
+      AD+Fo: {SiO2: '49.15(59)', Al2O3: '13.19(12)', MgO: '17.41(19)', CaO: '19.83(31)', TiO2: '1.04(1)', Total: '100.62(70)'}
+      AD+Wo: {SiO2: '51.49(44)', Al2O3: '6.25(8)', MgO: '4.27(5)', CaO: '37.43(46)', TiO2: '1.02(2)', Total: '100.46(64)'}
+      AD+En: {SiO2: '54.09(62)', Al2O3: '9.53(21)', MgO: '21.66(41)', CaO: '14.31(37)', TiO2: '1.06(3)', Total: '100.65(86)'}
+      AD+Qz: {SiO2: '65.86(36)', Al2O3: '10.03(27)', MgO: '6.98(13)', CaO: '15.30(33)', TiO2: '1.13(2)', Total: '99.30(57)'}
+    locator: {page: 213, table: '1'}
+species:
+  Ti:
+    observations: []
+    context:
+      - observation_id: berry_2024_experimental_conditions
+        type: experiment_series
+        locator: {page: 211, section: Experimental}
+        units: as printed
+        values:
+          system: CaO-MgO-Al2O3-SiO2 (CMAS), five compositions; 1 wt% TiO2 added
+          preparation: Reagent-grade SiO2, Al2O3, MgO, and TiO2 were dried at 1000 °C; CaCO3 was dried at 300 °C. Powders were ground and mixed under acetone using an agate mortar and pestle, then mixed with polyethylene oxide and water to form a paste.
+          furnace: Vertical gas-mixing furnace; atmospheric pressure; 1400 °C.
+          oxygen_fugacity_control: CO2-CO gas mixing at log fO2 values −3.1 to −14, calculated using thermodynamic data in Chase (1998), corresponding to 3.3 to −7.6 log units relative to FMQ as calculated using O'Neill et al. (2018). For nominal log fO2 as low as −20, powders were pressed into pellets, placed in wells drilled in a graphite block, and equilibrated with CO or CO diluted with Ar; for CO = 1/2 O2 + C, log fO2 = 2 log K + 2 log fCO and 2 log K = −16.1 at 1400 °C.
+          oxygen_fugacity_check: For experiments at log fO2 −11 to −14, values were checked using the Fe content of Ti-free AD equilibrated simultaneously on an Fe loop. At the more reducing graphite-block conditions, Table 2 also reports model-calculated log fO2.
+          containers: Wire loops of Pt or Re suspended from a chandelier. At log fO2 = −3, loops and chandelier were Pt; at −3 > log fO2 ≥ −12, both Pt and Re loops were used with a Pt chandelier; at log fO2 ≤ −13, loops were Re and the chandelier was ceramic. At log fO2 ≤ −16.1, graphite block with drilled wells was used. Results in this work are for samples prepared using Re loops.
+          duration: About 20 h.
+          quench: Quenched in water; resulting glass beads were 3–5 mm.
+          run_temperature: 1400 °C for all melts in Table 2.
+          locator_details: Furnace, gas control, run setup, duration, and quench are described on printed p. 211 (PDF p. 3); graphite-block method on printed p. 212 (PDF p. 4); Table 2 caption states 1400 °C on printed p. 214 (PDF p. 6).
+      - observation_id: berry_2024_glass_compositions_table1
+        type: composition
+        locator: {page: 213, table: '1'}
+        units: wt% oxides; average glass compositions determined by EPMA; parenthesized uncertainties are one standard deviation.
+        values:
+          quantity: average_glass_composition_as_printed
+          basis: analysed average glass compositions by EPMA, not nominal starting compositions
+          oxides_in_table_order: [SiO2, Al2O3, MgO, CaO, TiO2]
+          compositions:
+            AD: {SiO2: '49.96(49)', Al2O3: '15.44(17)', MgO: '10.59(9)', CaO: '23.27(30)', TiO2: '1.03(1)', Total: '100.29(61)'}
+            AD+Fo: {SiO2: '49.15(59)', Al2O3: '13.19(12)', MgO: '17.41(19)', CaO: '19.83(31)', TiO2: '1.04(1)', Total: '100.62(70)'}
+            AD+Wo: {SiO2: '51.49(44)', Al2O3: '6.25(8)', MgO: '4.27(5)', CaO: '37.43(46)', TiO2: '1.02(2)', Total: '100.46(64)'}
+            AD+En: {SiO2: '54.09(62)', Al2O3: '9.53(21)', MgO: '21.66(41)', CaO: '14.31(37)', TiO2: '1.06(3)', Total: '100.65(86)'}
+            AD+Qz: {SiO2: '65.86(36)', Al2O3: '10.03(27)', MgO: '6.98(13)', CaO: '15.30(33)', TiO2: '1.13(2)', Total: '99.30(57)'}
+          number_of_analyses: {AD: 105, AD+Fo: 111, AD+Wo: 117, AD+En: 134, AD+Qz: 106}
+      - observation_id: berry_2024_ti3_sumti_table2
+        type: as_printed_table
+        locator: {page: 214, table: '2'}
+        units: dimensionless Ti3+/ΣTi fraction, as calculated and printed
+        uncertainty:
+          note: Table 2 states that uncertainty in Ti3+/ΣTi is estimated to be similar to the LCF uncertainty, ±0.015; applied here to each numeric table cell as the shared printed estimate.
+        values:
+          quantity_as_printed: Ti3+/ΣTi
+          method: Recorded spectra of the most oxidised and most reduced glasses are fitted by linear combination over 4960–5000 eV, with the reduced glass Ti3+ fraction initially unknown. Eq. (3) jointly optimises that fraction, log K′, and the fO2 shift using the expected redox relation with fixed −1/4 dependence. Only afterward, Eq. (4) derives pure Ti3+ and Ti4+ end-member spectra. Printed pp. 212–214.
+          table2_model_interpretation: These Ti3+/SumTi values are outputs of a fit that assumes the one-electron (-1/4) fO2 dependence; the fO2 slope of this table is therefore not an independent measurement. The independent information is the position (log K') per composition.
+          fO2_representation_as_printed: >-
+            Table 2 reports nominal and calculated log fO2 in the conventional standard state, calculated ΔFMQ, and defines log fO2 relative to IW as log fO2_cal + 9.71. This printed offset is −log fO2(IW) at 1400 °C. The IW relation is attributed to O'Neill and Pownceby (1993): 14.056 − 28776.5/T − 2.0384 log T (printed p. 217). Extractor's check (not printed in the paper): at T = 1673.15 K the relation gives 14.056 − 17.199 − 6.571 = −9.714, consistent with the printed 9.71 offset. The experimental section cites Chase (1998) for thermodynamic data used for absolute log fO2 and O'Neill et al. (2018) for FMQ-relative values; these apply at 1400 °C. No fO2 values have been computed in this extract.
+          temperature: 1400 °C for all rows.
+          fixed_method_phrase: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+          rows:
+            - logfO2_nom: '−3.1'
+              logfO2_cal: '−3.10'
+              delta_FMQ_cal: '3.29'
+              Ti3+_over_SumTi: {AD: '0.000', AD+Fo: '0.000', AD+Wo: '0.000', AD+En: '0.000', AD+Qz: '0.000'}
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+            - logfO2_nom: '−9.4'
+              logfO2_cal: '−9.40'
+              delta_FMQ_cal: '−3.01'
+              Ti3+_over_SumTi: {AD: '0.019', AD+Fo: '0.023', AD+Wo: '0.020', AD+En: '0.032', AD+Qz: '0.014'}
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+            - logfO2_nom: '−11.0'
+              logfO2_cal: '−10.99'
+              delta_FMQ_cal: '−4.60'
+              Ti3+_over_SumTi: {AD: '0.042', AD+Fo: '0.042', AD+Wo: '0.040', AD+En: '0.058', AD+Qz: '0.069'}
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+            - logfO2_nom: '−12.0'
+              logfO2_cal: '−12.01'
+              delta_FMQ_cal: '−5.62'
+              Ti3+_over_SumTi: {AD: '0.094', AD+Fo: '0.087', AD+Wo: '0.073', AD+En: '0.109', AD+Qz: '0.129'}
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+            - logfO2_nom: '−13.0'
+              logfO2_cal: '−13.01'
+              delta_FMQ_cal: '−6.62'
+              Ti3+_over_SumTi:
+                AD: '0.156'
+                AD+Fo: '0.150'
+                AD+Wo: '0.125'
+                AD+En: {as_printed: '–', state: {tag: unknown, reason: not_published}}
+                AD+Qz: {as_printed: '–', state: {tag: unknown, reason: not_published}}
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+            - logfO2_nom: '−13.5'
+              logfO2_cal: '−13.52'
+              delta_FMQ_cal: '−7.13'
+              Ti3+_over_SumTi: {AD: '0.185', AD+Fo: '0.190', AD+Wo: '0.165', AD+En: '0.226', AD+Qz: '0.262'}
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+            - logfO2_nom: '−14.0'
+              logfO2_cal: '−13.98'
+              delta_FMQ_cal: '−7.59'
+              Ti3+_over_SumTi: {AD: '0.243', AD+Fo: '0.239', AD+Wo: '0.198', AD+En: '0.248', AD+Qz: '0.293'}
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+            - logfO2_nom: '−16.1'
+              logfO2_cal: '−16.10'
+              delta_FMQ_cal: '−9.71'
+              Ti3+_over_SumTi: {AD: '0.511', AD+Fo: '0.500', AD+Wo: '0.451', AD+En: '0.558', AD+Qz: '0.622'}
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+            - logfO2_nom: '−18.0'
+              logfO2_cal: '−16.35'
+              delta_FMQ_cal: '−9.96'
+              Ti3+_over_SumTi: {AD: '0.551', AD+Fo: '0.551', AD+Wo: '0.498', AD+En: '0.592', AD+Qz: '0.605'}
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+            - logfO2_nom: '−20.0'
+              logfO2_cal: '−16.62'
+              delta_FMQ_cal: '−10.23'
+              Ti3+_over_SumTi: {AD: '0.591', AD+Fo: '0.579', AD+Wo: '0.539', AD+En: '0.613', AD+Qz: '0.674'}
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
+          calibration_and_model:
+            method_and_locator: Ti K-edge XANES spectra, printed pp. 212–215 (PDF pp. 4–7).
+            energy_reference: Ti foil first derivative-spectrum peak set to 4966.4 eV; printed p. 212.
+            spectral_feature: LCF over 4960–5000 eV; printed p. 212. Pre-edge fit uses three same-line-shape pseudo-Voigt peaks and intensity-weighted centroid around 4970 eV; printed p. 212. Table 2 values use the LCF model rather than the centroid as direct valence calibration.
+            end_members: For each composition, the recorded spectra of the most oxidised and most reduced glasses are fitted by linear combination; the reduced glass Ti3+ fraction is initially unknown. Eq. (3) jointly optimises that fraction, log K′, and the shared fO2 shift using the expected log(Ti3+/Ti4+)–log fO2 relation with fixed −1/4 dependence (printed pp. 212–213). Only afterward, Eq. (4) derives pure Ti3+ and Ti4+ end-member spectra (printed p. 214).
+            physical_compounds: Ti2O3, TiO2, and Ni2.62Ti0.69O4 (spinel) standards mixed with BN (~1 wt% Ti) are described as prepared previously; printed p. 212. The paper does not state that these compounds set the Table 2 Ti3+/ΣTi scale.
+            model_note: The expected relation is log(Ti3+/Ti4+) = −1/4 log fO2 − log K′ (Eq. 1, printed p. 211). No slope or fO2 value has been calculated in this extract.
