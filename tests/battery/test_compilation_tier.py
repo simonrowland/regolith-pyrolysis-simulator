@@ -2121,6 +2121,49 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
     assert decision_band_for(Quantity.CP, SourceRelation.SAME_INPUT) is None
 
 
+def test_vaporock_gas_census_preserves_same_input_relation(monkeypatch) -> None:
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    from simulator.battery import score as score_module
+    from simulator.battery.compilation_tier import compilation_tier_census
+
+    reference = F.observation(
+        "kgas-cp-janaf",
+        "exp-1",
+        _gas_thermo(temperature_K=Decimal("1200")),
+        Decimal("20.787"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    residuals = []
+    compile_residual = score_module.compile_residual
+
+    def capture_residual(*args, **kwargs):
+        result = compile_residual(*args, **kwargs)
+        residuals.append(result[0])
+        return result
+
+    monkeypatch.setattr(score_module, "compile_residual", capture_residual)
+    census = compilation_tier_census(
+        _context(reference),
+        engines=(Engine.VAPOROCK,),
+        audit_compile_residual=False,
+    )
+
+    row = next(
+        row for row in census["rows"]
+        if row["quantity"] == Quantity.CP.value
+    )
+    assert row["reachable"] == 1
+    assert row["numeric"] == 1
+    assert row["refused"] == {}
+    assert len(residuals) == 1
+    assert residuals[0].reference == reference.observation_id
+    assert residuals[0].source_relation is SourceRelation.SAME_INPUT
+
+
 def test_vaporock_gas_refuses_missing_species_and_out_of_interval() -> None:
     import pytest
 
