@@ -1552,11 +1552,22 @@ def test_costa_2015_fo93fa7_composition_reaches_migrated_observations(
         temperature = conditions["temperature_K"]
         assert temperature.state.is_value
         assert temperature.state.value == observation.identity.temperature_K.value
+        assert temperature.inference is None
         located_composition = conditions["composition"]
         assert located_composition.state.is_value
         assert located_composition.state.value == composition.value
         assert located_composition.locator.page == 1
         assert located_composition.locator.pdf_page_index == 0
+
+    first_digitized_point = next(
+        observation
+        for observation in mapped
+        if observation.identity.temperature_K.value == Decimal("2014.83")
+    )
+    assert first_digitized_point.identity.temperature_K.value == Decimal("2014.83")
+    assert first_digitized_point.point_conditions["temperature_K"].state.value == Decimal(
+        "2014.83"
+    )
 
     measured_points = [
         observation
