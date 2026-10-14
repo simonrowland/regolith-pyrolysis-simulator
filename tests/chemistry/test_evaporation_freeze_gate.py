@@ -4327,19 +4327,11 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
     )
 
 
-def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version(
-    monkeypatch,
-    tmp_path,
-    vapor_pressure_data,
-    feedstocks_data,
-    setpoints_data,
-):
+def _installed_magemin_runtime_binaries():
     import hashlib
     from pathlib import Path
     import subprocess
-    import sys
 
-    from simulator import engine_local_config
     from simulator.engine_local_config import configured_magemin_binary_path
     from simulator.melt_backend.magemin import MAGEMinBackend
 
@@ -4374,14 +4366,13 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version(
         if digest not in seen_digests:
             runtime_binaries.append(binary)
             seen_digests.add(digest)
-    if len(runtime_binaries) < 2:
-        pytest.skip('requires two installed MAGEMin runtime builds')
+    return runtime_binaries
 
-    monkeypatch.setattr(
-        engine_local_config,
-        'cache_version_for',
-        lambda _engine: None,
-    )
+
+def _write_delegating_magemin_launcher(tmp_path):
+    from pathlib import Path
+    import sys
+
     target_file = tmp_path / 'delegated-magemin'
     launcher = tmp_path / 'MAGEMin-launcher'
     launcher.write_text(
@@ -4390,15 +4381,17 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version(
         'import hashlib\n'
         'import subprocess\n'
         'import sys\n'
-        'target = Path(__file__).with_name("delegated-magemin").read_text().strip()\n'
-        'result = subprocess.run([target, *sys.argv[1:]], capture_output=True, text=True)\n'
+        'metadata = Path(__file__).with_name("delegated-magemin").read_text().splitlines()\n'
+        'target = Path(metadata[0])\n'
+        'result = subprocess.run([str(target), *sys.argv[1:]], capture_output=True, text=True)\n'
         'if sys.argv[1:2] == ["--version"] and result.returncode == 0:\n'
         '    output = result.stdout or result.stderr\n'
         '    lines = output.strip().splitlines()\n'
         '    if lines:\n'
-        '        with open(target, "rb") as stream:\n'
+        '        with target.open("rb") as stream:\n'
         '            runtime_digest = hashlib.file_digest(stream, "sha256").hexdigest()\n'
-        '        print(f"{lines[0]} (runtime sha256={runtime_digest})")\n'
+        '        label = metadata[1] if len(metadata) > 1 else f"runtime sha256={runtime_digest}"\n'
+        '        print(f"{lines[0]} ({label})")\n'
         '    else:\n'
         '        sys.stdout.write(result.stdout)\n'
         '        sys.stderr.write(result.stderr)\n'
@@ -4408,6 +4401,29 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version(
         'sys.exit(result.returncode)\n'
     )
     launcher.chmod(0o755)
+    return target_file, launcher
+
+
+def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator import engine_local_config
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    runtime_binaries = _installed_magemin_runtime_binaries()
+    if len(runtime_binaries) < 2:
+        pytest.skip('requires two installed MAGEMin runtime builds')
+
+    monkeypatch.setattr(
+        engine_local_config,
+        'cache_version_for',
+        lambda _engine: None,
+    )
+    target_file, launcher = _write_delegating_magemin_launcher(tmp_path)
 
     curve = {
         'source': 'gate_liquid_fraction:fallback:magemin-shadow',
@@ -4460,6 +4476,94 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version(
     ]['sha256'] == receiver_evidence.provenance['runtime_artifacts'][
         'magemin_selected_binary'
     ]['sha256']
+    assert not engine_binding_admission.gate_curve_memo_origin_matches(
+        receiver,
+        curve,
+        record['origin'],
+        fresh_evidence=True,
+        evidence=receiver_evidence,
+    )
+
+
+def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version_on_one_install(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator import engine_local_config
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    runtime_binaries = _installed_magemin_runtime_binaries()
+    if not runtime_binaries:
+        pytest.skip('requires one installed MAGEMin runtime')
+
+    monkeypatch.setattr(
+        engine_local_config,
+        'cache_version_for',
+        lambda _engine: None,
+    )
+    target_file, launcher = _write_delegating_magemin_launcher(tmp_path)
+    curve = {
+        'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+        'status': 'ok',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1300.0,
+    }
+
+    def build_sim(*, change_reported_version):
+        sim = _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+        sim._register_freeze_gate_liquid_fraction_providers()
+        backend = MAGEMinBackend()
+        backend._binary_path = launcher
+        provider = sim._chem_registry.fallback_for(
+            ChemistryIntent.GATE_LIQUID_FRACTION
+        )
+        provider._backend = backend
+        reported_version = (
+            '\nreported-runtime-version=changed-by-test\n'
+            if change_reported_version
+            else '\n'
+        )
+        target_file.write_text(f'{runtime_binaries[0]}{reported_version}')
+        return sim, backend
+
+    producer, producer_backend = build_sim(change_reported_version=False)
+    producer_version = producer_backend.get_engine_version()
+    producer_evidence = engine_binding_admission.gate_curve_memo_evidence(
+        producer,
+        curve,
+        include_selected_bindings=False,
+    )
+    record = engine_binding_admission.write_gate_curve_memo_record(
+        producer,
+        curve,
+        evidence=producer_evidence,
+    )
+
+    receiver, receiver_backend = build_sim(change_reported_version=True)
+    receiver_version = receiver_backend.get_engine_version()
+    receiver_evidence = engine_binding_admission.gate_curve_memo_evidence(
+        receiver,
+        curve,
+        include_selected_bindings=False,
+    )
+
+    assert producer_version != receiver_version
+    assert producer_evidence.provenance['runtime_artifacts'][
+        'magemin_selected_binary'
+    ]['sha256'] == receiver_evidence.provenance['runtime_artifacts'][
+        'magemin_selected_binary'
+    ]['sha256']
+    assert producer_evidence.producer_evidence != (
+        receiver_evidence.producer_evidence
+    )
     assert not engine_binding_admission.gate_curve_memo_origin_matches(
         receiver,
         curve,
