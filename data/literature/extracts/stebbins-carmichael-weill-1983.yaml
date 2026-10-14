@@ -418,7 +418,7 @@ species:
             derivation:
               relation: H(T)-H(300 K) heat-content functions fitted to measured heat-capacity and heat-content data
               inputs: [Table 2 DSC Cp points, Table 3 drop-calorimetric heat contents]
-            derived_from: [tables:stebbins-carmichael-weill-1983/t2.csv, tables:stebbins-carmichael-weill-1983/t3.csv]
+            derived_from: [stebbins_1983_diopside_calorimetry_measured_tables_1_3]
             locator: {table: '4', page: PDF p. 6 / printed p. 722}
             equation: H_T_minus_H_300 = A*T + B*T^2 + C*T^-1 + D*T^0.5 + E*T^3 + F
             coefficient_units: table-scaled_as_printed
@@ -469,7 +469,7 @@ species:
           composition: CaMgSi2O6
           quantity: heat_of_fusion
           method_class: measured_reduced
-          derived_from: [stebbins_1983_diopside_calorimetry_measured_tables_1_3, tables:stebbins-carmichael-weill-1983/t4.csv, tables:stebbins-carmichael-weill-1983/t6.csv]
+          derived_from: [stebbins_1983_diopside_calorimetry_measured_tables_1_3, pdf:stebbins-carmichael-weill-1983]
           derivation:
             relation: Delta H_f(T) = H_liquid(T) - H_crystal(T); the paper combines liquid and crystal heat contents, heat of vitrification, and heat-capacity integrations as in Equations 3-4.
             inputs: ["Crystalline diopside drop data of White (1919) and Wagner (1932), compiled by Kelley (1960) and Robie et al. (1979), plus Ferrier (1968a)'s equation fitted to 38 measurements and combined with earlier studies (printed p. 721)", "Table 4 liquid heat-content fit", "Table 6 heat-of-vitrification values; Weill et al. (1980a) selected by the authors (printed p. 721)", "Subtract 1100 cal/mol from the glass enthalpy difference H^g_985-H^g_300 to include the enthalpy of annealing (printed p. 721)"]
@@ -479,7 +479,7 @@ species:
             derivation:
               relation: liquid-minus-crystal enthalpy at the stated fusion temperature; heat-of-vitrification and heat-capacity integrals are combined as described in Equations 3-4
               inputs: ["Crystalline diopside drop data of White (1919) and Wagner (1932), compiled by Kelley (1960) and Robie et al. (1979), plus Ferrier (1968a)'s equation fitted to 38 measurements and combined with earlier studies (printed p. 721)", "Table 4 liquid heat-content fit", "Table 6 heat-of-vitrification values; Weill et al. (1980a) selected by the authors (printed p. 721)", "Subtract 1100 cal/mol from the glass enthalpy difference H^g_985-H^g_300 to include the enthalpy of annealing (printed p. 721)"]
-            derived_from: [stebbins_1983_diopside_calorimetry_measured_tables_1_3, tables:stebbins-carmichael-weill-1983/t4.csv, tables:stebbins-carmichael-weill-1983/t6.csv]
+            derived_from: [stebbins_1983_diopside_calorimetry_measured_tables_1_3, pdf:stebbins-carmichael-weill-1983]
             entropy_of_fusion: {value: 20.2, units: cal/mol/K, locator: {page: 728, section: Discussion}}
             conversion_to_kJ_per_mol_formula_unit:
               premise: 1 kcal = 4.184 kJ
@@ -681,7 +681,7 @@ species:
           composition: NaAlSi3O8
           quantity: heat_of_fusion
           method_class: measured_reduced
-          derived_from: [stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5, tables:stebbins-carmichael-weill-1983/t4.csv, tables:stebbins-carmichael-weill-1983/t5.csv, tables:stebbins-carmichael-weill-1983/t6.csv, Stebbins et al. (1982) albite glass and liquid heat-content series]
+          derived_from: [stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5, pdf:stebbins-carmichael-weill-1983, Stebbins et al. (1982) albite glass and liquid heat-content series]
           derivation:
             relation: Delta H_f(T) = H_liquid(T) - H_crystal(T), combining the stable-liquid and disordered-crystal heat-content functions with heat-of-vitrification and heat-capacity corrections (Equations 3-4).
             inputs: ["Hemingway et al. (1981) crystalline albite heat-capacity equation selected for the disordered phase (printed p. 725)", "Weill et al. (1980a) heat-of-vitrification estimate selected and adjusted to 1373 K (printed p. 725)", "Subtract the 555 cal/mol annealing term at 981 K (Table 1 annealed-minus-unannealed difference; printed pp. 720 and 725)", "Table 5 crystalline analbite and low-albite melt heat contents", "Stebbins et al. (1982) albite glass/liquid heat-content series"]
@@ -698,7 +698,7 @@ species:
             derivation:
               relation: liquid-minus-crystal enthalpy at 1373 K using the stable-liquid and disordered-crystal heat-content equations
               inputs: ["Hemingway et al. (1981) crystalline albite heat-capacity equation selected for the disordered phase (printed p. 725)", "Weill et al. (1980a) heat-of-vitrification estimate selected and adjusted to 1373 K (printed p. 725)", "Subtract the 555 cal/mol annealing term at 981 K (Table 1 annealed-minus-unannealed difference; printed pp. 720 and 725)", "Table 5 crystalline analbite and low-albite melt heat contents", "Stebbins et al. (1982) albite glass/liquid heat-content series"]
-            derived_from: [stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5, tables:stebbins-carmichael-weill-1983/t4.csv, tables:stebbins-carmichael-weill-1983/t5.csv, tables:stebbins-carmichael-weill-1983/t6.csv, Stebbins et al. (1982) albite glass and liquid heat-content series]
+            derived_from: [stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5, pdf:stebbins-carmichael-weill-1983, Stebbins et al. (1982) albite glass and liquid heat-content series]
             entropy_of_fusion:
               values:
                 - {value: 10.9, units: cal/mol/K, locator: {page: 717, section: Abstract}}
@@ -810,7 +810,7 @@ species:
           composition: KAlSi3O8
           system: sanidine_glass_liquid_and_crystal
           method_class: measured_reduced
-          derived_from: [tables:stebbins-carmichael-weill-1983/t3.csv, Krupka et al. (1979) DSC glass Cp data]
+          derived_from: [stebbins_1983_sanidine_calorimetry_measured_table_3, Krupka et al. (1979) DSC glass Cp data]
           derivation:
             relation: H(T)-H(300 K) glass and stable-liquid functions fitted to Table 3 heat contents, with cited DSC glass Cp data
             inputs: [Table 3 glass and liquid heat-content series, Krupka et al. (1979) DSC glass Cp data, cited solid heat capacities]
@@ -820,7 +820,7 @@ species:
             derivation:
               relation: H(T)-H(300 K) glass and stable-liquid functions fitted to Table 3 heat contents, with cited DSC glass Cp data
               inputs: [Table 3 glass and liquid heat-content series, Krupka et al. (1979) DSC glass Cp data, cited solid heat capacities]
-            derived_from: [tables:stebbins-carmichael-weill-1983/t3.csv, Krupka et al. (1979) DSC glass Cp data]
+            derived_from: [stebbins_1983_sanidine_calorimetry_measured_table_3, Krupka et al. (1979) DSC glass Cp data]
             locator: {table: '4', page: PDF p. 6 / printed p. 722}
             equation: H_T_minus_H_300 = A*T + B*T^2 + C*T^-1 + D*T^0.5 + E*T^3 + F
             coefficient_units: table-scaled_as_printed
@@ -872,7 +872,7 @@ species:
           composition: KAlSi3O8
           quantity: heat_of_fusion
           method_class: measured_reduced
-          derived_from: [stebbins_1983_sanidine_calorimetry_measured_table_3, tables:stebbins-carmichael-weill-1983/t3.csv, tables:stebbins-carmichael-weill-1983/t4.csv, tables:stebbins-carmichael-weill-1983/t6.csv, Waldbaum (1968) metastable melting-temperature estimate]
+          derived_from: [stebbins_1983_sanidine_calorimetry_measured_table_3, pdf:stebbins-carmichael-weill-1983, Waldbaum (1968) metastable melting-temperature estimate]
           derivation:
             relation: Delta H_f(T) = H_liquid(T) - H_crystal(T) at the hypothetical metastable 1473 K reference; the paper combines liquid and crystal heat contents, heat of vitrification, and heat-capacity corrections as in Equations 3-4.
             inputs: ["Hemingway et al. (1981) crystalline sanidine heat-capacity equation based on DSC data to 1000 K, extrapolated above (printed p. 726)", "Waldbaum and Robie (1971) heat-of-vitrification value selected for sanidine (printed p. 726)", "Add approximately 555 cal/mol because the Waldbaum and Robie glass was thoroughly annealed relative to the rapidly quenched calorimeter glass (printed p. 726)", "Table 3 heat-content series and Krupka et al. (1979) DSC glass heat-capacity data", "Waldbaum (1968) metastable melting-temperature estimate"]
@@ -889,7 +889,7 @@ species:
             derivation:
               relation: metastable congruent liquid-minus-crystal enthalpy at the extrapolated 1473 K melting point
               inputs: ["Hemingway et al. (1981) crystalline sanidine heat-capacity equation based on DSC data to 1000 K, extrapolated above (printed p. 726)", "Waldbaum and Robie (1971) heat-of-vitrification value selected for sanidine (printed p. 726)", "Add approximately 555 cal/mol because the Waldbaum and Robie glass was thoroughly annealed relative to the rapidly quenched calorimeter glass (printed p. 726)", "Table 3 heat-content series and Krupka et al. (1979) DSC glass heat-capacity data", "Waldbaum (1968) metastable melting-temperature estimate"]
-            derived_from: [stebbins_1983_sanidine_calorimetry_measured_table_3, tables:stebbins-carmichael-weill-1983/t3.csv, tables:stebbins-carmichael-weill-1983/t4.csv, tables:stebbins-carmichael-weill-1983/t6.csv]
+            derived_from: [stebbins_1983_sanidine_calorimetry_measured_table_3, pdf:stebbins-carmichael-weill-1983]
             entropy_of_fusion: {value: 9.4, units: cal/mol/K, locator: {page: 717, section: Abstract}}
             direct_fusion_temperature_estimate: {value: 1473, uncertainty: 40, units: K, source: Waldbaum (1968), locator: {page: 726, section: Sanidine}}
             conversion_to_kJ_per_mol_formula_unit:
@@ -993,7 +993,7 @@ species:
             derivation:
               relation: H(T)-H(300 K) functions fitted to Table 3 heat contents
               inputs: [table_3_heat_content]
-            derived_from: [tables:stebbins-carmichael-weill-1983/t3.csv]
+            derived_from: [stebbins_1983_nepheline_calorimetry_measured_table_3]
             locator: {table: '4', page: PDF p. 6 / printed p. 722}
             equation: H_T_minus_H_300 = A*T + B*T^2 + C*T^-1 + D*T^0.5 + E*T^3 + F
             coefficient_units: table-scaled_as_printed
@@ -1046,7 +1046,7 @@ species:
           composition: NaAlSiO4
           quantity: heat_of_fusion
           method_class: measured_reduced
-          derived_from: [stebbins_1983_nepheline_calorimetry_measured_table_3, tables:stebbins-carmichael-weill-1983/t3.csv, tables:stebbins-carmichael-weill-1983/t4.csv, tables:stebbins-carmichael-weill-1983/t6.csv, phase-diagram estimate of metastable γ-nepheline melting temperature]
+          derived_from: [stebbins_1983_nepheline_calorimetry_measured_table_3, pdf:stebbins-carmichael-weill-1983, phase-diagram estimate of metastable γ-nepheline melting temperature]
           derivation:
             relation: Delta H_f(T) = H_liquid(T) - H_crystal(T) at the estimated metastable γ-nepheline temperature; the authors use β-nepheline heat of vitrification at 985 K and the reported zero β-to-γ transition enthalpy.
             inputs: ["Kelley et al. (1953) heat capacities for the four nepheline polymorphs; the authors report zero enthalpy change from beta to gamma (printed p. 726)", "Navrotsky et al. (1980) beta-nepheline heat-of-vitrification value measured at 985 K (printed p. 726)", "Table 3 liquid heat-content series and Table 4 glass/liquid functions", "Phase-diagram estimate of metastable gamma-nepheline melting at 1750 +/- 50 K; gamma-to-carnegieite conversion at 1525 K (printed pp. 726-727)"]
@@ -1057,7 +1057,7 @@ species:
             derivation:
               relation: liquid-minus-crystal enthalpy at the estimated metastable 1750 K γ-nepheline fusion temperature
               inputs: ["Kelley et al. (1953) heat capacities for the four nepheline polymorphs; the authors report zero enthalpy change from beta to gamma (printed p. 726)", "Navrotsky et al. (1980) beta-nepheline heat-of-vitrification value measured at 985 K (printed p. 726)", "Table 3 liquid heat-content series and Table 4 glass/liquid functions", "Phase-diagram estimate of metastable gamma-nepheline melting at 1750 +/- 50 K; gamma-to-carnegieite conversion at 1525 K (printed pp. 726-727)"]
-            derived_from: [stebbins_1983_nepheline_calorimetry_measured_table_3, tables:stebbins-carmichael-weill-1983/t3.csv, tables:stebbins-carmichael-weill-1983/t4.csv, tables:stebbins-carmichael-weill-1983/t6.csv]
+            derived_from: [stebbins_1983_nepheline_calorimetry_measured_table_3, pdf:stebbins-carmichael-weill-1983]
             entropy_of_fusion: {value: 6.7, uncertainty: 0.2, units: cal/mol/K, T_uncertainty_K: 50, locator: {page: 728, section: Discussion}}
             entropy_alternate_basis: {value: 0.96, uncertainty: 0.03, units: cal/gram-atom/K, locator: {page: 728, section: Discussion}}
             conversion_to_kJ_per_mol_formula_unit:
