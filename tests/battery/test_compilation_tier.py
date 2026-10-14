@@ -2855,15 +2855,21 @@ def test_scorer_streams_series_cells_without_child_observations(monkeypatch) -> 
 def test_internal_predicts_janaf_fusion_enthalpy_and_entropy() -> None:
     # JANAF Mg-008/Mg-009 print ΔfH at 3000 K as −709.524/−632.496
     # kJ/mol, so ΔH_fus is 77.028 kJ/mol. At 3100 K the printed values
-    # are −707.689/−629.904 kJ/mol, giving ΔH=77.785 kJ/mol and
-    # ΔS=77,785 J/mol / 3100 K = 25.091935... J/(mol K).
+    # are −707.689/−629.904 kJ/mol. Printed entropies give ΔS=24.804 at
+    # 3000 K (167.293−142.489) and 25.052 J/(mol K) at 3100 K
+    # (169.488−144.436), independently of the enthalpy values.
     experiment = F.tabulation_experiment()
     expected = (
         (Quantity.ENTHALPY_OF_FUSION, Decimal("3000"), Decimal("77.028")),
         (
             Quantity.ENTROPY_OF_FUSION,
+            Decimal("3000"),
+            Decimal("24.804"),
+        ),
+        (
+            Quantity.ENTROPY_OF_FUSION,
             Decimal("3100"),
-            Decimal("77785") / Decimal("3100"),
+            Decimal("25.052"),
         ),
     )
     for quantity, temperature, value in expected:
@@ -2881,6 +2887,12 @@ def test_internal_predicts_janaf_fusion_enthalpy_and_entropy() -> None:
             Quantity.ENTHALPY_OF_FUSION: "kJ_per_declared_mol_basis",
             Quantity.ENTROPY_OF_FUSION: "J_per_declared_mol_basis_per_K",
         }[quantity]
+        if quantity is Quantity.ENTROPY_OF_FUSION:
+            assert any(
+                notice.reason == "janaf_fusion_transition_off_equilibrium"
+                and "3104.968" in notice.band
+                for notice in attempt.notices
+            )
 
 
 def test_non_internal_engine_has_typed_fusion_refusal() -> None:

@@ -2660,6 +2660,13 @@ def _fusion_property_points(
     return tuple(points), digest, tuple(sorted(missing))
 
 
+@lru_cache(maxsize=2 * len(_FUSION_TABLES))
+def _fusion_entropy_points(
+    table_id: str,
+) -> tuple[tuple[tuple[Decimal, Decimal], ...], str, tuple[Decimal, ...]]:
+    return _fusion_property_points(table_id, "entropy")
+
+
 def _checked_fusion_table_rows(table_id: str) -> tuple[list[Mapping], str]:
     document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
     extraction = document.get("extraction")
@@ -2711,6 +2718,39 @@ def janaf_fusion_enthalpy(
         liquid_id,
         (solid_sha, liquid_sha),
     )
+
+
+def janaf_fusion_entropy(
+    oxide: str, temperature_K: Decimal
+) -> tuple[Decimal, Decimal]:
+    """Return ΔS_fus(T) and the selected pair's JANAF Gibbs crossing."""
+
+    try:
+        solid_id, liquid_id = _FUSION_TABLES[oxide]
+    except KeyError as exc:
+        raise ValueError(f"no JANAF fusion table pair for {oxide}") from exc
+    solid, _solid_sha, solid_missing = _fusion_entropy_points(solid_id)
+    liquid, _liquid_sha, liquid_missing = _fusion_entropy_points(liquid_id)
+    low = max(solid[0][0], liquid[0][0])
+    high = min(solid[-1][0], liquid[-1][0])
+    if low <= temperature_K <= high:
+        for points, missing in ((solid, solid_missing), (liquid, liquid_missing)):
+            missing_node = _missing_node_for_interpolation(
+                points, missing, temperature_K
+            )
+            if missing_node is not None:
+                raise ValueError(
+                    f"JANAF entropy interpolation spans missing grid node "
+                    f"{missing_node} K at {temperature_K} K"
+                )
+    delta_s = (
+        _interpolate_table_points(liquid, temperature_K, extrapolate=True)
+        - _interpolate_table_points(solid, temperature_K, extrapolate=True)
+    )
+    crossing = _janaf_fusion_energy_for_pair(
+        oxide, solid_id, liquid_id, temperature_K
+    ).melting_temperature_K
+    return delta_s, crossing
 
 
 @lru_cache(maxsize=2 * len(_FUSION_TABLES))

@@ -1240,7 +1240,10 @@ def predict_thermo_attempt(
                 origin=origin,
             )
         try:
-            from simulator.battery.generators.janaf import janaf_fusion_enthalpy
+            from simulator.battery.generators.janaf import (
+                janaf_fusion_enthalpy,
+                janaf_fusion_entropy,
+            )
 
             enthalpy_J_mol, low, high, solid, liquid, hashes = janaf_fusion_enthalpy(
                 identity.species.formula, temperature_K
@@ -1255,9 +1258,10 @@ def predict_thermo_attempt(
             )
         notices: tuple[Notice, ...] = ()
         authority = Authority.BRIDGE
+        notice_list: list[Notice] = []
         if temperature_K < low or temperature_K > high:
             authority = Authority.EXTRAPOLATED
-            notices = (
+            notice_list.append(
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                     affected_quantities=(quantity,),
@@ -1265,16 +1269,28 @@ def predict_thermo_attempt(
                     origin=origin,
                     band=f"[{low}, {high}] K",
                     authority=Authority.EXTRAPOLATED,
-                ),
+                )
             )
-        # JANAF formation enthalpies are kJ/mol; their endmember difference
-        # cancels the elemental reference. Convert to J/mol before deriving
-        # ΔS_fus = ΔH_fus/T_fus (J/mol/K); return the declared unit per kind.
-        predicted = (
-            enthalpy_J_mol / Decimal(1000)
-            if quantity is Quantity.ENTHALPY_OF_FUSION
-            else enthalpy_J_mol / temperature_K
-        )
+        if quantity is Quantity.ENTHALPY_OF_FUSION:
+            # JANAF formation enthalpies are kJ/mol; their endmember difference
+            # cancels the elemental reference. Convert to the declared unit.
+            predicted = enthalpy_J_mol / Decimal(1000)
+        else:
+            predicted, crossing_K = janaf_fusion_entropy(
+                identity.species.formula, temperature_K
+            )
+            if temperature_K != crossing_K:
+                notice_list.append(
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(quantity,),
+                        reason="janaf_fusion_transition_off_equilibrium",
+                        origin=origin,
+                        band=f"fusion crossing at {crossing_K} K",
+                        authority=authority,
+                    )
+                )
+        notices = tuple(notice_list)
         return ThermoAttempt(
             value=predicted,
             unit=QUANTITY_UNITS[quantity],
