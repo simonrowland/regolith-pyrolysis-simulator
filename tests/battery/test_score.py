@@ -95,6 +95,7 @@ from simulator.battery.score import (
     flagged_stratum_payloads,
     headline_payloads,
     load_score_context,
+    measured_engine_rail_records,
     parse_species_formula,
     predict_with_engine,
     resolve_source_relation,
@@ -4514,6 +4515,93 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
     assert payload_stratum["band_derived_n"] == 10
     assert payload_stratum["tail_out_count"] is None
     assert payload_record["match_rate_label"] == "band membership"
+
+
+def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None:
+    from simulator.battery.records import ResidualRefusal
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    observations = tuple(
+        F.observation(
+            f"headline-{name}",
+            experiment.experiment_id,
+            F.psat_identity("Na"),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=work.work_id,
+        )
+        for name in ("a", "b", "flagged", "refused")
+    )
+    context = _context(work, experiment, *observations)
+    engine = Engine.INTERNAL_ANALYTICAL
+    unit = "dimensionless"
+    band = DecisionBand(Decimal("20"), unit, "fixture band")
+
+    def measured(index: int, value: str) -> Residual:
+        return F.residual(
+            f"headline::{observations[index].observation_id}::{engine.value}",
+            observations[index].observation_id,
+            candidate="produced",
+            status=ResidualStatus.MATCH,
+            rail=Rail.VAPOUR,
+            numeric=ResidualNumeric(MetricOperation.DEX, unit, Decimal(value), band),
+        )
+
+    flagged_notice = Notice(
+        NoticeKind.OUT_OF_CERTIFIED_BAND,
+        (Quantity.P_SAT,),
+        "fixture outside certified domain",
+        "engine:fixture",
+    )
+    residuals = (
+        measured(0, "3"),
+        measured(1, "4"),
+        replace(measured(2, "10"), notices=(flagged_notice,)),
+        F.residual(
+            f"headline::{observations[3].observation_id}::{engine.value}",
+            observations[3].observation_id,
+            candidate="produced",
+            status=ResidualStatus.REFUSED,
+            rail=Rail.VAPOUR,
+            refusal=ResidualRefusal(RefusalReason.UNSUPPORTED, {"reason": "unsupported"}),
+        ),
+    )
+    row = next(
+        row for row in measured_engine_rail_records(
+            residuals, context=context, engines=(engine,)
+        ) if row["rail"] == Rail.VAPOUR.value
+    )
+    assert row["engine"] == engine.value  # key attribution is resolved by _engine_of.
+    assert row["candidates"] == 4
+    assert row["numeric"] == 3
+    assert row["certified_numeric"] == 2
+    assert row["flagged_numeric"] == 1
+    assert row["refused"] == 1
+    assert row["refused_by_reason"] == {RefusalReason.UNSUPPORTED.value: 1}
+    assert row["in_band"] == 3
+    metric = row["metrics"][0]
+    # RMS = sqrt((3² + 4²) / 2) = sqrt(12.5); the refused row is absent.
+    assert Decimal(metric["certified"]["rms"]).quantize(Decimal("0.001")) == Decimal("3.536")
+    assert metric["certified"]["median_abs"] == "3.5"
+    assert metric["flagged"]["rms"] == "10"
+    assert metric["unit"] == "dex"
+    assert metric["certified"]["n"] == 2
+    assert metric["flagged"]["n"] == 1
+
+
+def test_score_history_replaces_same_store_revision(tmp_path: Path) -> None:
+    from scripts.battery_score import _replace_history_revision
+
+    path = tmp_path / "score-history.jsonl"
+    first = {"store_revision": "abc", "observation_store_sha256": "hash", "run": 1}
+    replacement = {**first, "run": 2}
+    other = {"store_revision": "def", "observation_store_sha256": "other", "run": 3}
+    _replace_history_revision(path, first)
+    _replace_history_revision(path, other)
+    _replace_history_revision(path, replacement)
+    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    assert rows == [other, replacement]
 
 
 def test_compilation_series_does_not_change_empirical_headline() -> None:

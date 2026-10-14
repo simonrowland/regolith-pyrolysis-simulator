@@ -378,6 +378,8 @@ FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
+FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
+FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 
 
 @dataclass(frozen=True)
@@ -1187,6 +1189,10 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
         strata.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
+    if NoticeKind.OUT_OF_CERTIFIED_BAND.value in kinds:
+        strata.append(FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND)
+    if NoticeKind.OUT_OF_GAMMA_DOMAIN.value in kinds:
+        strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
     return tuple(strata)
 
 
@@ -6571,6 +6577,7 @@ def _score_store_with_decisions(
     work_id: str | None = None,
     limit: int | None = None,
     include_diagnostics: bool = True,
+    measured_only: bool = False,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
     _stream: _ResidualJsonlStream | None = None,
@@ -6617,6 +6624,12 @@ def _score_store_with_decisions(
             if obs.observation_id not in seen:
                 refs.append(obs)
                 seen.add(obs.observation_id)
+    if measured_only:
+        refs = [
+            obs for obs in refs
+            if obs.evidence.class_.is_value
+            and obs.evidence.class_.value in MEASURED_EVIDENCE
+        ]
     if work_id:
         filtered: list[Observation] = []
         for obs in refs:
@@ -6882,6 +6895,7 @@ def _score_store_to_jsonl(
     work_id: str | None = None,
     limit: int | None = None,
     include_diagnostics: bool = True,
+    measured_only: bool = False,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
 ) -> tuple[int, _ResidualReportMetadata]:
@@ -6896,6 +6910,7 @@ def _score_store_to_jsonl(
             work_id=work_id,
             limit=limit,
             include_diagnostics=include_diagnostics,
+            measured_only=measured_only,
             predict=predict,
             handles=handles,
             _stream=stream,
@@ -8103,6 +8118,98 @@ def headline_rows(
         )
         rows.append(row)
     return rows
+
+
+def measured_engine_rail_records(
+    residuals: Sequence[Residual],
+    *,
+    context: ScoreContext,
+    engines: Sequence[Engine],
+) -> list[dict[str, object]]:
+    """Measured-candidate counts and native-unit error metrics by engine/rail."""
+
+    certified = {id(row) for row in _measured_residuals(residuals, context)}
+    groups: dict[tuple[str, str], list[Residual]] = defaultdict(list)
+    for residual in residuals:
+        if residual.rail is not None:
+            groups[(residual.rail.value, _engine_of(residual))].append(residual)
+
+    records: list[dict[str, object]] = []
+    for rail in Rail:
+        for engine in engines:
+            bucket = groups.get((rail.value, engine.value), [])
+            numeric = [row for row in bucket if row.numeric is not None]
+            certified_numeric = [row for row in numeric if id(row) in certified]
+            flagged_numeric = [row for row in numeric if flagged_strata(row.notices)]
+            by_metric: dict[tuple[str, str], list[Residual]] = defaultdict(list)
+            for row in numeric:
+                assert row.numeric is not None
+                by_metric[(row.numeric.operation.value, row.numeric.unit)].append(row)
+            metrics: list[dict[str, object]] = []
+            for (operation, unit), metric_rows in sorted(by_metric.items()):
+                values = [row.numeric.value for row in metric_rows if row.numeric is not None]
+                metrics.append({
+                    "operation": operation,
+                    "unit": "dex" if operation == MetricOperation.DEX.value else unit,
+                    "n": len(values),
+                    "all_numeric": {
+                        "rms": _optional_decimal(_rms(values)),
+                        "median_abs": _optional_decimal(_median_abs(values)),
+                    },
+                    "certified": {
+                        "n": sum(id(row) in certified for row in metric_rows),
+                        "rms": _optional_decimal(_rms([
+                            row.numeric.value for row in metric_rows
+                            if row.numeric is not None and id(row) in certified
+                        ])),
+                        "median_abs": _optional_decimal(_median_abs([
+                            row.numeric.value for row in metric_rows
+                            if row.numeric is not None and id(row) in certified
+                        ])),
+                    },
+                    "flagged": {
+                        "n": sum(bool(flagged_strata(row.notices)) for row in metric_rows),
+                        "rms": _optional_decimal(_rms([
+                            row.numeric.value for row in metric_rows
+                            if row.numeric is not None and flagged_strata(row.notices)
+                        ])),
+                        "median_abs": _optional_decimal(_median_abs([
+                            row.numeric.value for row in metric_rows
+                            if row.numeric is not None and flagged_strata(row.notices)
+                        ])),
+                    },
+                })
+            refusal_counts: dict[str, int] = defaultdict(int)
+            for row in bucket:
+                if row.status is ResidualStatus.REFUSED:
+                    reason = (
+                        "untyped_refusal"
+                        if row.refusal is None
+                        else row.refusal.reason.value
+                    )
+                    refusal_counts[reason] += 1
+            records.append({
+                "rail": rail.value,
+                "engine": engine.value,
+                "candidates": len(bucket),
+                "numeric": len(numeric),
+                "certified_numeric": len(certified_numeric),
+                "flagged_numeric": len(flagged_numeric),
+                "refused": sum(row.status is ResidualStatus.REFUSED for row in bucket),
+                "refused_by_reason": dict(sorted(refusal_counts.items())),
+                "in_band": sum(
+                    row.numeric is not None
+                    and row.numeric.decision_band is not None
+                    and row.status is ResidualStatus.MATCH
+                    for row in bucket
+                ),
+                "metrics": metrics,
+            })
+    return records
+
+
+def _optional_decimal(value: Decimal | None) -> str | None:
+    return None if value is None else str(value)
 
 
 def flagged_stratum_rows(

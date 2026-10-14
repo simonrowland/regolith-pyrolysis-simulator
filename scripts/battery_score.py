@@ -10,18 +10,26 @@ regenerated from residuals.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import importlib.metadata
+import importlib.util
+import json
 import os
 import socket
 import subprocess
 import sys
 import time
+from collections.abc import Mapping
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from simulator.battery.migrate import canonicalize_rail  # noqa: E402
+from simulator.battery.migrate import (  # noqa: E402
+    canonicalize_rail,
+    iter_observation_store_paths,
+)
 from simulator.battery.compilation_tier import (  # noqa: E402
     iter_compilation_comparisons_jsonl,
     write_compilation_comparisons_jsonl,
@@ -49,11 +57,204 @@ from simulator.battery.score import (  # noqa: E402
     update_decision_band_ratchet,
     write_headline_summary_from_payloads_json,
     _write_headline_summary_from_accumulator_json,
+    measured_engine_rail_records,
+    load_residuals_jsonl,
 )
 
 STUDIO_HOST = "mac-studio-256-1"
 RESIDUALS_PATH = ROOT / "data" / "battery" / "residuals.jsonl"
 REPORT_PATH = ROOT / "data" / "battery" / "score-report.md"
+
+
+def _observation_store_hash(root: Path) -> str:
+    digest = hashlib.sha256()
+    store = root / "data" / "literature" / "observations-v2"
+    for path in sorted(iter_observation_store_paths(store)):
+        digest.update(path.relative_to(root).as_posix().encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def _openimcc_install_identity() -> dict[str, object]:
+    spec = importlib.util.find_spec("openimcc")
+    direct_url: dict[str, object] = {}
+    try:
+        direct_url = json.loads(
+            importlib.metadata.distribution("openimcc").read_text("direct_url.json") or "{}"
+        )
+    except importlib.metadata.PackageNotFoundError:
+        pass
+    vcs = direct_url.get("vcs_info") if isinstance(direct_url, Mapping) else None
+    return {
+        "module_file": None if spec is None else spec.origin,
+        "version": importlib.metadata.version("openimcc")
+        if spec is not None
+        else None,
+        "installed_commit": vcs.get("commit_id")
+        if isinstance(vcs, Mapping) else None,
+    }
+
+
+def _replace_history_revision(path: Path, record: Mapping[str, object]) -> None:
+    revision = record["store_revision"]
+    previous = []
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            old = json.loads(line)
+            if (
+                old.get("store_revision"), old.get("observation_store_sha256")
+            ) != (revision, record.get("observation_store_sha256")):
+                previous.append(old)
+    previous.append(dict(record))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "".join(json.dumps(item, sort_keys=True, separators=(",", ":")) + "\n" for item in previous),
+        encoding="utf-8",
+    )
+
+
+def _measured_report(payload: Mapping[str, object]) -> str:
+    lines = [
+        "# Measured-tier battery accuracy headline",
+        "",
+        f"Store revision: `{payload['store_revision']}`",
+        f"Observation-store SHA-256: `{payload['observation_store_sha256']}`",
+        f"Elapsed: {payload['wall_seconds']} s wall, {payload['process_cpu_seconds']} s process CPU",
+        f"Load average: `{payload['load_average']}`",
+        "",
+        "## Engine identities",
+        "",
+        "| engine | identity used |",
+        "|---|---|",
+        *[
+            f"| {engine} | `{json.dumps(identity, sort_keys=True)}` |"
+            for engine, identity in sorted(payload["engine_identities"].items())
+        ],
+        "",
+        "Flagged numeric predictions are retained in their own metric bucket. Refusals are counts by typed reason and have no error value.",
+        "",
+        "| rail | native unit / metric | engine | candidates | numeric | certified | flagged | refused | in band | RMS | median | refusal reasons |",
+        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+    ]
+    for row in payload["records"]:
+        assert isinstance(row, Mapping)
+        metrics = row.get("metrics") or []
+        if not metrics:
+            metrics = [{"unit": "—", "operation": "—", "rms": None, "median_abs": None}]
+        for metric in metrics:
+            assert isinstance(metric, Mapping)
+            refusal = ", ".join(
+                f"{reason}={count}" for reason, count in (row.get("refused_by_reason") or {}).items()
+            ) or "—"
+            lines.append(
+                f"| {row['rail']} | {metric['unit']} / {metric['operation']} | {row['engine']} | "
+                f"{row['candidates']} | {row['numeric']} | {row['certified_numeric']} | "
+                f"{row['flagged_numeric']} | {row['refused']} | {row['in_band']} | "
+                f"{(metric.get('certified') or {}).get('rms') or '—'} | "
+                f"{(metric.get('certified') or {}).get('median_abs') or '—'} | {refusal} |"
+            )
+    lines.append("")
+    return "\n".join(lines)
+
+
+def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
+    started_wall = time.perf_counter()
+    started_cpu = time.process_time()
+    print("loading measured-tier score context", flush=True)
+    context = context or load_score_context(root)
+    battery = root / "data" / "battery"
+    residuals_path = battery / "residuals.jsonl"
+    residuals_partial = residuals_path.with_name(residuals_path.name + ".partial")
+    engine_identities: dict[str, object] = {
+        engine.value: {"engine": engine.value} for engine in engines
+    }
+    handles: dict[str, object] = {}
+    openimcc_handle = None
+    try:
+        if any(engine.value == "openimcc" for engine in engines):
+            from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
+
+            openimcc_install = _openimcc_install_identity()
+            print(
+                "openimcc install: "
+                f"module={openimcc_install['module_file']} "
+                f"version={openimcc_install['version']} "
+                f"commit={openimcc_install['installed_commit']}",
+                flush=True,
+            )
+            openimcc_handle = open_battery_engine("openimcc")
+            handles["openimcc"] = openimcc_handle
+            engine_identities["openimcc"] = dict(
+                getattr(openimcc_handle, "identity", {}) or {}
+            )
+            engine_identities["openimcc"]["installation"] = openimcc_install
+        written, _metadata = _score_store_to_jsonl(
+            context,
+            residuals_path,
+            root=root,
+            engines=engines,
+            include_diagnostics=False,
+            measured_only=True,
+            handles=handles,
+        )
+        residuals = load_residuals_jsonl(residuals_partial)
+        records = measured_engine_rail_records(
+            residuals, context=context, engines=engines
+        )
+        revision_result = subprocess.run(
+            ["git", "-C", str(root), "rev-parse", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        try:
+            load_average = list(os.getloadavg())
+        except (AttributeError, OSError):
+            load_average = None
+        payload: dict[str, object] = {
+            "kind": "measured_engine_accuracy_headline",
+            "schema_version": "v1",
+            "store_revision": revision_result.stdout.strip(),
+            "observation_store_sha256": _observation_store_hash(root),
+            "engine_identities": engine_identities,
+            "wall_seconds": round(time.perf_counter() - started_wall, 3),
+            "process_cpu_seconds": round(time.process_time() - started_cpu, 3),
+            "load_average": load_average,
+            "records": records,
+        }
+        summary_path = battery / "score-summary.json"
+        summary_partial = summary_path.with_name(summary_path.name + ".partial")
+        report_path = battery / "score-report.md"
+        report_partial = report_path.with_name(report_path.name + ".partial")
+        summary_partial.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        report_partial.write_text(_measured_report(payload), encoding="utf-8")
+        os.replace(summary_partial, summary_path)
+        os.replace(report_partial, report_path)
+        _replace_history_revision(battery / "score-history.jsonl", payload)
+        print(
+            f"measured headline residuals={written} wall={payload['wall_seconds']}s "
+            f"cpu={payload['process_cpu_seconds']}s loadavg={load_average}",
+            flush=True,
+        )
+        for row in records:
+            if row["candidates"] or row["numeric"] or row["refused"]:
+                print(
+                    f"{row['engine']} {row['rail']}: candidates={row['candidates']} "
+                    f"numeric={row['numeric']} certified={row['certified_numeric']} "
+                    f"flagged={row['flagged_numeric']} refused={row['refused']}"
+                )
+        os.replace(residuals_partial, residuals_path)
+        return 0
+    finally:
+        if openimcc_handle is not None:
+            backend = getattr(openimcc_handle, "backend", None)
+            close = getattr(backend, "close", None)
+            if callable(close):
+                close()
 
 
 def _progress_wait(proc: subprocess.Popen[str], *, label: str) -> int:
@@ -169,6 +370,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument(
+        "--measured-headline",
+        action="store_true",
+        help="score measured-evidence candidates only and write the per-engine headline",
+    )
+    parser.add_argument(
         "--report-only",
         action="store_true",
         help="rebuild score-report.md from existing residuals.jsonl",
@@ -188,6 +394,9 @@ def main(argv: list[str] | None = None) -> int:
 
     engines = engines_from_names([p for p in args.engines.split(",") if p.strip()])
     rail = None if args.rail is None else canonicalize_rail(args.rail)
+
+    if args.measured_headline:
+        return _run_measured_headline(args.root, engines)
 
     if args.write_pins:
         payload = migrate_pin_records(args.root)
