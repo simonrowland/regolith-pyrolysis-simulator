@@ -2843,7 +2843,7 @@ def test_source_derivation_reports_relation_and_inputs_independently() -> None:
             (),
         ),
         (
-            "kems-012-sossi-2019.yaml",
+            "synthetic-offer7-derivation.yaml",
             "sossi_2019_k_table5_experimental",
             (
                 "invalid derivation annotation: derivation relation (author method) is required",
@@ -2851,7 +2851,7 @@ def test_source_derivation_reports_relation_and_inputs_independently() -> None:
             ),
         ),
         (
-            "kems-ms2000-044.yaml",
+            "synthetic-offer7-derivation.yaml",
             "ms2000_044_sio2_activity_na_system_xsio2_0805_t1473_class_quote_r2",
             (
                 "invalid derivation annotation: derivation relation (author method) is required",
@@ -2859,7 +2859,7 @@ def test_source_derivation_reports_relation_and_inputs_independently() -> None:
             ),
         ),
         (
-            "okazaki-2022-ryugu-gas-treasure-box.yaml",
+            "synthetic-offer7-derivation.yaml",
             "okazaki_2022_fragmentation_assumptions_and_model_output",
             (
                 "invalid derivation annotation: derivation relation (author method) is required",
@@ -2867,7 +2867,7 @@ def test_source_derivation_reports_relation_and_inputs_independently() -> None:
             ),
         ),
         (
-            "busemann-2024-noble-gases-ryugu-bennu.yaml",
+            "synthetic-offer7-derivation.yaml",
             "busemann_2024_preliminary_ryugu_exposure_ages",
             (
                 "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
@@ -2881,8 +2881,25 @@ def test_offer7_derivation_issue_classification_is_pinned(
     observation_id: str,
     expected_details: tuple[str, ...],
 ) -> None:
-    result = _migrate_real_extract(tmp_path, extract_name)
-    source_id = extract_name.removesuffix(".yaml")
+    if extract_name == "synthetic-offer7-derivation.yaml":
+        extract = _raw_inputs_extract("calculated")
+        child = extract["species"]["Na"]["observations"][0]
+        child["observation_id"] = observation_id
+        child["values"].pop("series", None)
+        child["values"]["pressure_atm"] = 1.0
+        derivation = child["values"].pop("derivation")
+        derivation.pop("raw_inputs")
+        if len(expected_details) == 1:
+            derivation["relation"] = "author calculation"
+        else:
+            derivation.pop("relation")
+            derivation.pop("inputs", None)
+        child["values"]["derivation"] = derivation
+        result = migrate(_write_min_tree(tmp_path, extract), write=False)
+        source_id = "fixture-source"
+    else:
+        result = _migrate_real_extract(tmp_path, extract_name)
+        source_id = extract_name.removesuffix(".yaml")
     path_prefix = f"observations.{source_id}::{observation_id}."
     details = tuple(
         issue.detail
@@ -2892,6 +2909,36 @@ def test_offer7_derivation_issue_classification_is_pinned(
     )
 
     assert details == expected_details
+
+
+def test_t1235_real_derivation_rows_are_valid_after_repair(tmp_path: Path) -> None:
+    extract_names = (
+        "kems-012-sossi-2019.yaml",
+        "kems-ms2000-044.yaml",
+        "okazaki-2022-ryugu-gas-treasure-box.yaml",
+        "busemann-2024-noble-gases-ryugu-bennu.yaml",
+    )
+    checked_rows = 0
+    for extract_name in extract_names:
+        source_id = extract_name.removesuffix(".yaml")
+        result = _migrate_real_extract(tmp_path / source_id, extract_name)
+        source_rows = [
+            row
+            for row in _extract_observations(extract_name)
+            if (row.get("values") or {}).get("derivation")
+            or row.get("derivation")
+        ]
+        checked_rows += len(source_rows)
+        derivation_issues = [
+            issue
+            for issue in result.validation.hard_issues
+            if issue.reason is RefusalReason.INVALID_SOURCE
+            and issue.path.startswith(f"observations.{source_id}::")
+            and (".derivation" in issue.path or ".derived_from" in issue.path)
+        ]
+        assert derivation_issues == [], (source_id, derivation_issues)
+
+    assert checked_rows >= 61
 
 
 @pytest.mark.parametrize("location", ["values", "observation"])
