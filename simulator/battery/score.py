@@ -8573,10 +8573,9 @@ def measured_engine_rail_records(
                             else "untyped_refusal"
                         )
                         refusal_counts[reason] += 1
-                records.append({
+                record = {
                     "rail": rail.value,
                     "engine": engine.value,
-                    "source_relation": relation.value,
                     "candidates": len(bucket),
                     "numeric": len(numeric),
                     "certified_numeric": len(certified_numeric),
@@ -8590,7 +8589,15 @@ def measured_engine_rail_records(
                         for row in bucket
                     ),
                     "metrics": metrics,
-                })
+                }
+                relation_key = _source_relation_headline_key(
+                    rail.value, engine.value, relation.value
+                )
+                if relation_key:
+                    record.update(_redox_source_relation_fields(relation_key))
+                else:
+                    record["source_relation"] = relation.value
+                records.append(record)
     return records
 
 

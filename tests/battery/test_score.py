@@ -4609,6 +4609,7 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
         }
     )
     assert "certified RMS" in report and "flagged RMS" in report
+    assert "population / source relation" in report
     assert "| 10 | 10 | unsupported=1 |" in report
 
 
@@ -6297,9 +6298,12 @@ def test_streamed_unrailed_measured_tier_matches_legacy_zero_grid(
     assert streamed_report == legacy_report
     from simulator.battery.score import SCORE_ENGINE_SET
 
+    measured_table = streamed_report.split("## Measured tier", 1)[1].split(
+        "## Flagged strata", 1
+    )[0]
     for rail in Rail:
         for report_engine in SCORE_ENGINE_SET:
-            assert f"| {rail.value} | {report_engine.value} | 0 |" in streamed_report
+            assert f"| {rail.value} | {report_engine.value} | — | 0 |" in measured_table
 
 
 def test_streamed_measured_grid_omits_selected_engine_without_rail_rows(

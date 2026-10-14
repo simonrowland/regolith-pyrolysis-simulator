@@ -136,7 +136,7 @@ def _measured_report(payload: Mapping[str, object]) -> str:
         "",
         "Flagged numeric predictions are retained in their own metric bucket. Refusals are counts by typed reason and have no error value.",
         "",
-        "| rail | native unit / metric | engine | source relation | candidates | numeric | certified | flagged | refused | in band | certified RMS | certified median | flagged RMS | flagged median | refusal reasons |",
+        "| rail | native unit / metric | engine | population / source relation | candidates | numeric | certified | flagged | refused | in band | certified RMS | certified median | flagged RMS | flagged median | refusal reasons |",
         "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for row in payload["records"]:
@@ -150,7 +150,7 @@ def _measured_report(payload: Mapping[str, object]) -> str:
                 f"{reason}={count}" for reason, count in (row.get("refused_by_reason") or {}).items()
             ) or "—"
             lines.append(
-                f"| {row['rail']} | {metric['unit']} / {metric['operation']} | {row['engine']} | {row['source_relation']} | "
+                f"| {row['rail']} | {metric['unit']} / {metric['operation']} | {row['engine']} | {row.get('population', row['source_relation'])} | "
                 f"{row['candidates']} | {row['numeric']} | {row['certified_numeric']} | "
                 f"{row['flagged_numeric']} | {row['refused']} | {row['in_band']} | "
                 f"{(metric.get('certified') or {}).get('rms') or '—'} | "
