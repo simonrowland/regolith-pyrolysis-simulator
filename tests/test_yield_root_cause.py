@@ -199,19 +199,14 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     na2o_left = sim.melt.composition_kg.get("Na2O", 0.0)
     reduced_pct = (feo_initial - feo_left) / feo_initial * 100.0
 
+    assert result.status == "partial"
     assert feo_initial > 100.0
     assert reduced_pct > 80.0
-    # 793f897 made the Nernst quotient parent-oxide stoichiometric: Na2O uses
-    # the square of single-cation activity. At the 1575 C C5 hold its effective
-    # requirement is 2.15044 V, so the 1.6 V cap cannot consume the remaining
-    # Na2O. The scheduler now skips that unreachable rung instead of spending
-    # the full C5 hold there; this residual is therefore mechanism-backed.
-    # Pin = the provisioned configured-engine path (MAGEMin liquid-fraction
-    # authority). The earlier 4.094548078976671 pin was measured with MAGEMin
-    # unavailable (Kress91 liquidus-floor fallback) and is not this test's
-    # environment contract; bit-deterministic across the 0.6.2 merge chain
-    # (see docs-private/research/2026-07-17-t262-attrib/findings.md).
-    assert na2o_left == pytest.approx(4.093990327892507, abs=1e-6)
+    # Na-bearing vapor leaves the melt during C0-C4 and splits among Stage-4
+    # capture, reagent inventory, and terminal offgas. The 2.150 V Na2O rung is
+    # above the 1.6 V cap, so C5 consumes none. C5 reaches its 800 h max hold;
+    # C6 runs for 20 h afterward, and the overall run ends partial.
+    assert na2o_left == pytest.approx(1.7917834200101006, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT
