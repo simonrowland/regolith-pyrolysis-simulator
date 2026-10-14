@@ -77,11 +77,32 @@ from simulator.state import (
     CampaignPhase,
     DecisionType,
 )
-from tests.chemistry.conftest import _atom_check, _build_sim
+from tests.chemistry.conftest import (
+    _atom_check,
+    _build_sim as _build_chemistry_sim,
+)
+from tests.magemin_test_support import close_test_owned_magemin_backend
 
 
 _TEST_OWNED_SIMULATORS: list[PyrolysisSimulator] = []
 _GATE_BACKEND_CLEANUP_REGRESSIONS: list[tuple[object, weakref.finalize]] = []
+
+
+def _build_sim(*args, **kwargs) -> PyrolysisSimulator:
+    sim = _build_chemistry_sim(*args, **kwargs)
+    _TEST_OWNED_SIMULATORS.append(sim)
+    return sim
+
+
+@pytest.fixture(autouse=True)
+def _close_test_owned_magemin_backends():
+    _TEST_OWNED_SIMULATORS.clear()
+    yield
+    try:
+        for sim in _TEST_OWNED_SIMULATORS:
+            close_test_owned_magemin_backend(sim)
+    finally:
+        _TEST_OWNED_SIMULATORS.clear()
 
 
 class _CloseTrackingGateBackend:
@@ -120,7 +141,6 @@ def test_metallothermic_simulator_closes_its_gate_backend_after_test(
     provider._backend = backend
     provider._backend_finalizer = finalizer
     provider._backend_initialised = True
-    _TEST_OWNED_SIMULATORS.append(sim)
     _GATE_BACKEND_CLEANUP_REGRESSIONS.append((backend, finalizer))
 
 
