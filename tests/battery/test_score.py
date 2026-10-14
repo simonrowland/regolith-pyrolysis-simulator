@@ -8071,6 +8071,7 @@ def test_fusion_conversion_without_janaf_pair_returns_typed_notice() -> None:
 def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual() -> None:
     from simulator.battery.score import fusion_comparison_reference
 
+    experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
             formula="CaO",
@@ -8082,14 +8083,23 @@ def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual()
     )
     reference = F.observation(
         "unestablished-engine-solid-activity",
-        F.kems_experiment().experiment_id,
+        experiment.experiment_id,
         identity,
         Decimal("0.5"),
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="another-source",
     )
 
-    result = fusion_comparison_reference(reference, engine=Engine.ELLINGHAM)
+    result = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
+    prediction = replace(
+        _predict(reference.value.point, identity), engine=Engine.MAGEMIN
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.MAGEMIN,
+        context=_context(F.work(), experiment, reference),
+        prediction=prediction,
+    )
 
     assert result.value.point == reference.value.point
     assert result.identity.reference_state.value.endmember.phase.value is Phase.CR
@@ -8098,9 +8108,10 @@ def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual()
     )
     assert notice.reason == (
         "solid/liquid reference conversion skipped: engine reference is "
-        "unestablished for ellingham; measured solid-reference value left unchanged"
+        "unestablished for magemin; measured solid-reference value left unchanged"
     )
-    assert notice.band == "engine activity reference unestablished: ellingham"
+    assert notice.band == "engine activity reference unestablished: magemin"
+    assert notice in residual.notices
 
 
 def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
