@@ -839,7 +839,28 @@ def gate_curve_memo_origin_matches(
         configuration = gate_curve_memo_producer_configuration(sim, curve)
     except Exception:  # noqa: BLE001 - malformed configuration is a miss
         return False
-    if origin.get("producer_configuration") != configuration:
+
+    def normalize_magemin_default(producer_configuration: Any) -> Any:
+        if not isinstance(producer_configuration, Mapping):
+            return producer_configuration
+        model = producer_configuration.get("model")
+        if (
+            not isinstance(model, Mapping)
+            or model.get("model") != "magemin-shadow"
+            or model.get("magemin_database") is not None
+        ):
+            return producer_configuration
+        from simulator.melt_backend.magemin import MAGEMinBackend
+
+        normalized = dict(producer_configuration)
+        normalized_model = dict(model)
+        normalized_model["magemin_database"] = MAGEMinBackend._DEFAULT_DATABASE
+        normalized["model"] = normalized_model
+        return normalized
+
+    if normalize_magemin_default(
+        origin.get("producer_configuration")
+    ) != normalize_magemin_default(configuration):
         return False
     producer_evidence = origin.get("producer_evidence")
     if producer_evidence == "no-external-install":
