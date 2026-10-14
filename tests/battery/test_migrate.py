@@ -1516,6 +1516,148 @@ def test_h12_costa_2015_reviewed_alias_collapses_three_ids() -> None:
     assert steurer_85 != steurer_92
 
 
+def test_costa_2015_fo93fa7_composition_reaches_migrated_observations(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-007-costa-2015.yaml")
+    expected = {
+        "MgO": Decimal("0.62"),
+        "FeO": Decimal("0.046666666667"),
+        "SiO2": Decimal("0.333333333333"),
+    }
+    identity_rows = {
+        "costa_2015_fe_partial_pressure_ir_digitized",
+        "costa_2015_fe_partial_pressure_mo_digitized",
+        "costa_2015_fe_vaporization_coefficient_alpha_digitized",
+        "costa_2015_mg_partial_pressure_ir_digitized",
+        "costa_2015_mg_partial_pressure_mo_digitized",
+    }
+    mapped = [
+        observation
+        for observation in result.observations.values()
+        if any(f"::{row_id}::" in observation.observation_id for row_id in identity_rows)
+    ]
+    assert len(mapped) == 23
+    for observation in mapped:
+        composition = observation.identity.composition
+        assert composition is not None and composition.is_value
+        assert composition.value.basis == "normalized_mole_fraction_from_published_Fo93Fa7"
+        assert composition.value.amount_basis.value == "mole_fraction"
+        assert dict(composition.value.components) == expected
+        assert observation.identity.species.phase.is_value
+        assert observation.identity.species.phase.value is Phase.G
+        assert observation.identity.temperature_K.is_value
+        conditions = observation.point_conditions
+        assert conditions is not None
+        temperature = conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == observation.identity.temperature_K.value
+        located_composition = conditions["composition"]
+        assert located_composition.state.is_value
+        assert located_composition.state.value == composition.value
+        assert located_composition.locator.page == 1
+        assert located_composition.locator.pdf_page_index == 0
+
+    measured_points = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+    ]
+    assert len(measured_points) == 109
+    assert all(
+        observation.point_conditions is not None
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].state.value
+        == observation.identity.temperature_K.value
+        for observation in measured_points
+    )
+
+    comparator_rows = [
+        observation
+        for observation in result.observations.values()
+        if "costa_2015_fe_partial_pressure_re_piacente_comparator" in observation.observation_id
+        or "costa_2015_mg_partial_pressure_re_piacente_comparator" in observation.observation_id
+    ]
+    assert len(comparator_rows) == 30
+    assert all(
+        observation.identity.composition is not None
+        and observation.identity.composition.is_unknown
+        and observation.identity.composition.reason == "no composition mapped from source"
+        for observation in comparator_rows
+    )
+
+    closed_cell_pressure_rows = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            f"::{row_id}::" in observation.observation_id
+            for row_id in {
+                "costa_2015_fe_partial_pressure_ir_digitized",
+                "costa_2015_fe_partial_pressure_mo_digitized",
+                "costa_2015_mg_partial_pressure_ir_digitized",
+                "costa_2015_mg_partial_pressure_mo_digitized",
+            }
+        )
+    ]
+    assert len(closed_cell_pressure_rows) == 18
+    assert all(observation.identity.fO2_Pa.is_unknown for observation in closed_cell_pressure_rows)
+    assert all(
+        observation.identity.total_pressure_Pa.is_unknown
+        and observation.identity.total_pressure_Pa.reason == "in_cell_total_pressure_not_derivable"
+        for observation in closed_cell_pressure_rows
+    )
+
+    ion_current_rows = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            f"::{row_id}::" in observation.observation_id
+            for row_id in {
+                "costa_2015_fe_time_equilibrium_mo_1669",
+                "costa_2015_fe_time_equilibrium_ir_1851",
+                "costa_2015_fe_siO_ion_intensity_ratio_digitized",
+                "costa_2015_mg_time_equilibrium_mo_1669",
+                "costa_2015_mg_time_equilibrium_ir_1851",
+                "costa_2015_mg_siO_ion_intensity_ratio_digitized",
+            }
+        )
+    ]
+    assert len(ion_current_rows) == 56
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.G
+        for observation in ion_current_rows
+    )
+
+    placeholders = {
+        "costa_2015_fe_olivine_kems_alpha_multicell",
+        "costa_2015_fe_olivine_class_and_motzfeldt_absence_b1",
+        "costa_2015_sio_olivine_kems_alpha_multicell",
+        "costa_2015_sio_olivine_class_and_motzfeldt_absence_b1",
+    }
+    for row_id in placeholders:
+        observation = next(
+            item
+            for item in result.observations.values()
+            if item.observation_id.endswith(f"::{row_id}")
+        )
+        assert quantity_token(observation.identity) is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.value.unavailable_reason == "figure_not_digitized"
+        assert observation.value.point is None
+        assert observation.value.series is None
+        assert observation.admission.status is AdmissionStatus.REJECTED
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        assert observation.identity.species.phase.is_value
+        assert observation.identity.species.phase.value is Phase.G
+        assert observation.identity.temperature_K.is_unknown
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_value
+        assert dict(observation.identity.composition.value.components) == expected
+
+
 def test_doi_canonicalisation_and_alias_registry() -> None:
     assert canonicalize_doi("https://doi.org/10.1063/1.555991") == "10.1063/1.555991"
     assert canonicalize_doi("DOI: 10.1063/1.555991") == "10.1063/1.555991"
@@ -7825,6 +7967,103 @@ def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> No
         polymorph = reference.value.endmember.polymorph
         assert polymorph is not None and polymorph.is_unknown
         assert polymorph.reason == "source does not state polymorph"
+
+
+def test_demaria_partial_alkalis_do_not_become_a_complete_composition(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
+    rows = {
+        obs.observation_id.split("::", 1)[1]: obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-022-demaria-1971"
+    }
+    for prefix in (
+        "demaria_1971_na_psat_figure1_sample_12022_digitized",
+        "demaria_1971_na_psat_figure1_sample_12065_digitized",
+    ):
+        related = [obs for key, obs in rows.items() if key.startswith(prefix)]
+        assert related
+        assert all(obs.identity.composition is not None for obs in related)
+        assert all(obs.identity.composition.is_unknown for obs in related)
+        assert all(
+            obs.identity.composition.reason == "no composition mapped from source"
+            for obs in related
+        )
+
+    extract_rows = _extract_observations("kems-022-demaria-1971.yaml")
+    sample_12022 = next(
+        row
+        for row in extract_rows
+        if row.get("observation_id")
+        == "demaria_1971_na_psat_figure1_sample_12022_digitized"
+    )
+    values = sample_12022["values"]
+    assert values["sample_alkali_content_wt_pct"] == {
+        "Na2O": 0.36,
+        "K2O": 0.068,
+    }
+    assert "reported elsewhere (SMALES, 1971)" in values["composition_source_gap"]
+    assert "composition_from_sample_catalog" not in values
+    assert "sample_oxide_composition_wt_pct" not in values
+    assert "printed_composition" not in values
+    sample_12065 = next(
+        row
+        for row in extract_rows
+        if row.get("observation_id")
+        == "demaria_1971_na_psat_figure1_sample_12065_digitized"
+    )
+    assert "does not print a bulk composition" in sample_12065["values"][
+        "composition_source_gap"
+    ]
+
+
+def test_demaria_undigitized_pressure_figures_are_unavailable_not_points(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import ScoreContext, comparison_candidates
+
+    result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
+    expected = {
+        "demaria_1971_ca_figure_only_and_measurement_difficulty",
+        "demaria_1971_tio_tio2_figure6_comparable_pressures",
+        "demaria_1971_tio2_figure6_comparable_to_tio",
+        "demaria_1971_al_monatomic_figure7",
+    }
+    rows = {
+        obs.observation_id.split("::", 1)[1]: obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-022-demaria-1971"
+    }
+    assert expected <= rows.keys()
+    extract_rows = {
+        row["observation_id"]: row
+        for row in _extract_observations("kems-022-demaria-1971.yaml")
+    }
+    for observation_id in expected:
+        obs = rows[observation_id]
+        source_values = extract_rows[observation_id]["values"]
+        assert "points" not in source_values
+        assert source_values["pressure_atm"] is None
+        assert quantity_token(obs.identity) is Quantity.P_PARTIAL
+        assert obs.identity.species.phase.is_value
+        assert obs.identity.species.phase.value is Phase.G
+        assert obs.evidence.class_.is_value
+        assert obs.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        assert obs.value.kind is ValueKind.UNAVAILABLE
+        assert obs.value.unavailable_reason
+        assert obs.admission.status is AdmissionStatus.REJECTED
+
+    candidates = comparison_candidates(
+        ScoreContext(
+            works=result.works,
+            experiments=result.experiments,
+            observations=result.observations,
+        )
+    )
+    assert expected.isdisjoint(
+        obs.observation_id.split("::", 1)[1] for obs in candidates
+    )
 
 
 def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None:
