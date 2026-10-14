@@ -1659,6 +1659,33 @@ def fit_compilation_thermo_range(
                         join in peaks,
                     ))
 
+        if is_element_reference and len(bounds) == 1:
+            # Premise: the largest-residual split can enter a greedy path that
+            # exhausts legal children even when another legal first split passes.
+            # Algebra: no acceptance predicate changes; each trial runs through
+            # the same T1/T2 checks in _fit_piecewise_candidate.
+            # Units: bounds are printed Cp temperatures in K; residuals stay in
+            # their existing Cp, H, and S units. Known-value check: JANAF C-002
+            # passes at 800 K and N-023 at 600 K, while the greedy path rejects.
+            for _score, split_index, join_K, _is_peak in sorted(
+                eligible, key=lambda item: (-item[0], item[2])
+            ):
+                start, end = bounds[split_index]
+                trial_bounds = [(start, join_K), (join_K, end)]
+                trial = _fit_piecewise_candidate(
+                    record=record,
+                    series=series,
+                    phase_label=phase_label,
+                    standard_state=standard_state,
+                    is_element_reference=is_element_reference,
+                    reference_curves=references,
+                    segment_bounds=trial_bounds,
+                    fit_lo=fit_lo,
+                    fit_hi=fit_hi,
+                )
+                if trial.record.get("status") == "accepted":
+                    return with_exclusions(trial)
+
         gas_1000 = [
             item for item in eligible
             if standard_state == "gas" and item[2] == 1000.0
