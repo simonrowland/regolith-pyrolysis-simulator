@@ -4190,6 +4190,60 @@ def test_gate_curve_memo_producer_configuration_projects_sulfur_state(
     assert gate_curve_memo_producer_configuration(state_changed, curve) != first
 
 
+def test_gate_curve_memo_admission_registers_uninitialized_fallback_supplier(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from engines.magemin import MAGEMinShadowProvider
+
+    producer = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    receiver = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    producer._register_freeze_gate_liquid_fraction_providers()
+    curve = {
+        'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1300.0,
+    }
+    producer_configuration = gate_curve_memo_producer_configuration(
+        producer,
+        curve,
+    )
+    assert receiver._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ) is None
+    origin = {
+        'producer_pid': os.getpid(),
+        'producer_configuration': producer_configuration,
+        'producer_evidence': 'a' * 64,
+    }
+
+    admitted = engine_binding_admission.gate_curve_memo_origin_matches(
+        receiver,
+        curve,
+        origin,
+        fresh_evidence=False,
+    )
+
+    assert admitted is True
+    assert isinstance(
+        receiver._chem_registry.fallback_for(
+            ChemistryIntent.GATE_LIQUID_FRACTION
+        ),
+        MAGEMinShadowProvider,
+    )
+
+
 def test_core_gate_curve_memo_reuses_local_slot_refused_curve(
     monkeypatch,
     vapor_pressure_data,
