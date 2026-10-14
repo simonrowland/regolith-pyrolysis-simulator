@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from copy import deepcopy
 import math
 from decimal import Decimal
 
@@ -17,6 +18,7 @@ from simulator.battery.records import State, Value
 from simulator.diagnostic_helpers.gibbs_battery import formation_subtraction_kJ_mol
 from simulator.battery.generators.compilation_thermo_fits import (
     _Cell,
+    _add_janaf_table,
     FittedCurve,
     _element_reference_terms,
     _evaluate,
@@ -28,6 +30,7 @@ from simulator.battery.generators.compilation_thermo_fits import (
     render_sidecar,
     source_metadata,
 )
+from simulator.battery.generators.janaf import generate_table
 from simulator.reference_data.janaf import TABLES_DIR, load_table_document
 from simulator.vapour_rail.nasa_cea import Nasa9Segment, R_J_PER_MOL_K
 import simulator.battery.generators.compilation_thermo_fits as compilation_thermo_fits
@@ -945,6 +948,60 @@ def test_printed_formation_cells_are_a_separate_pointwise_path() -> None:
     charged = by_id["Al-006"]
     assert charged["charge"] == 1
     assert "printed_formation_cells" not in charged
+
+
+def test_printed_formation_cells_respect_janaf_source_cell_refusals() -> None:
+    path = TABLES_DIR / "Fe-018.yaml"
+
+    def fit(document: dict) -> list[dict]:
+        records, _curves = _add_janaf_table(
+            record=document,
+            path=path,
+            series=compilation_column_series_from_record(document),
+            is_element_reference=False,
+            reference_curves={},
+        )
+        return records
+
+    def cells_at_298(records: list[dict]) -> list[dict]:
+        return [
+            cell
+            for record in records
+            for cell in record.get("printed_formation_cells", ())
+            if cell["quantity"] == Quantity.DELTA_FG.value
+            and cell["T_K"] == 298.15
+        ]
+
+    healthy = deepcopy(load_table_document(path))
+    healthy_cells = cells_at_298(fit(healthy))
+    assert [cell["value_kJ_per_mol"] for cell in healthy_cells] == [-251.429]
+
+    mutated = deepcopy(healthy)
+    row = next(
+        row
+        for row in mutated["table"]["values"]
+        if row["temperature"]["as_published"] == "298.15"
+    )
+    row["formation_gibbs_energy"].update(
+        value=-2514.29,
+        as_published="-2514.290",
+    )
+
+    owner = generate_table(mutated)
+    assert any(
+        refusal["temperature_as_published"] == "298.15"
+        for refusal in owner.report["scale_error_refusals"]
+    )
+    assert not any(
+        observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.DELTA_FG
+        and any(
+            temperature == Decimal("298.15")
+            for temperature, _value in observation.value.series or ()
+        )
+        for observation in owner.observations
+    )
+    assert cells_at_298(fit(mutated)) == []
 
 
 def test_janaf_formation_anchor_does_not_require_element_fit_at_298_15_k() -> None:
