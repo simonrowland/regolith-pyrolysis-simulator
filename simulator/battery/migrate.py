@@ -3647,10 +3647,19 @@ def _mole_fraction_composition_from_values(
             for token, amount in _composition_mol_items(raw):
                 # Declared amounts have one owner; malformed → ValueError (hard issue).
                 parsed = parse_declared_amount(amount)
-                if parse_species_formula(token) is None:
+                component = token
+                if token == "FeO+FeO1.5":
+                    # Premise: Borisov's composition_mol values are mole fractions
+                    # of oxide formula units, and FeO and FeO1.5 each contain one Fe.
+                    # Algebra: X_FeOT = X_FeO + X_FeO1.5, the total Fe fraction;
+                    # no Fe2+/Fe3+ split (or measured ratio) is used. Unit check:
+                    # both sides are mole fractions. Sanity check: row 438 closes at
+                    # 1.000000 before and after this name-only mapping.
+                    component = "FeO"
+                if parse_species_formula(component) is None:
                     omitted.append(token)
                     continue
-                components.append((token, parsed))
+                components.append((component, parsed))
     if len(components) < 2:
         for key in ("X_Na2O_as_published", "X_Na2O"):
             fraction = _as_dec_or_none(values.get(key))

@@ -5313,6 +5313,82 @@ def test_printed_mole_fraction_composition_maps_without_wt_conversion(
         assert obs.identity.composition.value.as_map() == expected
 
 
+def test_borisov_combined_iron_composition_migrates_without_a_redox_split(
+    tmp_path: Path,
+) -> None:
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/borisov-2018-compilation.yaml")
+        .read_text(encoding="utf-8")
+    )
+    rows = source["species"]["Fe"]["observations"]
+    assert len(rows) == 435
+
+    # Bound closure by half a unit of the last printed decimal place for each
+    # component, rather than imposing a tolerance unrelated to row precision.
+    for row in rows:
+        printed = row["values"]["composition_mol"]
+        amounts = [as_decimal(amount) for amount in printed.values()]
+        rounding_bound = sum(
+            (Decimal("0.5").scaleb(amount.as_tuple().exponent) for amount in amounts),
+            Decimal("0"),
+        )
+        assert abs(
+            sum(amounts, Decimal("0")) - Decimal("1")
+        ) <= rounding_bound
+        converted, omitted = _mole_fraction_composition_from_values(row["values"])
+        assert omitted == ()
+        assert converted is not None
+        assert converted.as_map()["FeO"] == as_decimal(printed["FeO+FeO1.5"])
+        assert abs(
+            sum(converted.as_map().values(), Decimal("0"))
+            - sum(amounts, Decimal("0"))
+        ) == 0
+
+    result = _migrate_real_extract(tmp_path, "borisov-2018-compilation.yaml")
+    assert len(result.observations) == 435
+    for observation in result.observations.values():
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.is_value
+        assert observation.point_conditions is not None
+        assert {"temperature_K", "fO2_log"} <= set(observation.point_conditions)
+    by_id = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in result.observations.values()
+    }
+    for row_id, expected_total_iron, expected_temperature in (
+        ("borisov_2018_table2_row_4", "0.0753203", "1775.15"),
+        ("borisov_2018_table2_row_155", "0.0428978", "1574.15"),
+        ("borisov_2018_table2_row_438", "0.0342061", "1523.15"),
+    ):
+        observation = by_id[row_id]
+        composition = observation.identity.composition.value
+        assert composition.as_map()["FeO"] == as_decimal(expected_total_iron)
+        assert observation.identity.species.phase.is_unknown
+        assert (
+            observation.identity.species.phase.reason
+            == "source does not state phase"
+        )
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert observation.evidence.original_method_class == "measured_reduced"
+        assert observation.identity.temperature_K.value == as_decimal(expected_temperature)
+        assert observation.point_conditions is not None
+        assert "fO2_log" in observation.point_conditions
+
+
+def test_unknown_mole_fraction_component_is_queued_and_withholds_composition() -> None:
+    composition, omitted = _mole_fraction_composition_from_values(
+        {
+            "composition_mol": {
+                "SiO2": "0.6",
+                "MgO": "0.3",
+                "unrecognized oxide": "0.1",
+            }
+        }
+    )
+    assert composition is None
+    assert omitted == ("unrecognized oxide",)
+
+
 def test_dacko_partial_composition_is_typed_refusal_not_scored(tmp_path: Path) -> None:
     result = _migrate_real_extract(
         tmp_path, "ta-dacko-conradt-low-p-transpiration.yaml"
