@@ -115,13 +115,20 @@ def _pure_standard_identity(identity, quantity: Quantity):
     )
 
 
-def _fusion_identity(quantity: Quantity, temperature: Decimal):
+def _fusion_identity(
+    quantity: Quantity,
+    temperature: Decimal,
+    *,
+    formula: str = "MgO",
+    polymorph: Polymorph = Polymorph.PERICLASE,
+    phase: Phase = Phase.CR,
+):
     identity = F.oxide_identity(
-        "MgO",
-        Phase.CR,
+        formula,
+        phase,
         T_K=temperature,
         per=PerBasis.MOL_SPECIES,
-        polymorph=Polymorph.PERICLASE.value,
+        polymorph=polymorph.value,
     )
     return replace(
         identity,
@@ -132,6 +139,92 @@ def _fusion_identity(quantity: Quantity, temperature: Decimal):
         formation_elements=State.not_applicable("not a formation quantity"),
         subtype=State.of("solid_to_liquid"),
     )
+
+
+def test_fusion_predictor_selects_the_stated_silica_polymorph_table() -> None:
+    experiment = F.tabulation_experiment()
+    for polymorph, solid_table in (
+        (Polymorph.QUARTZ, "O-037"),
+        (Polymorph.CRISTOBALITE_HIGH, "O-035"),
+    ):
+        identity = _fusion_identity(
+            Quantity.ENTHALPY_OF_FUSION,
+            Decimal("1986"),
+            formula="SiO2",
+            polymorph=polymorph,
+        )
+        observation = F.observation(
+            f"silica-fusion-{polymorph.value}",
+            experiment.experiment_id,
+            identity,
+            Decimal("9.4"),
+        )
+        attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+        assert attempt.value is not None
+        assert f"janaf-fusion:{solid_table}/O-038:" in attempt.call_evidence
+
+
+def test_fusion_predictor_refuses_unavailable_stated_polymorph() -> None:
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("1986"),
+        formula="SiO2",
+        polymorph=Polymorph.TRIDYMITE,
+    )
+    observation = F.observation(
+        "silica-fusion-tridymite",
+        experiment.experiment_id,
+        identity,
+        Decimal("9.4"),
+    )
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+
+
+def test_fusion_predictor_does_not_choose_an_unstated_polymorph() -> None:
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("1986"),
+        formula="SiO2",
+        polymorph=Polymorph.CRISTOBALITE_HIGH,
+    )
+    identity = replace(
+        identity,
+        species=replace(
+            identity.species,
+            polymorph=State.unknown("printed polymorph unknown"),
+        ),
+    )
+    observation = F.observation(
+        "silica-fusion-unstated",
+        experiment.experiment_id,
+        identity,
+        Decimal("9.4"),
+    )
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+
+
+def test_fusion_predictor_refuses_a_noncrystalline_solid_identity() -> None:
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("3000"),
+        phase=Phase.L,
+    )
+    observation = F.observation(
+        "fusion-liquid-identity",
+        experiment.experiment_id,
+        identity,
+        Decimal("77.028"),
+    )
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
 
 
 def _gas_thermo(
@@ -2897,7 +2990,12 @@ def test_internal_predicts_janaf_fusion_enthalpy_and_entropy() -> None:
 
 def test_non_internal_engine_has_typed_fusion_refusal() -> None:
     experiment = F.tabulation_experiment()
-    identity = _fusion_identity(Quantity.ENTHALPY_OF_FUSION, Decimal("3000"))
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("3000"),
+        formula="SiO2",
+        polymorph=Polymorph.QUARTZ,
+    )
     observation = F.observation(
         "unsupported-fusion",
         experiment.experiment_id,
@@ -2929,7 +3027,12 @@ def test_janaf_fusion_source_is_training_relation() -> None:
     from simulator.battery.score import compile_residual
 
     experiment = F.tabulation_experiment()
-    identity = _fusion_identity(Quantity.ENTHALPY_OF_FUSION, Decimal("3000"))
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("3000"),
+        formula="SiO2",
+        polymorph=Polymorph.QUARTZ,
+    )
     observation = F.observation(
         "janaf-fusion-training",
         experiment.experiment_id,
@@ -2938,12 +3041,12 @@ def test_janaf_fusion_source_is_training_relation() -> None:
         evidence=EvidenceClass.COMPILATION_ASSESSED,
         source_id="nist-janaf-4th",
     )
-    observation = replace(observation, read_from="Mg-008")
+    observation = replace(observation, read_from="O-037")
     experiment = F.tabulation_experiment(experiment_id="fusion-ref", work_id="ref-work")
     observation = replace(observation, experiment_id=experiment.experiment_id)
     works = {
-        "ref-work": _work_with_table_assets("ref-work", ("Mg-008",)),
-        "janaf-work": _work_with_table_assets("janaf-work", ("Mg-008", "Mg-009")),
+        "ref-work": _work_with_table_assets("ref-work", ("O-037",)),
+        "janaf-work": _work_with_table_assets("janaf-work", ("O-037", "O-038")),
     }
     residual, _ = compile_residual(
         observation,
@@ -2986,7 +3089,12 @@ def test_fusion_janaf_tables_do_not_make_other_works_training() -> None:
     from simulator.battery.score import compile_residual
 
     experiment = F.tabulation_experiment(experiment_id="independent-ref", work_id="other-work")
-    identity = _fusion_identity(Quantity.ENTHALPY_OF_FUSION, Decimal("3000"))
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("3000"),
+        formula="SiO2",
+        polymorph=Polymorph.QUARTZ,
+    )
     observation = F.observation(
         "independent-fusion-row",
         experiment.experiment_id,
@@ -2997,7 +3105,7 @@ def test_fusion_janaf_tables_do_not_make_other_works_training() -> None:
     )
     observation = replace(observation, read_from="independent-table")
     works = {
-        "janaf-work": _work_with_table_assets("janaf-work", ("Mg-008", "Mg-009")),
+        "janaf-work": _work_with_table_assets("janaf-work", ("O-037", "O-038")),
         "other-work": _work_with_table_assets("other-work", ("independent-table",)),
     }
     residual, _ = compile_residual(

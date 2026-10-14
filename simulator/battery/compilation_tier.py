@@ -41,6 +41,7 @@ from simulator.battery.enums import (
     NoticeKind,
     PerBasis,
     Phase,
+    Polymorph,
     Quantity,
     RefusalReason,
     MetricOperation,
@@ -1239,14 +1240,55 @@ def predict_thermo_attempt(
                 quantity=quantity,
                 origin=origin,
             )
+        phase = _state_value(identity.species.phase)
+        if phase is None:
+            return _refuse(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                "fusion-solid-phase-unknown",
+                quantity=quantity,
+                origin=origin,
+            )
+        if phase is not Phase.CR:
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-phase-must-be-crystal",
+                quantity=quantity,
+                origin=origin,
+                extra={"phase": str(getattr(phase, "value", phase))},
+            )
+        polymorph = _state_value(identity.species.polymorph)
+        if polymorph is None:
+            return _refuse(
+                RefusalReason.IDENTITY_UNKNOWN,
+                "fusion-solid-polymorph-unknown",
+                quantity=quantity,
+                origin=origin,
+            )
+        if not isinstance(polymorph, Polymorph):
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-not-closed",
+                quantity=quantity,
+                origin=origin,
+                extra={"polymorph": str(polymorph)},
+            )
         try:
             from simulator.battery.generators.janaf import (
+                JANAFFusionPolymorphUnavailable,
                 janaf_fusion_enthalpy,
                 janaf_fusion_entropy,
             )
 
             enthalpy_J_mol, low, high, solid, liquid, hashes = janaf_fusion_enthalpy(
-                identity.species.formula, temperature_K
+                identity.species.formula, temperature_K, polymorph
+            )
+        except JANAFFusionPolymorphUnavailable as exc:
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-not-in-janaf",
+                quantity=quantity,
+                origin=origin,
+                extra={"detail": str(exc), "formula": identity.species.formula},
             )
         except (KeyError, ValueError) as exc:
             return _refuse(
@@ -1276,8 +1318,10 @@ def predict_thermo_attempt(
             # cancels the elemental reference. Convert to the declared unit.
             predicted = enthalpy_J_mol / Decimal(1000)
         else:
+            # At the JANAF crossing, ΔG=0 gives ΔS=ΔH/T_fus. Away from
+            # that crossing, ΔS_fus(T) is the two curves' entropy difference.
             predicted, crossing_K = janaf_fusion_entropy(
-                identity.species.formula, temperature_K
+                identity.species.formula, temperature_K, polymorph
             )
             if temperature_K != crossing_K:
                 notice_list.append(

@@ -32,6 +32,8 @@ from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
 from simulator.battery.polymorph_dictionary import (
+    JANAF_CRYSTAL_DICTIONARY,
+    JANAF_CRYSTAL_TABLE_IDS,
     JANAF_LABEL_POLYMORPHS,
     JANAF_TRANSITION_POLYMORPHS,
     canonicalize_janaf_transition,
@@ -2571,6 +2573,34 @@ _FUSION_TABLES = {
     # below the accepted SiO2 melting point; the quartz table is metastable.
     "SiO2": ("O-035", "O-038"),
 }
+
+
+class JANAFFusionPolymorphUnavailable(ValueError):
+    """No unique JANAF solid table represents the stated fusion polymorph."""
+
+
+def _fusion_table_pair(
+    oxide: str, polymorph: Polymorph | None
+) -> tuple[str, str]:
+    try:
+        default_solid, liquid = _FUSION_TABLES[oxide]
+    except KeyError as exc:
+        raise ValueError(f"no JANAF fusion table pair for {oxide}") from exc
+    if polymorph is None:
+        return default_solid, liquid
+    solid_tables = tuple(
+        table_id
+        for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
+        if key[0] == oxide and JANAF_CRYSTAL_DICTIONARY.get(key) is polymorph
+        for table_id in table_ids
+    )
+    if len(solid_tables) != 1:
+        raise JANAFFusionPolymorphUnavailable(
+            f"no unique JANAF solid table for {oxide} polymorph {polymorph.value}"
+        )
+    return solid_tables[0], liquid
+
+
 # The source hashes identify the JANAF text; pin the extracted temperature-node
 # sets too so a dropped compiled row cannot silently widen interpolation.
 _FUSION_NODE_SET_SHA256 = {
@@ -2684,13 +2714,10 @@ def _checked_fusion_table_rows(table_id: str) -> tuple[list[Mapping], str]:
 
 
 def janaf_fusion_enthalpy(
-    oxide: str, temperature_K: Decimal
+    oxide: str, temperature_K: Decimal, polymorph: Polymorph | None = None
 ) -> tuple[Decimal, Decimal, Decimal, str, str, tuple[str, str]]:
-    """Return dH_fus(T) from the production JANAF solid/liquid table pair."""
-    try:
-        solid_id, liquid_id = _FUSION_TABLES[oxide]
-    except KeyError as exc:
-        raise ValueError(f"no JANAF fusion table pair for {oxide}") from exc
+    """Return dH_fus(T) from the selected JANAF solid/liquid table pair."""
+    solid_id, liquid_id = _fusion_table_pair(oxide, polymorph)
     solid, solid_sha, solid_missing = _fusion_enthalpy_points(solid_id)
     liquid, liquid_sha, liquid_missing = _fusion_enthalpy_points(liquid_id)
     low = max(solid[0][0], liquid[0][0])
@@ -2721,14 +2748,11 @@ def janaf_fusion_enthalpy(
 
 
 def janaf_fusion_entropy(
-    oxide: str, temperature_K: Decimal
+    oxide: str, temperature_K: Decimal, polymorph: Polymorph | None = None
 ) -> tuple[Decimal, Decimal]:
     """Return ΔS_fus(T) and the selected pair's JANAF Gibbs crossing."""
 
-    try:
-        solid_id, liquid_id = _FUSION_TABLES[oxide]
-    except KeyError as exc:
-        raise ValueError(f"no JANAF fusion table pair for {oxide}") from exc
+    solid_id, liquid_id = _fusion_table_pair(oxide, polymorph)
     solid, _solid_sha, solid_missing = _fusion_entropy_points(solid_id)
     liquid, _liquid_sha, liquid_missing = _fusion_entropy_points(liquid_id)
     low = max(solid[0][0], liquid[0][0])
