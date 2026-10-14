@@ -107,6 +107,25 @@ def _pure_standard_identity(identity, quantity: Quantity):
     )
 
 
+def _fusion_identity(quantity: Quantity, temperature: Decimal):
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=temperature,
+        per=PerBasis.MOL_SPECIES,
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    return replace(
+        identity,
+        quantity=quantity,
+        per=State.not_applicable("not a fusion basis"),
+        standard_pressure_Pa=State.not_applicable("not a pressure-dependent property"),
+        reaction=State.not_applicable("not a formation quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+        subtype=State.of("solid_to_liquid"),
+    )
+
+
 def _gas_thermo(
     formula: str = "K",
     quantity: Quantity = Quantity.CP,
@@ -2823,3 +2842,86 @@ def test_scorer_streams_series_cells_without_child_observations(monkeypatch) -> 
         "cell-view-series#t2200v-3.886",
     ]
     assert [row.reference for row in residuals] == references
+
+
+def test_internal_predicts_janaf_fusion_enthalpy_and_entropy() -> None:
+    # JANAF Mg-008/Mg-009 print ΔfH at 3000 K as −709.524/−632.496
+    # kJ/mol, so ΔH_fus is 77.028 kJ/mol. At 3100 K the printed values
+    # are −707.689/−629.904 kJ/mol, giving ΔH=77.785 kJ/mol and
+    # ΔS=77,785 J/mol / 3100 K = 25.091935... J/(mol K).
+    experiment = F.tabulation_experiment()
+    expected = (
+        (Quantity.ENTHALPY_OF_FUSION, Decimal("3000"), Decimal("77.028")),
+        (
+            Quantity.ENTROPY_OF_FUSION,
+            Decimal("3100"),
+            Decimal("77785") / Decimal("3100"),
+        ),
+    )
+    for quantity, temperature, value in expected:
+        identity = _fusion_identity(quantity, temperature)
+        observation = F.observation(
+            f"mg-fusion-{quantity.value}",
+            experiment.experiment_id,
+            identity,
+            value,
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+        assert attempt.value == value
+        assert attempt.unit == {
+            Quantity.ENTHALPY_OF_FUSION: "kJ_per_declared_mol_basis",
+            Quantity.ENTROPY_OF_FUSION: "J_per_declared_mol_basis_per_K",
+        }[quantity]
+
+
+def test_non_internal_engine_has_typed_fusion_refusal() -> None:
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(Quantity.ENTHALPY_OF_FUSION, Decimal("3000"))
+    observation = F.observation(
+        "unsupported-fusion",
+        experiment.experiment_id,
+        identity,
+        Decimal("77"),
+    )
+    attempt = predict_thermo_attempt(Engine.THERMOENGINE, observation)
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+
+
+def test_janaf_fusion_extrapolation_is_flagged() -> None:
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "extrapolated-fusion",
+        experiment.experiment_id,
+        _fusion_identity(Quantity.ENTHALPY_OF_FUSION, Decimal("7000")),
+        Decimal("77"),
+    )
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    assert attempt.value is not None
+    assert attempt.authority is Authority.EXTRAPOLATED
+    assert len(attempt.notices) == 1
+    assert attempt.notices[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert attempt.notices[0].band
+
+
+def test_janaf_fusion_source_is_training_relation() -> None:
+    from simulator.battery.score import compile_residual
+
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(Quantity.ENTHALPY_OF_FUSION, Decimal("3000"))
+    observation = F.observation(
+        "janaf-fusion-training",
+        experiment.experiment_id,
+        identity,
+        Decimal("77.028"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    residual, _ = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(observation),
+    )
+    assert residual.numeric is not None
+    assert residual.source_relation is SourceRelation.TRAINING

@@ -2593,19 +2593,7 @@ _ACCEPTED_MELTING_K = {
 
 @lru_cache(maxsize=2 * len(_FUSION_TABLES))
 def _fusion_table_points(table_id: str) -> tuple[tuple[tuple[Decimal, Decimal], ...], str]:
-    path = TABLES_DIR / f"{table_id}.yaml"
-    document = load_table_document(path)
-    extraction = document.get("extraction")
-    table = document.get("table")
-    if not isinstance(extraction, Mapping) or not isinstance(table, Mapping):
-        raise ValueError(f"{table_id}: JANAF cached table is incomplete")
-    digest = str(extraction.get("source_sha256") or "")
-    expected = _sidecar_hashes().get(f"{table_id}.txt")
-    if not digest or digest != expected:
-        raise ValueError(f"{table_id}: JANAF cache hash does not match source sidecar")
-    rows = table.get("values")
-    if not isinstance(rows, list):
-        raise ValueError(f"{table_id}: JANAF table values are missing")
+    rows, digest = _checked_fusion_table_rows(table_id)
     points: list[tuple[Decimal, Decimal]] = []
     temperatures: set[Decimal] = set()
     for row in rows:
@@ -2638,6 +2626,83 @@ def _fusion_table_points(table_id: str) -> tuple[tuple[tuple[Decimal, Decimal], 
     if len(points) < 2:
         raise ValueError(f"{table_id}: JANAF table has fewer than two Gibbs points")
     return tuple(points), digest
+
+
+@lru_cache(maxsize=2 * len(_FUSION_TABLES))
+def _fusion_enthalpy_points(
+    table_id: str,
+) -> tuple[tuple[tuple[Decimal, Decimal], ...], str, tuple[Decimal, ...]]:
+    rows, digest = _checked_fusion_table_rows(table_id)
+    points = []
+    missing = []
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        temperature = row.get("temperature")
+        enthalpy = row.get("formation_enthalpy")
+        t = temperature.get("value") if isinstance(temperature, Mapping) else None
+        h = enthalpy.get("value") if isinstance(enthalpy, Mapping) else None
+        if t is not None and h is not None:
+            points.append((Decimal(str(t)), Decimal(str(h))))
+        elif t is not None:
+            missing.append(Decimal(str(t)))
+    points.sort()
+    if len(points) < 2:
+        raise ValueError(f"{table_id}: JANAF table has fewer than two formation enthalpy points")
+    return tuple(points), digest, tuple(sorted(missing))
+
+
+def _checked_fusion_table_rows(table_id: str) -> tuple[list[Mapping], str]:
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    extraction = document.get("extraction")
+    table = document.get("table")
+    if not isinstance(extraction, Mapping) or not isinstance(table, Mapping):
+        raise ValueError(f"{table_id}: JANAF cached table is incomplete")
+    digest = str(extraction.get("source_sha256") or "")
+    expected = _sidecar_hashes().get(f"{table_id}.txt")
+    if not digest or digest != expected:
+        raise ValueError(f"{table_id}: JANAF cache hash does not match source sidecar")
+    rows = table.get("values")
+    if not isinstance(rows, list):
+        raise ValueError(f"{table_id}: JANAF table values are missing")
+    return rows, digest
+
+
+def janaf_fusion_enthalpy(
+    oxide: str, temperature_K: Decimal
+) -> tuple[Decimal, Decimal, Decimal, str, str, tuple[str, str]]:
+    """Return dH_fus(T) from the production JANAF solid/liquid table pair."""
+    try:
+        solid_id, liquid_id = _FUSION_TABLES[oxide]
+    except KeyError as exc:
+        raise ValueError(f"no JANAF fusion table pair for {oxide}") from exc
+    solid, solid_sha, solid_missing = _fusion_enthalpy_points(solid_id)
+    liquid, liquid_sha, liquid_missing = _fusion_enthalpy_points(liquid_id)
+    low = max(solid[0][0], liquid[0][0])
+    high = min(solid[-1][0], liquid[-1][0])
+
+    for points, missing in ((solid, solid_missing), (liquid, liquid_missing)):
+        if low <= temperature_K <= high:
+            missing_node = _missing_node_for_interpolation(
+                points, missing, temperature_K
+            )
+            if missing_node is not None:
+                raise ValueError(
+                    f"JANAF formation enthalpy interpolation spans missing grid "
+                    f"node {missing_node} K at {temperature_K} K"
+                )
+
+    return (
+        (
+            _interpolate_table_points(liquid, temperature_K, extrapolate=True)
+            - _interpolate_table_points(solid, temperature_K, extrapolate=True)
+        ) * Decimal(1000),
+        low,
+        high,
+        solid_id,
+        liquid_id,
+        (solid_sha, liquid_sha),
+    )
 
 
 @lru_cache(maxsize=2 * len(_FUSION_TABLES))
@@ -2677,14 +2742,32 @@ def _interpolate_formation_gibbs(
             f"JANAF formation Gibbs interpolation spans missing grid node "
             f"{missing_node} K at {temperature_K} K"
         )
-    for (t0, g0), (t1, g1) in zip(points, points[1:]):
-        if t0 <= temperature_K <= t1:
-            if temperature_K == t0:
-                return g0
-            if temperature_K == t1:
-                return g1
-            return g0 + (g1 - g0) * (temperature_K - t0) / (t1 - t0)
-    raise ValueError(f"{temperature_K} K is not bracketed by JANAF table rows")
+    return _interpolate_table_points(points, temperature_K)
+
+
+def _interpolate_table_points(
+    points: tuple[tuple[Decimal, Decimal], ...],
+    temperature_K: Decimal,
+    *,
+    extrapolate: bool = False,
+) -> Decimal:
+    if temperature_K < points[0][0]:
+        if not extrapolate:
+            raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+        left, right = points[0], points[1]
+    elif temperature_K > points[-1][0]:
+        if not extrapolate:
+            raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+        left, right = points[-2], points[-1]
+    else:
+        left, right = next(
+            (a, b)
+            for a, b in zip(points, points[1:])
+            if a[0] <= temperature_K <= b[0]
+        )
+    return left[1] + (right[1] - left[1]) * (temperature_K - left[0]) / (
+        right[0] - left[0]
+    )
 
 
 def _missing_node_for_interpolation(

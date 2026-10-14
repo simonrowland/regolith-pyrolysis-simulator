@@ -10063,11 +10063,7 @@ def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> Non
 
     assert prediction.value is None
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
-    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
-    assert prediction.refusal_detail == {
-        "reason": "quantity_not_predicted",
-        "quantity": quantity.value,
-    }
+    assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
 
     residuals, _candidates = score_store(
         _context(
@@ -10085,8 +10081,4 @@ def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> Non
     assert residual.rail is Rail.THERMOCHEMISTRY
     assert residual.execution.state is ExecutionState.UNSUPPORTED
     assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
-    assert residual.refusal.detail == {
-        "reason": "quantity_not_predicted",
-        "quantity": quantity.value,
-    }
+    assert residual.refusal.reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION

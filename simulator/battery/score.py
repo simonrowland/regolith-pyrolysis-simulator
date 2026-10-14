@@ -235,6 +235,8 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.ACTIVITY: MetricOperation.DEX,
     Quantity.ACTIVITY_COEFFICIENT: MetricOperation.DEX,
     Quantity.DELTA_FG: MetricOperation.ABSOLUTE,
+    Quantity.ENTHALPY_OF_FUSION: MetricOperation.ABSOLUTE,
+    Quantity.ENTROPY_OF_FUSION: MetricOperation.ABSOLUTE,
     Quantity.H_MINUS_H298: MetricOperation.ABSOLUTE,
     Quantity.PARTIAL_MOLAR_ENTHALPY: MetricOperation.ABSOLUTE,
     Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW: MetricOperation.ABSOLUTE,
@@ -4237,7 +4239,10 @@ def predict_with_engine(
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
-        if quantity not in _engine_thermo_quantities(engine):
+        if (
+            quantity not in _engine_thermo_quantities(engine)
+            and quantity not in FUSION_QUANTITIES
+        ):
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
@@ -4437,7 +4442,11 @@ def predict_with_engine(
     # Formation and pure-standard quantities are not melt activities or
     # partial pressures. A missing branch used to read those maps and
     # return the wrong unit. Refuse instead of emitting 0.
-    if quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO:
+    if (
+        quantity in FORMATION_QUANTITIES
+        or quantity in PURE_STANDARD_THERMO
+        or quantity in FUSION_QUANTITIES
+    ):
         from simulator.battery.compilation_tier import predict_thermo_attempt
 
         attempt = predict_thermo_attempt(engine, observation)
@@ -4445,7 +4454,10 @@ def predict_with_engine(
             exec_state = ExecutionState.PRODUCED
         elif attempt.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE:
             exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
-        elif attempt.refusal_reason is RefusalReason.UNSUPPORTED:
+        elif attempt.refusal_reason in {
+            RefusalReason.UNSUPPORTED,
+            RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+        }:
             exec_state = ExecutionState.UNSUPPORTED
         else:
             exec_state = ExecutionState.NOT_PROBED
@@ -6097,6 +6109,12 @@ def compile_residual(
         observations=context.observations,
         experiments=context.experiments,
     )
+    if (
+        quantity in FUSION_QUANTITIES
+        and prediction.engine is Engine.INTERNAL_ANALYTICAL
+        and source_relation is SourceRelation.SAME_INPUT
+    ):
+        source_relation = SourceRelation.TRAINING
     compilation = is_compilation_evidence(reference) or is_compilation_source(
         reference.source_id, origin
     )
