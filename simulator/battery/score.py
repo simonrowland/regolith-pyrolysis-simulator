@@ -2008,6 +2008,27 @@ def resolve_source_relation(
     return SourceRelation.INDEPENDENT
 
 
+KC91_CALIBRATION_SOURCES = {
+    "citation": "Kress & Carmichael (1991); Partzsch et al. (2004), p. 566",
+    "attributions": (
+        "K&C88+; K&C91",
+        "Kilinc et al. (1983)",
+        "Sack et al. (1980)",
+        "Thornber et al. (1980)",
+    ),
+}
+
+
+def _kc91_calibration_source_overlap(attribution: str | None) -> bool:
+    if not attribution:
+        return False
+    normalized = attribution.casefold()
+    return any(
+        normalized.startswith(label.casefold())
+        for label in KC91_CALIBRATION_SOURCES["attributions"]
+    )
+
+
 def selected_lineage_level(
     observation: Observation,
     comparison_ids: set[str],
@@ -4146,6 +4167,19 @@ def _predict_fe_redox(
             {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
         )
 
+    authority = Authority.BRIDGE
+    if not band["authoritative"]:
+        authority = Authority.EXTRAPOLATED
+    certified_band = {
+        "temperature_K": (
+            Decimal(str(KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15)),
+            Decimal(str(KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15)),
+        )
+    }
+    certified_band_text = (
+        f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
+        f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
+    )
     notices: tuple[Notice, ...] = ()
     if dropped_components and dropped_mass_fraction is not None:
         notices = (
@@ -4155,22 +4189,17 @@ def _predict_fe_redox(
                 reason=(
                     "Kress91 oxide basis omits composition components: "
                     f"{', '.join(dropped_components)}; "
-                    f"dropped_mass_fraction={dropped_mass_fraction:.6g}"
+                    f"dropped_mass_fraction={dropped_mass_fraction:.6g}; "
+                    f"authority={authority.value}; certified_band={certified_band_text}"
                 ),
                 origin="simulator.fe_redox:melt_mol_fractions_for_kress91",
+                band=certified_band_text,
                 dropped=dropped_components,
                 dropped_mass_fraction=Decimal(str(dropped_mass_fraction)),
+                authority=authority,
             ),
         )
-    authority = Authority.BRIDGE
-    certified_band = {
-        "temperature_K": (
-            Decimal(str(KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15)),
-            Decimal(str(KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15)),
-        )
-    }
     if not band["authoritative"]:
-        authority = Authority.EXTRAPOLATED
         notices += (
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
@@ -6358,6 +6387,21 @@ def compile_residual(
         observations=context.observations,
         experiments=context.experiments,
     )
+    if (
+        rail is Rail.REDOX
+        and engine is Engine.INTERNAL_ANALYTICAL
+        and quantity is Quantity.FE3_FE2_RATIO
+    ):
+        attribution = (
+            None
+            if reference.evidence is None
+            else reference.evidence.attribution
+        )
+        source_relation = (
+            SourceRelation.TRAINING
+            if _kc91_calibration_source_overlap(attribution)
+            else SourceRelation.INDEPENDENT
+        )
     compilation = is_compilation_evidence(reference) or is_compilation_source(
         reference.source_id, origin
     )
@@ -8327,7 +8371,7 @@ def headline_rows(
         return _all_numeric_rows_from_residuals(
             residuals, context=context, engines=engines
         )
-    groups: dict[tuple[str, str], list[Residual]] = {}
+    groups: dict[tuple[str, str, str], list[Residual]] = {}
     engines_seen: set[str] = set()
     if tier == "measured":
         tier_residuals = _measured_residuals(residuals, context)
@@ -8340,15 +8384,26 @@ def headline_rows(
             continue
         engine = _engine_of(residual)
         engines_seen.add(engine)
-        groups.setdefault((residual.rail.value, engine), []).append(residual)
+        relation = _source_relation_headline_key(
+            residual.rail.value, engine, residual.source_relation.value
+        )
+        groups.setdefault(
+            (residual.rail.value, engine, relation), []
+        ).append(residual)
     engine_names = [engine.value for engine in engines or ()]
     engine_names.extend(name for name in sorted(engines_seen) if name not in engine_names)
     for rail in Rail:
         for engine in engine_names or [e.value for e in SCORE_ENGINE_SET]:
-            groups.setdefault((rail.value, engine), [])
+            special_redox = _has_source_relation_headline_group(
+                groups, rail.value, engine
+            )
+            if not special_redox:
+                groups.setdefault((rail.value, engine, ""), [])
     rows: list[dict[str, object]] = []
-    for (rail, engine), bucket in sorted(groups.items()):
+    for (rail, engine, relation), bucket in sorted(groups.items()):
         row = _headline_metric_row(rail, engine, bucket, tier=tier)
+        if relation:
+            row.update(_redox_source_relation_fields(relation))
         row["decision_strata"] = (
             _compilation_decision_strata(
                 [
@@ -8357,6 +8412,10 @@ def headline_rows(
                     if _engine_of(r) == engine
                     and r.rail is not None
                     and r.rail.value == rail
+                    and (
+                        not relation
+                        or r.source_relation.value == relation
+                    )
                 ],
                 context,
             )
@@ -9206,10 +9265,11 @@ def _render_score_report_from_payloads_legacy(
     else:
         lines.extend(
             [
-                "| rail | engine | n candidates | n refused | n scored | n score eligible | "
+                "| rail | engine | population / source relation | n candidates | "
+                "n refused | n scored | n score eligible | "
                 "n inside band | RMS dex | median dex | median abs dex | band width dex | "
                 "RMS/band | n no band | match rate |",
-                "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+                "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
         for row in aggregate.headline_records(engines=report_engines):
@@ -9218,7 +9278,9 @@ def _render_score_report_from_payloads_legacy(
             rate = row["match_rate"]
             rate_s = "—" if rate is None else f"{rate:.3f}"
             lines.append(
-                f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
+                f"| {row['rail']} | {row['engine']} | "
+                f"{row.get('population', row.get('source_relation', '—'))} | "
+                f"{row['n_candidates']} | "
                 f"{row['n_refused']} | {row['n']} | {row['n_score_eligible']} | "
                 f"{row['n_inside_band']} | {row['rms_dex'] or '—'} | "
                 f"{row['median_dex'] or '—'} | {row['median_abs_dex'] or '—'} | "
@@ -9596,6 +9658,20 @@ def _headline_payload_record(
     return record
 
 
+def _source_relation_headline_key(rail: str, engine: str, relation: str) -> str:
+    if rail == Rail.REDOX.value and engine == Engine.INTERNAL_ANALYTICAL.value:
+        return relation or SourceRelation.UNKNOWN.value
+    return ""
+
+
+def _has_source_relation_headline_group(
+    groups: Mapping[tuple[str, str, str], object], rail: str, engine: str
+) -> bool:
+    return any(
+        key[0] == rail and key[1] == engine and bool(key[2]) for key in groups
+    )
+
+
 def headline_payloads(
     rows: Iterable[Mapping[str, object]],
     engines: Sequence[Engine],
@@ -9606,11 +9682,11 @@ def headline_payloads(
 ) -> list[dict[str, object]]:
     if tier not in {"measured", "compilation"}:
         raise ValueError(f"unknown headline tier {tier!r}")
-    groups: dict[tuple[str, str], dict[str, object]] = {}
+    groups: dict[tuple[str, str, str], dict[str, object]] = {}
     engine_names = [e.value for e in engines]
     for rail in Rail:
         for engine in engine_names:
-            groups[(rail.value, engine)] = _empty_headline_payload_stats()
+            groups[(rail.value, engine, "")] = _empty_headline_payload_stats()
     for row in rows:
         if not _headline_payload_admits(row, tier=tier):
             continue
@@ -9619,8 +9695,11 @@ def headline_payloads(
             ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
             or str(row.get("key") or "").rsplit("::", 1)[-1]
         )
+        relation = _source_relation_headline_key(
+            rail, engine, str(row.get("source_relation") or "")
+        )
         stats = groups.setdefault(
-            (rail, engine),
+            (rail, engine, relation),
             _empty_headline_payload_stats(),
         )
         stats["n_candidates"] = int(stats["n_candidates"]) + 1
@@ -9665,20 +9744,26 @@ def headline_payloads(
             except (TypeError, ValueError, ArithmeticError):
                 pass
     out: list[dict[str, object]] = []
-    for (rail, engine), stats in sorted(groups.items()):
+    for (rail, engine, relation), stats in sorted(groups.items()):
+        if (
+            not relation
+            and _has_source_relation_headline_group(groups, rail, engine)
+        ):
+            continue
         typed_widths = getattr(rows, "_typed_headline_band_values", {}).get(
             (tier, rail, engine)
         )
-        out.append(
-            _headline_payload_record(
-                tier,
-                rail,
-                engine,
-                stats,
-                typed_widths=typed_widths,
-                include_eligible_references=False,
-            )
+        record = _headline_payload_record(
+            tier,
+            rail,
+            engine,
+            stats,
+            typed_widths=typed_widths,
+            include_eligible_references=False,
         )
+        if relation:
+            record.update(_redox_source_relation_fields(relation))
+        out.append(record)
     return out
 
 
@@ -10016,31 +10101,20 @@ def flagged_stratum_payloads(
     ]
 
 
-KC91_CALIBRATION_SOURCES = {
-    "citation": "Kress & Carmichael (1991); Partzsch et al. (2004), p. 566",
-    "attributions": (
-        "K&C88+; K&C91",
-        "Kilinc et al. (1983)",
-        "Sack et al. (1980)",
-        "Thornber et al. (1980)",
-    ),
-}
-
-
-def _kc91_calibration_source_overlap(
-    row: Mapping[str, object], observations: Mapping[str, Observation]
-) -> bool:
-    reference = observations.get(str(row.get("reference") or ""))
-    if reference is None or reference.evidence is None:
-        return False
-    attribution = reference.evidence.attribution
-    if not attribution:
-        return False
-    normalized = attribution.casefold()
-    return any(
-        normalized.startswith(label.casefold())
-        for label in KC91_CALIBRATION_SOURCES["attributions"]
-    )
+def _redox_source_relation_fields(relation: str) -> dict[str, str]:
+    population = {
+        SourceRelation.TRAINING.value: "calibration_source_overlap_fit_fidelity",
+        SourceRelation.INDEPENDENT.value: "independent_source_accuracy",
+    }.get(relation)
+    fields = {"source_relation": relation}
+    if population is not None:
+        fields["population"] = population
+    if relation == SourceRelation.TRAINING.value:
+        fields["attribution_basis"] = (
+            "Observation.evidence.attribution via Residual.reference"
+        )
+        fields["calibration_source_citation"] = KC91_CALIBRATION_SOURCES["citation"]
+    return fields
 
 
 def headline_payload_records(
@@ -10079,59 +10153,6 @@ def headline_payload_records(
         *headline_payloads(compilation_rows, engines, tier="compilation"),
     ]
     if observations is not None:
-        redox_rows_by_population: dict[str, list[Mapping[str, object]]] = {
-            "calibration_source_overlap_fit_fidelity": [],
-            "independent_source_accuracy": [],
-        }
-        for row in rows:
-            if row.get("rail") != Rail.REDOX.value:
-                continue
-            engine_name = str(
-                ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
-                or str(row.get("key") or "").rsplit("::", 1)[-1]
-            )
-            if engine_name != Engine.INTERNAL_ANALYTICAL.value:
-                continue
-            reference = observations.get(str(row.get("reference") or ""))
-            if (
-                reference is None
-                or not isinstance(reference.identity, Identity)
-                or quantity_token(reference.identity) is not Quantity.FE3_FE2_RATIO
-                or not _headline_payload_admits(row, tier="measured")
-            ):
-                continue
-            population = (
-                "calibration_source_overlap_fit_fidelity"
-                if _kc91_calibration_source_overlap(row, observations)
-                else "independent_source_accuracy"
-            )
-            redox_rows_by_population[population].append(row)
-        if any(redox_rows_by_population.values()):
-            records = [
-                record
-                for record in records
-                if not (
-                    record.get("tier") == "measured"
-                    and record.get("rail") == Rail.REDOX.value
-                    and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-                )
-            ]
-            for population, population_rows in redox_rows_by_population.items():
-                population_record = next(
-                    record
-                    for record in headline_payloads(
-                        population_rows, engines, tier="measured"
-                    )
-                    if record.get("rail") == Rail.REDOX.value
-                    and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
-                )
-                population_record.update(
-                    population=population,
-                    attribution_basis="Observation.evidence.attribution via Residual.reference",
-                    calibration_source_citation=KC91_CALIBRATION_SOURCES["citation"],
-                )
-                records.append(population_record)
-
         compilation_rows = (row for row in rows if is_compilation(row))
         from simulator.battery.compilation_tier import (
             compilation_family,
@@ -10319,7 +10340,7 @@ class _ScorePayloadAccumulator:
             {} if typed_tier_band_values is None else typed_tier_band_values
         )
         self.headline_groups: dict[
-            str, dict[tuple[str, str], dict[str, object]]
+            str, dict[tuple[str, str, str], dict[str, object]]
         ] = {"measured": {}, "compilation": {}}
         self.all_numeric = _AllNumericHeadline()
         self.e15_points: list[_E15ResidualPoint] = []
@@ -10344,7 +10365,7 @@ class _ScorePayloadAccumulator:
         for tier in self.headline_groups:
             for rail in Rail:
                 for engine in engines:
-                    self.headline_groups[tier][(rail.value, engine.value)] = (
+                    self.headline_groups[tier][(rail.value, engine.value, "")] = (
                         _empty_headline_payload_stats()
                     )
 
@@ -10387,7 +10408,12 @@ class _ScorePayloadAccumulator:
         observation: Observation | None = None,
     ) -> None:
         groups = self.headline_groups[tier]
-        stats = groups.setdefault((rail, engine), _empty_headline_payload_stats())
+        relation = _source_relation_headline_key(
+            rail, engine, str(row.get("source_relation") or "")
+        )
+        stats = groups.setdefault(
+            (rail, engine, relation), _empty_headline_payload_stats()
+        )
         stats["n_candidates"] = int(stats["n_candidates"]) + 1
         status = str(row.get("status") or "")
         exclusions = tuple(row.get("exclusions") or ())
@@ -10750,23 +10776,40 @@ class _ScorePayloadAccumulator:
             keys = {
                 key for key in groups
                 if engines is None or key[1] in selected_names
+                if not (
+                    key[0] == Rail.REDOX.value
+                    and key[1] == Engine.INTERNAL_ANALYTICAL.value
+                    and key[2] == ""
+                    and any(
+                        other[0] == key[0]
+                        and other[1] == key[1]
+                        and other[2]
+                        for other in groups
+                    )
+                )
             }
             for rail in Rail:
                 for engine in selected_names:
-                    keys.add((rail.value, engine))
-            for rail, engine in sorted(keys):
-                stats = groups.get((rail, engine), _empty_headline_payload_stats())
-                records.append(
-                    _headline_payload_record(
-                        tier,
-                        rail,
-                        engine,
-                        stats,
-                        typed_widths=self.typed_headline_band_values.get(
-                            (tier, rail, engine)
-                        ),
-                    )
+                    if not _has_source_relation_headline_group(
+                        groups, rail.value, engine
+                    ):
+                        keys.add((rail.value, engine, ""))
+            for rail, engine, relation in sorted(keys):
+                stats = groups.get(
+                    (rail, engine, relation), _empty_headline_payload_stats()
                 )
+                record = _headline_payload_record(
+                    tier,
+                    rail,
+                    engine,
+                    stats,
+                    typed_widths=self.typed_headline_band_values.get(
+                        (tier, rail, engine)
+                    ),
+                )
+                if relation:
+                    record.update(_redox_source_relation_fields(relation))
+                records.append(record)
         self._add_compilation_decision_strata(records)
         return records
 
@@ -11032,10 +11075,11 @@ def render_score_report_from_payloads(
                 if observations is not None
                 else []
             ),
-            "| rail | engine | n candidates | n refused | n scored | n score eligible | "
+            "| rail | engine | population / source relation | n candidates | "
+            "n refused | n scored | n score eligible | "
             "n inside band | RMS dex | median dex | median abs dex | band width dex | "
             "RMS/band | n no band | match rate |",
-            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+            "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
     hulls: dict[tuple[str, str, str], _ConditionHull] | None = (
@@ -11052,7 +11096,9 @@ def render_score_report_from_payloads(
         band = row["band_width_dex"] or "—"
         ratio = row["rms_over_band"] or "—"
         lines.append(
-            f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
+            f"| {row['rail']} | {row['engine']} | "
+            f"{row.get('population', row.get('source_relation', '—'))} | "
+            f"{row['n_candidates']} | "
             f"{row['n_refused']} | {row['n']} | {row['n_score_eligible']} | "
             f"{row['n_inside_band']} | {rms} | {med} | {med_abs} | {band} | {ratio} | "
             f"{row['n_no_band']} | {rate_s} |"

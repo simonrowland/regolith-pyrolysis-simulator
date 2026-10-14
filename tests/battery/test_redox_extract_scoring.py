@@ -1,3 +1,7 @@
+import json
+import shutil
+import subprocess
+import sys
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -13,7 +17,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
 )
-from simulator.battery.migrate import Migrator, load_yaml
+from simulator.battery.migrate import Migrator, load_yaml, write_outputs
 from simulator.battery.score import (
     ScoreContext,
     comparison_candidates,
@@ -163,7 +167,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert zero_residuals[0].refusal.reason is RefusalReason.METRIC_DOMAIN
 
 
-def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy():
+def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_path):
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
     migrator = Migrator(root)
@@ -224,6 +228,117 @@ def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy():
         for record in records
     )
 
+    object_records = score_module.headline_records(
+        residuals,
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    accumulator = score_module._ScorePayloadAccumulator(
+        context, (Engine.INTERNAL_ANALYTICAL,)
+    )
+    for residual in residuals:
+        accumulator.add(score_module.residual_to_plain(residual))
+    accumulator_records = accumulator.headline_records()
+    for headline in (object_records, accumulator_records):
+        split = {
+            record["population"]: record
+            for record in headline
+            if record.get("tier") == "measured"
+            and record.get("rail") == Rail.REDOX.value
+            and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
+            and record.get("population")
+        }
+        assert split["calibration_source_overlap_fit_fidelity"]["n"] == 223
+        assert split["independent_source_accuracy"]["n"] == 212
+        assert split["calibration_source_overlap_fit_fidelity"]["source_relation"] == "training"
+        assert split["independent_source_accuracy"]["source_relation"] == "independent"
+        assert not any(
+            record.get("rail") == Rail.REDOX.value
+            and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
+            and record.get("tier") == "measured"
+            and not record.get("population")
+            for record in headline
+        )
+
+    fixture_extract = tmp_path / "data/literature/extracts" / extract.name
+    fixture_extract.parent.mkdir(parents=True)
+    shutil.copy2(extract, fixture_extract)
+    write_outputs(result, tmp_path)
+    subprocess.run(["git", "init", "--quiet", str(tmp_path)], check=True)
+    subprocess.run(["git", "-C", str(tmp_path), "add", "data"], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(tmp_path),
+            "-c",
+            "user.name=Battery score test",
+            "-c",
+            "user.email=battery-score-test@example.invalid",
+            "commit",
+            "--quiet",
+            "-m",
+            "Borisov fixture store",
+        ],
+        check=True,
+    )
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(root / "scripts" / "battery_score.py"),
+            "--root",
+            str(tmp_path),
+            "--engines",
+            Engine.INTERNAL_ANALYTICAL.value,
+            "--rail",
+            Rail.REDOX.value,
+            "--work",
+            "borisov-2018-compilation",
+        ],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    summary = json.loads(
+        (tmp_path / "data/battery/score-summary.json").read_text(encoding="utf-8")
+    )
+    production_rows = {
+        row["population"]: row
+        for row in summary["records"]
+        if row.get("tier") == "measured"
+        and row.get("rail") == Rail.REDOX.value
+        and row.get("engine") == Engine.INTERNAL_ANALYTICAL.value
+        and row.get("population")
+    }
+    assert production_rows["calibration_source_overlap_fit_fidelity"]["n"] == 223
+    assert production_rows["independent_source_accuracy"]["n"] == 212
+    assert production_rows["calibration_source_overlap_fit_fidelity"]["source_relation"] == "training"
+    assert production_rows["independent_source_accuracy"]["source_relation"] == "independent"
+    assert abs(
+        Decimal(production_rows["calibration_source_overlap_fit_fidelity"]["rms_dex"])
+        - Decimal("0.11250")
+    ) < Decimal("0.00001")
+    assert abs(
+        Decimal(production_rows["independent_source_accuracy"]["rms_dex"])
+        - Decimal("0.10468")
+    ) < Decimal("0.00001")
+    report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
+    report_rows = {
+        parts[2]: parts
+        for line in report.splitlines()
+        if line.startswith("| redox | internal-analytical | ")
+        if (parts := [part.strip() for part in line.strip("|").split("|")])
+        and len(parts) == 15
+    }
+    fit_row = report_rows["calibration_source_overlap_fit_fidelity"]
+    independent_row = report_rows["independent_source_accuracy"]
+    assert fit_row[3] == fit_row[5] == "223"
+    assert independent_row[3] == independent_row[5] == "212"
+    assert abs(Decimal(fit_row[8]) - Decimal("0.11250")) < Decimal("0.00001")
+    assert abs(Decimal(independent_row[8]) - Decimal("0.10468")) < Decimal("0.00001")
+
 
 def test_kress91_redox_flags_oxide_outside_its_converter_domain():
     root = Path(__file__).resolve().parents[2]
@@ -259,7 +374,11 @@ def test_kress91_redox_flags_oxide_outside_its_converter_domain():
     assert prediction.value is not None
     assert notice.dropped == ("Cr2O3",)
     assert notice.dropped_mass_fraction is not None
+    assert notice.authority is prediction.authority is Authority.BRIDGE
+    assert notice.band == "[1473.15, 1903.15] K"
     assert "Cr2O3" in notice.reason
+    assert "authority=bridge" in notice.reason
+    assert "certified_band=" in notice.reason
 
 
 @pytest.mark.parametrize("axis", ("temperature_K", "composition", "total_pressure_Pa", "fO2_Pa"))
