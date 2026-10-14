@@ -114,24 +114,31 @@ def test_stolyarova_1991_gas_rows_keep_phase_g(migrated) -> None:
         )
 
 
-def test_stolyarova_1991_point_composition_is_not_promoted(migrated) -> None:
+def test_stolyarova_1991_printed_composition_is_carried(migrated) -> None:
     rows = _printed_rows(migrated)
     assert len(rows) == 130
     assert sum(_x_sio2(observation) in CLASS_S_X for observation in rows) == 28
     for observation in rows:
         composition = observation.identity.composition
-        assert composition is None or not composition.is_value, observation.observation_id
+        # The repair carries printed compositions from b-890/d-142; this is
+        # explicit extract data, not promotion from phase_field_class or x(SiO2).
+        assert composition is not None and composition.is_value, observation.observation_id
+        point_composition = observation.point_conditions["composition"].state
+        assert point_composition.is_value
+        assert composition.value == point_composition.value
 
 
-def test_stolyarova_1991_identity_advisories_stay_434_138_138_84(migrated) -> None:
+def test_stolyarova_1991_identity_advisories_stay_250_8_84_84(migrated) -> None:
     detail = Counter(
         str(issue.detail)
         for issue in migrated.validation.issues
         if str(issue.reason) == "identity_incomplete"
     )
-    assert sum(detail.values()) == 434
-    assert detail["required axis composition is unknown"] == 138
-    assert detail["required axis fO2_Pa is unknown"] == 138
+    # Printed compositions now carried from b-890/d-142 remove 130
+    # composition advisories; the remaining required-axis gaps stay pinned.
+    assert sum(detail.values()) == 250
+    assert detail["required axis composition is unknown"] == 8
+    assert detail["required axis fO2_Pa is unknown"] == 84
     assert detail["required axis total_pressure_Pa is unknown"] == 84
 
 
