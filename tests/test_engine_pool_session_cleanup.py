@@ -1,9 +1,14 @@
 import gc
 import multiprocessing
 import os
+import shutil
+import subprocess
+import sys
+import tempfile
 import threading
 import time
 import weakref
+from pathlib import Path
 
 import pytest
 
@@ -178,38 +183,120 @@ def test_close_all_surfaces_bounded_shutdown_timeout():
     assert exc_info.value.phase == "shutdown"
 
 
-def test_module_teardown_guard_detects_live_magemin_pool():
-    class FakeWorker:
-        name = "MAGEMin subprocess pool slot 0"
-
-    class FakePool:
-        workers = (FakeWorker(),)
-
-    pool = FakePool()
-    engine_pool._LIVE_ENGINE_POOLS.add(pool)
-    try:
-        with pytest.raises(AssertionError, match="MAGEMin warm pools alive"):
-            conftest._assert_no_live_magemin_warm_pools()
-    finally:
-        engine_pool._LIVE_ENGINE_POOLS.discard(pool)
-
-
-def test_module_teardown_cleanup_closes_only_new_magemin_pools(monkeypatch):
-    class FakePool:
-        def __init__(self):
-            self.close_kwargs = None
-
-        def close(self, **kwargs):
-            self.close_kwargs = kwargs
-
-    existing, new = FakePool(), FakePool()
-    monkeypatch.setattr(
-        conftest,
-        "_live_magemin_warm_pools",
-        lambda: ((existing, ("existing",)), (new, ("new",))),
+def test_lazily_initialized_session_provider_survives_module_boundary():
+    test_dir = Path(
+        tempfile.mkdtemp(
+            prefix="t1229-provider-",
+            dir=os.environ.get("TMPDIR") or tempfile.gettempdir(),
+        )
     )
+    try:
+        (test_dir / "_t1229_test_plugin.py").write_text(
+            '''
+from pathlib import Path
+from types import SimpleNamespace
 
-    conftest._close_new_magemin_warm_pools({existing})
+import pytest
+import simulator.engine_pool as engine_pool
+import simulator.melt_backend.magemin as magemin_module
+from engines.magemin.provider import MAGEMinShadowProvider
 
-    assert existing.close_kwargs is None
-    assert new.close_kwargs == {"cancel_pending": True}
+
+class FakePool:
+    def __init__(self, _worker_factory, *, size):
+        self.workers = tuple(
+            SimpleNamespace(name=f"MAGEMin subprocess pool slot {i}")
+            for i in range(size)
+        )
+        self.closed = False
+        engine_pool._LIVE_ENGINE_POOLS.add(self)
+
+    def close(self, *, cancel_pending=False, timeout_s=None):
+        self.closed = True
+        engine_pool._LIVE_ENGINE_POOLS.discard(self)
+
+    def _request_cancel_pending(self):
+        return None
+
+
+@pytest.fixture(scope="session")
+def lazy_provider():
+    original_pool = magemin_module.EngineWorkerPool
+    original_locate = magemin_module.MAGEMinBackend._locate_binary
+    original_import = magemin_module.MAGEMinBackend._import_magemin_bridge
+    magemin_module.EngineWorkerPool = FakePool
+    magemin_module.MAGEMinBackend._locate_binary = staticmethod(
+        lambda _explicit: Path("/fake/MAGEMin")
+    )
+    magemin_module.MAGEMinBackend._import_magemin_bridge = (
+        lambda self, *, requested: ("subprocess", None)
+    )
+    provider = MAGEMinShadowProvider()
+    yield provider
+    if provider._backend is not None:
+        provider._backend.close()
+    magemin_module.EngineWorkerPool = original_pool
+    magemin_module.MAGEMinBackend._locate_binary = staticmethod(original_locate)
+    magemin_module.MAGEMinBackend._import_magemin_bridge = original_import
+''',
+            encoding="utf-8",
+        )
+        (test_dir / "test_01_provider_open.py").write_text(
+            '''
+def test_provider_opens_its_pool_lazily(lazy_provider):
+    backend = lazy_provider._ensure_backend()
+    assert backend is not None
+    lazy_provider._observed_pool = backend._subprocess_pool
+    assert lazy_provider._observed_pool.closed is False
+''',
+            encoding="utf-8",
+        )
+        (test_dir / "test_02_provider_reuse.py").write_text(
+            '''
+def test_session_provider_pool_survives_module_teardown(lazy_provider):
+    backend = lazy_provider._ensure_backend()
+    assert backend is not None
+    assert backend._subprocess_pool is lazy_provider._observed_pool
+    assert lazy_provider._observed_pool.closed is False
+''',
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pytest",
+                "-q",
+                "--rootdir",
+                str(Path(__file__).resolve().parents[1]),
+                "-o",
+                "addopts=",
+                "-p",
+                "conftest",
+                "-p",
+                "_t1229_test_plugin",
+                "-p",
+                "no:cacheprovider",
+                str(test_dir),
+            ],
+            cwd=Path(__file__).resolve().parents[1],
+            env={
+                **os.environ,
+                "PYTHONPATH": os.pathsep.join(
+                    filter(
+                        None,
+                        (
+                            str(test_dir),
+                            os.environ.get("PYTHONPATH", ""),
+                        ),
+                    )
+                ),
+            },
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
+    finally:
+        shutil.rmtree(test_dir)
