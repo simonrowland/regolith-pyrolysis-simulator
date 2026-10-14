@@ -10,7 +10,7 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.migrate import Migrator, REPO_ROOT, convert_pressure_to_pa
-from simulator.battery.enums import IdentityEqualKind
+from simulator.battery.enums import EvidenceClass, IdentityEqualKind, Quantity
 from simulator.battery.identity import identity_equal
 
 TOOLS = REPO_ROOT / "tools"
@@ -34,15 +34,42 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
     result = migrator.result
     records = list(result.observations.values())
 
-    assert len(records) == 104
+    assert len(records) == 134
     assert len(result.experiments) == 1
-    assert not result.queue
+    assert len(result.queue) == 2
+    assert sorted((tuple(item.axes), item.why) for item in result.queue) == [
+        (("phase",), "missing phase"),
+        (("phase",), "missing phase"),
+    ]
     assert not result.registry_issues
 
+    pressure_records = [
+        record
+        for record in records
+        if record.identity.quantity.value is Quantity.P_PARTIAL
+    ]
+    activity_records = [
+        record for record in records if record.identity.quantity.value is Quantity.ACTIVITY
+    ]
+    assert len(pressure_records) == 104
+    assert len(activity_records) == 30
+
     for formula, block in document["species"].items():
-        source_points = block["observations"][0]["values"]["points"]
+        source_observation = next(
+            observation
+            for observation in block["observations"]
+            if observation["observation_id"].startswith("shornikov_2026_table2_")
+        )
+        source_points = source_observation["values"]["points"]
+        assert "molybdenum effusion cell (according to Knudsen)" in source_observation[
+            "values"
+        ]["note"]
         migrated = sorted(
-            (record for record in records if record.identity.species.formula == formula),
+            (
+                record
+                for record in pressure_records
+                if record.identity.species.formula == formula
+            ),
             key=lambda record: record.identity.temperature_K.value,
         )
         assert len(migrated) == len(source_points)
@@ -61,9 +88,43 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
 
     # The table states no composition map, oxygen fugacity, or in-cell total
     # pressure. Keep those axes unknown while confirming printed T is bound.
-    outcomes = [identity_equal(record.identity, record.identity) for record in records]
+    outcomes = [
+        identity_equal(record.identity, record.identity) for record in pressure_records
+    ]
     assert all("temperature_K" not in outcome.fields for outcome in outcomes)
     assert all(outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN for outcome in outcomes)
+
+    for formula in ("CaO", "SiO2"):
+        observation = next(
+            row
+            for row in document["species"][formula]["observations"]
+            if row["observation_id"].startswith("shornikov_2026_figure4_")
+        )
+        source_points = observation["values"]["points"]
+        migrated = sorted(
+            (
+                record
+                for record in activity_records
+                if record.identity.species.formula == formula
+            ),
+            key=lambda record: record.identity.temperature_K.value,
+        )
+        assert len(migrated) == len(source_points) == 15
+        reference = migrated[0].identity.reference_state.value
+        assert reference.convention.value == "raoultian_pure_endmember"
+        assert reference.endmember.formula == formula
+        assert reference.endmember.phase.tag.value == "unknown"
+        assert reference.endmember.polymorph.tag.value == "unknown"
+        outcomes = [identity_equal(record.identity, record.identity) for record in migrated]
+        assert all(outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN for outcome in outcomes)
+        for point, record in zip(source_points, migrated, strict=True):
+            assert record.value.point == Decimal(point["activity"])
+            assert record.identity.temperature_K.value == Decimal(point["T_K"])
+            assert record.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+            condition = record.point_conditions["temperature_K"]
+            assert condition.state.value == Decimal(point["T_K"])
+            assert condition.locator.table == "2"
+            assert record.locator.figure == "4"
 
 
 def test_table_2_fidelity_series_pins_fail_after_value_mutation():
@@ -79,7 +140,9 @@ def test_table_2_fidelity_series_pins_fail_after_value_mutation():
             if item["observation_id"] == sample["observation_id"]
         )
         if sample["field"] == "points":
-            row["values"]["points"][0]["pressure_atm"] = "9.99e-99"
+            point = row["values"]["points"][0]
+            value_key = "pressure_atm" if "pressure_atm" in point else "activity"
+            point[value_key] = "9.99e-99"
         else:
             row["values"][sample["field"]] += " mutation"
         assert validator.check_fidelity_sample_matches(changed, sample)
