@@ -206,10 +206,23 @@ def binding_identity_for_backend(backend: Any) -> BindingIdentity | None:
     return None
 
 
+def _magemin_version_owner(backend: Any) -> Any:
+    if callable(getattr(backend, "get_engine_version", None)):
+        return backend
+    live_backend = getattr(backend, "_backend", None)
+    if callable(getattr(live_backend, "get_engine_version", None)):
+        return live_backend
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    return MAGEMinBackend()
+
+
 def current_backend_provenance(
     identity: BindingIdentity,
     backend: Any,
 ) -> dict[str, Any]:
+    if identity.engine_id == "magemin":
+        backend = _magemin_version_owner(backend)
     provenance = install_provenance(identity, runtime_backend=backend)
     getter = getattr(backend, "get_engine_version", None)
     provenance["runtime_version"] = version_getter_provenance(getter)
@@ -270,10 +283,7 @@ def current_cached_real_provenance(
             else None
         )
         live_backend = getattr(provider, "_backend", None)
-        provenance = install_provenance(identity, runtime_backend=live_backend)
-        getter = getattr(live_backend, "get_engine_version", None)
-        provenance["runtime_version"] = version_getter_provenance(getter)
-        return provenance
+        return current_backend_provenance(identity, live_backend)
     if config is None:
         raise ValueError("cached-real binding configuration is unavailable")
     actual_identity = binding_identity_for_cached_real(config)
@@ -728,30 +738,12 @@ def gate_curve_memo_evidence(
     from simulator.reduced_real_determinism import _gate_curve_provider_role
 
     provider_role = _gate_curve_provider_role(curve)
-    evidence = _live_binding_cache_evidence(
+    return _live_binding_cache_evidence(
         sim,
         provider_role=provider_role,
         artifact="freeze_gate_curve",
         include_selected_bindings=include_selected_bindings,
     )
-    if (
-        provider_role == "fallback"
-        and evidence.identity is not None
-        and evidence.identity.engine_id == "magemin"
-        and isinstance(evidence.provenance, Mapping)
-    ):
-        # The MAGEMin fallback initializes lazily. Its runtime version getter
-        # is unavailable before the first dispatch and populated afterward;
-        # the selected binary digest already pins that installed producer.
-        provenance = dict(evidence.provenance)
-        provenance.pop("runtime_version", None)
-        return _gate_curve_evidence(
-            sim,
-            evidence.identity,
-            provenance,
-            eligible=evidence.eligible,
-        )
-    return evidence
 
 
 def write_gate_curve_memo_origin(
@@ -1805,13 +1797,15 @@ def install_provenance(
         )
         binary = getattr(runtime_backend, "_binary_path", None)
         if binary is None:
-            from simulator.engine_local_config import configured_magemin_binary_path
-
-            binary = configured_magemin_binary_path()
-            if binary is None:
+            binary_resolver = getattr(
+                runtime_backend, "_resolve_binary_path", None
+            )
+            if callable(binary_resolver):
+                binary = binary_resolver()
+            else:
                 from simulator.melt_backend.magemin import MAGEMinBackend
 
-                binary = MAGEMinBackend()._locate_binary(None)
+                binary = MAGEMinBackend()._resolve_binary_path()
         binary_path = selected_path(binary)
         resolved_paths["magemin_selected_binary"] = (
             str(binary_path) if binary_path is not None else None
