@@ -2632,6 +2632,12 @@ def _fusion_table_points(table_id: str) -> tuple[tuple[tuple[Decimal, Decimal], 
 def _fusion_enthalpy_points(
     table_id: str,
 ) -> tuple[tuple[tuple[Decimal, Decimal], ...], str, tuple[Decimal, ...]]:
+    return _fusion_property_points(table_id, "formation_enthalpy")
+
+
+def _fusion_property_points(
+    table_id: str, property_name: str
+) -> tuple[tuple[tuple[Decimal, Decimal], ...], str, tuple[Decimal, ...]]:
     rows, digest = _checked_fusion_table_rows(table_id)
     points = []
     missing = []
@@ -2639,16 +2645,18 @@ def _fusion_enthalpy_points(
         if not isinstance(row, Mapping):
             continue
         temperature = row.get("temperature")
-        enthalpy = row.get("formation_enthalpy")
+        value = row.get(property_name)
         t = temperature.get("value") if isinstance(temperature, Mapping) else None
-        h = enthalpy.get("value") if isinstance(enthalpy, Mapping) else None
-        if t is not None and h is not None:
-            points.append((Decimal(str(t)), Decimal(str(h))))
+        y = value.get("value") if isinstance(value, Mapping) else None
+        if t is not None and y is not None:
+            points.append((Decimal(str(t)), Decimal(str(y))))
         elif t is not None:
             missing.append(Decimal(str(t)))
     points.sort()
     if len(points) < 2:
-        raise ValueError(f"{table_id}: JANAF table has fewer than two formation enthalpy points")
+        raise ValueError(
+            f"{table_id}: JANAF table has fewer than two {property_name} points"
+        )
     return tuple(points), digest, tuple(sorted(missing))
 
 
