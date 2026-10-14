@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 306
-  extracts: 304
+  sources: 313
+  extracts: 311
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 59
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 304
+  extracts_without_pdf: 311
   alias_groups_needing_resolution: 37
 gaps:
   pdfs_without_extract: []
@@ -31,10 +31,13 @@ gaps:
   - arxiv-1602-00658-fegley-rock-steam-solubility
   - arxiv-1902-05005
   - arxiv-2509-sio-flame-nucleation
+  - badjukov-petrova-1993-shock-vaporization
   - banchor-matsui-naito-1986
   - banya-watanabe-1977-feto-p2o5-solid-iron
+  - beckett-2002-silicate-melt-activities
   - behrens-rosenblatt-1972
   - bencze-yazhenskikh-2016
+  - bennour-1996-ternary-cs-na-silicate
   - berkowitz-chupka-inghram-1957
   - borisov-2018-compilation
   - boulliung-2025-mercury-volatile-metals-magmatic
@@ -58,6 +61,7 @@ gaps:
   - fdm879
   - fegley-2016-rock-steam-solubility
   - fegley-2023-chemical-equilibrium-calculations-bu
+  - ferguson-2004-iron-vapor-pressure
   - filiberto-lpsc2011-2064-volatiles
   - fray-schmitt-2009-ch4-1
   - fray-schmitt-2009-co-1
@@ -256,6 +260,7 @@ gaps:
   - ref-052-k-o-gas
   - ref-052-na-o-gas
   - reiss-2019-thermal-extraction-nulht2m
+  - richet-bottinga-1986-silicate-thermochemistry
   - richter-et-al-2007
   - robie-hemingway-wilson-1980-usgs-of-80-908
   - robinot-2025-promes-review
@@ -294,6 +299,7 @@ gaps:
   - stolyarova-1996-cao-alumina-silica-kems
   - street-2010-thermal-properties-simulants
   - sublimation-kinetics-2023-minerals
+  - sugawara-akaogi-2004-liquid-calorimetry
   - sutherland-2025-mare-simulant-volatile-loss
   - suzuki-2026-vacuum-oxygen-extraction
   - ta-badro-2021
@@ -317,6 +323,7 @@ gaps:
   - vanbuchem-2023-lavatmos
   - vanbuchem-2025-lavatmos2
   - visscher-fegley-2013-debris-disks
+  - volovetskii-2012-iron-redox
   - wadhwa-2008-redox-small-bodies
   - wetzel-gail-2013-sio-arrhenius
   - wilkerson-2021-jsc1a-tga-ms-poster
@@ -1367,6 +1374,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: badjukov-petrova-1993-shock-vaporization
+  aliases: []
+  citation: 'Badjukov D.D. and Petrova T.L. (1993). Vaporization by shock loading of albite, jadeite,
+    and pyrex glass: Experimental study. Lunar and Planetary Science XXIV, 51–52, abstract 1026.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/badjukov-petrova-1993-shock-vaporization.yaml
+    review_status: draft
+    rows: 3
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/badjukov-petrova-1993-shock-vaporization/badjukov-petrova-1993-shock-vaporization.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/badjukov-petrova-1993-shock-vaporization/sidecar.yaml
+      present: false
+    text:
+      path: text/badjukov-petrova-1993-shock-vaporization
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/badjukov-petrova-1993-shock-vaporization
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/badjukov-petrova-1993-shock-vaporization.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/badjukov-petrova-1993-shock-vaporization.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: banchor-matsui-naito-1986
   aliases: []
   citation: Banchornheavakul, Matsui & Naito, J. Nucl. Sci. Technol. 23 (1986) 602–611
@@ -1477,6 +1542,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/banya-watanabe-1977-feto-p2o5-solid-iron.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: beckett-2002-silicate-melt-activities
+  aliases: []
+  citation: 'Beckett J.R. (2002). Role of basicity and tetrahedral speciation in controlling the thermodynamic
+    properties of silicate liquids, part1: The system CaO–MgO–Al2O3–SiO2. Geochimica et Cosmochimica Acta66(1):93–107.'
+  doi: 10.1016/S0016-7037(01)00751-7
+  report_number: null
+  identifier: 10.1016/S0016-7037(01)00751-7
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/beckett-2002-silicate-melt-activities.yaml
+    review_status: draft
+    rows: 14
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/beckett-2002-silicate-melt-activities/beckett-2002-silicate-melt-activities.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/beckett-2002-silicate-melt-activities/sidecar.yaml
+      present: false
+    text:
+      path: text/beckett-2002-silicate-melt-activities
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/beckett-2002-silicate-melt-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/beckett-2002-silicate-melt-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/beckett-2002-silicate-melt-activities.yaml
       present: false
       error: null
       last_stage: null
@@ -1598,6 +1721,65 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: bennour-1996-ternary-cs-na-silicate
+  aliases: []
+  citation: Bennour F., Chastel R., Mathieu J.-C., Coutures J.-P., and Bergman C. (1996). Determination
+    of the Excess Thermodynamic Functions in Ternary Cs2O–SiO2–Na2O Melts by Knudsen Effusion Mass Spectrometry.
+    Physics and Chemistry of Liquids33(4):229–248.
+  doi: 10.1080/00319109608039824
+  report_number: null
+  identifier: 10.1080/00319109608039824
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/bennour-1996-ternary-cs-na-silicate.yaml
+    review_status: draft
+    rows: 8
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/bennour-1996-ternary-cs-na-silicate/bennour-1996-ternary-cs-na-silicate.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/bennour-1996-ternary-cs-na-silicate/sidecar.yaml
+      present: false
+    text:
+      path: text/bennour-1996-ternary-cs-na-silicate
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/bennour-1996-ternary-cs-na-silicate
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/bennour-1996-ternary-cs-na-silicate.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/bennour-1996-ternary-cs-na-silicate.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: berkowitz-chupka-inghram-1957
   aliases: []
@@ -2942,6 +3124,64 @@ sources:
       present: true
       error: null
       last_stage: scored
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: ferguson-2004-iron-vapor-pressure
+  aliases: []
+  citation: Ferguson F.T., Nuth J.A. III, and Johnson N.M. (2004). Thermogravimetric Measurement of the
+    Vapor Pressure of Iron from1573K to1973K. Journal of Chemical and Engineering Data49:497–501.
+  doi: 10.1021/je034152w
+  report_number: null
+  identifier: 10.1021/je034152w
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/ferguson-2004-iron-vapor-pressure.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ferguson-2004-iron-vapor-pressure/ferguson-2004-iron-vapor-pressure.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/ferguson-2004-iron-vapor-pressure/sidecar.yaml
+      present: false
+    text:
+      path: text/ferguson-2004-iron-vapor-pressure
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/ferguson-2004-iron-vapor-pressure
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ferguson-2004-iron-vapor-pressure.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ferguson-2004-iron-vapor-pressure.yaml
+      present: false
+      error: null
+      last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: filiberto-lpsc2011-2064-volatiles
@@ -14484,6 +14724,64 @@ sources:
       last_stage: extracted
       date: '2026-09-12'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: richet-bottinga-1986-silicate-thermochemistry
+  aliases: []
+  citation: 'Richet, P. & Bottinga, Y. (1986), "Thermochemical properties of silicate glasses and liquids:
+    A review", Reviews of Geophysics, 24(1), 1-25.'
+  doi: 10.1029/rg024i001p00001
+  report_number: null
+  identifier: 10.1029/rg024i001p00001
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/richet-bottinga-1986-silicate-thermochemistry.yaml
+    review_status: draft
+    rows: 24
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/richet-bottinga-1986-silicate-thermochemistry/richet-bottinga-1986-silicate-thermochemistry.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/richet-bottinga-1986-silicate-thermochemistry/sidecar.yaml
+      present: false
+    text:
+      path: text/richet-bottinga-1986-silicate-thermochemistry
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/richet-bottinga-1986-silicate-thermochemistry
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/richet-bottinga-1986-silicate-thermochemistry.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/richet-bottinga-1986-silicate-thermochemistry.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: richter-et-al-2007
   aliases:
   - kems-010-richter-2007
@@ -16705,6 +17003,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: sugawara-akaogi-2004-liquid-calorimetry
+  aliases: []
+  citation: Sugawara T. and Akaogi M. (2004). Calorimetry of liquids in the system Na2O–Fe2O3–SiO2. American
+    Mineralogist 89:1586–1596.
+  doi: 10.2138/am-2004-11-1202
+  report_number: null
+  identifier: 10.2138/am-2004-11-1202
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml
+    review_status: draft
+    rows: 7
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sugawara-akaogi-2004-liquid-calorimetry/sugawara-akaogi-2004-liquid-calorimetry.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/sugawara-akaogi-2004-liquid-calorimetry/sidecar.yaml
+      present: false
+    text:
+      path: text/sugawara-akaogi-2004-liquid-calorimetry
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/sugawara-akaogi-2004-liquid-calorimetry
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sugawara-akaogi-2004-liquid-calorimetry.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: sutherland-2025-mare-simulant-volatile-loss
   aliases: []
   citation: Sutherland J. et al. (2025) Volatile loss during heating of lunar mare simulants and related
@@ -18050,6 +18406,65 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: volovetskii-2012-iron-redox
+  aliases: []
+  citation: Volovetskii M.V., Lukanin O.A., Rusakov V.S., and Kargal'tsev A.A. (2012). Influence of Oxygen
+    Fugacity and Temperature on the Redox State of Iron in Natural Silicic Aluminosilicate Melts. Geochemistry
+    International 50(4):330–343.
+  doi: 10.1134/S0016702912040088
+  report_number: null
+  identifier: 10.1134/S0016702912040088
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/volovetskii-2012-iron-redox.yaml
+    review_status: draft
+    rows: 3
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/volovetskii-2012-iron-redox/volovetskii-2012-iron-redox.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/volovetskii-2012-iron-redox/sidecar.yaml
+      present: false
+    text:
+      path: text/volovetskii-2012-iron-redox
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/volovetskii-2012-iron-redox
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/volovetskii-2012-iron-redox.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/volovetskii-2012-iron-redox.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: wadhwa-2008-redox-small-bodies
   aliases: []
