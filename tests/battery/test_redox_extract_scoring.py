@@ -2,6 +2,9 @@ from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
+
+import simulator.battery.score as score_module
 from simulator.battery.enums import (
     Authority,
     Engine,
@@ -18,7 +21,8 @@ from simulator.battery.score import (
     score_store,
     SCORE_ENGINE_SET,
 )
-from simulator.battery.records import Value
+from simulator.battery.records import State, Value
+from simulator.battery.score import headline_payload_records, residual_to_plain
 
 
 def test_borisov_2018_rows_reach_redox_scoring_population():
@@ -124,6 +128,25 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert all(residual.status is not ResidualStatus.REFUSED for residual in residuals)
     assert all(residual.numeric.operation.value == "dex" for residual in residuals)
 
+    conflicting_fo2 = replace(
+        row4,
+        identity=replace(row4.identity, fO2_Pa=State.of(Decimal("1000"))),
+    )
+    mismatch_context = replace(
+        context,
+        observations={conflicting_fo2.observation_id: conflicting_fo2},
+    )
+    mismatch_residuals, _ = score_store(
+        mismatch_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+    assert len(mismatch_residuals) == 1
+    assert mismatch_residuals[0].numeric is None
+    assert mismatch_residuals[0].refusal is not None
+    assert mismatch_residuals[0].refusal.reason is RefusalReason.IDENTITY_MISMATCH
+    assert mismatch_residuals[0].refusal.detail["fields"] == ["fO2_Pa"]
+
     zero_ratio = replace(row4, value=Value.point_of(Decimal(0)))
     zero_context = replace(
         context,
@@ -138,6 +161,183 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert zero_residuals[0].numeric is None
     assert zero_residuals[0].refusal is not None
     assert zero_residuals[0].refusal.reason is RefusalReason.METRIC_DOMAIN
+
+
+def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy():
+    root = Path(__file__).resolve().parents[2]
+    extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
+    migrator = Migrator(root)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    result = migrator.result
+    context = ScoreContext(
+        result.works,
+        result.experiments,
+        result.observations,
+        origins={key: extract.name for key in result.observations},
+        benches=result.benches,
+    )
+    residuals, _ = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+    records = headline_payload_records(
+        [residual_to_plain(residual) for residual in residuals],
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        observations=result.observations,
+    )
+    split = {
+        record["population"]: record
+        for record in records
+        if record.get("rail") == Rail.REDOX.value
+        and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
+        and record.get("population")
+    }
+    assert set(split) == {
+        "calibration_source_overlap_fit_fidelity",
+        "independent_source_accuracy",
+    }
+    assert split["calibration_source_overlap_fit_fidelity"]["n"] == 223
+    assert split["independent_source_accuracy"]["n"] == 212
+    assert abs(
+        Decimal(split["calibration_source_overlap_fit_fidelity"]["rms_dex"])
+        - Decimal("0.11250")
+    ) < Decimal("0.00001")
+    assert abs(
+        Decimal(split["calibration_source_overlap_fit_fidelity"]["median_dex"])
+        - Decimal("-0.03487")
+    ) < Decimal("0.00001")
+    assert abs(
+        Decimal(split["independent_source_accuracy"]["rms_dex"])
+        - Decimal("0.10468")
+    ) < Decimal("0.00001")
+    assert abs(
+        Decimal(split["independent_source_accuracy"]["median_dex"])
+        - Decimal("-0.01574")
+    ) < Decimal("0.00001")
+    assert not any(
+        record.get("tier") == "measured"
+        and record.get("rail") == Rail.REDOX.value
+        and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
+        and not record.get("population")
+        for record in records
+    )
+
+
+def test_kress91_redox_flags_oxide_outside_its_converter_domain():
+    root = Path(__file__).resolve().parents[2]
+    extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
+    migrator = Migrator(root)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    result = migrator.result
+    row4 = result.observations[
+        f"{extract.stem}::borisov_2018_table2_row_4"
+    ]
+    composition = row4.identity.composition.value
+    changed_composition = replace(
+        composition,
+        components=tuple(
+            (name, amount * Decimal("0.9"))
+            for name, amount in composition.components
+        ) + (("Cr2O3", Decimal("0.1")),),
+    )
+    projected_row = replace(
+        row4,
+        identity=replace(
+            row4.identity,
+            composition=State.of(changed_composition),
+        ),
+    )
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, projected_row)
+    notice = next(
+        item
+        for item in prediction.notices
+        if item.kind is NoticeKind.COMPOSITION_PROJECTED
+    )
+    assert prediction.value is not None
+    assert notice.dropped == ("Cr2O3",)
+    assert notice.dropped_mass_fraction is not None
+    assert "Cr2O3" in notice.reason
+
+
+@pytest.mark.parametrize("axis", ("temperature_K", "composition", "total_pressure_Pa", "fO2_Pa"))
+def test_unknown_phase_redox_still_refuses_other_identity_axis_mismatches(axis, monkeypatch):
+    root = Path(__file__).resolve().parents[2]
+    extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
+    migrator = Migrator(root)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    result = migrator.result
+    reference = result.observations[
+        f"{extract.stem}::borisov_2018_table2_row_4"
+    ]
+    if axis == "total_pressure_Pa":
+        reference = replace(
+            reference,
+            identity=replace(
+                reference.identity,
+                total_pressure_Pa=State.of(Decimal("101325")),
+            ),
+        )
+    elif axis == "fO2_Pa":
+        reference = replace(
+            reference,
+            identity=replace(
+                reference.identity,
+                fO2_Pa=State.of(Decimal("1000")),
+            ),
+        )
+    context = ScoreContext(
+        result.works,
+        result.experiments,
+        {reference.observation_id: reference},
+        origins={reference.observation_id: extract.name},
+        benches=result.benches,
+    )
+    original_predict = score_module.predict_with_engine
+
+    def prediction_with_conflicting_axis(engine, observation, **kwargs):
+        prediction = original_predict(engine, observation, **kwargs)
+        if observation.observation_id != reference.observation_id:
+            return prediction
+        identity = prediction.identity
+        if axis == "temperature_K":
+            conflict = replace(
+                identity,
+                temperature_K=State.of(Decimal("1700")),
+            )
+        elif axis == "composition":
+            source = identity.composition.value
+            first, amount = source.components[0]
+            conflict = replace(
+                identity,
+                composition=State.of(
+                    replace(
+                        source,
+                        components=((first, amount + Decimal("0.01")), *source.components[1:]),
+                    )
+                ),
+            )
+        elif axis == "total_pressure_Pa":
+            conflict = replace(
+                identity, total_pressure_Pa=State.of(Decimal("200000"))
+            )
+        else:
+            conflict = identity
+        return replace(prediction, identity=conflict)
+
+    monkeypatch.setattr(score_module, "predict_with_engine", prediction_with_conflicting_axis)
+    residuals, _ = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+    assert len(residuals) == 1
+    assert residuals[0].numeric is None
+    assert residuals[0].refusal is not None
+    assert residuals[0].refusal.reason is RefusalReason.IDENTITY_MISMATCH
 
 
 def test_existing_sixteen_redox_rows_are_refused_for_unprinted_composition():

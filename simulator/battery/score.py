@@ -3972,6 +3972,7 @@ def _predict_fe_redox(
         KRESS91_LIQUID_CALIBRATION_MAX_T_C,
         KRESS91_LIQUID_CALIBRATION_MIN_T_C,
         _kress91_fe3_fe2_ratio,
+        kress91_dropped_components,
         kress91_split,
         kress91_temperature_band_case,
         melt_mol_fractions_for_kress91,
@@ -4055,6 +4056,9 @@ def _predict_fe_redox(
         )
         if composition_wt is None:
             raise ValueError("composition cannot be converted to oxide weights")
+        dropped_components, dropped_mass_fraction = kress91_dropped_components(
+            composition_wt
+        )
         mol_fractions = melt_mol_fractions_for_kress91(composition_wt)
     except (KeyError, TypeError, ValueError, OverflowError) as exc:
         return refused(
@@ -4143,6 +4147,21 @@ def _predict_fe_redox(
         )
 
     notices: tuple[Notice, ...] = ()
+    if dropped_components and dropped_mass_fraction is not None:
+        notices = (
+            Notice(
+                kind=NoticeKind.COMPOSITION_PROJECTED,
+                affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                reason=(
+                    "Kress91 oxide basis omits composition components: "
+                    f"{', '.join(dropped_components)}; "
+                    f"dropped_mass_fraction={dropped_mass_fraction:.6g}"
+                ),
+                origin="simulator.fe_redox:melt_mol_fractions_for_kress91",
+                dropped=dropped_components,
+                dropped_mass_fraction=Decimal(str(dropped_mass_fraction)),
+            ),
+        )
     authority = Authority.BRIDGE
     certified_band = {
         "temperature_K": (
@@ -4152,7 +4171,7 @@ def _predict_fe_redox(
     }
     if not band["authoritative"]:
         authority = Authority.EXTRAPOLATED
-        notices = (
+        notices += (
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                 affected_quantities=(Quantity.FE3_FE2_RATIO,),
