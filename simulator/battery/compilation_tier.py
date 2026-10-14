@@ -1322,9 +1322,9 @@ def predict_thermo_attempt(
                 extra={"detail": str(exc), "formula": identity.species.formula},
             )
         authority = Authority.BRIDGE
-        from simulator.battery.generators.janaf import _FUSION_TABLE_POLYMORPHS
+        from simulator.battery.generators.janaf import _JANAF_POLYMORPH_BY_TABLE
 
-        solid_polymorph = _FUSION_TABLE_POLYMORPHS.get(solid)
+        solid_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(solid)
         observed_polymorph = polymorph_token(identity.species)
         if (
             not polymorph_unspecified

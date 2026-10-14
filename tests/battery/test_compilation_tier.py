@@ -3083,6 +3083,114 @@ def test_fusion_prediction_flags_an_unstated_solid_polymorph() -> None:
     )
 
 
+def test_unstated_fusion_polymorph_refuses_incomplete_janaf_candidates(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.generators import janaf
+
+    original_points = janaf._fusion_table_points
+
+    def missing_stable_candidate(table_id: str):
+        if table_id == "O-035":
+            raise ValueError(
+                "O-035: needed JANAF table node row missing or changed"
+            )
+        return original_points(table_id)
+
+    monkeypatch.setattr(janaf, "_fusion_table_points", missing_stable_candidate)
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("1800"),
+        formula="SiO2",
+    )
+    identity = replace(
+        identity,
+        species=replace(
+            identity.species,
+            polymorph=State.unknown("source omits polymorph"),
+        ),
+    )
+    observation = F.observation(
+        "fusion-unknown-polymorph-with-corrupt-stable-candidate",
+        experiment.experiment_id,
+        identity,
+        Decimal("9.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(observation),
+    )
+
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert "O-035" in str(attempt.refusal_detail)
+    assert "needed JANAF table node row missing or changed" in str(
+        attempt.refusal_detail
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert "O-035" in str(residual.refusal.detail)
+
+
+def test_fusion_stability_uses_all_dictionary_alumina_crystals() -> None:
+    from simulator.battery.generators.janaf import _janaf_stable_crystal_set
+
+    stability = _janaf_stable_crystal_set("Al2O3", Decimal("1800"))
+    gibbs_by_table = {
+        candidate.table_id: candidate.gibbs_kJ_per_mol
+        for candidate in (stability.selected, *stability.alternatives)
+    }
+
+    assert stability.selected.table_id == "Al-096"
+    assert gibbs_by_table == {
+        "Al-096": Decimal("-1098.841"),
+        "Al-097": Decimal("-1094.690"),
+        "Al-098": Decimal("-1091.274"),
+        "Al-099": Decimal("-1094.275"),
+    }
+
+
+def test_missing_nonlocal_alumina_candidate_node_refuses_stability_selection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from copy import deepcopy
+
+    import pytest
+
+    from simulator.battery.generators import janaf
+
+    original_loader = janaf.load_table_document
+
+    def missing_alumina_node(path):
+        document = original_loader(path)
+        if path.name != "Al-097.yaml":
+            return document
+        incomplete = deepcopy(document)
+        incomplete["table"]["values"] = [
+            row
+            for row in incomplete["table"]["values"]
+            if row["temperature"].get("value") != 1000
+        ]
+        return incomplete
+
+    monkeypatch.setattr(janaf, "load_table_document", missing_alumina_node)
+    janaf._fusion_table_points.cache_clear()
+    janaf._janaf_pure_solid_table_temperature_range.cache_clear()
+
+    with pytest.raises(
+        janaf.JANAFFusionPolymorphUnavailable,
+        match="Al-097: needed JANAF table node row missing or changed",
+    ):
+        janaf._janaf_stable_crystal_set("Al2O3", Decimal("1800"))
+
+
 def test_fusion_prediction_refuses_a_stated_polymorph_mismatch() -> None:
     experiment = F.tabulation_experiment()
     identity = F.oxide_identity(

@@ -1376,7 +1376,7 @@ def fusion_comparison_reference(
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     from simulator.battery.generators.janaf import (
-        _FUSION_TABLE_POLYMORPHS,
+        _JANAF_POLYMORPH_BY_TABLE,
         JANAF_R_J_PER_MOL_K,
         JANAFFusionPolymorphUnavailable,
         _janaf_eligible_pure_crystal_tables,
@@ -1427,7 +1427,7 @@ def fusion_comparison_reference(
     # Thus ΔG_fus=+28.47061 kJ/mol and Δlog10(a)=ΔG_fus*1000/(R*T*ln(10))
     # = +0.793984 dex (R=8.31441 J mol^-1 K^-1). Their branches cross at
     # 3104.945598 K, where ΔG_fus and the reference shift go to zero.
-    expected_polymorph = _FUSION_TABLE_POLYMORPHS.get(fusion.crystal_table)
+    expected_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
     tridymite_to_cristobalite = (
         formula == "SiO2"
@@ -1458,27 +1458,37 @@ def fusion_comparison_reference(
                 fusion.crystal_table
             )
         elif len(eligible_solid_tables) > 1:
-            stability = None
             try:
                 stability = _janaf_stable_crystal_set(
                     formula,
                     temperature_K,
                     eligible_solid_tables,
-                    fail_on_error=True,
                 )
-            except JANAFFusionPolymorphUnavailable:
-                pass
-            if stability is not None:
-                stable_table = stability.selected.table_id
-                stable_polymorph = stability.selected.polymorph
-                stable_gibbs_kJ_per_mol = stability.selected.gibbs_kJ_per_mol
-                alternatives = tuple(
-                    (item.table_id, item.polymorph, item.gibbs_kJ_per_mol)
-                    for item in stability.alternatives
+            except JANAFFusionPolymorphUnavailable as exc:
+                notice = fusion_missing_input_notice(str(exc))
+                if notice is None:
+                    notice = Notice(
+                        kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            f"fusion conversion missing input for {formula}: "
+                            f"incomplete JANAF stability candidate set: {exc}"
+                        ),
+                        origin=reference.observation_id,
+                        band=f"JANAF stability data for {formula}: {exc}",
+                    )
+                return replace(
+                    reference,
+                    notices=union_notices(reference.notices, (notice,)),
                 )
-            else:
-                alternatives = ()
-            if stability is not None and alternatives:
+            stable_table = stability.selected.table_id
+            stable_polymorph = stability.selected.polymorph
+            stable_gibbs_kJ_per_mol = stability.selected.gibbs_kJ_per_mol
+            alternatives = tuple(
+                (item.table_id, item.polymorph, item.gibbs_kJ_per_mol)
+                for item in stability.alternatives
+            )
+            if alternatives:
                 # For equal chemical potential, changing the pure-solid
                     # standard state shifts activity by exp(dG/RT). Therefore
                     # d log10(a) = dG / (R T ln 10); J/mol divided by
@@ -3850,9 +3860,9 @@ def _comparison_identity(
         call_evidence = prediction.execution.call_evidence or ""
         fusion_pair = call_evidence.partition("janaf-fusion:")[2].partition(":")[0]
         solid_table = fusion_pair.partition("/")[0]
-        from simulator.battery.generators.janaf import _FUSION_TABLE_POLYMORPHS
+        from simulator.battery.generators.janaf import _JANAF_POLYMORPH_BY_TABLE
 
-        solid_polymorph = _FUSION_TABLE_POLYMORPHS.get(solid_table)
+        solid_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(solid_table)
         if solid_polymorph is not None:
             updates["species"] = replace(
                 identity.species, polymorph=State.of(solid_polymorph)
