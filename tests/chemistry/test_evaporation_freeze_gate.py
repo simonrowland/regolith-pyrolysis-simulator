@@ -4196,6 +4196,7 @@ def test_gate_curve_memo_admission_registers_uninitialized_fallback_supplier(
     setpoints_data,
 ):
     from engines.magemin import MAGEMinShadowProvider
+    from simulator.melt_backend.magemin import MAGEMinBackend
 
     producer = _build_freeze_gate_sim(
         vapor_pressure_data,
@@ -4218,6 +4219,9 @@ def test_gate_curve_memo_admission_registers_uninitialized_fallback_supplier(
     producer_configuration = gate_curve_memo_producer_configuration(
         producer,
         curve,
+    )
+    assert producer_configuration['model']['magemin_database'] == (
+        MAGEMinBackend()._database
     )
     assert receiver._chem_registry.fallback_for(
         ChemistryIntent.GATE_LIQUID_FRACTION
