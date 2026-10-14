@@ -164,6 +164,7 @@ class ThermoAttempt:
     refusal_reason: RefusalReason | None
     refusal_detail: dict[str, object]
     call_evidence: str
+    coefficient_sources: tuple[str, ...] = ()
 
 
 def _decimal_token(value: Decimal) -> str:
@@ -1285,6 +1286,7 @@ def predict_thermo_attempt(
                 f"janaf-fusion:{solid}/{liquid}:T={temperature_K}:"
                 f"source_sha256={hashes[0]}/{hashes[1]}"
             ),
+            coefficient_sources=(solid, liquid),
         )
     if engine is Engine.INTERNAL_ANALYTICAL:
         return _ellingham_attempt(identity, quantity, temperature_K, origin=origin)

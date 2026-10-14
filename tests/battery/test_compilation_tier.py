@@ -19,6 +19,7 @@ from simulator.battery.compilation_tier import (
 )
 from simulator.battery.enums import (
     AdmissionStatus,
+    AssetRole,
     Authority,
     Engine,
     EvidenceClass,
@@ -38,7 +39,14 @@ from simulator.battery.identity import (
     log10K_from_delta_fG_kJ_mol,
     standard_pressure_delta_g_kJ_per_mol,
 )
-from simulator.battery.records import Species, State, Uncertainty, Value
+from simulator.battery.records import (
+    SourceFile,
+    SourceFiles,
+    Species,
+    State,
+    Uncertainty,
+    Value,
+)
 from simulator.battery.score import (
     EnginePrediction,
     ScoreContext,
@@ -2918,10 +2926,78 @@ def test_janaf_fusion_source_is_training_relation() -> None:
         evidence=EvidenceClass.COMPILATION_ASSESSED,
         source_id="nist-janaf-4th",
     )
+    observation = replace(observation, read_from="Mg-008")
+    experiment = F.tabulation_experiment(experiment_id="fusion-ref", work_id="ref-work")
+    observation = replace(observation, experiment_id=experiment.experiment_id)
+    works = {
+        "ref-work": _work_with_table_assets("ref-work", ("Mg-008",)),
+        "janaf-work": _work_with_table_assets("janaf-work", ("Mg-008", "Mg-009")),
+    }
     residual, _ = compile_residual(
         observation,
         Engine.INTERNAL_ANALYTICAL,
-        context=_context(observation),
+        context=ScoreContext(
+            works=works,
+            experiments={experiment.experiment_id: experiment},
+            observations={observation.observation_id: observation},
+            extract_review={observation.source_id or "": None},
+            hostname="test",
+        ),
     )
     assert residual.numeric is not None
     assert residual.source_relation is SourceRelation.TRAINING
+
+
+def _work_with_table_assets(work_id: str, asset_ids: tuple[str, ...]):
+    work = F.work(work_id)
+    files = tuple(
+        SourceFile(
+            asset_id=asset_id,
+            role=AssetRole.TABLE_CSV,
+            path=f"{asset_id}.csv",
+            sha256=State.of(f"sha-{asset_id}"),
+        )
+        for asset_id in asset_ids
+    )
+    return replace(
+        work,
+        source_ids=(work_id,),
+        source_files=SourceFiles(
+            corpus_repo="test",
+            corpus_commit=State.of("test"),
+            files=files,
+        ),
+    )
+
+
+def test_fusion_janaf_tables_do_not_make_other_works_training() -> None:
+    from simulator.battery.score import compile_residual
+
+    experiment = F.tabulation_experiment(experiment_id="independent-ref", work_id="other-work")
+    identity = _fusion_identity(Quantity.ENTHALPY_OF_FUSION, Decimal("3000"))
+    observation = F.observation(
+        "independent-fusion-row",
+        experiment.experiment_id,
+        identity,
+        Decimal("77.028"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="independent-work",
+    )
+    observation = replace(observation, read_from="independent-table")
+    works = {
+        "janaf-work": _work_with_table_assets("janaf-work", ("Mg-008", "Mg-009")),
+        "other-work": _work_with_table_assets("other-work", ("independent-table",)),
+    }
+    residual, _ = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ScoreContext(
+            works=works,
+            experiments={experiment.experiment_id: experiment},
+            observations={observation.observation_id: observation},
+            extract_review={observation.source_id or "": None},
+            hostname="test",
+        ),
+    )
+    assert residual.numeric is not None
+    assert residual.source_relation is SourceRelation.INDEPENDENT

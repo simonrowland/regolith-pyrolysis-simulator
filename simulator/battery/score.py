@@ -4450,6 +4450,10 @@ def predict_with_engine(
         from simulator.battery.compilation_tier import predict_thermo_attempt
 
         attempt = predict_thermo_attempt(engine, observation)
+        coefficient_sources = attempt.coefficient_sources or sources
+        lineage_complete = (
+            lineage_complete_for(coefficient_sources) if attempt.value is not None else False
+        )
         if attempt.value is not None:
             exec_state = ExecutionState.PRODUCED
         elif attempt.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE:
@@ -4471,8 +4475,8 @@ def predict_with_engine(
             unit=attempt.unit,
             authority=attempt.authority,
             notices=attempt.notices,
-            coefficient_sources=sources,
-            lineage_complete=lineage_complete_for(sources) if attempt.value is not None else False,
+            coefficient_sources=coefficient_sources,
+            lineage_complete=lineage_complete,
             refusal_reason=attempt.refusal_reason,
             refusal_detail=attempt.refusal_detail,
             identity=identity,
