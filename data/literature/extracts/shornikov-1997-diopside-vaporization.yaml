@@ -5,7 +5,7 @@ source:
   year: 1997
 extraction:
   method: >-
-    Manual transcription of Tables 1–3 from the 200 dpi rendered page image, read independently by rows and columns. Table 1 values are printed partial pressures; Table 2 values are printed temperature-fit coefficients; Table 3 includes only activities attributed to this work. Tables 4–7 are not included: Table 4 is least-squares-derived partial functions, Tables 5–7 are thermodynamic calculations and comparisons outside the requested vapor and melt-activity scope.
+    Manual transcription of Tables 1–4 from the 200 dpi rendered page images, read independently by rows and columns. Table 1 values are printed partial pressures; Table 2 values are printed temperature-fit coefficients; Table 3 includes only activities attributed to this work; Table 4 contains this work's least-squares-derived partial component enthalpies and entropies. Tables 5–7 are thermodynamic calculations and model comparisons outside the requested vapor and melt-activity scope.
   date: '2026-10-14'
   worker: codex
 review_status: draft
@@ -991,6 +991,66 @@ fidelity_samples:
     published_page: 175
     pdf_page_index: 1
     table: '2'
+- path: species.CaO.observations[shornikov_1997_cao_partial_enthalpy_table4].values.points
+  value:
+  - temperature_range_K: [1665, 1870]
+    point_conditions:
+      composition:
+        state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+        locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+    partial_molar_enthalpy_as_printed: {value: 0.0, units: kJ/mol, as_printed: '0.0 ± 1.4'}
+    sigma: 1.4
+  locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+- path: species.CaO.observations[shornikov_1997_cao_partial_entropy_table4].values.points
+  value:
+  - temperature_range_K: [1665, 1870]
+    point_conditions:
+      composition:
+        state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+        locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+    entropy: {value: 17.0, units: J/mol/K, as_printed: '17.0 ± 1.5'}
+    sigma: 1.5
+  locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+- path: species.MgO.observations[shornikov_1997_mgo_partial_enthalpy_table4].values.points
+  value:
+  - temperature_range_K: [1665, 1870]
+    point_conditions:
+      composition:
+        state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+        locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+    partial_molar_enthalpy_as_printed: {value: -40.2, units: kJ/mol, as_printed: '−40.2 ± 2.6'}
+    sigma: 2.6
+  locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+- path: species.MgO.observations[shornikov_1997_mgo_partial_entropy_table4].values.points
+  value:
+  - temperature_range_K: [1665, 1870]
+    point_conditions:
+      composition:
+        state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+        locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+    entropy: {value: 19.1, units: J/mol/K, as_printed: '19.1 ± 1.5'}
+    sigma: 1.5
+  locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+- path: species.SiO2.observations[shornikov_1997_sio2_partial_enthalpy_table4].values.points
+  value:
+  - temperature_range_K: [1665, 1870]
+    point_conditions:
+      composition:
+        state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+        locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+    partial_molar_enthalpy_as_printed: {value: 9.6, units: kJ/mol, as_printed: '9.6 ± 2.4'}
+    sigma: 2.4
+  locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+- path: species.SiO2.observations[shornikov_1997_sio2_partial_entropy_table4].values.points
+  value:
+  - temperature_range_K: [1665, 1870]
+    point_conditions:
+      composition:
+        state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+        locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+    entropy: {value: 23.2, units: J/mol/K, as_printed: '23.2 ± 2.4'}
+    sigma: 2.4
+  locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
 species:
   Ca:
     observations:
@@ -1212,6 +1272,66 @@ species:
             SiO2: '2'
           temperature_range_K: [1566, 1862]
           points: [{T_K: 1566, activity: 0.21, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1640, activity: 0.23, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1688, activity: 0.21, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1743, activity: 0.22, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1778, activity: 0.20, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1862, activity: 0.19, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}]
+      - observation_id: shornikov_1997_sio2_partial_enthalpy_table4
+        type: gibbs_table
+        locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+        T_range_K: [1665, 1870]
+        phase: l
+        standard_state: Partial component enthalpy of SiO2 in molten CaO · MgO · 2SiO2; the paper does not state a reference state.
+        experiment: shornikov-1997-diopside-kems
+        point_conditions:
+          composition:
+            state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+            locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+        units: kJ_per_declared_mol_basis
+        derived_from: [tables:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
+          inputs: [tables:shornikov-1997-diopside-vaporization]
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: derived
+          formula: SiO2
+          composition_mol: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}
+          temperature_range_K: [1665, 1870]
+          points:
+            - temperature_range_K: [1665, 1870]
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+                  locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+              partial_molar_enthalpy_as_printed: {value: 9.6, units: kJ/mol, as_printed: '9.6 ± 2.4'}
+              sigma: 2.4
+      - observation_id: shornikov_1997_sio2_partial_entropy_table4
+        type: gibbs_table
+        locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+        T_range_K: [1665, 1870]
+        phase: l
+        standard_state: Partial component entropy of SiO2 in molten CaO · MgO · 2SiO2; the paper does not state a reference state.
+        experiment: shornikov-1997-diopside-kems
+        point_conditions:
+          composition:
+            state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+            locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+        units: J_per_declared_mol_basis_per_K
+        derived_from: [tables:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
+          inputs: [tables:shornikov-1997-diopside-vaporization]
+        values:
+          quantity: S
+          method_class: derived
+          formula: SiO2
+          composition_mol: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}
+          temperature_range_K: [1665, 1870]
+          points:
+            - temperature_range_K: [1665, 1870]
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+                  locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+              entropy: {value: 23.2, units: J/mol/K, as_printed: '23.2 ± 2.4'}
+              sigma: 2.4
   CaO:
     observations:
       - observation_id: shornikov_1997_cao_activity_table3
@@ -1239,6 +1359,66 @@ species:
             SiO2: '2'
           temperature_range_K: [1566, 1862]
           points: [{T_K: 1566, activity: 0.097, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1640, activity: 0.11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1688, activity: 0.11, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1743, activity: 0.12, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1778, activity: 0.12, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1862, activity: 0.12, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}]
+      - observation_id: shornikov_1997_cao_partial_enthalpy_table4
+        type: gibbs_table
+        locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+        T_range_K: [1665, 1870]
+        phase: l
+        standard_state: Partial component enthalpy of CaO in molten CaO · MgO · 2SiO2; the paper does not state a reference state.
+        experiment: shornikov-1997-diopside-kems
+        point_conditions:
+          composition:
+            state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+            locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+        units: kJ_per_declared_mol_basis
+        derived_from: [tables:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
+          inputs: [tables:shornikov-1997-diopside-vaporization]
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: derived
+          formula: CaO
+          composition_mol: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}
+          temperature_range_K: [1665, 1870]
+          points:
+            - temperature_range_K: [1665, 1870]
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+                  locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+              partial_molar_enthalpy_as_printed: {value: 0.0, units: kJ/mol, as_printed: '0.0 ± 1.4'}
+              sigma: 1.4
+      - observation_id: shornikov_1997_cao_partial_entropy_table4
+        type: gibbs_table
+        locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+        T_range_K: [1665, 1870]
+        phase: l
+        standard_state: Partial component entropy of CaO in molten CaO · MgO · 2SiO2; the paper does not state a reference state.
+        experiment: shornikov-1997-diopside-kems
+        point_conditions:
+          composition:
+            state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+            locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+        units: J_per_declared_mol_basis_per_K
+        derived_from: [tables:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
+          inputs: [tables:shornikov-1997-diopside-vaporization]
+        values:
+          quantity: S
+          method_class: derived
+          formula: CaO
+          composition_mol: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}
+          temperature_range_K: [1665, 1870]
+          points:
+            - temperature_range_K: [1665, 1870]
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+                  locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+              entropy: {value: 17.0, units: J/mol/K, as_printed: '17.0 ± 1.5'}
+              sigma: 1.5
   MgO:
     observations:
       - observation_id: shornikov_1997_mgo_activity_table3
@@ -1267,6 +1447,66 @@ species:
           temperature_range_K: [1566, 1862]
           calculation_method: 'The authors calculate MgO activity using data on the heterophase equilibrium [MgO] = (Mg) + (O), equation (4).'
           points: [{T_K: 1566, activity: 0.004, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1640, activity: 0.005, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1688, activity: 0.006, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1743, activity: 0.007, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1778, activity: 0.007, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}, {T_K: 1862, activity: 0.008, point_conditions: {composition: {state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}, locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}}}}]
+      - observation_id: shornikov_1997_mgo_partial_enthalpy_table4
+        type: gibbs_table
+        locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+        T_range_K: [1665, 1870]
+        phase: l
+        standard_state: Partial component enthalpy of MgO in molten CaO · MgO · 2SiO2; the paper does not state a reference state.
+        experiment: shornikov-1997-diopside-kems
+        point_conditions:
+          composition:
+            state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+            locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+        units: kJ_per_declared_mol_basis
+        derived_from: [tables:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
+          inputs: [tables:shornikov-1997-diopside-vaporization]
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: derived
+          formula: MgO
+          composition_mol: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}
+          temperature_range_K: [1665, 1870]
+          points:
+            - temperature_range_K: [1665, 1870]
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+                  locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+              partial_molar_enthalpy_as_printed: {value: -40.2, units: kJ/mol, as_printed: '−40.2 ± 2.6'}
+              sigma: 2.6
+      - observation_id: shornikov_1997_mgo_partial_entropy_table4
+        type: gibbs_table
+        locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+        T_range_K: [1665, 1870]
+        phase: l
+        standard_state: Partial component entropy of MgO in molten CaO · MgO · 2SiO2; the paper does not state a reference state.
+        experiment: shornikov-1997-diopside-kems
+        point_conditions:
+          composition:
+            state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+            locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+        units: J_per_declared_mol_basis_per_K
+        derived_from: [tables:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
+          inputs: [tables:shornikov-1997-diopside-vaporization]
+        values:
+          quantity: S
+          method_class: derived
+          formula: MgO
+          composition_mol: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}
+          temperature_range_K: [1665, 1870]
+          points:
+            - temperature_range_K: [1665, 1870]
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
+                  locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
+              entropy: {value: 19.1, units: J/mol/K, as_printed: '19.1 ± 1.5'}
+              sigma: 1.5
   O:
     observations:
       - observation_id: shornikov_1997_o_atomic_pressure_table1
