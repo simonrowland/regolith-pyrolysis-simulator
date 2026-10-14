@@ -456,6 +456,107 @@ def _migrate_real_extract(
     return migrate(root, write=write)
 
 
+def test_stolyarova_1991_printed_compositions_reach_migrated_observations(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.identity import Identity
+
+    result = _migrate_real_extract(
+        tmp_path, "kems-053-stolyarova-1991.yaml", write=False
+    )
+    rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-053-stolyarova-1991"
+    ]
+    table_rows = [
+        obs
+        for obs in rows
+        if obs.locator is not None
+        and obs.locator.table in {"Ia", "Ib", "IIa", "IIb"}
+        and obs.point_conditions
+        and "composition" in obs.point_conditions
+    ]
+    assert len(table_rows) == 130
+    for obs in table_rows:
+        assert isinstance(obs.identity, Identity)
+        assert obs.identity.composition is not None
+        assert obs.identity.composition.is_value
+        assert obs.identity.temperature_K.is_value
+        condition = obs.point_conditions["composition"]
+        assert condition.state.is_value
+        assert condition.locator is not None
+        assert "CaO=1-X(SiO2)" in condition.locator.note
+        assert "T_C is derived as T_K−273.15" in condition.locator.note
+        assert dict(obs.identity.composition.value.components) == dict(
+            condition.state.value.components
+        )
+        expected_temperature = Decimal(
+            "1993" if obs.locator.table == "Ia" else "1933"
+        )
+        assert obs.identity.temperature_K.value == expected_temperature
+
+    ca = next(
+        obs
+        for obs in table_rows
+        if "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation"
+        in obs.observation_id
+        and "Printed X(SiO2)=0.44" in obs.point_conditions["composition"].locator.note
+    )
+    assert dict(ca.identity.composition.value.components) == {
+        "CaO": Decimal("0.56"),
+        "SiO2": Decimal("0.44"),
+    }
+
+    ion_current_rows = [obs for obs in rows if "_ion_comparison" in obs.observation_id]
+    assert len(ion_current_rows) == 36
+    assert all(obs.identity.species.phase.value is Phase.G for obs in ion_current_rows)
+
+    pressure_rows = [
+        obs
+        for obs in table_rows
+        if obs.identity.quantity.value is Quantity.P_PARTIAL
+    ]
+    assert pressure_rows
+    assert all(obs.identity.fO2_Pa.is_unknown for obs in pressure_rows)
+    assert all(obs.identity.total_pressure_Pa.is_unknown for obs in pressure_rows)
+
+
+def test_stolyarova_1991_composition_map_mutation_removes_identity(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import shutil
+
+    module = sys.modules[__name__]
+    mutated_root = tmp_path / "mutated_repo"
+    extracts = mutated_root / "data" / "literature" / "extracts"
+    extracts.mkdir(parents=True)
+    original = REPO_ROOT / "data" / "literature" / "extracts" / (
+        "kems-053-stolyarova-1991.yaml"
+    )
+    shutil.copyfile(original, extracts / original.name)
+    document = yaml.safe_load(original.read_text(encoding="utf-8"))
+    point = document["species"]["Ca"]["observations"][0]["values"]["points"][0]
+    point.pop("composition_mol")
+    (extracts / original.name).write_text(
+        yaml.safe_dump(document, sort_keys=False), encoding="utf-8"
+    )
+    monkeypatch.setattr(module, "REPO_ROOT", mutated_root)
+
+    result = _migrate_real_extract(tmp_path / "migration", original.name, write=False)
+    mutated = next(
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-053-stolyarova-1991"
+        and "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation"
+        in obs.observation_id
+        and "T=1993.00" in obs.observation_id
+        and obs.identity.composition.is_unknown
+        and obs.point_conditions["composition"].state.is_value
+    )
+    assert mutated.identity.composition.reason == "no composition mapped from source"
+
+
 def _extract_observations(name: str) -> list[dict]:
     src = REPO_ROOT / "data" / "literature" / "extracts" / name
     doc = yaml.safe_load(src.read_text(encoding="utf-8"))
