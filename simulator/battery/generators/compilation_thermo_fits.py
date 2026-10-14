@@ -1760,24 +1760,37 @@ def _phase_standard_state(phase: str) -> str | None:
     return None
 
 
-def _phase_ranges_from_janaf(record: Mapping[str, Any], source_path: Path) -> list[dict[str, Any]]:
+def _phase_ranges_from_janaf(
+    record: Mapping[str, Any], source_path: Path
+) -> tuple[
+    list[dict[str, Any]],
+    dict[str, frozenset[tuple[str, float, float]]],
+]:
     from simulator.battery.generators.janaf import generate_table
 
     generated = generate_table(record, source_path=str(source_path))
     ranges: list[dict[str, Any]] = []
+    eligible_formation_cells: dict[str, set[tuple[str, float, float]]] = {}
     for observation in generated.observations:
         identity = observation.identity
-        if not identity.quantity.is_value or identity.quantity.value is not Quantity.CP:
+        if not identity.quantity.is_value:
             continue
-        points = observation.value.series or ()
-        if not points:
-            continue
+        quantity = identity.quantity.value
         species = identity.species
         phase = species.phase.value if species.phase.is_value else ""
         polymorph = species.polymorph.value if species.polymorph.is_value else None
         phase_label = str(phase)
         if polymorph is not None:
             phase_label += f":{polymorph}"
+        points = observation.value.series or ()
+        if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG}:
+            # JANAF observations contain only source cells accepted by its owner.
+            eligible_formation_cells.setdefault(phase_label, set()).update(
+                (quantity.value, float(temperature), float(value))
+                for temperature, value in points
+            )
+        if quantity is not Quantity.CP or not points:
+            continue
         ranges.append(
             {
                 "phase_label": phase_label,
@@ -1786,7 +1799,10 @@ def _phase_ranges_from_janaf(record: Mapping[str, Any], source_path: Path) -> li
                 "T_max_K": float(max(point[0] for point in points)),
             }
         )
-    return ranges
+    return ranges, {
+        phase_label: frozenset(cells)
+        for phase_label, cells in eligible_formation_cells.items()
+    }
 
 
 def _add_janaf_table(
@@ -1798,7 +1814,7 @@ def _add_janaf_table(
     reference_curves: Mapping[str, Sequence[FittedCurve]],
 ) -> tuple[list[dict[str, Any]], list[FittedCurve]]:
     metadata = source_metadata(record)
-    ranges = _phase_ranges_from_janaf(record, path)
+    ranges, eligible_formation_cells = _phase_ranges_from_janaf(record, path)
     if not ranges:
         base = _record_base(
             metadata=metadata,
@@ -1822,7 +1838,29 @@ def _add_janaf_table(
             is_element_reference=is_element_reference,
             reference_curves=reference_curves,
         )
-        records.append(dict(result.record))
+        output = dict(result.record)
+        printed_cells = output.get("printed_formation_cells")
+        if printed_cells:
+            eligible = eligible_formation_cells.get(
+                phase_range["phase_label"], frozenset()
+            )
+            # Preserve the accepted Cp/H/S fit and apply JANAF's pointwise
+            # source-cell decisions only to the separate printed-cell output.
+            printed_cells = [
+                cell
+                for cell in printed_cells
+                if (
+                    cell["quantity"],
+                    cell["T_K"],
+                    cell["value_kJ_per_mol"],
+                )
+                in eligible
+            ]
+            if printed_cells:
+                output["printed_formation_cells"] = printed_cells
+            else:
+                output.pop("printed_formation_cells")
+        records.append(output)
         if result.curve is not None:
             curves.append(result.curve)
     return records, curves
