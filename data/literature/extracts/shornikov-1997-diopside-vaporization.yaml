@@ -9,6 +9,10 @@ extraction:
   date: '2026-10-14'
   worker: codex
 review_status: draft
+experiments:
+  - experiment_id: shornikov-1997-diopside-kems
+    method: knudsen_effusion
+    locator: {page: 174, published_page: 174, pdf_page_index: 0, section: Experimental, note: 'The study used mass-spectrometric effusion Knudsen measurements on diopside in molybdenum cells.'}
 fidelity_samples:
 - path: species.Ca.observations[shornikov_1997_ca_pressure_table1].values.points[0].temperature_K
   value: 1566
@@ -1105,6 +1109,10 @@ species:
       - observation_id: shornikov_1997_ca_pressure_table1
         type: partial_pressure
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '1'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Partial pressure reduced from ion-current ratios using the stated ionization cross sections.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
@@ -1155,6 +1163,10 @@ species:
       - observation_id: shornikov_1997_mg_pressure_table1
         type: partial_pressure
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '1'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Partial pressure reduced from ion-current ratios using the stated ionization cross sections.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
@@ -1204,6 +1216,10 @@ species:
       - observation_id: shornikov_1997_sio_pressure_table1
         type: partial_pressure
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '1'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Partial pressure reduced from ion-current ratios using the stated ionization cross sections.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
@@ -1253,6 +1269,10 @@ species:
       - observation_id: shornikov_1997_sio2_pressure_table1
         type: partial_pressure
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '1'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Partial pressure reduced from ion-current ratios using the stated ionization cross sections.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1688, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
@@ -1298,6 +1318,10 @@ species:
       - observation_id: shornikov_1997_sio2_activity_table3
         type: activity_coefficient
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Silica activity reduced from mass-spectrometric ion-current ratios as described by the authors.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1566, 1862]
         phase: l
         standard_state: SiO2 activity relative to the pure oxide reference; condensed state is not stated.
@@ -1385,6 +1409,10 @@ species:
       - observation_id: shornikov_1997_cao_activity_table3
         type: activity_coefficient
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Calcia activity reduced from mass-spectrometric ion-current ratios as described by the authors.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1566, 1862]
         phase: l
         standard_state: CaO activity relative to the pure oxide reference; condensed state is not stated.
@@ -1472,6 +1500,10 @@ species:
       - observation_id: shornikov_1997_mgo_activity_table3
         type: activity_coefficient
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Magnesia activity reduced using the cited heterophase-equilibrium data as described by the authors.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1566, 1862]
         phase: l
         standard_state:
@@ -1572,6 +1604,10 @@ species:
       - observation_id: shornikov_1997_moo2_pressure_table1
         type: partial_pressure
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '1', note: 'MoO2 pressure is from the molybdenum effusion cell/crucible, not the diopside melt.'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Partial pressure reduced from ion-current ratios using the stated ionization cross sections.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
@@ -1597,6 +1633,10 @@ species:
       - observation_id: shornikov_1997_moo3_pressure_table1
         type: partial_pressure
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '1', note: 'MoO3 pressure is from the molybdenum effusion cell/crucible, not the diopside melt.'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Partial pressure reduced from ion-current ratios using the stated ionization cross sections.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
@@ -1622,6 +1662,10 @@ species:
       - observation_id: shornikov_1997_o_atomic_pressure_table1
         type: partial_pressure
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '1'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Atomic oxygen pressure calculated from MoO2 and MoO3 ion-current ratios and gas-phase equilibrium data.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
@@ -1649,6 +1693,10 @@ species:
       - observation_id: shornikov_1997_o_atomic_alternate_pressure_table1
         type: partial_pressure
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '1', note: 'Asterisked atomic-oxygen pressures are the authors’ alternate reductions using equation (3), distinct from the unasterisked oxygen row.'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Alternate atomic oxygen pressure calculated from SiO2 and SiO ion-current ratios and gas-phase equilibrium data.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1688, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems
@@ -1671,6 +1719,10 @@ species:
       - observation_id: shornikov_1997_o_atomic_pressure_table2
         type: partial_pressure
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '2'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Temperature fit to atomic oxygen pressures calculated from MoO2 and MoO3 ion-current ratios and gas-phase equilibrium data.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1665, 1870]
         phase: gas
         experiment: shornikov-1997-diopside-kems
@@ -1693,6 +1745,10 @@ species:
       - observation_id: shornikov_1997_o_atomic_alternate_pressure_table2
         type: partial_pressure
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '2', note: 'Asterisked oxygen fit calculated from reaction (3).'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Temperature fit to alternate atomic oxygen pressures calculated from SiO2 and SiO ion-current ratios and gas-phase equilibrium data.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1665, 1870]
         phase: gas
         experiment: shornikov-1997-diopside-kems
@@ -1717,6 +1773,10 @@ species:
       - observation_id: shornikov_1997_o2_pressure_table1
         type: partial_pressure
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '1'}
+        derived_from: [unknown:shornikov-1997-diopside-vaporization]
+        derivation:
+          relation: Molecular oxygen pressure calculated from atomic oxygen pressure and gas-phase equilibrium data.
+          inputs: [unknown:shornikov-1997-diopside-vaporization]
         T_range_K: [1566, 1862]
         phase: gas
         experiment: shornikov-1997-diopside-kems

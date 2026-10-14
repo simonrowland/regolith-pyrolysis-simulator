@@ -276,9 +276,10 @@ def test_mgo_activity_uses_the_source_stated_pure_solid_reference():
 
 
 def test_table4_lineage_resolves_to_same_source_table3_activity_rows():
-    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator = Migrator(root=ROOT)
     migrator._migrate_extract(EXTRACT)
     migrator._retarget_exploded_parents()
+    migrator.finalize()
     result = migrator.result
 
     table4_rows = [
@@ -295,7 +296,7 @@ def test_table4_lineage_resolves_to_same_source_table3_activity_rows():
         assert all(parent in result.observations for parent in row.derived_from)
         assert all(expected_prefix in parent for parent in row.derived_from)
 
-    report = validate_corpus(
+    report = result.validation or validate_corpus(
         result.works, result.experiments, result.observations
     )
     lineage_references = [
@@ -305,6 +306,39 @@ def test_table4_lineage_resolves_to_same_source_table3_activity_rows():
         and (".derived_from" in issue.path or ".inputs" in issue.path)
     ]
     assert lineage_references == []
+
+    source_issues = [
+        issue for issue in report.issues
+        if "shornikov-1997-diopside-vaporization" in issue.path
+    ]
+    assert not [
+        issue for issue in source_issues
+        if issue.reason in {
+            RefusalReason.REFERENTIAL_INTEGRITY,
+            RefusalReason.CONDITIONAL_FIELD,
+        }
+    ]
+    source_rows = [
+        row for row in result.observations.values()
+        if row.observation_id.startswith(
+            "shornikov-1997-diopside-vaporization::"
+        )
+    ]
+    assets = {
+        asset.asset_id
+        for work in result.works.values()
+        for asset in work.source_files.files
+    }
+    assert len(source_rows) == 81
+    for row in source_rows:
+        if row.derivation is None:
+            continue
+        assert row.derived_from
+        assert row.derived_from == row.derivation.inputs
+        assert all(
+            parent in result.observations or parent in assets
+            for parent in row.derived_from
+        )
 
     row = table4_rows[0]
     phantom = "tables:shornikov-1997-diopside-vaporization"
