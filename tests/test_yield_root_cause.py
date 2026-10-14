@@ -199,13 +199,21 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     na2o_left = sim.melt.composition_kg.get("Na2O", 0.0)
     reduced_pct = (feo_initial - feo_left) / feo_initial * 100.0
 
-    assert result.status == "partial"
+    assert sim.melt.campaign == CampaignPhase.COMPLETE
+    assert result.failure_exception is None
+    assert result.error_message == ""
+    assert result.reason == ""
+    assert result.status in {"ok", "partial"}
     assert feo_initial > 100.0
     assert reduced_pct > 80.0
-    # Na-bearing vapor leaves the melt during C0-C4 and splits among Stage-4
-    # capture, reagent inventory, and terminal offgas. The 2.150 V Na2O rung is
-    # above the 1.6 V cap, so C5 consumes none. C5 reaches its 800 h max hold;
-    # C6 runs for 20 h afterward, and the overall run ends partial.
+    # Na2O's effective Nernst requirement uses the parent-oxide quotient, the
+    # square of single-cation activity, and exceeds C5's 1.6 V cap; its hold is
+    # skipped without reducing Na. The residual reflects Na(g) evaporation in
+    # C0-C4, split among Stage-4 capture, reagent inventory, and terminal offgas.
+    # This fixture selects internal-analytical with HKL-only transport, not MAGEMin.
+    # C5 exits at its 800 h max hold without the final-rung current-decay endpoint.
+    # That incomplete-extraction failure mode is an endpoint miss once b-846 lands.
+    # This test asserts Fe reduction and Na2O pins, not extraction success.
     assert na2o_left == pytest.approx(1.7917834200101006, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
