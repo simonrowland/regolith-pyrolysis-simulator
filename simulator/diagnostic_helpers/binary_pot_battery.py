@@ -1819,6 +1819,9 @@ class _OpenImccBatteryBackend:
             "pack": self._pack_name,
             "pack_version": str(getattr(self._pack, "version", "unknown")),
             "pack_digest": str(openimcc_bridge._pack_digest(self._pack)),
+            "openimcc_commit": (
+                openimcc_bridge.imported_openimcc_commit() or "unverified"
+            ),
         }
         self._load_gas()
 

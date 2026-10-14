@@ -23,6 +23,7 @@ from simulator.melt_backend.openimcc_bridge import (
     _cleaned_melt_projection,
     evaluate as bridge_evaluate,
     evaluate_cleaned_melt,
+    imported_openimcc_commit,
 )
 from simulator.state import MOLAR_MASS
 
@@ -1001,6 +1002,182 @@ def test_recorded_openimcc_pin_matches_pyproject_extra() -> None:
     )
     extra = pyproject["project"]["optional-dependencies"]["imcc"]
     assert extra == [OPENIMCC_RECORDED_PIN]
+
+
+def test_imported_openimcc_commit_comes_from_its_distribution(monkeypatch, tmp_path) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = tmp_path / "site-packages/openimcc/__init__.py"
+    module_file.parent.mkdir(parents=True)
+    module_file.touch()
+    commit = "a" * 40
+
+    class Distribution:
+        files = [Path("openimcc/__init__.py")]
+
+        @staticmethod
+        def locate_file(entry):
+            return tmp_path / "site-packages" / entry
+
+        @staticmethod
+        def read_text(name):
+            assert name == "direct_url.json"
+            return json.dumps({"vcs_info": {"commit_id": commit}})
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(
+        openimcc_bridge.metadata, "distribution", lambda _name: Distribution()
+    )
+
+    assert imported_openimcc_commit() == commit
+
+
+def test_imported_openimcc_commit_uses_source_checkout_without_dist_info(
+    monkeypatch, tmp_path
+) -> None:
+    from importlib.metadata import PackageNotFoundError
+
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = tmp_path / "checkout/src/openimcc/__init__.py"
+    module_file.parent.mkdir(parents=True)
+    module_file.touch()
+    (tmp_path / "checkout/.git").mkdir()
+    commit = "b" * 40
+
+    def no_distribution(_name):
+        raise PackageNotFoundError("openimcc")
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(openimcc_bridge.metadata, "distribution", no_distribution)
+    monkeypatch.setattr(
+        openimcc_bridge.subprocess,
+        "run",
+        lambda args, **_kwargs: SimpleNamespace(stdout=f"{commit}\n"),
+    )
+
+    assert imported_openimcc_commit() == commit
+
+
+def test_imported_openimcc_commit_is_unverified_without_distribution_or_git(
+    monkeypatch, tmp_path
+) -> None:
+    from importlib.metadata import PackageNotFoundError
+
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = tmp_path / "loose/openimcc.py"
+    module_file.parent.mkdir()
+    module_file.touch()
+
+    def no_distribution(_name):
+        raise PackageNotFoundError("openimcc")
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(openimcc_bridge.metadata, "distribution", no_distribution)
+    monkeypatch.setattr(
+        openimcc_bridge.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("no git checkout should be queried"),
+    )
+
+    assert imported_openimcc_commit() is None
+
+
+def test_imported_openimcc_commit_ignores_shadowed_distribution(monkeypatch, tmp_path) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = tmp_path / "checkout/src/openimcc/__init__.py"
+    module_file.parent.mkdir(parents=True)
+    module_file.touch()
+    (tmp_path / "checkout/.git").mkdir()
+    stale_file = tmp_path / "site-packages/openimcc/__init__.py"
+    stale_file.parent.mkdir(parents=True)
+    stale_file.touch()
+    stale_commit = "c" * 40
+    checkout_commit = "d" * 40
+
+    class StaleDistribution:
+        files = [Path("openimcc/__init__.py")]
+
+        @staticmethod
+        def locate_file(entry):
+            return tmp_path / "site-packages" / entry
+
+        @staticmethod
+        def read_text(_name):
+            return json.dumps({"vcs_info": {"commit_id": stale_commit}})
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(
+        openimcc_bridge.metadata, "distribution", lambda _name: StaleDistribution()
+    )
+    monkeypatch.setattr(
+        openimcc_bridge.subprocess,
+        "run",
+        lambda args, **_kwargs: SimpleNamespace(stdout=f"{checkout_commit}\n"),
+    )
+
+    assert imported_openimcc_commit() == checkout_commit
+
+
+def test_imported_openimcc_commit_mismatch_fails_the_pin_guard(monkeypatch, tmp_path) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = tmp_path / "site-packages/openimcc/__init__.py"
+    module_file.parent.mkdir(parents=True)
+    module_file.touch()
+    installed = "e" * 40
+
+    class Distribution:
+        files = [Path("openimcc/__init__.py")]
+
+        @staticmethod
+        def locate_file(entry):
+            return tmp_path / "site-packages" / entry
+
+        @staticmethod
+        def read_text(_name):
+            return json.dumps({"vcs_info": {"commit_id": installed}})
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(
+        openimcc_bridge.metadata, "distribution", lambda _name: Distribution()
+    )
+    pinned = openimcc_bridge.OPENIMCC_RECORDED_PIN.rsplit("@", 1)[-1]
+    remedy = f"install --no-deps {openimcc_bridge.OPENIMCC_RECORDED_PIN!r}"
+    with pytest.raises(AssertionError, match="installed vs pinned"):
+        assert imported_openimcc_commit() == pinned, (
+            f"installed vs pinned: {installed} != {pinned}; remedy: {remedy}"
+        )
+
+
+def test_imported_openimcc_commit_matches_recorded_pin_when_importable() -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    if openimcc_bridge._openimcc is None:
+        pytest.skip("openimcc is an optional dependency")
+    installed = imported_openimcc_commit()
+    pinned = openimcc_bridge.OPENIMCC_RECORDED_PIN.rsplit("@", 1)[-1]
+    assert installed is not None, (
+        "installed openimcc commit is unverified; remedy: install "
+        f"--no-deps {openimcc_bridge.OPENIMCC_RECORDED_PIN!r}"
+    )
+    assert installed == pinned, (
+        f"installed openimcc commit {installed} does not match pinned commit "
+        f"{pinned}; remedy: install --no-deps "
+        f"{openimcc_bridge.OPENIMCC_RECORDED_PIN!r}"
+    )
 
 
 def test_evaluate_default_tracks_runtime_backend_pack(monkeypatch) -> None:
