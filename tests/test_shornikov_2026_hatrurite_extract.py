@@ -109,13 +109,21 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
             assert condition.locator.pdf_page_index == 10
             assert record.locator.published_page == 306
 
-    # The table states no composition map, oxygen fugacity, or in-cell total
-    # pressure. Keep those axes unknown while confirming printed T is bound.
+    # A closed Knudsen cell does not state oxygen fugacity or in-cell total
+    # pressure. Composition, temperature, and gas species are known.
     outcomes = [
         identity_equal(record.identity, record.identity) for record in pressure_records
     ]
-    assert all("temperature_K" not in outcome.fields for outcome in outcomes)
-    assert all(outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN for outcome in outcomes)
+    assert all(
+        outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+        and outcome.fields == ("fO2_Pa", "total_pressure_Pa")
+        for outcome in outcomes
+    )
+    for record in pressure_records:
+        assert record.identity.fO2_Pa.is_unknown
+        assert record.identity.fO2_Pa.reason
+        assert record.identity.total_pressure_Pa.is_unknown
+        assert record.identity.total_pressure_Pa.reason == "in_cell_total_pressure_not_derivable"
 
     for formula in ("CaO", "SiO2"):
         observation = next(
@@ -138,8 +146,23 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
         assert reference.endmember.formula == formula
         assert reference.endmember.phase.tag.value == "unknown"
         assert reference.endmember.polymorph.tag.value == "unknown"
+        assert all(
+            record.identity.composition.is_value
+            and record.identity.temperature_K.is_value
+            and record.identity.species.phase.is_unknown
+            and record.identity.species.phase.reason
+            and record.identity.species.formula == formula
+            and record.identity.reference_state.is_value
+            and record.identity.reference_state.value.endmember.phase.is_unknown
+            and record.identity.reference_state.value.endmember.polymorph.is_unknown
+            for record in migrated
+        )
         outcomes = [identity_equal(record.identity, record.identity) for record in migrated]
-        assert all(outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN for outcome in outcomes)
+        assert all(
+            outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+            and outcome.fields == ("species.phase",)
+            for outcome in outcomes
+        )
         for point, record in zip(source_points, migrated, strict=True):
             assert record.value.point == Decimal(point["activity"])
             assert record.identity.temperature_K.value == Decimal(point["T_K"])
