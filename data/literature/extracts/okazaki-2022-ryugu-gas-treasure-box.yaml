@@ -280,8 +280,13 @@ species:
         assumed_density_g_cm3: 1.8
         implanted_layer_thickness_nm: 50
         cumulative_fresh_surface_area_cm2: '3 x 10^-3'
-      derived_from: author geometric calculation from assumed cube dimensions, density, and implanted-layer thickness
+      derived_from:
+      - tables:okazaki-2022-ryugu-gas-treasure-box
       derivation:
+        relation: >-
+          The authors estimate fresh surface area by geometric bookkeeping for isotropic fragmentation under the stated cube, density, and implanted-layer assumptions (p. 8, Materials and Methods).
+        inputs:
+        - tables:okazaki-2022-ryugu-gas-treasure-box
         premise: three 1-cm cubes, density 1.8 g cm^-3, homogeneous 50-nm solar-wind layer, and fragmentation to 0.13-cm cubes
         algebra: isotropic cube-fragmentation surface-area bookkeeping as described in Materials and Methods
         unit_check: printed cm, g cm^-3, and nm inputs with printed cm2 output
@@ -309,8 +314,15 @@ species:
         alternative_fragment_count: 2000
         alternative_fragment_area_um2: '10 by 10'
         alternative_fragment_thickness_nm: '<50'
-      derived_from: author estimate constrained by measured blank-corrected SW-4He abundance and assumed grain population
+      derived_from:
+      - tables:okazaki-2022-ryugu-gas-treasure-box
+      - okazaki_2022_solar_wind_helium_abundance
       derivation:
+        relation: >-
+          The authors estimate pulverized surface area from the measured released solar-wind helium and the assumed grain population (p. 8, Materials and Methods).
+        inputs:
+        - tables:okazaki-2022-ryugu-gas-treasure-box
+        - okazaki_2022_solar_wind_helium_abundance
         premise: 1000 grains of 0.13-cm side, 5.4-g total mass, 4 x 10^-3 cm3 STP g^-1 bulk SW-4He, and a 50-nm implanted layer
         algebra: convert assumed bulk concentration to atom density, then solve fresh pulverized area from the measured released SW-4He
         unit_check: printed cm3 STP, g, atoms cm^-3, atoms cm^-2, cm2, and percent units retained
