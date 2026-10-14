@@ -1320,13 +1320,22 @@ def predict_thermo_attempt(
         else:
             # At the JANAF crossing, ΔG=0 gives ΔS=ΔH/T_fus. Away from
             # that crossing, ΔS_fus(T) is the two curves' entropy difference.
-            (
-                predicted,
-                crossing_K,
-                crossing_error,
-            ) = _janaf_fusion_entropy_with_crossing_reason(
-                identity.species.formula, temperature_K, polymorph
-            )
+            try:
+                (
+                    predicted,
+                    crossing_K,
+                    crossing_error,
+                ) = _janaf_fusion_entropy_with_crossing_reason(
+                    identity.species.formula, temperature_K, polymorph
+                )
+            except (KeyError, ValueError) as exc:
+                return _refuse(
+                    RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+                    "JANAF-fusion-endmembers-unavailable",
+                    quantity=quantity,
+                    origin=origin,
+                    extra={"detail": str(exc), "formula": identity.species.formula},
+                )
             if crossing_error is not None:
                 notice_list.append(
                     Notice(
@@ -2051,7 +2060,6 @@ def iter_compilation_comparisons_jsonl(path: Path) -> Iterable[dict[str, object]
 def _prediction_from_attempt(engine: Engine, observation: Observation, attempt: ThermoAttempt):
     from simulator.battery.score import (
         ENGINE_CHANNELS,
-        ENGINE_COEFFICIENT_SOURCES,
         EnginePrediction,
         Execution,
         ExecutionState,
@@ -2077,9 +2085,7 @@ def _prediction_from_attempt(engine: Engine, observation: Observation, attempt: 
         unit=attempt.unit,
         authority=attempt.authority,
         notices=attempt.notices,
-        coefficient_sources=(
-            attempt.coefficient_sources or ENGINE_COEFFICIENT_SOURCES[engine]
-        ),
+        coefficient_sources=attempt.coefficient_sources,
         lineage_complete=False,
         refusal_reason=attempt.refusal_reason,
         refusal_detail=attempt.refusal_detail,

@@ -171,6 +171,7 @@ def test_fusion_predictor_selects_the_stated_silica_polymorph_table() -> None:
 
 
 def test_fusion_predictor_refuses_unavailable_stated_polymorph() -> None:
+    from simulator.battery.compilation_tier import _prediction_from_attempt
     from simulator.battery.score import predict_with_engine
 
     experiment = F.tabulation_experiment()
@@ -191,6 +192,22 @@ def test_fusion_predictor_refuses_unavailable_stated_polymorph() -> None:
     assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
     prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
     assert prediction.coefficient_sources == ()
+    predictions = []
+
+    def predict_with_tier(engine, row, **_kwargs):
+        prediction = _prediction_from_attempt(engine, row, attempt)
+        predictions.append(prediction)
+        return prediction
+
+    residual, _ = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(observation),
+        comparison_ids=set(),
+        predict=predict_with_tier,
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert predictions[0].coefficient_sources == ()
 
 
 def test_fusion_predictor_refuses_a_stated_polymorph_on_an_unlisted_table(
@@ -3027,6 +3044,48 @@ def test_internal_predicts_janaf_fusion_enthalpy_and_entropy() -> None:
                 and "3104.968" in notice.band
                 for notice in attempt.notices
             )
+
+
+def test_missing_janaf_fusion_entropy_is_typed_refusal_and_scoring_continues(
+    monkeypatch,
+) -> None:
+    from simulator.battery.generators import janaf
+
+    original_entropy_points = janaf._fusion_entropy_points
+
+    def without_solid_3000_k(table_id):
+        points, digest, missing = original_entropy_points(table_id)
+        if table_id == "Mg-008":
+            points = tuple(
+                (temperature, value)
+                for temperature, value in points
+                if temperature != Decimal("3000")
+            )
+            missing = tuple(sorted((*missing, Decimal("3000"))))
+        return points, digest, missing
+
+    monkeypatch.setattr(janaf, "_fusion_entropy_points", without_solid_3000_k)
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "mg-fusion-missing-entropy-node",
+        experiment.experiment_id,
+        _fusion_identity(Quantity.ENTROPY_OF_FUSION, Decimal("3000")),
+        Decimal("24.804"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    residual, _ = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(observation),
+        comparison_ids=set(),
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION
+    assert residual.refusal.detail["reason"] == "JANAF-fusion-endmembers-unavailable"
+    assert "3000 K" in residual.refusal.detail["detail"]
 
 
 @pytest.mark.parametrize(
