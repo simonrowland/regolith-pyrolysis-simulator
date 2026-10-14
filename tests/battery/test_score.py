@@ -8068,6 +8068,41 @@ def test_fusion_conversion_without_janaf_pair_returns_typed_notice() -> None:
     assert notice.band
 
 
+def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=Decimal("2000"),
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+        ),
+        "lime",
+    )
+    reference = F.observation(
+        "unestablished-engine-solid-activity",
+        F.kems_experiment().experiment_id,
+        identity,
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="another-source",
+    )
+
+    result = fusion_comparison_reference(reference, engine=Engine.ELLINGHAM)
+
+    assert result.value.point == reference.value.point
+    assert result.identity.reference_state.value.endmember.phase.value is Phase.CR
+    notice = next(
+        n for n in result.notices if n.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+    )
+    assert notice.reason == (
+        "solid/liquid reference conversion skipped: engine reference is "
+        "unestablished for ellingham; measured solid-reference value left unchanged"
+    )
+    assert notice.band == "engine activity reference unestablished: ellingham"
+
+
 def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
