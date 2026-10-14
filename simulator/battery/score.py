@@ -5408,9 +5408,21 @@ def _hashimoto_residue_prediction(
             }
         )
         primary_geometry = primary.primary_geometry_policy_id
-        run_refusal = (primary.provenance.get("geometry_refusal_by_geometry") or {}).get(
-            primary_geometry
+        geometry_refusals = primary.provenance.get("geometry_refusal_by_geometry") or {}
+        production_refusals = production.provenance.get("geometry_refusal_by_geometry") or {}
+        timeout_refusal = next(
+            (
+                refusal
+                for refusal in (
+                    *geometry_refusals.values(),
+                    *production_refusals.values(),
+                )
+                if isinstance(refusal, Mapping)
+                and str(refusal.get("reason") or "").startswith("engine_timeout:")
+            ),
+            None,
         )
+        run_refusal = timeout_refusal or geometry_refusals.get(primary_geometry)
         if run_refusal:
             from simulator.battery.residue import ResidueInventoryRefusal
 
@@ -5486,10 +5498,18 @@ def _hashimoto_residue_prediction(
         return EnginePrediction(
             engine=engine,
             channel=channel,
-            execution=Execution(state=ExecutionState.NOT_PROBED),
+            execution=Execution(
+                state=(
+                    ExecutionState.ATTEMPTED_UNAVAILABLE
+                    if str(reason).startswith("engine_timeout:")
+                    else ExecutionState.NOT_PROBED
+                )
+            ),
             coefficient_sources=sources,
             refusal_reason=(
-                RefusalReason.OPENIMCC_NOT_IMPORTABLE
+                RefusalReason.ATTEMPTED_UNAVAILABLE
+                if str(reason).startswith("engine_timeout:")
+                else RefusalReason.OPENIMCC_NOT_IMPORTABLE
                 if str(reason) == "openimcc_not_importable"
                 else RefusalReason.UNSUPPORTED
             ),
@@ -5605,6 +5625,12 @@ def _sossi_residue_prediction(
         prediction = cache[cache_key].get(short_id)
         if prediction is None:
             raise ValueError("sossi_prediction_row_missing")
+        run_refusal = prediction.provenance.get("run_refusal")
+        if isinstance(run_refusal, Mapping):
+            raise ResidueInventoryRefusal(
+                str(run_refusal.get("reason") or "sossi_run_refused"),
+                json.dumps(run_refusal, sort_keys=True, default=str),
+            )
         if formula in prediction.channel_missing_elements:
             raise ResidueInventoryRefusal(
                 "channel_missing", f"no {formula} evaporation channel for {engine.value}"
@@ -5710,7 +5736,9 @@ def _sossi_residue_prediction(
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
         if cache_key not in cache:
             cache[cache_key] = {"__cohort_error__": str(reason)}
-        if reason == "oxygen_condition_missing":
+        if str(reason).startswith("engine_timeout:"):
+            refusal = RefusalReason.ATTEMPTED_UNAVAILABLE
+        elif reason == "oxygen_condition_missing":
             refusal = RefusalReason.IDENTITY_INCOMPLETE
         elif reason == "channel_missing":
             refusal = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
@@ -5721,7 +5749,13 @@ def _sossi_residue_prediction(
         return EnginePrediction(
             engine=engine,
             channel=channel,
-            execution=Execution(state=ExecutionState.NOT_PROBED),
+            execution=Execution(
+                state=(
+                    ExecutionState.ATTEMPTED_UNAVAILABLE
+                    if str(reason).startswith("engine_timeout:")
+                    else ExecutionState.NOT_PROBED
+                )
+            ),
             coefficient_sources=sources,
             refusal_reason=refusal,
             refusal_detail={
@@ -8121,90 +8155,107 @@ def headline_rows(
 
 
 def measured_engine_rail_records(
-    residuals: Sequence[Residual],
+    residuals: Iterable[Mapping[str, object]],
     *,
     context: ScoreContext,
     engines: Sequence[Engine],
 ) -> list[dict[str, object]]:
     """Measured-candidate counts and native-unit error metrics by engine/rail."""
 
-    certified = {id(row) for row in _measured_residuals(residuals, context)}
-    groups: dict[tuple[str, str], list[Residual]] = defaultdict(list)
+    measured_reference = _payload_measured_reference(
+        context.observations, context.origins
+    )
+    groups: dict[tuple[str, str, str], list[Mapping[str, object]]] = defaultdict(list)
+    certified: set[int] = set()
+    flagged: dict[int, bool] = {}
     for residual in residuals:
-        if residual.rail is not None:
-            groups[(residual.rail.value, _engine_of(residual))].append(residual)
+        rail = str(residual.get("rail") or "")
+        if not rail:
+            continue
+        engine = _ScorePayloadAccumulator._engine(residual)
+        relation = str(residual.get("source_relation") or SourceRelation.UNKNOWN.value)
+        groups[(rail, engine, relation)].append(residual)
+        flagged[id(residual)] = bool(_flagged_payload_strata(residual))
+        if measured_reference(residual) and _headline_payload_admits(
+            residual, tier="measured"
+        ):
+            certified.add(id(residual))
 
     records: list[dict[str, object]] = []
     for rail in Rail:
         for engine in engines:
-            bucket = groups.get((rail.value, engine.value), [])
-            numeric = [row for row in bucket if row.numeric is not None]
-            certified_numeric = [row for row in numeric if id(row) in certified]
-            flagged_numeric = [row for row in numeric if flagged_strata(row.notices)]
-            by_metric: dict[tuple[str, str], list[Residual]] = defaultdict(list)
-            for row in numeric:
-                assert row.numeric is not None
-                by_metric[(row.numeric.operation.value, row.numeric.unit)].append(row)
-            metrics: list[dict[str, object]] = []
-            for (operation, unit), metric_rows in sorted(by_metric.items()):
-                values = [row.numeric.value for row in metric_rows if row.numeric is not None]
-                metrics.append({
-                    "operation": operation,
-                    "unit": "dex" if operation == MetricOperation.DEX.value else unit,
-                    "n": len(values),
-                    "all_numeric": {
-                        "rms": _optional_decimal(_rms(values)),
-                        "median_abs": _optional_decimal(_median_abs(values)),
-                    },
-                    "certified": {
-                        "n": sum(id(row) in certified for row in metric_rows),
-                        "rms": _optional_decimal(_rms([
-                            row.numeric.value for row in metric_rows
-                            if row.numeric is not None and id(row) in certified
-                        ])),
-                        "median_abs": _optional_decimal(_median_abs([
-                            row.numeric.value for row in metric_rows
-                            if row.numeric is not None and id(row) in certified
-                        ])),
-                    },
-                    "flagged": {
-                        "n": sum(bool(flagged_strata(row.notices)) for row in metric_rows),
-                        "rms": _optional_decimal(_rms([
-                            row.numeric.value for row in metric_rows
-                            if row.numeric is not None and flagged_strata(row.notices)
-                        ])),
-                        "median_abs": _optional_decimal(_median_abs([
-                            row.numeric.value for row in metric_rows
-                            if row.numeric is not None and flagged_strata(row.notices)
-                        ])),
-                    },
+            relations = tuple(
+                relation
+                for relation in SourceRelation
+                if (rail.value, engine.value, relation.value) in groups
+            ) or (SourceRelation.UNKNOWN,)
+            for relation in relations:
+                bucket = groups.get((rail.value, engine.value, relation.value), [])
+                numeric: list[tuple[Mapping[str, object], Mapping[str, object], Decimal]] = []
+                for row in bucket:
+                    metric = row.get("numeric")
+                    if not isinstance(metric, Mapping) or metric.get("value") is None:
+                        continue
+                    try:
+                        value = as_decimal(metric["value"])
+                    except (KeyError, TypeError, ValueError, ArithmeticError):
+                        continue
+                    numeric.append((row, metric, value))
+                certified_numeric = [item for item in numeric if id(item[0]) in certified]
+                flagged_numeric = [item for item in numeric if flagged[id(item[0])]]
+                by_metric: dict[tuple[str, str], list[tuple[Mapping[str, object], Decimal]]] = defaultdict(list)
+                for row, metric, value in numeric:
+                    by_metric[(str(metric.get("operation") or ""), str(metric.get("unit") or ""))].append((row, value))
+                metrics: list[dict[str, object]] = []
+                for (operation, unit), metric_rows in sorted(by_metric.items()):
+                    values = [value for _row, value in metric_rows]
+                    metrics.append({
+                        "operation": operation,
+                        "unit": "dex" if operation == MetricOperation.DEX.value else unit,
+                        "n": len(values),
+                        "all_numeric": {
+                            "rms": _optional_decimal(_rms(values)),
+                            "median_abs": _optional_decimal(_median_abs(values)),
+                        },
+                        "certified": {
+                            "n": sum(id(row) in certified for row, _value in metric_rows),
+                            "rms": _optional_decimal(_rms([value for row, value in metric_rows if id(row) in certified])),
+                            "median_abs": _optional_decimal(_median_abs([value for row, value in metric_rows if id(row) in certified])),
+                        },
+                        "flagged": {
+                            "n": sum(flagged[id(row)] for row, _value in metric_rows),
+                            "rms": _optional_decimal(_rms([value for row, value in metric_rows if flagged[id(row)]])),
+                            "median_abs": _optional_decimal(_median_abs([value for row, value in metric_rows if flagged[id(row)]])),
+                        },
+                    })
+                refusal_counts: dict[str, int] = defaultdict(int)
+                for row in bucket:
+                    if row.get("status") == ResidualStatus.REFUSED.value:
+                        refusal = row.get("refusal")
+                        reason = (
+                            str(refusal.get("reason") or "untyped_refusal")
+                            if isinstance(refusal, Mapping)
+                            else "untyped_refusal"
+                        )
+                        refusal_counts[reason] += 1
+                records.append({
+                    "rail": rail.value,
+                    "engine": engine.value,
+                    "source_relation": relation.value,
+                    "candidates": len(bucket),
+                    "numeric": len(numeric),
+                    "certified_numeric": len(certified_numeric),
+                    "flagged_numeric": len(flagged_numeric),
+                    "refused": sum(row.get("status") == ResidualStatus.REFUSED.value for row in bucket),
+                    "refused_by_reason": dict(sorted(refusal_counts.items())),
+                    "in_band": sum(
+                        isinstance(row.get("numeric"), Mapping)
+                        and row["numeric"].get("decision_band") is not None
+                        and row.get("status") == ResidualStatus.MATCH.value
+                        for row in bucket
+                    ),
+                    "metrics": metrics,
                 })
-            refusal_counts: dict[str, int] = defaultdict(int)
-            for row in bucket:
-                if row.status is ResidualStatus.REFUSED:
-                    reason = (
-                        "untyped_refusal"
-                        if row.refusal is None
-                        else row.refusal.reason.value
-                    )
-                    refusal_counts[reason] += 1
-            records.append({
-                "rail": rail.value,
-                "engine": engine.value,
-                "candidates": len(bucket),
-                "numeric": len(numeric),
-                "certified_numeric": len(certified_numeric),
-                "flagged_numeric": len(flagged_numeric),
-                "refused": sum(row.status is ResidualStatus.REFUSED for row in bucket),
-                "refused_by_reason": dict(sorted(refusal_counts.items())),
-                "in_band": sum(
-                    row.numeric is not None
-                    and row.numeric.decision_band is not None
-                    and row.status is ResidualStatus.MATCH
-                    for row in bucket
-                ),
-                "metrics": metrics,
-            })
     return records
 
 
@@ -8766,14 +8817,29 @@ def notice_backlog(residuals: Sequence[Residual]) -> dict[str, int]:
 
 
 def _engine_of(residual: Residual) -> str:
-    if residual.candidate_request is not None:
-        return residual.candidate_request.engine.value
-    if residual.candidate and residual.candidate.startswith("engine:"):
-        parts = residual.candidate.split(":")
+    request = residual.candidate_request
+    return _engine_from_payload(
+        {
+            "candidate_request": (
+                {"engine": request.engine.value} if request is not None else None
+            ),
+            "candidate": residual.candidate,
+            "key": residual.key,
+        }
+    )
+
+
+def _engine_from_payload(row: Mapping[str, object]) -> str:
+    request = row.get("candidate_request")
+    if isinstance(request, Mapping) and request.get("engine"):
+        return str(request["engine"])
+    candidate = row.get("candidate")
+    if isinstance(candidate, str) and candidate.startswith("engine:"):
+        parts = candidate.split(":")
         if len(parts) >= 2:
             return parts[1]
-    if residual.key:
-        return residual.key.rsplit("::", 1)[-1]
+    if row.get("key"):
+        return str(row["key"]).rsplit("::", 1)[-1]
     return "unknown"
 
 
@@ -10127,12 +10193,7 @@ class _ScorePayloadAccumulator:
 
     @staticmethod
     def _engine(row: Mapping[str, object]) -> str:
-        request = row.get("candidate_request")
-        return str(
-            request.get("engine")
-            if isinstance(request, Mapping) and request.get("engine")
-            else str(row.get("key") or "").rsplit("::", 1)[-1]
-        )
+        return _engine_from_payload(row)
 
     def _add_headline(
         self,

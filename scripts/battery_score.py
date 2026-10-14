@@ -58,7 +58,6 @@ from simulator.battery.score import (  # noqa: E402
     write_headline_summary_from_payloads_json,
     _write_headline_summary_from_accumulator_json,
     measured_engine_rail_records,
-    load_residuals_jsonl,
 )
 
 STUDIO_HOST = "mac-studio-256-1"
@@ -137,8 +136,8 @@ def _measured_report(payload: Mapping[str, object]) -> str:
         "",
         "Flagged numeric predictions are retained in their own metric bucket. Refusals are counts by typed reason and have no error value.",
         "",
-        "| rail | native unit / metric | engine | candidates | numeric | certified | flagged | refused | in band | RMS | median | refusal reasons |",
-        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        "| rail | native unit / metric | engine | source relation | candidates | numeric | certified | flagged | refused | in band | certified RMS | certified median | flagged RMS | flagged median | refusal reasons |",
+        "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for row in payload["records"]:
         assert isinstance(row, Mapping)
@@ -151,11 +150,13 @@ def _measured_report(payload: Mapping[str, object]) -> str:
                 f"{reason}={count}" for reason, count in (row.get("refused_by_reason") or {}).items()
             ) or "—"
             lines.append(
-                f"| {row['rail']} | {metric['unit']} / {metric['operation']} | {row['engine']} | "
+                f"| {row['rail']} | {metric['unit']} / {metric['operation']} | {row['engine']} | {row['source_relation']} | "
                 f"{row['candidates']} | {row['numeric']} | {row['certified_numeric']} | "
                 f"{row['flagged_numeric']} | {row['refused']} | {row['in_band']} | "
                 f"{(metric.get('certified') or {}).get('rms') or '—'} | "
-                f"{(metric.get('certified') or {}).get('median_abs') or '—'} | {refusal} |"
+                f"{(metric.get('certified') or {}).get('median_abs') or '—'} | "
+                f"{(metric.get('flagged') or {}).get('rms') or '—'} | "
+                f"{(metric.get('flagged') or {}).get('median_abs') or '—'} | {refusal} |"
             )
     lines.append("")
     return "\n".join(lines)
@@ -192,16 +193,19 @@ def _run_measured_headline(root: Path, engines: tuple, context=None) -> int:
                 getattr(openimcc_handle, "identity", {}) or {}
             )
             engine_identities["openimcc"]["installation"] = openimcc_install
-        written, _metadata = _score_store_to_jsonl(
+        written, metadata = _score_store_to_jsonl(
             context,
             residuals_path,
-            root=root,
             engines=engines,
+            root=root,
             include_diagnostics=False,
             measured_only=True,
             handles=handles,
         )
-        residuals = load_residuals_jsonl(residuals_partial)
+        residuals = _ResidualJsonlRows(
+            residuals_partial,
+            metadata=metadata,
+        )
         records = measured_engine_rail_records(
             residuals, context=context, engines=engines
         )

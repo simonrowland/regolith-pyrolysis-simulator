@@ -4519,6 +4519,7 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
 
 def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None:
     from simulator.battery.records import ResidualRefusal
+    from simulator.battery.score import dumps_residual_line
 
     work = F.work()
     experiment = F.tabulation_experiment(work_id=work.work_id)
@@ -4569,8 +4570,13 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
     )
     row = next(
         row for row in measured_engine_rail_records(
-            residuals, context=context, engines=(engine,)
-        ) if row["rail"] == Rail.VAPOUR.value
+            tuple(json.loads(dumps_residual_line(item)) for item in residuals),
+            context=context,
+            engines=(engine,),
+        )
+        if row["rail"] == Rail.VAPOUR.value
+        and row["source_relation"] == SourceRelation.INDEPENDENT.value
+        and row["candidates"]
     )
     assert row["engine"] == engine.value  # key attribution is resolved by _engine_of.
     assert row["candidates"] == 4
@@ -4585,9 +4591,171 @@ def test_measured_engine_headline_counts_flags_refusals_and_native_rms() -> None
     assert Decimal(metric["certified"]["rms"]).quantize(Decimal("0.001")) == Decimal("3.536")
     assert metric["certified"]["median_abs"] == "3.5"
     assert metric["flagged"]["rms"] == "10"
+    assert metric["flagged"]["median_abs"] == "10"
     assert metric["unit"] == "dex"
     assert metric["certified"]["n"] == 2
     assert metric["flagged"]["n"] == 1
+    from scripts.battery_score import _measured_report
+
+    report = _measured_report(
+        {
+            "store_revision": "fixture",
+            "observation_store_sha256": "fixture",
+            "wall_seconds": 0,
+            "process_cpu_seconds": 0,
+            "load_average": None,
+            "engine_identities": {engine.value: {}},
+            "records": [row],
+        }
+    )
+    assert "certified RMS" in report and "flagged RMS" in report
+    assert "| 10 | 10 | unsupported=1 |" in report
+
+
+def test_measured_engine_rail_records_group_source_relation() -> None:
+    from simulator.battery.score import dumps_residual_line
+    engine = Engine.INTERNAL_ANALYTICAL
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    training = F.observation(
+        "relation-training",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    independent = replace(training, observation_id="relation-independent")
+    context = _context(work, experiment, training, independent)
+    numeric = ResidualNumeric(
+        MetricOperation.DEX,
+        "dimensionless",
+        Decimal("1"),
+        DecisionBand(Decimal("2"), "dimensionless", "fixture band"),
+    )
+    residuals = (
+        replace(
+            F.residual(
+                f"relation::{training.observation_id}::{engine.value}",
+                training.observation_id,
+                candidate="produced",
+                status=ResidualStatus.MATCH,
+                rail=Rail.VAPOUR,
+                numeric=numeric,
+            ),
+            source_relation=SourceRelation.TRAINING,
+        ),
+        replace(
+            F.residual(
+                f"relation::{independent.observation_id}::{engine.value}",
+                independent.observation_id,
+                candidate="produced",
+                status=ResidualStatus.MATCH,
+                rail=Rail.VAPOUR,
+                numeric=replace(numeric, value=Decimal("100")),
+            ),
+            source_relation=SourceRelation.INDEPENDENT,
+        ),
+    )
+
+    rows = [
+        row
+        for row in measured_engine_rail_records(
+            tuple(json.loads(dumps_residual_line(item)) for item in residuals),
+            context=context,
+            engines=(engine,),
+        )
+        if row["rail"] == Rail.VAPOUR.value and row["candidates"]
+    ]
+
+    assert [(row["source_relation"], row["candidates"]) for row in rows] == [
+        (SourceRelation.INDEPENDENT.value, 1),
+        (SourceRelation.TRAINING.value, 1),
+    ]
+
+
+def test_measured_headline_mode_serializes_typed_residuals_end_to_end(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+    from scripts import battery_score
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    reference = F.observation(
+        "measured-headline-mode",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    context = _context(work, experiment, reference)
+    residual = F.residual(
+        f"headline::{reference.observation_id}::{Engine.INTERNAL_ANALYTICAL.value}",
+        reference.observation_id,
+        candidate="predicted",
+        status=ResidualStatus.MATCH,
+        rail=Rail.VAPOUR,
+        numeric=ResidualNumeric(
+            MetricOperation.ABSOLUTE,
+            "Pa",
+            Decimal("7"),
+            DecisionBand(Decimal("2"), "Pa", "fixture certified band"),
+        ),
+    )
+    root = tmp_path / "small-store"
+    battery = root / "data" / "battery"
+    (root / "data" / "literature" / "observations-v2").mkdir(parents=True)
+    battery.mkdir(parents=True)
+    (battery / "migration-report.md").write_text(
+        "rows in: 1\nrecords out (observations): 1\nworks: 1\nexperiments: 1\n"
+        "queue size: 0\nhard issues: 0\n",
+        encoding="utf-8",
+    )
+    subprocess.run(["git", "init", "--quiet", str(root)], check=True)
+    subprocess.run(["git", "-C", str(root), "add", "data"], check=True)
+    subprocess.run(
+        [
+            "git", "-C", str(root), "-c", "user.name=Fixture",
+            "-c", "user.email=fixture@example.invalid", "commit", "--quiet",
+            "-m", "fixture store",
+        ],
+        check=True,
+    )
+    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    def score_fixture(store_context, *, engines, _stream, **_kwargs):
+        _stream.append(residual, reference)
+        _stream.finalize(context=store_context, engines=engines)
+        return (), {}, []
+
+    monkeypatch.setattr(score_mod, "_score_store_with_decisions", score_fixture)
+    monkeypatch.setattr(battery_score, "_observation_store_hash", lambda _root: "fixture")
+
+    result = battery_score.main(
+        [
+            "--measured-headline",
+            "--root", str(root),
+            "--engines", Engine.INTERNAL_ANALYTICAL.value,
+        ]
+    )
+
+    assert result == 0
+    jsonl = (battery / "residuals.jsonl").read_text(encoding="utf-8").splitlines()
+    serialized = [json.loads(line) for line in jsonl]
+    assert len(serialized) == 2  # store stamp plus the real residual serializer row
+    assert serialized[1]["reference"] == reference.observation_id
+    summary = json.loads((battery / "score-summary.json").read_text(encoding="utf-8"))
+    assert summary["kind"] == "measured_engine_accuracy_headline"
+    assert summary["records"]
+    history = [
+        json.loads(line)
+        for line in (battery / "score-history.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert len(history) == 1 and history[0]["kind"] == summary["kind"]
+    report = (battery / "score-report.md").read_text(encoding="utf-8")
+    assert "certified RMS" in report and "flagged RMS" in report
+    assert "7" in report
 
 
 def test_score_history_replaces_same_store_revision(tmp_path: Path) -> None:

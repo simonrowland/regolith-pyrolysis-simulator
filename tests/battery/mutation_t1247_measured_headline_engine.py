@@ -10,13 +10,17 @@ import pytest
 from simulator.battery import score
 
 
-source = textwrap.dedent(inspect.getsource(score._engine_of))
-needle = 'return residual.key.rsplit("::", 1)[-1]'
+source = textwrap.dedent(inspect.getsource(score._engine_from_payload))
+needle = "def _engine_from_payload(row: Mapping[str, object]) -> str:\n"
 assert source.count(needle) == 1
-mutated = source.replace(needle, 'return "mutated-engine"')
+mutated = source.replace(needle, needle + '    return "mutated-engine"\n')
 namespace: dict[str, object] = {}
-exec(compile(mutated, "<t1247-engine-attribution-mutation>", "exec"), score.__dict__, namespace)
-score._engine_of = namespace["_engine_of"]
+exec(
+    compile(mutated, "<t1247-engine-attribution-mutation>", "exec"),
+    score.__dict__,
+    namespace,
+)
+score._engine_from_payload = namespace["_engine_from_payload"]
 
 result = pytest.main(
     [

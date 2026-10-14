@@ -22,6 +22,12 @@ PRIMARY_TABLE3_PREFIX = "::hashimoto_1983_table3_residue_composition_series::"
 OXIDES = ("FeO", "MgO", "SiO2", "CaO", "Al2O3")
 
 
+def _hanging_openimcc_engine(**_kwargs):
+    import threading
+
+    threading.Event().wait(30)
+
+
 def _source_data():
     source = yaml.safe_load(SOURCE.read_text())
     store = yaml.safe_load(STORE.read_text())
@@ -344,6 +350,7 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     pytest.importorskip("openimcc")
+    import simulator.battery.residue as residue
     from simulator.melt_backend import openimcc_bridge
 
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
@@ -355,6 +362,11 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
         activity_compositions.append(tuple(sorted(composition_mol.items())))
         return original_evaluate(composition_mol=composition_mol, **kwargs)
 
+    monkeypatch.setattr(
+        residue,
+        "_evaluate_openimcc_isolated",
+        lambda evaluate, *, timeout_s, **kwargs: evaluate(**kwargs),
+    )
     monkeypatch.setattr(openimcc_bridge, "evaluate", track_activities)
     predictions = _predict_hashimoto_residue_cohort(
         experiments[:1],
@@ -520,4 +532,64 @@ def test_hashimoto_primary_policy_cannot_choose_the_arm_closest_to_residues(
     assert _hashimoto_primary_policy() == (
         _HASHIMOTO_PRIMARY_ALPHA_ARM,
         _HASHIMOTO_PRIMARY_GEOMETRY,
+    )
+
+
+def test_hashimoto_openimcc_timeout_is_typed_and_cohort_continues(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("openimcc")
+    import simulator.battery.residue as residue
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.melt_backend import openimcc_bridge
+
+    experiments, _measured_rows, preform_dimensions_mm = _source_data()
+    experiment = experiments[0]
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+    monkeypatch.setitem(binary_pot_battery._ENGINE_OUTER_TIMEOUT_S, "openimcc", 0.02)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", _hanging_openimcc_engine)
+
+    def integrate_with_engine_call(
+        inventory,
+        _channels,
+        pressure_model,
+        *,
+        temperature_K,
+        duration_s,
+        steps,
+        geometry_policy_id,
+        initial_area_m2,
+    ):
+        try:
+            pressure_model(inventory, -9.0)
+        except residue.ResidueEngineNonconvergence as exc:
+            refusal = exc
+        else:
+            refusal = None
+        return residue._hashimoto_project_oxide_wt_pct(inventory), (), (), refusal, {}
+
+    monkeypatch.setattr(
+        residue, "_hashimoto_integrate_geometry", integrate_with_engine_call
+    )
+    predictions = residue._predict_hashimoto_residue_cohort(
+        (experiment,),
+        catalog,
+        preform_dimensions_mm=preform_dimensions_mm,
+        code_revision="timeout-fixture",
+        _allow_partial_cohort_for_test=True,
+    )
+
+    assert {row.alpha_arm for row in predictions} == {
+        "alpha_common_unity_sensitivity",
+        "alpha_runtime_catalog",
+    }
+    assert all(
+        row.provenance["run_refusal"]["reason"]
+        == "engine_timeout:openimcc:hashimoto_residue_cohort"
+        for row in predictions
+    )
+    assert all(
+        "Hashimoto residue cohort OpenIMCC timeout" in row.provenance["run_refusal"]["message"]
+        for row in predictions
     )
