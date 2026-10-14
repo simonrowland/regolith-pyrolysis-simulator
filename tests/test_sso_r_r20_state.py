@@ -72,6 +72,92 @@ def _cleaned_melt_debit_mol(sim: PyrolysisSimulator, transition, species: str) -
     )
 
 
+def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 0.2
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt", {"Fe2O3": 1e6},
+        source="test near-all-ferric inventory", material_origin="feedstock",
+    )
+    sim._project_cleaned_melt_from_atom_ledger()
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = 78.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1873.15
+    sim._sync_oxygen_reservoir_mirror()
+    assert sim._melt_redox_capacity_mol_per_ln_fO2(
+        fO2_log=78.0, T_K=1873.15,
+    ) < 1e-3
+    before_atoms = {
+        account: sim.atom_ledger.atom_moles_by_account(account)
+        for account in sim.atom_ledger.mol_by_account()
+    }
+    before_o = sum(atoms.get("O", 0.0) for atoms in before_atoms.values())
+    transitions_before = len(sim.atom_ledger.transitions)
+
+    sim._credit_evaporation_transition(
+        "Fe", 0.001, 0.001, sim.vapor_pressures["metals"]["Fe"],
+    )
+
+    assert sim._current_melt_redox_fO2_log() <= math.log10(2e-4)
+    evaporation = sim.atom_ledger.transitions[transitions_before]
+    emitted_o2 = _transition_account_species_mol(
+        sim, evaporation, side="credits", account="reservoir.fo2_buffer", species="O2",
+    )
+    assert emitted_o2 > 0.0
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"] >= emitted_o2
+    assert "EXCESS_OXYGEN_TO_GAS" in sim._last_fe_redox_respeciation_diagnostic["flags"]
+    for transition in sim.atom_ledger.transitions[transitions_before:]:
+        transition.validate_conservation(sim.species_formula_registry)
+    after_o = sum(
+        sim.atom_ledger.atom_moles_by_account(account).get("O", 0.0)
+        for account in sim.atom_ledger.mol_by_account()
+    )
+    assert after_o == before_o
+
+
+def test_default_lunar_redox_runaway_acceptance() -> None:
+    from simulator.runner import PyrolysisRun
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C0", hours=400,
+        mass_kg=1000.0, allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    sim = session.simulator
+    step = sim.step
+    hot_hours = set()
+    c6_releases = []
+
+    def checked_step():
+        transition_count = len(sim.atom_ledger.transitions)
+        snapshot = step()
+        assert abs(snapshot.mass_balance_error_pct) <= 5e-12
+        if sim.melt.hour in (167, 168):
+            hot_hours.add(sim.melt.hour)
+            assert sim._current_melt_redox_fO2_log() <= math.log10(
+                sim.melt.p_total_mbar / 1000.0,
+            )
+        if sim.melt.campaign == CampaignPhase.C6:
+            for transition in sim.atom_ledger.transitions[transition_count:]:
+                if transition.name == "fe_redox_respeciation":
+                    o2 = _transition_account_species_mol(
+                        sim, transition, side="credits",
+                        account="process.overhead_gas", species="O2",
+                    )
+                    if o2 > 0.0:
+                        c6_releases.append(o2)
+            inventory = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+            assert inventory.get("FeO", 0.0) > 0.0
+        return snapshot
+
+    sim.step = checked_step
+    run._run_session(session)
+    assert sim.is_complete()
+    assert hot_hours == {167, 168}
+    assert c6_releases
+
+
 def _transition_account_species_mol(
     sim: PyrolysisSimulator,
     transition,
