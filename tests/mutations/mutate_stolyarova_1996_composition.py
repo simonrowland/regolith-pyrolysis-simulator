@@ -31,7 +31,6 @@ def main() -> int:
 
     env = os.environ.copy()
     env["PYTHONPATH"] = str(ROOT)
-    env["MPLCONFIGDIR"] = "/private/tmp/claude-501/main-review/mplcache"
     SOURCE.write_text(mutated, encoding="utf-8")
     try:
         result = subprocess.run(
