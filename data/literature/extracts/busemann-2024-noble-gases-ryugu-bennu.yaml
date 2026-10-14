@@ -156,18 +156,21 @@ species:
     - observation_id: busemann_2024_preliminary_ryugu_exposure_ages
       type: rate_series
       derived_from:
-      - tables:busemann-2024-noble-gases-ryugu-bennu
+      - pdf:busemann-2024-noble-gases-ryugu-bennu
       derivation:
         relation: >-
           The authors use cosmic-ray production rates from reference [7] to calculate preliminary exposure ages (p. 1, Results & Discussion).
         inputs:
-        - tables:busemann-2024-noble-gases-ryugu-bennu
+        - pdf:busemann-2024-noble-gases-ryugu-bennu
         input_source: Okazaki et al. 2023, reference [7]
         status: preliminary
       locator:
+        source_path: raw/busemann-2024-noble-gases-ryugu-bennu/busemann-2024-noble-gases-ryugu-bennu.pdf
         page: 1
         section: Results & Discussion
-        note: preliminary ages obtained using cosmic-ray production rates from reference [7]
+        note: >-
+          d-129; preliminary ages obtained using cosmic-ray production rates from
+          reference [7].
       phase: returned_asteroid_particle
       regime: cosmic_ray_exposure_age_calculation
       units: Ma, as printed
