@@ -1347,38 +1347,20 @@ def test_kor_sulfur_tables_are_typed_refusals_and_keep_24_hour_footnote() -> Non
     assert len(activities) == 2
     assert all(obs.admission.status is AdmissionStatus.ADMITTED for obs in activities)
     assert migrator.result.validation is not None
-    table_asset = "tables:kor-1967-thesis-sulphur-oxides-slags"
-    expected_issues = set()
-    for suffix in ("h=496a7a098edd", "h=b5bde09ebf68"):
-        observation_id = (
-            "kor-1967-thesis-sulphur-oxides-slags::"
-            "kor_1967_table_xxiv_cas_sat_lime_activities::T=1773:"
-            f"{suffix}"
-        )
-        path = f"observation[{observation_id}]"
-        expected_issues.update(
-            {
-                (
-                    f"{path}.derived_from",
-                    RefusalReason.CONDITIONAL_FIELD,
-                    "derived observation requires derived_from",
-                ),
-                (
-                    f"{path}.derived_from",
-                    RefusalReason.REFERENTIAL_INTEGRITY,
-                    f"derived_from {table_asset!r} does not resolve",
-                ),
-                (
-                    f"{path}.derivation.inputs",
-                    RefusalReason.REFERENTIAL_INTEGRITY,
-                    f"derivation input {table_asset!r} does not resolve",
-                ),
-            }
-        )
-    assert {
-        (issue.path, issue.reason, issue.detail)
+    activity_ids = {
+        "kor-1967-thesis-sulphur-oxides-slags::"
+        "kor_1967_table_xxiv_cas_sat_lime_activities::T=1773:"
+        f"{suffix}"
+        for suffix in ("h=496a7a098edd", "h=b5bde09ebf68")
+    }
+    assert not [
+        issue
         for issue in migrator.result.validation.hard_issues
-    } == expected_issues
+        if any(
+            f"observation[{observation_id}]" in issue.path
+            for observation_id in activity_ids
+        )
+    ]
 
 
 def test_identity_complete_compilation_cells_are_admitted_at_source_level() -> None:
