@@ -13557,8 +13557,14 @@ class Migrator:
                     raw_per, lambda value: PerBasis(str(value))
                 )
             except (TypeError, ValueError):
-                ident_kwargs["per"] = State.unknown(
-                    f"unrecognised per basis {raw_per!r}"
+                reason = f"unrecognised per basis {raw_per!r}"
+                ident_kwargs["per"] = State.unknown(reason)
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=f"observations.{obs_id}.identity.per",
+                        reason=RefusalReason.INVALID_IDENTITY,
+                        detail=reason,
+                    )
                 )
         if source_reference_state is not None:
             ident_kwargs["reference_state"] = source_reference_state

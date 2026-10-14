@@ -5591,19 +5591,24 @@ def test_k01_source_activity_is_quantity_activity(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize(
-    ("per", "expected", "reason"),
+    ("per", "expected", "reason", "invalid"),
     [
-        ("mol_species", PerBasis.MOL_SPECIES, None),
+        ("mol_species", PerBasis.MOL_SPECIES, None, False),
         (
             {"tag": "unknown", "reason": "basis not printed"},
             None,
             "basis not printed",
+            False,
         ),
-        ("widgets", None, "unrecognised per basis 'widgets'"),
+        ("widgets", None, "unrecognised per basis 'widgets'", True),
     ],
 )
 def test_extract_nonactivity_per_preserves_typed_state(
-    tmp_path: Path, per: object, expected: PerBasis | None, reason: str | None
+    tmp_path: Path,
+    per: object,
+    expected: PerBasis | None,
+    reason: str | None,
+    invalid: bool,
 ) -> None:
     extract = _scalar_extract(
         quantity="delta_fG",
@@ -5647,6 +5652,13 @@ def test_extract_nonactivity_per_preserves_typed_state(
     ]
     assert changed_axes == ["per"]
     assert before.value == obs.value
+    invalid_per_issues = [
+        issue
+        for issue in result.validation.issues
+        if issue.path == f"observations.{obs.observation_id}.identity.per"
+        and issue.reason is RefusalReason.INVALID_IDENTITY
+    ]
+    assert bool(invalid_per_issues) is invalid
     if expected is not None:
         assert obs.identity.per.is_value
         assert obs.identity.per.value is expected
