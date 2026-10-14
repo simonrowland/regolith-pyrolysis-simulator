@@ -68,6 +68,7 @@ from simulator.battery.identity import (
     PA_PER_BAR_DEC,
     THERMOCHEMICAL_CALORIE_J,
     identity_equal,
+    _same_row_redox_identity_equal,
     log10K_from_delta_fG_kJ_mol,
     profile_for,
     quantity_token,
@@ -6462,18 +6463,12 @@ def compile_residual(
         compared_candidate = _comparison_identity(
             compared_candidate, reference, prediction
         )
-    equal = identity_equal(compared_reference, compared_candidate)
-    if (
-        quantity is Quantity.FE3_FE2_RATIO
-        and equal.kind is IdentityEqualKind.IDENTITY_UNKNOWN
-        and equal.fields == ("species.phase",)
-    ):
-        # Phase remains unknown because the extract does not state it. The
-        # row and its prediction share the same printed melt composition and
-        # conditions; phase is not a Kress91 input, so this one unknown axis
-        # does not prevent the same-row residual comparison.
-        equal = None
-    if equal is not None and equal.kind is not IdentityEqualKind.EQUAL:
+    equal = (
+        _same_row_redox_identity_equal(compared_reference, compared_candidate)
+        if quantity is Quantity.FE3_FE2_RATIO
+        else identity_equal(compared_reference, compared_candidate)
+    )
+    if equal.kind is not IdentityEqualKind.EQUAL:
         reason = (
             RefusalReason.IDENTITY_MISMATCH
             if equal.kind is IdentityEqualKind.IDENTITY_MISMATCH
