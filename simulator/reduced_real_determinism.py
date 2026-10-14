@@ -2290,6 +2290,8 @@ def _effective_magemin_database(
     sim: Any,
     intent: ChemistryIntent,
     provider_role: str | None,
+    *,
+    resolve_default: bool = True,
 ) -> str | None:
     candidates: list[Any] = []
     registry = getattr(sim, "_chem_registry", None)
@@ -2306,7 +2308,7 @@ def _effective_magemin_database(
         database = getattr(candidate, "_database", None)
         if database is not None and str(database).strip():
             return str(database).strip()
-    if any(
+    if resolve_default and any(
         getattr(candidate, "real_backend_family", None)
         is RealBackendFamily.MAGEMIN
         for candidate in candidates
@@ -2415,7 +2417,10 @@ def record_dependency_vector(
     *,
     artifact: str,
     provider_role: str | None = None,
+    resolve_magemin_database_default: bool = False,
 ) -> dict[str, Any]:
+    # PT0 keys keep an unset MAGEMin database as recorded; memo admission opts
+    # into resolving that default so lazy and initialized producers compare equal.
     provider = _provider_identity(sim, intent, provider_role=provider_role)
     vapor_provider = _provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
     resolved_backend = _resolved_backend_for_cache_identity(
@@ -2450,7 +2455,10 @@ def record_dependency_vector(
             "model": provider.get("model"),
             "mode": provider.get("mode"),
             "magemin_database": _effective_magemin_database(
-                sim, intent, provider_role
+                sim,
+                intent,
+                provider_role,
+                resolve_default=resolve_magemin_database_default,
             ),
         },
     }
@@ -2548,6 +2556,7 @@ def gate_curve_memo_producer_configuration(
         ChemistryIntent.GATE_LIQUID_FRACTION,
         artifact="freeze_gate_curve",
         provider_role=provider_role,
+        resolve_magemin_database_default=True,
     )
     sulfur_side = dependency_vector["sulfur_side"]
     model = dependency_vector["model"]
