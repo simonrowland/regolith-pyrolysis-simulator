@@ -1,0 +1,448 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/badjukov-petrova-1993-shock-vaporization.yaml
+observations:
+- observation_id: badjukov-petrova-1993-shock-vaporization::badj93_albite_shock_vaporized_mass::T=5273.15:h=01ae41f70787
+  experiment_id: ce7d9aed54fadbd297aaf13ece8baea2f44811d50fd2feaa8586b764fff7c44e::badjukov-petrova-1993-shock-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Albite
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '5273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.04'
+    approximate: true
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty or confidence level is stated for this mass-loss estimate.
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: badjukov-petrova-1993-shock-vaporization
+  locator:
+    page: 1
+    published_page: 51
+    pdf_page_index: 0
+    figure: '2'
+    note: Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to albite
+      glass.
+  read_from: pdf:badjukov-petrova-1993-shock-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '5273.15'
+      locator:
+        page: 1
+        published_page: 51
+        pdf_page_index: 0
+        section: Experimental study
+        note: Unit conversion only from printed shock temperature about 5000 C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '5000'
+            locator:
+              page: 1
+              published_page: 51
+              pdf_page_index: 0
+              section: Experimental study
+              note: Unit conversion only from printed shock temperature about 5000 C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              published_page: 51
+              pdf_page_index: 0
+              section: Experimental study
+              note: Unit conversion only from printed shock temperature about 5000 C.
+        output_unit: K
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:badjukov-petrova-1993-shock-vaporization
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '4'
+        locator:
+          page: 1
+          published_page: 51
+          pdf_page_index: 0
+          figure: '2'
+          note: Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to
+            albite glass.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 1
+          published_page: 51
+          pdf_page_index: 0
+          figure: '2'
+          note: Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to
+            albite glass.
+    output_unit: dimensionless
+- observation_id: badjukov-petrova-1993-shock-vaporization::badj93_jadeite_shock_vaporized_mass::T=5273.15:h=a1a8a7936516
+  experiment_id: ce7d9aed54fadbd297aaf13ece8baea2f44811d50fd2feaa8586b764fff7c44e::badjukov-petrova-1993-shock-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Jadeite
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '5273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.04'
+    approximate: true
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty or confidence level is stated for this mass-loss estimate.
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: badjukov-petrova-1993-shock-vaporization
+  locator:
+    page: 1
+    published_page: 51
+    pdf_page_index: 0
+    figure: '2'
+    note: Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to jadeite
+      glass.
+  read_from: pdf:badjukov-petrova-1993-shock-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '5273.15'
+      locator:
+        page: 1
+        published_page: 51
+        pdf_page_index: 0
+        section: Experimental study
+        note: Unit conversion only from printed shock temperature about 5000 C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '5000'
+            locator:
+              page: 1
+              published_page: 51
+              pdf_page_index: 0
+              section: Experimental study
+              note: Unit conversion only from printed shock temperature about 5000 C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              published_page: 51
+              pdf_page_index: 0
+              section: Experimental study
+              note: Unit conversion only from printed shock temperature about 5000 C.
+        output_unit: K
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:badjukov-petrova-1993-shock-vaporization
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '4'
+        locator:
+          page: 1
+          published_page: 51
+          pdf_page_index: 0
+          figure: '2'
+          note: Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to
+            jadeite glass.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 1
+          published_page: 51
+          pdf_page_index: 0
+          figure: '2'
+          note: Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to
+            jadeite glass.
+    output_unit: dimensionless
+- observation_id: badjukov-petrova-1993-shock-vaporization::badj93_pyrex_shock_vaporized_mass::point:0
+  experiment_id: ce7d9aed54fadbd297aaf13ece8baea2f44811d50fd2feaa8586b764fff7c44e::badjukov-petrova-1993-shock-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Pyrex glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.036'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty or confidence level is stated for this mass-loss estimate.
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: badjukov-petrova-1993-shock-vaporization
+  locator:
+    page: 1
+    published_page: 51
+    pdf_page_index: 0
+    figure: '2'
+    note: Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to fused
+      pyrex glass.
+  read_from: pdf:badjukov-petrova-1993-shock-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 1
+        published_page: 51
+        pdf_page_index: 0
+        section: Experimental study
+        note: The pyrex projectile shock-pressure range is printed; its shock temperature is not stated.
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:badjukov-petrova-1993-shock-vaporization
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '3.6'
+        locator:
+          page: 1
+          published_page: 51
+          pdf_page_index: 0
+          figure: '2'
+          note: Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to
+            fused pyrex glass.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 1
+          published_page: 51
+          pdf_page_index: 0
+          figure: '2'
+          note: Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to
+            fused pyrex glass.
+    output_unit: dimensionless

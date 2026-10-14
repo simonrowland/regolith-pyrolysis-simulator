@@ -1,0 +1,179 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1021/je034152w
+  citation: Ferguson F.T., Nuth J.A. III, and Johnson N.M. (2004). Thermogravimetric Measurement of the Vapor Pressure of
+    Iron from1573K to1973K. Journal of Chemical and Engineering Data49:497–501.
+  source_ids:
+  - ferguson-2004-iron-vapor-pressure
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:ferguson-2004-iron-vapor-pressure
+      role: pdf
+      path: raw/ferguson-2004-iron-vapor-pressure/ferguson-2004-iron-vapor-pressure.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:ferguson-2004-iron-vapor-pressure
+      role: pdftotext
+      path: text/ferguson-2004-iron-vapor-pressure
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ferguson-2004-iron-vapor-pressure
+      role: table_csv
+      path: tables/ferguson-2004-iron-vapor-pressure
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:ferguson-2004-iron-vapor-pressure
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1021/je034152w
+experiments:
+- experiment_id: 10.1021/je034152w::ferguson-2004-iron-vapor-pressure
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/je034152w
+  locator:
+    page: 3
+    published_page: 499
+    pdf_page_index: 2
+    table: '1'
+context:
+- observation_id: ferguson_2004_desai_quoted_enthalpy_vaporization
+  type: relation
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 500
+    section: Results
+  units: kJ/mol
+  values:
+    method_class: quoted_attributed
+    quotation_as_printed: For comparison, Desai estimated this value to be 415 ±1 kJ/mol.⁶
+    value_kJ_mol: 415
+    uncertainty_kJ_mol_as_printed: 1
+    reference_temperature_K: '298.15'
+    attribution: Desai, P. D. Thermodynamic Properties of Iron and Silicon. J. Phys. Chem. Ref. Data 1986, 15 967-983.
+    method: unknown
+  context_id: ferguson-2004-iron-vapor-pressure::context::ferguson_2004_desai_quoted_enthalpy_vaporization
+  work_id: 10.1021/je034152w
+  source_id: ferguson-2004-iron-vapor-pressure
+  species: Fe
+- observation_id: ferguson_2004_equation6_vapor_pressure_fit
+  type: relation
+  locator:
+    equation: '6'
+    page: 3
+    pdf_page_index: 2
+    published_page: 499
+  units: as printed
+  values:
+    quantity: published_vapor_pressure_fit
+    method_class: model_derived
+    fit:
+      equation_as_printed: log10(P/Pa) = (11.7 ± 0.3) - (21000 ± 500)/(T/K)
+      intercept: '11.7'
+      intercept_uncertainty: '0.3'
+      inverse_temperature_coefficient_K: 21000
+      inverse_temperature_coefficient_uncertainty_K: 500
+      validity_range_K:
+      - 1573
+      - 1973
+    method_as_printed: A weighted, least-squares fit to the range of data yielded the following equation for the vapor pressure.
+  context_id: ferguson-2004-iron-vapor-pressure::context::ferguson_2004_equation6_vapor_pressure_fit
+  work_id: 10.1021/je034152w
+  source_id: ferguson-2004-iron-vapor-pressure
+  species: Fe
+- observation_id: ferguson_2004_figure4_curve_comparison
+  type: figure_only
+  locator:
+    figure: '4'
+    page: 4
+    pdf_page_index: 3
+    published_page: 500
+  units: as plotted
+  values:
+    method_class: figure_only
+    figure_caption_as_printed: 'Figure 4. Comparison between the current experimental iron vapor-pressure data and available
+      published data. Shown in the figure are experimental data from: ○, the current experimental work; ▼, Darken and Gurry,⁹;
+      ◇, Mikulinskii and Umova,¹⁰; triangle pointing right, Wessel,¹¹ 1951; triangle pointing left, Vintaikin,¹² 1957; ×,
+      Turkdogan and Leake,¹³ 1960; □, Smith and Shuttleworth,¹⁴ 1965; △, Karasev et al.,¹⁵ 1971; ▽, Yavoiskii et al.,¹⁶ 1971;
+      and +, Lindscheid and Lange,¹⁷ 1975. Fits to experimentally measured data are shown for Zellars et al.,¹⁸ 1959 (bold
+      dotted line); Chegodaev et al.,¹⁹ 1978 (solid line); Bodrov et al.,²⁰ 1982 (dotted line); and Zaitsev et al.,²¹ 1990
+      (bold solid line). The compilation of iron data by Desai 1986 (dashed line) is also shown in the figure.'
+  context_id: ferguson-2004-iron-vapor-pressure::context::ferguson_2004_figure4_curve_comparison
+  work_id: 10.1021/je034152w
+  source_id: ferguson-2004-iron-vapor-pressure
+  species: Fe
+- observation_id: ferguson_2004_fit_enthalpy_vaporization
+  type: relation
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 500
+    section: Results
+  units: kJ/mol
+  values:
+    method_class: model_derived
+    quotation_as_printed: On the basis of our fit to the data, we estimate the enthalpy of vaporization to be ΔH = 403 ± 8
+      kJ/mol over the experimental temperature range.
+    value_kJ_mol: 403
+    uncertainty_kJ_mol_as_printed: 8
+  context_id: ferguson-2004-iron-vapor-pressure::context::ferguson_2004_fit_enthalpy_vaporization
+  work_id: 10.1021/je034152w
+  source_id: ferguson-2004-iron-vapor-pressure
+  species: Fe
+- observation_id: ferguson_2004_third_law_enthalpy_vaporization
+  type: relation
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 500
+    section: Results
+  units: kJ/mol
+  values:
+    method_class: model_derived
+    quotation_as_printed: By assumption of negligible error in the thermodynamic data, the error levels for the individual
+      data points shown in Figure 3 and Table 1 correspond to an approximately ±3 kJ/mol deviation in individual enthalpy
+      calculations. An inverse square of these individual error levels was used to calculate a mean enthalpy of vaporization
+      at 298.15 K of ΔH = 431.2 ± 0.4 kJ/mol, where the error level is based on the standard deviation of this mean value.
+    value_kJ_mol: '431.2'
+    uncertainty_kJ_mol_as_printed: '0.4'
+    individual_enthalpy_deviation_kJ_mol_as_printed: approximately ±3 kJ/mol
+    reference_temperature_K: '298.15'
+  context_id: ferguson-2004-iron-vapor-pressure::context::ferguson_2004_third_law_enthalpy_vaporization
+  work_id: 10.1021/je034152w
+  source_id: ferguson-2004-iron-vapor-pressure
+  species: Fe

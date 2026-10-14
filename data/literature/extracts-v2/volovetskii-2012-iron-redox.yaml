@@ -1,0 +1,6419 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/volovetskii-2012-iron-redox.yaml
+observations:
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1498.15:h=c13a26b4a50c
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1498.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.8016410218700649803749113707'
+        - - TiO2
+          - '0.0004088679096570302573377812337'
+        - - Al2O3
+          - '0.08685584550912574606449984141'
+        - - FeO
+          - '0.02790727223055767357385597338'
+        - - MgO
+          - '0.001944476117790316881834968136'
+        - - CaO
+          - '0.01805163086020151356728399423'
+        - - Na2O
+          - '0.03677507889292442544742314952'
+        - - K2O
+          - '0.02641580660967831383285292142'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.2987012987012987012987012987'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1498.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1225'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.8016410218700649803749113707'
+          - - TiO2
+            - '0.0004088679096570302573377812337'
+          - - Al2O3
+            - '0.08685584550912574606449984141'
+          - - FeO
+            - '0.02790727223055767357385597338'
+          - - MgO
+            - '0.001944476117790316881834968136'
+          - - CaO
+            - '0.01805163086020151356728399423'
+          - - Na2O
+            - '0.03677507889292442544742314952'
+          - - K2O
+            - '0.02641580660967831383285292142'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1225'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '-11.5'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '40'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.23'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1513.15:h=39c6ee2f228d
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1513.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7970883715178891173687406453'
+        - - TiO2
+          - '0.0004083731789248529107427661545'
+        - - Al2O3
+          - '0.08860603871404339590153970012'
+        - - FeO
+          - '0.02823667708850615352659230245'
+        - - MgO
+          - '0.002103966907268925716128043103'
+        - - CaO
+          - '0.01872771565350562028695879847'
+        - - Na2O
+          - '0.03809876882779367675166793186'
+        - - K2O
+          - '0.02673008811206825753762981139'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.01'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '1.173913043478260869565217391'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1513.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1240'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-7'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7970883715178891173687406453'
+          - - TiO2
+            - '0.0004083731789248529107427661545'
+          - - Al2O3
+            - '0.08860603871404339590153970012'
+          - - FeO
+            - '0.02823667708850615352659230245'
+          - - MgO
+            - '0.002103966907268925716128043103'
+          - - CaO
+            - '0.01872771565350562028695879847'
+          - - Na2O
+            - '0.03809876882779367675166793186'
+          - - K2O
+            - '0.02673008811206825753762981139'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1240'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '40'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.54'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1513.15:h=5ebb0bdaa04b
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1513.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.79523232347046118592828724'
+        - - TiO2
+          - '0.0004881753226938034374676920736'
+        - - Al2O3
+          - '0.09017940233921322839543114647'
+        - - FeO
+          - '0.02695298238727498059903043117'
+        - - MgO
+          - '0.002257152764230053929581022497'
+        - - CaO
+          - '0.01877203306110163556432191159'
+        - - Na2O
+          - '0.03942099493321146645646893616'
+        - - K2O
+          - '0.02669693572181364568941161977'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.01'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '1.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1513.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1240'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-7'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.79523232347046118592828724'
+          - - TiO2
+            - '0.0004881753226938034374676920736'
+          - - Al2O3
+            - '0.09017940233921322839543114647'
+          - - FeO
+            - '0.02695298238727498059903043117'
+          - - MgO
+            - '0.002257152764230053929581022497'
+          - - CaO
+            - '0.01877203306110163556432191159'
+          - - Na2O
+            - '0.03942099493321146645646893616'
+          - - K2O
+            - '0.02669693572181364568941161977'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1240'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.6'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1593.15:h=3f8ac7823326
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1593.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7702585241157616525570003622'
+        - - TiO2
+          - '0.0003337485347376635968847700673'
+        - - Al2O3
+          - '0.1006482987437038588996243319'
+        - - FeO
+          - '0.031350326518798870016418666'
+        - - MgO
+          - '0.002149369463630815434867681239'
+        - - CaO
+          - '0.02352861107009581983762418889'
+        - - Na2O
+          - '0.0432215755370299246890876524'
+        - - K2O
+          - '0.02850954601624139496849234745'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.03092783505154639175257731959'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1320'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7702585241157616525570003622'
+          - - TiO2
+            - '0.0003337485347376635968847700673'
+          - - Al2O3
+            - '0.1006482987437038588996243319'
+          - - FeO
+            - '0.031350326518798870016418666'
+          - - MgO
+            - '0.002149369463630815434867681239'
+          - - CaO
+            - '0.02352861107009581983762418889'
+          - - Na2O
+            - '0.0432215755370299246890876524'
+          - - K2O
+            - '0.02850954601624139496849234745'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1320'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.5'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '12'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.03'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1613.15:h=2c8cc3a7e98e
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1613.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7961972753412489891184483173'
+        - - TiO2
+          - '0.0004930592383255083914443502087'
+        - - Al2O3
+          - '0.08953674896334444413087930799'
+        - - FeO
+          - '0.02813614272871534650602354421'
+        - - MgO
+          - '0.001954057962925105581714124128'
+        - - CaO
+          - '0.01849169243148094708798112626'
+        - - Na2O
+          - '0.03822699999909153439281470327'
+        - - K2O
+          - '0.02696402333486812479069452711'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.07943282347242815020659182828'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '1.439024390243902439024390244'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1613.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1340'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-6.1'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7961972753412489891184483173'
+          - - TiO2
+            - '0.0004930592383255083914443502087'
+          - - Al2O3
+            - '0.08953674896334444413087930799'
+          - - FeO
+            - '0.02813614272871534650602354421'
+          - - MgO
+            - '0.001954057962925105581714124128'
+          - - CaO
+            - '0.01849169243148094708798112626'
+          - - Na2O
+            - '0.03822699999909153439281470327'
+          - - K2O
+            - '0.02696402333486812479069452711'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1340'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '10'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.59'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1613.15:h=3a8ff82c6692
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1613.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.799285163262645459553886255'
+        - - TiO2
+          - '0.0005645325730231841910944559259'
+        - - Al2O3
+          - '0.08818662558696137112116256005'
+        - - FeO
+          - '0.02617820164283131066348824632'
+        - - MgO
+          - '0.001917699509917339877860774791'
+        - - CaO
+          - '0.02055965016486232361856288308'
+        - - Na2O
+          - '0.03595689887693700144013055384'
+        - - K2O
+          - '0.02735122838282200953381427129'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0003162277660168379331998893544'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.1235955056179775280898876404'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1613.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1340'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-8.5'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.799285163262645459553886255'
+          - - TiO2
+            - '0.0005645325730231841910944559259'
+          - - Al2O3
+            - '0.08818662558696137112116256005'
+          - - FeO
+            - '0.02617820164283131066348824632'
+          - - MgO
+            - '0.001917699509917339877860774791'
+          - - CaO
+            - '0.02055965016486232361856288308'
+          - - Na2O
+            - '0.03595689887693700144013055384'
+          - - K2O
+            - '0.02735122838282200953381427129'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1340'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '16.5'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.11'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1613.15:h=4845771d8157
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1613.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.799902756114613588534425526'
+        - - TiO2
+          - '0.0004931887369624226975075544018'
+        - - Al2O3
+          - '0.08762869943020736206109373045'
+        - - FeO
+          - '0.02768665696667705558140223305'
+        - - MgO
+          - '0.002443213978606583015112695533'
+        - - CaO
+          - '0.0174429482471960545275283289'
+        - - Na2O
+          - '0.03791928072353478238576234186'
+        - - K2O
+          - '0.02648325580220215119716758935'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.07943282347242815020659182828'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '1.272727272727272727272727273'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1613.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1340'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-6.1'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.799902756114613588534425526'
+          - - TiO2
+            - '0.0004931887369624226975075544018'
+          - - Al2O3
+            - '0.08762869943020736206109373045'
+          - - FeO
+            - '0.02768665696667705558140223305'
+          - - MgO
+            - '0.002443213978606583015112695533'
+          - - CaO
+            - '0.0174429482471960545275283289'
+          - - Na2O
+            - '0.03791928072353478238576234186'
+          - - K2O
+            - '0.02648325580220215119716758935'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1340'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '19'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.56'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1613.15:h=59ccc461a268
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1613.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.8019884550575215976352088438'
+        - - TiO2
+          - '0.0003971442490582949412256624088'
+        - - Al2O3
+          - '0.08772507083525922195643774354'
+        - - FeO
+          - '0.02516454750166083949134637703'
+        - - MgO
+          - '0.002046114682728907459571446346'
+        - - CaO
+          - '0.01900462391274441002796264755'
+        - - Na2O
+          - '0.03613001514509210580582071272'
+        - - K2O
+          - '0.02754402861593462268242656571'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000001258925411794167210423954106'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0638297872340425531914893617'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1613.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1340'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.9'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.8019884550575215976352088438'
+          - - TiO2
+            - '0.0003971442490582949412256624088'
+          - - Al2O3
+            - '0.08772507083525922195643774354'
+          - - FeO
+            - '0.02516454750166083949134637703'
+          - - MgO
+            - '0.002046114682728907459571446346'
+          - - CaO
+            - '0.01900462391274441002796264755'
+          - - Na2O
+            - '0.03613001514509210580582071272'
+          - - K2O
+            - '0.02754402861593462268242656571'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1340'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '5.5'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.06'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1613.15:h=95ca469f7fd7
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1613.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7950917123420790054172234546'
+        - - TiO2
+          - '0.0004947502690012838857723259618'
+        - - Al2O3
+          - '0.09107102876099310243992460935'
+        - - FeO
+          - '0.0277743183398233762823470861'
+        - - MgO
+          - '0.002124156382489901697034572946'
+        - - CaO
+          - '0.01785048830339148305051027'
+        - - Na2O
+          - '0.03867687143342096560103843551'
+        - - K2O
+          - '0.02691667416880088162614924508'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '19952.62314968879601352455397'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '13.28571428571428571428571429'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1613.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1340'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7950917123420790054172234546'
+          - - TiO2
+            - '0.0004947502690012838857723259618'
+          - - Al2O3
+            - '0.09107102876099310243992460935'
+          - - FeO
+            - '0.0277743183398233762823470861'
+          - - MgO
+            - '0.002124156382489901697034572946'
+          - - CaO
+            - '0.01785048830339148305051027'
+          - - Na2O
+            - '0.03867687143342096560103843551'
+          - - K2O
+            - '0.02691667416880088162614924508'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1340'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '13'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.93'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1623.15:h=cca327be29e6
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7722319223345265942855798498'
+        - - TiO2
+          - '0.0004947108953457884537714215133'
+        - - Al2O3
+          - '0.09868472160853254250807499386'
+        - - FeO
+          - '0.03125507861701711496996968314'
+        - - MgO
+          - '0.002287370977219298035126224478'
+        - - CaO
+          - '0.02419018387009239264923862785'
+        - - Na2O
+          - '0.04324240088028437013855750336'
+        - - K2O
+          - '0.02761361081698189895968169562'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '19952.62314968879601352455397'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '2.571428571428571428571428571'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1623.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1350'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7722319223345265942855798498'
+          - - TiO2
+            - '0.0004947108953457884537714215133'
+          - - Al2O3
+            - '0.09868472160853254250807499386'
+          - - FeO
+            - '0.03125507861701711496996968314'
+          - - MgO
+            - '0.002287370977219298035126224478'
+          - - CaO
+            - '0.02419018387009239264923862785'
+          - - Na2O
+            - '0.04324240088028437013855750336'
+          - - K2O
+            - '0.02761361081698189895968169562'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '12'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.72'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1693.15:h=1a82d044ee41
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.8123110403626730204889176887'
+        - - TiO2
+          - '0.0004938905952634356888554221229'
+        - - Al2O3
+          - '0.09310500771164815261204783069'
+        - - FeO
+          - '0.02525541910212206168030957687'
+        - - MgO
+          - '0.002283578195175003631013199806'
+        - - CaO
+          - '0.01793670481593548760138117696'
+        - - Na2O
+          - '0.02174445522586936904339327807'
+        - - K2O
+          - '0.02686990399131346925408182693'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '19952.62314968879601352455397'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.5151515151515151515151515152'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.8123110403626730204889176887'
+          - - TiO2
+            - '0.0004938905952634356888554221229'
+          - - Al2O3
+            - '0.09310500771164815261204783069'
+          - - FeO
+            - '0.02525541910212206168030957687'
+          - - MgO
+            - '0.002283578195175003631013199806'
+          - - CaO
+            - '0.01793670481593548760138117696'
+          - - Na2O
+            - '0.02174445522586936904339327807'
+          - - K2O
+            - '0.02686990399131346925408182693'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '6'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.34'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1693.15:h=2435884ac754
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.8194334967351393336459908016'
+        - - TiO2
+          - '0.0004983553520245423912700303562'
+        - - Al2O3
+          - '0.08477321095138119883375465615'
+        - - FeO
+          - '0.02622238612781624578803564373'
+        - - MgO
+          - '0.002139634413717087696110198604'
+        - - CaO
+          - '0.01833543841314386632709755823'
+        - - Na2O
+          - '0.02204805386272904817553130556'
+        - - K2O
+          - '0.02654942414404867714220980483'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.1995262314968879601352455397'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.1494252873563218390804597701'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.8194334967351393336459908016'
+          - - TiO2
+            - '0.0004983553520245423912700303562'
+          - - Al2O3
+            - '0.08477321095138119883375465615'
+          - - FeO
+            - '0.02622238612781624578803564373'
+          - - MgO
+            - '0.002139634413717087696110198604'
+          - - CaO
+            - '0.01833543841314386632709755823'
+          - - Na2O
+            - '0.02204805386272904817553130556'
+          - - K2O
+            - '0.02654942414404867714220980483'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '7'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.13'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1693.15:h=624ecf03a757
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.8114970633583307278651658892'
+        - - TiO2
+          - '0.000505725475018383026282186985'
+        - - Al2O3
+          - '0.08926200000857190547355824298'
+        - - FeO
+          - '0.02764086236241308092589018046'
+        - - MgO
+          - '0.002171277233899286609775494683'
+        - - CaO
+          - '0.01836651406262372270654840144'
+        - - Na2O
+          - '0.02432914033408079589811980614'
+        - - K2O
+          - '0.0262274171650620974946597982'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.1584893192461113485202101373'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0638297872340425531914893617'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.8'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.8114970633583307278651658892'
+          - - TiO2
+            - '0.000505725475018383026282186985'
+          - - Al2O3
+            - '0.08926200000857190547355824298'
+          - - FeO
+            - '0.02764086236241308092589018046'
+          - - MgO
+            - '0.002171277233899286609775494683'
+          - - CaO
+            - '0.01836651406262372270654840144'
+          - - Na2O
+            - '0.02432914033408079589811980614'
+          - - K2O
+            - '0.0262274171650620974946597982'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '16'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.06'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1693.15:h=74cf4d1198b3
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.8052538641444378795879808031'
+        - - TiO2
+          - '0.000484315629587523160382625867'
+        - - Al2O3
+          - '0.08706377938723241439204146749'
+        - - FeO
+          - '0.02638095763172108071646849186'
+        - - MgO
+          - '0.001919405902987670563912188114'
+        - - CaO
+          - '0.01885353565082902537535623789'
+        - - Na2O
+          - '0.03328452603600298871594342816'
+        - - K2O
+          - '0.0267596156172014174879147579'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0001584893192461113485202101373'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.05263157894736842105263157895'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-8.8'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.8052538641444378795879808031'
+          - - TiO2
+            - '0.000484315629587523160382625867'
+          - - Al2O3
+            - '0.08706377938723241439204146749'
+          - - FeO
+            - '0.02638095763172108071646849186'
+          - - MgO
+            - '0.001919405902987670563912188114'
+          - - CaO
+            - '0.01885353565082902537535623789'
+          - - Na2O
+            - '0.03328452603600298871594342816'
+          - - K2O
+            - '0.0267596156172014174879147579'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '5.5'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.05'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1693.15:h=e41e5b158157
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.80570730845154948521480156'
+        - - TiO2
+          - '0.0005625795331130516604518840321'
+        - - Al2O3
+          - '0.0854893469327443813839607569'
+        - - FeO
+          - '0.02501554168034846103334431169'
+        - - MgO
+          - '0.002070320518902626897032078833'
+        - - CaO
+          - '0.01865714629417214671027389323'
+        - - Na2O
+          - '0.03490044413221869181550008585'
+        - - K2O
+          - '0.02759731245695115528463543017'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '199.5262314968879601352455397'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '1.439024390243902439024390244'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 4
+    published_page: 333
+    pdf_page_index: 3
+    table: '1'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 333
+              pdf_page_index: 3
+              table: '1'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.7'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.80570730845154948521480156'
+          - - TiO2
+            - '0.0005625795331130516604518840321'
+          - - Al2O3
+            - '0.0854893469327443813839607569'
+          - - FeO
+            - '0.02501554168034846103334431169'
+          - - MgO
+            - '0.002070320518902626897032078833'
+          - - CaO
+            - '0.01865714629417214671027389323'
+          - - Na2O
+            - '0.03490044413221869181550008585'
+          - - K2O
+            - '0.02759731245695115528463543017'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+    duration_h:
+      state:
+        tag: value
+        value: '6'
+      locator:
+        page: 4
+        published_page: 333
+        pdf_page_index: 3
+        table: '1'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.59'
+        locator:
+          page: 4
+          published_page: 333
+          pdf_page_index: 3
+          table: '1'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_initial_fe_redox
+  experiment_id: 10.1134/s0016702912040088::volovetskii-2012-iron-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7521637416705405438891455991'
+        - - TiO2
+          - '0.00298343441975674157732286161'
+        - - Al2O3
+          - '0.04797166306603938136597707621'
+        - - FeO
+          - '0.07204216238899097499404583703'
+        - - MnO
+          - '0.00289240496120210680060492975'
+        - - MgO
+          - '0.00114953018830299802232907156'
+        - - CaO
+          - '0.00401295820318077173853500796'
+        - - Na2O
+          - '0.07058795808174949594892415937'
+        - - K2O
+          - '0.02930056057183866256680403831'
+        - - Cl
+          - '0.01512304590553490475779981019'
+        - - ZrO2
+          - '0.0017725405428634183385116082'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.219512195121951219512195122'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: volovetskii-2012-iron-redox::volo12_p9_initial_fe_redox
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '7.39'
+          CaO: '0.34'
+          Cl: '0.81'
+          FeO: '7.82'
+          K2O: '4.17'
+          MgO: '0.07'
+          MnO: '0.31'
+          Na2O: '6.61'
+          SiO2: '68.28'
+          TiO2: '0.36'
+          ZrO2: '0.33'
+          total: '96.48'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.18'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1483.15:h=b9186a44aec8
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1483.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7665937354286329753154119274'
+        - - TiO2
+          - '0.002815200090881307511438900983'
+        - - Al2O3
+          - '0.05078115874093905353262102733'
+        - - FeO
+          - '0.0716208929513337370434573836'
+        - - MnO
+          - '0.00289784138665810287492754862'
+        - - MgO
+          - '0.001593857789785031080935375623'
+        - - CaO
+          - '0.004353078955116792453973623145'
+        - - Na2O
+          - '0.05679851046330277801245109132'
+        - - K2O
+          - '0.02816547983183057773327629271'
+        - - Cl
+          - '0.01250347041129821324495158579'
+        - - ZrO2
+          - '0.00187677395022143119655524389'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000003162277660168379331998893544'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0989010989010989010989010989'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1483.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1210'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-11.5'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7665937354286329753154119274'
+          - - TiO2
+            - '0.002815200090881307511438900983'
+          - - Al2O3
+            - '0.05078115874093905353262102733'
+          - - FeO
+            - '0.0716208929513337370434573836'
+          - - MnO
+            - '0.00289784138665810287492754862'
+          - - MgO
+            - '0.001593857789785031080935375623'
+          - - CaO
+            - '0.004353078955116792453973623145'
+          - - Na2O
+            - '0.05679851046330277801245109132'
+          - - K2O
+            - '0.02816547983183057773327629271'
+          - - Cl
+            - '0.01250347041129821324495158579'
+          - - ZrO2
+            - '0.00187677395022143119655524389'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1210'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '18'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.09'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1488.15:h=7bee75a5812f
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1488.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7724588906977353968773362015'
+        - - TiO2
+          - '0.003066203456968905373419696658'
+        - - Al2O3
+          - '0.05157436295748705234090425931'
+        - - FeO
+          - '0.07543612299433164724304193657'
+        - - MnO
+          - '0.00308872823577864313929641409'
+        - - MgO
+          - '0.001279133005426242805458327624'
+        - - CaO
+          - '0.004022139608873680364066709445'
+        - - Na2O
+          - '0.04730901801064542447462313617'
+        - - K2O
+          - '0.02716024969628042358451907163'
+        - - Cl
+          - '0.01308850747126357151708693735'
+        - - ZrO2
+          - '0.001516643865209012280247309169'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '199.5262314968879601352455397'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '1.380952380952380952380952381'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1488.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1215'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.7'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7724588906977353968773362015'
+          - - TiO2
+            - '0.003066203456968905373419696658'
+          - - Al2O3
+            - '0.05157436295748705234090425931'
+          - - FeO
+            - '0.07543612299433164724304193657'
+          - - MnO
+            - '0.00308872823577864313929641409'
+          - - MgO
+            - '0.001279133005426242805458327624'
+          - - CaO
+            - '0.004022139608873680364066709445'
+          - - Na2O
+            - '0.04730901801064542447462313617'
+          - - K2O
+            - '0.02716024969628042358451907163'
+          - - Cl
+            - '0.01308850747126357151708693735'
+          - - ZrO2
+            - '0.001516643865209012280247309169'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1215'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '46'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.58'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1573.15:h=ecfef932492d
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7690515588498855764461738942'
+        - - TiO2
+          - '0.003080912223925154481198141031'
+        - - Al2O3
+          - '0.05048811990485644943051355161'
+        - - FeO
+          - '0.07787094820792566925770769305'
+        - - MnO
+          - '0.003103545055487067084512380086'
+        - - MgO
+          - '0.001445927720948451089984542347'
+        - - CaO
+          - '0.004272373149635393395154038342'
+        - - Na2O
+          - '0.05307311833221565081163929734'
+        - - K2O
+          - '0.02708431335180542858089429034'
+        - - Cl
+          - '0.008584872373170347965349126328'
+        - - ZrO2
+          - '0.001944310830144811456873045843'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.000001995262314968879601352455397'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.08695652173913043478260869565'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.7'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7690515588498855764461738942'
+          - - TiO2
+            - '0.003080912223925154481198141031'
+          - - Al2O3
+            - '0.05048811990485644943051355161'
+          - - FeO
+            - '0.07787094820792566925770769305'
+          - - MnO
+            - '0.003103545055487067084512380086'
+          - - MgO
+            - '0.001445927720948451089984542347'
+          - - CaO
+            - '0.004272373149635393395154038342'
+          - - Na2O
+            - '0.05307311833221565081163929734'
+          - - K2O
+            - '0.02708431335180542858089429034'
+          - - Cl
+            - '0.008584872373170347965349126328'
+          - - ZrO2
+            - '0.001944310830144811456873045843'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '19'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.08'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1588.15:h=ae0a638ed35a
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1588.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7767643654814975046030810045'
+        - - TiO2
+          - '0.002935244679172058125636778963'
+        - - Al2O3
+          - '0.07830308300321313725487330311'
+        - - FeO
+          - '0.07057292802686449673038165369'
+        - - MnO
+          - '0.00264373368929301787318886704'
+        - - MgO
+          - '0.001495640168092984602617132767'
+        - - CaO
+          - '0.004777580139595329917324255499'
+        - - Na2O
+          - '0.02204558344444521449026403742'
+        - - K2O
+          - '0.03100192302209606395959528271'
+        - - Cl
+          - '0.007557471410101194348707841284'
+        - - ZrO2
+          - '0.001902446935628998094329843661'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0002511886431509580111085032068'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.1235955056179775280898876404'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1588.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1315'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-8.6'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7767643654814975046030810045'
+          - - TiO2
+            - '0.002935244679172058125636778963'
+          - - Al2O3
+            - '0.07830308300321313725487330311'
+          - - FeO
+            - '0.07057292802686449673038165369'
+          - - MnO
+            - '0.00264373368929301787318886704'
+          - - MgO
+            - '0.001495640168092984602617132767'
+          - - CaO
+            - '0.004777580139595329917324255499'
+          - - Na2O
+            - '0.02204558344444521449026403742'
+          - - K2O
+            - '0.03100192302209606395959528271'
+          - - Cl
+            - '0.007557471410101194348707841284'
+          - - ZrO2
+            - '0.001902446935628998094329843661'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1315'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '16'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.11'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1593.15:h=b3bffaf30f45
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1593.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7647375559039683161570530023'
+        - - TiO2
+          - '0.003070794131753766153363416993'
+        - - Al2O3
+          - '0.05597298531810562763137182676'
+        - - FeO
+          - '0.0722398327454826598754671008'
+        - - MnO
+          - '0.00252287742672826238280896061'
+        - - MgO
+          - '0.001644588782902069500434329488'
+        - - CaO
+          - '0.004373432482702614476009895048'
+        - - Na2O
+          - '0.05507713886249107695457353422'
+        - - K2O
+          - '0.02835828111010732845869510033'
+        - - Cl
+          - '0.01065771469519561501070182594'
+        - - ZrO2
+          - '0.001344798540562663399521007886'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '158.4893192461113485202101373'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '6.692307692307692307692307692'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1320'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.8'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7647375559039683161570530023'
+          - - TiO2
+            - '0.003070794131753766153363416993'
+          - - Al2O3
+            - '0.05597298531810562763137182676'
+          - - FeO
+            - '0.0722398327454826598754671008'
+          - - MnO
+            - '0.00252287742672826238280896061'
+          - - MgO
+            - '0.001644588782902069500434329488'
+          - - CaO
+            - '0.004373432482702614476009895048'
+          - - Na2O
+            - '0.05507713886249107695457353422'
+          - - K2O
+            - '0.02835828111010732845869510033'
+          - - Cl
+            - '0.01065771469519561501070182594'
+          - - ZrO2
+            - '0.001344798540562663399521007886'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1320'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.87'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1593.15:h=d995eb12d286
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1593.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7634887638464583417467390302'
+        - - TiO2
+          - '0.002961135098090664462875143695'
+        - - Al2O3
+          - '0.06314051765706479490795992963'
+        - - FeO
+          - '0.07388105251350179292813397691'
+        - - MnO
+          - '0.002870786028273236836263975721'
+        - - MgO
+          - '0.002444867492567021029007908139'
+        - - CaO
+          - '0.007497343679710585127711119497'
+        - - Na2O
+          - '0.04928603018084874128085694404'
+        - - K2O
+          - '0.0272683184871938075531310587'
+        - - Cl
+          - '0.005188645611230454227527545709'
+        - - ZrO2
+          - '0.001972539405060559899793367114'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '158.4893192461113485202101373'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '2.44827586206896551724137931'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1320'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.8'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7634887638464583417467390302'
+          - - TiO2
+            - '0.002961135098090664462875143695'
+          - - Al2O3
+            - '0.06314051765706479490795992963'
+          - - FeO
+            - '0.07388105251350179292813397691'
+          - - MnO
+            - '0.002870786028273236836263975721'
+          - - MgO
+            - '0.002444867492567021029007908139'
+          - - CaO
+            - '0.007497343679710585127711119497'
+          - - Na2O
+            - '0.04928603018084874128085694404'
+          - - K2O
+            - '0.0272683184871938075531310587'
+          - - Cl
+            - '0.005188645611230454227527545709'
+          - - ZrO2
+            - '0.001972539405060559899793367114'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1320'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '7.5'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.71'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1593.15:h=f873881d497b
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1593.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.759488745087162249701697121'
+        - - TiO2
+          - '0.003421869301309000765043402273'
+        - - Al2O3
+          - '0.05406440299283760222481987196'
+        - - FeO
+          - '0.06967636566338569370534657176'
+        - - MnO
+          - '0.002724965245659392675589903919'
+        - - MgO
+          - '0.001323054985762078186757188405'
+        - - CaO
+          - '0.004516841819181398323757228115'
+        - - Na2O
+          - '0.06280693099758853192978194799'
+        - - K2O
+          - '0.02993269410384280167826722822'
+        - - Cl
+          - '0.0105295023137682255197018914'
+        - - ZrO2
+          - '0.001514627489503025289237645307'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '19952.62314968879601352455397'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '13.28571428571428571428571429'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1320'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.759488745087162249701697121'
+          - - TiO2
+            - '0.003421869301309000765043402273'
+          - - Al2O3
+            - '0.05406440299283760222481987196'
+          - - FeO
+            - '0.06967636566338569370534657176'
+          - - MnO
+            - '0.002724965245659392675589903919'
+          - - MgO
+            - '0.001323054985762078186757188405'
+          - - CaO
+            - '0.004516841819181398323757228115'
+          - - Na2O
+            - '0.06280693099758853192978194799'
+          - - K2O
+            - '0.02993269410384280167826722822'
+          - - Cl
+            - '0.0105295023137682255197018914'
+          - - ZrO2
+            - '0.001514627489503025289237645307'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1320'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '8'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.93'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1603.15:h=28d79266d1da
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1603.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7735247615578084012315289255'
+        - - TiO2
+          - '0.003245880458346461449814561474'
+        - - Al2O3
+          - '0.06460526466160128245555918824'
+        - - FeO
+          - '0.06772437208462887009484582866'
+        - - MnO
+          - '0.002623670876015410127679396113'
+        - - MgO
+          - '0.001979053369818915806710843376'
+        - - CaO
+          - '0.004385724657815322823650891175'
+        - - Na2O
+          - '0.04665222222969486206148755421'
+        - - K2O
+          - '0.02956703779175025438225470489'
+        - - Cl
+          - '0.00375005956827369923242472174'
+        - - ZrO2
+          - '0.00194195274424652033404338553'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.07943282347242815020659182828'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.5873015873015873015873015873'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1603.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1330'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-6.1'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7735247615578084012315289255'
+          - - TiO2
+            - '0.003245880458346461449814561474'
+          - - Al2O3
+            - '0.06460526466160128245555918824'
+          - - FeO
+            - '0.06772437208462887009484582866'
+          - - MnO
+            - '0.002623670876015410127679396113'
+          - - MgO
+            - '0.001979053369818915806710843376'
+          - - CaO
+            - '0.004385724657815322823650891175'
+          - - Na2O
+            - '0.04665222222969486206148755421'
+          - - K2O
+            - '0.02956703779175025438225470489'
+          - - Cl
+            - '0.00375005956827369923242472174'
+          - - ZrO2
+            - '0.00194195274424652033404338553'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1330'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '7'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.37'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1633.15:h=0b50426cf7e1
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1633.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.768310952532433039254234069'
+        - - TiO2
+          - '0.002953613339963676771817234416'
+        - - Al2O3
+          - '0.05083396256719661540132791672'
+        - - FeO
+          - '0.07351097342596320986258569564'
+        - - MnO
+          - '0.003048235304906640761622631767'
+        - - MgO
+          - '0.001950925709575551189139071611'
+        - - CaO
+          - '0.004323391738967730828886706261'
+        - - Na2O
+          - '0.05783005840840281947571471476'
+        - - K2O
+          - '0.02803380611628834494056838493'
+        - - Cl
+          - '0.007023846197348036142050595684'
+        - - ZrO2
+          - '0.002180234658954335372052980093'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '19952.62314968879601352455397'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '11.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1633.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1360'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.768310952532433039254234069'
+          - - TiO2
+            - '0.002953613339963676771817234416'
+          - - Al2O3
+            - '0.05083396256719661540132791672'
+          - - FeO
+            - '0.07351097342596320986258569564'
+          - - MnO
+            - '0.003048235304906640761622631767'
+          - - MgO
+            - '0.001950925709575551189139071611'
+          - - CaO
+            - '0.004323391738967730828886706261'
+          - - Na2O
+            - '0.05783005840840281947571471476'
+          - - K2O
+            - '0.02803380611628834494056838493'
+          - - Cl
+            - '0.007023846197348036142050595684'
+          - - ZrO2
+            - '0.002180234658954335372052980093'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1360'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '8'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.92'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1693.15:h=169c884db025
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7647271170079394299823820849'
+        - - TiO2
+          - '0.003117524070136436880011755565'
+        - - Al2O3
+          - '0.09404794205464103400492031662'
+        - - FeO
+          - '0.0592895007096064199121421854'
+        - - MnO
+          - '0.002371545758973671604463686426'
+        - - MgO
+          - '0.002003538457947543518627127277'
+        - - CaO
+          - '0.003599988141712189791481866646'
+        - - Na2O
+          - '0.03040053924024119064043680457'
+        - - K2O
+          - '0.031075865091687085507015248'
+        - - Cl
+          - '0.007782734307413797726762240833'
+        - - ZrO2
+          - '0.001583705159701200431756683892'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0001584893192461113485202101373'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.08695652173913043478260869565'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-8.8'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7647271170079394299823820849'
+          - - TiO2
+            - '0.003117524070136436880011755565'
+          - - Al2O3
+            - '0.09404794205464103400492031662'
+          - - FeO
+            - '0.0592895007096064199121421854'
+          - - MnO
+            - '0.002371545758973671604463686426'
+          - - MgO
+            - '0.002003538457947543518627127277'
+          - - CaO
+            - '0.003599988141712189791481866646'
+          - - Na2O
+            - '0.03040053924024119064043680457'
+          - - K2O
+            - '0.031075865091687085507015248'
+          - - Cl
+            - '0.007782734307413797726762240833'
+          - - ZrO2
+            - '0.001583705159701200431756683892'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '4'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.08'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1693.15:h=36dcff2ada74
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7750716062250813114717881962'
+        - - TiO2
+          - '0.003189963826336764944695417232'
+        - - Al2O3
+          - '0.07680179061828456624765629762'
+        - - FeO
+          - '0.07222858620818738729471933736'
+        - - MnO
+          - '0.00292986266983067026289094358'
+        - - MgO
+          - '0.00166345289608440152412780955'
+        - - CaO
+          - '0.00561916446960060009162187103'
+        - - Na2O
+          - '0.02109365980690560891921879283'
+        - - K2O
+          - '0.02960883852100826271697834105'
+        - - Cl
+          - '0.009834352291218215485131893593'
+        - - ZrO2
+          - '0.00195872246746221104117110074'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '19952.62314968879601352455397'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '6.692307692307692307692307692'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.7'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7750716062250813114717881962'
+          - - TiO2
+            - '0.003189963826336764944695417232'
+          - - Al2O3
+            - '0.07680179061828456624765629762'
+          - - FeO
+            - '0.07222858620818738729471933736'
+          - - MnO
+            - '0.00292986266983067026289094358'
+          - - MgO
+            - '0.00166345289608440152412780955'
+          - - CaO
+            - '0.00561916446960060009162187103'
+          - - Na2O
+            - '0.02109365980690560891921879283'
+          - - K2O
+            - '0.02960883852100826271697834105'
+          - - Cl
+            - '0.009834352291218215485131893593'
+          - - ZrO2
+            - '0.00195872246746221104117110074'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '6'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.87'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1693.15:h=6e09cd652d35
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7803040462564350865569018224'
+        - - TiO2
+          - '0.003117560467786553948418533086'
+        - - Al2O3
+          - '0.08626111956917228530620706424'
+        - - FeO
+          - '0.07024904375013349055003355947'
+        - - MnO
+          - '0.002561299322969325558910489668'
+        - - MgO
+          - '0.001836598362148686497480571705'
+        - - CaO
+          - '0.003360028160735382212839239058'
+        - - Na2O
+          - '0.0226920960069306361606196971'
+        - - K2O
+          - '0.02643265362286275909813687103'
+        - - Cl
+          - '0.001328775029404499613184251145'
+        - - ZrO2
+          - '0.001856779451421294497267900103'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.1584893192461113485202101373'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.3333333333333333333333333333'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.8'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7803040462564350865569018224'
+          - - TiO2
+            - '0.003117560467786553948418533086'
+          - - Al2O3
+            - '0.08626111956917228530620706424'
+          - - FeO
+            - '0.07024904375013349055003355947'
+          - - MnO
+            - '0.002561299322969325558910489668'
+          - - MgO
+            - '0.001836598362148686497480571705'
+          - - CaO
+            - '0.003360028160735382212839239058'
+          - - Na2O
+            - '0.0226920960069306361606196971'
+          - - K2O
+            - '0.02643265362286275909813687103'
+          - - Cl
+            - '0.001328775029404499613184251145'
+          - - ZrO2
+            - '0.001856779451421294497267900103'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.25'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1693.15:h=8681bebf5b15
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.7330732144968382649466199772'
+        - - TiO2
+          - '0.003028399612578455177122130126'
+        - - Al2O3
+          - '0.09174394963852095142434195447'
+        - - FeO
+          - '0.08161498266798211270087082577'
+        - - MnO
+          - '0.002764496990346687295509967384'
+        - - MgO
+          - '0.002270637674498203194969599231'
+        - - CaO
+          - '0.004779330224706333013814077194'
+        - - Na2O
+          - '0.04440263243401873711249013902'
+        - - K2O
+          - '0.02970168624536416692801500535'
+        - - Cl
+          - '0.005347486689817231242255867611'
+        - - ZrO2
+          - '0.001273183325328856963990456198'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '199.5262314968879601352455397'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '1.564102564102564102564102564'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.7'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.7330732144968382649466199772'
+          - - TiO2
+            - '0.003028399612578455177122130126'
+          - - Al2O3
+            - '0.09174394963852095142434195447'
+          - - FeO
+            - '0.08161498266798211270087082577'
+          - - MnO
+            - '0.002764496990346687295509967384'
+          - - MgO
+            - '0.002270637674498203194969599231'
+          - - CaO
+            - '0.004779330224706333013814077194'
+          - - Na2O
+            - '0.04440263243401873711249013902'
+          - - K2O
+            - '0.02970168624536416692801500535'
+          - - Cl
+            - '0.005347486689817231242255867611'
+          - - ZrO2
+            - '0.001273183325328856963990456198'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '2'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.61'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless
+- observation_id: volovetskii-2012-iron-redox::volo12_p9_pantellerite_table2::T=1693.15:h=8aff13a08df6
+  experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1693.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.8008517284740843637963387798'
+        - - TiO2
+          - '0.003002008239195515771756041131'
+        - - Al2O3
+          - '0.06832307508414515162483532407'
+        - - FeO
+          - '0.06906080615925386601444939639'
+        - - MnO
+          - '0.002534875022668161931493398127'
+        - - MgO
+          - '0.00198289159077138635628635888'
+        - - CaO
+          - '0.00261278566203300650402675378'
+        - - Na2O
+          - '0.01955671611589262116907376939'
+        - - K2O
+          - '0.0263720621217709332827156977'
+        - - Cl
+          - '0.003757332518779969708686667057'
+        - - ZrO2
+          - '0.001945719011405023840337813953'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0001584893192461113485202101373'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0638297872340425531914893617'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: volovetskii-2012-iron-redox
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+  read_from: pdf:volovetskii-2012-iron-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 334
+              pdf_page_index: 4
+              table: '2'
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-8.8'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.8008517284740843637963387798'
+          - - TiO2
+            - '0.003002008239195515771756041131'
+          - - Al2O3
+            - '0.06832307508414515162483532407'
+          - - FeO
+            - '0.06906080615925386601444939639'
+          - - MnO
+            - '0.002534875022668161931493398127'
+          - - MgO
+            - '0.00198289159077138635628635888'
+          - - CaO
+            - '0.00261278566203300650402675378'
+          - - Na2O
+            - '0.01955671611589262116907376939'
+          - - K2O
+            - '0.0263720621217709332827156977'
+          - - Cl
+            - '0.003757332518779969708686667057'
+          - - ZrO2
+            - '0.001945719011405023840337813953'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    T_C:
+      state:
+        tag: value
+        value: '1420'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    duration_h:
+      state:
+        tag: value
+        value: '7'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - pdf:volovetskii-2012-iron-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:volovetskii-2012-iron-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.06'
+        locator:
+          page: 5
+          published_page: 334
+          pdf_page_index: 4
+          table: '2'
+    output_unit: dimensionless

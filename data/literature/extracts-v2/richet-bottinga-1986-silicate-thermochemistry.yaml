@@ -1,0 +1,2348 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/richet-bottinga-1986-silicate-thermochemistry.yaml
+observations:
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_anorthite_entropy_of_fusion_table5
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: CaAl2Si2O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: anorthite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1830'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '72.7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet and Bottinga [1984b]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_anorthite_entropy_of_fusion_table5
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 16
+    published_page: 16
+    pdf_page_index: 15
+    table: '5'
+    note: row=Anorthite; column=ΔS_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1830'
+      locator:
+        page: 16
+        published_page: 16
+        pdf_page_index: 15
+        table: '5'
+        note: row=Anorthite; column=T_f (K)
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_anorthite_transition_table5
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaAl2Si2O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: anorthite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1830'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Weill et al. [1980]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_anorthite_transition_table5
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 16
+    published_page: 16
+    pdf_page_index: 15
+    table: '5'
+    note: row=Anorthite; column=T_f (K)
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_cristobalite_entropy_of_fusion_table5
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'Cristobalite' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1999'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '4.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet et al. [1982]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_cristobalite_entropy_of_fusion_table5
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 16
+    published_page: 16
+    pdf_page_index: 15
+    table: '5'
+    note: row=Cristobalite; column=ΔS_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1999'
+      locator:
+        page: 16
+        published_page: 16
+        pdf_page_index: 15
+        table: '5'
+        note: row=Cristobalite; column=T_f (K)
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_cristobalite_transition_table5
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'Cristobalite' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1999'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet et al. [1982]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_cristobalite_transition_table5
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 16
+    published_page: 16
+    pdf_page_index: 15
+    table: '5'
+    note: row=Cristobalite; column=T_f (K)
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_diopside_entropy_of_fusion_table5
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'Diopside' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1670'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '82.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet and Bottinga [1984b]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_diopside_entropy_of_fusion_table5
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 16
+    published_page: 16
+    pdf_page_index: 15
+    table: '5'
+    note: row=Diopside; column=ΔS_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1670'
+      locator:
+        page: 16
+        published_page: 16
+        pdf_page_index: 15
+        table: '5'
+        note: row=Diopside; column=T_f (K)
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_diopside_transition_table5
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'Diopside' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1670'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet and Bottinga [1984b]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_diopside_transition_table5
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 16
+    published_page: 16
+    pdf_page_index: 15
+    table: '5'
+    note: row=Diopside; column=T_f (K)
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_high_albite_entropy_of_fusion_table5
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'High albite' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1393'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '46.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet and Bottinga [1984a]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_high_albite_entropy_of_fusion_table5
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 16
+    published_page: 16
+    pdf_page_index: 15
+    table: '5'
+    note: row=High albite; column=ΔS_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1393'
+      locator:
+        page: 16
+        published_page: 16
+        pdf_page_index: 15
+        table: '5'
+        note: row=High albite; column=T_f (K)
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_high_albite_transition_table5
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'High albite' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1393'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet and Bottinga [1984a]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_high_albite_transition_table5
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 16
+    published_page: 16
+    pdf_page_index: 15
+    table: '5'
+    note: row=High albite; column=T_f (K)
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_high_sanidine_entropy_of_fusion_table5
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: KAlSi3O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'High sanidine' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '36'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet and Bottinga [1984a]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_high_sanidine_entropy_of_fusion_table5
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 16
+    published_page: 16
+    pdf_page_index: 15
+    table: '5'
+    note: row=High sanidine; column=ΔS_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        page: 16
+        published_page: 16
+        pdf_page_index: 15
+        table: '5'
+        note: row=High sanidine; column=T_f (K)
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_high_sanidine_transition_table5
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: KAlSi3O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'High sanidine' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1500'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet and Bottinga [1984a]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_high_sanidine_transition_table5
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 16
+    published_page: 16
+    pdf_page_index: 15
+    table: '5'
+    note: row=High sanidine; column=T_f (K)
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_entropy_of_fusion_table4
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '24.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '3'
+      units: J/mol K
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_entropy_of_fusion_table4
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 15
+    published_page: 15
+    pdf_page_index: 14
+    table: '4'
+    note: row=K2Si2O5; column=ΔS_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  derived_from:
+  - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_heat_of_fusion_table4
+  - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_transition_table4
+  derivation:
+    relation: ΔS_f = ΔH_f/T_f
+    inputs:
+    - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_heat_of_fusion_table4
+    - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_transition_table4
+    parameters: []
+    output_unit: J/mol K
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_heat_of_fusion_table4
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '32'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '4'
+      units: kJ/mol
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_heat_of_fusion_table4
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 15
+    published_page: 15
+    pdf_page_index: 14
+    table: '4'
+    note: row=K2Si2O5; column=ΔH_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_transition_table4
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1318'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Levin et al. [1964]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_transition_table4
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 15
+    published_page: 15
+    pdf_page_index: 14
+    table: '4'
+    note: row=K2Si2O5; column=T_f (K)
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_entropy_of_fusion_table4
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: K2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '15.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '3.2'
+      units: J/mol K
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_entropy_of_fusion_table4
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 15
+    published_page: 15
+    pdf_page_index: 14
+    table: '4'
+    note: row=K2SiO3; column=ΔS_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  derived_from:
+  - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_heat_of_fusion_table4
+  - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_transition_table4
+  derivation:
+    relation: ΔS_f = ΔH_f/T_f
+    inputs:
+    - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_heat_of_fusion_table4
+    - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_transition_table4
+    parameters: []
+    output_unit: J/mol K
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_heat_of_fusion_table4
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: K2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '19.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '4'
+      units: kJ/mol
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_heat_of_fusion_table4
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 15
+    published_page: 15
+    pdf_page_index: 14
+    table: '4'
+    note: row=K2SiO3; column=ΔH_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_transition_table4
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1249'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Levin et al. [1964]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_transition_table4
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 15
+    published_page: 15
+    pdf_page_index: 14
+    table: '4'
+    note: row=K2SiO3; column=T_f (K)
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_entropy_of_fusion_table4
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'clinoenstatite' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1834'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '39.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '3.3'
+      units: J/mol K
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_entropy_of_fusion_table4
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 15
+    published_page: 15
+    pdf_page_index: 14
+    table: '4'
+    note: row=MgSiO3; column=ΔS_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1834'
+      locator:
+        page: 15
+        published_page: 15
+        pdf_page_index: 14
+        table: '4'
+        note: row=MgSiO3; column=T_f (K)
+  derived_from:
+  - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_heat_of_fusion_table4
+  - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_transition_table4
+  derivation:
+    relation: ΔS_f = ΔH_f/T_f
+    inputs:
+    - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_heat_of_fusion_table4
+    - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_transition_table4
+    parameters: []
+    output_unit: J/mol K
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_heat_of_fusion_table4
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'clinoenstatite' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1834'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '73.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '6'
+      units: kJ/mol
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_heat_of_fusion_table4
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 15
+    published_page: 15
+    pdf_page_index: 14
+    table: '4'
+    note: row=MgSiO3; column=ΔH_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1834'
+      locator:
+        page: 15
+        published_page: 15
+        pdf_page_index: 14
+        table: '4'
+        note: row=MgSiO3; column=T_f (K)
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_transition_table4
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: unrecognised polymorph 'clinoenstatite' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1834'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bowen and Andersen [1914]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_transition_table4
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 15
+    published_page: 15
+    pdf_page_index: 14
+    table: '4'
+    note: row=MgSiO3; column=T_f (K)
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_entropy_of_fusion_table4
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '32.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '3.8'
+      units: J/mol K
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_entropy_of_fusion_table4
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 15
+    published_page: 15
+    pdf_page_index: 14
+    table: '4'
+    note: row=Na2Si2O5; column=ΔS_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  derived_from:
+  - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_heat_of_fusion_table4
+  - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_transition_table4
+  derivation:
+    relation: ΔS_f = ΔH_f/T_f
+    inputs:
+    - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_heat_of_fusion_table4
+    - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_transition_table4
+    parameters: []
+    output_unit: J/mol K
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_heat_of_fusion_table4
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '37.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '4.4'
+      units: kJ/mol
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_heat_of_fusion_table4
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 15
+    published_page: 15
+    pdf_page_index: 14
+    table: '4'
+    note: row=Na2Si2O5; column=ΔH_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_transition_table4
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1147'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Levin et al. [1964]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_transition_table4
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 15
+    published_page: 15
+    pdf_page_index: 14
+    table: '4'
+    note: row=Na2Si2O5; column=T_f (K)
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_quartz_entropy_of_fusion_table5
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: entropy_of_fusion
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: quartz
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1700'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
+  value:
+    kind: point
+    point: '5.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet et al. [1982]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_quartz_entropy_of_fusion_table5
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 16
+    published_page: 16
+    pdf_page_index: 15
+    table: '5'
+    note: row=Quartz; column=ΔS_f
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700'
+      locator:
+        page: 16
+        published_page: 16
+        pdf_page_index: 15
+        table: '5'
+        note: row=Quartz; column=T_f (K)
+- observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_quartz_transition_table5
+  experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: quartz
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1700'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet et al. [1982]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_quartz_transition_table5
+  source_id: richet-bottinga-1986-silicate-thermochemistry
+  locator:
+    page: 16
+    published_page: 16
+    pdf_page_index: 15
+    table: '5'
+    note: row=Quartz; column=T_f (K)
+  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
