@@ -353,10 +353,12 @@ def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
         vapor_pressures,
     )
     calls: list[str] = []
+    available_internal_o2_mol: list[float] = []
     original = validation_map.PyrolysisSimulator._apply_fe_redox_respeciation
 
     def wrapped(self, **kwargs):
         calls.append(str(kwargs.get("oxygen_source", "overhead_gas")))
+        available_internal_o2_mol.append(self._remaining_fe_redox_internal_o2_capacity_mol())
         return original(self, **kwargs)
 
     monkeypatch.setattr(
@@ -368,7 +370,7 @@ def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
     row = validation_map.run_row(
         1650.0,
         validation_map.GasPoint(1.0e-6, 10.0, "n2_carrier"),
-        1.0,
+        0.0,
         calibration,
         setpoints,
         feedstocks,
@@ -379,6 +381,7 @@ def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
     assert row["redox_source_terms_mol_o2_equiv_by_label"][
         "redox_source:evaporative_metal_loss"
     ] > 0.0
+    assert available_internal_o2_mol[-1] > 0.0
     assert calls[-1] == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
 
 
