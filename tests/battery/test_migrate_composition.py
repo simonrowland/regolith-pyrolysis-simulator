@@ -296,7 +296,6 @@ def _assert_plante_observations_use_analyzed_composition(
         "plante_hastie_1983_csbo2_activity_1200K": "kms-vacuum-glass-series",
         "plante_hastie_1983_csbo2_activity_quoted": "kms-vacuum-glass-series",
         "plante_hastie_1983_ru_re_sr_undetected": "kms-vacuum-glass-series",
-        "plante_hastie_1983_detection_limits_quoted": "kms-vacuum-glass-series",
         "plante_hastie_1983_o2_kms_figure_only": "kms-vacuum-glass-series",
         "plante_hastie_1983_o2_figure_only_quoted": "kms-vacuum-glass-series",
     }
@@ -322,6 +321,31 @@ def _assert_plante_observations_use_analyzed_composition(
         }:
             phase = observation.identity.species.phase
             assert phase.is_value and phase.value is Phase.G, source_id
+
+
+def test_plante_section_4_1_detection_limits_have_no_vacuum_conditions() -> None:
+    path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
+    migrator = Migrator()
+    migrator._migrate_extract(path)
+
+    observation = migrator.result.observations[
+        "kems-027-plante-hastie-1983::plante_hastie_1983_detection_limits_quoted"
+    ]
+    experiment = migrator.result.experiments[observation.experiment_id]
+
+    assert not experiment.experiment_id.endswith(
+        "::experiment::kms-vacuum-glass-series"
+    )
+    assert not (
+        experiment.method.is_value
+        and experiment.method.value.value == "knudsen_effusion"
+    )
+    sweep_gas = experiment.pressure_environment.sweep_gas.state
+    assert not (
+        sweep_gas.is_value and sweep_gas.value.species in {None, "none", "vacuum"}
+    )
+    regime = experiment.pressure_environment.regime.regime_class
+    assert not (regime.is_value and regime.value.value == "molecular")
 
 
 @pytest.mark.parametrize(
