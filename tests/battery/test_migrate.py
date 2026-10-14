@@ -13165,6 +13165,7 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
     from simulator.diagnostic_helpers.binary_pot_scoring import (
         feto_fe2_fe3_to_feo_fe2o3_moles,
     )
+    from simulator.battery.stable_ids import series_row_extra
 
     source_id = "kems-058-ohara-1987"
     result = _migrate_real_extract(tmp_path, f"{source_id}.yaml", write=False)
@@ -13198,6 +13199,7 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
         point_temperature = observation.point_conditions["temperature_K"]
         assert point_temperature.state.is_value
         assert point_temperature.state.value == Decimal("1643.0")
+        assert point_temperature.inference is None
 
     assert all(
         observation.identity.fO2_Pa is not None
@@ -13269,6 +13271,14 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
         for observation in table2
     )
     assert all(
+        observation.point_conditions is not None
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].state.value
+        == Decimal("1643.0")
+        and observation.point_conditions["temperature_K"].inference is None
+        for observation in table2
+    )
+    assert all(
         sum(observation.identity.composition.value.as_map().values())
         == pytest.approx(Decimal("1"))
         for observation in table2
@@ -13278,14 +13288,69 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
         observation.identity.composition.value
         for observation in table2
     }
-    for observation in pressures + ion_currents:
-        condition = observation.point_conditions["composition"]
-        if condition.state.is_value:
-            sample_number = re.search(r"sample (\d+)", condition.locator.note)
-            assert sample_number is not None
-            assert condition.state.value == table2_compositions[
-                int(sample_number.group(1))
+    source_observations = _extract_observations(f"{source_id}.yaml")
+    pressure_rows_by_species = {
+        "PO": "ohara_1987_table1_partial_pressures_1643k",
+        "PO2": "ohara_1987_po2_table1_partial_pressure",
+        "P2": "ohara_1987_p2_table1_partial_pressure",
+    }
+    pressure_source_rows = {
+        formula: next(
+            row["values"]["rows"]
+            for row in source_observations
+            if row.get("observation_id") == source_observation_id
+        )
+        for formula, source_observation_id in pressure_rows_by_species.items()
+    }
+    current_source_rows = next(
+        row["values"]["rows"]
+        for row in source_observations
+        if row.get("observation_id") == "ohara_1987_table1_ion_current_ratios_1643k"
+    )
+
+    def assert_row_composition_matches_sample(observations, source_rows) -> None:
+        for observation in observations:
+            matching_rows = [
+                row
+                for row in source_rows
+                if observation.observation_id.endswith(
+                    series_row_extra(row, include_locator=False)
+                )
             ]
+            assert len(matching_rows) == 1
+            sample_number = int(matching_rows[0]["sample_no"])
+            condition = observation.point_conditions["composition"]
+            if sample_number in table2_compositions:
+                expected_composition = table2_compositions[sample_number]
+                if quantity_token(observation.identity) is Quantity.P_PARTIAL:
+                    assert observation.identity.composition.value == expected_composition, (
+                        f"pressure composition does not match source sample {sample_number}"
+                    )
+                else:
+                    assert observation.identity.composition.is_not_applicable
+                assert condition.state.value == expected_composition
+                assert condition.locator.table == "2"
+                assert f"sample {sample_number}" in condition.locator.note
+            else:
+                assert sample_number == 20
+                if quantity_token(observation.identity) is Quantity.P_PARTIAL:
+                    assert observation.identity.composition.is_unknown
+                else:
+                    assert observation.identity.composition.is_not_applicable
+                assert condition.state.is_unknown
+                assert condition.locator.table == "1"
+                assert "sample 20" in condition.locator.note
+
+    for formula, source_rows in pressure_source_rows.items():
+        assert_row_composition_matches_sample(
+            [
+                observation
+                for observation in pressures
+                if observation.identity.species.formula == formula
+            ],
+            source_rows,
+        )
+    assert_row_composition_matches_sample(ion_currents, current_source_rows)
 
     sample1_source = next(
         row
@@ -13357,6 +13422,40 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
     assert figure3.identity.quantity.is_unknown
 
 
+def test_ohara_1987_sample_swap_mutation_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source_id = "kems-058-ohara-1987"
+    name = f"{source_id}.yaml"
+    mutated = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / name).read_text(
+            encoding="utf-8"
+        )
+    )
+    pressure_parent = next(
+        row
+        for block in mutated["species"].values()
+        for row in block.get("observations", [])
+        if row.get("observation_id") == "ohara_1987_table1_partial_pressures_1643k"
+    )
+    sample2, sample3 = pressure_parent["values"]["rows"][1:3]
+    for key in ("composition_mol", "point_conditions"):
+        sample2[key], sample3[key] = sample3[key], sample2[key]
+
+    mutation_root = tmp_path / "mutation-repository"
+    extract_dir = mutation_root / "data" / "literature" / "extracts"
+    extract_dir.mkdir(parents=True)
+    (extract_dir / name).write_text(
+        yaml.safe_dump(mutated, sort_keys=False), encoding="utf-8"
+    )
+    monkeypatch.setattr(sys.modules[__name__], "REPO_ROOT", mutation_root)
+
+    with pytest.raises(AssertionError, match="source sample 2"):
+        test_ohara_1987_printed_compositions_reach_migrated_observations(
+            tmp_path / "mutated-migration"
+        )
+
+
 def test_ohara_1987_point_condition_locator_mutation_proof(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -13400,13 +13499,6 @@ def test_ohara_1987_point_condition_locator_mutation_proof(
         )
     ]
     assert len(row_observations) == 20
-    unresolved_temperatures = [
-        (observation.observation_id, observation.identity.temperature_K)
-        for observation in row_observations
-        if observation.identity.temperature_K is None
-        or not observation.identity.temperature_K.is_value
-    ]
-    assert not unresolved_temperatures, unresolved_temperatures
     converted_row = next(
         observation
         for observation in row_observations
@@ -13415,6 +13507,13 @@ def test_ohara_1987_point_condition_locator_mutation_proof(
         and observation.point_conditions["composition"].locator.note == mutation_note
     )
     assert converted_row.identity.temperature_K.value == Decimal("1643.15")
+    assert all(
+        observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value == Decimal("1643.0")
+        for observation in row_observations
+        if observation is not converted_row
+    )
     mutated_conditions = [
         observation
         for observation in row_observations
