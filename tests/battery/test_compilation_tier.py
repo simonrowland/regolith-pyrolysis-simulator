@@ -165,6 +165,7 @@ def test_fusion_predictor_selects_the_stated_silica_polymorph_table() -> None:
         )
         attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
         assert attempt.value is not None
+        assert attempt.coefficient_sources == (solid_table, "O-038")
         assert f"janaf-fusion:{solid_table}/O-038:" in attempt.call_evidence
         prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
         assert prediction.coefficient_sources == (solid_table, "O-038")
@@ -190,6 +191,7 @@ def test_fusion_predictor_refuses_unavailable_stated_polymorph() -> None:
     attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
     assert attempt.value is None
     assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert attempt.coefficient_sources == ()
     prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
     assert prediction.coefficient_sources == ()
     predictions = []
@@ -2049,6 +2051,7 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
         )
         assert attempt.refusal_reason is None
         assert attempt.value is not None
+        assert attempt.coefficient_sources is None
         assert abs(attempt.value - printed) < tolerance
         assert "implementation-fidelity" in attempt.call_evidence
         attempts[quantity] = attempt
@@ -2090,6 +2093,23 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
     )
     assert candidate is not None
     assert residual.source_relation is SourceRelation.SAME_INPUT
+    from simulator.battery.compilation_tier import _prediction_from_attempt
+
+    tier_prediction = _prediction_from_attempt(
+        Engine.VAPOROCK, reference, attempts[Quantity.CP]
+    )
+    tier_residual, tier_candidate = compile_residual(
+        reference,
+        Engine.VAPOROCK,
+        context=_context(reference),
+        comparison_ids=set(),
+        predict=lambda _engine, _observation, **_kwargs: tier_prediction,
+    )
+    assert tier_candidate is not None
+    assert candidate.engine.coefficient_sources == tier_candidate.engine.coefficient_sources
+    assert tier_candidate.engine.coefficient_sources == ("janaf-4th",)
+    assert tier_residual.source_relation is residual.source_relation
+    assert tier_residual.notices == residual.notices
     assert all(
         f"{name}=" in residual.execution.call_evidence for name in fields
     )

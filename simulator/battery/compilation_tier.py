@@ -165,7 +165,7 @@ class ThermoAttempt:
     refusal_reason: RefusalReason | None
     refusal_detail: dict[str, object]
     call_evidence: str
-    coefficient_sources: tuple[str, ...] = ()
+    coefficient_sources: tuple[str, ...] | None = None
 
 
 def _decimal_token(value: Decimal) -> str:
@@ -420,6 +420,7 @@ def _refuse(
         refusal_reason=reason,
         refusal_detail=payload,
         call_evidence=call_evidence,
+        coefficient_sources=() if quantity in FUSION_QUANTITIES else None,
     )
 
 
@@ -2063,6 +2064,7 @@ def _prediction_from_attempt(engine: Engine, observation: Observation, attempt: 
         EnginePrediction,
         Execution,
         ExecutionState,
+        _attempt_coefficient_sources,
     )
 
     if attempt.value is not None:
@@ -2085,7 +2087,9 @@ def _prediction_from_attempt(engine: Engine, observation: Observation, attempt: 
         unit=attempt.unit,
         authority=attempt.authority,
         notices=attempt.notices,
-        coefficient_sources=attempt.coefficient_sources,
+        coefficient_sources=_attempt_coefficient_sources(
+            engine, attempt.coefficient_sources
+        ),
         lineage_complete=False,
         refusal_reason=attempt.refusal_reason,
         refusal_detail=attempt.refusal_detail,

@@ -329,6 +329,20 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.OPENIMCC: (),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
 }
+
+
+def _attempt_coefficient_sources(
+    engine: Engine, coefficient_sources: tuple[str, ...] | None
+) -> tuple[str, ...]:
+    """Use explicit attempt ancestry, falling back only when it was unspecified."""
+
+    return (
+        ENGINE_COEFFICIENT_SOURCES[engine]
+        if coefficient_sources is None
+        else coefficient_sources
+    )
+
+
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
 # Unmapped aliases (MELTS calibration DBs) stay incomplete; do not invent
 # a work. VapoRock/Ellingham consume JANAF; Antoine sidecar is NIST WebBook;
@@ -4446,11 +4460,8 @@ def predict_with_engine(
         from simulator.battery.compilation_tier import predict_thermo_attempt
 
         attempt = predict_thermo_attempt(engine, observation)
-        coefficient_sources = (
-            attempt.coefficient_sources
-            if quantity in FUSION_QUANTITIES
-            and engine is Engine.INTERNAL_ANALYTICAL
-            else attempt.coefficient_sources or sources
+        coefficient_sources = _attempt_coefficient_sources(
+            engine, attempt.coefficient_sources
         )
         lineage_complete = (
             lineage_complete_for(coefficient_sources)
