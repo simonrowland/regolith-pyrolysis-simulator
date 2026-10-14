@@ -3070,6 +3070,63 @@ def test_t1235_real_derivation_rows_are_valid_after_repair(tmp_path: Path) -> No
     ]
     assert_registered_assets(rows_to_check)
 
+    sossi_observation_parents = {
+        "sossi_2019_k_table5_experimental": ("sossi_2019_k_logKstar_table3",),
+        "sossi_2019_mn_table6_te1_pure_system_derived": (
+            "sossi_2019_mn_table5_pure_system_not_experimental",
+        ),
+        "sossi_2019_li_table4_gamma_this_work": (
+            "sossi_2019_li_logKstar_table3_Li_g",
+        ),
+        "sossi_2019_li_table5_experimental_Li_g": (
+            "sossi_2019_li_logKstar_table3_Li_g",
+        ),
+        "sossi_2019_rb_table4_gamma_this_work": (
+            "sossi_2019_rb_logKstar_table3",
+        ),
+        "sossi_2019_rb_table5_experimental": (
+            "sossi_2019_rb_logKstar_table3",
+        ),
+        "sossi_2019_cu_table4_gamma_this_work": (
+            "sossi_2019_cu_logKstar_table3",
+        ),
+        "sossi_2019_cu_table5_experimental": (
+            "sossi_2019_cu_logKstar_table3",
+        ),
+        "sossi_2019_ag_table4_gamma_this_work": (
+            "sossi_2019_ag_logKstar_table3",
+        ),
+        "sossi_2019_zn_table4_gamma_this_work": (
+            "sossi_2019_zn_logKstar_table3",
+        ),
+        "sossi_2019_zn_table5_experimental": (
+            "sossi_2019_zn_logKstar_table3",
+        ),
+        "sossi_2019_ge_table4_gamma_this_work": (
+            "sossi_2019_ge_logKstar_table3",
+        ),
+        "sossi_2019_ge_table5_experimental": (
+            "sossi_2019_ge_logKstar_table3",
+        ),
+        "sossi_2019_cd_table4_gamma_this_work": (
+            "sossi_2019_cd_logKstar_table3",
+        ),
+        "sossi_2019_ga_table5_experimental_Ga_g": (
+            "sossi_2019_ga_logKstar_table3_Ga_g",
+        ),
+        "sossi_2019_pb_table4_gamma_this_work": (
+            "sossi_2019_pb_logKstar_table3_Pb_g",
+        ),
+        "sossi_2019_pb_table5_experimental_PbO_g": (
+            "sossi_2019_pb_logKstar_table3_PbO_g",
+        ),
+        "sossi_2019_mo_table5_experimental_MoO3": (
+            "sossi_2019_mo_logKstar_table3_MoO3_congruent",
+        ),
+        "sossi_2019_cr_table5_experimental_CrO_ox": (
+            "sossi_2019_cr_logKstar_table3_CrO_ox",
+        ),
+    }
     sossi_footnote = (
         "* denotes elements for which logK* was measured at only 1 temperature, "
         "∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
@@ -3108,6 +3165,17 @@ def test_t1235_real_derivation_rows_are_valid_after_repair(tmp_path: Path) -> No
     result = migrate(root, write=False)
     assert result.validation is not None
     assert_target_rows_clean(result.validation.hard_issues)
+    sossi_source_id = "kems-012-sossi-2019"
+    for observation_id, expected_parents in sossi_observation_parents.items():
+        observation = result.observations[f"{sossi_source_id}::{observation_id}"]
+        qualified_parents = (
+            f"tables:{sossi_source_id}",
+            *(f"{sossi_source_id}::{parent_id}" for parent_id in expected_parents),
+        )
+        assert observation.derived_from == qualified_parents
+        assert observation.derivation is not None
+        assert observation.derivation.inputs == qualified_parents
+
     fragmentation = result.observations[
         f"{okazaki_id}::okazaki_2022_fragmentation_assumptions_and_model_output"
     ]
