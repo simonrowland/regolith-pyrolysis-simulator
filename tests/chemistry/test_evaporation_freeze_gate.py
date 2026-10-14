@@ -4381,23 +4381,30 @@ def _installed_magemin_runtime_binaries():
     from simulator.melt_backend.magemin import MAGEMinBackend
 
     worktree_root = Path(__file__).resolve().parents[2]
-    common_dir = subprocess.run(
-        ['git', 'rev-parse', '--git-common-dir'],
-        cwd=worktree_root,
-        capture_output=True,
-        check=True,
-        text=True,
-    ).stdout.strip()
-    common_dir_path = Path(common_dir)
-    if not common_dir_path.is_absolute():
-        common_dir_path = worktree_root / common_dir_path
-    main_repo_root = common_dir_path.resolve().parent
-    candidates = (
+    candidates = [
         configured_magemin_binary_path(),
         MAGEMinBackend._locate_binary(None),
-        main_repo_root / 'engines' / 'magemin' / 'bin' / 'MAGEMin',
-        main_repo_root / 'engines' / 'magemin' / 'MAGEMin',
-    )
+    ]
+    try:
+        common_dir = subprocess.run(
+            ['git', 'rev-parse', '--git-common-dir'],
+            cwd=worktree_root,
+            capture_output=True,
+            check=True,
+            text=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        pass
+    else:
+        if common_dir:
+            common_dir_path = Path(common_dir)
+            if not common_dir_path.is_absolute():
+                common_dir_path = worktree_root / common_dir_path
+            main_repo_root = common_dir_path.resolve().parent
+            candidates.extend((
+                main_repo_root / 'engines' / 'magemin' / 'bin' / 'MAGEMin',
+                main_repo_root / 'engines' / 'magemin' / 'MAGEMin',
+            ))
     runtime_binaries = []
     seen_digests = set()
     for candidate in candidates:
