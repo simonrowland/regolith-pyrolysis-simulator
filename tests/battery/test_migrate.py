@@ -2912,33 +2912,249 @@ def test_offer7_derivation_issue_classification_is_pinned(
 
 
 def test_t1235_real_derivation_rows_are_valid_after_repair(tmp_path: Path) -> None:
-    extract_names = (
-        "kems-012-sossi-2019.yaml",
-        "kems-ms2000-044.yaml",
-        "okazaki-2022-ryugu-gas-treasure-box.yaml",
-        "busemann-2024-noble-gases-ryugu-bennu.yaml",
-    )
-    checked_rows = 0
-    for extract_name in extract_names:
-        source_id = extract_name.removesuffix(".yaml")
-        result = _migrate_real_extract(tmp_path / source_id, extract_name)
-        source_rows = [
-            row
-            for row in _extract_observations(extract_name)
-            if (row.get("values") or {}).get("derivation")
-            or row.get("derivation")
-        ]
-        checked_rows += len(source_rows)
-        derivation_issues = [
-            issue
-            for issue in result.validation.hard_issues
-            if issue.reason is RefusalReason.INVALID_SOURCE
-            and issue.path.startswith(f"observations.{source_id}::")
-            and (".derivation" in issue.path or ".derived_from" in issue.path)
-        ]
-        assert derivation_issues == [], (source_id, derivation_issues)
+    target_rows = {
+        "kems-012-sossi-2019": {
+            "sossi_2019_k_table5_experimental",
+            "sossi_2019_mn_table5_pure_system_not_experimental",
+            "sossi_2019_mn_table6_te1_pure_system_derived",
+            "sossi_2019_li_logKstar_table3_Li_g",
+            "sossi_2019_li_logKstar_table3_LiO_g",
+            "sossi_2019_li_table4_gamma_this_work",
+            "sossi_2019_li_table5_experimental_Li_g",
+            "sossi_2019_rb_logKstar_table3",
+            "sossi_2019_rb_table4_gamma_this_work",
+            "sossi_2019_rb_table5_experimental",
+            "sossi_2019_cu_logKstar_table3",
+            "sossi_2019_cu_table4_gamma_this_work",
+            "sossi_2019_cu_table5_experimental",
+            "sossi_2019_ag_logKstar_table3",
+            "sossi_2019_ag_table4_gamma_this_work",
+            "sossi_2019_zn_logKstar_table3",
+            "sossi_2019_zn_table4_gamma_this_work",
+            "sossi_2019_zn_table5_experimental",
+            "sossi_2019_ge_logKstar_table3",
+            "sossi_2019_ge_table4_gamma_this_work",
+            "sossi_2019_ge_table5_experimental",
+            "sossi_2019_cd_logKstar_table3",
+            "sossi_2019_cd_table4_gamma_this_work",
+            "sossi_2019_ga_logKstar_table3_Ga_g",
+            "sossi_2019_ga_logKstar_table3_GaO_g",
+            "sossi_2019_ga_table5_experimental_Ga_g",
+            "sossi_2019_pb_logKstar_table3_PbO_g",
+            "sossi_2019_pb_logKstar_table3_Pb_g",
+            "sossi_2019_pb_table4_gamma_this_work",
+            "sossi_2019_pb_table5_experimental_PbO_g",
+            "sossi_2019_mo_logKstar_table3_MoO3_congruent",
+            "sossi_2019_mo_logKstar_table3_MoO2_ox",
+            "sossi_2019_mo_table5_experimental_MoO3",
+            "sossi_2019_cr_logKstar_table3_CrO_ox",
+            "sossi_2019_cr_table5_experimental_CrO_ox",
+        },
+        "kems-ms2000-044": {
+            "ms2000_044_sio2_activity_na_system_xsio2_0805_t1473_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0753_t1273_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0709_t1673_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0671_t1173_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0625_t1573_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0573_t1473_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0524_t1573_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0477_t1373_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0430_t1473_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0405_t1423_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0382_t1383_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0349_t1373_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0892_t1723_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0848_t1573_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0811_t1173_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0770_t1073_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0722_t1323_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0722_t1673_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0674_t1373_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0630_t1323_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0630_t1523_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0591_t1323_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0543_t1473_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0500_t1473_class_quote_r2",
+        },
+        "okazaki-2022-ryugu-gas-treasure-box": {
+            "okazaki_2022_fragmentation_assumptions_and_model_output",
+            "okazaki_2022_surface_pulverization_model",
+        },
+        "busemann-2024-noble-gases-ryugu-bennu": {
+            "busemann_2024_preliminary_ryugu_exposure_ages",
+        },
+    }
+    assert sum(map(len, target_rows.values())) == 62
 
-    assert checked_rows >= 61
+    extract_dir = REPO_ROOT / "data" / "literature" / "extracts"
+    root = tmp_path / "t1235-real-index"
+    copied_extracts = root / "data" / "literature" / "extracts"
+    copied_extracts.mkdir(parents=True)
+    (root / "data" / "literature" / "compilations").mkdir()
+    index_path = REPO_ROOT / "data" / "literature" / "INDEX.yaml"
+    (root / "data" / "literature" / "INDEX.yaml").write_text(
+        index_path.read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    index_doc = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    index_rows = {row["source_id"]: row for row in index_doc["sources"]}
+    source_rows: dict[str, dict[str, dict]] = {}
+    for source_id in target_rows:
+        path = extract_dir / f"{source_id}.yaml"
+        (copied_extracts / path.name).write_text(
+            path.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        source_rows[source_id] = {
+            row["observation_id"]: row
+            for block in document["species"].values()
+            for row in block.get("observations", [])
+        }
+        assert target_rows[source_id] <= source_rows[source_id].keys()
+
+    def assert_registered_assets(rows: list[tuple[str, dict]]) -> None:
+        for source_id, row in rows:
+            values = row.get("values") or {}
+            for payload in (row, values):
+                derivation = payload.get("derivation") or {}
+                refs = payload.get("derived_from") or ()
+                if isinstance(refs, str):
+                    refs = (refs,)
+                refs = (*refs, *(derivation.get("inputs") or ()))
+                for ref in refs:
+                    if not isinstance(ref, str) or ":" not in ref:
+                        continue
+                    asset_kind, asset_source = ref.split(":", 1)
+                    if asset_kind not in {"pdf", "tables"}:
+                        continue
+                    asset_index = index_rows.get(asset_source) or {}
+                    corpus = asset_index.get("corpus") or {}
+                    if asset_kind == "pdf":
+                        assert (corpus.get("raw") or {}).get("path") or asset_index.get(
+                            "pdf_path"
+                        ), (source_id, row["observation_id"], ref)
+                    else:
+                        # source_files_for may register a table path despite exists=false.
+                        table_asset = corpus.get("tables") or {}
+                        assert table_asset.get("exists") is True and int(
+                            table_asset.get("file_count") or 0
+                        ) > 0, (source_id, row["observation_id"], ref)
+
+    def assert_target_rows_clean(issues: tuple) -> None:
+        qualified_ids = {
+            f"{source_id}::{observation_id}"
+            for source_id, observation_ids in target_rows.items()
+            for observation_id in observation_ids
+        }
+        failures = []
+        for issue in issues:
+            if not any(
+                f"{qualified_id}]" in issue.path
+                or f"{qualified_id}." in issue.path
+                for qualified_id in qualified_ids
+            ):
+                continue
+            if issue.reason in {
+                RefusalReason.INVALID_SOURCE,
+                RefusalReason.REFERENTIAL_INTEGRITY,
+            } or (
+                issue.reason is RefusalReason.CONDITIONAL_FIELD
+                and (".derived_from" in issue.path or ".derivation" in issue.path)
+            ):
+                failures.append(issue)
+        assert failures == [], failures
+
+    rows_to_check = [
+        (source_id, source_rows[source_id][observation_id])
+        for source_id, observation_ids in target_rows.items()
+        for observation_id in observation_ids
+    ]
+    assert_registered_assets(rows_to_check)
+
+    sossi_footnote = (
+        "* denotes elements for which logK* was measured at only 1 temperature, "
+        "∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
+    )
+    for observation_id in (
+        "sossi_2019_k_table5_experimental",
+        "sossi_2019_li_table5_experimental_Li_g",
+        "sossi_2019_mo_table5_experimental_MoO3",
+        "sossi_2019_cr_table5_experimental_CrO_ox",
+    ):
+        row = source_rows["kems-012-sossi-2019"][observation_id]
+        derivation = row["values"]["derivation"]
+        assert derivation["relation"] == sossi_footnote
+        assert row["locator"]["table"] == "5"
+        assert row["locator"]["line_range"] == "1121-1127"
+
+    for observation_id in target_rows["kems-ms2000-044"]:
+        row = source_rows["kems-ms2000-044"][observation_id]
+        assert row["derived_from"] == ["tables:kems-ms2000-044"]
+        assert row["derivation"]["inputs"] == ["tables:kems-ms2000-044"]
+    okazaki_id = "okazaki-2022-ryugu-gas-treasure-box"
+    assert source_rows[okazaki_id][
+        "okazaki_2022_fragmentation_assumptions_and_model_output"
+    ]["derived_from"] == ["pdf:okazaki-2022-ryugu-gas-treasure-box"]
+    assert source_rows[okazaki_id]["okazaki_2022_surface_pulverization_model"][
+        "derived_from"
+    ] == [
+        "pdf:okazaki-2022-ryugu-gas-treasure-box",
+        "okazaki_2022_solar_wind_helium_abundance",
+    ]
+    busemann_id = "busemann-2024-noble-gases-ryugu-bennu"
+    assert source_rows[busemann_id][
+        "busemann_2024_preliminary_ryugu_exposure_ages"
+    ]["derived_from"] == ["pdf:busemann-2024-noble-gases-ryugu-bennu"]
+
+    result = migrate(root, write=False)
+    assert result.validation is not None
+    assert_target_rows_clean(result.validation.hard_issues)
+    fragmentation = result.observations[
+        f"{okazaki_id}::okazaki_2022_fragmentation_assumptions_and_model_output"
+    ]
+    assert fragmentation.derived_from == (
+        f"pdf:{okazaki_id}",
+    )
+    pulverization = result.observations[
+        f"{okazaki_id}::okazaki_2022_surface_pulverization_model"
+    ]
+    assert pulverization.derived_from == (
+        f"pdf:{okazaki_id}",
+        f"{okazaki_id}::okazaki_2022_solar_wind_helium_abundance",
+    )
+    exposure_ages = result.observations[
+        f"{busemann_id}::busemann_2024_preliminary_ryugu_exposure_ages"
+    ]
+    assert exposure_ages.derived_from == (
+        f"pdf:{busemann_id}",
+    )
+
+    from simulator.battery.validate import validate_corpus
+
+    mutated_observations = dict(result.observations)
+    mutated_id = (
+        "busemann-2024-noble-gases-ryugu-bennu::"
+        "busemann_2024_preliminary_ryugu_exposure_ages"
+    )
+    mutated_observations[mutated_id] = replace(
+        mutated_observations[mutated_id], derived_from=("pdf:not-registered",)
+    )
+    mutated_report = validate_corpus(
+        result.works, result.experiments, mutated_observations
+    )
+    assert any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        and mutated_id in issue.path
+        for issue in mutated_report.hard_issues
+    )
+    with pytest.raises(AssertionError):
+        assert_target_rows_clean(mutated_report.hard_issues)
+
+    mutant_row = deepcopy(
+        source_rows[busemann_id]["busemann_2024_preliminary_ryugu_exposure_ages"]
+    )
+    mutant_row["derived_from"] = ["tables:not-registered"]
+    with pytest.raises(AssertionError):
+        assert_registered_assets([(busemann_id, mutant_row)])
 
 
 @pytest.mark.parametrize("location", ["values", "observation"])
