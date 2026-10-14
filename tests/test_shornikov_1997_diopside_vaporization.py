@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import Phase, Quantity, ReferenceStateConvention, ValueKind
 from simulator.battery.migrate import Migrator
 from simulator.battery.records import AmountBasis
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
@@ -129,3 +129,25 @@ def test_table1_preserves_temperature_widths_separately_from_pressure_widths():
         width = expected_widths[temperature]
         assert point["temperature_uncertainty_K_as_printed"] == width
         assert point["temperature_as_printed"] == f"{temperature} ± {width} K"
+
+
+def test_mgo_activity_uses_the_source_stated_pure_solid_reference():
+    rows = [
+        row
+        for row in _migrated().observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.ACTIVITY
+        and row.identity.species.formula == "MgO"
+    ]
+
+    assert len(rows) == 6
+    for row in rows:
+        reference = row.identity.reference_state
+        assert reference is not None and reference.is_value
+        standard_state = reference.value
+        assert standard_state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert standard_state.endmember.formula == "MgO"
+        assert standard_state.endmember.phase.is_value
+        assert standard_state.endmember.phase.value is Phase.CR
+        assert standard_state.endmember.polymorph is None
+        assert standard_state.reference_pressure_bar is None

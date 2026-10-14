@@ -1474,7 +1474,18 @@ species:
         locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3'}
         T_range_K: [1566, 1862]
         phase: l
-        standard_state: MgO activity relative to the pure oxide reference; condensed state is not stated.
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: MgO
+                phase: {tag: value, value: cr}
+              component_basis: MgO
+          inferred: false
+          locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3', note: 'Equation (4) uses [MgO]; the paper defines square brackets as solid phase on p. 176.'}
+          note: 'Pure solid MgO reference. No polymorph or standard pressure is stated.'
         experiment: shornikov-1997-diopside-kems
         regime: kems_effusion
         units: dimensionless
