@@ -6890,7 +6890,7 @@ def test_ohta_feto_standard_state_lifts_liquid_reference(tmp_path: Path) -> None
     assert reference_state.value.endmember.phase.value is Phase.L
 
 
-def test_stolyarova_table3_137_row_ids_and_reference_states_unchanged(
+def test_stolyarova_table3_137_content_ids_and_reference_states_are_stable(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(
@@ -6908,9 +6908,9 @@ def test_stolyarova_table3_137_row_ids_and_reference_states_unchanged(
             payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
         ).encode()
     ).hexdigest()
-    # Pinned to the digest on green c9b6e545d, whose Stolyarova 1996 locator notes carry the
-    # Table 1 caption and Eq. (13) quotes; this change must leave it unchanged.
-    assert digest == "a3f9988c9f64bb73c07eefa07b1d2edaac77abb0b2496799dba925c6bedaa968"
+    # Adding the published point compositions changes content-stable point ids. This pin
+    # keeps their migrated ids and the existing reference states stable from this extract shape.
+    assert digest == "1c09862823fb9dd8daebaf6ed44053644f4330d5fec0dd0023cba7a32d564259"
 
 
 def test_schaefer_photochemical_lifetimes_retain_table4_rate_ancestry(
@@ -6997,6 +6997,77 @@ def test_stolyarova_1996_comparison_provenance_is_activity_only(
         }.intersection(obs.provenance)
         for obs in pressures
     )
+
+
+def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.identity import Identity
+
+    result = _migrate_real_extract(
+        tmp_path, "stolyarova-1996-cao-alumina-silica-kems.yaml"
+    )
+    rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+    ]
+    composition_rows = [
+        obs
+        for obs in rows
+        if isinstance(obs.identity, Identity)
+        and obs.identity.composition is not None
+        and obs.identity.composition.is_value
+    ]
+    assert len(composition_rows) == 300
+    for obs in composition_rows:
+        assert obs.identity.temperature_K.is_value
+        assert obs.identity.temperature_K.value == Decimal("1933")
+        condition = obs.point_conditions["composition"]
+        assert condition.state.is_value
+        assert condition.locator is not None
+        assert condition.locator.page in {20, 23}
+        assert condition.locator.table in {"2", "3"}
+
+    table2_cao = next(
+        obs
+        for obs in composition_rows
+        if "stolyarova_1996_table2_pCa_1933k" in obs.observation_id
+        and "xA/xC=0.11, xS=0.44"
+        in obs.point_conditions["composition"].locator.note
+    )
+    assert dict(table2_cao.identity.composition.value.components) == {
+        "CaO": Decimal("0.504504504505"),
+        "Al2O3": Decimal("0.055495495495"),
+        "SiO2": Decimal("0.44"),
+    }
+
+    table3_alumina = next(
+        obs
+        for obs in composition_rows
+        if "stolyarova_1996_table3_al2o3_activity_column_2_1933k"
+        in obs.observation_id
+        and "xA/xC=0.16, xS=0.50"
+        in obs.point_conditions["composition"].locator.note
+    )
+    assert dict(table3_alumina.identity.composition.value.components) == {
+        "CaO": Decimal("0.431034482759"),
+        "Al2O3": Decimal("0.068965517241"),
+        "SiO2": Decimal("0.50"),
+    }
+
+    ion_currents = [obs for obs in rows if "table1_" in obs.observation_id]
+    assert len(ion_currents) == 6
+    assert all(obs.identity.species.phase.value is Phase.G for obs in ion_currents)
+    figure_rows = [obs for obs in rows if "figure_only" in obs.observation_id]
+    assert len(figure_rows) == 6
+    assert all(obs.identity.quantity.is_unknown for obs in figure_rows)
+    assert all(
+        obs.identity.quantity.reason
+        == "source semantics bound_not_point_ordering is ordering/categorical, not activity"
+        for obs in figure_rows
+    )
+    assert all(obs.identity.species.phase.value is Phase.L for obs in figure_rows)
 
 
 def test_comparison_provenance_is_not_inherited_by_unknown_quantity_points(
