@@ -7238,6 +7238,33 @@ def test_unknown_polymorph_with_multiple_solid_tables_uses_lowest_janaf_gibbs() 
     assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
 
 
+def test_unknown_polymorph_activity_conversion_has_numeric_golden_pin() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        None,
+    )
+    reference = F.observation(
+        "silica-unknown-polymorph-activity-golden",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference)
+
+    assert float(comparison.value.point).hex() == "0x1.24c715327cb38p-2"
+
+
 def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> None:
     import json
 
