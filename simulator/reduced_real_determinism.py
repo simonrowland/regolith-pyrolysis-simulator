@@ -2306,6 +2306,14 @@ def _effective_magemin_database(
         database = getattr(candidate, "_database", None)
         if database is not None and str(database).strip():
             return str(database).strip()
+    if any(
+        getattr(candidate, "real_backend_family", None)
+        is RealBackendFamily.MAGEMIN
+        for candidate in candidates
+    ):
+        from simulator.melt_backend.magemin import MAGEMinBackend
+
+        return MAGEMinBackend._DEFAULT_DATABASE
     return None
 
 

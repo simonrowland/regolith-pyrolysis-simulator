@@ -1036,13 +1036,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     """
 
     real_backend_family = RealBackendFamily.MAGEMIN
+    _DEFAULT_DATABASE = 'ig'
 
     name = 'magemin'
 
     def __init__(self) -> None:
         self._available: bool = False
         self._config: Dict[str, Any] = {}
-        self._database: str = 'ig'
+        self._database: str = self._DEFAULT_DATABASE
         # 'subprocess' | 'pymagemin' | 'ctypes' | 'julia'
         self._bridge: Optional[str] = None
         self._magemin_module: Optional[Any] = None
@@ -1071,7 +1072,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         self._last_error = None
         self._config = dict(config or {})
 
-        self._database = str(self._config.get('database') or 'ig')
+        self._database = str(
+            self._config.get('database') or self._DEFAULT_DATABASE
+        )
 
         explicit_path = self._config.get('binary_path')
         if explicit_path:
