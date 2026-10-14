@@ -37,6 +37,13 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
     assert len(records) == 134
     assert len(result.experiments) == 1
     assert len(result.queue) == 2
+    sample_composition = next(iter(result.experiments.values())).sample.initial_composition
+    assert sample_composition is not None and sample_composition.state.is_value
+    assert dict(sample_composition.state.value.components) == {
+        "CaO": Decimal("0.75"),
+        "SiO2": Decimal("0.25"),
+    }
+    assert sample_composition.locator.published_page == 298
     assert sorted((tuple(item.axes), item.why) for item in result.queue) == [
         (("phase",), "missing phase"),
         (("phase",), "missing phase"),
@@ -53,6 +60,22 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
     ]
     assert len(pressure_records) == 104
     assert len(activity_records) == 30
+
+    expected_composition = {"CaO": Decimal("0.75"), "SiO2": Decimal("0.25")}
+
+    def assert_stoichiometric_composition(record):
+        composition_state = record.identity.composition
+        assert composition_state.is_value
+        composition = composition_state.value
+        assert composition is not None
+        assert composition.basis == "stoichiometric_Ca3SiO5_oxide_mole_fractions"
+        assert composition.amount_basis.value == "mole_fraction"
+        assert dict(composition.components) == expected_composition
+
+    for record in records:
+        assert_stoichiometric_composition(record)
+        assert record.identity.temperature_K.is_value
+        assert record.identity.species.formula in document["species"]
 
     for formula, block in document["species"].items():
         source_observation = next(
