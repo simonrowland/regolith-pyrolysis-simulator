@@ -10,9 +10,13 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from functools import lru_cache
+from importlib import metadata
 from importlib import resources
+import json
 import math
 import numbers
+from pathlib import Path
+import subprocess
 from types import MappingProxyType
 from typing import Any
 
@@ -58,6 +62,97 @@ OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
     "@af0f2a241b4a76bd3d0867bdce2029497bc11403"
 )
+
+
+def imported_openimcc_commit() -> str | None:
+    """Return the commit for the imported package, if it can be verified."""
+
+    module = _openimcc
+    module_file = getattr(module, "__file__", None) if module is not None else None
+    if not isinstance(module_file, str):
+        return None
+    try:
+        imported_path = Path(module_file).resolve()
+    except (OSError, RuntimeError):
+        return None
+
+    try:
+        distribution = metadata.distribution("openimcc")
+    except metadata.PackageNotFoundError:
+        distribution = None
+
+    if distribution is not None:
+        distribution_files = distribution.files
+        belongs_to_distribution = bool(
+            distribution_files
+            and any(
+                Path(distribution.locate_file(entry)).resolve() == imported_path
+                for entry in distribution_files
+            )
+        )
+        if not belongs_to_distribution:
+            # Some editable installs omit RECORD entries. Compare the imported
+            # package file at the distribution's location rather than trusting
+            # an unrelated openimcc dist-info elsewhere on sys.path.
+            belongs_to_distribution = (
+                Path(distribution.locate_file("openimcc/__init__.py")).resolve()
+                == imported_path
+            )
+        if belongs_to_distribution:
+            direct_url = distribution.read_text("direct_url.json")
+            if direct_url:
+                try:
+                    direct_url_data = json.loads(direct_url)
+                except (TypeError, json.JSONDecodeError):
+                    direct_url_data = None
+                vcs_info = (
+                    direct_url_data.get("vcs_info")
+                    if isinstance(direct_url_data, dict)
+                    else None
+                )
+                commit_id = (
+                    vcs_info.get("commit_id") if isinstance(vcs_info, dict) else None
+                )
+                if isinstance(commit_id, str) and commit_id:
+                    return commit_id
+
+    # A PYTHONPATH source checkout may shadow a stale distribution. In that
+    # case report the checkout's HEAD, never the unrelated dist-info commit.
+    if "site-packages" in imported_path.parts or any(
+        part in {".venv", "venv", "env"} for part in imported_path.parts
+    ):
+        return None
+    for checkout in imported_path.parents:
+        if not (checkout / ".git").exists():
+            continue
+        try:
+            relative_path = imported_path.relative_to(checkout)
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(checkout),
+                    "ls-files",
+                    "--error-unmatch",
+                    str(relative_path),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            result = subprocess.run(
+                ["git", "-C", str(checkout), "rev-parse", "HEAD"],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+        except (OSError, subprocess.SubprocessError):
+            continue
+        commit_id = result.stdout.strip()
+        return commit_id or None
+    return None
 DEFAULT_BACKEND_PACK_NAME = "default"
 
 _PACK_RESOURCE_NAMES = {
