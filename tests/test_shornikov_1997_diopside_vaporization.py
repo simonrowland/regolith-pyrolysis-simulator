@@ -25,7 +25,7 @@ def _migrated():
 def test_table_values_conditions_and_uncertainties_reach_migrated_records():
     result = _migrated()
     records = list(result.observations.values())
-    assert len(records) == 65
+    assert len(records) == 81
 
     pressure_points = [
         row for row in records
@@ -33,17 +33,20 @@ def test_table_values_conditions_and_uncertainties_reach_migrated_records():
         and row.identity.quantity.value is Quantity.P_PARTIAL
         and "_pressure_table1::" in row.observation_id
     ]
-    assert len(pressure_points) == 34
+    assert len(pressure_points) == 50
     for row in pressure_points:
         assert row.identity.species.phase.is_value
         assert row.identity.species.phase.value.value == "g"
         assert row.point_conditions["temperature_K"].state.is_value
-        assert row.point_conditions["composition"].state.is_value
-        composition = row.point_conditions["composition"].state.value
-        assert composition.amount_basis is AmountBasis.MOL_INVENTORY
-        assert dict(composition.components) == {
-            "CaO": Decimal("1"), "MgO": Decimal("1"), "SiO2": Decimal("2")
-        }
+        if "moo" in row.observation_id:
+            assert row.point_conditions["composition"].state.is_unknown
+        else:
+            assert row.point_conditions["composition"].state.is_value
+            composition = row.point_conditions["composition"].state.value
+            assert composition.amount_basis is AmountBasis.MOL_INVENTORY
+            assert dict(composition.components) == {
+                "CaO": Decimal("1"), "MgO": Decimal("1"), "SiO2": Decimal("2")
+            }
         assert row.value.kind is ValueKind.POINT
         assert row.uncertainty.verbatim["sigma"] > 0
 
