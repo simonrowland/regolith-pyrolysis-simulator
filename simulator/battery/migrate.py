@@ -13979,6 +13979,22 @@ class Migrator:
                 species_formula=species.formula,
                 values=values,
             )
+        elif obs.get("per") is not None:
+            raw_per = obs["per"]
+            try:
+                ident_kwargs["per"] = _state_from_plain(
+                    raw_per, lambda value: PerBasis(str(value))
+                )
+            except (TypeError, ValueError):
+                reason = f"unrecognised per basis {raw_per!r}"
+                ident_kwargs["per"] = State.unknown(reason)
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=f"observations.{obs_id}.identity.per",
+                        reason=RefusalReason.INVALID_IDENTITY,
+                        detail=reason,
+                    )
+                )
         if source_reference_state is not None:
             ident_kwargs["reference_state"] = source_reference_state
             if source_reference_state.is_unknown:

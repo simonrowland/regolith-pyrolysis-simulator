@@ -6572,6 +6572,83 @@ def test_k01_source_activity_is_quantity_activity(tmp_path: Path) -> None:
     assert obs.value.point == as_decimal("7.19e-10")
 
 
+@pytest.mark.parametrize(
+    ("per", "expected", "reason", "invalid"),
+    [
+        ("mol_species", PerBasis.MOL_SPECIES, None, False),
+        (
+            {"tag": "unknown", "reason": "basis not printed"},
+            None,
+            "basis not printed",
+            False,
+        ),
+        ("widgets", None, "unrecognised per basis 'widgets'", True),
+    ],
+)
+def test_extract_nonactivity_per_preserves_typed_state(
+    tmp_path: Path,
+    per: object,
+    expected: PerBasis | None,
+    reason: str | None,
+    invalid: bool,
+) -> None:
+    extract = _scalar_extract(
+        quantity="delta_fG",
+        units="kJ/mol",
+        values={
+            "quantity": "delta_fG",
+            "delta_fG_kJ_mol": -1.2,
+            "method_class": "measured_direct",
+        },
+    )
+    extract["species"]["Na"]["observations"][0]["per"] = per
+
+    baseline_extract = _scalar_extract(
+        quantity="delta_fG",
+        units="kJ/mol",
+        values={
+            "quantity": "delta_fG",
+            "delta_fG_kJ_mol": -1.2,
+            "method_class": "measured_direct",
+        },
+    )
+    baseline = migrate(
+        _write_min_tree(tmp_path / "before", baseline_extract), write=False
+    )
+    result = migrate(_write_min_tree(tmp_path / "after", extract), write=False)
+
+    obs = next(iter(result.observations.values()))
+    before = next(iter(baseline.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.DELTA_FG
+    assert obs.identity.per is not None
+    assert before.identity.per is not None and before.identity.per.is_unknown
+    per_outcome = identity_equal(before.identity, obs.identity)
+    assert per_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "per" in per_outcome.fields
+    from dataclasses import fields
+
+    changed_axes = [
+        field.name
+        for field in fields(before.identity)
+        if getattr(before.identity, field.name) != getattr(obs.identity, field.name)
+    ]
+    assert changed_axes == ["per"]
+    assert before.value == obs.value
+    invalid_per_issues = [
+        issue
+        for issue in result.validation.issues
+        if issue.path == f"observations.{obs.observation_id}.identity.per"
+        and issue.reason is RefusalReason.INVALID_IDENTITY
+    ]
+    assert bool(invalid_per_issues) is invalid
+    if expected is not None:
+        assert obs.identity.per.is_value
+        assert obs.identity.per.value is expected
+    else:
+        assert obs.identity.per.is_unknown
+        assert obs.identity.per.reason == reason
+
+
 def test_k01_dimensionless_activity_field_without_activity_units(tmp_path: Path) -> None:
     extract = _scalar_extract(
         quantity="activity",
