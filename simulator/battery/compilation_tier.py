@@ -1276,7 +1276,7 @@ def predict_thermo_attempt(
             from simulator.battery.generators.janaf import (
                 JANAFFusionPolymorphUnavailable,
                 janaf_fusion_enthalpy,
-                janaf_fusion_entropy,
+                _janaf_fusion_entropy_with_crossing_reason,
             )
 
             enthalpy_J_mol, low, high, solid, liquid, hashes = janaf_fusion_enthalpy(
@@ -1320,10 +1320,27 @@ def predict_thermo_attempt(
         else:
             # At the JANAF crossing, ΔG=0 gives ΔS=ΔH/T_fus. Away from
             # that crossing, ΔS_fus(T) is the two curves' entropy difference.
-            predicted, crossing_K = janaf_fusion_entropy(
+            (
+                predicted,
+                crossing_K,
+                crossing_error,
+            ) = _janaf_fusion_entropy_with_crossing_reason(
                 identity.species.formula, temperature_K, polymorph
             )
-            if temperature_K != crossing_K:
+            if crossing_error is not None:
+                notice_list.append(
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(quantity,),
+                        reason=(
+                            "janaf_fusion_crossing_undetermined: "
+                            f"{crossing_error}"
+                        ),
+                        origin=origin,
+                        authority=authority,
+                    )
+                )
+            elif temperature_K != crossing_K:
                 notice_list.append(
                     Notice(
                         kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
@@ -2060,7 +2077,9 @@ def _prediction_from_attempt(engine: Engine, observation: Observation, attempt: 
         unit=attempt.unit,
         authority=attempt.authority,
         notices=attempt.notices,
-        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        coefficient_sources=(
+            attempt.coefficient_sources or ENGINE_COEFFICIENT_SOURCES[engine]
+        ),
         lineage_complete=False,
         refusal_reason=attempt.refusal_reason,
         refusal_detail=attempt.refusal_detail,

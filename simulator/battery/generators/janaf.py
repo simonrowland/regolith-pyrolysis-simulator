@@ -2767,8 +2767,19 @@ def janaf_fusion_enthalpy(
 
 def janaf_fusion_entropy(
     oxide: str, temperature_K: Decimal, polymorph: Polymorph | None = None
-) -> tuple[Decimal, Decimal]:
-    """Return ΔS_fus(T) and the selected pair's JANAF Gibbs crossing."""
+) -> tuple[Decimal, Decimal | None]:
+    """Return ΔS_fus(T) and its Gibbs crossing when it can be determined."""
+
+    delta_s, crossing, _crossing_error = _janaf_fusion_entropy_with_crossing_reason(
+        oxide, temperature_K, polymorph
+    )
+    return delta_s, crossing
+
+
+def _janaf_fusion_entropy_with_crossing_reason(
+    oxide: str, temperature_K: Decimal, polymorph: Polymorph | None = None
+) -> tuple[Decimal, Decimal | None, str | None]:
+    """Return ΔS_fus(T), its crossing when available, and any failure reason."""
 
     solid_id, liquid_id = _fusion_table_pair(oxide, polymorph)
     solid, _solid_sha, solid_missing = _fusion_entropy_points(solid_id)
@@ -2789,10 +2800,13 @@ def janaf_fusion_entropy(
         _interpolate_table_points(liquid, temperature_K, extrapolate=True)
         - _interpolate_table_points(solid, temperature_K, extrapolate=True)
     )
-    crossing = _janaf_fusion_energy_for_pair(
-        oxide, solid_id, liquid_id, temperature_K
-    ).melting_temperature_K
-    return delta_s, crossing
+    try:
+        crossing = _janaf_fusion_energy_for_pair(
+            oxide, solid_id, liquid_id, temperature_K
+        ).melting_temperature_K
+    except (KeyError, ValueError) as exc:
+        return delta_s, None, str(exc)
+    return delta_s, crossing, None
 
 
 @lru_cache(maxsize=2 * len(_FUSION_TABLES))

@@ -11,6 +11,8 @@ from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
 
+import pytest
+
 from simulator.battery.compilation_tier import (
     _parse_product,
     _iter_compilation_series_cells,
@@ -3027,6 +3029,43 @@ def test_internal_predicts_janaf_fusion_enthalpy_and_entropy() -> None:
             )
 
 
+@pytest.mark.parametrize(
+    "crossing_error",
+    (
+        "MgO: expected one JANAF cr/l crossing, got []",
+        "MgO: expected one JANAF cr/l crossing, got [1, 2]",
+        "2963 K is outside the JANAF table range",
+    ),
+)
+def test_janaf_fusion_entropy_returns_prediction_when_crossing_fails(
+    monkeypatch, crossing_error: str
+) -> None:
+    from simulator.battery.generators import janaf
+
+    def unavailable_crossing(*_args, **_kwargs):
+        raise ValueError(crossing_error)
+
+    monkeypatch.setattr(
+        janaf, "_janaf_fusion_energy_for_pair", unavailable_crossing
+    )
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "mg-fusion-crossing-unavailable",
+        experiment.experiment_id,
+        _fusion_identity(Quantity.ENTROPY_OF_FUSION, Decimal("2963")),
+        Decimal("24.804"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+
+    assert attempt.value == Decimal("24.7041")
+    assert any(
+        notice.reason == f"janaf_fusion_crossing_undetermined: {crossing_error}"
+        for notice in attempt.notices
+    )
+
+
 def test_non_internal_engine_has_typed_fusion_refusal() -> None:
     experiment = F.tabulation_experiment()
     identity = _fusion_identity(
@@ -3063,6 +3102,7 @@ def test_janaf_fusion_extrapolation_is_flagged() -> None:
 
 
 def test_janaf_fusion_source_is_training_relation() -> None:
+    from simulator.battery.compilation_tier import _prediction_from_attempt
     from simulator.battery.score import compile_residual
 
     experiment = F.tabulation_experiment()
@@ -3087,9 +3127,15 @@ def test_janaf_fusion_source_is_training_relation() -> None:
         "ref-work": _work_with_table_assets("ref-work", ("O-037",)),
         "janaf-work": _work_with_table_assets("janaf-work", ("O-037", "O-038")),
     }
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    prediction = _prediction_from_attempt(
+        Engine.INTERNAL_ANALYTICAL, observation, attempt
+    )
+    assert prediction.coefficient_sources == ("O-037", "O-038")
     residual, _ = compile_residual(
         observation,
         Engine.INTERNAL_ANALYTICAL,
+        prediction=prediction,
         context=ScoreContext(
             works=works,
             experiments={experiment.experiment_id: experiment},
@@ -3125,6 +3171,7 @@ def _work_with_table_assets(work_id: str, asset_ids: tuple[str, ...]):
 
 
 def test_fusion_janaf_tables_do_not_make_other_works_training() -> None:
+    from simulator.battery.compilation_tier import _prediction_from_attempt
     from simulator.battery.score import compile_residual
 
     experiment = F.tabulation_experiment(experiment_id="independent-ref", work_id="other-work")
@@ -3147,9 +3194,15 @@ def test_fusion_janaf_tables_do_not_make_other_works_training() -> None:
         "janaf-work": _work_with_table_assets("janaf-work", ("O-037", "O-038")),
         "other-work": _work_with_table_assets("other-work", ("independent-table",)),
     }
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    prediction = _prediction_from_attempt(
+        Engine.INTERNAL_ANALYTICAL, observation, attempt
+    )
+    assert prediction.coefficient_sources == ("O-037", "O-038")
     residual, _ = compile_residual(
         observation,
         Engine.INTERNAL_ANALYTICAL,
+        prediction=prediction,
         context=ScoreContext(
             works=works,
             experiments={experiment.experiment_id: experiment},
