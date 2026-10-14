@@ -1540,10 +1540,44 @@ def fit_compilation_thermo_range(
                 in_range_temperatures.append(cell.temperature_K)
 
     def with_exclusions(result: FitResult) -> FitResult:
-        if not excluded:
-            return result
         output = dict(result.record)
-        output["excluded_cells"] = excluded
+        changed = False
+        if excluded:
+            output["excluded_cells"] = excluded
+            changed = True
+        if (
+            result.record.get("status") == "accepted"
+            and metadata["charge"] == 0
+            and metadata["reference_pressure_Pa"] is not None
+            and formula_composition(str(metadata["formula"]))
+        ):
+            # Keep source formation cells as a separate pointwise comparison
+            # path. These values come directly from the compilation table;
+            # they are not evaluated from the NASA-9 fit or extrapolated.
+            printed_cells = [
+                {
+                    "quantity": quantity.value,
+                    "T_K": cell.temperature_K,
+                    "value_kJ_per_mol": cell.value,
+                    "raw_token": cell.raw_token,
+                    "source_unit": cell.source_unit,
+                    "rounding_allowance_kJ_per_mol": cell.uncertainty,
+                    "provenance": "printed formation cell",
+                }
+                for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG)
+                for cell in channels.get(quantity, ())
+                if cell.raw_token is not None
+                and (T_min_K is None or cell.temperature_K >= T_min_K)
+                and (T_max_K is None or cell.temperature_K <= T_max_K)
+            ]
+            if printed_cells:
+                output["printed_formation_cells"] = sorted(
+                    printed_cells,
+                    key=lambda cell: (cell["T_K"], cell["quantity"]),
+                )
+                changed = True
+        if not changed:
+            return result
         return FitResult(output, result.curve)
 
     if not in_range_temperatures:

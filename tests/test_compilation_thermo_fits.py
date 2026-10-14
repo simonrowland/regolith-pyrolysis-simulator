@@ -897,6 +897,56 @@ def test_janaf_printed_formation_h_uses_exact_elemental_h298_gauge(
     assert record["fit_statistics"]["derived_formation_H_kJ_per_mol"]["cell_count"] > 0
 
 
+def test_printed_formation_cells_are_a_separate_pointwise_path() -> None:
+    records = generate_janaf_sidecar(table_ids=["O-029", "Fe-018", "Al-006"])
+    by_id = {
+        record["source_record_id"]: record
+        for record in records
+        if record.get("status") == "accepted"
+    }
+
+    oxygen = by_id["O-029"]
+    oxygen_cell = next(
+        cell for cell in oxygen["printed_formation_cells"]
+        if cell["quantity"] == Quantity.DELTA_FG.value
+        and cell["T_K"] == 298.15
+    )
+    assert oxygen_cell["value_kJ_per_mol"] == 0.0
+    assert oxygen_cell["provenance"] == "printed formation cell"
+
+    iron_oxide = by_id["Fe-018"]
+    assert iron_oxide["formation_capable"] is False
+    assert iron_oxide["formation_reason_code"] == "missing_element_reference_phase"
+    source = load_table_document(TABLES_DIR / "Fe-018.yaml")
+    source_series = compilation_column_series_from_record(source)
+    for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG):
+        oxide_cell = next(
+            cell for cell in iron_oxide["printed_formation_cells"]
+            if cell["quantity"] == quantity.value and cell["T_K"] == 298.15
+        )
+        source_cell = next(
+            (value, token, unit, uncertainty)
+            for item in source_series
+            if item.quantity is quantity
+            for (temperature, value), token, unit, uncertainty in zip(
+                item.value.series or (),
+                item.raw_tokens,
+                item.source_units,
+                item.cell_uncertainties,
+            )
+            if temperature == Decimal("298.15")
+        )
+        assert oxide_cell["value_kJ_per_mol"] == float(source_cell[0])
+        assert oxide_cell["raw_token"] == source_cell[1]
+        assert oxide_cell["source_unit"] == source_cell[2]
+        assert oxide_cell["rounding_allowance_kJ_per_mol"] == float(source_cell[3])
+        assert oxide_cell["provenance"] == "printed formation cell"
+
+    charged = by_id["Al-006"]
+    assert charged["charge"] == 1
+    assert "printed_formation_cells" not in charged
+
+
 def test_janaf_formation_anchor_does_not_require_element_fit_at_298_15_k() -> None:
     expected_missing_comparison_reference = {
         "Al-009": ("g", "Br, none, no accepted reference fit covers 200 K"),
