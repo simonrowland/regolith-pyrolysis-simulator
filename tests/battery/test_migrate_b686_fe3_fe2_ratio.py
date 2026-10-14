@@ -71,16 +71,20 @@ def _migrate(path: Path):
     return migrator.result
 
 
-def test_aithala_s1_rows_migrate_to_fe3_fe2_ratio_measured_reduced() -> None:
-    # b-686 change. Pin (006e13b70): quantity unknown ("unsupported quantity
-    # 'Fe3+/FeT'"), value UNAVAILABLE, evidence measured_direct.
-    result = _migrate(AITHALA)
-    rows = {
+def _aithala_fe_rows(result):
+    return {
         oid[len(PREFIX):]: obs
         for oid, obs in result.observations.items()
         if oid.startswith(PREFIX)
         and oid[len(PREFIX):] in AITHALA_S1_FE3_OVER_FET
     }
+
+
+def test_aithala_s1_rows_migrate_to_fe3_fe2_ratio_measured_reduced() -> None:
+    # b-686 change. Pin (006e13b70): quantity unknown ("unsupported quantity
+    # 'Fe3+/FeT'"), value UNAVAILABLE, evidence measured_direct.
+    result = _migrate(AITHALA)
+    rows = _aithala_fe_rows(result)
     assert set(rows) == set(AITHALA_S1_FE3_OVER_FET)
     asset_ids = {
         asset.asset_id
