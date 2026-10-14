@@ -8737,6 +8737,12 @@ def _selection_from_named_field(
     units: str | None,
     condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
 ) -> SourceSelection | None:
+    if q_token is Quantity.ACTIVITY and payload.get("unavailable_reason"):
+        return _unavailable_selection(
+            str(payload["unavailable_reason"]),
+            condition_ranges=condition_ranges,
+            field_name="activity",
+        )
     if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
         for key, unit in _PRESSURE_SERIES_KEYS:
             if key not in payload:
