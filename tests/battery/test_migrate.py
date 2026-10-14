@@ -7887,8 +7887,6 @@ def test_demaria_undigitized_pressure_figures_are_unavailable_not_points(
         "demaria_1971_tio_tio2_figure6_comparable_pressures",
         "demaria_1971_tio2_figure6_comparable_to_tio",
         "demaria_1971_al_monatomic_figure7",
-        "demaria_1971_na_first_observed_figure1",
-        "demaria_1971_k_first_observed_figure2",
     }
     rows = {
         obs.observation_id.split("::", 1)[1]: obs
