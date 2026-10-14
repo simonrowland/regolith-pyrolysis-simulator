@@ -4450,9 +4450,16 @@ def predict_with_engine(
         from simulator.battery.compilation_tier import predict_thermo_attempt
 
         attempt = predict_thermo_attempt(engine, observation)
-        coefficient_sources = attempt.coefficient_sources or sources
+        coefficient_sources = (
+            attempt.coefficient_sources
+            if quantity in FUSION_QUANTITIES
+            and engine is Engine.INTERNAL_ANALYTICAL
+            else attempt.coefficient_sources or sources
+        )
         lineage_complete = (
-            lineage_complete_for(coefficient_sources) if attempt.value is not None else False
+            lineage_complete_for(coefficient_sources)
+            if attempt.value is not None
+            else False
         )
         if attempt.value is not None:
             exec_state = ExecutionState.PRODUCED

@@ -142,6 +142,8 @@ def _fusion_identity(
 
 
 def test_fusion_predictor_selects_the_stated_silica_polymorph_table() -> None:
+    from simulator.battery.score import predict_with_engine
+
     experiment = F.tabulation_experiment()
     for polymorph, solid_table in (
         (Polymorph.QUARTZ, "O-037"),
@@ -162,9 +164,13 @@ def test_fusion_predictor_selects_the_stated_silica_polymorph_table() -> None:
         attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
         assert attempt.value is not None
         assert f"janaf-fusion:{solid_table}/O-038:" in attempt.call_evidence
+        prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
+        assert prediction.coefficient_sources == (solid_table, "O-038")
 
 
 def test_fusion_predictor_refuses_unavailable_stated_polymorph() -> None:
+    from simulator.battery.score import predict_with_engine
+
     experiment = F.tabulation_experiment()
     identity = _fusion_identity(
         Quantity.ENTHALPY_OF_FUSION,
@@ -181,6 +187,8 @@ def test_fusion_predictor_refuses_unavailable_stated_polymorph() -> None:
     attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
     assert attempt.value is None
     assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
+    assert prediction.coefficient_sources == ()
 
 
 def test_fusion_predictor_does_not_choose_an_unstated_polymorph() -> None:
