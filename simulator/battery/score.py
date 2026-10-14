@@ -6116,6 +6116,7 @@ def compile_residual(
     if (
         quantity in FUSION_QUANTITIES
         and prediction.engine is Engine.INTERNAL_ANALYTICAL
+        and reference.read_from in prediction.coefficient_sources
         and source_relation is SourceRelation.SAME_INPUT
     ):
         source_relation = SourceRelation.TRAINING
