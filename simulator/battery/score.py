@@ -9997,6 +9997,33 @@ def flagged_stratum_payloads(
     ]
 
 
+KC91_CALIBRATION_SOURCES = {
+    "citation": "Kress & Carmichael (1991); Partzsch et al. (2004), p. 566",
+    "attributions": (
+        "K&C88+; K&C91",
+        "Kilinc et al. (1983)",
+        "Sack et al. (1980)",
+        "Thornber et al. (1980)",
+    ),
+}
+
+
+def _kc91_calibration_source_overlap(
+    row: Mapping[str, object], observations: Mapping[str, Observation]
+) -> bool:
+    reference = observations.get(str(row.get("reference") or ""))
+    if reference is None or reference.evidence is None:
+        return False
+    attribution = reference.evidence.attribution
+    if not attribution:
+        return False
+    normalized = attribution.casefold()
+    return any(
+        normalized.startswith(label.casefold())
+        for label in KC91_CALIBRATION_SOURCES["attributions"]
+    )
+
+
 def headline_payload_records(
     rows: Iterable[Mapping[str, object]],
     *,
@@ -10005,6 +10032,8 @@ def headline_payload_records(
     origins: Mapping[str, str] | None = None,
 ) -> list[dict[str, object]]:
     """Machine-readable headline records from residual payloads."""
+
+    rows = tuple(rows)
 
     compilation_rows: Iterable[Mapping[str, object]] = ()
     is_measured = _payload_measured_reference(observations, origins)
@@ -10031,6 +10060,59 @@ def headline_payload_records(
         *headline_payloads(compilation_rows, engines, tier="compilation"),
     ]
     if observations is not None:
+        redox_rows_by_population: dict[str, list[Mapping[str, object]]] = {
+            "calibration_source_overlap_fit_fidelity": [],
+            "independent_source_accuracy": [],
+        }
+        for row in rows:
+            if row.get("rail") != Rail.REDOX.value:
+                continue
+            engine_name = str(
+                ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
+                or str(row.get("key") or "").rsplit("::", 1)[-1]
+            )
+            if engine_name != Engine.INTERNAL_ANALYTICAL.value:
+                continue
+            reference = observations.get(str(row.get("reference") or ""))
+            if (
+                reference is None
+                or not isinstance(reference.identity, Identity)
+                or quantity_token(reference.identity) is not Quantity.FE3_FE2_RATIO
+                or not _headline_payload_admits(row, tier="measured")
+            ):
+                continue
+            population = (
+                "calibration_source_overlap_fit_fidelity"
+                if _kc91_calibration_source_overlap(row, observations)
+                else "independent_source_accuracy"
+            )
+            redox_rows_by_population[population].append(row)
+        if any(redox_rows_by_population.values()):
+            records = [
+                record
+                for record in records
+                if not (
+                    record.get("tier") == "measured"
+                    and record.get("rail") == Rail.REDOX.value
+                    and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
+                )
+            ]
+            for population, population_rows in redox_rows_by_population.items():
+                population_record = next(
+                    record
+                    for record in headline_payloads(
+                        population_rows, engines, tier="measured"
+                    )
+                    if record.get("rail") == Rail.REDOX.value
+                    and record.get("engine") == Engine.INTERNAL_ANALYTICAL.value
+                )
+                population_record.update(
+                    population=population,
+                    attribution_basis="Observation.evidence.attribution via Residual.reference",
+                    calibration_source_citation=KC91_CALIBRATION_SOURCES["citation"],
+                )
+                records.append(population_record)
+
         compilation_rows = (row for row in rows if is_compilation(row))
         from simulator.battery.compilation_tier import (
             compilation_family,
