@@ -4248,6 +4248,70 @@ def test_gate_curve_memo_admission_registers_uninitialized_fallback_supplier(
     )
 
 
+def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from engines.magemin import MAGEMinShadowProvider
+    from simulator.engine_binding_admission import gate_curve_memo_evidence
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    producer = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    receiver = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    producer._register_freeze_gate_liquid_fraction_providers()
+    receiver._register_freeze_gate_liquid_fraction_providers()
+    producer_provider = producer._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    assert isinstance(producer_provider, MAGEMinShadowProvider)
+    producer_backend = MAGEMinBackend()
+    producer_backend.get_engine_version = lambda: 'MAGEMin pinned test build'
+    producer_provider._backend = producer_backend
+    producer_provider._backend_initialised = True
+    monkeypatch.setattr(
+        admission_module,
+        'install_provenance',
+        lambda _identity, **_kwargs: {
+            'runtime_artifacts': {
+                'magemin_selected_binary': {'sha256': 'a' * 64},
+            },
+        },
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1300.0,
+    }
+
+    producer_evidence = gate_curve_memo_evidence(
+        producer,
+        curve,
+        include_selected_bindings=False,
+    )
+    receiver_evidence = gate_curve_memo_evidence(
+        receiver,
+        curve,
+        include_selected_bindings=False,
+    )
+
+    assert producer_evidence.identity == receiver_evidence.identity
+    assert producer_evidence.producer_evidence == (
+        receiver_evidence.producer_evidence
+    )
+
+
 def test_core_gate_curve_memo_reuses_local_slot_refused_curve(
     monkeypatch,
     vapor_pressure_data,
