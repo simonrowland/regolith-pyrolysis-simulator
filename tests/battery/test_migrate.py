@@ -5312,16 +5312,21 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         # printed in J per mol of formula unit). The store keeps H(T)-H(298.15) in kJ/mol
         # (migrate derivation J_to_kJ_exact), so a J/mol cell is divided by exactly 1000:
         # 147,433.0 J/mol / 1000 = 147.433 kJ/mol. Any other unit is not inferred.
-        for key in ("enthalpy_increment", "H_minus_H298"):
+        for key in (
+            "enthalpy_increment",
+            "H_minus_H298",
+            "minus_delta_H_cool_kJ_mol-1",
+            "value",
+        ):
             if key not in item:
                 continue
             amount = _num(item.get(key))
             if amount is None:
                 return None
             unit = str(units or "").strip().lower().replace(" ", "")
-            if unit in {"j/mol", "jmol-1", "jmol^-1"}:
+            if unit in {"j/mol", "jmol-1", "jmol^-1", "j_per_mol"}:
                 return amount / as_decimal("1000")
-            if unit in {"kj/mol", "kjmol-1", "kjmol^-1"}:
+            if unit in {"kj/mol", "kjmol-1", "kjmol^-1", "kj_per_mol"}:
                 return amount
             return None
         return None
@@ -5662,15 +5667,17 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # the 12 duplicate Fedkin mirror cells (b677: the pre-item24 total 1877->1865).
     # The 13 Suzuki pO2 points now join p_partial, moving 1878->1891.
     # Item 24 adds 13 Abdul 2023 H_minus_H298 cells (Table 3 rankinite 7 + Table 4
-    # belite 6), which moved 1877->1890 on the tree that still counted those 12
-    # Fedkin mirror cells. Combined: 1865 + 13 = 1878 (equivalently 1890 - 12).
-    # Per-source delta abdul-2023-cao-sio2-calphad 0->13; H_minus_H298 0->13.
-    # No check was relaxed and mismatches stay 0.
-    assert census.get("H_minus_H298") == 13
+    # belite 6); Sugawara & Akaogi adds six measured heat-content cells, including
+    # the Table 1 series. Per-source deltas: Abdul 0->13, Sugawara 0->6.
+    # The independent census checks all six source cells; mismatches stay 0.
+    assert census.get("H_minus_H298") == 19
     assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
-    # The merged store adds 65 Holzheid points and 109 Sato points to the green
-    # baseline's 1891 numeric series points: 1891 + 65 + 109 = 2065.
-    assert n_numeric == 2065, (n_numeric, census, n_unavailable)
+    assert per_source.get("sugawara-akaogi-2004-liquid-calorimetry") == {
+        "H_minus_H298": 6
+    }
+    # The merged store adds 65 Holzheid points, 109 Sato points, and six Sugawara
+    # heat-content points to the green baseline's 1891 numeric series: 2071 total.
+    assert n_numeric == 2071, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
