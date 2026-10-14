@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -10,11 +11,13 @@ import yaml
 from simulator.battery.enums import (
     Phase,
     Quantity,
+    RefusalReason,
     ReferenceStateConvention,
     ValueKind,
 )
 from simulator.battery.migrate import Migrator, convert_pressure_to_pa
 from simulator.battery.records import AmountBasis
+from simulator.battery.validate import validate_corpus
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
@@ -267,8 +270,60 @@ def test_mgo_activity_uses_the_source_stated_pure_solid_reference():
         assert standard_state.endmember.formula == "MgO"
         assert standard_state.endmember.phase.is_value
         assert standard_state.endmember.phase.value is Phase.CR
-        assert standard_state.endmember.polymorph is None
+        assert standard_state.endmember.polymorph is not None
+        assert standard_state.endmember.polymorph.is_unknown
         assert standard_state.reference_pressure_bar is None
+
+
+def test_table4_lineage_resolves_to_same_source_table3_activity_rows():
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator._retarget_exploded_parents()
+    result = migrator.result
+
+    table4_rows = [
+        row for row in result.observations.values()
+        if "partial_" in row.observation_id and "table4" in row.observation_id
+    ]
+    assert len(table4_rows) == 6
+    for row in table4_rows:
+        formula = row.identity.species.formula.lower()
+        expected_prefix = f"shornikov_1997_{formula}_activity_table3"
+        assert row.derived_from
+        assert row.derivation is not None
+        assert row.derived_from == row.derivation.inputs
+        assert all(parent in result.observations for parent in row.derived_from)
+        assert all(expected_prefix in parent for parent in row.derived_from)
+
+    report = validate_corpus(
+        result.works, result.experiments, result.observations
+    )
+    lineage_references = [
+        issue for issue in report.issues
+        if issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        and any(row.observation_id in issue.path for row in table4_rows)
+        and (".derived_from" in issue.path or ".inputs" in issue.path)
+    ]
+    assert lineage_references == []
+
+    row = table4_rows[0]
+    phantom = "tables:shornikov-1997-diopside-vaporization"
+    mutated_row = replace(
+        row,
+        derived_from=(phantom,),
+        derivation=replace(row.derivation, inputs=(phantom,)),
+    )
+    mutated_observations = dict(result.observations)
+    mutated_observations[row.observation_id] = mutated_row
+    mutated_report = validate_corpus(
+        result.works, result.experiments, mutated_observations
+    )
+    assert any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        and row.observation_id in issue.path
+        and phantom in issue.detail
+        for issue in mutated_report.issues
+    )
 
 
 def test_table1_scaled_pressure_widths_and_point_temperatures_reach_migration():

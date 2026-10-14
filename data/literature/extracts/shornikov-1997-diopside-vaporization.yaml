@@ -1332,10 +1332,10 @@ species:
             state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
             locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
         units: kJ_per_declared_mol_basis
-        derived_from: [tables:shornikov-1997-diopside-vaporization]
+        derived_from: [shornikov_1997_sio2_activity_table3]
         derivation:
           relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
-          inputs: [tables:shornikov-1997-diopside-vaporization]
+          inputs: [shornikov_1997_sio2_activity_table3]
         values:
           quantity: partial_molar_enthalpy
           method_class: derived
@@ -1362,10 +1362,10 @@ species:
             state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
             locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
         units: J_per_declared_mol_basis_per_K
-        derived_from: [tables:shornikov-1997-diopside-vaporization]
+        derived_from: [shornikov_1997_sio2_activity_table3]
         derivation:
           relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
-          inputs: [tables:shornikov-1997-diopside-vaporization]
+          inputs: [shornikov_1997_sio2_activity_table3]
         values:
           quantity: S
           method_class: derived
@@ -1419,10 +1419,10 @@ species:
             state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
             locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
         units: kJ_per_declared_mol_basis
-        derived_from: [tables:shornikov-1997-diopside-vaporization]
+        derived_from: [shornikov_1997_cao_activity_table3]
         derivation:
           relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
-          inputs: [tables:shornikov-1997-diopside-vaporization]
+          inputs: [shornikov_1997_cao_activity_table3]
         values:
           quantity: partial_molar_enthalpy
           method_class: derived
@@ -1449,10 +1449,10 @@ species:
             state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
             locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
         units: J_per_declared_mol_basis_per_K
-        derived_from: [tables:shornikov-1997-diopside-vaporization]
+        derived_from: [shornikov_1997_cao_activity_table3]
         derivation:
           relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
-          inputs: [tables:shornikov-1997-diopside-vaporization]
+          inputs: [shornikov_1997_cao_activity_table3]
         values:
           quantity: S
           method_class: derived
@@ -1482,6 +1482,7 @@ species:
               endmember:
                 formula: MgO
                 phase: {tag: value, value: cr}
+                polymorph: {tag: unknown, reason: 'The paper identifies solid MgO but does not name its polymorph.'}
               component_basis: MgO
           inferred: false
           locator: {page: 175, published_page: 175, pdf_page_index: 1, table: '3', note: 'Equation (4) uses [MgO]; the paper defines square brackets as solid phase on p. 176.'}
@@ -1518,10 +1519,10 @@ species:
             state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
             locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
         units: kJ_per_declared_mol_basis
-        derived_from: [tables:shornikov-1997-diopside-vaporization]
+        derived_from: [shornikov_1997_mgo_activity_table3]
         derivation:
           relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
-          inputs: [tables:shornikov-1997-diopside-vaporization]
+          inputs: [shornikov_1997_mgo_activity_table3]
         values:
           quantity: partial_molar_enthalpy
           method_class: derived
@@ -1548,10 +1549,10 @@ species:
             state: {tag: value, value: {basis: printed_formula_stoichiometry, amount_basis: mol_inventory, components: [[CaO, '1'], [MgO, '1'], [SiO2, '2']]}}
             locator: {page: 176, published_page: 176, pdf_page_index: 2, table: '4'}
         units: J_per_declared_mol_basis_per_K
-        derived_from: [tables:shornikov-1997-diopside-vaporization]
+        derived_from: [shornikov_1997_mgo_activity_table3]
         derivation:
           relation: The temperature dependences of component activities in molten diopside were processed by the method of least squares to estimate the temperature dependences of the partial enthalpies and entropies in CaO ⋅ MgO ⋅ 2SiO2 (Table 4).
-          inputs: [tables:shornikov-1997-diopside-vaporization]
+          inputs: [shornikov_1997_mgo_activity_table3]
         values:
           quantity: S
           method_class: derived
