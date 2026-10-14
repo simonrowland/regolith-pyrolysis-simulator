@@ -4,10 +4,16 @@ import copy
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
-from simulator.battery.enums import Phase, Quantity, ReferenceStateConvention, ValueKind
-from simulator.battery.migrate import Migrator
+from simulator.battery.enums import (
+    Phase,
+    Quantity,
+    ReferenceStateConvention,
+    ValueKind,
+)
+from simulator.battery.migrate import Migrator, convert_pressure_to_pa
 from simulator.battery.records import AmountBasis
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -16,10 +22,122 @@ ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/shornikov-1997-diopside-vaporization.yaml"
 
 
-def _migrated():
+def _migrated(extract: Path = EXTRACT):
     migrator = Migrator(root=ROOT, index={}, aliases={})
-    migrator._migrate_extract(EXTRACT)
+    migrator._migrate_extract(extract)
     return migrator.result
+
+
+_TABLE1_PRESSURES_ATM = {
+    "shornikov_1997_ca_pressure_table1": [
+        (1566, "1.6e-10", "2e-11"),
+        (1640, "6.7e-10", "5e-11"),
+        (1688, "1.5e-9", "1e-10"),
+        (1743, "4.0e-9", "2e-10"),
+        (1778, "7.2e-9", "3e-10"),
+        (1862, "2.63e-8", "1e-9"),
+    ],
+    "shornikov_1997_mg_pressure_table1": [
+        (1566, "2.2e-9", "2e-10"),
+        (1640, "8.1e-9", "7e-10"),
+        (1688, "1.9e-8", "1e-9"),
+        (1743, "4.9e-8", "2e-9"),
+        (1778, "8.5e-8", "3e-9"),
+        (1862, "2.98e-7", "1e-8"),
+    ],
+    "shornikov_1997_sio_pressure_table1": [
+        (1566, "1.2e-7", "2e-8"),
+        (1640, "5.2e-7", "5e-8"),
+        (1688, "1.1e-6", "1e-7"),
+        (1743, "3.0e-6", "2e-7"),
+        (1778, "5.2e-6", "3e-7"),
+        (1862, "1.98e-5", "1e-6"),
+    ],
+    "shornikov_1997_sio2_pressure_table1": [
+        (1688, "1.2e-10", "3e-11"),
+        (1743, "5.4e-10", "5e-11"),
+        (1778, "1.1e-9", "1e-10"),
+        (1862, "5.9e-9", "5e-10"),
+    ],
+    "shornikov_1997_moo2_pressure_table1": [
+        (1566, "6.5e-9", "6e-10"),
+        (1640, "1.4e-8", "2e-9"),
+        (1688, "2.1e-8", "2e-9"),
+        (1743, "2.2e-8", "2e-9"),
+        (1778, "2.9e-8", "2e-9"),
+        (1862, "3.8e-8", "3e-9"),
+    ],
+    "shornikov_1997_moo3_pressure_table1": [
+        (1566, "1.1e-9", "2e-10"),
+        (1640, "3.2e-9", "4e-10"),
+        (1688, "5.7e-9", "4e-10"),
+        (1743, "6.4e-9", "4e-10"),
+        (1778, "8.6e-9", "5e-10"),
+        (1862, "1.2e-8", "1e-9"),
+    ],
+    "shornikov_1997_o_atomic_pressure_table1": [
+        (1566, "4.0e-13", "1e-13"),
+        (1640, "3.8e-12", "4e-13"),
+        (1688, "1.5e-11", "2e-12"),
+        (1743, "6.3e-11", "8e-12"),
+        (1778, "1.4e-10", "1.5e-11"),
+        (1862, "9.2e-10", "1e-10"),
+    ],
+    "shornikov_1997_o_atomic_alternate_pressure_table1": [
+        (1688, "1.1e-11", "3e-12"),
+        (1743, "5.0e-11", "9e-12"),
+        (1778, "1.2e-10", "1.8e-11"),
+        (1862, "7.0e-10", "1.5e-10"),
+    ],
+    "shornikov_1997_o2_pressure_table1": [
+        (1566, "2.0e-15", "1e-15"),
+        (1640, "2.8e-14", "4e-15"),
+        (1688, "1.5e-13", "2e-14"),
+        (1743, "8.2e-13", "1.3e-13"),
+        (1778, "1.69e-12", "1.5e-13"),
+        (1862, "1.86e-11", "9e-13"),
+    ],
+}
+
+
+def _assert_table1_migrated_pressures(result):
+    rows = [
+        row
+        for row in result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.P_PARTIAL
+        and "_pressure_table1::" in row.observation_id
+    ]
+    assert len(rows) == 50
+    assert len(_TABLE1_PRESSURES_ATM) == 9
+    assert sum(map(len, _TABLE1_PRESSURES_ATM.values())) == 50
+
+    for observation_id, expected_points in _TABLE1_PRESSURES_ATM.items():
+        matching = [
+            row for row in rows if f"::{observation_id}::T=" in row.observation_id
+        ]
+        matching.sort(
+            key=lambda row: Decimal(row.observation_id.split("::T=")[1].split(":")[0])
+        )
+        assert len(matching) == len(expected_points)
+        for row, (temperature, pressure_atm, sigma_atm) in zip(
+            matching, expected_points, strict=True
+        ):
+            expected_pa, relation = convert_pressure_to_pa(
+                Decimal(pressure_atm), "atm"
+            )
+            assert relation == "atm_to_Pa"
+            assert row.value.kind is ValueKind.POINT
+            assert row.value.point == expected_pa, row.observation_id
+            assert Decimal(str(row.uncertainty.verbatim["sigma"])) == Decimal(
+                sigma_atm
+            )
+            temperature_condition = row.point_conditions["temperature_K"]
+            composition_condition = row.point_conditions["composition"]
+            assert temperature_condition.state.is_value
+            assert temperature_condition.state.value == Decimal(temperature)
+            assert temperature_condition.locator is not None
+            assert composition_condition.locator is not None
 
 
 def test_table_values_conditions_and_uncertainties_reach_migrated_records():
@@ -151,3 +269,20 @@ def test_mgo_activity_uses_the_source_stated_pure_solid_reference():
         assert standard_state.endmember.phase.value is Phase.CR
         assert standard_state.endmember.polymorph is None
         assert standard_state.reference_pressure_bar is None
+
+
+def test_table1_scaled_pressure_widths_and_point_temperatures_reach_migration():
+    _assert_table1_migrated_pressures(_migrated())
+
+
+def test_mutating_consumed_pressure_atm_makes_numeric_regression_fail(tmp_path: Path):
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    ca_points = document["species"]["Ca"]["observations"][0]["values"]["points"]
+    ca_points[0]["pressure_atm"] = 1.6e-9
+    mutated_extract = tmp_path / EXTRACT.name
+    mutated_extract.write_text(
+        yaml.safe_dump(document, sort_keys=False), encoding="utf-8"
+    )
+
+    with pytest.raises(AssertionError, match="shornikov_1997_ca_pressure_table1"):
+        _assert_table1_migrated_pressures(_migrated(mutated_extract))
