@@ -33,6 +33,7 @@ Covers:
 from __future__ import annotations
 
 from dataclasses import replace
+import weakref
 from unittest.mock import patch
 
 import copy
@@ -77,6 +78,50 @@ from simulator.state import (
     DecisionType,
 )
 from tests.chemistry.conftest import _atom_check, _build_sim
+
+
+_TEST_OWNED_SIMULATORS: list[PyrolysisSimulator] = []
+_GATE_BACKEND_CLEANUP_REGRESSIONS: list[tuple[object, weakref.finalize]] = []
+
+
+class _CloseTrackingGateBackend:
+    def __init__(self):
+        self.closed = False
+
+    def close(self):
+        self.closed = True
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _assert_metallothermic_gate_backend_closed_after_test():
+    yield
+    for backend, finalizer in _GATE_BACKEND_CLEANUP_REGRESSIONS:
+        assert backend.closed, "test-owned gate backend remained open after its test"
+        assert not finalizer.alive, "test-owned gate backend finalizer remained attached"
+
+
+def test_metallothermic_simulator_closes_its_gate_backend_after_test(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    backend = _CloseTrackingGateBackend()
+    finalizer = weakref.finalize(provider, lambda: None)
+    provider._backend = backend
+    provider._backend_finalizer = finalizer
+    provider._backend_initialised = True
+    _TEST_OWNED_SIMULATORS.append(sim)
+    _GATE_BACKEND_CLEANUP_REGRESSIONS.append((backend, finalizer))
 
 
 def _hkl_only_setpoints(setpoints_data):
