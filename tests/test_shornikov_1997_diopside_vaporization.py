@@ -110,3 +110,22 @@ def test_fidelity_pins_cover_table_values_and_fail_after_mutation():
     points = mutated_table4["species"]["CaO"]["observations"][1]["values"]["points"]
     points[0]["sigma"] = 1.6
     assert check_all_fidelity_samples_match(mutated_table4, label=str(EXTRACT))
+
+
+def test_table1_preserves_temperature_widths_separately_from_pressure_widths():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    expected_widths = {1566: 7, 1640: 3, 1688: 5, 1743: 8, 1778: 5, 1862: 4}
+    table1_points = [
+        point
+        for entry in document["species"].values()
+        for observation in entry.get("observations", [])
+        if "_pressure_table1" in observation["observation_id"]
+        for point in observation["values"].get("points", [])
+    ]
+
+    assert len(table1_points) == 50
+    for point in table1_points:
+        temperature = point["temperature_K"]
+        width = expected_widths[temperature]
+        assert point["temperature_uncertainty_K_as_printed"] == width
+        assert point["temperature_as_printed"] == f"{temperature} ± {width} K"
