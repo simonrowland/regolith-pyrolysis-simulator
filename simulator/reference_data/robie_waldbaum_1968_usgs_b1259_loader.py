@@ -84,6 +84,7 @@ IMAGE_VERIFIED_METADATA = {
     145: {"phase": "α tridymite 298.15° to 390°K. β tridymite 390° to 2000°K."},
     153: {"phase": "Crystals 298.15° to 1300°K."},
     206: {"formula_as_published": "Ca5(PO4)3OH"},
+    228: {"formula_as_published": "MgSiO3"},
     233: {"phase": "Crystals 298.15° to 1400°K."},
     237: {"phase": "Crystals 298.15° to 1400°K."},
     238: {"phase": "Crystals 298.15° to 1400°K."},
