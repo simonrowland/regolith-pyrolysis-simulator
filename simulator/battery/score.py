@@ -1218,6 +1218,19 @@ def _is_flagged_stratum_notice(notice: Notice) -> bool:
     return bool(flagged_strata((notice,)))
 
 
+def _score_eligibility_notices(notices: Sequence[Notice]) -> tuple[Notice, ...]:
+    """Remove diagnostic engine band flags; authority gates eligibility."""
+
+    return tuple(
+        notice
+        for notice in notices
+        if not (
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and notice.origin.startswith("engine:")
+        )
+    )
+
+
 @lru_cache(maxsize=1)
 def _janaf_pure_solid_table_index() -> tuple[tuple[str, str, Polymorph | None], ...]:
     """Return JANAF neutral crystal tables and their canonical polymorphs."""
@@ -2108,6 +2121,9 @@ def build_conjuncts(
     independent = (
         source_relation is SourceRelation.INDEPENDENT and lineage_complete
     )
+    # Engine band notices remain visible to the measured report's flagged
+    # population. Prediction authority is already gated separately.
+    eligibility_notices = _score_eligibility_notices(notices)
     return EligibleConjuncts(
         status=status,
         finite_numeric_point_endpoints=finite_points,
@@ -2121,11 +2137,11 @@ def build_conjuncts(
         candidate_engine_prediction_authority_allowed=cand_ok,
         no_blocking_qualification=not blocking_qualifications(
             quantity,
-            notices,
+            eligibility_notices,
             oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
         ),
         not_flagged_stratum=not any(
-            _is_flagged_stratum_notice(notice) for notice in notices
+            _is_flagged_stratum_notice(notice) for notice in eligibility_notices
         ),
         selected_independent_lineage_level=selected_lineage_level(
             reference, comparison_ids
@@ -7606,14 +7622,27 @@ def _iqr(values: Sequence[Decimal]) -> Decimal | None:
 def _measured_residuals(
     residuals: Sequence[Residual],
     context: ScoreContext | None,
+    *,
+    include_engine_out_of_band: bool = False,
 ) -> list[Residual]:
-    """Keep only measured-evidence rows outside flagged and compilation tiers."""
+    """Keep measured rows outside flagged/compilation tiers.
+
+    The headline can retain engine band diagnostics; certified metrics cannot.
+    """
+
+    def unflagged(residual: Residual) -> bool:
+        notices = (
+            _score_eligibility_notices(residual.notices)
+            if include_engine_out_of_band
+            else residual.notices
+        )
+        return not flagged_strata(notices)
 
     if context is None:
         return [
             residual
             for residual in residuals
-            if not flagged_strata(residual.notices)
+            if unflagged(residual)
             and _reference_has_measured_evidence(
                 None, exclusions=residual.exclusions
             )
@@ -7623,7 +7652,7 @@ def _measured_residuals(
     return [
         residual
         for residual in residuals
-        if not flagged_strata(residual.notices)
+        if unflagged(residual)
         if _reference_has_measured_evidence(
             context.observations.get(residual.reference),
             exclusions=residual.exclusions,
@@ -8432,7 +8461,9 @@ def headline_rows(
     groups: dict[tuple[str, str, str], list[Residual]] = {}
     engines_seen: set[str] = set()
     if tier == "measured":
-        tier_residuals = _measured_residuals(residuals, context)
+        tier_residuals = _measured_residuals(
+            residuals, context, include_engine_out_of_band=True
+        )
     elif tier == "compilation":
         tier_residuals = _compilation_residuals(residuals, context)
     else:
