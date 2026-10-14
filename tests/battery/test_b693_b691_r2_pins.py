@@ -315,7 +315,10 @@ def test_r2_f2_all_numeric_has_full_engine_rail_grid_and_prints_zero_rows(tmp_pa
     for writer in ("typed", "stream"):
         b_lines = _b_section(out["md"][writer]).splitlines()
         assert any(
-            line.startswith("| vapour | internal-analytical | 1 | 0 | 1 |") for line in b_lines
+            line.startswith(
+                "| vapour | internal-analytical | — | 1 | 0 | 1 |"
+            )
+            for line in b_lines
         ), writer
         assert not any("| openimcc |" in line for line in b_lines), writer
     # Certified membership inside A is B's own decision, per engine.

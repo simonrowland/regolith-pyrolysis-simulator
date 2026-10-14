@@ -8868,7 +8868,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     )
     assert (
         f"| {residual.rail.value} | {Engine.OPENIMCC.value} | "
-        "0 | 0 | 0 | 0 |"
+        "— | 0 | 0 | 0 | 0 |"
     ) in report
     assert (
         f"| {FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION} | "
