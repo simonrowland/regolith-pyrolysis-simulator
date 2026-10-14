@@ -144,6 +144,7 @@ class RefusalReason(StrEnum):
     OPENIMCC_NOT_IMPORTABLE = "openimcc_not_importable"
     OUTSIDE_SUPPORTED_SPECIES = "outside_supported_species"
     COEFFICIENT_BASIS_MISMATCH = "coefficient_basis_mismatch"
+    ENGINE_DOES_NOT_REPORT_FE_REDOX = "engine_does_not_report_fe_redox"
 
 
 class CellMaterial(StrEnum):
