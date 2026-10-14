@@ -55,6 +55,7 @@ import yaml
 from simulator.battery.polymorph_dictionary import (
     POLYMORPH_ALIASES,
     is_generic_polymorph_name,
+    polymorph_matches_formula,
     resolve_formula_polymorph,
 )
 from simulator.battery.extract_context import iter_extract_context_containers
@@ -7779,7 +7780,32 @@ def _identity_provenance_for_value_derivation(
     )
 
 
-def polymorph_from_extract(obs: Mapping[str, Any]) -> State[Polymorph] | State[str] | None:
+_EXTRACT_POLYMORPH_ALIASES: dict[str, Polymorph] = {
+    "clinoenstatite": Polymorph.CLINOENSTATITE,
+    "diopside": Polymorph.DIOPSIDE,
+    "high albite": Polymorph.ALBITE_HIGH,
+    "high sanidine": Polymorph.SANIDINE_HIGH,
+}
+
+
+def _extract_polymorph_alias(
+    value: object, formula: str
+) -> State[Polymorph] | None:
+    spelling = " ".join(str(value).casefold().split())
+    alias = _EXTRACT_POLYMORPH_ALIASES.get(spelling)
+    if alias is None:
+        return None
+    token = alias
+    if not polymorph_matches_formula(formula, token):
+        return State.unknown(
+            f"polymorph {value!r} does not denote formula {formula}"
+        )
+    return State.of(token)
+
+
+def polymorph_from_extract(
+    obs: Mapping[str, Any], formula: str
+) -> State[Polymorph] | State[str] | None:
     """Read condensed_form.polymorph from an extract observation.
 
     Plain closed tokens stay ``State.of(str(...))`` for Species coercion.
@@ -7795,6 +7821,10 @@ def polymorph_from_extract(obs: Mapping[str, Any]) -> State[Polymorph] | State[s
     if not raw:
         return None
     if isinstance(raw, Mapping):
+        if str(raw.get("tag") or "") == "value":
+            alias = _extract_polymorph_alias(raw.get("value"), formula)
+            if alias is not None:
+                return alias
         try:
             return _state_from_plain(raw, _polymorph_from_plain)
         except ValueError:
@@ -7802,6 +7832,9 @@ def polymorph_from_extract(obs: Mapping[str, Any]) -> State[Polymorph] | State[s
 
             spelling = raw.get("value") if str(raw.get("tag") or "") == "value" else raw
             return State.unknown(unrecognised_polymorph_reason(spelling))
+    alias = _extract_polymorph_alias(raw, formula)
+    if alias is not None:
+        return alias
     return State.of(str(raw))
 
 
@@ -13417,7 +13450,7 @@ class Migrator:
         species_polymorph = (
             None
             if measured_tabulated_gas_formula is not None
-            else polymorph_from_extract(obs)
+            else polymorph_from_extract(obs, species_formula)
         )
         species = make_species(
             species_formula, phase, polymorph=species_polymorph
@@ -13480,7 +13513,9 @@ class Migrator:
                 oxide_map=initial_oxide_map,
             )
             species = make_species(
-                species_formula, phase, polymorph=polymorph_from_extract(obs)
+                species_formula,
+                phase,
+                polymorph=polymorph_from_extract(obs, species_formula),
             )
 
         t_payload = dict(values)
@@ -13565,8 +13600,10 @@ class Migrator:
                                 and target_phase is not Phase.L
                             ):
                                 continue
-                        transition_polymorph = polymorph_from_extract(transition)
-                        fusion_polymorph = polymorph_from_extract(obs)
+                        transition_polymorph = polymorph_from_extract(
+                            transition, formula
+                        )
+                        fusion_polymorph = polymorph_from_extract(obs, formula)
                         if (
                             transition_polymorph is None
                             or fusion_polymorph is None

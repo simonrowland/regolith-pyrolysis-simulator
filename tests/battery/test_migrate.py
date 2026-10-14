@@ -2166,6 +2166,66 @@ def _phase_state(obs):
     return obs.identity.species.phase
 
 
+@pytest.mark.parametrize(
+    ("spelling", "printed_name", "expected"),
+    (
+        (" CLINOENSTATITE ", "clinoenstatite", Polymorph.CLINOENSTATITE),
+        ("  Diopside  ", "Diopside", Polymorph.DIOPSIDE),
+        ("High   albite", "High albite", Polymorph.ALBITE_HIGH),
+        ("HIGH SANIDINE", "High sanidine", Polymorph.SANIDINE_HIGH),
+    ),
+)
+def test_extract_named_polymorphs_are_formula_scoped(
+    spelling: str, printed_name: str, expected: Polymorph
+) -> None:
+    from simulator.battery.migrate import polymorph_from_extract
+
+    source_path = (
+        REPO_ROOT
+        / "data/literature/extracts/richet-bottinga-1986-silicate-thermochemistry.yaml"
+    )
+    source = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    matching_formulas = {
+        formula
+        for formula, body in source["species"].items()
+        for row in body.get("observations", ())
+        if row.get("condensed_form", {}).get("polymorph") == printed_name
+    }
+    assert len(matching_formulas) == 1
+    formula = matching_formulas.pop()
+    unrelated_formula = next(
+        candidate for candidate in source["species"] if candidate != formula
+    )
+
+    observation = {"condensed_form": {"polymorph": spelling}}
+    resolved = polymorph_from_extract(observation, formula)
+    assert resolved is not None and resolved.is_value
+    assert resolved.value is expected
+
+    typed = polymorph_from_extract(
+        {"condensed_form": {"polymorph": {"tag": "value", "value": spelling}}},
+        formula,
+    )
+    assert typed is not None and typed.is_value
+    assert typed.value is expected
+
+    unrelated = polymorph_from_extract(observation, unrelated_formula)
+    assert unrelated is not None and unrelated.is_unknown
+    assert unrelated_formula in (unrelated.reason or "")
+
+
+def test_unqualified_cristobalite_is_not_assigned_a_structural_state() -> None:
+    from simulator.battery.migrate import make_species, polymorph_from_extract
+
+    raw = polymorph_from_extract(
+        {"condensed_form": {"polymorph": "Cristobalite"}}, "SiO2"
+    )
+    assert raw is not None and raw.is_value
+    assert raw.value == "Cristobalite"
+    species = make_species("SiO2", Phase.CR, polymorph=raw)
+    assert species.polymorph is not None and species.polymorph.is_unknown
+
+
 def test_unrecognised_polymorph_is_counted_and_queued(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     observations = extract["species"]["Na"]["observations"]
