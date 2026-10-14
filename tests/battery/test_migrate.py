@@ -1353,14 +1353,13 @@ def test_kor_sulfur_tables_are_typed_refusals_and_keep_24_hour_footnote() -> Non
         f"{suffix}"
         for suffix in ("h=496a7a098edd", "h=b5bde09ebf68")
     }
-    assert not [
-        issue
+    migrated_activity_ids = {obs.observation_id for obs in activities}
+    assert migrated_activity_ids == activity_ids
+    expected = set()
+    assert {
+        (issue.path, issue.reason, issue.detail)
         for issue in migrator.result.validation.hard_issues
-        if any(
-            f"observation[{observation_id}]" in issue.path
-            for observation_id in activity_ids
-        )
-    ]
+    } == expected
 
 
 def test_identity_complete_compilation_cells_are_admitted_at_source_level() -> None:
