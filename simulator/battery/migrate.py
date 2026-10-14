@@ -6188,6 +6188,8 @@ def lineage_parents_from_source(
             parents.append(item)
         elif item.startswith("tables:") and item in asset_ids:
             parents.append(item)
+        elif item.startswith("pdf:") and item in asset_ids:
+            parents.append(item)
         elif "::" in item:
             # Source-stated qualified pointer; kept as written. If it
             # dangles, the store validator flags the extract, not us.

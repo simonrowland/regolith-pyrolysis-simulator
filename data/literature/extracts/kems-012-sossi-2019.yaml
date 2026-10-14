@@ -6250,6 +6250,9 @@ species:
       units: kJ/mol and kJ/(mol·K) as published in Table 5
       values:
         quantity: experimental_reaction_enthalpy_entropy
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_k_logKstar_table3
         evidence_class: experimental_open_furnace_second_law
         reaction: KO0.5(l) = K(g) + 1/4 O2
         n_electrons: 1
@@ -6261,7 +6264,12 @@ species:
         source_column: 2
         derived: true
         derivation:
-          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          relation: >-
+            * denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures.
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_k_logKstar_table3
+          premise: "* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
           algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
           unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
           sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
@@ -6933,6 +6941,8 @@ species:
       units: kJ/mol and kJ/(mol·K) as published in Table 5
       values:
         quantity: pure_system_reaction_enthalpy_entropy
+        derived_from:
+        - tables:kems-012-sossi-2019
         evidence_class: pure_system_literature_reprint
         reaction: MnO(l) = Mn(g) + 1/2 O2
         n_electrons: 2
@@ -6941,6 +6951,10 @@ species:
         source_column: 1,4
         derived: true
         derivation:
+          relation: >-
+            Table 5 reprints pure-system ΔH° and ΔS° from cited literature, with γi = 1; these are not experimental values (Table 5; §4.7).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: Sossi reprints pure-system ΔH°/ΔS° from cited compilations; not measured in these runs
           algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
           unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
@@ -6967,11 +6981,19 @@ species:
       units: K
       values:
         quantity: one_percent_evaporation_temperature
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_mn_table5_pure_system_not_experimental
         evidence_class: thermodynamic_model_parameter
         gas_species: Mn(g)
         derived: true
         not_from_this_experiment: true
         derivation:
+          relation: >-
+            The authors calculate Te1 from pure-system thermodynamic data at stated oxygen fugacity (Table 6; §5.1).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_mn_table5_pure_system_not_experimental
           premise: OCR Fig.13 / Table 6 caption — Mn, Mg, Fe, Co, Ni, Cr (below IW-1) taken from pure-system data (Table 5)
           algebra: T_e^1 from experimental or pure-system K(T) at stated log fO2 (OCR §5.1)
           unit_check: temperatures in K as published
@@ -18180,6 +18202,8 @@ species:
         confidence_level: one_sigma
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Li(g)
         reaction: LiO0.5(l) = Li(g) + 1/4 O2
         n_electrons: 1
@@ -18191,6 +18215,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -18263,6 +18291,8 @@ species:
         confidence_level: one_sigma
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Li(g)
         reaction: LiO0.5(l) + 1/4 O2 = LiO(g)
         n_electrons: -1
@@ -18274,6 +18304,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -18341,6 +18375,9 @@ species:
       values:
         gamma: 15.4
         quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_li_logKstar_table3_Li_g
         oxide_formula_as_published: LiO0.5
         gas_species: Li(g)
         material: ferrobasalt_FCMAS_open_furnace
@@ -18349,6 +18386,11 @@ species:
         derived: true
         not_a_measured_alpha: true
         derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_li_logKstar_table3_Li_g
           premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
           algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
           unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
@@ -18408,6 +18450,9 @@ species:
       units: kJ/mol and kJ/(mol·K) as published in Table 5
       values:
         quantity: experimental_reaction_enthalpy_entropy
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_li_logKstar_table3_Li_g
         evidence_class: experimental_open_furnace_second_law
         reaction: LiO0.5(l) = Li(g) + 1/4 O2
         n_electrons: 1
@@ -18419,7 +18464,12 @@ species:
         source_column: 1
         derived: true
         derivation:
-          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          relation: >-
+            * denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures.
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_li_logKstar_table3_Li_g
+          premise: "* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
           algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
           unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
           sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
@@ -18638,6 +18688,8 @@ species:
         confidence_level: one_sigma
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Rb(g)
         reaction: RbO0.5(l) = Rb(g) + 1/4 O2
         n_electrons: 1
@@ -18649,6 +18701,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -18737,6 +18793,9 @@ species:
           gamma_uncertainty: null
           uncertainty_note: no uncertainty printed for this Table 4 cell
         quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_rb_logKstar_table3
         oxide_formula_as_published: RbO0.5
         gas_species: Rb(g)
         material: ferrobasalt_FCMAS_open_furnace
@@ -18745,6 +18804,11 @@ species:
         derived: true
         not_a_measured_alpha: true
         derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_rb_logKstar_table3
           premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
           algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
           unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
@@ -18804,6 +18868,9 @@ species:
       units: kJ/mol and kJ/(mol·K) as published in Table 5
       values:
         quantity: experimental_reaction_enthalpy_entropy
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_rb_logKstar_table3
         evidence_class: experimental_open_furnace_second_law
         reaction: RbO0.5(l) = Rb(g) + 1/4 O2
         n_electrons: 1
@@ -18817,7 +18884,12 @@ species:
         source_column: 2
         derived: true
         derivation:
-          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          relation: >-
+            The authors derive ΔH* and ΔS* from the temperature dependence of experimental log K* using the second law (Table 5; §4.7, Eqs. 17–18).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_rb_logKstar_table3
+          premise: "* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
           algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
           unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
           sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
@@ -19037,6 +19109,8 @@ species:
         confidence_level: one_sigma
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Cu(g)
         reaction: CuO0.5(l) = Cu(g) + 1/4 O2
         n_electrons: 1
@@ -19048,6 +19122,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -19145,6 +19223,9 @@ species:
           source_marker: '*'
           uncertainty_note: source footnote states this value was extrapolated to 1923.15 K
         quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_cu_logKstar_table3
         oxide_formula_as_published: CuO0.5
         gas_species: Cu(g)
         material: ferrobasalt_FCMAS_open_furnace
@@ -19153,6 +19234,11 @@ species:
         derived: true
         not_a_measured_alpha: true
         derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_cu_logKstar_table3
           premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
           algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
           unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
@@ -19213,6 +19299,9 @@ species:
       units: kJ/mol and kJ/(mol·K) as published in Table 5
       values:
         quantity: experimental_reaction_enthalpy_entropy
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_cu_logKstar_table3
         evidence_class: experimental_open_furnace_second_law
         reaction: CuO0.5(l) = Cu(g) + 1/4 O2
         n_electrons: 1
@@ -19226,7 +19315,12 @@ species:
         source_column: 1, 4
         derived: true
         derivation:
-          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          relation: >-
+            The authors derive ΔH* and ΔS* from the temperature dependence of experimental log K* using the second law (Table 5; §4.7, Eqs. 17–18).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_cu_logKstar_table3
+          premise: "* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
           algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
           unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
           sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
@@ -19480,6 +19574,8 @@ species:
         note: Table 3 value without published SD at this T (single-T or N=1 row)
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Ag(g)
         reaction: AgO0.5(l) = Ag(g) + 1/4 O2
         n_electrons: 1
@@ -19490,6 +19586,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -19557,6 +19657,9 @@ species:
       values:
         gamma: 0.67
         quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_ag_logKstar_table3
         oxide_formula_as_published: AgO0.5
         gas_species: Ag(g)
         material: ferrobasalt_FCMAS_open_furnace
@@ -19565,6 +19668,11 @@ species:
         derived: true
         not_a_measured_alpha: true
         derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_ag_logKstar_table3
           premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
           algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
           unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
@@ -19711,6 +19819,8 @@ species:
         confidence_level: one_sigma
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Zn(g)
         reaction: ZnO(l) = Zn(g) + 1/2 O2
         n_electrons: 2
@@ -19722,6 +19832,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -19814,6 +19928,9 @@ species:
           gamma_uncertainty: null
           uncertainty_note: no uncertainty printed for this Table 4 cell
         quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_zn_logKstar_table3
         oxide_formula_as_published: ZnO
         gas_species: Zn(g)
         material: ferrobasalt_FCMAS_open_furnace
@@ -19822,6 +19939,11 @@ species:
         derived: true
         not_a_measured_alpha: true
         derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_zn_logKstar_table3
           premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
           algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
           unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
@@ -19881,6 +20003,9 @@ species:
       units: kJ/mol and kJ/(mol·K) as published in Table 5
       values:
         quantity: experimental_reaction_enthalpy_entropy
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_zn_logKstar_table3
         evidence_class: experimental_open_furnace_second_law
         reaction: ZnO(l) = Zn(g) + 1/2 O2
         n_electrons: 2
@@ -19894,7 +20019,12 @@ species:
         source_column: 3
         derived: true
         derivation:
-          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          relation: >-
+            The authors derive ΔH* and ΔS* from the temperature dependence of experimental log K* using the second law (Table 5; §4.7, Eqs. 17–18).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_zn_logKstar_table3
+          premise: "* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
           algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
           unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
           sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
@@ -20139,6 +20269,8 @@ species:
         confidence_level: one_sigma
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Ge(g)
         reaction: GeO2(l) = GeO(g) + 1/2 O2
         n_electrons: 2
@@ -20150,6 +20282,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -20242,6 +20378,9 @@ species:
           gamma_uncertainty: null
           uncertainty_note: no uncertainty printed for this Table 4 cell
         quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_ge_logKstar_table3
         oxide_formula_as_published: GeO2
         gas_species: Ge(g)
         material: ferrobasalt_FCMAS_open_furnace
@@ -20250,6 +20389,11 @@ species:
         derived: true
         not_a_measured_alpha: true
         derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_ge_logKstar_table3
           premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
           algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
           unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
@@ -20308,6 +20452,9 @@ species:
       units: kJ/mol and kJ/(mol·K) as published in Table 5
       values:
         quantity: experimental_reaction_enthalpy_entropy
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_ge_logKstar_table3
         evidence_class: experimental_open_furnace_second_law
         reaction: GeO2(l) = GeO(g) + 1/2 O2
         n_electrons: 2
@@ -20321,7 +20468,12 @@ species:
         source_column: 3
         derived: true
         derivation:
-          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          relation: >-
+            The authors derive ΔH* and ΔS* from the temperature dependence of experimental log K* using the second law (Table 5; §4.7, Eqs. 17–18).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_ge_logKstar_table3
+          premise: "* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
           algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
           unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
           sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
@@ -20564,6 +20716,8 @@ species:
         note: Table 3 value without published SD at this T (single-T or N=1 row)
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Cd(g)
         reaction: CdO(l) = Cd(g) + 1/2 O2
         n_electrons: 2
@@ -20574,6 +20728,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -20639,6 +20797,9 @@ species:
       values:
         gamma: 0.15
         quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_cd_logKstar_table3
         oxide_formula_as_published: CdO
         gas_species: Cd(g)
         material: ferrobasalt_FCMAS_open_furnace
@@ -20647,6 +20808,11 @@ species:
         derived: true
         not_a_measured_alpha: true
         derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_cd_logKstar_table3
           premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
           algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
           unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
@@ -20792,6 +20958,8 @@ species:
         confidence_level: one_sigma
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Ga(g)
         reaction: GaO1.5(l) = Ga(g) + 3/4 O2
         n_electrons: 3
@@ -20803,6 +20971,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -20882,6 +21054,8 @@ species:
         confidence_level: one_sigma
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Ga(g)
         reaction: GaO1.5(l) = GaO(g) + 1/4 O2
         n_electrons: 1
@@ -20893,6 +21067,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -20963,6 +21141,9 @@ species:
       units: kJ/mol and kJ/(mol·K) as published in Table 5
       values:
         quantity: experimental_reaction_enthalpy_entropy
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_ga_logKstar_table3_Ga_g
         evidence_class: experimental_open_furnace_second_law
         reaction: GaO1.5(l) = Ga(g) + 3/4 O2
         n_electrons: 3
@@ -20976,7 +21157,12 @@ species:
         source_column: 3
         derived: true
         derivation:
-          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          relation: >-
+            The authors derive ΔH* and ΔS* from the temperature dependence of experimental log K* using the second law (Table 5; §4.7, Eqs. 17–18).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_ga_logKstar_table3_Ga_g
+          premise: "* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
           algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
           unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
           sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
@@ -21191,6 +21377,8 @@ species:
         note: Table 3 value without published SD at this T (single-T or N=1 row)
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Pb(g)
         reaction: PbO(l) = PbO(g)
         n_electrons: 0
@@ -21201,6 +21389,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -21275,6 +21467,8 @@ species:
         note: Table 3 value without published SD at this T (single-T or N=1 row)
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Pb(g)
         reaction: PbO(l) = Pb(g) + 1/2 O2
         n_electrons: 2
@@ -21285,6 +21479,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -21372,6 +21570,9 @@ species:
             uncertainty_note: no uncertainty printed for this Table 4 cell
         channel_note: PbO^ and PbO# retained as printed; channel footnote was not recovered from the repaired slice.
         quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_pb_logKstar_table3_Pb_g
         oxide_formula_as_published: PbO
         gas_species: Pb(g)
         material: ferrobasalt_FCMAS_open_furnace
@@ -21380,6 +21581,11 @@ species:
         derived: true
         not_a_measured_alpha: true
         derivation:
+          relation: >-
+            The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_pb_logKstar_table3_Pb_g
           premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
           algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
           unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
@@ -21441,6 +21647,9 @@ species:
       units: kJ/mol and kJ/(mol·K) as published in Table 5
       values:
         quantity: experimental_reaction_enthalpy_entropy
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_pb_logKstar_table3_PbO_g
         evidence_class: experimental_open_furnace_second_law
         reaction: PbO(l) = PbO(g)
         n_electrons: 0
@@ -21454,7 +21663,12 @@ species:
         source_column: 3
         derived: true
         derivation:
-          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          relation: >-
+            The authors derive ΔH* and ΔS* from the temperature dependence of experimental log K* using the second law (Table 5; §4.7, Eqs. 17–18).
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_pb_logKstar_table3_PbO_g
+          premise: "* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
           algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
           unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
           sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
@@ -21715,6 +21929,8 @@ species:
         confidence_level: one_sigma
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Mo(g)
         reaction: MoO3(l) = MoO3(g)
         n_electrons: 0
@@ -21726,6 +21942,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -21809,6 +22029,8 @@ species:
         confidence_level: one_sigma
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Mo(g)
         reaction: MoO2(l) + 1/2 O2 = MoO3(g)
         n_electrons: -2
@@ -21820,6 +22042,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -21893,6 +22119,9 @@ species:
       units: kJ/mol and kJ/(mol·K) as published in Table 5
       values:
         quantity: experimental_reaction_enthalpy_entropy
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_mo_logKstar_table3_MoO3_congruent
         evidence_class: experimental_open_furnace_second_law
         reaction: MoO3(l) = MoO3(g)
         n_electrons: 0
@@ -21906,7 +22135,12 @@ species:
         source_column: 1
         derived: true
         derivation:
-          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          relation: >-
+            * denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures.
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_mo_logKstar_table3_MoO3_congruent
+          premise: "* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
           algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
           unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
           sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
@@ -22127,6 +22361,8 @@ species:
         note: Table 3 value without published SD at this T (single-T or N=1 row)
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
         gas_species: Cr(g)
         reaction: CrO(l) + 1/2 O2 = CrO2(g)
         n_electrons: -2
@@ -22137,6 +22373,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: >-
+            The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares fit to the experimental data (Table 3; §3.2, Eq. 8).
+          inputs:
+          - tables:kems-012-sossi-2019
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -22207,6 +22447,9 @@ species:
       units: kJ/mol and kJ/(mol·K) as published in Table 5
       values:
         quantity: experimental_reaction_enthalpy_entropy
+        derived_from:
+        - tables:kems-012-sossi-2019
+        - sossi_2019_cr_logKstar_table3_CrO_ox
         evidence_class: experimental_open_furnace_second_law
         reaction: CrO(l) + 1/2 O2 = CrO2(g)
         n_electrons: -2
@@ -22220,7 +22463,12 @@ species:
         source_column: 1, 6
         derived: true
         derivation:
-          premise: second-law slope of experimental logK* vs 1/T (OCR §4.7)
+          relation: >-
+            * denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures.
+          inputs:
+          - tables:kems-012-sossi-2019
+          - sossi_2019_cr_logKstar_table3_CrO_ox
+          premise: "* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
           algebra: ΔG = ΔH − T ΔS; log10 K = (−ΔH + T·ΔS)/(R T ln 10)
           unit_check: Table 5 ΔS in kJ/molK, ΔH in kJ/mol as published
           sanity_check: Na* experimental (0.071, 255.0) matches the already-extracted Table 5 Na row
