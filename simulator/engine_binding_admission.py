@@ -727,12 +727,31 @@ def gate_curve_memo_evidence(
 ) -> GateCurveEvidence:
     from simulator.reduced_real_determinism import _gate_curve_provider_role
 
-    return _live_binding_cache_evidence(
+    provider_role = _gate_curve_provider_role(curve)
+    evidence = _live_binding_cache_evidence(
         sim,
-        provider_role=_gate_curve_provider_role(curve),
+        provider_role=provider_role,
         artifact="freeze_gate_curve",
         include_selected_bindings=include_selected_bindings,
     )
+    if (
+        provider_role == "fallback"
+        and evidence.identity is not None
+        and evidence.identity.engine_id == "magemin"
+        and isinstance(evidence.provenance, Mapping)
+    ):
+        # The MAGEMin fallback initializes lazily. Its runtime version getter
+        # is unavailable before the first dispatch and populated afterward;
+        # the selected binary digest already pins that installed producer.
+        provenance = dict(evidence.provenance)
+        provenance.pop("runtime_version", None)
+        return _gate_curve_evidence(
+            sim,
+            evidence.identity,
+            provenance,
+            eligible=evidence.eligible,
+        )
+    return evidence
 
 
 def write_gate_curve_memo_origin(
