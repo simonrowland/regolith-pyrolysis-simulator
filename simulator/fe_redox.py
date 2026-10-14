@@ -1241,3 +1241,9 @@ def kress91_split(
         'extrapolation': temperature_band['extrapolation'],
         'high_uncertainty': temperature_band['high_uncertainty'],
     }
+
+
+def _kress91_fe3_fe2_ratio(fe2o3_over_feo_molar: float) -> float:
+    # One Fe2O3 formula unit contains two Fe3+ cations; FeO contains one
+    # Fe2+ cation, so Fe3+/Fe2+ = 2*n(Fe2O3)/n(FeO) = 2*ratio.
+    return 2.0 * float(fe2o3_over_feo_molar)
