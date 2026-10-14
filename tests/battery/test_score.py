@@ -7265,6 +7265,46 @@ def test_unknown_polymorph_activity_conversion_has_numeric_golden_pin() -> None:
     assert float(comparison.value.point).hex() == "0x1.24c715327cb38p-2"
 
 
+def test_unknown_alumina_activity_notice_lists_all_dictionary_crystals() -> None:
+    import json
+
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="Al2O3",
+            T_K=Decimal("1800"),
+            endmember_phase=Phase.CR,
+            component_basis="Al2O3",
+        ),
+        None,
+    )
+    reference = F.observation(
+        "alumina-unknown-polymorph-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference)
+    notice = next(
+        item
+        for item in comparison.notices
+        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
+    )
+    detail = json.loads(notice.reason.split(": ", 1)[1])
+
+    assert detail["chosen_table"] == "Al-096"
+    assert {item["table"] for item in detail["alternatives"]} == {
+        "Al-097",
+        "Al-098",
+        "Al-099",
+    }
+
+
 def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> None:
     import json
 
