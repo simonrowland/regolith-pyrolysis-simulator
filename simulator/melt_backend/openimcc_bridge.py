@@ -272,6 +272,59 @@ class OpenImccBridgeResult:
     activity_coefficients: Mapping[str, Mapping[str, Any]] | None = None
     parent_oxide_x_star_ratios: Mapping[str, float] = field(default_factory=dict)
 
+    def to_transport(self) -> dict[str, Any]:
+        """Return every result field in a plain, multiprocessing-safe shape."""
+        return {
+            "parent_oxide_activities": dict(self.parent_oxide_activities),
+            "parent_oxides": self.parent_oxides,
+            "flags": self.flags,
+            "notices": self.notices,
+            "acid_sink_ratio": self.acid_sink_ratio,
+            "pack_model_id": self.pack_model_id,
+            "pack_version": self.pack_version,
+            "pack_digest": self.pack_digest,
+            "openimcc_version": self.openimcc_version,
+            "envelope_status": self.envelope_status,
+            "extrapolated": self.extrapolated,
+            "labels": {
+                "identity": dict(self.labels.identity),
+                "coverage": dict(self.labels.coverage),
+                "trust": self.labels.trust,
+                "envelope_status": self.labels.envelope_status,
+                "flags": self.labels.flags,
+                "notices": self.labels.notices,
+                "acid_sink_ratio": self.labels.acid_sink_ratio,
+            },
+            "coverage": dict(self.coverage),
+            "activity_coefficients": {
+                key: dict(value)
+                for key, value in (self.activity_coefficients or {}).items()
+            },
+            "parent_oxide_x_star_ratios": dict(self.parent_oxide_x_star_ratios),
+        }
+
+    @classmethod
+    def from_transport(cls, payload: Mapping[str, Any]) -> OpenImccBridgeResult:
+        """Rebuild the immutable bridge DTO after crossing a process boundary."""
+        labels = payload["labels"]
+        return cls(
+            parent_oxide_activities=payload["parent_oxide_activities"],
+            parent_oxides=payload["parent_oxides"],
+            flags=payload["flags"],
+            notices=payload["notices"],
+            acid_sink_ratio=payload["acid_sink_ratio"],
+            pack_model_id=payload["pack_model_id"],
+            pack_version=payload["pack_version"],
+            pack_digest=payload["pack_digest"],
+            openimcc_version=payload["openimcc_version"],
+            envelope_status=payload["envelope_status"],
+            extrapolated=payload["extrapolated"],
+            labels=ImccAdapterLabels(**labels),
+            coverage=payload["coverage"],
+            activity_coefficients=payload["activity_coefficients"],
+            parent_oxide_x_star_ratios=payload["parent_oxide_x_star_ratios"],
+        )
+
     def __post_init__(self) -> None:
         object.__setattr__(
             self,

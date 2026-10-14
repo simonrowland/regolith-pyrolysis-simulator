@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import math
+from decimal import Decimal
 from pathlib import Path
+from types import MappingProxyType
 
 import pytest
 import yaml
@@ -20,6 +22,116 @@ SOURCE = ROOT / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
 STORE = ROOT / "data/literature/extracts-v2/kems-015-hashimoto-1983.yaml"
 PRIMARY_TABLE3_PREFIX = "::hashimoto_1983_table3_residue_composition_series::"
 OXIDES = ("FeO", "MgO", "SiO2", "CaO", "Al2O3")
+
+
+@pytest.fixture(autouse=True)
+def _close_openimcc_worker_between_tests():
+    from simulator.battery.residue import _close_openimcc_evaluation_worker
+
+    _close_openimcc_evaluation_worker()
+    yield
+    _close_openimcc_evaluation_worker()
+
+
+def _hanging_openimcc_engine(**_kwargs):
+    import threading
+
+    threading.Event().wait(30)
+
+
+def _fake_openimcc_bridge_result(**_kwargs):
+    from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
+    from simulator.melt_backend.imcc_adapter_labels import ImccAdapterLabels
+
+    return OpenImccBridgeResult(
+        parent_oxide_activities={"SiO2": 0.75, "MgO": 0.25},
+        parent_oxides=("SiO2", "MgO"),
+        flags=("fixture-flag",),
+        notices=("fixture-notice",),
+        acid_sink_ratio=0.125,
+        pack_model_id="fixture-model",
+        pack_version="fixture-version",
+        pack_digest="fixture-digest",
+        openimcc_version="fixture-openimcc",
+        envelope_status="in_domain",
+        extrapolated=False,
+        labels=ImccAdapterLabels(
+            identity={"model_id": "fixture-model"},
+            coverage={"SiO2": "covered"},
+            trust="internal-analytical",
+            envelope_status="in_domain",
+            flags=("fixture-flag",),
+            notices=("fixture-notice",),
+            acid_sink_ratio=0.125,
+        ),
+        coverage={"SiO2": "covered"},
+        activity_coefficients={
+            "Si": {
+                "value": Decimal("1.25"),
+                "coefficient_basis": "single_cation",
+                "standard_state": {"convention": "raoultian_pure_endmember"},
+            }
+        },
+        parent_oxide_x_star_ratios={"SiO2": 0.875},
+    )
+
+
+def test_openimcc_bridge_result_round_trips_through_isolated_worker():
+    from simulator.battery.residue import _evaluate_openimcc_isolated
+
+    direct = _fake_openimcc_bridge_result()
+    isolated = _evaluate_openimcc_isolated(
+        _fake_openimcc_bridge_result, timeout_s=10.0
+    )
+
+    assert isolated == direct
+    assert set(isolated.to_transport()) == {
+        "parent_oxide_activities",
+        "parent_oxides",
+        "flags",
+        "notices",
+        "acid_sink_ratio",
+        "pack_model_id",
+        "pack_version",
+        "pack_digest",
+        "openimcc_version",
+        "envelope_status",
+        "extrapolated",
+        "labels",
+        "coverage",
+        "activity_coefficients",
+        "parent_oxide_x_star_ratios",
+    }
+    assert isinstance(isolated.parent_oxide_activities, MappingProxyType)
+    assert isinstance(isolated.coverage, MappingProxyType)
+    assert isinstance(isolated.activity_coefficients, MappingProxyType)
+    assert isinstance(isolated.parent_oxide_x_star_ratios, MappingProxyType)
+
+
+def test_real_openimcc_bridge_result_round_trips_when_available():
+    pytest.importorskip("openimcc")
+    from simulator.battery.residue import _evaluate_openimcc_isolated
+    from simulator.melt_backend import openimcc_bridge
+
+    kwargs = {
+        "composition_mol": {"SiO2": 1.0, "MgO": 1.0},
+        "temperature_K": 1800.0,
+        "allow_extrapolation": True,
+        "allow_out_of_envelope": True,
+    }
+    direct = openimcc_bridge.evaluate(**kwargs)
+    isolated = _evaluate_openimcc_isolated(
+        openimcc_bridge.evaluate, timeout_s=30.0, **kwargs
+    )
+
+    assert isolated == direct
+
+
+def test_isolated_openimcc_worker_still_times_out():
+    from simulator.battery.residue import _evaluate_openimcc_isolated
+
+    with pytest.raises(TimeoutError, match="timed out"):
+        _evaluate_openimcc_isolated(_hanging_openimcc_engine, timeout_s=0.05)
 
 
 def _source_data():
@@ -344,6 +456,7 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     pytest.importorskip("openimcc")
+    import simulator.battery.residue as residue
     from simulator.melt_backend import openimcc_bridge
 
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
@@ -355,6 +468,11 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
         activity_compositions.append(tuple(sorted(composition_mol.items())))
         return original_evaluate(composition_mol=composition_mol, **kwargs)
 
+    monkeypatch.setattr(
+        residue,
+        "_evaluate_openimcc_isolated",
+        lambda evaluate, *, timeout_s, **kwargs: evaluate(**kwargs),
+    )
     monkeypatch.setattr(openimcc_bridge, "evaluate", track_activities)
     predictions = _predict_hashimoto_residue_cohort(
         experiments[:1],
@@ -520,4 +638,64 @@ def test_hashimoto_primary_policy_cannot_choose_the_arm_closest_to_residues(
     assert _hashimoto_primary_policy() == (
         _HASHIMOTO_PRIMARY_ALPHA_ARM,
         _HASHIMOTO_PRIMARY_GEOMETRY,
+    )
+
+
+def test_hashimoto_openimcc_timeout_is_typed_and_cohort_continues(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("openimcc")
+    import simulator.battery.residue as residue
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.melt_backend import openimcc_bridge
+
+    experiments, _measured_rows, preform_dimensions_mm = _source_data()
+    experiment = experiments[0]
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+    monkeypatch.setitem(binary_pot_battery._ENGINE_OUTER_TIMEOUT_S, "openimcc", 0.02)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", _hanging_openimcc_engine)
+
+    def integrate_with_engine_call(
+        inventory,
+        _channels,
+        pressure_model,
+        *,
+        temperature_K,
+        duration_s,
+        steps,
+        geometry_policy_id,
+        initial_area_m2,
+    ):
+        try:
+            pressure_model(inventory, -9.0)
+        except residue.ResidueEngineNonconvergence as exc:
+            refusal = exc
+        else:
+            refusal = None
+        return residue._hashimoto_project_oxide_wt_pct(inventory), (), (), refusal, {}
+
+    monkeypatch.setattr(
+        residue, "_hashimoto_integrate_geometry", integrate_with_engine_call
+    )
+    predictions = residue._predict_hashimoto_residue_cohort(
+        (experiment,),
+        catalog,
+        preform_dimensions_mm=preform_dimensions_mm,
+        code_revision="timeout-fixture",
+        _allow_partial_cohort_for_test=True,
+    )
+
+    assert {row.alpha_arm for row in predictions} == {
+        "alpha_common_unity_sensitivity",
+        "alpha_runtime_catalog",
+    }
+    assert all(
+        row.provenance["run_refusal"]["reason"]
+        == "engine_timeout:openimcc:hashimoto_residue_cohort"
+        for row in predictions
+    )
+    assert all(
+        "Hashimoto residue cohort OpenIMCC timeout" in row.provenance["run_refusal"]["message"]
+        for row in predictions
     )
