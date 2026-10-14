@@ -32,6 +32,7 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux, MeltState
 from scripts import evaporation_selectivity_map as selectivity_map
+from tests.magemin_test_support import close_test_owned_magemin_backend
 
 
 # stateful redox simulation matrix flakes under xdist coscheduling.
@@ -53,16 +54,7 @@ def _close_test_owned_magemin_backends():
     yield
     try:
         for sim in _TEST_OWNED_SIMULATORS:
-            provider = sim._chem_registry.fallback_for(
-                ChemistryIntent.GATE_LIQUID_FRACTION
-            )
-            backend = getattr(provider, "_backend", None)
-            if backend is None:
-                continue
-            finalizer = getattr(provider, "_backend_finalizer", None)
-            if finalizer is not None:
-                finalizer.detach()
-            backend.close()
+            close_test_owned_magemin_backend(sim)
     finally:
         _TEST_OWNED_SIMULATORS.clear()
 
