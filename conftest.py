@@ -266,6 +266,21 @@ def _close_new_magemin_warm_pools(preexisting_pools=frozenset()) -> None:
             pool.close(cancel_pending=True)
 
 
+@pytest.fixture(autouse=True)
+def _close_magemin_warm_pools_after_test(request):
+    # This module accumulated provider-created pools until its module teardown
+    # timed out. Keep the per-test pool scan local to that observed caller.
+    if request.node.path.name != "test_sso_r_r20_state.py":
+        yield
+        return
+    preexisting_pools = {
+        pool for pool, _worker_names in _live_magemin_warm_pools()
+    }
+    yield
+    _close_new_magemin_warm_pools(preexisting_pools)
+    _assert_no_live_magemin_warm_pools(preexisting_pools)
+
+
 @pytest.fixture(scope="module", autouse=True)
 def _assert_magemin_warm_pools_closed_at_module_teardown():
     # Pools owned by wider-scoped fixtures can outlive a module that uses them.
