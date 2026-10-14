@@ -4260,6 +4260,51 @@ def test_gate_curve_memo_admission_registers_uninitialized_fallback_supplier(
     )
 
 
+@pytest.mark.parametrize(
+    ('stored_database', 'expected_match'),
+    [(None, True), ('igad', False)],
+)
+def test_gate_curve_memo_origin_normalizes_historical_magemin_default(
+    stored_database,
+    expected_match,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim._register_freeze_gate_liquid_fraction_providers()
+    curve = {
+        'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1300.0,
+    }
+    record = engine_binding_admission.write_gate_curve_memo_record(
+        sim,
+        curve,
+        evidence=admission_module.GateCurveEvidence('a' * 64, False),
+    )
+    origin = deepcopy(record['origin'])
+    configuration = origin['producer_configuration']
+    assert configuration['model']['magemin_database'] == (
+        MAGEMinBackend._DEFAULT_DATABASE
+    )
+    configuration['model']['magemin_database'] = stored_database
+
+    assert engine_binding_admission.gate_curve_memo_origin_matches(
+        sim,
+        curve,
+        origin,
+        fresh_evidence=False,
+    ) is expected_match
+
+
 def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
     monkeypatch,
     vapor_pressure_data,
