@@ -752,12 +752,30 @@ def test_o2_bubbler_refusal_is_visible_in_runner_envelope_without_advancing():
     assert payload["status"] == "refused"
     assert payload["reason"] == "negative_rate_kg_per_hr"
     assert payload["run_metadata"]["hours_completed"] == 0
+    notice = payload['run_metadata']['feedstock_iron_notice']
+    assert notice['method'] == 'predicted_kress91_split'
+    assert 'measured_feedstock_iron_split' in notice['certification_gaps']
     assert payload["run_metadata"]["refusal_diagnostic"] == {
         "status": "refused",
         "reason": "negative_rate_kg_per_hr",
         "rate_kg_per_hr": -1.0,
         "injected_mol": 0.0,
     }
+
+
+def test_runner_exports_feedstock_initialization_gaps_without_an_equilibrium_tick():
+    run = PyrolysisRun(feedstock_id='lunar_mare_low_ti', campaign='C0', hours=0)
+    session = run._start_session()
+    sim = session.simulator
+    before = sim.atom_ledger.mol_by_account()
+    payload = run._run_session(session)
+    notice = payload['run_metadata']['feedstock_iron_notice']
+    assert notice == json.loads(json.dumps(sim._feedstock_iron_initialization))
+    assert notice['method'] == 'predicted_kress91_split'
+    assert set(notice['certification_gaps']) >= {
+        'formation_temperature_K', 'measured_feedstock_iron_split',
+    }
+    assert sim.atom_ledger.mol_by_account() == before
 
 
 @pytest.mark.parametrize(
