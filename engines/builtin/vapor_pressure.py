@@ -998,7 +998,10 @@ def _attach_high_t_activity_provenance(
         parent_oxide = str(row.get("parent_oxide") or "")
         if parent_oxide not in _HIGH_T_FLUX_OXIDES:
             continue
-        if authority.get("fallback"):
+        fallback_applied = bool(authority.get("fallback")) and (
+            parent_oxide not in _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS
+        )
+        if fallback_applied:
             provenance["melt_activity_parent_oxide"] = parent_oxide
         provenance["high_t_melt_activity_mode"] = str(
             authority.get("requested") or "openimcc"
@@ -1026,6 +1029,8 @@ def _attach_high_t_activity_provenance(
                 exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(
                     parent_oxide
                 )
+        elif authority.get("fallback"):
+            exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(parent_oxide)
         if exclusion is not None:
             provenance["melt_activity_authority"] = exclusion["authority"]
             exclusion_payload = dict(exclusion)
@@ -1041,7 +1046,11 @@ def _attach_high_t_activity_provenance(
                     "authority": exclusion["authority"],
                     "ruling": exclusion["ruling"],
                     "certification": exclusion["tracking_id"],
-                    "reason": exclusion["reason"],
+                    **(
+                        {"reason": exclusion["reason"]}
+                        if exclusion.get("reason")
+                        else {}
+                    ),
                     "citation": exclusion["citation"],
                 }
             token = (
