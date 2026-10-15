@@ -539,6 +539,10 @@ species:
         values:
           method_class: derived
           quantity: entropy_of_fusion
+          T_fus_K:
+            value: 1147
+            units: K
+            locator: {page: 15, published_page: 15, pdf_page_index: 14, table: '4', row: Na2Si2O5, column: T_f (K)}
           delta_S_fus_J_mol-1_K-1: 32.9
         uncertainty: {reported_status: printed, value: 3.8, units: J/mol K}
   K2Si2O5:
@@ -598,6 +602,10 @@ species:
         values:
           method_class: derived
           quantity: entropy_of_fusion
+          T_fus_K:
+            value: 1318
+            units: K
+            locator: {page: 15, published_page: 15, pdf_page_index: 14, table: '4', row: K2Si2O5, column: T_f (K)}
           delta_S_fus_J_mol-1_K-1: 24.3
         uncertainty: {reported_status: printed, value: 3.0, units: J/mol K}
   K2SiO3:
@@ -657,6 +665,10 @@ species:
         values:
           method_class: derived
           quantity: entropy_of_fusion
+          T_fus_K:
+            value: 1249
+            units: K
+            locator: {page: 15, published_page: 15, pdf_page_index: 14, table: '4', row: K2SiO3, column: T_f (K)}
           delta_S_fus_J_mol-1_K-1: 15.7
         uncertainty: {reported_status: printed, value: 3.2, units: J/mol K}
   MgSiO3:
@@ -731,14 +743,19 @@ species:
           basis: explicit_author
           note: Table 4 footnote b marks metastable congruent melting.
         units: J/mol K
-        derived_from: [rb86_1986_mgsio3_heat_of_fusion_table4, rb86_1986_mgsio3_transition_table4]
+        derived_from: [rb86_1986_mgsio3_heat_of_fusion_table4]
         derivation:
           relation: ΔS_f = ΔH_f/T_f
-          inputs: [rb86_1986_mgsio3_heat_of_fusion_table4, rb86_1986_mgsio3_transition_table4]
+          inputs: [rb86_1986_mgsio3_heat_of_fusion_table4]
           output_unit: J/mol K
         values:
           method_class: derived
           quantity: entropy_of_fusion
+          T_fus_K:
+            value: null
+            units: K
+            reason: Table 4 does not print Tf for the second MgSiO3 row (This work, appendix).
+            locator: {page: 15, published_page: 15, pdf_page_index: 14, table: '4', row: MgSiO3, column: T_f (K)}
           delta_S_fus_J_mol-1_K-1: 39.9
         uncertainty: {reported_status: printed, value: 3.3, units: J/mol K}
   NaAlSi3O8:
