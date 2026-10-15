@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import math
 from pathlib import Path
 from types import SimpleNamespace
@@ -32,6 +33,7 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux, MeltState
 from scripts import evaporation_selectivity_map as selectivity_map
+from web.events import _tick_payload
 
 
 # stateful redox simulation matrix flakes under xdist coscheduling.
@@ -2353,9 +2355,17 @@ def test_exchange_target_cannot_exceed_controlled_total_pressure() -> None:
     )
 
 
-@pytest.mark.parametrize("buffer_o2_mol", [0.0, 1.0e-6])
+@pytest.mark.parametrize(
+    ("buffer_o2_mol", "expected_unbacked_o2_mol", "expected_fO2_log"),
+    [
+        (0.0, 0.0015952259282159419, -1.0),
+        (1.0e-6, 0.001594225928215942, -1.0000000153832351),
+    ],
+)
 def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
     buffer_o2_mol: float,
+    expected_unbacked_o2_mol: float,
+    expected_fO2_log: float,
 ) -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
@@ -2403,7 +2413,11 @@ def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
     assert reservoir.exchange_direction == "melt_to_headspace"
     assert reservoir.exchange_clamped is True
     assert reservoir.exchange_o2_mol == pytest.approx(buffer_o2_mol)
-    assert reservoir.exchange_unbacked_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL
+    assert reservoir.exchange_unbacked_o2_mol == pytest.approx(
+        expected_unbacked_o2_mol,
+        rel=0.0,
+        abs=1.0e-18,
+    )
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
         "O2", 0.0
     ) == pytest.approx(before_overhead_o2 + buffer_o2_mol)
@@ -2414,20 +2428,48 @@ def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
         "O2", 0.0
     ) >= -OXYGEN_RESERVOIR_NOOP_MOL
     if buffer_o2_mol == 0.0:
-        assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
         assert len(sim.atom_ledger.transitions) == before_transition_count
     else:
-        expected_fO2 = before_fO2 - (
-            reservoir.exchange_o2_mol
-            / reservoir.melt_redox_capacity_mol_per_ln_fO2
-        ) / math.log(10.0)
-        assert reservoir.melt_intrinsic_fO2_log == pytest.approx(expected_fO2)
         assert len(sim.atom_ledger.transitions) == before_transition_count + 1
+    # Resolver-measured receipt: the 1e-6 mol buffer case was run through
+    # sim._apply_oxygen_reservoir_exchange() on the r3 candidate; its returned
+    # state had log10(fO2) = -1.0000000153832351. This pins the resolver result
+    # without restating the production capacity/conversion formula.
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        expected_fO2_log,
+        rel=0.0,
+        abs=1.0e-15,
+    )
     assert after_o_atoms == pytest.approx(
         before_o_atoms,
         rel=0.0,
         abs=2 * math.ulp(before_o_atoms),
     )
+
+    snapshot = sim._make_snapshot()
+    summary = build_per_hour_summary(
+        sim,
+        snapshot,
+        include_fe_redox_split=False,
+    )
+    tick_payload = _tick_payload(
+        sim=sim,
+        snapshot=snapshot,
+        backend_message="",
+        backend_status="internal-analytical",
+        backend_authoritative=False,
+    )
+    for output in (summary, tick_payload):
+        serialized = json.loads(json.dumps(output, allow_nan=False))
+        exchange = serialized["oxygen_reservoir"]
+        assert exchange["exchange_o2_mol"] == pytest.approx(buffer_o2_mol)
+        assert exchange["exchange_unbacked_o2_mol"] == pytest.approx(
+            expected_unbacked_o2_mol,
+            rel=0.0,
+            abs=1.0e-18,
+        )
+        assert exchange["exchange_direction"] == "melt_to_headspace"
+        assert exchange["exchange_clamped"] is True
 
 
 def test_headspace_exchange_cannot_instantly_erase_reductant_dose() -> None:
