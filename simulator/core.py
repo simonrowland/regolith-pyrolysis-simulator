@@ -4675,6 +4675,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         gate_authority: _MeltRedoxGateAuthority | object = (
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         ),
+        *,
+        redox_state: RedoxState | None = None,
     ) -> _MeltRedoxGateAuthority:
         if gate_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
             pinned_hour = getattr(
@@ -4691,7 +4693,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 pinned_hour == int(self.melt.hour)
                 and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
             ):
-                if self._melt_redox_gate_record_is_admitted(pinned_authority):
+                if self._melt_redox_gate_record_is_admitted(
+                    pinned_authority,
+                    redox_state=redox_state,
+                ):
                     return pinned_authority['curve']
                 if not isinstance(pinned_authority, Mapping):
                     return pinned_authority
@@ -4699,7 +4704,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     _RESOLVE_MELT_REDOX_GATE_AUTHORITY
                 )
                 self._melt_redox_gate_authority_tick_hour = None
-            return self._melt_redox_liquidus_gate_curve()
+            return self._melt_redox_liquidus_gate_curve(
+                redox_state=redox_state,
+            )
         if (
             gate_authority is None
             or isinstance(gate_authority, _MeltRedoxLiquidusFloorFallback)
@@ -4707,13 +4714,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return gate_authority
         if isinstance(gate_authority, Mapping):
             if gate_authority.get('disposition') in {'live', 'memo-hit', 'replay'}:
-                if self._melt_redox_gate_record_is_admitted(gate_authority):
+                if self._melt_redox_gate_record_is_admitted(
+                    gate_authority,
+                    redox_state=redox_state,
+                ):
                     return gate_authority['curve']
                 return None
             return gate_authority
         raise TypeError(f'invalid melt redox gate authority: {gate_authority!r}')
 
-    def _melt_redox_gate_record_is_admitted(self, value: Any) -> bool:
+    def _melt_redox_gate_record_is_admitted(
+        self,
+        value: Any,
+        *,
+        redox_state: RedoxState | None = None,
+    ) -> bool:
         if not (
             isinstance(value, Mapping)
             and value.get('disposition') in {'live', 'memo-hit'}
@@ -4729,6 +4744,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             value['curve'],
             value.get('origin'),
             fresh_evidence=False,
+            redox_state=redox_state,
         )
 
     def _establish_melt_redox_gate_authority_for_current_hour(
@@ -4800,8 +4816,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _melt_redox_liquidus_gate_curve(
         self,
+        *,
+        redox_state: RedoxState | None = None,
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
-        authority = self._melt_redox_liquidus_gate_record()
+        authority = self._melt_redox_liquidus_gate_record(
+            redox_state=redox_state,
+        )
         if (
             isinstance(authority, Mapping)
             and isinstance(authority.get('curve'), Mapping)
@@ -4811,6 +4831,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _melt_redox_liquidus_gate_record(
         self,
+        *,
+        redox_state: RedoxState | None = None,
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
         from simulator.engine_binding_admission import (
             gate_curve_memo_origin_matches,
@@ -4825,12 +4847,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_reduced_real_replay_notices = None
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
         fO2_log = float(self._current_melt_redox_fO2_log())
+        fO2_log, redox_state = normalize_redox_state(
+            fO2_log,
+            redox_state,
+        )
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
         key = self._freeze_gate_cache_key(
             pressure_bar=pressure_bar,
             fO2_log=redox_key_fO2_log,
+            redox_state=redox_state,
         )
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         curve = cache.get('curve') if isinstance(cache, dict) else None
@@ -4848,6 +4875,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 curve,
                 cache.get('origin'),
                 fresh_evidence=False,
+                redox_state=redox_state,
             )
         )
         if not cache_hit:
@@ -4877,6 +4905,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     memoized_record['curve'],
                     memoized_record.get('origin'),
                     fresh_evidence=False,
+                    redox_state=redox_state,
                 )
             ):
                 record = gate_curve_memo_record(
@@ -4923,7 +4952,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._freeze_gate_liquid_fraction_cache = None
                 cache = None
             try:
-                record = self._freeze_gate_curve_record()
+                record = self._freeze_gate_curve_record(
+                    redox_state=redox_state,
+                )
                 curve = record['curve']
                 replay_notices = getattr(
                     self,
@@ -5024,6 +5055,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 normalized_curve,
                 validated_cache.get('origin'),
                 fresh_evidence=False,
+                redox_state=redox_state,
             )
             and isinstance(validated_cache.get('repair_notices'), list)
         ):
