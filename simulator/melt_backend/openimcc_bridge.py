@@ -49,6 +49,12 @@ except (ImportError, OSError, RuntimeError) as exc:  # pragma: no cover
 else:
     _OPENIMCC_IMPORT_ERROR = None
 
+_IMCC_NONCONVERGENCE_ERROR_TYPE: type[BaseException] | None = (
+    getattr(_openimcc, "ImccNonconvergenceError", None)
+    if _openimcc is not None
+    else None
+)
+
 
 OPENIMCC_INSTALL_HINT = (
     "python -m pip install --no-deps "

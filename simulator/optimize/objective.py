@@ -3614,6 +3614,9 @@ def product_summary(
     rump = _rump_expectation_notice(sim)
     if rump:
         summary["rump_expectation_notice"] = rump
+    high_t_activity = _high_t_melt_activity_fallback_notice(sim)
+    if high_t_activity:
+        summary["high_t_melt_activity_fallback_notice"] = high_t_activity
     summary.update(_coating_product_summary(run_execution))
     lifetime, has_positive_fouling = _selection_coating_lifetime(
         coating_margin,
@@ -3666,6 +3669,16 @@ def _sulfur_saturation_notice(sim: Any) -> Mapping[str, Any] | None:
 
 def _rump_expectation_notice(sim: Any) -> Mapping[str, Any] | None:
     reader = getattr(sim, "rump_expectation_run_notice", None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    if not isinstance(notice, Mapping) or not notice:
+        return None
+    return dict(notice)
+
+
+def _high_t_melt_activity_fallback_notice(sim: Any) -> Mapping[str, Any] | None:
+    reader = getattr(sim, "high_t_melt_activity_run_notice", None)
     if not callable(reader):
         return None
     notice = reader()

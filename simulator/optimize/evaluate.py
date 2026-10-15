@@ -5956,6 +5956,20 @@ def _cache_trace_payload(
             payload["rump_expectation_notice"] = _compact_jsonable(
                 dict(rump_notice)
             )
+    high_t_activity_reader = getattr(
+        simulator,
+        "high_t_melt_activity_run_notice",
+        None,
+    )
+    if callable(high_t_activity_reader):
+        high_t_activity_notice = high_t_activity_reader()
+        if (
+            isinstance(high_t_activity_notice, MappingABC)
+            and high_t_activity_notice
+        ):
+            payload["high_t_melt_activity_fallback_notice"] = _compact_jsonable(
+                dict(high_t_activity_notice)
+            )
     alpha_authority_status_by_species = getattr(
         simulator,
         "_alpha_authority_status_by_species_engaged",
