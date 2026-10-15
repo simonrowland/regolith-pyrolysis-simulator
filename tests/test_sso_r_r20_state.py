@@ -2701,6 +2701,10 @@ def test_full_c2a_step_reports_closed_ferric_divergence_after_respeciation() -> 
     )
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
     sim._sync_oxygen_reservoir_mirror()
+    # Start with a funded liquid split consistent with the scalar. Passive
+    # exchange funds only its differential step, not an arbitrary initial
+    # all-ferrous-to-Kress inventory correction from overhead a second time.
+    assert sim._apply_fe_redox_respeciation()["status"] == "ok"
 
     snapshot = sim.step()
     summary = build_per_hour_summary(sim, snapshot)
