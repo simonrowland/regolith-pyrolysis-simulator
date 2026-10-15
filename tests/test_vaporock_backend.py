@@ -826,9 +826,8 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
     # ------------------------------------------------------------------
     # Regime A: intrinsic fO2 (IW-like) -- literature comparison
     # ------------------------------------------------------------------
-    fO2_log_iw = sim._compute_intrinsic_melt_fO2(
-        sim.melt.temperature_C + 273.15
-    )
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
+    fO2_log_iw = feo_iw_log10_fO2_bar(sim.melt.temperature_C + 273.15)
 
     vaporock_iw = backend.equilibrate(
         sim.melt.temperature_C,

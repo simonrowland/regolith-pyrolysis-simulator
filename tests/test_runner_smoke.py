@@ -2229,7 +2229,7 @@ def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
         campaign="C5",
         hours=1,
         c5_enabled=True,
-        mre_target_species="CaO",
+        mre_target_species="FeO",
         mre_max_voltage_V=2.5,
         run_metadata_overrides={
             "started_at_utc": "2026-05-15T00:00:00Z",

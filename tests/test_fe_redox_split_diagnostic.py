@@ -13,6 +13,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import CampaignPhase
+from tests.chemistry.conftest import _seed_melt_redox
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -206,20 +207,8 @@ def test_native_fe_authoritative_extent_ignores_diagnostic_payload(
 ) -> None:
     sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
     _seed_redox_liquidus_curve(sim)
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim.melt.fO2_log = -10.0
-    sim.melt.melt_fO2_log = -10.0
-    pre_poison_split = sim._compute_fe_redox_split_diagnostic()
-    native_frac = max(
-        0.0,
-        float(pre_poison_split.get("native_fe_frac", 0.0) or 0.0),
-    )
-    cleaned_melt_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
-    feo_mol = max(0.0, float(cleaned_melt_mol.get("FeO", 0.0) or 0.0))
-    expected_native_fe_mol = min(
-        feo_mol,
-        sim._cleaned_melt_fe_atom_mol() * native_frac,
-    )
+    _seed_melt_redox(sim, -10.0)
+    expected_native_fe_mol = sim._compute_native_fe_saturation_extent()['native_fe_mol']
     assert expected_native_fe_mol > 0.0
 
     def poisoned_diagnostic(*_args: Any, **_kwargs: Any) -> dict[str, Any]:

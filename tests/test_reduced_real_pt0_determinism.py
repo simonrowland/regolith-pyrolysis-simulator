@@ -35,6 +35,7 @@ from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
     resolve_alphamelts_python_api_model,
 )
+from tests.chemistry.conftest import _seed_melt_redox
 from simulator.grind_preflight import GrindSourceGateError
 from simulator.melt_backend.base import (
     EquilibriumResult,
@@ -1729,14 +1730,7 @@ def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
     replay_key = replay.replay_sequence[-1]["key"]
     assert replay_key == capture_key
 
-    capacity = replay_sim._melt_redox_capacity_mol_per_ln_fO2(
-        fO2_log=replay_sim._current_melt_redox_fO2_log(),
-        T_K=1600.0 + 273.15,
-    )
-    replay_sim._apply_oxygen_reservoir_redox_source_terms(
-        {"pt0_real_redox_step": capacity * math.log(10.0) * 0.25},
-        temperature_K=1600.0 + 273.15,
-    )
+    _seed_melt_redox(replay_sim, replay_sim._current_melt_redox_fO2_log() + 0.25)
     redox_key = canonical_replay_key(
         replay_sim,
         artifact="freeze_gate_curve",

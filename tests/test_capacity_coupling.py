@@ -1827,14 +1827,13 @@ def test_binding_cold_train_does_not_turn_redox_no_capacity_into_fo2_move(
     )
     assert isinstance(capacity, FiniteCapacity)
     sim.melt.temperature_C = 1600.0
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
-    sim.melt.oxygen_reservoir.reference_T_K = 1873.15
-    sim._sync_oxygen_reservoir_mirror()
+    from tests.chemistry.conftest import _seed_melt_redox
+    _seed_melt_redox(sim, -9.0)
     before_transitions = len(sim.atom_ledger.transitions)
     monkeypatch.setattr(
         sim,
-        "_melt_redox_capacity_mol_per_ln_fO2",
-        lambda **_kwargs: 0.0,
+        "_melt_redox_temperature_shift_is_liquid",
+        lambda *_args, **_kwargs: False,
     )
 
     reservoir = sim._apply_oxygen_reservoir_redox_source_terms(

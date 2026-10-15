@@ -117,7 +117,8 @@ def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
     anchor = hour_trace[SIO_ANCHOR_HOUR]
     p_sio_finite = anchor["p_SiO_Pa"]
     temperature_C = anchor["temperature_C"]
-    fO2_log_iw = sim._compute_intrinsic_melt_fO2(temperature_C + 273.15)
+    from simulator.fe_redox import feo_iw_log10_fO2_bar
+    fO2_log_iw = feo_iw_log10_fO2_bar(temperature_C + 273.15)
     iw_result = sim._chem_kernel.dispatch(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=temperature_C,

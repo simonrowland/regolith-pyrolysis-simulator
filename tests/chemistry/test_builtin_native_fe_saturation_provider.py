@@ -17,7 +17,7 @@ from simulator.chemistry.kernel.validation import (
     validate_atom_balance,
     validate_proposal_accounts,
 )
-from tests.chemistry.conftest import _atom_check, _build_sim
+from tests.chemistry.conftest import _atom_check, _build_sim, _seed_melt_redox
 
 
 DECLARED_ACCOUNTS = frozenset({
@@ -259,9 +259,7 @@ def _native_fe_saturating_sim(
         additives_kg=additives,
     )
     sim.melt.temperature_C = 1600.0
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim.melt.fO2_log = -10.0
-    sim.melt.melt_fO2_log = -10.0
+    _seed_melt_redox(sim, -10.0)
     return sim
 
 

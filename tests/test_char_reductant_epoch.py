@@ -218,10 +218,8 @@ def test_c0_bubbler_dose_reaches_char_even_when_melt_is_at_target() -> None:
     char_before = _committed_char_mol(sim)
     sim.melt.temperature_C = 1600.0
     sim.melt.campaign = CampaignPhase.C0
-    sim._refresh_oxygen_reservoir_without_exchange(
-        melt_intrinsic_fO2_log=-8.0,
-        reference_T_K=1873.15,
-    )
+    from tests.chemistry.conftest import _seed_melt_redox
+    _seed_melt_redox(sim, -8.0)
     sim.campaign_mgr.overrides.setdefault("C0", {}).update({
         "o2_bubbler_kg_per_hr": char_before * OXYGEN_MOLAR_MASS_KG_PER_MOL,
         "o2_bubbler_eta_absorb_default": 1.0,

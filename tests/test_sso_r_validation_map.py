@@ -293,12 +293,20 @@ def test_exact_full_dose_oxidizing_pn2_row_refuses_absent_melt_redox_capacity():
     assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
     assert math.isfinite(row["redox_source_delta_ln_fO2"])
     assert row["redox_source_skip_reason"] == "no_melt_redox_capacity"
-    assert row["redox_source_skipped_terms_mol_o2_equiv_by_label"][
-        "redox_source:evaporative_metal_loss"
-    ] > 0.0
+    # A finite ferric ledger has capacity even when the earlier, cold Na
+    # operation was gated. The hot evaporative labels describe committed
+    # chemistry; they do not integrate a second scalar potential.
+    label = 'redox_source:evaporative_metal_loss'
+    assert row['redox_source_terms_mol_o2_equiv_by_label'][label] > 0.0
+    assert row['redox_source_applied_terms_mol_o2_equiv_by_label'][label] == (
+        row['redox_source_terms_mol_o2_equiv_by_label'][label])
+    assert label not in row['redox_source_skipped_terms_mol_o2_equiv_by_label']
     assert row["redox_source_skipped_reasons_by_label"][
-        "redox_source:evaporative_metal_loss"
+        "redox_source:c3_na_shuttle_reduction"
     ] == "no_melt_redox_capacity"
+    assert row['redox_source_delta_ln_fO2'] == 0.0
+    assert row['ferric_divergence_material'] is False
+    assert row['mass_balance_error_pct'] == pytest.approx(0.0, abs=5e-12)
     assert row["redox_source_refusal_context"] == {}
 
 

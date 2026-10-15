@@ -5,18 +5,17 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from types import SimpleNamespace
 from typing import Any
 
 import pytest
 import yaml
 
 from simulator.core import PyrolysisSimulator
-from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator import feedstock_composition
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.fe_redox import (
     feot_equivalent_wt_pct,
+    intrinsic_melt_fO2,
     kress91_split,
     melt_mol_fractions_for_kress91,
 )
@@ -36,14 +35,7 @@ def _normalize_core_mass_pin(masses: dict[str, float], target_mass_kg: float) ->
 
 
 def _intrinsic_fO2_pin(composition: dict[str, Any]) -> float:
-    sim = SimpleNamespace(
-        melt=SimpleNamespace(temperature_C=1600.0),
-        _melt_oxide_wt_pct=lambda: composition,
-        _vacuum_floor_bar=lambda: DEFAULT_VACUUM_FLOOR_BAR,
-    )
-    return PyrolysisSimulator._compute_intrinsic_melt_fO2(
-        sim, temperature_K=1873.15
-    )
+    return intrinsic_melt_fO2(composition, 1873.15)
 
 
 def _float_hex_tree(value: Any) -> Any:
