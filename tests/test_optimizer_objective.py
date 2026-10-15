@@ -2278,6 +2278,24 @@ def test_product_summary_includes_input_output_yield_table_and_mass_closure() ->
     assert target_yield["targets"]["Fe"]["yield_fraction"] is not None
 
 
+def test_product_summary_preserves_high_t_melt_activity_notice() -> None:
+    notice = {
+        "kind": "high_t_melt_activity_fallback",
+        "authority": "extrapolated",
+        "reason": "imcc_nonconvergence",
+        "campaigns": ["C2A", "C4"],
+    }
+    sim = _FakeProductSim()
+    sim.high_t_melt_activity_run_notice = lambda: notice
+
+    summary = product_summary(
+        SimpleNamespace(simulator=sim, trace=None),
+        {"feedstock": "lunar_mare_low_ti"},
+    )
+
+    assert summary["high_t_melt_activity_fallback_notice"] == notice
+
+
 def test_unclassified_product_mass_makes_yield_table_inconclusive() -> None:
     summary = product_summary(
         SimpleNamespace(simulator=_FakeUnclassifiedProductSim(), trace=None),

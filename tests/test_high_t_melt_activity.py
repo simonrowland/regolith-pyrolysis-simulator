@@ -30,7 +30,10 @@ from simulator.melt_backend.openimcc_bridge import (
 import simulator.melt_backend.openimcc_bridge as openimcc_bridge_module
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 from simulator.run_executor import RunExecutor
-from simulator.runner import PyrolysisRun
+from simulator.runner import (
+    PyrolysisRun,
+    _high_t_melt_activity_fallback_sentence,
+)
 from simulator.state import CampaignPhase, MOLAR_MASS
 
 
@@ -617,6 +620,71 @@ def test_unexpected_openimcc_activity_error_propagates(monkeypatch) -> None:
         )
 
 
+def test_envelope_refusal_keeps_flagged_constant_gamma_prediction() -> None:
+    composition = {"Na2O": 2.0, "SiO2": 1.0}
+    provider = _provider()
+    predicted = provider.dispatch(
+        _request(
+            composition,
+            2400.0,
+            high_t_melt_activity="openimcc",
+        )
+    )
+    constant_gamma = provider.dispatch(
+        _request(
+            composition,
+            2400.0,
+            high_t_melt_activity="constant_gamma",
+        )
+    )
+
+    assert predicted.status == "ok"
+    assert predicted.diagnostic["vapor_pressures_Pa"] == constant_gamma.diagnostic[
+        "vapor_pressures_Pa"
+    ]
+    authority = predicted.diagnostic["high_t_melt_activity"]
+    assert authority["provider"] == "constant_gamma"
+    assert authority["fallback"] is True
+    assert authority["authority"] == "extrapolated"
+    assert authority["fallback_reason"]["code"] == (
+        "imcc_composition_outside_validated_envelope"
+    )
+
+
+def test_fallback_status_remains_on_warning_without_authority_status_fields(
+    monkeypatch,
+) -> None:
+    def nonconverge(**kwargs):
+        raise ImccNonconvergenceError(
+            "IMCC-SF04 parent-balance solve did not converge",
+            {"residual_inf": 0.25},
+        )
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
+    result = _provider().dispatch(
+        _request(BASE_MELT_MOL, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
+    )
+    authority = result.diagnostic["high_t_melt_activity"]
+    fallback_activity = vapor_pressure_module._high_t_activity_for_parent(
+        "Na2O",
+        BASE_MELT_MOL,
+        temperature_K=CAP_PLUS_T_K,
+        authority=authority,
+    )
+
+    assert fallback_activity.evidence_tier == "PREDICT_AND_FLAG"
+    assert "openimcc_refused_constant_gamma_fallback" in fallback_activity.warning
+    assert fallback_activity.authority_status != "extrapolated"
+    fallback_provenance = result.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]
+    assert all(
+        "melt_oxide_activity_authority_status" not in item
+        for item in fallback_provenance.values()
+        if item.get("melt_activity_fallback")
+    )
+
+
 def test_nonconvergence_keeps_prediction_and_emits_run_notice(monkeypatch) -> None:
     diagnostics = {"iterations": 8, "residual_inf": 0.25}
     real_evaluate = openimcc_bridge_module.evaluate
@@ -687,15 +755,31 @@ def test_nonconvergence_keeps_prediction_and_emits_run_notice(monkeypatch) -> No
     assert notice["reason"] == "imcc_nonconvergence"
     assert notice["notices"][0]["residual_inf"] == 0.25
     assert notice["affected_tick_count"] == 1
-    assert notice["affected_parent_count"] == len(
-        notice["affected_parent_oxides"]
-    )
+    assert notice["affected_parent_count"] == 7
+    assert notice["affected_parent_count"] == len(notice["affected_parent_oxides"])
+    assert "K2O" not in notice["affected_parent_oxides"]
     assert notice["first_hour"] == notice["last_hour"] == 1
     assert notice["campaign"] == "C2A"
     assert output["product_classification"][
         "high_t_melt_activity_fallback_notice"
     ] == notice
     assert "IMCC" in output["product_classification"]["markdown"]
+
+
+def test_fallback_sentence_renders_all_campaigns() -> None:
+    sentence = _high_t_melt_activity_fallback_sentence(
+        {
+            "reason": "imcc_nonconvergence",
+            "campaigns": ["C2A", "C4"],
+            "affected_tick_count": 2,
+            "affected_parent_count": 7,
+            "first_hour": 1,
+            "last_hour": 3,
+        }
+    )
+
+    assert "campaigns `C2A, C4`" in sentence
+    assert "campaign `unspecified`" not in sentence
 
 
 def test_absent_parent_stays_out_of_openimcc_authority() -> None:
