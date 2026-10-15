@@ -57,6 +57,7 @@ from simulator.battery.enums import (
     UncertaintyKind,
     ValueKind,
 )
+from simulator.battery.polymorph_dictionary import polymorph_matches_formula
 from simulator.state_types import State
 
 T = TypeVar("T")
@@ -240,7 +241,16 @@ class Species:
             raise ValueError(
                 f"Species.phase must be a closed Phase token, not {phase.value!r}"
             )
-        object.__setattr__(self, "polymorph", _coerce_polymorph_state(self.polymorph))
+        polymorph = _coerce_polymorph_state(self.polymorph)
+        if (
+            polymorph is not None
+            and polymorph.is_value
+            and not polymorph_matches_formula(self.formula, polymorph.value)
+        ):
+            polymorph = State.unknown(
+                f"polymorph {polymorph.value.value} does not denote formula {self.formula}"
+            )
+        object.__setattr__(self, "polymorph", polymorph)
 
 
 def phase_token(species: Species) -> Phase | None:

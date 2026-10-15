@@ -10,9 +10,13 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from functools import lru_cache
+from importlib import metadata
 from importlib import resources
+import json
 import math
 import numbers
+from pathlib import Path
+import subprocess
 from types import MappingProxyType
 from typing import Any
 
@@ -58,6 +62,97 @@ OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
     "@e256a69794390fda513ab7e7fe13972f3203f36b"
 )
+
+
+def imported_openimcc_commit() -> str | None:
+    """Return the commit for the imported package, if it can be verified."""
+
+    module = _openimcc
+    module_file = getattr(module, "__file__", None) if module is not None else None
+    if not isinstance(module_file, str):
+        return None
+    try:
+        imported_path = Path(module_file).resolve()
+    except (OSError, RuntimeError):
+        return None
+
+    try:
+        distribution = metadata.distribution("openimcc")
+    except metadata.PackageNotFoundError:
+        distribution = None
+
+    if distribution is not None:
+        distribution_files = distribution.files
+        belongs_to_distribution = bool(
+            distribution_files
+            and any(
+                Path(distribution.locate_file(entry)).resolve() == imported_path
+                for entry in distribution_files
+            )
+        )
+        if not belongs_to_distribution:
+            # Some editable installs omit RECORD entries. Compare the imported
+            # package file at the distribution's location rather than trusting
+            # an unrelated openimcc dist-info elsewhere on sys.path.
+            belongs_to_distribution = (
+                Path(distribution.locate_file("openimcc/__init__.py")).resolve()
+                == imported_path
+            )
+        if belongs_to_distribution:
+            direct_url = distribution.read_text("direct_url.json")
+            if direct_url:
+                try:
+                    direct_url_data = json.loads(direct_url)
+                except (TypeError, json.JSONDecodeError):
+                    direct_url_data = None
+                vcs_info = (
+                    direct_url_data.get("vcs_info")
+                    if isinstance(direct_url_data, dict)
+                    else None
+                )
+                commit_id = (
+                    vcs_info.get("commit_id") if isinstance(vcs_info, dict) else None
+                )
+                if isinstance(commit_id, str) and commit_id:
+                    return commit_id
+
+    # A PYTHONPATH source checkout may shadow a stale distribution. In that
+    # case report the checkout's HEAD, never the unrelated dist-info commit.
+    if "site-packages" in imported_path.parts or any(
+        part in {".venv", "venv", "env"} for part in imported_path.parts
+    ):
+        return None
+    for checkout in imported_path.parents:
+        if not (checkout / ".git").exists():
+            continue
+        try:
+            relative_path = imported_path.relative_to(checkout)
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(checkout),
+                    "ls-files",
+                    "--error-unmatch",
+                    str(relative_path),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            result = subprocess.run(
+                ["git", "-C", str(checkout), "rev-parse", "HEAD"],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+        except (OSError, subprocess.SubprocessError):
+            continue
+        commit_id = result.stdout.strip()
+        return commit_id or None
+    return None
 DEFAULT_BACKEND_PACK_NAME = "default"
 
 _PACK_RESOURCE_NAMES = {
@@ -176,6 +271,59 @@ class OpenImccBridgeResult:
     coverage: Mapping[str, str]
     activity_coefficients: Mapping[str, Mapping[str, Any]] | None = None
     parent_oxide_x_star_ratios: Mapping[str, float] = field(default_factory=dict)
+
+    def to_transport(self) -> dict[str, Any]:
+        """Return every result field in a plain, multiprocessing-safe shape."""
+        return {
+            "parent_oxide_activities": dict(self.parent_oxide_activities),
+            "parent_oxides": self.parent_oxides,
+            "flags": self.flags,
+            "notices": self.notices,
+            "acid_sink_ratio": self.acid_sink_ratio,
+            "pack_model_id": self.pack_model_id,
+            "pack_version": self.pack_version,
+            "pack_digest": self.pack_digest,
+            "openimcc_version": self.openimcc_version,
+            "envelope_status": self.envelope_status,
+            "extrapolated": self.extrapolated,
+            "labels": {
+                "identity": dict(self.labels.identity),
+                "coverage": dict(self.labels.coverage),
+                "trust": self.labels.trust,
+                "envelope_status": self.labels.envelope_status,
+                "flags": self.labels.flags,
+                "notices": self.labels.notices,
+                "acid_sink_ratio": self.labels.acid_sink_ratio,
+            },
+            "coverage": dict(self.coverage),
+            "activity_coefficients": {
+                key: dict(value)
+                for key, value in (self.activity_coefficients or {}).items()
+            },
+            "parent_oxide_x_star_ratios": dict(self.parent_oxide_x_star_ratios),
+        }
+
+    @classmethod
+    def from_transport(cls, payload: Mapping[str, Any]) -> OpenImccBridgeResult:
+        """Rebuild the immutable bridge DTO after crossing a process boundary."""
+        labels = payload["labels"]
+        return cls(
+            parent_oxide_activities=payload["parent_oxide_activities"],
+            parent_oxides=payload["parent_oxides"],
+            flags=payload["flags"],
+            notices=payload["notices"],
+            acid_sink_ratio=payload["acid_sink_ratio"],
+            pack_model_id=payload["pack_model_id"],
+            pack_version=payload["pack_version"],
+            pack_digest=payload["pack_digest"],
+            openimcc_version=payload["openimcc_version"],
+            envelope_status=payload["envelope_status"],
+            extrapolated=payload["extrapolated"],
+            labels=ImccAdapterLabels(**labels),
+            coverage=payload["coverage"],
+            activity_coefficients=payload["activity_coefficients"],
+            parent_oxide_x_star_ratios=payload["parent_oxide_x_star_ratios"],
+        )
 
     def __post_init__(self) -> None:
         object.__setattr__(

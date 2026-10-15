@@ -565,6 +565,9 @@ def test_openimcc_battery_reports_runtime_backend_pack(monkeypatch) -> None:
     assert backend._identity["pack_digest"] == openimcc_bridge._pack_digest(
         expected_pack
     )
+    assert backend._identity["openimcc_commit"] == (
+        openimcc_bridge.imported_openimcc_commit() or "unverified"
+    )
 
 
 def test_missing_binding_digest_refuses_without_residual_identity_or_cache_key(

@@ -295,7 +295,13 @@ species:
           column: T_f (K)
         pressure_basis_locator: {pdf_page_index: 20, page: 21, published_page: 21, section: Conclusions}
         phase: cr
-        condensed_form: {state: crystalline, polymorph: Cristobalite, basis: explicit_author}
+        condensed_form:
+          state: crystalline
+          polymorph: cristobalite_high
+          basis: explicit_author
+          note: >-
+            Labelled interpretation: the only cristobalite stable at 1999 K is
+            high (beta) cristobalite; the alpha-beta inversion is near 500 K.
         units: K
         values:
           quantity: transition_temperature
@@ -332,7 +338,13 @@ species:
           row: Cristobalite
           column: ΔS_f
         phase: cr
-        condensed_form: {state: crystalline, polymorph: Cristobalite, basis: explicit_author}
+        condensed_form:
+          state: crystalline
+          polymorph: cristobalite_high
+          basis: explicit_author
+          note: >-
+            Labelled interpretation: the only cristobalite stable at 1999 K is
+            high (beta) cristobalite; the alpha-beta inversion is near 500 K.
         units: J/mol K
         values:
           quantity: entropy_of_fusion
@@ -408,6 +420,13 @@ species:
           published_page: 16
           table: '5'
           row: Cristobalite
+        condensed_form:
+          state: crystalline
+          polymorph: cristobalite_high
+          basis: explicit_author
+          note: >-
+            Labelled interpretation: the only cristobalite stable at 1999 K is
+            high (beta) cristobalite; the alpha-beta inversion is near 500 K.
         units: J per mol K
         values:
           method_class: model_derived
