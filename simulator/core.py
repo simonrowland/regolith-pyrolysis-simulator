@@ -6624,6 +6624,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 exchange_clamped = True
             max_real_absorbable = max(0.0, head_o2_mol - n_floor_mol)
             dn_ledger_to_headspace = max(dn_to_headspace, -max_real_absorbable)
+        elif dn_to_headspace > 0.0:
+            # Premise: positive exchange moves O2 molecules, while the ledger
+            # validates their oxygen atoms (n_O = 2 * n_O2). Compare in mol O2
+            # against the buffer's mol O2 inventory; the excess stays in the
+            # existing typed unbacked amount. At zero inventory the booked
+            # transfer is zero; with enough inventory the requested flow stays
+            # unchanged. Melt potential alone is not an O2 ledger parcel.
+            buffer_o2_mol = max(0.0, float(
+                self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+                    OXYGEN_SPECIES,
+                    0.0,
+                )
+            ))
+            dn_ledger_to_headspace = min(dn_to_headspace, buffer_o2_mol)
+            if dn_ledger_to_headspace < dn_to_headspace:
+                exchange_clamped = True
+            if dn_ledger_to_headspace < OXYGEN_RESERVOIR_NOOP_MOL:
+                dn_ledger_to_headspace = 0.0
 
         if abs(dn_to_headspace) < OXYGEN_RESERVOIR_NOOP_MOL:
             dn_to_headspace = 0.0

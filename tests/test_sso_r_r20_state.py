@@ -2353,6 +2353,83 @@ def test_exchange_target_cannot_exceed_controlled_total_pressure() -> None:
     )
 
 
+@pytest.mark.parametrize("buffer_o2_mol", [0.0, 1.0e-6])
+def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
+    buffer_o2_mol: float,
+) -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 1.5
+    sim._overhead_headspace_config["enabled"] = True
+    initial_buffer_o2 = sim.atom_ledger.mol_by_account(
+        "reservoir.fo2_buffer"
+    ).get("O2", 0.0)
+    if initial_buffer_o2 > 0.0:
+        sim._dispatch_and_commit(
+            ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
+            control_inputs={"dn_to_headspace_mol": initial_buffer_o2},
+        )
+    if buffer_o2_mol > 0.0:
+        sim.atom_ledger.load_external_mol(
+            "reservoir.fo2_buffer",
+            {"O2": buffer_o2_mol},
+            source="test partial O2 buffer for exchange clamp",
+            material_origin="feedstock",
+        )
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -1.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1873.15
+    sim._sync_oxygen_reservoir_mirror()
+    before_overhead_o2 = sim.atom_ledger.mol_by_account(
+        "process.overhead_gas"
+    ).get("O2", 0.0)
+    before_buffer_o2 = sim.atom_ledger.mol_by_account(
+        "reservoir.fo2_buffer"
+    ).get("O2", 0.0)
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_transition_count = len(sim.atom_ledger.transitions)
+    before_o_atoms = math.fsum(
+        sim.atom_ledger.atom_moles_by_account(account).get("O", 0.0)
+        for account in sim.atom_ledger.mol_by_account()
+    )
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    after_o_atoms = math.fsum(
+        sim.atom_ledger.atom_moles_by_account(account).get("O", 0.0)
+        for account in sim.atom_ledger.mol_by_account()
+    )
+    assert reservoir.exchange_direction == "melt_to_headspace"
+    assert reservoir.exchange_clamped is True
+    assert reservoir.exchange_o2_mol == pytest.approx(buffer_o2_mol)
+    assert reservoir.exchange_unbacked_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2", 0.0
+    ) == pytest.approx(before_overhead_o2 + buffer_o2_mol)
+    assert sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get(
+        "O2", 0.0
+    ) == pytest.approx(before_buffer_o2 - buffer_o2_mol)
+    assert sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get(
+        "O2", 0.0
+    ) >= -OXYGEN_RESERVOIR_NOOP_MOL
+    if buffer_o2_mol == 0.0:
+        assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
+        assert len(sim.atom_ledger.transitions) == before_transition_count
+    else:
+        expected_fO2 = before_fO2 - (
+            reservoir.exchange_o2_mol
+            / reservoir.melt_redox_capacity_mol_per_ln_fO2
+        ) / math.log(10.0)
+        assert reservoir.melt_intrinsic_fO2_log == pytest.approx(expected_fO2)
+        assert len(sim.atom_ledger.transitions) == before_transition_count + 1
+    assert after_o_atoms == pytest.approx(
+        before_o_atoms,
+        rel=0.0,
+        abs=2 * math.ulp(before_o_atoms),
+    )
+
+
 def test_headspace_exchange_cannot_instantly_erase_reductant_dose() -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0

@@ -45,13 +45,11 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     # 2026-08-05 MC-4 wave 1B (a34318c): the composed Na carrier set routes
     # the tick flux exactly; the residual Na roundoff dust is gone and the
     # audited overhead is now empty. HI-2 above remains <= 1e-12 %.
-    # Restored flagged routing leaves only these identified roundoff parcels.
-    # 2026-10-13 b-850 round 2: parent-oxide alkali-dimer pressures no longer
-    # leave the prior 1.994e-20 kg Na roundoff parcel. The remaining SiO2_gas
-    # residual shifts from 9.409239450400745e-14 to 9.409239449650439e-14 kg.
-    expected_overhead: dict[str, float] = {
-        "SiO2_gas": 9.409239449650439e-14,
-    }
+    # b-894 r2 ae95ab42c retains positive trace lots through materialization.
+    # The overhead bleed now carries the 9.409239449650439e-14 kg SiO2_gas
+    # trace into terminal.offgas, so it is no longer in overhead; HI-2 above
+    # confirms that this account move preserves mass closure.
+    expected_overhead: dict[str, float] = {}
     assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
         expected_overhead,
         rel=1.0e-12,
