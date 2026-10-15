@@ -245,6 +245,7 @@ def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, li
     assert after_o == pytest.approx(before_o, rel=0.0, abs=2.0 * math.ulp(before_o))
 
 
+@pytest.mark.nightly
 @pytest.mark.timeout(1800)
 def test_default_lunar_redox_runaway_acceptance() -> None:
     from simulator.runner import PyrolysisRun
