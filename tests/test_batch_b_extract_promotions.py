@@ -1,0 +1,51 @@
+from decimal import Decimal
+from pathlib import Path
+
+import yaml
+
+from simulator.battery.migrate import Migrator
+from tools.validate_literature_extracts import validate_extract_document
+
+
+ROOT = Path(__file__).resolve().parents[1]
+EXTRACTS = ROOT / "data/literature/extracts"
+
+
+def _migrate(name: str):
+    path = EXTRACTS / name
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    assert validate_extract_document(
+        document, expected_source_id=path.stem, check_fidelity_match=True
+    ) == []
+    source_id = document["source_id"]
+    migrator = Migrator(
+        root=ROOT,
+        index={source_id: dict(document["source"], source_id=source_id)},
+        aliases={},
+    )
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    return migrator.result
+
+
+def _point(result, observation_id: str) -> Decimal:
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith(f"::{observation_id}")
+    )
+    assert observation.value.point is not None
+    return observation.value.point
+
+
+def test_di_donato_granati_2000_migrates_printed_activity_cells() -> None:
+    result = _migrate("di-donato-granati-2000.yaml")
+    assert len(result.observations) == 95
+    assert _point(result, "di_donato_2000_t2_slag1_r1") == Decimal("0.015")
+    assert _point(result, "di_donato_2000_t4_slag1_r2") == Decimal("0.078")
+    assert all(
+        observation.identity.temperature_K.is_value
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].locator is not None
+        for observation in result.observations.values()
+    )
