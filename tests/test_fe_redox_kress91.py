@@ -74,7 +74,8 @@ def test_intrinsic_kress91_ends_follow_exchange(feo_mol, fe2o3_mol, exchange, ex
 
 
 @pytest.mark.parametrize('kind', ['absolute', 'buffer_offset'])
-def test_intrinsic_kress91_preserves_imposed_state(kind):
+@pytest.mark.parametrize('temperature_K', [1873.15, 2373.15])
+def test_intrinsic_kress91_preserves_imposed_state(kind, temperature_K):
     from simulator.fe_redox import (
         FE_FEO_BUFFER_STANDARD, RedoxState, _non_absolute_redox_state_kwargs,
         kress91_intrinsic_state,
@@ -86,11 +87,12 @@ def test_intrinsic_kress91_preserves_imposed_state(kind):
     kwargs = _non_absolute_redox_state_kwargs(imposed)
     state = kress91_intrinsic_state(
         feo_mol=0.0, fe2o3_mol=1.0, mol_fractions=KRESS91_MOL_FRACTIONS,
-        T_K=1873.15, pressure_bar=0.01, exchange_fO2_log=-5.0,
+        T_K=temperature_K, pressure_bar=0.01, exchange_fO2_log=-5.0,
         redox_state=imposed,
     )
-    assert state['fO2_log'] == imposed.log_fO2_at(1873.15)
+    assert state['fO2_log'] == imposed.log_fO2_at(temperature_K)
     assert not state['exchange_bounded']
+    assert state['flags'] == []
     assert imposed.cache_identity() == identity
     assert _non_absolute_redox_state_kwargs(imposed) == kwargs
 

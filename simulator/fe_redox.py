@@ -928,6 +928,11 @@ def kress91_intrinsic_state(
     redox_state: RedoxState | None = None,
 ) -> dict[str, object]:
     """Derive the liquid oxygen potential from its actual iron inventory."""
+    if redox_state is not None:
+        return {
+            'fO2_log': redox_state.log_fO2_at(T_K),
+            'exchange_bounded': False, 'flags': [],
+        }
     _validate_kress91_controls(
         fO2_log=exchange_fO2_log, T_K=T_K, pressure_bar=pressure_bar,
     )
@@ -938,9 +943,7 @@ def kress91_intrinsic_state(
     if kress91_temperature_band_case(T_K - 273.15)['extrapolation']:
         flags.append('OUT_OF_CERTIFIED_BAND')
     bounded = False
-    if redox_state is not None:
-        value = redox_state.log_fO2_at(T_K)
-    elif feo_mol == 0.0 or fe2o3_mol == 0.0:
+    if feo_mol == 0.0 or fe2o3_mol == 0.0:
         # Kress has no finite inverse at either end (or with no iron couple).
         # The gas-side boundary supplies a finite potential, never a sentinel.
         value = min(exchange_fO2_log, math.log10(pressure_bar))
