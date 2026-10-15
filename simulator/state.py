@@ -452,6 +452,7 @@ class ProcessInventory:
 
 @dataclass
 class OxygenReservoirState:
+    # Output mirror: intrinsic redox is the AtomLedger FeO/Fe2O3 inventory.
     melt_intrinsic_fO2_log: float = -9.0
     reference_T_K: float | None = None
     headspace_ledger_pO2_bar: float = DEFAULT_VACUUM_FLOOR_BAR
@@ -511,8 +512,7 @@ class MeltState:
     pO2_mbar: float = 0.0          # Controlled oxygen partial pressure
     p_total_mbar: float = 0.0      # Total pressure above melt
     fO2_log: float = -9.0          # log₁₀(fO₂/bar) for MELTS calc
-    # SSO-R intrinsic melt redox state, log10(fO2/bar); seeded from the
-    # legacy intrinsic estimate, then advanced by the oxygen reservoir.
+    # Derived log10(fO2/bar) output mirror of the ledger's FeO/Fe2O3 split.
     melt_fO2_log: float = -9.0
     oxygen_reservoir: OxygenReservoirState = field(
         default_factory=OxygenReservoirState)
@@ -1219,7 +1219,7 @@ class HourSnapshot:
     # pre-equilibrium O2 exchange.
 
     redox_source_breakdown: Dict[str, Any] = field(default_factory=dict)
-    # Per-tick mol-O2-equivalent source terms applied to the melt redox scalar.
+    # Per-tick mol-O2-equivalent labels for committed ledger source terms.
     # Diagnostic only; mass movement remains in AtomLedger transitions.
 
     # --- O2 bubbler actuator telemetry (SSO-O2 chunk A) ---

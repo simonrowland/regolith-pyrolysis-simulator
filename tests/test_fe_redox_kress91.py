@@ -95,6 +95,32 @@ def test_intrinsic_kress91_preserves_imposed_state(kind):
     assert _non_absolute_redox_state_kwargs(imposed) == kwargs
 
 
+@pytest.mark.parametrize('ferric_mol', [0.0, 1.0, 50.0])
+def test_finite_headspace_exchange_cannot_cross_equilibrium(ferric_mol):
+    from simulator.fe_redox import _kress91_exchange_uptake_mol, kress91_intrinsic_state
+
+    feo_mol = 100.0 - 2.0 * ferric_mol
+    head_o2_mol = 10.0
+
+    def gas_potential(remaining_o2):
+        # Ideal gas at fixed T/V: p is proportional to actual O2 mol.
+        return math.log10(max(remaining_o2 / 1000.0, 1e-9))
+
+    uptake = _kress91_exchange_uptake_mol(
+        feo_mol=feo_mol, fe2o3_mol=ferric_mol,
+        mol_fractions=KRESS91_MOL_FRACTIONS, T_K=1673.15,
+        pressure_bar=0.01, head_o2_mol=head_o2_mol,
+        available_o2_mol=head_o2_mol, gas_log_fO2=gas_potential,
+    )
+    assert -ferric_mol / 2.0 < uptake < head_o2_mol
+    liquid = kress91_intrinsic_state(
+        feo_mol=feo_mol - 4.0 * uptake, fe2o3_mol=ferric_mol + 2.0 * uptake,
+        mol_fractions=KRESS91_MOL_FRACTIONS, T_K=1673.15,
+        pressure_bar=0.01, exchange_fO2_log=gas_potential(head_o2_mol - uptake),
+    )
+    assert liquid['fO2_log'] == pytest.approx(gas_potential(head_o2_mol - uptake), abs=1e-9)
+
+
 @pytest.mark.parametrize('pressure_bar', [0.0, -1.0])
 def test_floor_vacuum_pressure_bar_floors_finite_vacuum_pressure(
     pressure_bar: float,

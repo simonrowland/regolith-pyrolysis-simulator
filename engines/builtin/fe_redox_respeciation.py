@@ -122,7 +122,9 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
             "flags": ["OUT_OF_CERTIFIED_BAND"] if temperature_band.get("extrapolation") else [],
         }
         if not bool(temperature_band.get("authoritative")) and (
-            temperature_band.get("case") != "1630C_2100C_extrapolation_experimentally_confirmed"
+            temperature_band.get("case") in {
+                "below_1200C_extrapolation", "non_finite_temperature",
+            }
         ):
             return IntentResult(
                 intent=ChemistryIntent.FE_REDOX_RESPECIATION,

@@ -696,6 +696,35 @@ def _seed_o2_bubbler_redox_state(
     )
 
 
+def test_trial_oxygen_transport_matches_same_committed_headspace() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim.melt.pO2_mbar = 0.0
+    sim._overhead_headspace_config["enabled"] = True
+    trial = sim._inert_sweep_transport_pO2_bar(1.0)
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas", {"O2": 1.0},
+        source="test same candidate gas inventory", material_origin="reagent",
+    )
+    assert sim._inert_sweep_transport_pO2_bar(1.0) == trial
+
+
+def test_all_ferrous_bubbler_uses_inventory_demand_at_equal_boundary_potential() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1873.15
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt").get("Fe2O3", 0.0) == 0.0
+    target = sim._current_melt_redox_fO2_log()
+    _configure_o2_bubbler(sim, rate_kg_per_hr=1.0, eta_absorb=1.0, target_fO2_log=target)
+    diagnostic = sim._apply_o2_bubbler()
+    assert diagnostic["absorbed_mol"] > 0.0
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"] > 0.0
+    for transition in sim.atom_ledger.transitions:
+        transition.validate_conservation(sim.species_formula_registry)
+
+
 def test_o2_bubbler_cannot_exceed_total_pressure_or_double_book_passthrough() -> None:
     sim = _make_sim()
     _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
@@ -1355,7 +1384,7 @@ def test_redox_source_bounds_finite_absurd_candidate_fo2(
     assert reservoir.redox_source_refusal_context == {}
 
 
-def test_redox_source_valid_candidate_fo2_still_applies_exact_delta() -> None:
+def test_redox_source_label_cannot_advance_potential_without_ledger_change() -> None:
     sim = _make_sim()
     sim.melt.p_total_mbar = 10.0  # Keep the small increment below the gas ceiling.
     sim.melt.temperature_C = 1600.0
@@ -1363,6 +1392,8 @@ def test_redox_source_valid_candidate_fo2_still_applies_exact_delta() -> None:
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim.melt.oxygen_reservoir.reference_T_K = temperature_K
     sim._sync_oxygen_reservoir_mirror()
+    before = sim._current_melt_redox_fO2_log()
+    inventory = dict(sim.atom_ledger.mol_by_account("process.cleaned_melt"))
     capacity = sim._melt_redox_capacity_mol_per_ln_fO2(
         fO2_log=sim._current_melt_redox_fO2_log(),
         T_K=temperature_K,
@@ -1373,27 +1404,22 @@ def test_redox_source_valid_candidate_fo2_still_applies_exact_delta() -> None:
         temperature_K=temperature_K,
     )
 
-    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(-8.75)
+    assert reservoir.melt_intrinsic_fO2_log == before
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt") == inventory
     assert reservoir.redox_source_terms_applied is True
     assert reservoir.redox_source_skip_reason == ""
     assert reservoir.redox_source_refusal_context == {}
 
 
-def test_nonfinite_reservoir_fo2_raises_accounting_error_with_attribution() -> None:
+def test_corrupt_output_mirror_cannot_replace_ledger_redox_state() -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
     sim._redox_source_terms_this_hr = {"redox_source:test": 1.25}
+    expected = sim._current_melt_redox_fO2_log()
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = math.inf
-
-    with pytest.raises(AccountingError) as excinfo:
-        sim._sync_oxygen_reservoir_mirror()
-
-    message = str(excinfo.value)
-    assert "sync_oxygen_reservoir_mirror" in message
-    assert "temperature_C" in message
-    assert "headspace_o2_mol" in message
-    assert "source_terms_mol_o2_equiv" in message
-    assert "redox_source:test" in message
+    sim._sync_oxygen_reservoir_mirror()
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == expected
+    assert sim.melt.melt_fO2_log == expected
 
 
 def test_c3_na_source_term_comes_from_committed_transition() -> None:

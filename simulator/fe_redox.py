@@ -24,23 +24,17 @@ def intrinsic_melt_fO2(
     *,
     vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
-    """Return the legacy intrinsic-fO2 diagnostic for an oxide composition."""
-    temperature = float(temperature_K)
-    if temperature <= 0.0:
-        return math.log10(vacuum_floor_bar)
+    """Composition-only diagnostic using the same inverse as the ledger path."""
+    from simulator.state import MOLAR_MASS
+
     feo, fe2o3 = iron_oxide_values(composition_wt_pct)
-    alkali = max(0.0, float(composition_wt_pct.get("Na2O", 0.0))) + max(
-        0.0, float(composition_wt_pct.get("K2O", 0.0))
-    )
-    log_iw = -27215.0 / temperature + 6.57
-    redox_offset = 0.0
-    if feo > 0.0 and fe2o3 > 0.0:
-        redox_offset += 0.25 * math.log10(max(fe2o3 / feo, 1.0e-12))
-    redox_offset += min(0.15, alkali * 0.01)
-    return max(
-        math.log10(vacuum_floor_bar),
-        min(0.0, log_iw + redox_offset),
-    )
+    return float(kress91_intrinsic_state(
+        feo_mol=feo / MOLAR_MASS['FeO'],
+        fe2o3_mol=fe2o3 / MOLAR_MASS['Fe2O3'],
+        mol_fractions=melt_mol_fractions_for_kress91(composition_wt_pct),
+        T_K=temperature_K, pressure_bar=vacuum_floor_bar,
+        exchange_fO2_log=math.log10(vacuum_floor_bar),
+    )['fO2_log'])
 
 
 KRESS91_MOL_FRACTION_OXIDES = (
@@ -921,6 +915,102 @@ def kress91_fe3_over_sigma_fe(
         pressure_bar=pressure_bar,
     )
     return 2.0 * ratio / (2.0 * ratio + 1.0)
+
+
+def kress91_intrinsic_state(
+    *,
+    feo_mol: float,
+    fe2o3_mol: float,
+    mol_fractions: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+    exchange_fO2_log: float,
+    redox_state: RedoxState | None = None,
+) -> dict[str, object]:
+    """Derive the liquid oxygen potential from its actual iron inventory."""
+    _validate_kress91_controls(
+        fO2_log=exchange_fO2_log, T_K=T_K, pressure_bar=pressure_bar,
+    )
+    for name, mol in (('FeO', feo_mol), ('Fe2O3', fe2o3_mol)):
+        if not math.isfinite(mol) or mol < 0.0:
+            raise Kress91InvalidControls(f'{name} mol must be finite non-negative')
+    flags = []
+    if kress91_temperature_band_case(T_K - 273.15)['extrapolation']:
+        flags.append('OUT_OF_CERTIFIED_BAND')
+    bounded = False
+    if redox_state is not None:
+        value = redox_state.log_fO2_at(T_K)
+    elif feo_mol == 0.0 or fe2o3_mol == 0.0:
+        # Kress has no finite inverse at either end (or with no iron couple).
+        # The gas-side boundary supplies a finite potential, never a sentinel.
+        value = min(exchange_fO2_log, math.log10(pressure_bar))
+        bounded = True
+        flags.append('EXCHANGE_BOUNDED')
+    else:
+        # Premise (Kress & Carmichael 1991): ln(n_Fe2O3/n_FeO) = a ln fO2 + B,
+        # B containing composition and the full T/P terms. Evaluate B through
+        # the forward owner at fO2=1 bar (ln fO2=0), avoiding a second formula.
+        # Algebra: log10(fO2/bar) = [ln(n_Fe2O3)-ln(n_FeO)-B]/[a ln(10)].
+        # All logs are dimensionless; the mol units cancel in the ratio.
+        # Limits: n_Fe2O3 -> 0 gives -infinity, n_FeO -> 0 gives +infinity;
+        # those exact ends use exchange above. Sanity: at 1873.15 K, 0.01 bar,
+        # the basalt test basis ratio 0.02275705282703544 returns -7.5 dex.
+        baseline = _kress91_fe2o3_over_feo_molar(
+            fO2_log=0.0, mol_fractions=mol_fractions,
+            T_K=T_K, pressure_bar=pressure_bar,
+        )
+        value = (math.log(fe2o3_mol) - math.log(feo_mol) - math.log(baseline)) / (
+            KRESS91_LN_FO2_COEFFICIENT * math.log(10.0)
+        )
+    return {'fO2_log': value, 'exchange_bounded': bounded, 'flags': flags}
+
+
+def kress91_oxygen_demand_mol(
+    *, feo_mol: float, fe2o3_mol: float, fO2_log: float,
+    mol_fractions: Mapping[str, float], T_K: float, pressure_bar: float,
+) -> float:
+    """Finite O2 uptake (negative for release) needed to reach a gas potential."""
+    target = kress91_fe3_over_sigma_fe(
+        fO2_log=fO2_log, mol_fractions=mol_fractions,
+        T_K=T_K, pressure_bar=pressure_bar,
+    )
+    # 2 FeO + 1/2 O2 = Fe2O3: n_Fe stays constant, n_Fe2O3=x*n_Fe/2,
+    # so demand = (target n_Fe2O3 - current n_Fe2O3)/2 mol O2.
+    # At equal splits demand=0; from all-ferrous to all-ferric it is n_Fe/4.
+    return (0.5 * target * (feo_mol + 2.0 * fe2o3_mol) - fe2o3_mol) / 2.0
+
+
+def _kress91_exchange_uptake_mol(
+    *, feo_mol: float, fe2o3_mol: float,
+    mol_fractions: Mapping[str, float], T_K: float, pressure_bar: float,
+    head_o2_mol: float, available_o2_mol: float,
+    gas_log_fO2: Callable[[float], float],
+) -> float:
+    """Finite closed-headspace equilibrium transfer, positive into liquid."""
+    def demand(uptake: float) -> float:
+        return kress91_oxygen_demand_mol(
+            feo_mol=feo_mol, fe2o3_mol=fe2o3_mol,
+            fO2_log=gas_log_fO2(max(0.0, head_o2_mol - uptake)),
+            mol_fractions=mol_fractions, T_K=T_K, pressure_bar=pressure_bar,
+        )
+
+    initial = demand(0.0)
+    low, high = (0.0, min(initial, available_o2_mol)) if initial > 0.0 else (initial, 0.0)
+    # This solves oxygen CONSERVATION against the changing gas, not the Kress
+    # inverse (which remains closed form). For uptake u, n_gas'=n_gas-u and
+    # n_Fe2O3'=n_Fe2O3+2u. Equilibrium demands D(pO2(n_gas-u))=u mol O2.
+    # D decreases with u, so the bracket is monotone; at gas exhaustion the
+    # actual available molecules bound uptake. Multiplying this finite answer
+    # by the kinetic relaxation cannot overshoot either equilibrium or stock.
+    if initial > 0.0 and demand(high) >= high:
+        return high
+    for _ in range(64):
+        mid = (low + high) / 2.0
+        if demand(mid) > mid:
+            low = mid
+        else:
+            high = mid
+    return (low + high) / 2.0
 
 
 def _kress91_ferrous_feo_activity_raw(
