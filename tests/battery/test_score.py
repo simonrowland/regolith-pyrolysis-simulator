@@ -7850,7 +7850,10 @@ def test_source_polymorph_classification_pin() -> None:
         _source_polymorph_is_unspecified,
     )
 
-    omitted = State.unknown("source does not state polymorph")
+    from simulator.battery.migrate import make_species
+
+    omitted = make_species("MgO", Phase.CR).polymorph
+    assert omitted is not None
     unrecognised = Species("MgO", Phase.CR, State.of("unknown-form")).polymorph
     contradictory_mgo = Species(
         "MgO", Phase.CR, State.of(Polymorph.CLINOENSTATITE)
