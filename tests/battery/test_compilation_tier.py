@@ -516,6 +516,57 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
     }
 
 
+def test_nasa9_fit_writer_respects_selected_engines_and_policy(tmp_path, monkeypatch) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
+    import simulator.battery.generators.compilation_thermo_fits as fit_generator
+    from simulator.battery.compilation_tier import (
+        ThermoAttempt,
+        _write_compilation_comparisons_jsonl,
+        iter_compilation_comparisons_jsonl,
+    )
+    from simulator.battery.enums import QUANTITY_UNITS
+
+    record, context, _printed_cell = _nasa9_fit_test_case()
+    calls = []
+
+    def score_selected(engine, observation, **kwargs):
+        calls.append((engine, kwargs["invoke_pure_phase"]))
+        assert engine is Engine.THERMOENGINE
+        assert kwargs["invoke_pure_phase"] is False
+        return ThermoAttempt(
+            value=observation.value.point,
+            unit=QUANTITY_UNITS[Quantity.CP],
+            authority=Authority.BRIDGE,
+            notices=(),
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence="selected-fit-test",
+            coefficient_sources=(),
+        )
+
+    monkeypatch.setattr(compilation_tier, "predict_thermo_attempt", score_selected)
+    monkeypatch.setattr(fit_generator, "load_sidecar", lambda: [record])
+    path = tmp_path / "selected-compilation-comparisons.jsonl"
+
+    assert _write_compilation_comparisons_jsonl(
+        context,
+        path,
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=False,
+    ) > 0
+
+    fit_rows = tuple(
+        row
+        for row in iter_compilation_comparisons_jsonl(path)
+        if str(row["comparison_channel"]).startswith("nasa9_fit:")
+    )
+    assert fit_rows
+    assert {row["comparison_channel"] for row in fit_rows} == {
+        f"nasa9_fit:{Engine.THERMOENGINE.value}"
+    }
+    assert calls and set(calls) == {(Engine.THERMOENGINE, False)}
+
+
 @pytest.mark.parametrize("mutation", ("outside_validity", "rejected"))
 def test_nasa9_fit_mutations_produce_no_comparison(mutation, monkeypatch) -> None:
     from copy import deepcopy
@@ -544,7 +595,7 @@ def test_nasa9_fit_mutations_produce_no_comparison(mutation, monkeypatch) -> Non
     )
 
 
-def test_al091_h_minus_h298_current_comparison_count_pin() -> None:
+def test_al091_h_minus_h298_fit_restores_all_qualified_comparisons() -> None:
     from simulator.battery.compilation_tier import _nasa9_fit_comparisons
     from simulator.battery.generators.compilation_thermo_fits import load_sidecar
     from simulator.battery.generators.janaf import generate_table
@@ -583,11 +634,12 @@ def test_al091_h_minus_h298_current_comparison_count_pin() -> None:
         fit_records=(record,),
     )
 
-    assert not [
+    h_comparisons = [
         comparison
         for comparison in comparisons
         if comparison.quantity is Quantity.H_MINUS_H298
     ]
+    assert len(h_comparisons) == 16
 
 
 def test_nasa9_fit_census_is_separate_and_lists_regolith_species() -> None:

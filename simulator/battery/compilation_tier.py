@@ -2025,6 +2025,24 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
     """
 
     from simulator.battery.score import SCORE_ENGINE_SET
+
+    return _write_compilation_comparisons_jsonl(
+        context,
+        path,
+        engines=SCORE_ENGINE_SET,
+        invoke_pure_phase=True,
+    )
+
+
+def _write_compilation_comparisons_jsonl(
+    context,
+    path: Path,
+    *,
+    engines: Sequence[Engine],
+    invoke_pure_phase: bool,
+) -> int:
+    """Write comparison rows for the selected engine execution policy."""
+
     from simulator.diagnostic_helpers.species_rail_differential import (
         COMPILATION_JANAF,
         KeyedTablePoint,
@@ -2137,8 +2155,8 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
                         written += 1
             for comparison in _nasa9_fit_comparisons(
                 context,
-                engines=SCORE_ENGINE_SET,
-                invoke_pure_phase=True,
+                engines=engines,
+                invoke_pure_phase=invoke_pure_phase,
             ):
                 residual = comparison.residual
                 numeric = residual.numeric
@@ -2326,6 +2344,32 @@ def _nasa9_fit_comparisons(
         formula = str(record.get("formula") or "")
         phase = str(record.get("phase") or "")
         table_points = source_cells.get(table_id, {})
+        h_anchor_points = [
+            point
+            for (point_formula, _point_phase, point_quantity, temperature), point
+            in table_points.items()
+            if point_formula == formula
+            and point_quantity == Quantity.DELTA_FH.value
+            and temperature == Decimal("298.15")
+        ]
+        h_anchor_point = h_anchor_points[0] if len(h_anchor_points) == 1 else None
+        if (
+            h_anchor_point is not None
+            and h_anchor_point.value.kind is ValueKind.POINT
+            and h_anchor_point.value.point is not None
+        ):
+            # The source table owns ΔfH°(298.15 K), which is the integration
+            # constant carried by the high-temperature NASA-9 H coefficients.
+            h_anchor_kJ_mol: float | None = float(
+                as_decimal(h_anchor_point.value.point)
+            )
+        elif record.get("is_element_reference") or record.get(
+            "formation_reason_code"
+        ) == "missing_formation_h_anchor":
+            # The generator uses a zero integration constant for these records.
+            h_anchor_kJ_mol = 0.0
+        else:
+            h_anchor_kJ_mol = None
         validity = record.get("validity")
         summary = record.get("residual_summary")
         if not isinstance(validity, Mapping) or not isinstance(summary, Mapping):
@@ -2405,6 +2449,7 @@ def _nasa9_fit_comparisons(
                     quantity,
                     temperature_K,
                     reference_curves=reference_curves,
+                    formation_enthalpy_anchor_kJ_mol=h_anchor_kJ_mol,
                 )
                 if refusal is not None or fit_value is None:
                     continue

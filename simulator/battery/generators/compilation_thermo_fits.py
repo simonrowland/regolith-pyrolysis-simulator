@@ -2001,6 +2001,7 @@ def evaluate_sidecar_fit(
     temperature_K: float,
     *,
     reference_curves: Mapping[str, Sequence[FittedCurve]],
+    formation_enthalpy_anchor_kJ_mol: float | None = None,
 ) -> tuple[float | None, str | None]:
     """Evaluate one accepted fit quantity without crossing its declared range."""
 
@@ -2042,7 +2043,11 @@ def evaluate_sidecar_fit(
     if quantity is Quantity.CP:
         return cp, None
     if quantity is Quantity.H_MINUS_H298:
-        return enthalpy / 1000.0, None
+        if formation_enthalpy_anchor_kJ_mol is None:
+            return None, "formation_h_anchor_missing"
+        return _h_minus_h298_kJ_mol(
+            enthalpy, formation_enthalpy_anchor_kJ_mol * 1000.0
+        ), None
     if quantity is Quantity.S:
         return entropy, None
     if quantity not in {Quantity.DELTA_FH, Quantity.DELTA_FG}:

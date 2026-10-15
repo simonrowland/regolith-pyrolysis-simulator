@@ -1074,13 +1074,36 @@ def test_sidecar_fit_matches_an_independent_accepted_janaf_cell() -> None:
     ]["gate_tolerance"])
 
 
-def test_al091_enthalpy_evaluator_current_output_pin() -> None:
+def test_al091_enthalpy_evaluator_subtracts_source_formation_anchor() -> None:
     from simulator.battery.generators.compilation_thermo_fits import load_sidecar
 
+    table_id = "Al-091"
+    table_path = TABLES_DIR / f"{table_id}.yaml"
+    source = generate_table(
+        load_table_document(table_path), source_path=str(table_path)
+    )
+    printed_h = next(
+        (temperature, value)
+        for observation in source.observations
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.H_MINUS_H298
+        for temperature, value in observation.value.series or ()
+        if temperature == Decimal("2500")
+    )
+    anchor = next(
+        value
+        for observation in source.observations
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.DELTA_FH
+        for temperature, value in observation.value.series or ()
+        if temperature == Decimal("298.15")
+    )
+    assert anchor == Decimal("-2299.108")
+    assert printed_h[1] == Decimal("613.051")
     record = next(
         item
         for item in load_sidecar()
-        if item["source_record_id"] == "Al-091"
+        if item["record_id"] == "nist-janaf-4th:Al-091:l:2500:4000"
         and item["phase"] == "l"
         and item["status"] == "accepted"
     )
@@ -1088,12 +1111,18 @@ def test_al091_enthalpy_evaluator_current_output_pin() -> None:
     fitted, reason = evaluate_sidecar_fit(
         record,
         Quantity.H_MINUS_H298,
-        2500.0,
+        float(printed_h[0]),
         reference_curves={},
+        formation_enthalpy_anchor_kJ_mol=float(anchor),
     )
 
     assert reason is None
-    assert fitted == pytest.approx(-1686.0569999998672, abs=1e-9)
+    assert fitted == pytest.approx(
+        float(printed_h[1]),
+        abs=record["residual_summary"][Quantity.H_MINUS_H298.value][
+            "gate_tolerance"
+        ],
+    )
 
 
 def test_janaf_formation_anchor_does_not_require_element_fit_at_298_15_k() -> None:
