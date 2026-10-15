@@ -44,7 +44,10 @@ from simulator.condensation import (
     knudsen_regime_diagnostic,
 )
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
-from simulator.core import PoisonedHourError
+from simulator.core import (
+    PoisonedHourError,
+    read_high_t_melt_activity_fallback_notice,
+)
 from simulator.cost_energy import unavailable_quantity
 from simulator.cost_ledger import run_pumping_input_cost
 from simulator.cost_parameters import default_cost_parameters_block
@@ -5956,20 +5959,13 @@ def _cache_trace_payload(
             payload["rump_expectation_notice"] = _compact_jsonable(
                 dict(rump_notice)
             )
-    high_t_activity_reader = getattr(
-        simulator,
-        "high_t_melt_activity_run_notice",
-        None,
+    high_t_activity_notice = read_high_t_melt_activity_fallback_notice(
+        simulator
     )
-    if callable(high_t_activity_reader):
-        high_t_activity_notice = high_t_activity_reader()
-        if (
-            isinstance(high_t_activity_notice, MappingABC)
-            and high_t_activity_notice
-        ):
-            payload["high_t_melt_activity_fallback_notice"] = _compact_jsonable(
-                dict(high_t_activity_notice)
-            )
+    if high_t_activity_notice:
+        payload["high_t_melt_activity_fallback_notice"] = _compact_jsonable(
+            high_t_activity_notice
+        )
     alpha_authority_status_by_species = getattr(
         simulator,
         "_alpha_authority_status_by_species_engaged",

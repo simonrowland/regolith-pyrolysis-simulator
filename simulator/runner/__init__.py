@@ -78,6 +78,7 @@ from simulator.core import (
     CampaignPhase,
     DEGRADED_PATH_ENGAGEMENT_KEYS,
     PyrolysisSimulator,
+    read_high_t_melt_activity_fallback_notice,
 )
 from simulator.condensation import (
     KNUDSEN_REFUSAL_REASON,
@@ -3521,21 +3522,11 @@ def _attach_composition_projected_liquidus_notice(
         )
 
 
-def _high_t_melt_activity_fallback_notice(sim: Any) -> dict[str, Any] | None:
-    reader = getattr(sim, "high_t_melt_activity_run_notice", None)
-    if not callable(reader):
-        return None
-    notice = reader()
-    if not isinstance(notice, Mapping) or not notice:
-        return None
-    return dict(notice)
-
-
 def _attach_high_t_melt_activity_fallback_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    notice = _high_t_melt_activity_fallback_notice(sim)
+    notice = read_high_t_melt_activity_fallback_notice(sim)
     if notice:
         run_metadata["high_t_melt_activity_fallback_notice"] = _json_safe(
             notice
@@ -3638,7 +3629,7 @@ def _product_classification_report(
     if notice:
         report["engine_commissioning_notice"] = _json_safe(notice)
         sentences.append(_engine_commissioning_sentence(notice))
-    high_t_activity_notice = _high_t_melt_activity_fallback_notice(sim)
+    high_t_activity_notice = read_high_t_melt_activity_fallback_notice(sim)
     if high_t_activity_notice:
         report["high_t_melt_activity_fallback_notice"] = _json_safe(
             high_t_activity_notice

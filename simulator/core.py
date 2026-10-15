@@ -1002,6 +1002,18 @@ def _feedstock_surface_pressure_mbar(feedstock: Mapping[str, Any]) -> float:
     )
 
 
+def read_high_t_melt_activity_fallback_notice(
+    sim: Any,
+) -> dict[str, Any] | None:
+    reader = getattr(sim, 'high_t_melt_activity_run_notice', None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    if not isinstance(notice, Mapping) or not notice:
+        return None
+    return dict(notice)
+
+
 class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     """
     Hour-by-hour simulator for the Oxygen Shuttle process.
