@@ -8905,7 +8905,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'count': len(warnings),
         }
 
-    def _project_cleaned_melt_from_atom_ledger(self) -> None:
+    def _melt_resident_composition_kg_from_atom_ledger(self) -> Dict[str, float]:
+        """Project both melt-resident accounts without changing cached outputs."""
         ledger_melt = self.atom_ledger.project_account_kg('process.cleaned_melt')
         spent_reductant_residue = self.atom_ledger.project_account_kg(
             SPENT_REDUCTANT_RESIDUE_ACCOUNT)
@@ -8915,6 +8916,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         for species, kg in spent_reductant_residue.items():
             projected_melt[species] = projected_melt.get(species, 0.0) + float(kg)
+        return projected_melt
+
+    def _project_cleaned_melt_from_atom_ledger(self) -> None:
+        projected_melt = self._melt_resident_composition_kg_from_atom_ledger()
         # Project the *full* cleaned_melt account, not just OXIDE_SPECIES: a
         # FactSAGE LIQUID/SOLID phase can legitimately carry non-oxide species
         # (dissolved metallic Fe/Si, a solid mineral). Truncating to oxides
