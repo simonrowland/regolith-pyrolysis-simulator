@@ -422,6 +422,7 @@ from simulator.feedstock_composition import (
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR, feedstock_body
 from simulator.fe_redox import (
     RedoxState,
+    _non_absolute_redox_state_kwargs,
     _reanchor_redox_state,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
@@ -4678,12 +4679,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         redox_state: RedoxState | None = None,
     ) -> _MeltRedoxGateAuthority:
-        redox_state_kwargs = (
-            {"redox_state": redox_state}
-            if redox_state is not None
-            and redox_state.cache_identity() is not None
-            else {}
-        )
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         if gate_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
             pinned_hour = getattr(
                 self,
@@ -4745,12 +4741,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_curve_memo_origin_matches,
         )
 
-        redox_state_kwargs = (
-            {"redox_state": redox_state}
-            if redox_state is not None
-            and redox_state.cache_identity() is not None
-            else {}
-        )
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         return gate_curve_memo_origin_matches(
             self,
             value['curve'],
@@ -4831,12 +4822,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         redox_state: RedoxState | None = None,
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
-        redox_state_kwargs = (
-            {"redox_state": redox_state}
-            if redox_state is not None
-            and redox_state.cache_identity() is not None
-            else {}
-        )
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         authority = self._melt_redox_liquidus_gate_record(
             **redox_state_kwargs,
         )
@@ -4869,12 +4855,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             fO2_log,
             redox_state,
         )
-        redox_state_kwargs = (
-            {"redox_state": redox_state}
-            if redox_state is not None
-            and redox_state.cache_identity() is not None
-            else {}
-        )
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )

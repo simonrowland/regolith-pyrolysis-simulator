@@ -614,6 +614,15 @@ class RedoxState:
         return self.to_descriptor()
 
 
+def _non_absolute_redox_state_kwargs(
+    redox_state: RedoxState | None,
+) -> dict[str, RedoxState]:
+    """Forward only redox states that add cache identity beyond scalar fO2."""
+    if redox_state is None or redox_state.cache_identity() is None:
+        return {}
+    return {'redox_state': redox_state}
+
+
 def normalize_redox_state(
     fO2_log: float | None,
     redox_state: RedoxState | None = None,

@@ -21,6 +21,7 @@ from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     RedoxState,
+    _non_absolute_redox_state_kwargs,
     _kress91_gate_key_referenced_log_fO2,
     kress91_temperature_band_case,
     normalize_redox_state,
@@ -2084,12 +2085,7 @@ class EvaporationMixin:
             float(self._current_melt_redox_fO2_log())
         )
         fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
-        redox_state_kwargs = (
-            {"redox_state": redox_state}
-            if redox_state is not None
-            and redox_state.cache_identity() is not None
-            else {}
-        )
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )

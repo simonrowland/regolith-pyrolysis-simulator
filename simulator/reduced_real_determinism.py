@@ -41,6 +41,7 @@ from simulator.grind_preflight import (
 )
 from simulator.fe_redox import (
     RedoxState,
+    _non_absolute_redox_state_kwargs,
     _kress91_gate_key_referenced_log_fO2,
 )
 from simulator.fidelity_vocabulary import EvidenceClass
@@ -665,12 +666,7 @@ class PT0DeterminismStore:
         if not _is_cacheable_gate_curve(curve):
             self._mark_uncacheable_capture(sim)
             return
-        redox_state_kwargs = (
-            {"redox_state": redox_state}
-            if redox_state is not None
-            and redox_state.cache_identity() is not None
-            else {}
-        )
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         from simulator.engine_binding_admission import (
             gate_curve_memo_evidence,
             gate_curve_memo_origin_matches,
@@ -780,12 +776,7 @@ class PT0DeterminismStore:
             raise PT0CacheMiss(
                 "PT-0 cached replay miss: no admitted gate candidates"
             )
-        redox_state_kwargs = (
-            {"redox_state": redox_state}
-            if redox_state is not None
-            and redox_state.cache_identity() is not None
-            else {}
-        )
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         keys = tuple(
             canonical_replay_key(
                 sim,
