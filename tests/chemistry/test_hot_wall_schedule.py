@@ -6,6 +6,10 @@ import pytest
 
 from simulator import condensation
 from simulator.condensation import CondensationModel, CondensationTrain
+from simulator.chemistry.organics_pyrolysis import (
+    load_organics_pyrolysis_params,
+    tar_fate,
+)
 from simulator.overhead import OverheadGasModel
 from simulator.state import CampaignPhase, MeltState
 
@@ -23,13 +27,35 @@ def test_default_upstream_wall_tracks_each_melt_temperature(setpoints_data, camp
         assert model.resolve_pipe_segment_temperatures_C(NAMES, melt)[NAMES[0]] == temperature
 
 
+def test_organic_default_wall_is_above_tar_no_coat_threshold(setpoints_data):
+    model = OverheadGasModel(setpoints_data["overhead_headspace"])
+    melt = MeltState(temperature_C=100.0, campaign=CampaignPhase.C2A)
+    wall_C = model.resolve_pipe_temperature_C(melt, organic_tar_kg=1.0)
+    params = load_organics_pyrolysis_params()
+
+    assert wall_C > melt.temperature_C
+    assert tar_fate({"C": 1.0, "H": 0.8}, melt.temperature_C, wall_C, params).coat_frac == 0.0
+
+
+def test_organic_absent_default_wall_remains_exactly_melt_temperature(setpoints_data):
+    model = OverheadGasModel(setpoints_data["overhead_headspace"])
+    melt = MeltState(temperature_C=100.0, campaign=CampaignPhase.C2A)
+
+    assert model.resolve_pipe_temperature_C(melt, organic_tar_kg=0.0) == 100.0
+    assert model.resolve_pipe_segment_temperatures_C(
+        NAMES, melt, organic_tar_kg=0.0
+    )[NAMES[0]] == 100.0
+
+
 @pytest.mark.parametrize("key", ["liner_temperature_C", "pipe_segment_temperatures_C"])
 def test_explicit_scalar_wall_override_is_preserved(setpoints_data, key):
     config = deepcopy(setpoints_data["overhead_headspace"])
     config[key] = 1234.0
     model = OverheadGasModel(config)
     melt = MeltState(temperature_C=2100.0, campaign=CampaignPhase.C2A)
-    assert model.resolve_pipe_segment_temperatures_C(NAMES, melt)[NAMES[0]] == 1234.0
+    assert model.resolve_pipe_segment_temperatures_C(
+        NAMES, melt, organic_tar_kg=8.3
+    )[NAMES[0]] == 1234.0
 
 
 def test_explicit_upstream_recipe_schedule_is_preserved(setpoints_data):
@@ -41,22 +67,29 @@ def test_explicit_upstream_recipe_schedule_is_preserved(setpoints_data):
     }
     model = OverheadGasModel(config)
     melt = MeltState(temperature_C=2100.0, campaign=CampaignPhase.C2A, campaign_hour=3.0)
-    assert model.resolve_pipe_segment_temperatures_C(NAMES, melt)[NAMES[0]] == 1500.0
+    assert model.resolve_pipe_segment_temperatures_C(
+        NAMES, melt, organic_tar_kg=8.3
+    )[NAMES[0]] == 1500.0
 
 
 def test_upstream_material_limits_are_separate_notices_without_clamping(setpoints_data):
+    melt = MeltState(temperature_C=2100.0)
+    upstream_C = OverheadGasModel(
+        setpoints_data["overhead_headspace"]
+    ).resolve_pipe_segment_temperatures_C(
+        NAMES, melt, organic_tar_kg=8.3
+    )[NAMES[0]]
     model = CondensationModel(CondensationTrain.create_default())
     model.apply_setpoints_overrides(setpoints_data)
-    model.configure_operating_conditions(pipe_segment_temperatures_C={NAMES[0]: 2100.0})
-    melt = MeltState(temperature_C=2100.0)
+    model.configure_operating_conditions(pipe_segment_temperatures_C={NAMES[0]: upstream_C})
     notices = model._upstream_wall_temperature_notices(melt)
     material_notices = [item for item in notices if item["type"] == "UpstreamWallMaterialLimitExceeded"]
     assert {item["constraint"]: item["limit_C"] for item in material_notices} == {
         "hot_duct": 1750.0, "stage_0_surface": 1600.0,
     }
-    assert all(item["wall_temperature_C"] == 2100.0 for item in material_notices)
+    assert all(item["wall_temperature_C"] == upstream_C for item in material_notices)
     assert all(item["source"] for item in material_notices)
-    assert model.pipe_segments[0].wall_temperature_C == 2100.0
+    assert model.pipe_segments[0].wall_temperature_C == upstream_C
 
 
 def test_deliberately_colder_upstream_wall_is_flagged(setpoints_data):

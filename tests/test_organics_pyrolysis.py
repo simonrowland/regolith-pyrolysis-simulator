@@ -27,6 +27,7 @@ from simulator.chemistry.organics_pyrolysis import (
 from simulator.core import CHAR_SPECIES, PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.silent_zero import CATEGORY_PROVEN_ZERO
+from simulator.state import CampaignPhase, EvaporationFlux
 
 
 DATA = Path(__file__).resolve().parent.parent / "data"
@@ -223,6 +224,29 @@ def test_ci_source_term_commits_h2_tar_char_and_closes() -> None:
             "organic_tar", 0.0
         )
         or 0.0
+    ) == pytest.approx(0.0)
+
+
+def test_ci_c2b_cold_start_tar_uses_default_no_coat_wall() -> None:
+    sim = _build_sim("ci_carbonaceous_chondrite")
+    organic_tar_kg = float(
+        sim.atom_ledger.kg_by_account("process.overhead_gas").get(
+            "organic_tar", 0.0
+        )
+        or 0.0
+    )
+    assert organic_tar_kg > 0.0
+
+    sim.melt.campaign = CampaignPhase.C2B
+    sim.melt.campaign_hour = 0.0
+    sim.melt.temperature_C = 100.0
+    sim._configure_condensation_operating_conditions(EvaporationFlux())
+    assert sim.condensation_model.pipe_segments[0].wall_temperature_C > 100.0
+
+    sim._apply_organic_tar_wall_deposit()
+
+    assert sim.atom_ledger.kg_by_account("process.wall_deposit").get(
+        "organic_tar", 0.0
     ) == pytest.approx(0.0)
 
 
