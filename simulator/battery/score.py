@@ -51,6 +51,7 @@ from simulator.battery.enums import (
     PerBasis,
     Phase,
     Polymorph,
+    PolymorphRejectionKind,
     PURE_STANDARD_THERMO,
     Quantity,
     ReferenceStateConvention,
@@ -1239,18 +1240,18 @@ def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
         return True
     if not source_polymorph.is_unknown:
         return False
-    reason = source_polymorph.reason or ""
-    rejected = reason.startswith("unrecognised polymorph ") or (
-        reason.startswith("polymorph ") and " does not denote formula " in reason
-    )
-    return not rejected
+    return source_polymorph.rejection_kind is PolymorphRejectionKind.OMITTED
 
 
 def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
     return (
         source_polymorph is not None
         and source_polymorph.is_unknown
-        and not _source_polymorph_is_unspecified(source_polymorph)
+        and source_polymorph.rejection_kind
+        in (
+            PolymorphRejectionKind.UNRECOGNISED,
+            PolymorphRejectionKind.CONTRADICTS_FORMULA,
+        )
     )
 
 

@@ -76,6 +76,7 @@ from simulator.battery.enums import (
     PerBasis,
     Phase,
     Polymorph,
+    PolymorphRejectionKind,
     Quantity,
     RawInputStatus,
     Rail,
@@ -826,6 +827,8 @@ def to_plain(obj: object) -> object:
             payload["value"] = to_plain(obj.value)
         if obj.reason is not None:
             payload["reason"] = obj.reason
+        if obj.rejection_kind is not None:
+            payload["rejection_kind"] = obj.rejection_kind.value
         return payload
     if is_dataclass(obj) and not isinstance(obj, type):
         out: dict[str, object] = {}
@@ -880,10 +883,15 @@ def _state_from_plain(payload: object, cast) -> State:
     tag = StateTag(str(payload.get("tag") or "value"))
     if tag is StateTag.VALUE:
         return State.of(cast(payload.get("value")))
+    rejection_kind = payload.get("rejection_kind")
+    if rejection_kind is not None:
+        rejection_kind = PolymorphRejectionKind(str(rejection_kind))
     reason = payload.get("reason")
     if tag is StateTag.NOT_APPLICABLE:
         return State.not_applicable(reason)  # type: ignore[arg-type]
-    return State.unknown(reason)  # type: ignore[arg-type]
+    return State.unknown(
+        reason, rejection_kind=rejection_kind  # type: ignore[arg-type]
+    )
 
 
 class _InvalidDerivationAnnotation(ValueError):
@@ -1254,6 +1262,22 @@ def _polymorph_from_plain(value: object) -> Polymorph:
     return coerce_polymorph_token(value)
 
 
+def _polymorph_state_from_plain(payload: object) -> State[Polymorph]:
+    state = _state_from_plain(payload, _polymorph_from_plain)
+    if state.is_unknown and state.rejection_kind is None:
+        # Legacy stores predate the typed rejection kind. Classify their
+        # existing reason here once; scorer decisions use only the enum.
+        reason = state.reason or ""
+        if reason.startswith("unrecognised polymorph "):
+            kind = PolymorphRejectionKind.UNRECOGNISED
+        elif reason.startswith("polymorph ") and " does not denote formula " in reason:
+            kind = PolymorphRejectionKind.CONTRADICTS_FORMULA
+        else:
+            kind = PolymorphRejectionKind.OMITTED
+        state = State.unknown(reason, rejection_kind=kind)
+    return state
+
+
 def _charge_from_plain(value: object) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         return int(str(value))
@@ -1281,15 +1305,15 @@ def migrate_species_payload(payload: Mapping[str, Any]) -> Species:
     if polymorph is None:
         polymorph_state = None
     elif isinstance(polymorph, Mapping) and str(polymorph.get("tag") or "") != "value":
-        polymorph_state = _state_from_plain(polymorph, _polymorph_from_plain)
+        polymorph_state = _polymorph_state_from_plain(polymorph)
     else:
         try:
-            polymorph_state = _state_from_plain(polymorph, _polymorph_from_plain)
+            polymorph_state = _polymorph_state_from_plain(polymorph)
         except ValueError:
-            from simulator.battery.polymorph_dictionary import unrecognised_polymorph_reason
+            from simulator.battery.polymorph_dictionary import unrecognised_polymorph_state
 
             raw = polymorph.get("value") if isinstance(polymorph, Mapping) else polymorph
-            polymorph_state = State.unknown(unrecognised_polymorph_reason(raw))
+            polymorph_state = unrecognised_polymorph_state(raw)
     charge_payload = payload.get("charge")
     charge_state: State[int] | None
     if charge_payload is None:
@@ -6640,10 +6664,16 @@ def make_species(
     token = phase_state.value if phase_state.is_value else None
     if token is Phase.CR:
         if polymorph is None:
-            polymorph = State.unknown("source does not state polymorph")
+            polymorph = State.unknown(
+                "source does not state polymorph",
+                rejection_kind=PolymorphRejectionKind.OMITTED,
+            )
     elif token is None:
         if polymorph is None:
-            polymorph = State.unknown("phase unknown; polymorph unresolved")
+            polymorph = State.unknown(
+                "phase unknown; polymorph unresolved",
+                rejection_kind=PolymorphRejectionKind.OMITTED,
+            )
     else:
         if polymorph is None or polymorph.is_value:
             polymorph = State.not_applicable("not crystal")
@@ -7808,9 +7838,9 @@ def _extract_polymorph_alias(
         return None
     token = alias
     if not polymorph_matches_formula(formula, token):
-        return State.unknown(
-            f"polymorph {value!r} does not denote formula {formula}"
-        )
+        from simulator.battery.polymorph_dictionary import contradicting_polymorph_state
+
+        return contradicting_polymorph_state(value, formula, quoted=True)
     return State.of(token)
 
 
@@ -7837,12 +7867,12 @@ def polymorph_from_extract(
             if alias is not None:
                 return alias
         try:
-            return _state_from_plain(raw, _polymorph_from_plain)
+            return _polymorph_state_from_plain(raw)
         except ValueError:
-            from simulator.battery.polymorph_dictionary import unrecognised_polymorph_reason
+            from simulator.battery.polymorph_dictionary import unrecognised_polymorph_state
 
             spelling = raw.get("value") if str(raw.get("tag") or "") == "value" else raw
-            return State.unknown(unrecognised_polymorph_reason(spelling))
+            return unrecognised_polymorph_state(spelling)
     alias = _extract_polymorph_alias(raw, formula)
     if alias is not None:
         return alias
