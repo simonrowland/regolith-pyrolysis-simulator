@@ -2326,7 +2326,10 @@ def test_session_warm_boot_cache_reuses_identical_config(monkeypatch):
     """
     from simulator.melt_backend import vaporock as vaporock_mod
 
-    vaporock_mod.clear_session_backend_cache()
+    shared_cache = vaporock_mod._SESSION_BACKEND_CACHE
+    # Keep this unit test's cache teardown from closing a warm backend that
+    # another test or provider already owns in this process.
+    monkeypatch.setattr(vaporock_mod, "_SESSION_BACKEND_CACHE", {})
     monkeypatch.setenv(vaporock_mod.SESSION_WARM_ENV, "0")
     assert vaporock_mod.session_warm_enabled() is False
     assert vaporock_mod.get_or_create_session_backend({}) is None
@@ -2352,6 +2355,20 @@ def test_session_warm_boot_cache_reuses_identical_config(monkeypatch):
             self._warm_pool = None
 
     monkeypatch.setattr(vaporock_mod, "VapoRockBackend", TrackingBackend)
+
+    class UnrelatedBackend:
+        available = True
+
+        def close(self) -> None:
+            self.available = False
+
+        def is_available(self) -> bool:
+            return self.available
+
+    shared_backend = UnrelatedBackend()
+    shared_key = (("test-owned-by-another-provider", True),)
+    previous_backend = shared_cache.get(shared_key)
+    shared_cache[shared_key] = shared_backend
     vaporock_mod.clear_session_backend_cache()
     try:
         first = vaporock_mod.get_or_create_session_backend({})
@@ -2360,8 +2377,21 @@ def test_session_warm_boot_cache_reuses_identical_config(monkeypatch):
         assert first is second
         assert len(created) == 1
         assert created[0].get("warm_worker") is True
+
+        vaporock_mod.clear_session_backend_cache()
+        assert first.is_available() is False
+
+        reopened = vaporock_mod.get_or_create_session_backend({})
+        assert reopened is not None and reopened is not first
+        assert len(created) == 2
     finally:
         vaporock_mod.clear_session_backend_cache()
+        assert shared_backend.is_available() is True
+        shared_backend.close()
+        if previous_backend is None:
+            shared_cache.pop(shared_key, None)
+        else:
+            shared_cache[shared_key] = previous_backend
 
 
 class _WarmPayloadFuture:
