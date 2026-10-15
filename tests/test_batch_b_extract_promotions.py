@@ -122,3 +122,22 @@ def test_shimaoka_nakamura_1991_migrates_table1_cells() -> None:
         and observation.point_conditions["temperature_K"].locator is not None
         for observation in result.observations.values()
     )
+
+
+def test_shornikov_2013_migrates_printed_gibbs_energies() -> None:
+    result = _migrate("shornikov-2013-potassium-silicate-thermodynamics.yaml")
+    assert len(result.observations) == 27
+    assert _point(result, "shornikov_2013_t3_solid_k2sio3") == Decimal("-1089.318")
+    assert _point(result, "shornikov_2013_t3_liquid_k2sio3") == Decimal("-1099.514")
+    located = [
+        observation
+        for observation in result.observations.values()
+        if observation.point_conditions
+    ]
+    assert len(located) == 26
+    assert all(
+        observation.identity.temperature_K.is_value
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].locator is not None
+        for observation in located
+    )
