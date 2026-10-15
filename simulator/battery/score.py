@@ -1235,11 +1235,22 @@ def _is_flagged_stratum_notice(notice: Notice) -> bool:
 
 
 def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
-    return source_polymorph is None or (
-        source_polymorph.is_unknown
-        and not (source_polymorph.reason or "").startswith(
-            "unrecognised polymorph "
-        )
+    if source_polymorph is None:
+        return True
+    if not source_polymorph.is_unknown:
+        return False
+    reason = source_polymorph.reason or ""
+    rejected = reason.startswith("unrecognised polymorph ") or (
+        reason.startswith("polymorph ") and " does not denote formula " in reason
+    )
+    return not rejected
+
+
+def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
+    return (
+        source_polymorph is not None
+        and source_polymorph.is_unknown
+        and not _source_polymorph_is_unspecified(source_polymorph)
     )
 
 
@@ -6317,6 +6328,27 @@ def compile_residual(
             ),
             candidate,
         )
+
+    if (
+        quantity is Quantity.ACTIVITY
+        and isinstance(identity, Identity)
+        and identity.reference_state is not None
+        and identity.reference_state.is_value
+        and isinstance(identity.reference_state.value, StandardState)
+    ):
+        source_polymorph = identity.reference_state.value.endmember.polymorph
+        if _source_polymorph_is_rejected(source_polymorph):
+            assert source_polymorph is not None
+            return _refused(
+                RefusalReason.IDENTITY_MISMATCH,
+                {
+                    "reason": "solid_reference_polymorph_rejected",
+                    "formula": identity.reference_state.value.endmember.formula,
+                    "polymorph_reason": source_polymorph.reason,
+                },
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                exclusions=("identity_equal", "status_match_or_mismatch"),
+            )
 
     if quantity is None:
         detail: dict[str, object] = {"reason": "quantity_unknown"}

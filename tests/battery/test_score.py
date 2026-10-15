@@ -7798,6 +7798,52 @@ def test_single_table_cao_conversion_keeps_its_value_and_flag_byte_identical() -
     ,)
 
 
+def test_rejected_cao_reference_polymorph_is_not_converted_or_scored() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+        ),
+        Polymorph.CLINOENSTATITE.value,
+    )
+    source_polymorph = identity.reference_state.value.endmember.polymorph
+    assert source_polymorph is not None and source_polymorph.is_unknown
+    assert source_polymorph.reason == (
+        "polymorph clinoenstatite does not denote formula CaO"
+    )
+    reference = F.observation(
+        "cao-reference-rejected-clinoenstatite",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-rejected-cao-reference",
+    )
+
+    comparison = fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    assert comparison.value.point == Decimal("0.3")
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_MISMATCH
+    assert residual.refusal.detail["reason"] == "solid_reference_polymorph_rejected"
+    assert residual.refusal.detail["polymorph_reason"] == source_polymorph.reason
+
+
 def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
     from simulator.battery.enums import Polymorph
     from simulator.battery.generators.janaf import (

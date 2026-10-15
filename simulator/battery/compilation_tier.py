@@ -1257,9 +1257,24 @@ def predict_thermo_attempt(
                 origin=origin,
                 extra={"phase": str(getattr(phase, "value", phase))},
             )
-        from simulator.battery.score import _source_polymorph_is_unspecified
+        from simulator.battery.score import (
+            _source_polymorph_is_rejected,
+            _source_polymorph_is_unspecified,
+        )
 
         source_polymorph = identity.species.polymorph
+        if _source_polymorph_is_rejected(source_polymorph):
+            assert source_polymorph is not None
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-rejected",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "formula": identity.species.formula,
+                    "polymorph_reason": source_polymorph.reason,
+                },
+            )
         polymorph_unspecified = _source_polymorph_is_unspecified(source_polymorph)
         polymorph = _state_value(source_polymorph)
         alternatives: tuple[Polymorph, ...] = ()

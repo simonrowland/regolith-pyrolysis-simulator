@@ -3243,6 +3243,48 @@ def test_fusion_prediction_flags_an_unstated_solid_polymorph() -> None:
     )
 
 
+def test_fusion_prediction_refuses_a_polymorph_contradicting_formula() -> None:
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION, Decimal("3000")
+    )
+    identity = replace(
+        identity,
+        species=replace(
+            identity.species,
+            polymorph=State.of(Polymorph.CLINOENSTATITE),
+        ),
+    )
+    source_polymorph = identity.species.polymorph
+    assert source_polymorph is not None and source_polymorph.is_unknown
+    assert source_polymorph.reason == (
+        "polymorph clinoenstatite does not denote formula MgO"
+    )
+    observation = F.observation(
+        "fusion-rejected-clinoenstatite-on-mgo",
+        experiment.experiment_id,
+        identity,
+        Decimal("77.028"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(observation),
+    )
+
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert attempt.refusal_detail["reason"] == "fusion-solid-polymorph-rejected"
+    assert attempt.refusal_detail["polymorph_reason"] == source_polymorph.reason
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_MISMATCH
+
+
 def test_unstated_fusion_polymorph_refuses_incomplete_janaf_candidates(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
