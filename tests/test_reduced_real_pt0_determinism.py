@@ -1527,7 +1527,7 @@ def test_pt1_physics_ladder_reemits_source_notices_and_approximation_notice(
 
 def _real_magemin_available() -> bool:
     backend = MAGEMinBackend()
-    backend.initialize({"python_bridge": "subprocess"})
+    backend.initialize({"python_bridge": "subprocess", "warm_worker": False})
     return backend.is_available()
 
 

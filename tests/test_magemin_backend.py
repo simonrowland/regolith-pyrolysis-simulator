@@ -25,6 +25,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+import simulator.engine_pool as engine_pool
 from simulator.engine_pool import (
     EngineWorkerDied,
     EngineWorkerPoolLifecycleError,
@@ -56,6 +57,51 @@ from simulator.melt_backend.magemin import (
 # not assert a latency. Any test that means to claim "within N seconds" should
 # use its own explicit figure and say so, rather than borrowing this one.
 _RENDEZVOUS_TIMEOUT_S = 30.0
+
+
+class _RegisteredMageminPool:
+    def __init__(self):
+        self.workers = (types.SimpleNamespace(
+            name="MAGEMin subprocess pool slot 0",
+        ),)
+        self.closed = False
+        engine_pool._LIVE_ENGINE_POOLS.add(self)
+
+    def close(self, *, cancel_pending=False, timeout_s=None):
+        self.closed = True
+        engine_pool._LIVE_ENGINE_POOLS.discard(self)
+
+    def _request_cancel_pending(self):
+        return None
+
+
+@pytest.fixture(scope="module")
+def _preexisting_magemin_pool():
+    pool = _RegisteredMageminPool()
+    yield pool
+    pool.close(cancel_pending=True)
+
+
+@pytest.fixture
+def _test_owned_magemin_backend(request):
+    backend = MAGEMinBackend()
+    backend._subprocess_pool = _RegisteredMageminPool()
+    request.addfinalizer(backend.close)
+    return backend
+
+
+def test_adapter_cleanup_owns_only_the_backend_created_by_that_test(
+    _preexisting_magemin_pool,
+    _test_owned_magemin_backend,
+):
+    assert _preexisting_magemin_pool.closed is False
+    assert _test_owned_magemin_backend._subprocess_pool.closed is False
+
+
+def test_preexisting_magemin_pool_survives_adapter_test_teardown(
+    _preexisting_magemin_pool,
+):
+    assert _preexisting_magemin_pool.closed is False
 
 
 def _disable_configured_magemin_path(monkeypatch):
@@ -262,7 +308,10 @@ def _assert_magemin_bulk_drop_projected(
 
 
 
-def test_magemin_defaults_to_subprocess_even_if_pymagemin_importable(monkeypatch):
+def test_magemin_defaults_to_subprocess_even_if_pymagemin_importable(
+    monkeypatch,
+    request,
+):
     _disable_configured_magemin_path(monkeypatch)
     fake_module = types.SimpleNamespace(minimize=lambda **kwargs: {})
     monkeypatch.setitem(sys.modules, 'pymagemin', fake_module)
@@ -273,6 +322,7 @@ def test_magemin_defaults_to_subprocess_even_if_pymagemin_importable(monkeypatch
     )
 
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     with warnings.catch_warnings():
         warnings.simplefilter('ignore', UserWarning)
         assert backend.initialize({}) is True
@@ -335,7 +385,7 @@ def test_magemin_reinitialize_closes_existing_warm_pool(monkeypatch):
     assert backend._subprocess_pool is None
 
 
-def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch):
+def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request):
     import simulator.melt_backend.magemin as magemin_module
 
     submitted = {}
@@ -369,6 +419,7 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch):
     )
 
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     assert backend.initialize({}) is True
     assert backend._subprocess_pool.size == 1
     assert backend._subprocess_pool.workers[0].call_timeout_s == pytest.approx(
@@ -2534,12 +2585,13 @@ _LIVE_MAGEMIN_BINARY = MAGEMinBackend._locate_binary(None)
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_smoke_runs_real_binary():
+def test_magemin_live_smoke_runs_real_binary(request):
     # End-to-end against the real MAGEMin binary: a basalt analog at
     # crustal P/T must equilibrate, report a silicate liquid, and -- the
     # invariant that matters -- leave ledger_transition None. MAGEMin is
     # shadow/diagnostic: it never gets AtomLedger authority.
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         available = backend.initialize({})
@@ -2594,11 +2646,12 @@ def test_magemin_live_smoke_runs_real_binary():
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_subliquidus_run_reports_crystalline_phases():
+def test_magemin_live_subliquidus_run_reports_crystalline_phases(request):
     # A second live point below the liquidus: the binary must report
     # crystalline phases alongside (or instead of) the melt, and the
     # liquid fraction must drop relative to the super-liquidus case.
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         available = backend.initialize({})
@@ -2640,7 +2693,7 @@ def test_magemin_live_subliquidus_run_reports_crystalline_phases():
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane():
+def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane(request):
     """Apollo low-Ti mare basalt sample 12009 begins crystallizing near 1230 C.
 
     Reference: Walker et al. 1971, Experimental petrology of Apollo 12 basalts,
@@ -2648,6 +2701,7 @@ def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane():
     analog, so the test checks a sane bracket rather than a forced retune.
     """
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         available = backend.initialize({})
@@ -3103,13 +3157,14 @@ def test_magemin_subprocess_slots_bound_concurrency(monkeypatch, tmp_path):
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_subprocess_does_not_append_dump_in_engine_tree():
+def test_magemin_live_subprocess_does_not_append_dump_in_engine_tree(request):
     """Equilibrium calls must not grow _pseudosection_output.txt in-tree."""
     binary = _LIVE_MAGEMIN_BINARY.resolve()
     dump_path = binary.parent / "_pseudosection_output.txt"
     size_before = dump_path.stat().st_size if dump_path.exists() else 0
 
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         available = backend.initialize({"binary_path": str(binary)})
