@@ -240,9 +240,10 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux(monkeypatch):
     # 2026-10-13 b-850 round 2: parent-oxide activity for the four alkali
     # dimers changes the melt activity and the small SiO/SiO2 wall budget:
     # 8.191796266986e-06 -> 8.191792965091e-06 kg.
+    # 2026-10-15 b-894 r4: r3's O2 exchange clamp shifts melt fO2 and SiO wall flux.
     try:
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            8.191792965091e-06, rel=1e-9
+            8.191790844919e-06, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9

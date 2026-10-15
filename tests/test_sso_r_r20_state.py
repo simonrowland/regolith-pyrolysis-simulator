@@ -2428,6 +2428,7 @@ def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
         "O2", 0.0
     ) >= -OXYGEN_RESERVOIR_NOOP_MOL
     if buffer_o2_mol == 0.0:
+        assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
         assert len(sim.atom_ledger.transitions) == before_transition_count
     else:
         assert len(sim.atom_ledger.transitions) == before_transition_count + 1

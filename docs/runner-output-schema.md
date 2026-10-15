@@ -753,6 +753,12 @@ mole, energy, pressure, or partition arithmetic.
         "sampling_context": "current_ledger_vs_current_reservoir",
         "warning": true
       }
+    },
+    "oxygen_reservoir": {                   // optional; present when an O2 exchange is clamped
+      "exchange_o2_mol": 0.000001,          // ledger-committed exchange amount, mol O2
+      "exchange_unbacked_o2_mol": 0.001594225928215942, // requested remainder, mol O2
+      "exchange_direction": "melt_to_headspace",
+      "exchange_clamped": true
     }
   },
   ...
@@ -928,6 +934,10 @@ incident, stuck, re-evaporated, and net continuous flux and has
     implied-vs-ledger ferric divergence. The divergence warning threshold
     mirrors the ledger relative tolerance; it is a loud diagnostic tripwire,
     not a fitted chemistry coefficient.
+  * `oxygen_reservoir` -- emitted by
+    `_oxygen_reservoir_exchange_observables` when the snapshot reports a
+    clamped exchange; carries the ledger-committed O2 amount, unbacked O2
+    remainder, direction, and clamp status from `HourSnapshot.oxygen_reservoir`.
   * `mass_balance_error_category` -- added inline by `build_per_hour_summary`
     when `HourSnapshot.mass_balance_error_category` is a non-empty string; the
     categorical mass-balance-error label for that hour.
