@@ -9500,23 +9500,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # The dispatch-only helper still routes melt-derived T/P through
         # the same single path the rest of the simulator uses.
         pO2_bar = self._vapor_pressure_dispatch_pO2_bar()
-        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
-        intrinsic_fO2_log = getattr(
-            reservoir,
-            'melt_intrinsic_fO2_log',
-            None,
-        )
-        if intrinsic_fO2_log is None:
-            intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
-        if intrinsic_fO2_log is None:
-            current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
-            if callable(current_fO2):
-                intrinsic_fO2_log = current_fO2()
-            else:
+        melt_redox_state = {}
+        current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
+        if callable(current_fO2):
+            intrinsic_fO2_log = current_fO2()
+            melt_redox_state = {
+                'origin': 'closed_ledger',
+                **getattr(self, '_last_intrinsic_redox_state', {}),
+            }
+        else:
+            reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+            intrinsic_fO2_log = getattr(reservoir, 'melt_intrinsic_fO2_log', None)
+            if intrinsic_fO2_log is None:
+                intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
+            if intrinsic_fO2_log is None:
                 intrinsic_fO2_log = getattr(
-                    result,
-                    'fO2_log',
-                    getattr(self.melt, 'fO2_log', -9.0),
+                    result, 'fO2_log', getattr(self.melt, 'fO2_log', -9.0),
                 )
         intrinsic_fO2_log = float(intrinsic_fO2_log)
         vacuum_floor = (
@@ -9561,6 +9560,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'control_inputs': {
                 'pO2_bar': pO2_bar,
                 'intrinsic_fO2_log': intrinsic_fO2_log,
+                **({'melt_redox_state': melt_redox_state} if melt_redox_state else {}),
                 'vacuum_floor_bar': vacuum_floor,
                 'body': getattr(self.melt, 'body', ''),
                 'process_phase': process_phase,

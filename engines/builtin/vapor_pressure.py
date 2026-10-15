@@ -1975,22 +1975,27 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         )
         warnings: list[str] = []
         feo_activity_pressure_bar = vacuum_floor_bar
+        feo_activity_diagnostic = None
         if intrinsic_fO2_log is not None:
             from simulator.fe_redox import (
-                kress91_ferrous_feo_activity,
+                calphad_ferrous_feo_activity_diagnostic,
                 kress91_furnace_activity_pressure_bar,
             )
 
             feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
                 floor_bar=vacuum_floor_bar,
             )
-            below_cap_fe_activity = kress91_ferrous_feo_activity(
+            feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
                 comp_wt=comp_wt,
                 fO2_log=intrinsic_fO2_log,
                 T_K=T_K,
                 pressure_bar=feo_activity_pressure_bar,
                 floor_bar=vacuum_floor_bar,
+                closed_ledger=(controls.get('melt_redox_state', {}).get('origin')
+                               == 'closed_ledger'),
             )
+            below_cap_fe_activity = max(0.0, float(
+                feo_activity_diagnostic.get('a_FeO_authoritative', 0.0) or 0.0))
             below_cap_fe_activity_basis = "kress91_ferrous"
         else:
             below_cap_fe_activity = comp_wt.get("FeO", 0.0) / 100.0
@@ -2014,20 +2019,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     f"{notice.get('code', 'high_t_melt_activity_notice')}: "
                     f"{notice.get('message', '')}"
                 )
-        feo_activity_diagnostic = None
-        if intrinsic_fO2_log is not None:
-            from simulator.fe_redox import (
-                calphad_ferrous_feo_activity_diagnostic,
-            )
-
-            feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
-                comp_wt=comp_wt,
-                fO2_log=intrinsic_fO2_log,
-                T_K=T_K,
-                pressure_bar=feo_activity_pressure_bar,
-                floor_bar=vacuum_floor_bar,
-            )
-
         vapor_pressures: dict[str, float] = {}
         vapor_pressure_sources: dict[str, str] = {}
         vapor_pressure_provenance: dict[str, dict[str, Any]] = {}

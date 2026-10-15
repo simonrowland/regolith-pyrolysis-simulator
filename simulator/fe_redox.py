@@ -1260,11 +1260,12 @@ def _calphad_feo_activity_components(
         )
         if fe3_over_sigma_fe is not None:
             x = float(fe3_over_sigma_fe)
-            if not math.isfinite(x) or not 0.0 <= x < 1.0:
-                raise Kress91InvalidControls('activity ferric fraction must be finite in [0, 1)')
+            if not math.isfinite(x) or not 0.0 <= x <= 1.0:
+                raise Kress91InvalidControls('activity ferric fraction must be finite in [0, 1]')
             # In the closed state the ledger already specifies the split.
             # n_FeO=(1-x)*n_Fe and n_Fe2O3=x*n_Fe/2; no second Kress state.
-            split.update(fe3=x, ratio=x / (2.0 * (1.0-x)),
+            # At x=1, FeO activity is zero and Fe2O3/FeO has no finite value.
+            split.update(fe3=x, ratio=x / (2.0 * (1.0-x)) if x < 1.0 else None,
                          x_feo=(1.0-x)*mol_fractions['FeOt'],
                          x_fe2o3=x*mol_fractions['FeOt']/2.0)
         kress91_activity = max(0.0, float(split['x_feo']))
@@ -1468,7 +1469,19 @@ def calphad_ferrous_feo_activity_diagnostic(
     pressure_bar: float,
     floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
     fe3_over_sigma_fe: float | None = None,
+    closed_ledger: bool = False,
 ) -> dict[str, object]:
+    if closed_ledger:
+        from simulator.state import MOLAR_MASS
+
+        feo, fe2o3 = iron_oxide_values(comp_wt)
+        n_fe2 = feo / MOLAR_MASS['FeO']
+        n_fe3 = 2.0 * fe2o3 / MOLAR_MASS['Fe2O3']
+        # Closed inventory fixes x=n_Fe3/(n_Fe2+n_Fe3), independent of its
+        # stability potential. Mass/M gives mol on the same analysis basis;
+        # normalization cancels. At Fe2O3=0, x=0 even at an IW lower bound:
+        # forwarding that bound through Kress would invent ferric inventory.
+        fe3_over_sigma_fe = n_fe3 / (n_fe2 + n_fe3) if n_fe2 + n_fe3 else 0.0
     return _calphad_feo_activity_components(
         comp_wt=comp_wt,
         fO2_log=fO2_log,
