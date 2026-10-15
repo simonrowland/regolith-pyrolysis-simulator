@@ -49,3 +49,16 @@ def test_di_donato_granati_2000_migrates_printed_activity_cells() -> None:
         and observation.point_conditions["temperature_K"].locator is not None
         for observation in result.observations.values()
     )
+
+
+def test_shults_1994_migrates_printed_pressure_and_activity_cells() -> None:
+    result = _migrate("shults-1994-mullite-evaporation.yaml")
+    assert len(result.observations) == 45
+    assert _point(result, "shults_1994_t6_al2o3_activity_1833k") == Decimal("1.05")
+    assert _point(result, "shults_1994_t6_sio2_activity_2033k") == Decimal("0.17")
+    assert all(
+        observation.identity.temperature_K.is_value
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].locator is not None
+        for observation in result.observations.values()
+    )

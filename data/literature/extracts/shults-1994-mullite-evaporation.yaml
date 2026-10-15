@@ -1,0 +1,3740 @@
+schema_version: literature_extract.v1
+source_id: shults-1994-mullite-evaporation
+source:
+  citation: Shul’ts, M. M., Shornikov, S. I., and Stolyarova, V. L. (1994), “Evaporation Processes and Thermodynamic
+    Properties of Mullite”, Doklady Physical Chemistry 336(1–3), 95–98 (translation of Doklady Akademii Nauk 336(3),
+    368–371).
+  year: 1994
+  corpus_asset: raw/shults-1994-mullite-evaporation/shults-1994-mullite-evaporation.pdf
+  corpus_sha256: fadf2922fe29054a04e2b5bc52065cad7ea2c3bbb23691a0a9dd93173800addf
+  related_work_id: shornikov-1994-mullite-kems
+extraction:
+  method: pdftotext -layout as a lead; all four pages rendered at 300 dpi and visually checked; all seven tables
+    manually transcribed to CSV. Fix round 1 by solfix-T rechecked all four pages and every carried number, sign,
+    exponent, unit and locator against fresh 250 dpi pdftoppm images; Figure 1 not digitized.
+  date: '2026-10-05'
+  worker: codex-resume-28539-1791216756
+  provenance_path: tables/shults-1994-mullite-evaporation/provenance.md
+review_status: draft
+fidelity_samples:
+- path: species.Al.observations[shults_1994_t2_al_partial_pressure_1933k].values.pressure_coefficient_as_printed
+  value: 3.29
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: pAl at 1933 K, printed coefficient 3.29 ± 0.15 under ×10^8 scale.
+- path: species.O.observations[shults_1994_t2_o_partial_pressure_2033k].values.pressure_coefficient_as_printed
+  value: 15.8
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: pO at 2033 K, printed coefficient 15.8 ± 0.8 under ×10^9 scale.
+- path: species.Al2O3.observations[shults_1994_t6_al2o3_activity_1833k].values.activity
+  value: 1.05
+  locator:
+    page: 97
+    published_page: 97
+    pdf_page_index: 2
+    table: '6'
+    note: Al2O3 activity at 1833 K, printed 1.05 ± 0.07.
+- path: species.SiO2.observations[shults_1994_t6_sio2_activity_2033k].values.activity
+  value: 0.17
+  locator:
+    page: 97
+    published_page: 97
+    pdf_page_index: 2
+    table: '6'
+    note: SiO2 activity at 2033 K, printed 0.17 ± 0.01.
+benches:
+- id: shults-1994-mi1201-mo-kems
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MI-1201 mass spectrometer modified for high-temperature experiments
+    locator:
+      page: 95
+      published_page: 95
+      pdf_page_index: 0
+      section: Experimental
+      note: The paper describes evaporation from molybdenum chambers using an MI-1201 mass spectrometer.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: molybdenum chambers; liner not stated
+    locator:
+      page: 95
+      published_page: 95
+      pdf_page_index: 0
+      section: Experimental
+      note: The printed phrase is “molybdenum chambers”; a liner is not mentioned.
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      page: 95
+      published_page: 95
+      pdf_page_index: 0
+      section: Experimental
+      note: The printed cell/chamber material is molybdenum.
+  geometry:
+    orifice_to_sample_area_ratio:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '>='
+          bound_value: '0.0025'
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: 'Printed: “the ratio of areas of effusion and evaporation apertures was no less than 1:400”; the numeric
+          threshold is retained as effusion/evaporation area ratio >= 1/400.'
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: No orifice diameter is stated; the paper gives only an aperture-area ratio.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: No orifice channel length is stated.
+  detector:
+    state:
+      tag: value
+      value: MI-1201 mass spectrometer
+    locator:
+      page: 95
+      published_page: 95
+      pdf_page_index: 0
+      section: Experimental
+      note: Modified for high-temperature experiments; details described elsewhere [8].
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: The paper gives tabulated temperatures but does not identify a pyrometer, thermocouple, or other sensor.
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: No temperature calibration method or uncertainty is stated in this paper.
+  ionization:
+    energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '70'
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: The paper states “Ionization energy was 70 eV.”
+experiments:
+- experiment_id: shults-1994-mullite-knudsen-series
+  bench_id: shults-1994-mi1201-mo-kems
+  method: knudsen_effusion
+  locator:
+    page: 95
+    published_page: 95
+    pdf_page_index: 0
+    section: Experimental
+    note: Mullite evaporation measured by mass-spectrometric Knudsen effusion.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: mullite, 3Al2O3·2SiO2
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: The paper identifies the samples as mullite, 3Al2O3·2SiO2.
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: formula-derived composition from printed mullite stoichiometry
+          amount_basis: mole_fraction
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: Formula-unit fractions calculated as 3/(3+2) Al2O3 and 2/(3+2) SiO2; this is stoichiometry from the
+          stated formula, not an assay.
+    pretreatment:
+      state:
+        tag: value
+        value: precursor method, details in reference [7]
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: Samples were prepared by the precursor method described in reference [7]; starting reagents and purity
+          are not reproduced here.
+    characterization:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Results
+        note: No composition analysis after the evaporation runs is reported.
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: value
+          value: comparison of ionic currents
+        locator:
+          page: 96
+          published_page: 96
+          pdf_page_index: 1
+          section: Results
+          note: Partial pressures were determined by “the method of comparing ionic currents.”
+      reference_substance:
+        state:
+          tag: value
+          value: silver and gold vapors
+        locator:
+          page: 96
+          published_page: 96
+          pdf_page_index: 1
+          section: Results
+          note: Silver and gold vapor partial pressures were used as standards (Table 2).
+      ionization_cross_sections:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 96
+          published_page: 96
+          pdf_page_index: 1
+          section: Results
+          note: Ionization cross-sections and their source are not stated.
+      multiplier_or_isotope_corrections:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 95
+          published_page: 95
+          pdf_page_index: 0
+          section: Experimental
+          note: No multiplier or isotope correction is reported.
+    ionization:
+      energy_eV:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '70'
+        locator:
+          page: 95
+          published_page: 95
+          pdf_page_index: 0
+          section: Experimental
+          note: Ionization energy was 70 eV.
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 95
+          published_page: 95
+          pdf_page_index: 0
+          section: Experimental
+          note: Not stated; only aperture-area ratio is given.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 95
+          published_page: 95
+          pdf_page_index: 0
+          section: Experimental
+          note: Not stated.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 1833, 1933, 1983, 2033 K
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Four published discrete temperatures, retained individually on each observation; not a continuous range.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: formula-unit mole fraction calculated from printed mullite formula
+          components:
+          - species: Al2O3
+            mole_fraction: 0.6
+          - species: SiO2
+            mole_fraction: 0.4
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: Formula-derived fractions 3/(3+2) and 2/(3+2); not a measured chemical analysis.
+    oxygen_condition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: The paper tabulates calculated p(O) and p(O2), but does not report imposed atmosphere or a controlled
+          pO2.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: No chamber/background pressure is reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: No sweep or carrier gas is reported.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        section: Experimental
+        note: No flow-regime criterion is reported.
+  activity_definitions:
+    state:
+      tag: value
+      value: Al2O3 and SiO2 activities are calculated from vapor-pressure ratios using equations (7) and (8), respectively.
+    locator:
+      page: 97
+      published_page: 97
+      pdf_page_index: 2
+      table: '6'
+      note: Equation (7) uses Al and O reference partial pressures both over pure Al2O3; equation (8) uses SiO
+        and O reference partial pressures both over pure SiO2. No separate pure-O condensed reference is printed.
+species:
+  Al:
+    observations:
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_Al × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_al_partial_pressure_1833k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al row at 1833 K; scale p_Al × 10^8 atm.
+      T_range_K:
+      - 1833.0
+      - 1833.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.02 under scale ×10^8 atm
+        value: 2.0265e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1833.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_Al × 10^8
+        pressure_coefficient_as_printed: 0.36
+        pressure_atm: 3.6e-09
+        pressure_sigma_atm: 2.0e-10
+        printed_coefficient_sigma: 0.02
+        printed_cell_as_printed: 0.36 ± 0.02
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '5.268899999999999e-07'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1833 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_Al × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_al_partial_pressure_1933k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al row at 1933 K; scale p_Al × 10^8 atm.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.15 under scale ×10^8 atm
+        value: 0.0001519875
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1933.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_Al × 10^8
+        pressure_coefficient_as_printed: 3.29
+        pressure_atm: 3.2900000000000003e-08
+        pressure_sigma_atm: 1.5e-09
+        printed_coefficient_sigma: 0.15
+        printed_cell_as_printed: 3.29 ± 0.15
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '4.6508175e-06'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1933 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_Al × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_al_partial_pressure_1983k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al row at 1983 K; scale p_Al × 10^8 atm.
+      T_range_K:
+      - 1983.0
+      - 1983.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.30 under scale ×10^8 atm
+        value: 0.000303975
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1983.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_Al × 10^8
+        pressure_coefficient_as_printed: 7.5
+        pressure_atm: 7.5e-08
+        pressure_sigma_atm: 3.0e-09
+        printed_coefficient_sigma: 0.3
+        printed_cell_as_printed: 7.50 ± 0.30
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.3881525e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1983 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_Al × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_al_partial_pressure_2033k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al row at 2033 K; scale p_Al × 10^8 atm.
+      T_range_K:
+      - 2033.0
+      - 2033.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.8 under scale ×10^8 atm
+        value: 0.0008106000000000001
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 2033.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_Al × 10^8
+        pressure_coefficient_as_printed: 21.1
+        pressure_atm: 2.1100000000000002e-07
+        pressure_sigma_atm: 8.0e-09
+        printed_coefficient_sigma: 0.8
+        printed_cell_as_printed: 21.1 ± 0.8
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3.475447499999999e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 2033 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+  AlO:
+    observations:
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_AlO × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_alo_partial_pressure_1933k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlO row at 1933 K; scale p_AlO × 10^8 atm.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.040 under scale ×10^8 atm
+        value: 4.053e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: AlO(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1933.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_AlO × 10^8
+        pressure_coefficient_as_printed: 0.553
+        pressure_atm: 5.5300000000000005e-09
+        pressure_sigma_atm: 4.0e-10
+        printed_coefficient_sigma: 0.04
+        printed_cell_as_printed: 0.553 ± 0.040
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '4.6508175e-06'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1933 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_AlO × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_alo_partial_pressure_1983k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlO row at 1983 K; scale p_AlO × 10^8 atm.
+      T_range_K:
+      - 1983.0
+      - 1983.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.09 under scale ×10^8 atm
+        value: 9.11925e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: AlO(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1983.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_AlO × 10^8
+        pressure_coefficient_as_printed: 1.58
+        pressure_atm: 1.5800000000000003e-08
+        pressure_sigma_atm: 9.0e-10
+        printed_coefficient_sigma: 0.09
+        printed_cell_as_printed: 1.58 ± 0.09
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.3881525e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1983 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_AlO × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_alo_partial_pressure_2033k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlO row at 2033 K; scale p_AlO × 10^8 atm.
+      T_range_K:
+      - 2033.0
+      - 2033.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.18 under scale ×10^8 atm
+        value: 0.000182385
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: AlO(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 2033.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_AlO × 10^8
+        pressure_coefficient_as_printed: 4.21
+        pressure_atm: 4.21e-08
+        pressure_sigma_atm: 1.8e-09
+        printed_coefficient_sigma: 0.18
+        printed_cell_as_printed: 4.21 ± 0.18
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3.475447499999999e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 2033 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+  Al2O:
+    observations:
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_Al2O × 10^9 atm, pressure_atm = coefficient × 10^-9
+      observation_id: shults_1994_t2_al2o_partial_pressure_1933k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al2O row at 1933 K; scale p_Al2O × 10^9 atm.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.15 under scale ×10^9 atm
+        value: 1.5198749999999999e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: Al2O(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1933.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_Al2O × 10^9
+        pressure_coefficient_as_printed: 2.1
+        pressure_atm: 2.1e-09
+        pressure_sigma_atm: 1.5e-10
+        printed_coefficient_sigma: 0.15
+        printed_cell_as_printed: 2.10 ± 0.15
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '4.6508175e-06'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1933 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_Al2O × 10^9 atm, pressure_atm = coefficient × 10^-9
+      observation_id: shults_1994_t2_al2o_partial_pressure_1983k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al2O row at 1983 K; scale p_Al2O × 10^9 atm.
+      T_range_K:
+      - 1983.0
+      - 1983.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.25 under scale ×10^9 atm
+        value: 2.5331250000000002e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: Al2O(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1983.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_Al2O × 10^9
+        pressure_coefficient_as_printed: 4.47
+        pressure_atm: 4.47e-09
+        pressure_sigma_atm: 2.5e-10
+        printed_coefficient_sigma: 0.25
+        printed_cell_as_printed: 4.47 ± 0.25
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.3881525e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1983 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_Al2O × 10^9 atm, pressure_atm = coefficient × 10^-9
+      observation_id: shults_1994_t2_al2o_partial_pressure_2033k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al2O row at 2033 K; scale p_Al2O × 10^9 atm.
+      T_range_K:
+      - 2033.0
+      - 2033.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.8 under scale ×10^9 atm
+        value: 8.106000000000001e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: Al2O(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 2033.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_Al2O × 10^9
+        pressure_coefficient_as_printed: 14.5
+        pressure_atm: 1.45e-08
+        pressure_sigma_atm: 8.000000000000001e-10
+        printed_coefficient_sigma: 0.8
+        printed_cell_as_printed: 14.5 ± 0.8
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3.475447499999999e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 2033 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+  SiO:
+    observations:
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_SiO × 10^5 atm, pressure_atm = coefficient × 10^-5
+      observation_id: shults_1994_t2_sio_partial_pressure_1833k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO row at 1833 K; scale p_SiO × 10^5 atm.
+      T_range_K:
+      - 1833.0
+      - 1833.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.80 under scale ×10^5 atm
+        value: 0.8106000000000001
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1833.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_SiO × 10^5
+        pressure_coefficient_as_printed: 3.95
+        pressure_atm: 3.9500000000000005e-05
+        pressure_sigma_atm: 8.000000000000001e-06
+        printed_coefficient_sigma: 0.8
+        printed_cell_as_printed: 3.95 ± 0.80
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '5.268899999999999e-07'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1833 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_SiO × 10^5 atm, pressure_atm = coefficient × 10^-5
+      observation_id: shults_1994_t2_sio_partial_pressure_1933k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO row at 1933 K; scale p_SiO × 10^5 atm.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.15 under scale ×10^5 atm
+        value: 0.1519875
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1933.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_SiO × 10^5
+        pressure_coefficient_as_printed: 4.08
+        pressure_atm: 4.08e-05
+        pressure_sigma_atm: 1.5e-06
+        printed_coefficient_sigma: 0.15
+        printed_cell_as_printed: 4.08 ± 0.15
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '4.6508175e-06'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1933 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_SiO × 10^5 atm, pressure_atm = coefficient × 10^-5
+      observation_id: shults_1994_t2_sio_partial_pressure_1983k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO row at 1983 K; scale p_SiO × 10^5 atm.
+      T_range_K:
+      - 1983.0
+      - 1983.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.25 under scale ×10^5 atm
+        value: 0.2533125
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1983.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_SiO × 10^5
+        pressure_coefficient_as_printed: 8.58
+        pressure_atm: 8.580000000000001e-05
+        pressure_sigma_atm: 2.5e-06
+        printed_coefficient_sigma: 0.25
+        printed_cell_as_printed: 8.58 ± 0.25
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.3881525e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1983 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_SiO × 10^5 atm, pressure_atm = coefficient × 10^-5
+      observation_id: shults_1994_t2_sio_partial_pressure_2033k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO row at 2033 K; scale p_SiO × 10^5 atm.
+      T_range_K:
+      - 2033.0
+      - 2033.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.7 under scale ×10^5 atm
+        value: 0.709275
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 2033.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_SiO × 10^5
+        pressure_coefficient_as_printed: 23.2
+        pressure_atm: 0.000232
+        pressure_sigma_atm: 7.0e-06
+        printed_coefficient_sigma: 0.7
+        printed_cell_as_printed: 23.2 ± 0.7
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3.475447499999999e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 2033 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+  SiO2:
+    observations:
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_SiO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_sio2_partial_pressure_1833k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO2 row at 1833 K; scale p_SiO2 × 10^8 atm.
+      T_range_K:
+      - 1833.0
+      - 1833.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.05 under scale ×10^8 atm
+        value: 5.0662500000000005e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: SiO2(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1833.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_SiO2 × 10^8
+        pressure_coefficient_as_printed: 0.2
+        pressure_atm: 2.0e-09
+        pressure_sigma_atm: 5.0e-10
+        printed_coefficient_sigma: 0.05
+        printed_cell_as_printed: 0.20 ± 0.05
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '5.268899999999999e-07'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1833 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_SiO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_sio2_partial_pressure_1933k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO2 row at 1933 K; scale p_SiO2 × 10^8 atm.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.060 under scale ×10^8 atm
+        value: 6.0794999999999996e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: SiO2(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1933.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_SiO2 × 10^8
+        pressure_coefficient_as_printed: 0.632
+        pressure_atm: 6.3200000000000005e-09
+        pressure_sigma_atm: 6.0e-10
+        printed_coefficient_sigma: 0.06
+        printed_cell_as_printed: 0.632 ± 0.060
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '4.6508175e-06'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1933 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_SiO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_sio2_partial_pressure_1983k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO2 row at 1983 K; scale p_SiO2 × 10^8 atm.
+      T_range_K:
+      - 1983.0
+      - 1983.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.22 under scale ×10^8 atm
+        value: 0.00022291500000000002
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: SiO2(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1983.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_SiO2 × 10^8
+        pressure_coefficient_as_printed: 1.91
+        pressure_atm: 1.91e-08
+        pressure_sigma_atm: 2.2000000000000003e-09
+        printed_coefficient_sigma: 0.22
+        printed_cell_as_printed: 1.91 ± 0.22
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.3881525e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1983 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_SiO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_sio2_partial_pressure_2033k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO2 row at 2033 K; scale p_SiO2 × 10^8 atm.
+      T_range_K:
+      - 2033.0
+      - 2033.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.80 under scale ×10^8 atm
+        value: 0.0008106000000000001
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: SiO2(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 2033.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_SiO2 × 10^8
+        pressure_coefficient_as_printed: 4.65
+        pressure_atm: 4.6500000000000006e-08
+        pressure_sigma_atm: 8.0e-09
+        printed_coefficient_sigma: 0.8
+        printed_cell_as_printed: 4.65 ± 0.80
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3.475447499999999e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 2033 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: activity_coefficient
+      standard_state: &id002
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase:
+                tag: unknown
+                reason: not_published
+            component_basis: SiO2
+        inferred: true
+        note: Inferred from equations (7)–(8), which normalize vapor pressures to the pure oxide; the paper does
+          not name the condensed phase or polymorph.
+        locator:
+          page: 97
+          published_page: 97
+          pdf_page_index: 2
+          table: '6'
+          note: The pressure-ratio reference is vapor over the pure oxide; its condensed phase is unstated.
+      experiment: shults-1994-mullite-knudsen-series
+      units: dimensionless activity as printed
+      observation_id: shults_1994_t6_sio2_activity_1833k
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 SiO2 row at 1833 K.
+      T_range_K:
+      - 1833.0
+      - 1833.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.09
+        value: 0.09
+        basis: absolute dimensionless activity
+      derived_from: &id001
+      - shults_1994_t2_sio_partial_pressure_1833k
+      - shults_1994_t2_o_partial_pressure_1833k
+      derivation:
+        relation: alpha_SiO2 = (p_SiO p_O)/(p_SiO^0 p_O^0), equation (8); pure oxide reference vapor pressures are
+          not tabulated in this paper.
+        inputs: *id001
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: pressure-ratio calculation using equations (7) or (8)
+        temperature_range_K: &id004
+        - 1833.0
+        - 2033.0
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: formula-unit mole fractions derived from printed mullite formula; not an assay
+        standard_state_description: pure SiO2 reference vapor pressure; condensed phase and polymorph are unstated
+        defining_ion: &id005
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 97
+            published_page: 97
+            pdf_page_index: 2
+            table: '6'
+            note: Activities are calculated from partial pressures in equations (7)–(8); the paper does not define
+              a single ion intensity as the activity.
+        temperature_K: 1833.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        activity: 0.37
+        activity_sigma: 0.09
+        activity_as_printed: 0.37 ± 0.09
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '5.268899999999999e-07'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1833 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: activity_coefficient
+      standard_state: *id002
+      experiment: shults-1994-mullite-knudsen-series
+      units: dimensionless activity as printed
+      observation_id: shults_1994_t6_sio2_activity_1933k
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 SiO2 row at 1933 K.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.02
+        value: 0.02
+        basis: absolute dimensionless activity
+      derived_from: &id003
+      - shults_1994_t2_sio_partial_pressure_1933k
+      - shults_1994_t2_o_partial_pressure_1933k
+      derivation:
+        relation: alpha_SiO2 = (p_SiO p_O)/(p_SiO^0 p_O^0), equation (8); pure oxide reference vapor pressures are
+          not tabulated in this paper.
+        inputs: *id003
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: pressure-ratio calculation using equations (7) or (8)
+        temperature_range_K: *id004
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: formula-unit mole fractions derived from printed mullite formula; not an assay
+        standard_state_description: pure SiO2 reference vapor pressure; condensed phase and polymorph are unstated
+        defining_ion: *id005
+        temperature_K: 1933.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        activity: 0.19
+        activity_sigma: 0.02
+        activity_as_printed: 0.19 ± 0.02
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '4.6508175e-06'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1933 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: activity_coefficient
+      standard_state: *id002
+      experiment: shults-1994-mullite-knudsen-series
+      units: dimensionless activity as printed
+      observation_id: shults_1994_t6_sio2_activity_1983k
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 SiO2 row at 1983 K.
+      T_range_K:
+      - 1983.0
+      - 1983.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.02
+        value: 0.02
+        basis: absolute dimensionless activity
+      derived_from: &id006
+      - shults_1994_t2_sio_partial_pressure_1983k
+      - shults_1994_t2_o_partial_pressure_1983k
+      derivation:
+        relation: alpha_SiO2 = (p_SiO p_O)/(p_SiO^0 p_O^0), equation (8); pure oxide reference vapor pressures are
+          not tabulated in this paper.
+        inputs: *id006
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: pressure-ratio calculation using equations (7) or (8)
+        temperature_range_K: *id004
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: formula-unit mole fractions derived from printed mullite formula; not an assay
+        standard_state_description: pure SiO2 reference vapor pressure; condensed phase and polymorph are unstated
+        defining_ion: *id005
+        temperature_K: 1983.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        activity: 0.18
+        activity_sigma: 0.02
+        activity_as_printed: 0.18 ± 0.02
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.3881525e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1983 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: activity_coefficient
+      standard_state: *id002
+      experiment: shults-1994-mullite-knudsen-series
+      units: dimensionless activity as printed
+      observation_id: shults_1994_t6_sio2_activity_2033k
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 SiO2 row at 2033 K.
+      T_range_K:
+      - 2033.0
+      - 2033.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.01
+        value: 0.01
+        basis: absolute dimensionless activity
+      derived_from: &id007
+      - shults_1994_t2_sio_partial_pressure_2033k
+      - shults_1994_t2_o_partial_pressure_2033k
+      derivation:
+        relation: alpha_SiO2 = (p_SiO p_O)/(p_SiO^0 p_O^0), equation (8); pure oxide reference vapor pressures are
+          not tabulated in this paper.
+        inputs: *id007
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: pressure-ratio calculation using equations (7) or (8)
+        temperature_range_K: *id004
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: formula-unit mole fractions derived from printed mullite formula; not an assay
+        standard_state_description: pure SiO2 reference vapor pressure; condensed phase and polymorph are unstated
+        defining_ion: *id005
+        temperature_K: 2033.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        activity: 0.17
+        activity_sigma: 0.01
+        activity_as_printed: 0.17 ± 0.01
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3.475447499999999e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 2033 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+  AlSiO:
+    observations:
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_AlSiO × 10^10 atm, pressure_atm = coefficient × 10^-10
+      observation_id: shults_1994_t2_alsio_partial_pressure_1933k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlSiO row at 1933 K; scale p_AlSiO × 10^10 atm.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.030 under scale ×10^10 atm
+        value: 3.03975e-07
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: AlSiO(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1933.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_AlSiO × 10^10
+        pressure_coefficient_as_printed: 0.341
+        pressure_atm: 3.4100000000000004e-11
+        pressure_sigma_atm: 3.0e-12
+        printed_coefficient_sigma: 0.03
+        printed_cell_as_printed: 0.341 ± 0.030
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '4.6508175e-06'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1933 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_AlSiO × 10^10 atm, pressure_atm = coefficient × 10^-10
+      observation_id: shults_1994_t2_alsio_partial_pressure_1983k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlSiO row at 1983 K; scale p_AlSiO × 10^10 atm.
+      T_range_K:
+      - 1983.0
+      - 1983.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.11 under scale ×10^10 atm
+        value: 1.114575e-06
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: AlSiO(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1983.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_AlSiO × 10^10
+        pressure_coefficient_as_printed: 1.41
+        pressure_atm: 1.41e-10
+        pressure_sigma_atm: 1.1e-11
+        printed_coefficient_sigma: 0.11
+        printed_cell_as_printed: 1.41 ± 0.11
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.3881525e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1983 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_AlSiO × 10^10 atm, pressure_atm = coefficient × 10^-10
+      observation_id: shults_1994_t2_alsio_partial_pressure_2033k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlSiO row at 2033 K; scale p_AlSiO × 10^10 atm.
+      T_range_K:
+      - 2033.0
+      - 2033.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.40 under scale ×10^10 atm
+        value: 4.053e-06
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: AlSiO(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 2033.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_AlSiO × 10^10
+        pressure_coefficient_as_printed: 5.34
+        pressure_atm: 5.34e-10
+        pressure_sigma_atm: 4.0000000000000004e-11
+        printed_coefficient_sigma: 0.4
+        printed_cell_as_printed: 5.34 ± 0.40
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3.475447499999999e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 2033 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+  MoO2:
+    observations:
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_MoO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_moo2_partial_pressure_1833k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO2 row at 1833 K; scale p_MoO2 × 10^8 atm.
+      T_range_K:
+      - 1833.0
+      - 1833.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.05 under scale ×10^8 atm
+        value: 5.0662500000000005e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: MoO2(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1833.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_MoO2 × 10^8
+        pressure_coefficient_as_printed: 0.53
+        pressure_atm: 5.3e-09
+        pressure_sigma_atm: 5.0e-10
+        printed_coefficient_sigma: 0.05
+        printed_cell_as_printed: 0.53 ± 0.05
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '5.268899999999999e-07'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1833 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_MoO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_moo2_partial_pressure_1933k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO2 row at 1933 K; scale p_MoO2 × 10^8 atm.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.15 under scale ×10^8 atm
+        value: 0.0001519875
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: MoO2(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1933.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_MoO2 × 10^8
+        pressure_coefficient_as_printed: 1.91
+        pressure_atm: 1.91e-08
+        pressure_sigma_atm: 1.5e-09
+        printed_coefficient_sigma: 0.15
+        printed_cell_as_printed: 1.91 ± 0.15
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '4.6508175e-06'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1933 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_MoO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_moo2_partial_pressure_1983k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO2 row at 1983 K; scale p_MoO2 × 10^8 atm.
+      T_range_K:
+      - 1983.0
+      - 1983.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.25 under scale ×10^8 atm
+        value: 0.0002533125
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: MoO2(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1983.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_MoO2 × 10^8
+        pressure_coefficient_as_printed: 3.4
+        pressure_atm: 3.4e-08
+        pressure_sigma_atm: 2.5e-09
+        printed_coefficient_sigma: 0.25
+        printed_cell_as_printed: 3.40 ± 0.25
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.3881525e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1983 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_MoO2 × 10^8 atm, pressure_atm = coefficient × 10^-8
+      observation_id: shults_1994_t2_moo2_partial_pressure_2033k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO2 row at 2033 K; scale p_MoO2 × 10^8 atm.
+      T_range_K:
+      - 2033.0
+      - 2033.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.30 under scale ×10^8 atm
+        value: 0.000303975
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: MoO2(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 2033.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_MoO2 × 10^8
+        pressure_coefficient_as_printed: 5.78
+        pressure_atm: 5.78e-08
+        pressure_sigma_atm: 3.0e-09
+        printed_coefficient_sigma: 0.3
+        printed_cell_as_printed: 5.78 ± 0.30
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3.475447499999999e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 2033 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+  MoO3:
+    observations:
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_MoO3 × 10^9 atm, pressure_atm = coefficient × 10^-9
+      observation_id: shults_1994_t2_moo3_partial_pressure_1833k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO3 row at 1833 K; scale p_MoO3 × 10^9 atm.
+      T_range_K:
+      - 1833.0
+      - 1833.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.08 under scale ×10^9 atm
+        value: 8.106e-06
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: MoO3(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1833.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_MoO3 × 10^9
+        pressure_coefficient_as_printed: 1.24
+        pressure_atm: 1.24e-09
+        pressure_sigma_atm: 8.000000000000001e-11
+        printed_coefficient_sigma: 0.08
+        printed_cell_as_printed: 1.24 ± 0.08
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '5.268899999999999e-07'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1833 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_MoO3 × 10^9 atm, pressure_atm = coefficient × 10^-9
+      observation_id: shults_1994_t2_moo3_partial_pressure_1933k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO3 row at 1933 K; scale p_MoO3 × 10^9 atm.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.25 under scale ×10^9 atm
+        value: 2.5331250000000002e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: MoO3(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1933.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_MoO3 × 10^9
+        pressure_coefficient_as_printed: 4.22
+        pressure_atm: 4.22e-09
+        pressure_sigma_atm: 2.5e-10
+        printed_coefficient_sigma: 0.25
+        printed_cell_as_printed: 4.22 ± 0.25
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '4.6508175e-06'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1933 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_MoO3 × 10^9 atm, pressure_atm = coefficient × 10^-9
+      observation_id: shults_1994_t2_moo3_partial_pressure_1983k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO3 row at 1983 K; scale p_MoO3 × 10^9 atm.
+      T_range_K:
+      - 1983.0
+      - 1983.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.40 under scale ×10^9 atm
+        value: 4.053000000000001e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: MoO3(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 1983.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_MoO3 × 10^9
+        pressure_coefficient_as_printed: 7.64
+        pressure_atm: 7.640000000000001e-09
+        pressure_sigma_atm: 4.0000000000000007e-10
+        printed_coefficient_sigma: 0.4
+        printed_cell_as_printed: 7.64 ± 0.40
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.3881525e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1983 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_MoO3 × 10^9 atm, pressure_atm = coefficient × 10^-9
+      observation_id: shults_1994_t2_moo3_partial_pressure_2033k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO3 row at 2033 K; scale p_MoO3 × 10^9 atm.
+      T_range_K:
+      - 2033.0
+      - 2033.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.6 under scale ×10^9 atm
+        value: 6.0794999999999996e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: MoO3(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ionic currents
+        method_as_printed: method of comparing ionic currents; silver and gold vapor pressures used as standards
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        temperature_K: 2033.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_MoO3 × 10^9
+        pressure_coefficient_as_printed: 12.4
+        pressure_atm: 1.2400000000000002e-08
+        pressure_sigma_atm: 6.0e-10
+        printed_coefficient_sigma: 0.6
+        printed_cell_as_printed: 12.4 ± 0.6
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3.475447499999999e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 2033 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+  O:
+    observations:
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_O × 10^9 atm, pressure_atm = coefficient × 10^-9
+      observation_id: shults_1994_t2_o_partial_pressure_1833k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O row at 1833 K; scale p_O × 10^9 atm.
+      T_range_K:
+      - 1833.0
+      - 1833.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.04 under scale ×10^9 atm
+        value: 4.053e-06
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: O(g)
+        method_class: model_derived
+        admission_status: admitted
+        method: gas-phase equilibrium calculation using reference equilibrium data [11]
+        method_as_printed: calculated from vapor-phase equilibria (1) and (2)
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+        temperature_K: 1833.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_O × 10^9
+        pressure_coefficient_as_printed: 0.38
+        pressure_atm: 3.8000000000000003e-10
+        pressure_sigma_atm: 4.0000000000000004e-11
+        printed_coefficient_sigma: 0.04
+        printed_cell_as_printed: 0.38 ± 0.04
+      derived_from: &id008
+      - shults_1994_t2_moo3_partial_pressure_1833k
+      - shults_1994_t2_moo2_partial_pressure_1833k
+      derivation:
+        relation: p(O) calculated using equilibrium (1), (MoO3)=(MoO2)+(O); equilibrium constant from [11].
+        inputs: *id008
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '5.268899999999999e-07'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1833 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_O × 10^9 atm, pressure_atm = coefficient × 10^-9
+      observation_id: shults_1994_t2_o_partial_pressure_1933k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O row at 1933 K; scale p_O × 10^9 atm.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.15 under scale ×10^9 atm
+        value: 1.5198749999999999e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: O(g)
+        method_class: model_derived
+        admission_status: admitted
+        method: gas-phase equilibrium calculation using reference equilibrium data [11]
+        method_as_printed: calculated from vapor-phase equilibria (1) and (2)
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+        temperature_K: 1933.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_O × 10^9
+        pressure_coefficient_as_printed: 2.65
+        pressure_atm: 2.65e-09
+        pressure_sigma_atm: 1.5e-10
+        printed_coefficient_sigma: 0.15
+        printed_cell_as_printed: 2.65 ± 0.15
+      derived_from: &id009
+      - shults_1994_t2_moo3_partial_pressure_1933k
+      - shults_1994_t2_moo2_partial_pressure_1933k
+      derivation:
+        relation: p(O) calculated using equilibrium (1), (MoO3)=(MoO2)+(O); equilibrium constant from [11].
+        inputs: *id009
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '4.6508175e-06'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1933 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_O × 10^9 atm, pressure_atm = coefficient × 10^-9
+      observation_id: shults_1994_t2_o_partial_pressure_1983k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O row at 1983 K; scale p_O × 10^9 atm.
+      T_range_K:
+      - 1983.0
+      - 1983.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.30 under scale ×10^9 atm
+        value: 3.0397499999999998e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: O(g)
+        method_class: model_derived
+        admission_status: admitted
+        method: gas-phase equilibrium calculation using reference equilibrium data [11]
+        method_as_printed: calculated from vapor-phase equilibria (1) and (2)
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+        temperature_K: 1983.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_O × 10^9
+        pressure_coefficient_as_printed: 6.83
+        pressure_atm: 6.830000000000001e-09
+        pressure_sigma_atm: 3.0e-10
+        printed_coefficient_sigma: 0.3
+        printed_cell_as_printed: 6.83 ± 0.30
+      derived_from: &id010
+      - shults_1994_t2_moo3_partial_pressure_1983k
+      - shults_1994_t2_moo2_partial_pressure_1983k
+      derivation:
+        relation: p(O) calculated using equilibrium (1), (MoO3)=(MoO2)+(O); equilibrium constant from [11].
+        inputs: *id010
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.3881525e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1983 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_O × 10^9 atm, pressure_atm = coefficient × 10^-9
+      observation_id: shults_1994_t2_o_partial_pressure_2033k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O row at 2033 K; scale p_O × 10^9 atm.
+      T_range_K:
+      - 2033.0
+      - 2033.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.8 under scale ×10^9 atm
+        value: 8.106000000000001e-05
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: O(g)
+        method_class: model_derived
+        admission_status: admitted
+        method: gas-phase equilibrium calculation using reference equilibrium data [11]
+        method_as_printed: calculated from vapor-phase equilibria (1) and (2)
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+        temperature_K: 2033.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_O × 10^9
+        pressure_coefficient_as_printed: 15.8
+        pressure_atm: 1.5800000000000003e-08
+        pressure_sigma_atm: 8.000000000000001e-10
+        printed_coefficient_sigma: 0.8
+        printed_cell_as_printed: 15.8 ± 0.8
+      derived_from: &id011
+      - shults_1994_t2_moo3_partial_pressure_2033k
+      - shults_1994_t2_moo2_partial_pressure_2033k
+      derivation:
+        relation: p(O) calculated using equilibrium (1), (MoO3)=(MoO2)+(O); equilibrium constant from [11].
+        inputs: *id011
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3.475447499999999e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 2033 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+  O2:
+    observations:
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_O2 × 10^11 atm, pressure_atm = coefficient × 10^-11
+      observation_id: shults_1994_t2_o2_partial_pressure_1833k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O2 row at 1833 K; scale p_O2 × 10^11 atm.
+      T_range_K:
+      - 1833.0
+      - 1833.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.05 under scale ×10^11 atm
+        value: 5.06625e-08
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: O2(g)
+        method_class: model_derived
+        admission_status: admitted
+        method: gas-phase equilibrium calculation using reference equilibrium data [11]
+        method_as_printed: calculated from vapor-phase equilibria (1) and (2)
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+        temperature_K: 1833.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_O2 × 10^11
+        pressure_coefficient_as_printed: 0.52
+        pressure_atm: 5.2e-12
+        pressure_sigma_atm: 5.0e-13
+        printed_coefficient_sigma: 0.05
+        printed_cell_as_printed: 0.52 ± 0.05
+      derived_from:
+      - shults_1994_t2_o_partial_pressure_1833k
+      derivation:
+        relation: p(O2) calculated using equilibrium (2), (O2)=2(O); equilibrium constant from [11].
+        inputs:
+        - shults_1994_t2_o_partial_pressure_1833k
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '5.268899999999999e-07'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1833 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_O2 × 10^11 atm, pressure_atm = coefficient × 10^-11
+      observation_id: shults_1994_t2_o2_partial_pressure_1933k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O2 row at 1933 K; scale p_O2 × 10^11 atm.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.26 under scale ×10^11 atm
+        value: 2.6344499999999996e-07
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: O2(g)
+        method_class: model_derived
+        admission_status: admitted
+        method: gas-phase equilibrium calculation using reference equilibrium data [11]
+        method_as_printed: calculated from vapor-phase equilibria (1) and (2)
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+        temperature_K: 1933.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_O2 × 10^11
+        pressure_coefficient_as_printed: 4.59
+        pressure_atm: 4.59e-11
+        pressure_sigma_atm: 2.6e-12
+        printed_coefficient_sigma: 0.26
+        printed_cell_as_printed: 4.59 ± 0.26
+      derived_from:
+      - shults_1994_t2_o_partial_pressure_1933k
+      derivation:
+        relation: p(O2) calculated using equilibrium (2), (O2)=2(O); equilibrium constant from [11].
+        inputs:
+        - shults_1994_t2_o_partial_pressure_1933k
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '4.6508175e-06'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1933 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_O2 × 10^11 atm, pressure_atm = coefficient × 10^-11
+      observation_id: shults_1994_t2_o2_partial_pressure_1983k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O2 row at 1983 K; scale p_O2 × 10^11 atm.
+      T_range_K:
+      - 1983.0
+      - 1983.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.6 under scale ×10^11 atm
+        value: 6.079499999999999e-07
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: O2(g)
+        method_class: model_derived
+        admission_status: admitted
+        method: gas-phase equilibrium calculation using reference equilibrium data [11]
+        method_as_printed: calculated from vapor-phase equilibria (1) and (2)
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+        temperature_K: 1983.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_O2 × 10^11
+        pressure_coefficient_as_printed: 13.7
+        pressure_atm: 1.37e-10
+        pressure_sigma_atm: 5.9999999999999995e-12
+        printed_coefficient_sigma: 0.6
+        printed_cell_as_printed: 13.7 ± 0.6
+      derived_from:
+      - shults_1994_t2_o_partial_pressure_1983k
+      derivation:
+        relation: p(O2) calculated using equilibrium (2), (O2)=2(O); equilibrium constant from [11].
+        inputs:
+        - shults_1994_t2_o_partial_pressure_1983k
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.3881525e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1983 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: partial_pressure
+      experiment: shults-1994-mullite-knudsen-series
+      regime: kems_effusion
+      units: atm; printed coefficient under p_O2 × 10^11 atm, pressure_atm = coefficient × 10^-11
+      observation_id: shults_1994_t2_o2_partial_pressure_2033k
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O2 row at 2033 K; scale p_O2 × 10^11 atm.
+      T_range_K:
+      - 2033.0
+      - 2033.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 1.7 under scale ×10^11 atm
+        value: 1.7225249999999999e-06
+        basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+      values:
+        quantity: partial_pressure
+        gas_species: O2(g)
+        method_class: model_derived
+        admission_status: admitted
+        method: gas-phase equilibrium calculation using reference equilibrium data [11]
+        method_as_printed: calculated from vapor-phase equilibria (1) and (2)
+        composition_component: mullite
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: stoichiometric formula-unit fractions derived from the stated mullite formula; not a
+          measured assay
+        attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+        temperature_K: 2033.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        pressure_scale_as_printed: p_O2 × 10^11
+        pressure_coefficient_as_printed: 34.3
+        pressure_atm: 3.4299999999999995e-10
+        pressure_sigma_atm: 1.7e-11
+        printed_coefficient_sigma: 1.7
+        printed_cell_as_printed: 34.3 ± 1.7
+      derived_from:
+      - shults_1994_t2_o_partial_pressure_2033k
+      derivation:
+        relation: p(O2) calculated using equilibrium (2), (O2)=2(O); equilibrium constant from [11].
+        inputs:
+        - shults_1994_t2_o_partial_pressure_2033k
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3.475447499999999e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 2033 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+  Al2O3:
+    observations:
+    - type: activity_coefficient
+      standard_state: &id013
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Al2O3
+              phase:
+                tag: unknown
+                reason: not_published
+            component_basis: Al2O3
+        inferred: true
+        note: Inferred from equations (7)–(8), which normalize vapor pressures to the pure oxide; the paper does
+          not name the condensed phase or polymorph.
+        locator:
+          page: 97
+          published_page: 97
+          pdf_page_index: 2
+          table: '6'
+          note: The pressure-ratio reference is vapor over the pure oxide; its condensed phase is unstated.
+      experiment: shults-1994-mullite-knudsen-series
+      units: dimensionless activity as printed
+      observation_id: shults_1994_t6_al2o3_activity_1833k
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 Al2O3 row at 1833 K.
+      T_range_K:
+      - 1833.0
+      - 1833.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.07
+        value: 0.07
+        basis: absolute dimensionless activity
+      derived_from: &id012
+      - shults_1994_t2_al_partial_pressure_1833k
+      - shults_1994_t2_o_partial_pressure_1833k
+      derivation:
+        relation: alpha_Al2O3 = (p_Al^2 p_O^3)/((p_Al^0)^2 (p_O^0)^3), equation (7); pure oxide reference vapor
+          pressures are not tabulated in this paper.
+        inputs: *id012
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: pressure-ratio calculation using equations (7) or (8)
+        temperature_range_K: &id015
+        - 1833.0
+        - 2033.0
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: formula-unit mole fractions derived from printed mullite formula; not an assay
+        standard_state_description: pure Al2O3 reference vapor pressure; condensed phase and polymorph are unstated
+        defining_ion: &id016
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 97
+            published_page: 97
+            pdf_page_index: 2
+            table: '6'
+            note: Activities are calculated from partial pressures in equations (7)–(8); the paper does not define
+              a single ion intensity as the activity.
+        temperature_K: 1833.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        activity: 1.05
+        activity_sigma: 0.07
+        activity_as_printed: 1.05 ± 0.07
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '5.268899999999999e-07'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1833 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: activity_coefficient
+      standard_state: *id013
+      experiment: shults-1994-mullite-knudsen-series
+      units: dimensionless activity as printed
+      observation_id: shults_1994_t6_al2o3_activity_1933k
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 Al2O3 row at 1933 K.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.06
+        value: 0.06
+        basis: absolute dimensionless activity
+      derived_from: &id014
+      - shults_1994_t2_al_partial_pressure_1933k
+      - shults_1994_t2_o_partial_pressure_1933k
+      derivation:
+        relation: alpha_Al2O3 = (p_Al^2 p_O^3)/((p_Al^0)^2 (p_O^0)^3), equation (7); pure oxide reference vapor
+          pressures are not tabulated in this paper.
+        inputs: *id014
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: pressure-ratio calculation using equations (7) or (8)
+        temperature_range_K: *id015
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: formula-unit mole fractions derived from printed mullite formula; not an assay
+        standard_state_description: pure Al2O3 reference vapor pressure; condensed phase and polymorph are unstated
+        defining_ion: *id016
+        temperature_K: 1933.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        activity: 1.04
+        activity_sigma: 0.06
+        activity_as_printed: 1.04 ± 0.06
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '4.6508175e-06'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1933 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: activity_coefficient
+      standard_state: *id013
+      experiment: shults-1994-mullite-knudsen-series
+      units: dimensionless activity as printed
+      observation_id: shults_1994_t6_al2o3_activity_1983k
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 Al2O3 row at 1983 K.
+      T_range_K:
+      - 1983.0
+      - 1983.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.05
+        value: 0.05
+        basis: absolute dimensionless activity
+      derived_from: &id017
+      - shults_1994_t2_al_partial_pressure_1983k
+      - shults_1994_t2_o_partial_pressure_1983k
+      derivation:
+        relation: alpha_Al2O3 = (p_Al^2 p_O^3)/((p_Al^0)^2 (p_O^0)^3), equation (7); pure oxide reference vapor
+          pressures are not tabulated in this paper.
+        inputs: *id017
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: pressure-ratio calculation using equations (7) or (8)
+        temperature_range_K: *id015
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: formula-unit mole fractions derived from printed mullite formula; not an assay
+        standard_state_description: pure Al2O3 reference vapor pressure; condensed phase and polymorph are unstated
+        defining_ion: *id016
+        temperature_K: 1983.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        activity: 1.01
+        activity_sigma: 0.05
+        activity_as_printed: 1.01 ± 0.05
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.3881525e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 1983 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+    - type: activity_coefficient
+      standard_state: *id013
+      experiment: shults-1994-mullite-knudsen-series
+      units: dimensionless activity as printed
+      observation_id: shults_1994_t6_al2o3_activity_2033k
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 Al2O3 row at 2033 K.
+      T_range_K:
+      - 2033.0
+      - 2033.0
+      uncertainty:
+        kind: printed
+        verbatim: ± 0.03
+        value: 0.03
+        basis: absolute dimensionless activity
+      derived_from: &id018
+      - shults_1994_t2_al_partial_pressure_2033k
+      - shults_1994_t2_o_partial_pressure_2033k
+      derivation:
+        relation: alpha_Al2O3 = (p_Al^2 p_O^3)/((p_Al^0)^2 (p_O^0)^3), equation (7); pure oxide reference vapor
+          pressures are not tabulated in this paper.
+        inputs: *id018
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method: pressure-ratio calculation using equations (7) or (8)
+        temperature_range_K: *id015
+        composition_as_printed: 3Al2O3·2SiO2
+        composition_basis: formula-unit mole fractions derived from printed mullite formula; not an assay
+        standard_state_description: pure Al2O3 reference vapor pressure; condensed phase and polymorph are unstated
+        defining_ion: *id016
+        temperature_K: 2033.0
+        composition_mole_fraction:
+          Al2O3: 0.6
+          SiO2: 0.4
+        activity: 1.01
+        activity_sigma: 0.03
+        activity_as_printed: 1.01 ± 0.03
+      point_conditions:
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '3.475447499999999e-05'
+          locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            table: '2'
+            note: Calculated pO2 at 2033 K from Table 2 pO2 × 10^11 atm; converted to Pa.
+  Mullite:
+    observations: []
+    context:
+    - observation_id: shults_1994_table1_mass_spectral_data
+      type: thermodynamic_example
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        table: '1'
+        note: Complete Table 1 transcription. Printed dashes are retained; the final mullite subcolumn is blank
+          for Al+, AlO+, Al2O+ and AlSiO+. The two mullite subcolumns have no stated normalization basis.
+      units: arbitrary relative ion signal; numeric central values and uncertainties as printed
+      values:
+        quantity: mass_spectral_relative_ion_signals
+        method_class: measured_tabulated
+        source_path: tables/shults-1994-mullite-evaporation/t1.csv
+        temperature_K: 1933.0
+        composition_columns:
+        - Al2O3
+        - SiO2
+        - mullite column 1 as printed
+        - mullite column 2 as printed
+        mullite_subcolumn_heading: The printed merged mullite heading has two numeric columns with no subheadings;
+          no basis for the two columns is stated.
+        rows:
+        - ion_as_printed: Al+
+          Al2O3_relative_signal_as_printed: 1.0
+          SiO2_relative_signal_as_printed: —
+          mullite_column_1_as_printed: 1.0
+          mullite_column_2_as_printed: ""
+        - ion_as_printed: AlO+
+          Al2O3_relative_signal_as_printed: 0.2
+          SiO2_relative_signal_as_printed: —
+          mullite_column_1_as_printed: 0.2
+          mullite_column_2_as_printed: ""
+          Al2O3_sigma: 0.02
+          mullite_column_1_sigma: 0.02
+        - ion_as_printed: Al2O+
+          Al2O3_relative_signal_as_printed: 0.2
+          SiO2_relative_signal_as_printed: —
+          mullite_column_1_as_printed: 0.14
+          mullite_column_2_as_printed: ""
+          Al2O3_sigma: 0.03
+          mullite_column_1_sigma: 0.02
+        - ion_as_printed: SiO+
+          Al2O3_relative_signal_as_printed: —
+          SiO2_relative_signal_as_printed: 100.0
+          mullite_column_1_as_printed: 870.0
+          mullite_column_2_as_printed: 100.0
+          mullite_column_1_sigma: 50.0
+        - ion_as_printed: SiO2+
+          Al2O3_relative_signal_as_printed: —
+          SiO2_relative_signal_as_printed: 0.025
+          mullite_column_1_as_printed: 0.22
+          mullite_column_2_as_printed: 0.025
+          SiO2_sigma: 0.005
+          mullite_column_1_sigma: 0.05
+          mullite_column_2_sigma: 0.006
+        - ion_as_printed: Si+
+          Al2O3_relative_signal_as_printed: —
+          SiO2_relative_signal_as_printed: 44.0
+          mullite_column_1_as_printed: 350.0
+          mullite_column_2_as_printed: 40.0
+          SiO2_sigma: 3.0
+          mullite_column_1_sigma: 30.0
+          mullite_column_2_sigma: 4.0
+        - ion_as_printed: AlSiO+
+          Al2O3_relative_signal_as_printed: —
+          SiO2_relative_signal_as_printed: —
+          mullite_column_1_as_printed: 0.002
+          mullite_column_2_as_printed: ""
+          mullite_column_1_sigma: 0.0003
+        - ion_as_printed: MoO2+
+          Al2O3_relative_signal_as_printed: 0.21
+          SiO2_relative_signal_as_printed: 0.022
+          mullite_column_1_as_printed: 0.25
+          mullite_column_2_as_printed: 0.028
+          Al2O3_sigma: 0.02
+          SiO2_sigma: 0.003
+          mullite_column_1_sigma: 0.03
+          mullite_column_2_sigma: 0.003
+        - ion_as_printed: MoO3+
+          Al2O3_relative_signal_as_printed: 0.05
+          SiO2_relative_signal_as_printed: 0.005
+          mullite_column_1_as_printed: 0.06
+          mullite_column_2_as_printed: 0.007
+          Al2O3_sigma: 0.01
+          SiO2_sigma: 0.001
+          mullite_column_1_sigma: 0.01
+          mullite_column_2_sigma: 0.001
+    - observation_id: shults_1994_table3_alsio_reaction_enthalpies
+      type: thermodynamic_example
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '3'
+        note: Complete Table 3; II and III law results, including values attributed to references [9] and [10].
+      units: kJ/mol as printed
+      values:
+        quantity: reaction_enthalpies_involving_AlSiO_gas
+        method_class: measured_reduced
+        reduction_method: II-law Clausius–Clapeyron and III-law Gibbs–Helmholtz reductions of pressure-temperature data.
+        source_inputs: Table 2 gas-phase partial pressures and temperatures for the printed Table 3 reactions; thermodynamic functions from [9], with reference gas formation enthalpies [11] used for Table 4. Original fit inputs and functions are not tabulated.
+        source_path: tables/shults-1994-mullite-evaporation/t3.csv
+        rows:
+        - reaction_as_printed: (Al) + (SiO) = (AlSiO)
+          delta_r_H298_II_law_kJ_mol: -294.0
+          sigma_II_law: 21.0
+          delta_r_H298_II_law_as_printed: null
+          delta_r_H298_III_law_kJ_mol: -270.0
+          sigma_III_law: 17.0
+          reference_as_printed: This work
+          method_class: measured_reduced
+          attribution: Reduced in this work
+        - reaction_as_printed: (Al) + (SiO) = (AlSiO)
+          delta_r_H298_II_law_kJ_mol: null
+          sigma_II_law: null
+          delta_r_H298_II_law_as_printed: —
+          delta_r_H298_III_law_kJ_mol: -255.0
+          sigma_III_law: 33.0
+          reference_as_printed: '[10]'
+          method_class: quoted_attributed
+          attribution: Reference [10] as cited in this paper
+        - reaction_as_printed: (Al2O) + 2(SiO) = 2(AlSiO) + (O)
+          delta_r_H298_II_law_kJ_mol: 610.0
+          sigma_II_law: 84.0
+          delta_r_H298_II_law_as_printed: null
+          delta_r_H298_III_law_kJ_mol: 473.0
+          sigma_III_law: 63.0
+          reference_as_printed: This work
+          method_class: measured_reduced
+          attribution: Reduced in this work
+        - reaction_as_printed: (Al2O) + 2(SiO2) = 2(AlSiO) + 3(O)
+          delta_r_H298_II_law_kJ_mol: 1505.0
+          sigma_II_law: 105.0
+          delta_r_H298_II_law_as_printed: null
+          delta_r_H298_III_law_kJ_mol: 1388.0
+          sigma_III_law: 63.0
+          reference_as_printed: This work (ditto mark)
+          method_class: measured_reduced
+          attribution: Reduced in this work
+        - reaction_as_printed: (AlO) + (SiO) = (AlSiO) + (O)
+          delta_r_H298_II_law_kJ_mol: 246.0
+          sigma_II_law: 29.0
+          delta_r_H298_II_law_as_printed: null
+          delta_r_H298_III_law_kJ_mol: 241.0
+          sigma_III_law: 17.0
+          reference_as_printed: This work (ditto mark)
+          method_class: measured_reduced
+          attribution: Reduced in this work
+        - reaction_as_printed: (Al2O) + (Si) = (AlSiO) + (Al)
+          delta_r_H298_II_law_kJ_mol: null
+          sigma_II_law: null
+          delta_r_H298_II_law_as_printed: —
+          delta_r_H298_III_law_kJ_mol: 34.0
+          sigma_III_law: 17.0
+          reference_as_printed: '[9]'
+          method_class: quoted_attributed
+          attribution: Reference [9] as cited in this paper
+    - observation_id: shults_1994_table4_alsio_formation_enthalpies
+      type: thermodynamic_example
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '4'
+        note: Complete Table 4; authors calculate each reaction route and report the common value.
+      units: kJ/mol as printed
+      values:
+        quantity: AlSiO_gas_formation_enthalpy_from_reactions
+        method_class: measured_reduced
+        reduction_method: Formation enthalpy from the corresponding Table 3 reaction enthalpy and reference gas-species formation enthalpies [11]; II-law and III-law results kept separate.
+        source_inputs: Table 3 reduced reaction enthalpies, using thermodynamic functions [9] and formation enthalpies [11]. Reference numbers are reported, without invented numerical reference inputs.
+        source_path: tables/shults-1994-mullite-evaporation/t4.csv
+        rows:
+        - reaction_or_summary_as_printed: (Al) + (SiO) = (AlSiO)
+          delta_f_H298_II_law_kJ_mol: -66.0
+          sigma_II_law: 22.0
+          delta_f_H298_III_law_kJ_mol: -41.0
+          sigma_III_law: 18.0
+          method_class: measured_reduced
+          attribution: Reduced in this work using reference formation enthalpies for vapor molecular species
+            [11]
+        - reaction_or_summary_as_printed: (Al2O) + 2(SiO) = 2(AlSiO) + (O)
+          delta_f_H298_II_law_kJ_mol: 14.0
+          sigma_II_law: 44.0
+          delta_f_H298_III_law_kJ_mol: -26.0
+          sigma_III_law: 25.0
+          method_class: measured_reduced
+          attribution: Reduced in this work using reference formation enthalpies for vapor molecular species
+            [11]
+        - reaction_or_summary_as_printed: (Al2O) + 2(SiO2) = 2(AlSiO) + 3(O)
+          delta_f_H298_II_law_kJ_mol: -5.0
+          sigma_II_law: 37.0
+          delta_f_H298_III_law_kJ_mol: -64.0
+          sigma_III_law: 35.0
+          method_class: measured_reduced
+          attribution: Reduced in this work using reference formation enthalpies for vapor molecular species
+            [11]
+        - reaction_or_summary_as_printed: (AlO) + (SiO) = (AlSiO) + (O)
+          delta_f_H298_II_law_kJ_mol: -34.0
+          sigma_II_law: 30.0
+          delta_f_H298_III_law_kJ_mol: -38.0
+          sigma_III_law: 18.0
+          method_class: measured_reduced
+          attribution: Reduced in this work using reference formation enthalpies for vapor molecular species
+            [11]
+        - reaction_or_summary_as_printed: Common value
+          delta_f_H298_II_law_kJ_mol: -31.0
+          sigma_II_law: 33.0
+          delta_f_H298_III_law_kJ_mol: -40.0
+          sigma_III_law: 25.0
+          method_class: measured_reduced
+          attribution: Reduced in this work using reference formation enthalpies for vapor molecular species
+            [11]
+    - observation_id: shults_1994_table5_alsio_appearance_and_atomization
+      type: thermodynamic_example
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '5'
+        note: Complete Table 5. The appearance potential for this work was measured using Warren’s method and the
+          silver appearance potential as standard; other rows are attributed.
+      units: eV and kJ/mol as printed
+      values:
+        quantity: AlSiO_appearance_potential_formation_enthalpy_and_atomization_energy
+        method_class: measured_reduced
+        note: Mixed provenance; this-work appearance potential is measured_direct, H and D are measured_reduced, and literature rows remain quoted_attributed.
+        source_path: tables/shults-1994-mullite-evaporation/t5.csv
+        rows:
+        - reference_as_printed: This work
+          method_class: measured_reduced
+          attribution: This work; appearance potential determined by Warren method against silver appearance potential;
+            thermochemistry calculated in this work
+          appearance_potential_method_class: measured_direct
+          appearance_potential_method: Warren method using silver appearance potential as standard
+          thermochemistry_method_class: measured_reduced
+          thermochemistry_inputs: Table 4 common II/III-law formation enthalpies and reference thermodynamic data [11]; not a model prediction.
+          appearance_potential_eV: 6.5
+          appearance_sigma_eV: 0.5
+          delta_f_H298_II_law_kJ_mol: -31.0
+          sigma_II_law: 33.0
+          delta_f_H298_III_law_kJ_mol: -40.0
+          sigma_III_law: 25.0
+          atomization_energy_D298_kJ_mol: 1062.0
+          sigma_D298: 25.0
+        - reference_as_printed: '[10]'
+          method_class: quoted_attributed
+          attribution: Reference [10] as cited in this paper
+          appearance_potential_eV: 8.0
+          appearance_sigma_eV: 1.0
+          delta_f_H298_II_law_kJ_mol_as_printed: —
+          delta_f_H298_III_law_kJ_mol: -26.0
+          sigma_III_law: 33.0
+          atomization_energy_D298_kJ_mol: 1050.0
+          sigma_D298: 33.0
+        - reference_as_printed: '[9]'
+          method_class: quoted_attributed
+          attribution: Reference [9] as cited in this paper
+          appearance_potential_eV: 6.3
+          appearance_sigma_eV: 1.0
+          delta_f_H298_II_law_kJ_mol: 24.0
+          sigma_II_law: 25.0
+          delta_f_H298_III_law_kJ_mol: 20.0
+          sigma_III_law: 21.0
+          atomization_energy_D298_kJ_mol: 1006.0
+          sigma_D298: 20.0
+    - observation_id: shults_1994_table7_mullite_formation_functions
+      type: thermodynamic_example
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '7'
+        note: Complete Table 7. The current-study row is authors’ result; other methods and results are attributed
+          to references [2]–[5] and [12].
+      units: Entropy table heading prints J/(k mol); p. 98 prose prints J/(K mol); enthalpy and Gibbs energy in kJ/mol
+      values:
+        quantity: mullite_formation_entropy_enthalpy_and_Gibbs_energy
+        method_class: measured_reduced
+        reduction_method: Mullite formation Gibbs energies reduced from measured activities (Table 6); entropy and enthalpy obtained by equations (9) and (10) on p. 97.
+        source_inputs: Table 6 activity reductions based on temperature-matched Table 2 partial pressures and pure-oxide reference pressures. Reference pressures and the original Gibbs-energy fit are not tabulated; no reconstruction is claimed.
+        source_path: tables/shults-1994-mullite-evaporation/t7.csv
+        compound_as_printed: 3Al2O3·2SiO2
+        Gibbs_energy_temperature_K: 1933.0
+        rows:
+        - method_as_printed: Mass spectrometric effusion Knudsen method
+          temperature_range_K:
+          - 1833.0
+          - 2033.0
+          reference_as_printed: This work
+          method_class: measured_reduced
+          attribution: Calculated/determined in this work by mass spectrometric Knudsen effusion
+          delta_f_S_J_mol_K: 13.8
+          sigma_S: 0.6
+          delta_f_H_kJ_mol: 15.9
+          sigma_H: 0.6
+          delta_f_G_at_1933_K_kJ_mol: -10.8
+          sigma_G: 0.6
+        - method_as_printed: Exchange equilibria
+          temperature_range_K:
+          - 1700.0
+          - 1900.0
+          reference_as_printed: '[2]'
+          method_class: quoted_attributed
+          attribution: Reference [2] as cited in this paper
+          delta_f_S_J_mol_K: 2.1
+          delta_f_H_kJ_mol: -0.9
+          delta_f_G_at_1933_K_kJ_mol: -4.9
+        - method_as_printed: Exchange equilibria
+          temperature_range_K:
+          - 1673.0
+          - 1873.0
+          reference_as_printed: '[3]'
+          method_class: quoted_attributed
+          attribution: Reference [3] as cited in this paper
+          delta_f_S_J_mol_K: 15.1
+          delta_f_H_kJ_mol: 22.2
+          delta_f_G_at_1933_K_kJ_mol: -7.1
+        - method_as_printed: Calorimetric dissolution
+          temperature_range_K:
+          - 298.0
+          - 968.0
+          reference_as_printed: '[4]'
+          method_class: quoted_attributed
+          attribution: Reference [4] as cited in this paper
+          delta_f_S_J_mol_K: 5.8
+          sigma_S: 0.4
+          delta_f_H_kJ_mol: 4.6
+          sigma_H: 0.3
+          delta_f_G_at_1933_K_kJ_mol: -7.1
+          sigma_G: 0.4
+        - method_as_printed: Calorimetric dissolution
+          temperature_range_K:
+          - 298.0
+          - 1800.0
+          reference_as_printed: '[5]'
+          method_class: quoted_attributed
+          attribution: Reference [5] as cited in this paper
+          delta_f_S_J_mol_K: 15.1
+          sigma_S: 2.0
+          delta_f_H_kJ_mol: 23.0
+          sigma_H: 8.0
+          delta_f_G_at_1933_K_kJ_mol: -5.3
+          sigma_G: 4.6
+        - method_as_printed: Calculation using reference data
+          temperature_range_K:
+          - 298.0
+          - 2000.0
+          reference_as_printed: '[12]'
+          method_class: quoted_attributed
+          attribution: Reference [12] as cited in this paper
+          delta_f_S_J_mol_K: 4.4
+          delta_f_H_kJ_mol: 5.8
+          delta_f_G_at_1933_K_kJ_mol: -5.7
+    - observation_id: shults_1994_source_relationship_to_existing_mullite_extract
+      type: source_relationship
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        note: The simulator corpus contains shornikov-1994-mullite-kems (Rapid Communications, pp. 478–480), explicitly
+          marked as canonical with this Doklady paper as a related source. Numeric comparison found non-overlapping
+          Table 1 and Tables 3–5 and 7; therefore this is not an all-numbers-duplicated extract.
+      units: as reported
+      values:
+        quantity: relationship_to_related_Rapid_Communications_paper
+        method_class: quoted_attributed
+        related_source_id: shornikov-1994-mullite-kems
+        relationship: related Doklady translation by the same authors; existing extract provenance identifies this
+          as the related Doklady paper
+        overlap: Shared measurement provenance; 41 existing comparator points were matched by species, observable
+          and temperature. Of these 33 match value and uncertainty and eight differ. Doklady also carries four SiO2
+          pressure values and Tables 1, 3, 4, 5 and 7 without numeric counterparts in the existing comparator.
+        differences_as_printed:
+        - Al, 1833 K; Doklady 0.36 ± 0.02 versus comparator 0.355 ± 0.018, both ×10^-8 atm.
+        - Al2O, 1933 K; Doklady 2.10 ± 0.15 ×10^-9 atm versus comparator same coefficient/sigma ×10^-8 atm.
+        - Al2O, 1983 K; Doklady 4.47 ± 0.25 ×10^-9 atm versus comparator same coefficient/sigma ×10^-8 atm.
+        - Al2O, 2033 K; Doklady 14.5 ± 0.8 ×10^-9 atm versus comparator same coefficient/sigma ×10^-8 atm.
+        - MoO2, 1833 K; Doklady 0.53 ± 0.05 versus comparator 0.526 ± 0.050, both ×10^-8 atm.
+        - O, 1833 K; Doklady 0.38 ± 0.04 versus comparator 0.375 ± 0.040, both ×10^-9 atm.
+        - O2, 1833 K; Doklady 0.52 ± 0.05 versus comparator 0.521 ± 0.050, both ×10^-11 atm.
+        - Al2O3 activity, 1933 K; Doklady 1.04 ± 0.06 versus comparator 1.01 ± 0.05.
+        comparison_note: This comparison reports the existing related extract, without adjudicating its original
+          PDF. Literal Doklady values are preserved. Shared measurements are not independent replications; complete
+          numerical identity is false, so duplicate_of is not asserted.
+    - observation_id: shults_1994_method_and_sample_context
+      type: method
+      locator:
+        page: 95
+        published_page: 95
+        pdf_page_index: 0
+        note: Experiment facts and the source statements that qualify or compare the results; exact quotations were
+          checked against 300-dpi page images.
+      units: as reported
+      values:
+        quantity: experiment_and_sample_context
+        method_class: measured_tabulated
+        method: Knudsen effusion mass spectrometry with MI-1201
+        sample_composition_as_printed: 3Al2O3·2SiO2 mullite
+        sample_preparation: precursor method, details in reference [7]
+        starting_materials_and_purity: not stated in this paper
+        post_run_composition: not reported
+        gas_phase_ion_species_as_printed:
+        - Al+
+        - AlO+
+        - Al2O+
+        - AlO2+
+        - Al2O2+
+        - SiO+
+        - SiO2+
+        - Si+
+        - AlSiO+
+        - Mo+
+        - MoO+
+        - MoO2+
+        - MoO3+
+        method_qualifications:
+        - locator:
+            page: 95
+            published_page: 95
+            pdf_page_index: 0
+            section: Introduction
+          quote: Mullite (3Al2O3 · 2SiO2) is a single compound stable at temperatures above 1350 K in an Al2O3–SiO2
+            system.
+          classification: stated stability and temperature threshold
+        - locator:
+            page: 95
+            published_page: 95
+            pdf_page_index: 0
+            section: Introduction
+          quote: This compound melts incongruently at 2163 ± 4 K [1].
+          classification: transition temperature with stated uncertainty
+        - locator:
+            page: 95
+            published_page: 95
+            pdf_page_index: 0
+            section: Introduction
+          quote: However, the appropriate findings diverge considerably.
+          classification: comparison of prior methods
+        - locator:
+            page: 95
+            published_page: 95
+            pdf_page_index: 0
+            section: Introduction
+          quote: Mass spectrometric investigation of evaporation processes in the given Al2O3–SiO2 system was limited
+            to studying the samples containing from 0 to 0.16 mole fractions of Al2O3; only the (SiO) and (SiO2)
+            molecules were detected in the vapors over the melts of the system [6].
+          classification: prior study composition range and detected species
+        - locator:
+            page: 95
+            published_page: 95
+            pdf_page_index: 0
+            section: Experimental
+          quote: The mullite samples were prepared by the precursor method described in detail in [7].
+          classification: sample preparation; reagents/purity details deferred to reference
+        - locator:
+            page: 95
+            published_page: 95
+            pdf_page_index: 0
+            section: Experimental
+          quote: 'the ratio of areas of effusion and evaporation apertures was no less than 1 : 400'
+          classification: apparatus area ratio bound
+        - locator:
+            page: 95
+            published_page: 95
+            pdf_page_index: 0
+            section: Experimental
+          quote: Ionization energy was 70 eV.
+          classification: instrument setting
+        - locator:
+            page: 95
+            published_page: 95
+            pdf_page_index: 0
+            section: Experimental
+          quote: The mass spectra of vapors over 3Al2O3 · 2SiO2 in the temperature range 1800 - 2050 K indicated
+            the presence of Al+, AlO+, Al2O+, AlO2+, Al2O2+, SiO+, SiO2+, Si+, AlSiO+, Mo+, MoO+, MoO2+, and MoO3+
+            ions.
+          classification: species detection and temperature range
+        - locator:
+            page: 95
+            published_page: 95
+            pdf_page_index: 0
+            section: Experimental
+          quote: The relative content of ions in the mass spectra of vapors over mullite coincided, to within the
+            experimental error that did not exceed 15%, with that found in the mass spectra of vapors over aluminum
+            and silicon oxides (Table 1).
+          classification: comparative result and maximum relative error
+        - locator:
+            page: 95
+            published_page: 95
+            pdf_page_index: 0
+            section: Results
+          quote: Therefore, evaporation of the 3Al2O3 · 2SiO2 compound occurs chiefly in the same manner as the
+            transition into the gas phase of appropriate oxides.
+          classification: comparative interpretation
+        - locator:
+            page: 95
+            published_page: 95
+            pdf_page_index: 0
+            section: Results
+          quote: It should be noted that in this work we showed for the first time that the (AlSiO) molecule is
+            present in vapors over mullite; earlier, this molecule was found in vapors over Al–Si–Al2O3–SiO2 and
+            Al–Al2O3–SiO2 systems [9, 10].
+          classification: first detection and comparison with earlier systems
+        - locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            section: Results
+          quote: The appearance potential of the AlSiO+ in the mass spectra of vapors over mullite, determined by
+            Warren’s method using the silver appearance potential as a standard, is 6.5 ± 0.5 eV.
+          classification: appearance potential and uncertainty
+        - locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            section: Results
+          quote: Partial pressures of molecular forms of vapors over mullite were determined by the method of comparing
+            ionic currents; partial pressures of silver and gold vapors were used as standard ones (Table 2).
+          classification: pressure calibration method and standards
+        - locator:
+            page: 96
+            published_page: 96
+            pdf_page_index: 1
+            section: Results
+          quote: Partial pressures of atomic and molecular oxygen were calculated, as was done earlier [8], using
+            data on the reaction equilibria in the gas phase [11].
+          classification: calculated oxygen pressures and source
+        - locator:
+            page: 97
+            published_page: 97
+            pdf_page_index: 2
+            section: Results
+          quote: 'Oxygen partial pressures, determined from equilibria (1) and (2), corresponded, to within the
+            experimental error that did not exceed 15%, to the values found when using the following equilibria:'
+          classification: oxygen-pressure cross-check and maximum relative error
+        - locator:
+            page: 97
+            published_page: 97
+            pdf_page_index: 2
+            section: Results
+          quote: Enthalpies of evaporation of molecular forms of vapors over 3Al2O3 · 2SiO2 were determined by the
+            Clausius–Clapeyron equation.
+          classification: calculation method
+        - locator:
+            page: 97
+            published_page: 97
+            pdf_page_index: 2
+            section: Results
+          quote: Table 3 shows that the values of enthalpies of the reaction found by the Clausius–Clapeyron and
+            Gibbs–Helmholtz equations are in satisfactory agreement with the data [10].
+          classification: method comparison
+        - locator:
+            page: 97
+            published_page: 97
+            pdf_page_index: 2
+            section: Results
+          quote: However, the inaccuracy of determining the ΔrH°298 value when using the second law is somewhat
+            higher.
+          classification: uncertainty comparison between laws
+        - locator:
+            page: 97
+            published_page: 97
+            pdf_page_index: 2
+            section: Results
+          quote: Table 5 indicates that our data on the enthalpy of formation and atomization energy of the (AlSiO)
+            molecule are consistent with those reported earlier in [9, 10].
+          classification: comparison with prior results
+        - locator:
+            page: 97
+            published_page: 97
+            pdf_page_index: 2
+            section: Results
+          quote: 'Activities of Al2O3 and SiO2 in the 3Al2O3 · 2SiO2 compound (Table 6) were determined on the basis
+            of the following relationships:'
+          classification: activity derivation; equations (7) and (8)
+        - locator:
+            page: 97
+            published_page: 97
+            pdf_page_index: 2
+            section: Results
+          quote: For the most part, the experimental error did not exceed 0.7 kJ/mol; the calculation was performed
+            for 1 mol of 3Al2O3 · 2SiO2.
+          classification: Gibbs-energy figure uncertainty and formula basis
+        - locator:
+            page: 97
+            published_page: 97
+            pdf_page_index: 2
+            section: Results
+          quote: It should be noted that the data determined by the method of exchange equilibria (dependencies
+            2 and 3) disagree with the calculated ones (dependence 4).
+          classification: directional/comparative discrepancy
+        - locator:
+            page: 97
+            published_page: 97
+            pdf_page_index: 2
+            section: Results
+          quote: Our results are not in conflict with the most reliable data determined by the method of high-temperature
+            calorimetry of dissolution [5].
+          classification: comparison with calorimetry
+        - locator:
+            page: 97
+            published_page: 97
+            pdf_page_index: 2
+            section: Conclusion
+          quote: The calculated values of thermodynamic functions for the gaseous AlSiO molecule are consistent
+            with those earlier obtained in [9, 10].
+          classification: comparison with earlier results
+        - locator:
+            page: 98
+            published_page: 98
+            pdf_page_index: 3
+            section: Conclusion
+          quote: Entropy and enthalpy of 3Al2O3 · 2SiO2 formation were found to be 13.8 ± 0.6 J/(K mol) and 15.9
+            ± 0.6 kJ/mol in the temperature range 1833 - 2033 K.
+          classification: numeric summary with uncertainties and temperature range
+    - observation_id: shults_1994_table2_oxygen_condition_by_temperature
+      type: laboratory_conditions
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Join condition for Table 2 pressure observations by the shared printed temperature; the pO2 row is
+          calculated, not an imposed buffer.
+      units: atm as printed; pressure_atm values converted from the printed scale
+      values:
+        quantity: oxygen_partial_pressure_condition_for_table2_rows
+        method_class: model_derived
+        source_path: tables/shults-1994-mullite-evaporation/t2.csv
+        relation: The calculated pO2 Table 2 row at each temperature is the corresponding oxygen condition for all
+          Table 2 vapor-pressure rows at that same temperature and mullite composition. pO2 is not converted to
+          fugacity.
+        attribution: Calculated in this work from equilibrium (2) using data [11].
+        rows:
+        - temperature_K: 1833.0
+          p_O_atm: 3.8e-10
+          p_O2_atm: 5.2e-12
+          composition_as_printed: 3Al2O3·2SiO2
+          oxygen_pressure_method_class: model_derived
+        - temperature_K: 1933.0
+          p_O_atm: 2.65e-09
+          p_O2_atm: 4.59e-11
+          composition_as_printed: 3Al2O3·2SiO2
+          oxygen_pressure_method_class: model_derived
+        - temperature_K: 1983.0
+          p_O_atm: 6.83e-09
+          p_O2_atm: 1.37e-10
+          composition_as_printed: 3Al2O3·2SiO2
+          oxygen_pressure_method_class: model_derived
+        - temperature_K: 2033.0
+          p_O_atm: 1.58e-08
+          p_O2_atm: 3.43e-10
+          composition_as_printed: 3Al2O3·2SiO2
+          oxygen_pressure_method_class: model_derived
+    - observation_id: shults_1994_calibration_and_measurement_context
+      type: method
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        note: Ionization energy 70 eV is on p. 95, PDF index 0; appearance potential 6.5 ± 0.5 eV, Warren method
+          and silver/gold pressure standards are on p. 96, PDF index 1. Facts set to null are not printed.
+      units: as reported
+      values:
+        quantity: mass_spectrometric_pressure_measurement_details
+        method_class: measured_tabulated
+        pressure_conversion: comparing ionic currents
+        pressure_standards:
+        - silver vapor pressure
+        - gold vapor pressure
+        electron_ionization_energy_eV: 70.0
+        alsio_appearance_potential_eV: 6.5
+        alsio_appearance_potential_sigma_eV: 0.5
+        appearance_potential_method: Warren method using silver appearance potential as standard
+        ionization_cross_sections_and_source: null
+        multiplier_or_isotope_corrections: null
+        temperature_sensor: null
+        temperature_calibration_and_uncertainty: null
+        chamber_background_pressure: null
+        sweep_gas: null
+        oxygen_pressure_method: calculated from gas-phase equilibrium reactions (1) and (2), using data [11]
+    - observation_id: shults_1994_activity_standard_states_and_defining_pressures
+      type: thermodynamic_example
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Equations (7)–(8) and Table 6 define the activity reductions. The standard-state condensed phase is
+          not specified.
+      units: dimensionless activity
+      values:
+        quantity: activity_definitions_standard_states_and_ion_relations
+        method_class: measured_reduced
+        Al2O3_activity_standard_state: pure Al2O3 reference vapor pressure; condensed phase and polymorph not stated
+        SiO2_activity_standard_state: pure SiO2 reference vapor pressure; condensed phase and polymorph not stated
+        Al2O3_activity_pressure_relation: equation (7), pAl and pO over mullite relative to pAl^0 and pO^0 both
+          over pure Al2O3
+        SiO2_activity_pressure_relation: equation (8), pSiO and pO over mullite relative to pSiO^0 and pO^0 both
+          over pure SiO2
+        defining_ion: No ion is directly named as the activity; activities are reduced from species partial pressures.
+    - observation_id: shults_1994_figure1_gibbs_formation_curve
+      type: figure_only
+      locator:
+        page: 98
+        published_page: 98
+        pdf_page_index: 3
+        figure: '1'
+        note: Figure 1 plotted values are not digitized. The caption defines the four plotted sources/methods; all
+          prose comparisons are quoted in the method-and-sample context.
+      units: kJ/mol
+      values:
+        quantity: mullite_formation_gibbs_energy_temperature_curve
+        method_class: figure_only
+        admission_status: figure_only
+        reason: Figure 1 contains curves and comparative literature series; values were not digitized.
+        formula_basis: 1 mol of 3Al2O3·2SiO2
+        curves_as_captioned:
+        - mass-spectrometric effusion Knudsen method, this work
+        - exchange equilibria in slags [2] and [3]
+        - high-temperature calorimetry of dissolution [5]
+        - calculated using reference data [12]
+    - observation_id: shults_1994_equation_3
+      type: thermodynamic_example
+      locator:
+        published_page: 97
+        pdf_page_index: 2
+        equation: "3"
+      units: "gas-phase reaction notation; parentheses denote vapor forms"
+      values:
+        method_class: model_derived
+        quantity: printed_derivation_relation
+        relation_as_printed: "(AlO) = (Al) + (O)"
+        note: "Equilibria (3)–(6) cross-check calculated oxygen from (1)–(2), agreeing within experimental error ≤15%; not substituted for its primary parents."
+    - observation_id: shults_1994_equation_4
+      type: thermodynamic_example
+      locator:
+        published_page: 97
+        pdf_page_index: 2
+        equation: "4"
+      units: "gas-phase reaction notation; parentheses denote vapor forms"
+      values:
+        method_class: model_derived
+        quantity: printed_derivation_relation
+        relation_as_printed: "2(AlO) = (Al2O) + (O)"
+        note: "Equilibria (3)–(6) cross-check calculated oxygen from (1)–(2), agreeing within experimental error ≤15%; not substituted for its primary parents."
+    - observation_id: shults_1994_equation_5
+      type: thermodynamic_example
+      locator:
+        published_page: 97
+        pdf_page_index: 2
+        equation: "5"
+      units: "gas-phase reaction notation; parentheses denote vapor forms"
+      values:
+        method_class: model_derived
+        quantity: printed_derivation_relation
+        relation_as_printed: "(Al2O) = 2(Al) + (O)"
+        note: "Equilibria (3)–(6) cross-check calculated oxygen from (1)–(2), agreeing within experimental error ≤15%; not substituted for its primary parents."
+    - observation_id: shults_1994_equation_6
+      type: thermodynamic_example
+      locator:
+        published_page: 97
+        pdf_page_index: 2
+        equation: "6"
+      units: "gas-phase reaction notation; parentheses denote vapor forms"
+      values:
+        method_class: model_derived
+        quantity: printed_derivation_relation
+        relation_as_printed: "(SiO2) = (SiO) + (O)"
+        note: "Equilibria (3)–(6) cross-check calculated oxygen from (1)–(2), agreeing within experimental error ≤15%; not substituted for its primary parents."
+    - observation_id: shults_1994_equation_9
+      type: thermodynamic_example
+      locator:
+        published_page: 97
+        pdf_page_index: 2
+        equation: "9"
+      units: "Table 7 entropy heading J/(k mol); p. 98 prose J/(K mol); H and G in kJ/mol"
+      values:
+        method_class: measured_reduced
+        quantity: printed_derivation_relation
+        relation_as_printed: "Δ_f S_T^0 = −d(Δ_f G_T^0)/dT"
+        note: "Author reduction relation for Table 7 formation functions, using the formation Gibbs energies; not a model-predicted experiment."
+    - observation_id: shults_1994_equation_10
+      type: thermodynamic_example
+      locator:
+        published_page: 97
+        pdf_page_index: 2
+        equation: "10"
+      units: "Table 7 entropy heading J/(k mol); p. 98 prose J/(K mol); H and G in kJ/mol"
+      values:
+        method_class: measured_reduced
+        quantity: printed_derivation_relation
+        relation_as_printed: "Δ_f H_T^0 = Δ_f G_T^0 + T Δ_f S_T^0"
+        note: "Author reduction relation for Table 7 formation functions, using the formation Gibbs energies; not a model-predicted experiment."
