@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
+
+if TYPE_CHECKING:
+    from simulator.battery.enums import PolymorphRejectionKind
 
 
 class StateTag(StrEnum):
@@ -23,26 +26,37 @@ class State(Generic[T]):
     tag: StateTag
     value: T | None = None
     reason: str | None = None
+    rejection_kind: PolymorphRejectionKind | None = None
 
     def __post_init__(self) -> None:
         if self.reason is not None and not isinstance(self.reason, str):
             raise ValueError(f"State.{self.tag} reason must be a string")
+        if self.rejection_kind is not None and not isinstance(
+            self.rejection_kind, StrEnum
+        ):
+            raise ValueError("State.rejection_kind must be a string enum")
         if self.tag is StateTag.VALUE:
             if self.value is None:
                 raise ValueError("State.value requires a value")
+            if self.rejection_kind is not None:
+                raise ValueError("State.value cannot carry a rejection kind")
         else:
             if self.value is not None:
                 raise ValueError(f"State.{self.tag} cannot carry a value")
             if not self.reason or not self.reason.strip():
                 raise ValueError(f"State.{self.tag} requires a reason")
+            if self.rejection_kind is not None and self.tag is not StateTag.UNKNOWN:
+                raise ValueError("Only State.unknown can carry a rejection kind")
 
     @classmethod
     def of(cls, value: T) -> "State[T]":
         return cls(StateTag.VALUE, value=value)
 
     @classmethod
-    def unknown(cls, reason: str) -> "State[T]":
-        return cls(StateTag.UNKNOWN, reason=reason)
+    def unknown(
+        cls, reason: str, *, rejection_kind: PolymorphRejectionKind | None = None
+    ) -> "State[T]":
+        return cls(StateTag.UNKNOWN, reason=reason, rejection_kind=rejection_kind)
 
     @classmethod
     def not_applicable(cls, reason: str) -> "State[T]":
