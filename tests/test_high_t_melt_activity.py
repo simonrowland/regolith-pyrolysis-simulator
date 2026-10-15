@@ -12,7 +12,6 @@ from types import SimpleNamespace
 
 import pytest
 import yaml
-from openimcc import ImccNonconvergenceError
 
 from engines.builtin import vapor_pressure as vapor_pressure_module
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
@@ -35,7 +34,8 @@ from simulator.runner import PyrolysisRun
 from simulator.state import CampaignPhase, MOLAR_MASS
 
 
-pytest.importorskip("openimcc")
+_openimcc = pytest.importorskip("openimcc")
+ImccNonconvergenceError = _openimcc.ImccNonconvergenceError
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 REPO_ROOT = DATA_DIR.parent
