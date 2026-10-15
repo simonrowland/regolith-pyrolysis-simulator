@@ -619,6 +619,7 @@ def test_unexpected_openimcc_activity_error_propagates(monkeypatch) -> None:
 
 def test_nonconvergence_keeps_prediction_and_emits_run_notice(monkeypatch) -> None:
     diagnostics = {"iterations": 8, "residual_inf": 0.25}
+    real_evaluate = openimcc_bridge_module.evaluate
 
     def nonconverge(**kwargs):
         raise ImccNonconvergenceError(
@@ -654,14 +655,21 @@ def test_nonconvergence_keeps_prediction_and_emits_run_notice(monkeypatch) -> No
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C2A",
-        hours=0,
+        hours=1,
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,
     )
     session = run._start_session()
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", real_evaluate)
+    execution = RunExecutor().execute_session(session, hours=1)
     sim = session.simulator
+    completed_hour = int(sim.melt.hour)
+    assert completed_hour > 0
+    sim._high_t_melt_activity_fallback_steps = []
+    sim.melt.hour = completed_hour - 1
     sim.melt.campaign = CampaignPhase.C2A
     sim.melt.temperature_C = CAP_PLUS_T_K - 273.15
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
     sim._refresh_vapor_pressures_from_kernel(
         SimpleNamespace(
             vapor_pressures_Pa={},
@@ -671,9 +679,8 @@ def test_nonconvergence_keeps_prediction_and_emits_run_notice(monkeypatch) -> No
             activity_coefficients={},
         )
     )
-    sim.melt.hour = 1
+    sim.melt.hour = completed_hour
 
-    execution = RunExecutor().execute_session(session, hours=0)
     output = run._build_output(execution)
     notice = output["run_metadata"]["high_t_melt_activity_fallback_notice"]
     assert notice["authority"] == "extrapolated"
