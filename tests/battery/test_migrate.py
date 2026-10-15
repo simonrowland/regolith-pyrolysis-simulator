@@ -14112,3 +14112,152 @@ def test_fusion_temperature_requires_melting_and_matching_crystal_identity(
     if fusion.point_conditions is not None:
         temperature = fusion.point_conditions.get("temperature_K")
         assert temperature is None or temperature.state.is_unknown
+def test_stolyarova_1995_printed_compositions_reach_migrated_observations(
+    tmp_path: Path,
+) -> None:
+    from collections import Counter
+
+    from simulator.battery.identity import Identity
+    from simulator.battery.score import (
+        ScoreContext,
+        comparison_candidates,
+        rail_for_quantity,
+    )
+
+    source_id = "stolyarova-1995-cao-alumina-kems"
+    result = _migrate_real_extract(
+        tmp_path, "stolyarova-1995-cao-alumina-kems.yaml"
+    )
+    rows = [obs for obs in result.observations.values() if obs.source_id == source_id]
+    pressure_rows = [
+        obs
+        for obs in rows
+        if isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+    ]
+
+    assert len(rows) == 56
+    assert len(pressure_rows) == 50
+    for obs in pressure_rows:
+        assert obs.identity.species.phase.is_value
+        assert obs.identity.species.phase.value is Phase.G
+        assert obs.identity.temperature_K.is_value
+        assert obs.identity.temperature_K.value == Decimal("1933")
+        assert obs.identity.composition is not None
+        assert obs.identity.composition.is_value
+        condition = obs.point_conditions["composition"]
+        assert condition.state.is_value
+        assert condition.locator is not None
+        assert condition.locator.page == 687
+        assert condition.locator.table == "2"
+        assert "binary complement" in condition.locator.note
+        assert condition.state.value == obs.identity.composition.value
+        assert obs.identity.fO2_Pa.is_unknown
+        assert obs.identity.total_pressure_Pa.is_unknown
+        assert (
+            obs.identity.total_pressure_Pa.reason
+            == "in_cell_total_pressure_not_derivable"
+        )
+
+    ca_0143 = next(
+        obs
+        for obs in pressure_rows
+        if "stolyarova_1995_ca_partial_pressure_table2" in obs.observation_id
+        and obs.point_conditions["composition"].state.value.components[0][1]
+        == Decimal("0.143")
+    )
+    assert dict(ca_0143.identity.composition.value.components) == {
+        "CaO": Decimal("0.143"),
+        "Al2O3": Decimal("0.857"),
+    }
+
+    al_0000 = next(
+        obs
+        for obs in pressure_rows
+        if "stolyarova_1995_al_partial_pressure_table2" in obs.observation_id
+        and obs.point_conditions["composition"].state.value.components[0][1]
+        == Decimal("0.000")
+    )
+    assert dict(al_0000.identity.composition.value.components) == {
+        "CaO": Decimal("0.000"),
+        "Al2O3": Decimal("1.000"),
+    }
+
+    figure_rows = [obs for obs in rows if "figure_only" in obs.observation_id]
+    activities = [
+        obs
+        for obs in figure_rows
+        if "activity_fig1" in obs.observation_id
+    ]
+    assert len(figure_rows) == 6
+    assert all(obs.value.kind is ValueKind.UNAVAILABLE for obs in figure_rows)
+    assert len(activities) == 2
+
+    candidates = [
+        obs
+        for obs in comparison_candidates(
+            ScoreContext(
+                works=result.works,
+                experiments=result.experiments,
+                observations=result.observations,
+            )
+        )
+        if obs.source_id == source_id
+    ]
+    rails = Counter(
+        str(
+            rail_for_quantity(
+                quantity_token(obs.identity),
+                species_formula=obs.identity.species.formula,
+            )
+        )
+        for obs in candidates
+    )
+    assert len(candidates) == 24
+    assert rails == {"vapour": 24}
+
+
+def test_stolyarova_1995_composition_mutation_removes_identity_map(
+    tmp_path: Path,
+) -> None:
+    source_id = "stolyarova-1995-cao-alumina-kems"
+    name = "stolyarova-1995-cao-alumina-kems.yaml"
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    first = extract["species"]["Ca"]["observations"][0]["values"]["points"][0]
+    del first["composition_mol"]
+
+    root = tmp_path / "mutant"
+    extracts = root / "data" / "literature" / "extracts"
+    extracts.mkdir(parents=True)
+    (root / "data" / "literature" / "compilations").mkdir(parents=True)
+    (extracts / name).write_text(yaml.safe_dump(extract, sort_keys=False), encoding="utf-8")
+    (root / "data" / "literature" / "INDEX.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "literature_index.v1",
+                "sources": [
+                    {
+                        "source_id": source_id,
+                        "citation": extract["source"]["citation"],
+                        "doi": extract["source"].get("doi"),
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    mutated = next(
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == source_id
+        and "stolyarova_1995_ca_partial_pressure_table2::T=1933" in obs.observation_id
+        and obs.point_conditions["composition"].state.value.components[0][1]
+        == Decimal("0.143")
+    )
+    assert mutated.point_conditions["composition"].state.is_value
+    assert mutated.identity.composition.is_unknown
+
+
