@@ -198,6 +198,7 @@ def wall_deposit_candidate_for_surface_kg(
     from simulator.condensation import (
         DepositionInputRefusal,
         WallSaturationPressureRefusal,
+        UPSTREAM_PIPE_SEGMENT_NAME,
         _alpha_s_spec_from_entry,
         _deposition_finite_scalar,
         _flowing_species_partial_pressures_pa,
@@ -206,6 +207,7 @@ def wall_deposit_candidate_for_surface_kg(
         _reactive_product_backstop_authorized,
         _required_record_alpha_s,
         _series_resistance_deposition_flux_mol_m2_s,
+        _sio_wall_saturation_pressure_pa,
         _species_vapor_data,
         _transport_parameter_notice,
         _wall_alpha_record,
@@ -313,6 +315,20 @@ def wall_deposit_candidate_for_surface_kg(
             raise DepositionInputRefusal("P_local_pa", P_local_pa, "must be non-negative")
 
     rate_diagnostic: dict[str, Any] = {"status": "computed"}
+    sio_dew_pressure_pa = None
+    source_pressure = getattr(model, '_source_saturation_pressures_pa', {}).get('SiO')
+    if (
+        species == 'SiO' and segment_name == UPSTREAM_PIPE_SEGMENT_NAME
+        and source_pressure is not None and alpha_s > 0.0 and P_local_pa > 0.0
+        and wall_temperature_C >= melt_temperature_C
+    ):
+        # Prove the d-148 hot-wall zero; deliberately colder overrides retain
+        # the existing reactive-product model pending its thermochemistry ticket.
+        sio_dew_pressure_pa = _sio_wall_saturation_pressure_pa(
+            T_wall_K, melt_temperature_C + CELSIUS_TO_KELVIN_OFFSET,
+            source_pressure, vapor_pressure_data=model.vapor_pressure_data,
+            diagnostic_out=rate_diagnostic,
+        )
     if alpha_s == 0.0:
         # Only a declared/evaluated coefficient can prove a non-sticking zero.
         flux = 0.0
@@ -323,6 +339,14 @@ def wall_deposit_candidate_for_surface_kg(
         flux = 0.0
         rate_diagnostic["zero_reason"] = "computed_zero_species_partial_pressure"
         rate_diagnostic["zero_source"] = pressure_source_label
+    elif sio_dew_pressure_pa is not None and P_local_pa <= sio_dew_pressure_pa:
+        flux = 0.0
+        rate_diagnostic.update({
+            'zero_reason': 'same_source_sio_dew_margin',
+            'wall_saturation_pressure_pa': sio_dew_pressure_pa,
+            'wall_saturation_pressure_status': 'same_melt_reaction_and_source',
+            'wall_saturation_pressure_refused': False,
+        })
     else:
         try:
             gas_temperature_C = float(model.gas_temperature_C)

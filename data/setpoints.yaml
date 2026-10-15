@@ -1749,36 +1749,11 @@ overhead_headspace:
   temperature_model: "melt"
   temperature_offset_K: null
 
-  # Hot-wall liner trajectory. Scalar values hold a constant wall T; schedule
-  # entries linearly interpolate over campaign_hour. C2A/C2A_staged preheat
-  # before the >1400 C SiO release window so cold-wall fouling is explicit.
-  liner_temperature_C: &upstream_wall_schedule
-    default_C: 1500
-    schedule:
-      - campaign: ["C2A", "C2A_continuous"]
-        from_campaign_hour: 0
-        to_campaign_hour: 6
-        start_C: 1200
-        end_C: 1650
-      - campaign: ["C2A", "C2A_continuous"]
-        from_campaign_hour: 6
-        start_C: 1650
-        end_C: 1650
-      - campaign: ["C2A_STAGED", "C2A_staged"]
-        from_campaign_hour: 0
-        start_C: 1800
-        end_C: 1800
-      - campaign: ["C3", "C3_K", "C3_NA", "C4", "C5", "C6"]
-        from_campaign_hour: 0
-        start_C: 1500
-        end_C: 1500
-
-  # Per-pipe-segment wall schedule. Upstream segments stay hot until the
-  # designated condenser inlet; downstream segments follow condenser design T.
+  # Absent liner/upstream schedules track melt T through OverheadGasModel.
+  # Explicit scalar or recipe schedules still override that default. Keep
+  # the downstream design schedules independent of the furnace temperature.
   pipe_segment_temperatures_C:
-    default_C: 1500
     segments:
-      stage_0_to_stage_1: *upstream_wall_schedule
       stage_1_to_stage_2:
         default_C: 1500
         schedule:

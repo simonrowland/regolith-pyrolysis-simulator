@@ -417,6 +417,45 @@ def test_authoritative_bad_coating_fails_grounded_campaign_gate() -> None:
     ) in coating.detail
 
 
+def test_furnace_tracking_wall_clears_existing_coating_margin() -> None:
+    from simulator.condensation import CondensationModel, CondensationTrain
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import MeltState
+    from simulator.wall_deposition import wall_deposit_candidate_for_surface_kg
+
+    melt = MeltState(temperature_C=2100.0, campaign=CampaignPhase.C2A)
+    constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
+        ("hot_wall", "Fe"): ThresholdSpec(
+            id="test_hot_wall_capacity", value=0.001, units="kg",
+            source="engineering_envelope", source_ref="test coating capacity",
+        ),
+    })
+    margins = []
+    for config in ({"liner_temperature_C": 1500.0}, {}):
+        overhead = OverheadGasModel(config)
+        wall_C = overhead.resolve_pipe_temperature_C(melt)
+        model = CondensationModel(CondensationTrain.create_default())
+        model.configure_operating_conditions(
+            wall_temperature_C=wall_C, gas_temperature_C=melt.temperature_C,
+            overhead_pressure_mbar=10.0, species_partial_pressures_mbar={"Fe": 1.0},
+        )
+        deposit = wall_deposit_candidate_for_surface_kg(
+            model, species="Fe", rate_kg_hr=1.0, T_cond_C=1250.0,
+            melt_temperature_C=melt.temperature_C, wall_temperature_C=wall_C,
+            surface_area_m2=1.0, segment=model.pipe_segments[0],
+        )
+        trace = _trace(
+            condensed=({(1, "Fe"): 1.0 - deposit},),
+            wall=({("hot_wall", "Fe"): deposit},),
+            wall_deposit_sticking_authority=_wall_deposit_sticking_authority("Fe", cited=True),
+        )
+        margins.append(constraints.coating(trace))
+    assert margins[0].margin < 0.0
+    assert margins[1].margin >= 0.0
+    assert margins[1].feasible
+    assert margins[1].detail == "no wall deposit"
+
+
 def test_runner_fouling_report_binds_authoritative_coating_gate() -> None:
     trace = _valid_trace_object(
         wall_fouling_report={

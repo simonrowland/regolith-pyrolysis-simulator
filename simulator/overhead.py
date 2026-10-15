@@ -61,9 +61,9 @@ from simulator.state import (
     MeltState,
     OverheadGas,
 )
-# Single-source the pipe-temperature default from condensation (canonical
-# pipe-defaults home; cycle-safe — condensation doesn't import overhead) [BUG-052].
-from simulator.condensation import DEFAULT_PIPE_TEMPERATURE_C  # °C — default pipe/liner temperature
+# Initialization/downstream fallback; the upstream schedule is resolved here
+# from the live melt. Cycle-safe: condensation does not import overhead.
+from simulator.condensation import DEFAULT_PIPE_TEMPERATURE_C, UPSTREAM_PIPE_SEGMENT_NAME
 from engines.builtin.overhead_bleed import (
     EffectiveTransportCapacity,
     controlled_flow_capacity,
@@ -433,7 +433,7 @@ class OverheadGasModel:
         'conductance_kg_s': None,  # kg/s — finite-headspace bleed mass-flow override
         'conductance_kg_s_per_bar': None,  # deprecated compatibility alias; kg/s, not per-bar
         'downstream_pressure_bar': None,  # bar — downstream/reference pressure override
-        'liner_temperature_C': DEFAULT_PIPE_TEMPERATURE_C,  # °C — default liner/pipe wall temperature
+        'liner_temperature_C': None,  # absent upstream schedule tracks the melt
         'pipe_segment_temperatures_C': None,  # °C — per-pipe-segment wall temperature schedule
     }
 
@@ -459,7 +459,7 @@ class OverheadGasModel:
             for stage, source in DEFAULT_CONDENSER_STAGE_AREA_RATIO_SOURCES.items()
         }
         self._pipe_temperature_C = DEFAULT_PIPE_TEMPERATURE_C  # °C — active pipe/liner wall temperature
-        self._liner_temperature_config: Any = DEFAULT_PIPE_TEMPERATURE_C  # °C or schedule — liner temperature config
+        self._liner_temperature_config: Any = None  # °C or schedule — explicit liner temperature config
         self._pipe_segment_temperature_config: Any = None  # °C or mapping — per-segment wall temperature config
         self._degraded_path_engagement_recorder = (
             degraded_path_engagement_recorder
@@ -634,9 +634,8 @@ class OverheadGasModel:
         if self._conductance_override is None:
             self._conductance_override = merged.get('conductance_kg_s_per_bar')  # kg/s — deprecated compatibility alias
         self._downstream_pressure_override = merged.get('downstream_pressure_bar')  # bar or None — downstream pressure override
-        self._liner_temperature_config = merged.get(  # °C or schedule — liner temperature config
-            'liner_temperature_C',
-            merged.get('pipe_temperature_C', DEFAULT_PIPE_TEMPERATURE_C),
+        self._liner_temperature_config = config.get(
+            'liner_temperature_C', config.get('pipe_temperature_C'),
         )
         self._pipe_segment_temperature_config = merged.get(  # °C or mapping — per-segment wall temperature config
             'pipe_segment_temperatures_C',
@@ -664,7 +663,14 @@ class OverheadGasModel:
         base_C = self.resolve_pipe_temperature_C(melt)  # °C — scalar fallback pipe/liner wall temperature
         config = self._pipe_segment_temperature_config  # °C or mapping — segment temperature config
         if config in (None, ''):
-            return {str(name): base_C for name in segment_names}
+            return {
+                str(name): (
+                    base_C if name == UPSTREAM_PIPE_SEGMENT_NAME
+                    or self._liner_temperature_config is not None
+                    else DEFAULT_PIPE_TEMPERATURE_C
+                )
+                for name in segment_names
+            }
         if isinstance(config, (int, float)) or not isinstance(config, Mapping):
             value = self._resolve_liner_temperature_value(config, melt)  # °C — scalar segment wall temperature
             return {str(name): max(0.0, float(value)) for name in segment_names}
@@ -874,6 +880,18 @@ class OverheadGasModel:
         config: Any,
         melt: Optional[MeltState],
     ) -> float:
+        if config is None and melt is not None:
+            # d-148: p_i <= a_i*Psat_i(T_melt), a_i<=1. Monotone Psat gives
+            # Psat_i(T_wall)>=Psat_i(T_melt)>=p_i when T_wall>=T_melt.
+            # Both sides are Pa: no supersaturation at equal T; a colder wall
+            # can deposit. Dilution and pressure drop only increase margin.
+            # Fe sanity at C2A's 2100 C: the existing pure-component surface
+            # gives Psat=1537.63 Pa (15.3763 mbar), so p_i<=1537.63 Pa gives
+            # zero driving pressure at equal T. Hardware limits never cap T.
+            temperature_C = _required_finite_float(melt.temperature_C, 'melt.temperature_C')
+            if temperature_C <= -CELSIUS_TO_KELVIN_OFFSET:
+                raise OverheadConfigurationError('melt.temperature_C must be above absolute zero')
+            return temperature_C
         if is_declared_real_scalar(config) and isinstance(config, (int, float)):
             return float(config)
         if not isinstance(config, Mapping):

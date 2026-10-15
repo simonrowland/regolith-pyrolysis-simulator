@@ -1,7 +1,4 @@
-"""Green wall-schedule pins before the d-148 ownership refactor.
-
-These capture the pre-change numbers; they do not endorse cold upstream walls.
-"""
+"""Preserve downstream green schedule pins while d-148 heats upstream walls."""
 
 import pytest
 
@@ -25,7 +22,7 @@ def test_green_wall_schedule_pin(setpoints_data, campaign, hour, hot_C, downstre
     )
     names = tuple(f"stage_{number}_to_stage_{number + 1}" for number in range(7))
 
-    assert model.resolve_pipe_temperature_C(melt) == hot_C
+    assert model.resolve_pipe_temperature_C(melt) == melt.temperature_C
     assert model.resolve_pipe_segment_temperatures_C(names, melt) == dict(
-        zip(names, (hot_C,) * 4 + downstream_C)
+        zip(names, (melt.temperature_C,) + (hot_C,) * 3 + downstream_C)
     )

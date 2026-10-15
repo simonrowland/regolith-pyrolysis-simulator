@@ -159,6 +159,7 @@ DATA_DIR = Path(__file__).resolve().parent.parent / 'data'
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
 WALL_DEPOSIT_SEGMENT_ACCOUNTS = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
 DEFAULT_PIPE_TEMPERATURE_C = 1500.0
+UPSTREAM_PIPE_SEGMENT_NAME = 'stage_0_to_stage_1'
 DEFAULT_PIPE_DIAMETER_M = 0.12
 # N2_COLLISION_DIAMETER_M and the Knudsen flow-regime thresholds
 # (VISCOUS_KNUDSEN_MAX / FREE_MOLECULAR_KNUDSEN_MIN) are single-sourced in
@@ -2138,6 +2139,8 @@ class CondensationModel:
             float(wall_temperature_C))
         self.cold_spot_margin_C = COLD_SPOT_MARGIN_C
         self.upstream_hot_wall_min_C = DEFAULT_UPSTREAM_HOT_WALL_MIN_C
+        self._upstream_duct_material: Mapping[str, Any] = {}
+        self._source_saturation_pressures_pa: dict[str, float] = {}
         self.last_cold_spot_diagnostic: dict[str, Any] = {
             'has_cold_spot': False,
             'warnings': [],
@@ -2573,6 +2576,11 @@ class CondensationModel:
         """
         if not setpoints:
             return
+        self._upstream_duct_material = next(
+            (zone for zone in (setpoints.get('refractory_compatibility', {}) or {}).get('zones', ())
+             if zone.get('zone') == 'Stage 0 hot duct'),
+            {},
+        )
         self.upstream_hot_wall_min_C = _stage0_hot_wall_min_C_from_setpoints(
             setpoints,
             default_C=self.upstream_hot_wall_min_C,
@@ -2633,6 +2641,48 @@ class CondensationModel:
                     f"finite ({value!r}); refusing rather than skipping."
                 )
             self.condensation_temperatures_C[name] = T_C
+
+    def _upstream_wall_temperature_notices(self, melt: MeltState) -> list[dict[str, Any]]:
+        notices: list[dict[str, Any]] = []
+        stage0 = next((stage for stage in self.train.stages if stage.stage_number == 0), None)
+        surface = {} if stage0 is None else _stage_material_config(stage0, self.materials)
+        for segment in self.pipe_segments:
+            if (
+                segment.name != UPSTREAM_PIPE_SEGMENT_NAME
+                or segment.name in self.wall_temperature_input_refusals
+            ):
+                continue
+            wall_C = float(segment.wall_temperature_C)
+            if wall_C < float(melt.temperature_C):
+                notices.append({
+                    'type': 'UpstreamWallCoatingRisk',
+                    'segment': segment.name,
+                    'wall_temperature_C': wall_C,
+                    'melt_temperature_C': float(melt.temperature_C),
+                    'reason': 'explicit colder upstream wall; deliberate coating risk',
+                })
+            # The mandate's Fe bake-off duty (~1775 C at 1 mbar) already
+            # exceeds the stated Doloma-REE duct rating. Report the duct and
+            # Stage 0 surface ratings separately; neither is a thermal clamp.
+            for constraint, material, key, source in (
+                ('hot_duct', self._upstream_duct_material, 'max_T_C',
+                 'data/setpoints.yaml:refractory_compatibility.zones[Stage 0 hot duct]'),
+                ('stage_0_surface', surface, 'max_service_T_C', 'data/materials.yaml:stages.0'),
+            ):
+                limit = material.get(key)
+                if limit is not None:
+                    limit = _deposition_finite_scalar(f'{constraint}.{key}', limit)
+                if limit is not None and wall_C > limit:
+                    notices.append({
+                        'type': 'UpstreamWallMaterialLimitExceeded',
+                        'segment': segment.name,
+                        'constraint': constraint,
+                        'wall_temperature_C': wall_C,
+                        'limit_C': float(limit),
+                        'material': material.get('material', material.get('liner_material')),
+                        'source': source,
+                    })
+        return notices
 
     def _build_default_pipe_segments(
         self,
@@ -2981,6 +3031,10 @@ class CondensationModel:
             vapor_pressure_data=self.vapor_pressure_data,
             species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
         )
+        diagnostic['wall_temperature_notices'] = self._upstream_wall_temperature_notices(melt)
+        if self.operating_history:
+            self.operating_history[-1]['wall_temperature_notices'] = copy.deepcopy(
+                diagnostic['wall_temperature_notices'])
         self.last_cold_spot_diagnostic = copy.deepcopy(diagnostic)
         self.cold_spot_history.append(copy.deepcopy(diagnostic))
         cold_spot_warnings = tuple(diagnostic.get('warnings', ()))
@@ -6610,6 +6664,44 @@ def _wall_antoine_temperature_relation(
         if T_surface_K > high_K:
             return "above"
     return None
+
+
+def _sio_wall_saturation_pressure_pa(
+    wall_temperature_K: float,
+    melt_temperature_K: float,
+    source_saturation_pressure_pa: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any],
+    diagnostic_out: MutableMapping[str, Any] | None = None,
+) -> float:
+    """Reverse the existing melt-side SiO reaction with identical activities."""
+    catalog = _condensation_catalog(
+        vapor_pressure_data, _authoritative_vapour_catalog_payload(vapor_pressure_data),
+    )
+    evaluator = catalog.evaluator_for_hot_train('SiO')
+    # Same SiO2(l)=SiO+0.5O2 source on both sides: P=K(T)*a/sqrt(pO2).
+    # Holding a and pO2 fixed gives P_wall/P_melt=K(T_wall)/K(T_melt).
+    # Evaluate at explicit unit activity and the source reference pO2 so
+    # those dimensionless factors cancel, without inventing wall chemistry.
+    # Units: Pa*(Pa/Pa)=Pa. Equal T yields an exactly unit ratio, hence no
+    # driving force for a saturated stream at ANY pO2. This is a dew check,
+    # not a 2SiO->Si+SiO2 disproportionation/product-activity evaluator.
+    reference = dict(source_activity=1.0, pO2_bar=evaluator.pO2_reference_bar)
+    melt_evaluation = evaluator.evaluate(melt_temperature_K, **reference)
+    wall_evaluation = evaluator.evaluate(wall_temperature_K, **reference)
+    if diagnostic_out is not None and (melt_evaluation.out_of_range or wall_evaluation.out_of_range):
+        diagnostic_out['wall_saturation_pressure_notice'] = {
+            'status': 'extrapolated',
+            'authority_level': 'extrapolated',
+            'reason': 'same_source_sio_dew_outside_source_band',
+            'temperature_K': wall_temperature_K,
+            'melt_temperature_K': melt_temperature_K,
+            'valid_range_K': evaluator.valid_temperature_K,
+        }
+    source_pressure = _finite_nonnegative_value(
+        source_saturation_pressure_pa, label='source_saturation_pressure_pa',
+    )
+    return source_pressure * (wall_evaluation.pressure_pa / melt_evaluation.pressure_pa)
 
 
 def _wall_deposition_driving_pressure_pa(

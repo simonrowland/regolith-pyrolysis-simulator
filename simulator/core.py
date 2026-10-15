@@ -3657,6 +3657,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             campaign_name=getattr(self.melt.campaign, 'name', ''),
             campaign_hour=float(self.melt.campaign_hour),
         )
+        self.condensation_model._source_saturation_pressures_pa = dict(
+            (getattr(self, '_last_vapour_batch_flux_overlay', {}) or {})
+            .get('selected_runtime_pa_by_species', {})
+        )
 
     def _apply_c2a_knudsen_pressure_adjustment(self) -> None:
         if self.melt.campaign not in (
