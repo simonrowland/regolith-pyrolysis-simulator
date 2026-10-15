@@ -953,7 +953,6 @@ def _high_t_activity_for_parent(
                 else fallback_warning
             ),
             evidence_tier="PREDICT_AND_FLAG",
-            authority_status="extrapolated",
         )
     if authority.get("provider") != "openimcc":
         return legacy
@@ -1099,7 +1098,6 @@ def _attach_high_t_activity_provenance(
         else:
             provenance["melt_activity_authority"] = provider
             provenance["melt_activity_fallback"] = True
-            provenance["melt_oxide_activity_authority_status"] = "extrapolated"
             provenance["openimcc_refusal"] = fallback_reason
             token = "openimcc_refused_constant_gamma_fallback"
             if fallback_reason.get("code"):
