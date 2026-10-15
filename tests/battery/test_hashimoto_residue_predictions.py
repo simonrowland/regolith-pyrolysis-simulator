@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 import math
 from pathlib import Path
 
@@ -521,3 +522,16 @@ def test_hashimoto_primary_policy_cannot_choose_the_arm_closest_to_residues(
         _HASHIMOTO_PRIMARY_ALPHA_ARM,
         _HASHIMOTO_PRIMARY_GEOMETRY,
     )
+
+
+def test_ferric_model_residue_is_compared_on_the_printed_feot_basis():
+    from simulator.accounting import resolve_species_formula
+    from simulator.fe_redox import split_feot_composition, RedoxState
+    from simulator.battery.residue import _hashimoto_project_oxide_wt_pct
+
+    printed = {'SiO2': 80.0, 'FeO': 20.0}
+    split = split_feot_composition(printed, 1873.15,
+        redox_state=RedoxState.absolute(-9.0))['composition_wt_pct']
+    inventory = {k: v / resolve_species_formula(k).molar_mass_g_per_mol()
+                 for k, v in split.items()}
+    assert _hashimoto_project_oxide_wt_pct(inventory) == pytest.approx(printed, abs=2e-14)
