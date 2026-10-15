@@ -1,0 +1,613 @@
+schema_version: literature_extract.v1
+source_id: adamkovicova-1980-casio3-heat-of-fusion
+source:
+  citation: 'Adamkovičová, K., Kosa, L. & Proks, I. (1980), "The Heat of Fusion of CaSiO3", Silikáty XXIV, 193–201.'
+  doi: null
+  url: https://www2.irsm.cas.cz/materialy/cs_content/1980/Adamkovicova_CS_1980_0000.pdf
+  year: 1980
+extraction:
+  method: manual_transcription_checked_against_all_nine_page_images
+  date: '2026-10-03'
+  worker: t1115-adamkovicova1980
+  provenance_path: text/adamkovicova-1980-casio3-heat-of-fusion/pdftotext-layout.txt
+  source_note: >-
+    Every page was rendered with pdftoppm at 180 dpi and visually read; all numeric
+    table entries were checked against their page images. The paper has three data
+    tables, all transcribed in tables/adamkovicova-1980-casio3-heat-of-fusion/.
+    Temperatures are K as printed. Energies and heat capacities are kJ mol−1 and
+    kJ mol−1 K−1 per mole of CaSiO3 formula units as printed; no unit conversion
+    was made. Hrel is defined at 298 K by Eq. (1), Hrel = −(ΔHcool + ΔHsol).
+    The sidecar licence field is empty: the paper and the controller's archive-fetch
+    metadata provide no licence statement.
+  method_token_note: >-
+    The paper reports drop calorimetry and solution calorimetry. Neither has an
+    experiment MethodToken; the two experiments retain typed unknown method States
+    with the published method names. No enum value was added.
+review_status: draft
+benches:
+  - id: adamkovicova-drop-calorimeter
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: drop calorimeter}
+      locator: {published_page: 194, section: Experimental}
+    method:
+      state: {tag: value, value: drop calorimetry}
+      locator: {published_page: 194, section: Experimental}
+    cell_material_and_liner:
+      state: {tag: unknown, reason: in_cited_source}
+      locator: {published_page: 194, section: Experimental, note: 'The authors refer to [10] for calorimeter description and procedure; container material is not stated here.'}
+    temperature_measurement:
+      state: {tag: unknown, reason: in_cited_source}
+      locator: {published_page: 194, section: Experimental, note: 'The authors refer to [10] for apparatus and procedure; temperature instrument and uncertainty are not stated here.'}
+    temperature_calibration:
+      state: {tag: unknown, reason: in_cited_source}
+      locator: {published_page: 194, section: Experimental, note: 'No temperature-calibration details are given here; the authors refer to [10].'}
+    other_facts:
+      - name: reference_temperature_K
+        unit: K
+        value:
+          state: {tag: value, value: {kind: point, point: '298'}}
+          locator: {published_page: 194, section: Experimental, note: 'Cooling enthalpy is from T to 298 K.'}
+      - name: heat_calibration_material
+        unit: as_published
+        value:
+          state: {tag: unknown, reason: in_cited_source}
+          locator: {published_page: 194, section: Experimental, note: 'Calorimeter calibration is not described here; the authors refer to [10].'}
+  - id: adamkovicova-solution-calorimeter
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: solution calorimeter}
+      locator: {published_page: 194, section: Experimental}
+    method:
+      state: {tag: value, value: solution calorimetry}
+      locator: {published_page: 194, section: Experimental}
+    cell_material_and_liner:
+      state: {tag: unknown, reason: in_cited_source}
+      locator: {published_page: 194, section: Experimental, note: 'The authors refer to [11] for calorimeter description and procedure; container material is not stated here.'}
+    temperature_measurement:
+      state: {tag: unknown, reason: in_cited_source}
+      locator: {published_page: 194, section: Experimental, note: 'The authors refer to [11] for apparatus and procedure; temperature instrument and uncertainty are not stated here.'}
+    temperature_calibration:
+      state: {tag: unknown, reason: in_cited_source}
+      locator: {published_page: 194, section: Experimental, note: 'No temperature-calibration details are given here; the authors refer to [11].'}
+    other_facts:
+      - name: calorimeter_medium_as_printed
+        unit: as_published
+        value:
+          state: {tag: value, value: {kind: categorical, categorical: 'concentrated HF and HNO3 (2:1)'}}
+          locator: {published_page: 194, section: Experimental, note: 'One mole of phase was dissolved in this mixture at 298 K.'}
+      - name: reference_temperature_K
+        unit: K
+        value:
+          state: {tag: value, value: {kind: point, point: '298'}}
+          locator: {published_page: 194, section: Experimental, note: 'Heat of solution measured at 298 K.'}
+      - name: heat_calibration_material
+        unit: as_published
+        value:
+          state: {tag: unknown, reason: in_cited_source}
+          locator: {published_page: 194, section: Experimental, note: 'Calorimeter calibration is not described here; the authors refer to [11].'}
+experiments:
+  - experiment_id: adamkovicova-pseudowollastonite-drop-series
+    bench_id: adamkovicova-drop-calorimeter
+    method: {tag: unknown, reason: 'unmapped published method: drop calorimetry'}
+    method_as_published: drop calorimetry
+    locator: {published_page: 195, section: Experimental, table: I}
+    sample:
+      mass_g:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 195, section: Experimental, table: I}
+      form:
+        state: {tag: value, value: pseudowollastonite}
+        locator: {published_page: 195, section: Experimental}
+      characterization:
+        state: {tag: value, value: 'Prepared from a precursor with molar CaO:SiO2 = 1:1; the precursor was heated 8 h at about 1670 K; pure pseudowollastonite was confirmed by X-ray phase analysis and IR spectroscopy. After drop-calorimeter measurements, X-ray phase analysis found no transformation to β-wollastonite.'}
+        locator: {published_page: 195, section: Experimental}
+      pretreatment:
+        state: {tag: value, value: 'precursor heated 8 h at about 1670 K'}
+        locator: {published_page: 195, section: Experimental}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: in_cited_source}
+        locator: {published_page: 194, section: Experimental, note: 'Drop-calorimeter atmosphere and pressure are not stated here; apparatus details are referred to [10].'}
+      sweep_gas:
+        state: {tag: unknown, reason: in_cited_source}
+        locator: {published_page: 194, section: Experimental, note: 'No sweep gas is stated; apparatus details are referred to [10].'}
+      regime:
+        regime_class: {tag: unknown, reason: in_cited_source}
+    conditions:
+      temperature_K:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 195, table: I, note: 'Individual sample temperatures are transcribed in the observation points; no single series setpoint applies.'}
+  - experiment_id: adamkovicova-pseudowollastonite-solution-series
+    bench_id: adamkovicova-solution-calorimeter
+    method: {tag: unknown, reason: 'unmapped published method: solution calorimetry'}
+    method_as_published: solution calorimetry
+    locator: {published_page: 196, section: Experimental, table: II}
+    sample:
+      mass_g:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 196, table: II}
+      form:
+        state: {tag: value, value: pseudowollastonite}
+        locator: {published_page: 196, section: Experimental}
+      characterization:
+        state: {tag: value, value: 'Same pseudowollastonite sample used for the drop-calorimeter measurements; pure phase confirmed by X-ray phase analysis and IR spectroscopy.'}
+        locator: {published_page: 196, section: Experimental}
+    conditions:
+      temperature_K:
+        state: {tag: value, value: {kind: point, point: '298'}}
+        locator: {published_page: 194, section: Experimental}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 194, section: Experimental, note: 'No solution-calorimeter pressure is stated.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 194, section: Experimental, note: 'Solution calorimetry in liquid solvent; no sweep gas applies.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+  - experiment_id: adamkovicova-melt-drop-series
+    bench_id: adamkovicova-drop-calorimeter
+    method: {tag: unknown, reason: 'unmapped published method: drop calorimetry'}
+    method_as_published: drop calorimetry
+    locator: {published_page: 196, section: Experimental, table: III}
+    sample:
+      mass_g:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 196, table: III}
+      form:
+        state: {tag: value, value: CaSiO3 melt}
+        locator: {published_page: 196, table: III}
+      characterization:
+        state: {tag: value, value: 'Melt prepared by fusing pseudowollastonite; a CaSiO3 glass precursor was prepared by quenching this melt.'}
+        locator: {published_page: 195, section: Experimental}
+      pretreatment:
+        state: {tag: value, value: 'pseudowollastonite fused and heated 4 h at about 1870 K; melt quenched to make the CaSiO3 glass precursor'}
+        locator: {published_page: 195, section: Experimental}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: in_cited_source}
+        locator: {published_page: 194, section: Experimental, note: 'Drop-calorimeter atmosphere and pressure are not stated here; apparatus details are referred to [10].'}
+      sweep_gas:
+        state: {tag: unknown, reason: in_cited_source}
+        locator: {published_page: 194, section: Experimental, note: 'No sweep gas is stated; apparatus details are referred to [10].'}
+      regime:
+        regime_class: {tag: unknown, reason: in_cited_source}
+    conditions:
+      temperature_K:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 196, table: III, note: 'Individual sample temperatures are transcribed in the observation points; no single series setpoint applies.'}
+  - experiment_id: adamkovicova-melt-solution-series
+    bench_id: adamkovicova-solution-calorimeter
+    method: {tag: unknown, reason: 'unmapped published method: solution calorimetry'}
+    method_as_published: solution calorimetry
+    locator: {published_page: 196, section: Experimental, table: III}
+    sample:
+      mass_g:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 196, table: III}
+      form:
+        state: {tag: value, value: 'CaSiO3 melt sample, represented by the glass produced on cooling'}
+        locator: {published_page: 194, section: Experimental}
+      characterization:
+        state: {tag: value, value: 'CaSiO3 melt prepared by fusing pseudowollastonite; the corresponding glass precursor was obtained by quenching.'}
+        locator: {published_page: 195, section: Experimental}
+    conditions:
+      temperature_K:
+        state: {tag: value, value: {kind: point, point: '298'}}
+        locator: {published_page: 194, section: Experimental}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 194, section: Experimental, note: 'No solution-calorimeter pressure is stated.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 194, section: Experimental, note: 'Solution calorimetry in liquid solvent; no sweep gas applies.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+species:
+  CaSiO3:
+    observations:
+      - observation_id: adamkovicova_1980_table1_solid_cooling_measured
+        experiment: adamkovicova-pseudowollastonite-drop-series
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 195, pdf_page_index: 3, table: I}
+        T_range_K: [1506, 1780]
+        phase: crystalline_pseudowollastonite_alpha_wollastonite
+        condensed_form: {polymorph: alpha}
+        polymorph_notes: 'The authors identify the solid as α-wollastonite (pseudowollastonite); no more specific pseudowollastonite enum token exists.'
+        standard_state: 'Cooling enthalpy from each stated T to 298 K; values are per mole of CaSiO3.'
+        units: 'T in K; enthalpy in kJ mol−1 CaSiO3'
+        values:
+          quantity: negative_enthalpy_change_on_cooling
+          method_class: measured_direct
+          table_csv: tables/adamkovicova-1980-casio3-heat-of-fusion/t1.csv
+          sign_convention: 'Table I prints ΔHcool without a leading minus; the discussion and Eq. (3) use −ΔHcool and positive magnitudes.'
+          points:
+            - {T_K: 1506, delta_Hcool_kJ_mol-1_as_printed: 139.6, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1576, delta_Hcool_kJ_mol-1_as_printed: 150.6, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1630, delta_Hcool_kJ_mol-1_as_printed: 157.1, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1678, delta_Hcool_kJ_mol-1_as_printed: 165.0, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1730, delta_Hcool_kJ_mol-1_as_printed: 173.9, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1780, delta_Hcool_kJ_mol-1_as_printed: 183.3, point_uncertainty_status: not_reported_individually}
+        uncertainty: {reported_status: not_reported_for_individual_points, note: 'The paper reports 1.1 kJ mol−1 as the regression error for Eq. (3), not as a per-point uncertainty.'}
+
+      - observation_id: adamkovicova_1980_table2_solid_solution_heats_measured
+        experiment: adamkovicova-pseudowollastonite-solution-series
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 196, pdf_page_index: 4, table: II}
+        T_range_K: [298, 298]
+        phase: crystalline_pseudowollastonite_alpha_wollastonite
+        condensed_form: {polymorph: alpha}
+        polymorph_notes: 'The authors identify the solid as α-wollastonite (pseudowollastonite).'
+        standard_state: 'Heat of solution in concentrated HF:HNO3 (2:1) at 298 K; per mole of CaSiO3.'
+        units: 'T in K; enthalpy in kJ mol−1 CaSiO3'
+        values:
+          quantity: heat_of_solution
+          method_class: measured_direct
+          table_csv: tables/adamkovicova-1980-casio3-heat-of-fusion/t2.csv
+          sign_convention: 'Table II lists positive values; the authors report the mean as −ΔHsol = 309.2 ± 1.8 kJ mol−1.'
+          points:
+            - {measurement: 1, T_K: 298, delta_Hsol_kJ_mol-1_as_printed: 311.1, point_uncertainty_status: not_reported_individually}
+            - {measurement: 2, T_K: 298, delta_Hsol_kJ_mol-1_as_printed: 310.4, point_uncertainty_status: not_reported_individually}
+            - {measurement: 3, T_K: 298, delta_Hsol_kJ_mol-1_as_printed: 308.3, point_uncertainty_status: not_reported_individually}
+            - {measurement: 4, T_K: 298, delta_Hsol_kJ_mol-1_as_printed: 307.6, point_uncertainty_status: not_reported_individually}
+            - {measurement: 5, T_K: 298, delta_Hsol_kJ_mol-1_as_printed: 310.7, point_uncertainty_status: not_reported_individually}
+            - {measurement: 6, T_K: 298, delta_Hsol_kJ_mol-1_as_printed: 307.3, point_uncertainty_status: not_reported_individually}
+          reported_mean_minus_delta_Hsol_kJ_mol-1: 309.2
+          reported_mean_uncertainty_kJ_mol-1: 1.8
+          reported_mean_reliability: 0.95
+          single_measurement_mean_relative_error: 0.014
+        uncertainty: {reported_status: printed, individual_points: not_reported, mean_kJ_mol-1: 1.8, confidence: 'reliability coefficient (1−α) = 0.95'}
+
+      - observation_id: adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 195, pdf_page_index: 3, table: I}
+        T_range_K: [1506, 1780]
+        phase: crystalline_pseudowollastonite_alpha_wollastonite
+        condensed_form: {polymorph: alpha}
+        polymorph_notes: 'The authors identify the solid as α-wollastonite (pseudowollastonite).'
+        standard_state: 'Relative enthalpy Hrel defined by Eq. (1), from T to the 298 K reference.'
+        units: 'T in K; Hrel in kJ mol−1 CaSiO3'
+        values:
+          quantity: relative_enthalpy
+          method_class: measured_reduced
+          table_csv: tables/adamkovicova-1980-casio3-heat-of-fusion/t1.csv
+          points:
+            - {T_K: 1506, H_rel_kJ_mol-1: 448.8, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1576, H_rel_kJ_mol-1: 459.8, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1630, H_rel_kJ_mol-1: 466.3, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1678, H_rel_kJ_mol-1: 474.2, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1730, H_rel_kJ_mol-1: 483.1, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1780, H_rel_kJ_mol-1: 492.5, point_uncertainty_status: not_reported_individually}
+          derivation:
+            relation: 'Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution heat.'
+            inputs: [adamkovicova_1980_table1_solid_cooling_measured, adamkovicova_1980_table2_solid_solution_heats_measured]
+          derived_from: [adamkovicova_1980_table1_solid_cooling_measured, adamkovicova_1980_table2_solid_solution_heats_measured]
+        uncertainty: {reported_status: not_reported_for_individual_points, note: 'The fitted relative-enthalpy function in Eq. (6) has a stated error of 2.1 kJ mol−1.'}
+
+      - observation_id: adamkovicova_1980_solid_cooling_fit_eq3
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 195, pdf_page_index: 3, equation: '3', table: I}
+        T_range_K: [1506, 1780]
+        phase: crystalline_pseudowollastonite_alpha_wollastonite
+        condensed_form: {polymorph: alpha}
+        units: 'T in K; enthalpy in kJ mol−1 CaSiO3'
+        values:
+          quantity: fitted_enthalpy_of_cooling
+          method_class: measured_reduced
+          equation_as_printed: '−ΔHcool,CS,c,φ = −2.15 × 10^1 + 6.358 × 10^−2 T + 2.862 × 10^−5 T^2 [kJ mol−1]'
+          fit_error_kJ_mol-1: 1.1
+          fit_error_note: 'Eq. (2) error definition: half-width of the 95% reliability interval, approximately twice the Gaussian standard deviation.'
+          fit_points:
+            - {T_K: 1506, minus_delta_Hcool_kJ_mol-1: 139.2}
+            - {T_K: 1576, minus_delta_Hcool_kJ_mol-1: 149.8}
+            - {T_K: 1630, minus_delta_Hcool_kJ_mol-1: 158.2}
+            - {T_K: 1678, minus_delta_Hcool_kJ_mol-1: 165.8}
+            - {T_K: 1730, minus_delta_Hcool_kJ_mol-1: 174.2}
+            - {T_K: 1780, minus_delta_Hcool_kJ_mol-1: 182.4}
+          derivation:
+            relation: 'Least-squares regression of measured pseudowollastonite cooling enthalpies, with ΔHcool = 0 at 298 K, Eq. (3).'
+            inputs: [adamkovicova_1980_table1_solid_cooling_measured]
+          derived_from: [adamkovicova_1980_table1_solid_cooling_measured]
+        uncertainty: {reported_status: printed, value_kJ_mol-1: 1.1}
+
+      - observation_id: adamkovicova_1980_solid_relative_enthalpy_fit_eq6
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 196, pdf_page_index: 4, equation: '6', table: I}
+        T_range_K: [1506, 1780]
+        phase: crystalline_pseudowollastonite_alpha_wollastonite
+        condensed_form: {polymorph: alpha}
+        standard_state: 'Relative enthalpy Hrel defined at 298 K by Eq. (1).'
+        units: 'T in K; Hrel in kJ mol−1 CaSiO3'
+        values:
+          quantity: fitted_relative_enthalpy
+          method_class: measured_reduced
+          equation_as_printed: 'Hrel,CS,c,φ′ = 2.877 × 10^2 + 6.358 × 10^−2 T + 2.862 × 10^−5 T^2 [kJ mol−1]'
+          fit_error_kJ_mol-1: 2.1
+          fit_points:
+            - {T_K: 1506, H_rel_kJ_mol-1: 448.4}
+            - {T_K: 1576, H_rel_kJ_mol-1: 459.0}
+            - {T_K: 1630, H_rel_kJ_mol-1: 467.4}
+            - {T_K: 1678, H_rel_kJ_mol-1: 475.0}
+            - {T_K: 1730, H_rel_kJ_mol-1: 483.4}
+            - {T_K: 1780, H_rel_kJ_mol-1: 491.6}
+          derivation:
+            relation: 'Add the Eq. (3) fitted cooling enthalpy and mean solution enthalpy from Eq. (5) under the Eq. (1) reference-state definition.'
+            inputs: [adamkovicova_1980_solid_cooling_fit_eq3, adamkovicova_1980_table2_solid_solution_heats_measured]
+          derived_from: [adamkovicova_1980_solid_cooling_fit_eq3, adamkovicova_1980_table2_solid_solution_heats_measured]
+        uncertainty: {reported_status: printed, value_kJ_mol-1: 2.1}
+
+      - observation_id: adamkovicova_1980_solid_heat_capacity_eq4
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 196, pdf_page_index: 4, equation: '4'}
+        T_range_K: [1506, 1780]
+        phase: crystalline_pseudowollastonite_alpha_wollastonite
+        condensed_form: {polymorph: alpha}
+        units: 'T in K; molar heat capacity in kJ mol−1 K−1 CaSiO3'
+        values:
+          quantity: molar_heat_capacity
+          method_class: measured_reduced
+          equation_as_printed: 'C_Cs,c,φ = 6.358 × 10^−2 + 5.724 × 10^−5 T [kJ mol−1 K−1]'
+          derivation:
+            relation: 'Authors obtain Eq. (4) from the temperature derivative of the Eq. (3) fitted cooling enthalpy.'
+            inputs: [adamkovicova_1980_solid_cooling_fit_eq3]
+          derived_from: [adamkovicova_1980_solid_cooling_fit_eq3]
+        uncertainty: {reported_status: not_reported}
+
+      - observation_id: adamkovicova_1980_table3_melt_cooling_measured
+        experiment: adamkovicova-melt-drop-series
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 196, pdf_page_index: 4, table: III}
+        T_range_K: [1829, 1961]
+        phase: CaSiO3_melt
+        polymorph_notes: 'The authors formed the melt by fusing pseudowollastonite; the liquid has no condensed polymorph.'
+        standard_state: 'Cooling enthalpy from each stated T to 298 K; values are per mole of CaSiO3.'
+        units: 'T in K; enthalpy in kJ mol−1 CaSiO3'
+        values:
+          quantity: negative_enthalpy_change_on_cooling
+          method_class: measured_direct
+          table_csv: tables/adamkovicova-1980-casio3-heat-of-fusion/t3.csv
+          sign_convention: 'Table III explicitly prints −ΔHcool as positive values.'
+          points:
+            - {T_K: 1829, minus_delta_Hcool_kJ_mol-1: 217.1, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1848, minus_delta_Hcool_kJ_mol-1: 219.9, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1859, minus_delta_Hcool_kJ_mol-1: 222.2, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1915, minus_delta_Hcool_kJ_mol-1: 230.5, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1961, minus_delta_Hcool_kJ_mol-1: 238.9, point_uncertainty_status: not_reported_individually}
+        uncertainty: {reported_status: not_reported_for_individual_points, note: 'The authors state that individual ΔHcool errors for melt cannot be determined separately.'}
+
+      - observation_id: adamkovicova_1980_table3_melt_solution_means_measured
+        experiment: adamkovicova-melt-solution-series
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 196, pdf_page_index: 4, table: III}
+        T_range_K: [1829, 1961]
+        phase: CaSiO3_melt_sample_solution_heat
+        standard_state: 'Heat of solution in concentrated HF:HNO3 (2:1) at 298 K; per mole of CaSiO3.'
+        units: 'sample T in K; solution enthalpy in kJ mol−1 CaSiO3'
+        values:
+          quantity: mean_negative_heat_of_solution
+          method_class: measured_direct
+          table_csv: tables/adamkovicova-1980-casio3-heat-of-fusion/t3.csv
+          note: 'Table III reports the mean heat of solution for each melt sample; the printed text says these are mean values of measurements but does not establish a replicate count.'
+          sign_convention: 'Table III explicitly prints −ΔHsol as positive values.'
+          points:
+            - {T_K: 1829, minus_delta_Hsol_kJ_mol-1: 340.5, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1848, minus_delta_Hsol_kJ_mol-1: 339.5, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1859, minus_delta_Hsol_kJ_mol-1: 339.0, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1915, minus_delta_Hsol_kJ_mol-1: 337.3, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1961, minus_delta_Hsol_kJ_mol-1: 339.0, point_uncertainty_status: not_reported_individually}
+        uncertainty: {reported_status: not_reported_for_individual_points, note: 'The authors state that individual ΔHsol errors for melt cannot be determined separately.'}
+
+      - observation_id: adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 196, pdf_page_index: 4, table: III}
+        T_range_K: [1829, 1961]
+        phase: CaSiO3_melt
+        standard_state: 'Relative enthalpy Hrel defined by Eq. (1), from T to the 298 K reference.'
+        units: 'T in K; Hrel in kJ mol−1 CaSiO3'
+        values:
+          quantity: relative_enthalpy
+          method_class: measured_reduced
+          table_csv: tables/adamkovicova-1980-casio3-heat-of-fusion/t3.csv
+          points:
+            - {T_K: 1829, H_rel_kJ_mol-1: 557.6, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1848, H_rel_kJ_mol-1: 559.4, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1859, H_rel_kJ_mol-1: 561.2, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1915, H_rel_kJ_mol-1: 567.8, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1961, H_rel_kJ_mol-1: 577.9, point_uncertainty_status: not_reported_individually}
+          derivation:
+            relation: 'Hrel = −(ΔHcool + ΔHsol), Eq. (1); Table III reports the sums of its cooling and mean solution-heat columns.'
+            inputs: [adamkovicova_1980_table3_melt_cooling_measured, adamkovicova_1980_table3_melt_solution_means_measured]
+          derived_from: [adamkovicova_1980_table3_melt_cooling_measured, adamkovicova_1980_table3_melt_solution_means_measured]
+        uncertainty: {reported_status: not_reported_for_individual_points, note: 'The fitted relative-enthalpy function in Eq. (7) has a stated error of 2.0 kJ mol−1.'}
+
+      - observation_id: adamkovicova_1980_melt_relative_enthalpy_fit_eq7
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 197, pdf_page_index: 5, equation: '7', table: III}
+        T_range_K: [1829, 1961]
+        phase: CaSiO3_melt
+        standard_state: 'Relative enthalpy Hrel defined at 298 K by Eq. (1).'
+        units: 'T in K; Hrel in kJ mol−1 CaSiO3'
+        values:
+          quantity: fitted_relative_enthalpy
+          method_class: measured_reduced
+          equation_as_printed: 'Hrel,CS,m,φ = 2.827 × 10^2 + 1.4985 × 10^−1 T [kJ mol−1]'
+          fit_error_kJ_mol-1: 2.0
+          fit_points:
+            - {T_K: 1829, H_rel_kJ_mol-1: 556.8}
+            - {T_K: 1848, H_rel_kJ_mol-1: 559.6}
+            - {T_K: 1859, H_rel_kJ_mol-1: 561.3}
+            - {T_K: 1915, H_rel_kJ_mol-1: 569.7}
+            - {T_K: 1961, H_rel_kJ_mol-1: 576.6}
+          derivation:
+            relation: 'Least-squares regression of the measured melt relative enthalpy values in Table III, Eq. (7).'
+            inputs: [adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced]
+          derived_from: [adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced]
+        uncertainty: {reported_status: printed, value_kJ_mol-1: 2.0}
+
+      - observation_id: adamkovicova_1980_melt_heat_capacity_stated
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 198, pdf_page_index: 6, section: Discussion, equation: '7'}
+        T_range_K: [1829, 1961]
+        phase: CaSiO3_melt
+        units: 'kJ mol−1 K−1 CaSiO3'
+        values:
+          quantity: molar_heat_capacity
+          method_class: measured_reduced
+          value_kJ_mol-1_K-1: 1.4985e-1
+          as_printed: 'C_CS,m,φ = 1.4985 × 10^−1 kJ mol−1 K−1; constant within the framework of errors over 1829–1961 K.'
+          derivation:
+            relation: 'The authors identify the Eq. (7) linear relative-enthalpy slope as the melt molar heat capacity; this is their stated value, not a new calculation.'
+            inputs: [adamkovicova_1980_melt_relative_enthalpy_fit_eq7]
+          derived_from: [adamkovicova_1980_melt_relative_enthalpy_fit_eq7]
+        uncertainty: {reported_status: not_reported}
+
+      - observation_id: adamkovicova_1980_heat_of_fusion_at_1817K
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 197, pdf_page_index: 5, equation: '8', figure: '1'}
+        T_range_K: [1817, 1817]
+        phase: pseudowollastonite_to_CaSiO3_melt
+        polymorph_notes: 'The authors state congruent melting of CaSiO3 at 1817 K and identify the crystalline phase as pseudowollastonite (α-wollastonite).'
+        standard_state: 'Heat of fusion per mole of CaSiO3 at the equilibrium fusion temperature stated by the authors.'
+        units: 'kJ mol−1 CaSiO3; K'
+        values:
+          quantity: heat_of_fusion
+          method_class: measured_reduced
+          delta_H_fus_kJ_mol-1: 57.3
+          uncertainty_kJ_mol-1: 2.9
+          T_fus_K: 1817
+          T_fus_uncertainty_status: not_reported
+          entropy_of_fusion_J_mol-1_K-1: 31.5
+          entropy_of_fusion_uncertainty_J_mol-1_K-1: 1.6
+          method: 'Difference between Hrel for CaSiO3 melt and Hrel for pseudowollastonite at 1817 K, using Eqs. (6) and (7), as described with Fig. 1.'
+          extrapolation: 'Eq. (6) crystal fit is extended 37 K above its upper measured temperature of 1780 K; Eq. (7) melt fit is extended 12 K below its lower measured temperature of 1829 K.'
+          derivation:
+            relation: 'ΔHfus(1817 K) = Hrel,melt(1817 K) − Hrel,pseudowollastonite(1817 K), from Eqs. (6) and (7).'
+            inputs: [adamkovicova_1980_solid_relative_enthalpy_fit_eq6, adamkovicova_1980_melt_relative_enthalpy_fit_eq7]
+          derived_from: [adamkovicova_1980_solid_relative_enthalpy_fit_eq6, adamkovicova_1980_melt_relative_enthalpy_fit_eq7]
+        uncertainty: {reported_status: printed, value_kJ_mol-1: 2.9, note: 'Authors combine the errors of both relative-enthalpy functions by the Gauss error-distribution law.'}
+
+      - observation_id: adamkovicova_1980_prior_heat_fusion_56_1_quote
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 199, pdf_page_index: 7, section: Discussion}
+        phase: CaSiO3_heat_of_fusion_prior_value
+        units: kJ mol−1 CaSiO3
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          attribution: 'Tables [3]–[6]; the authors say table [6] reports Kelley’s calculation from Allen and White data for the CaSiO3–MgSiO3 system.'
+          value_kJ_mol-1: 56.1
+          note: 'Prior tabulated value quoted for comparison; not measured in the present work.'
+        uncertainty: {reported_status: not_reported}
+
+      - observation_id: adamkovicova_1980_prior_heat_fusion_50_1_quote
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 199, pdf_page_index: 7, section: Discussion}
+        phase: CaSiO3_heat_of_fusion_prior_value
+        units: kJ mol−1 CaSiO3
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          attribution: 'Adams and Cohen (1966), derived from the decrease of the CaSiO3 solidification point in the CaSiO3–BaSiO3 system.'
+          value_kJ_mol-1: 50.1
+          note: 'Earlier-worker value quoted for comparison; not measured in the present work.'
+        uncertainty: {reported_status: not_reported}
+
+      - observation_id: adamkovicova_1980_prior_heat_fusion_59_0_quote
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 199, pdf_page_index: 7, section: Discussion}
+        phase: CaSiO3_heat_of_fusion_prior_value
+        units: kJ mol−1 CaSiO3
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          attribution: 'Bottinga and Richet (1978), calculated from the CaSiO3 heat of devitrification at 298 K and heat-capacity data.'
+          value_kJ_mol-1: 59.0
+          note: 'Earlier-worker calculated value quoted for comparison; not measured in the present work.'
+        uncertainty: {reported_status: not_reported}
+
+      - observation_id: adamkovicova_1980_prior_heat_fusion_68_2_quote
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 199, pdf_page_index: 7, section: Discussion}
+        phase: CaSiO3_heat_of_fusion_prior_value
+        units: kJ mol−1 CaSiO3
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          attribution: 'Bottinga and Richet (1978), calculated using the Clapeyron equation.'
+          value_kJ_mol-1: 68.2
+          note: 'Earlier-worker calculated value quoted for comparison; not measured in the present work.'
+        uncertainty: {reported_status: not_reported}
+
+      - observation_id: adamkovicova_1980_prior_heat_fusion_27_6_quote
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 199, pdf_page_index: 7, section: Discussion}
+        phase: CaSiO3_heat_of_fusion_prior_value
+        units: kJ mol−1 CaSiO3
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          attribution: 'Bottinga and Richet (1978), one of the two CaSiO3 heat-of-fusion values reported in their survey.'
+          value_kJ_mol-1: 27.6
+          note: 'Earlier-worker value quoted for comparison; not measured in the present work.'
+        uncertainty: {reported_status: not_reported}
+
+      - observation_id: adamkovicova_1980_prior_heat_fusion_82_9_quote
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 199, pdf_page_index: 7, section: Discussion}
+        phase: CaSiO3_heat_of_fusion_prior_value
+        units: kJ mol−1 CaSiO3
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          attribution: 'Bottinga and Richet (1978), the other CaSiO3 heat-of-fusion value reported in their survey.'
+          value_kJ_mol-1: 82.9
+          note: 'Earlier-worker value quoted for comparison; not measured in the present work.'
+        uncertainty: {reported_status: not_reported}
+
+      - observation_id: adamkovicova_1980_prior_melt_heat_capacity_0_15073_quote
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 198, pdf_page_index: 6, section: Discussion}
+        phase: CaSiO3_melt
+        units: kJ mol−1 K−1 CaSiO3
+        values:
+          quantity: molar_heat_capacity
+          method_class: quoted_attributed
+          attribution: 'Barin, Knacke and Kubaschewski (1977), Thermochemical Properties of Inorganic Substances, Supplement, pp. 116–117, cited as [4].'
+          value_kJ_mol-1_K-1: 1.5073e-1
+          note: 'Earlier-worker melt heat-capacity value quoted in the discussion.'
+        uncertainty: {reported_status: not_reported}
+
+      - observation_id: adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 198, pdf_page_index: 6, section: Discussion}
+        phase: CaSiO3_melt
+        units: kJ mol−1 K−1 CaSiO3
+        values:
+          quantity: molar_heat_capacity
+          method_class: quoted_attributed
+          attribution: 'Barin, Knacke and Kubaschewski (1977), Thermochemical Properties of Inorganic Substances, Supplement, pp. 116–117, cited as [4].'
+          value_kJ_mol-1_K-1: 1.4654e-1
+          note: 'Alternative earlier-worker melt heat-capacity value quoted in the discussion.'
+        uncertainty: {reported_status: not_reported}
+
+fidelity_samples:
+  - path: species.CaSiO3.observations[adamkovicova_1980_table1_solid_cooling_measured].values.points[0].delta_Hcool_kJ_mol-1_as_printed
+    value: 139.6
+    locator: {page: 195, table: I, note: PDF page 3 image}
+  - path: species.CaSiO3.observations[adamkovicova_1980_table2_solid_solution_heats_measured].values.points[0].delta_Hsol_kJ_mol-1_as_printed
+    value: 311.1
+    locator: {page: 196, table: II, note: PDF page 4 image}
+  - path: species.CaSiO3.observations[adamkovicova_1980_table3_melt_cooling_measured].values.points[0].minus_delta_Hcool_kJ_mol-1
+    value: 217.1
+    locator: {page: 196, table: III, note: PDF page 4 image}
+  - path: species.CaSiO3.observations[adamkovicova_1980_melt_relative_enthalpy_fit_eq7].values.equation_as_printed
+    value: 'Hrel,CS,m,φ = 2.827 × 10^2 + 1.4985 × 10^−1 T [kJ mol−1]'
+    locator: {page: 197, equation: '7', note: PDF page 5 image}
+  - path: species.CaSiO3.observations[adamkovicova_1980_heat_of_fusion_at_1817K].values.delta_H_fus_kJ_mol-1
+    value: 57.3
+    locator: {page: 197, equation: '8', note: PDF page 5 image}
+  - path: species.CaSiO3.observations[adamkovicova_1980_prior_heat_fusion_82_9_quote].values.value_kJ_mol-1
+    value: 82.9
+    locator: {page: 199, section: Discussion, note: PDF page 7 image}
