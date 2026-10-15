@@ -1069,6 +1069,31 @@ def test_janaf_na_cr_uses_reduced_basis_and_keeps_typed_rejection() -> None:
     assert 2 <= sodium["basis_terms"] <= 6
 
 
+@pytest.mark.parametrize(
+    ("table_id", "phase", "join_K"),
+    (("C-002", "cr", 800.0), ("N-023", "g", 600.0)),
+)
+def test_element_reference_search_finds_passing_two_segment_boundary(
+    table_id: str, phase: str, join_K: float
+) -> None:
+    assert (TABLES_DIR / f"{table_id}.yaml").is_file()
+    records = generate_janaf_sidecar(table_ids=[table_id])
+    fit = next(
+        record
+        for record in records
+        if record["source_record_id"] == table_id and record["phase"] == phase
+    )
+
+    assert fit["status"] == "accepted", fit
+    segments = fit["thermo_record"]["segments"]
+    assert len(segments) == 2
+    assert segments[0]["T_max_K"] == join_K
+    assert segments[1]["T_min_K"] == join_K
+    checks = fit["fit_statistics"]["smooth_fit_checks"]
+    assert checks["anti_ringing_passed"] is True
+    assert checks["join_continuity_passed"] is True
+
+
 def test_reduced_basis_record_evaluates_through_existing_nasa9_owner() -> None:
     temperatures = [298.15, 400, 600, 800, 1000]
     source = _constant_cp_segment(30.0, temperatures[0], temperatures[-1])
