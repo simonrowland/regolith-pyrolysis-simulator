@@ -19,7 +19,9 @@ from simulator.chemistry.kernel.dto import (
     IntentRequest,
     IntentResult,
     LedgerTransitionProposal,
+    ProviderAccountView,
 )
+from simulator.account_ids import MELT_RESIDENT_ACCOUNTS
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
@@ -51,7 +53,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
 
     name = "builtin-fe-redox-respeciation"
     DECLARED_ACCOUNTS = frozenset({
-        CLEANED_MELT_ACCOUNT,
+        *MELT_RESIDENT_ACCOUNTS,
         OXYGEN_ACCOUNT,
         FO2_BUFFER_ACCOUNT,
     })
@@ -163,10 +165,17 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                 },
             )
 
+        from simulator.accounting.ledger import _merge_species_amounts_from_accounts
+
+        # Provenance-isolated spent oxide is physically in the same melt.
+        # Only this thermodynamic basis is combined; Fe/O2 funding and
+        # transition accounts continue to use the original account view.
+        basis_view = ProviderAccountView(
+            accounts={CLEANED_MELT_ACCOUNT: _merge_species_amounts_from_accounts(
+                accounts, MELT_RESIDENT_ACCOUNTS)},
+            species_formula_registry=request.account_view.species_formula_registry)
         comp_wt = composition_wt_pct_from_account_view(
-            request.account_view,
-            CLEANED_MELT_ACCOUNT,
-        )
+            basis_view, CLEANED_MELT_ACCOUNT)
         mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
         if not mol_fractions:
             return IntentResult(

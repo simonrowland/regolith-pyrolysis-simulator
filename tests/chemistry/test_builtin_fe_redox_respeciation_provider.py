@@ -19,6 +19,7 @@ from tests.chemistry.conftest import _atom_check, _build_sim
 
 DECLARED_ACCOUNTS = frozenset({
     "process.cleaned_melt",
+    "process.spent_reductant_residue",
     "process.overhead_gas",
     "reservoir.fo2_buffer",
 })

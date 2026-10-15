@@ -248,10 +248,11 @@ def test_provider_declares_only_vapor_pressure_intent(vapor_pressure_data):
             assert not profile.is_authoritative(intent)
 
 
-def test_provider_declares_only_cleaned_melt_account(vapor_pressure_data):
+def test_provider_declares_exactly_melt_resident_accounts(vapor_pressure_data):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     profile = provider.capability_profile()
-    assert profile.declared_accounts == frozenset({"process.cleaned_melt"})
+    assert profile.declared_accounts == frozenset({
+        "process.cleaned_melt", "process.spent_reductant_residue"})
 
 
 def test_t622_request_and_builtin_provider_share_one_domain_policy_callable() -> None:
@@ -3110,11 +3111,10 @@ def test_kress91_ferrous_feo_activity_no_iron_guards() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_kernel_filters_provider_to_cleaned_melt_only(
+def test_kernel_filters_provider_to_melt_resident_accounts_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """Even when other accounts hold material, the provider must see only
-    ``process.cleaned_melt`` — the kernel account filter is the enforcer."""
+    """The kernel exposes both physical melt accounts and excludes other phases."""
 
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -3126,6 +3126,10 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
     sim.atom_ledger.load_external(
         "process.metal_phase", {"Fe": 0.5}, source="test seed",
         material_origin="feedstock",
+    )
+    sim.atom_ledger.load_external_mol(
+        "process.spent_reductant_residue", {"Na2O": 1.0}, source="test seed",
+        material_origin="reagent",
     )
 
     seen_accounts: list[frozenset[str]] = []
@@ -3148,7 +3152,8 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
 
     assert seen_accounts, "provider was never dispatched"
     for accounts in seen_accounts:
-        assert accounts == frozenset({"process.cleaned_melt"}), (
+        assert accounts == frozenset({
+            "process.cleaned_melt", "process.spent_reductant_residue"}), (
             "kernel filter leaked an undeclared account into the provider"
         )
 
