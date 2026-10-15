@@ -54,9 +54,41 @@ experiments:
         note: Series I and II initial masses are separately printed; no single mass assigned to this aggregate series
     initial_composition:
       state:
-        tag: unknown
-        reason: 'mass-percent composition is not usable: printed oxide wt% map has unsupported numeric component(s): Cs2O,
-          Li2O, MnO2, Re2O7, RuO2, SrO, ZrO2'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5938921582998945505736528565'
+          - - Fe2O3
+            - '0.04775847018151053520230035559'
+          - - Al2O3
+            - '0.03092170232379047692074982569'
+          - - B2O3
+            - '0.0618770118396122730821324633'
+          - - Li2O
+            - '0.08796888103859484902423807954'
+          - - Na2O
+            - '0.0919923625412062804124878744'
+          - - MnO2
+            - '0.02725638671539415627031887632'
+          - - NiO
+            - '0.01599543410131647716558943935'
+          - - CaO
+            - '0.01195464109557555066434296773'
+          - - MgO
+            - '0.00889294384231716960417376657'
+          - - ZrO2
+            - '0.02041507109229302715728528457'
+          - - SrO
+            - '0.0003202805368355789208244550888'
+          - - Cs2O
+            - '0.0001648700342983751054382492711'
+          - - RuO2
+            - '0.0005486798304776872411608867317'
+          - - Re2O7
+            - '0.00004110652688301265530462096359'
+          amount_basis: mole_fraction
       locator:
         published_page: 3
         pdf_page_index: 9
@@ -64,6 +96,343 @@ experiments:
         note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions derived
           from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition for thermodynamic-estimate
           role
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '53.76'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.49'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.75'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '6.49'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_Li2O_wt_pct
+          - state:
+              tag: value
+              value: '3.96'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_Li2O_g_mol
+          - state:
+              tag: value
+              value: '29.879'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '8.59'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_MnO2_wt_pct
+          - state:
+              tag: value
+              value: '3.57'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_MnO2_g_mol
+          - state:
+              tag: value
+              value: '86.936044'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_NiO_wt_pct
+          - state:
+              tag: value
+              value: '1.8'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_NiO_g_mol
+          - state:
+              tag: value
+              value: '74.69239999999999'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.01'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0.54'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_ZrO2_wt_pct
+          - state:
+              tag: value
+              value: '3.79'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_ZrO2_g_mol
+          - state:
+              tag: value
+              value: '123.22200000000001'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_SrO_wt_pct
+          - state:
+              tag: value
+              value: '0.05'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_SrO_g_mol
+          - state:
+              tag: value
+              value: '103.619'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_Cs2O_wt_pct
+          - state:
+              tag: value
+              value: '0.07'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_Cs2O_g_mol
+          - state:
+              tag: value
+              value: '281.80990392'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_RuO2_wt_pct
+          - state:
+              tag: value
+              value: '0.11'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_RuO2_g_mol
+          - state:
+              tag: value
+              value: '133.06799999999998'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - original_Re2O7_wt_pct
+          - state:
+              tag: value
+              value: '0.03'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        - - M_Re2O7_g_mol
+          - state:
+              tag: value
+              value: '484.407'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions
+                derived from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition
+                for thermodynamic-estimate role
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -294,15 +663,354 @@ experiments:
         note: Sample mass not printed for this series
     initial_composition:
       state:
-        tag: unknown
-        reason: 'mass-percent composition is not usable: printed oxide wt% map has unsupported numeric component(s): Cs2O,
-          Li2O, MnO2, Re2O7, RuO2, SrO, ZrO2'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5938921582998945505736528565'
+          - - Fe2O3
+            - '0.04775847018151053520230035559'
+          - - Al2O3
+            - '0.03092170232379047692074982569'
+          - - B2O3
+            - '0.0618770118396122730821324633'
+          - - Li2O
+            - '0.08796888103859484902423807954'
+          - - Na2O
+            - '0.0919923625412062804124878744'
+          - - MnO2
+            - '0.02725638671539415627031887632'
+          - - NiO
+            - '0.01599543410131647716558943935'
+          - - CaO
+            - '0.01195464109557555066434296773'
+          - - MgO
+            - '0.00889294384231716960417376657'
+          - - ZrO2
+            - '0.02041507109229302715728528457'
+          - - SrO
+            - '0.0003202805368355789208244550888'
+          - - Cs2O
+            - '0.0001648700342983751054382492711'
+          - - RuO2
+            - '0.0005486798304776872411608867317'
+          - - Re2O7
+            - '0.00004110652688301265530462096359'
+          amount_basis: mole_fraction
       locator:
         published_page: 3
         pdf_page_index: 9
         table: '1'
-        note: Nominal Weight % column selected because the source says it was used for thermodynamic estimates; normalized
-          mole fractions derived from the printed oxide wt% values
+        note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived from
+          all printed oxide wt% values
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '53.76'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.49'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.75'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '6.49'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_Li2O_wt_pct
+          - state:
+              tag: value
+              value: '3.96'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_Li2O_g_mol
+          - state:
+              tag: value
+              value: '29.879'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '8.59'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_MnO2_wt_pct
+          - state:
+              tag: value
+              value: '3.57'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_MnO2_g_mol
+          - state:
+              tag: value
+              value: '86.936044'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_NiO_wt_pct
+          - state:
+              tag: value
+              value: '1.8'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_NiO_g_mol
+          - state:
+              tag: value
+              value: '74.69239999999999'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.01'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0.54'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_ZrO2_wt_pct
+          - state:
+              tag: value
+              value: '3.79'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_ZrO2_g_mol
+          - state:
+              tag: value
+              value: '123.22200000000001'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_SrO_wt_pct
+          - state:
+              tag: value
+              value: '0.05'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_SrO_g_mol
+          - state:
+              tag: value
+              value: '103.619'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_Cs2O_wt_pct
+          - state:
+              tag: value
+              value: '0.07'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_Cs2O_g_mol
+          - state:
+              tag: value
+              value: '281.80990392'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_RuO2_wt_pct
+          - state:
+              tag: value
+              value: '0.11'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_RuO2_g_mol
+          - state:
+              tag: value
+              value: '133.06799999999998'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - original_Re2O7_wt_pct
+          - state:
+              tag: value
+              value: '0.03'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        - - M_Re2O7_g_mol
+          - state:
+              tag: value
+              value: '484.407'
+            locator:
+              published_page: 3
+              pdf_page_index: 9
+              table: '1'
+              note: Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived
+                from all printed oxide wt% values
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -474,7 +1182,8 @@ experiments:
     pdf_page_index: 51
     figure: '19'
     note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
-      equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+      equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit. The
+      Fig. 19 caption pools KMS and TMS without per-point sample labels; composition remains unknown.
 benches:
 - id: 10.6028/nbs.ir.83-2731::bench::kms
   work_id: 10.6028/nbs.ir.83-2731
