@@ -36,24 +36,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
-    - asset_id: pdf:sf04-magma-companion-workbook
-      role: pdf
-      path: raw/sf04-magma-companion-workbook/sf04-magma-companion-workbook.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:sf04-magma-companion-workbook
-      role: pdftotext
-      path: text/sf04-magma-companion-workbook
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:sf04-magma-companion-workbook
-      role: table_csv
-      path: tables/sf04-magma-companion-workbook
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:sf04-magma-companion-workbook
       role: pdftotext
       path: unknown

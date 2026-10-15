@@ -92,11 +92,11 @@ observations:
   locator:
     page: 6
     section: '2.3'
-  read_from: pdf:deffrennes-2020-ca-o-calphad
+  read_from: unknown:deffrennes-2020-ca-o-calphad
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - pdf:deffrennes-2020-ca-o-calphad
+    - unknown:deffrennes-2020-ca-o-calphad
     parameters: []
     output_unit: Pa
 - observation_id: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_reducing_solidification
@@ -189,11 +189,11 @@ observations:
   locator:
     page: 6
     section: '2.3'
-  read_from: pdf:deffrennes-2020-ca-o-calphad
+  read_from: unknown:deffrennes-2020-ca-o-calphad
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - pdf:deffrennes-2020-ca-o-calphad
+    - unknown:deffrennes-2020-ca-o-calphad
     parameters: []
     output_unit: Pa
 - observation_id: deffrennes-2020-ca-o-calphad::deffrennes_2020_yamada_solidification
@@ -284,10 +284,10 @@ observations:
   locator:
     page: 23
     section: '5'
-  read_from: pdf:deffrennes-2020-ca-o-calphad
+  read_from: unknown:deffrennes-2020-ca-o-calphad
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - pdf:deffrennes-2020-ca-o-calphad
+    - unknown:deffrennes-2020-ca-o-calphad
     parameters: []
     output_unit: Pa

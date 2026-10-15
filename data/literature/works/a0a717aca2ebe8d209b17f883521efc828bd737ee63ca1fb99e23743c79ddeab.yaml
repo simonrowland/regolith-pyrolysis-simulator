@@ -13,24 +13,6 @@ work:
       tag: value
       value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
-    - asset_id: pdf:costa-jacobson-2015
-      role: pdf
-      path: raw/costa-jacobson-2015/costa-jacobson-2015.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:costa-jacobson-2015
-      role: pdftotext
-      path: text/costa-jacobson-2015
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:costa-jacobson-2015
-      role: table_csv
-      path: tables/costa-jacobson-2015
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:costa-jacobson-2015
       role: pdftotext
       path: unknown
@@ -49,12 +31,6 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:kems-007-costa-2015
-      role: table_csv
-      path: tables/kems-007-costa-2015
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-007-costa-2015
       role: pdftotext
       path: unknown
