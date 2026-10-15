@@ -10008,10 +10008,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(result, 'vapor_pressures_source', {}) or {}
         )
         self._last_vapor_pressure_diagnostic = diagnostic
-        self._note_high_t_melt_activity_fallback(
-            diagnostic.get('high_t_melt_activity'),
-            diagnostic.get('vapor_pressure_numerator_provenance'),
+        note_high_t_fallback = getattr(
+            self, '_note_high_t_melt_activity_fallback', None
         )
+        if callable(note_high_t_fallback):
+            note_high_t_fallback(
+                diagnostic.get('high_t_melt_activity'),
+                diagnostic.get('vapor_pressure_numerator_provenance'),
+            )
 
     @staticmethod
     def _kernel_vapor_pressure_source(diagnostic: Mapping[str, Any]) -> str:
