@@ -6004,8 +6004,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'eta_absorb': eta_absorb,
             'target_fO2_log': target_fO2_log,
             'target_source': target_source,
-            'pressure_ceiling_notices': ([target_ceiling_notice]
-                                         if target_ceiling_notice else []),
+            **({'pressure_ceiling_notices': [target_ceiling_notice]}
+               if target_ceiling_notice else {}),
             'current_fO2_log_before': current_fO2_log,
             'melt_redox_capacity_mol_per_ln_fO2': self._melt_redox_source_capacity_mol_per_ln_fO2(
                 fO2_log=current_fO2_log, T_K=T_K, gate_authority=gate_authority,
@@ -6416,7 +6416,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self, '_last_fe_redox_respeciation_diagnostic', {}) or {}
             ),
             'fe_redox_respeciation_attempts': respeciation_attempts,
-            'pressure_ceiling_notices': ceiling_notices,
+            **({'pressure_ceiling_notices': ceiling_notices} if ceiling_notices else {}),
             'source_context': source_context,
             'redox_source_refusal_context': refusal_context,
             'source_campaign': str(source_context.get('campaign', '')),

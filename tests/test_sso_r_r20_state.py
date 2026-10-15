@@ -976,7 +976,7 @@ def test_o2_bubbler_cap_prevents_overoxidation_and_overhead_transition() -> None
 
     assert diagnostic["reason"] == "at_or_above_target"
     assert diagnostic["injected_mol"] == pytest.approx(0.0)
-    assert diagnostic['pressure_ceiling_notices'] == []
+    assert 'pressure_ceiling_notices' not in diagnostic
     assert sim._current_melt_redox_fO2_log() == pytest.approx(-8.0)
     assert len(sim.atom_ledger.transitions) == before_transitions
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
