@@ -545,6 +545,12 @@ def _piecewise_evaluate(
     return _evaluate(segments[_segment_index(temperature_K, bounds)], temperature_K)
 
 
+def _h_minus_h298_kJ_mol(enthalpy_J_mol: float, formation_anchor_J_mol: float) -> float:
+    # NASA-9 H carries the printed ΔfH°(298.15 K) integration constant; subtract
+    # that source anchor to recover H-H298 without extending the fit to 298.15 K.
+    return (enthalpy_J_mol - formation_anchor_J_mol) / 1000.0
+
+
 def _printed_cp_extrema(cells: Sequence[_Cell]) -> set[float]:
     values = sorted(cells, key=lambda cell: cell.temperature_K)
     return {
@@ -984,9 +990,9 @@ def _fit_piecewise_candidate(
                 "residual": residual, "allowance": cell.uncertainty,
             })
     for cell in h_cells:
-        residual = (
-            _piecewise_evaluate(segments, cell.temperature_K)[1] - h_anchor_J
-        ) / 1000.0 - cell.value
+        residual = _h_minus_h298_kJ_mol(
+            _piecewise_evaluate(segments, cell.temperature_K)[1], h_anchor_J
+        ) - cell.value
         h_residuals.append(residual)
         if abs(residual) > cell.uncertainty:
             over_precision.append({
