@@ -10,6 +10,13 @@ extraction:
   worker: w1-boulliung-wood-2022-so2-solubility-silicate-melts
   provenance_path: corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
 review_status: draft
+fidelity_samples:
+- species: S
+  observable: composition_series
+  observation_id: boulliung_wood_2022_starting_material_compositions
+  field: material_form
+  value: fused_starting_material
+  locator: {page: 151, table: '1', note: 'Table 1 caption identifies fused starting materials.'}
 benches:
 - id: gero-vertical-furnace
   identity: {basis: described_in_this_work}
