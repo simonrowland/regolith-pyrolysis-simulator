@@ -1752,7 +1752,7 @@ overhead_headspace:
   # Hot-wall liner trajectory. Scalar values hold a constant wall T; schedule
   # entries linearly interpolate over campaign_hour. C2A/C2A_staged preheat
   # before the >1400 C SiO release window so cold-wall fouling is explicit.
-  liner_temperature_C:
+  liner_temperature_C: &upstream_wall_schedule
     default_C: 1500
     schedule:
       - campaign: ["C2A", "C2A_continuous"]
@@ -1778,26 +1778,7 @@ overhead_headspace:
   pipe_segment_temperatures_C:
     default_C: 1500
     segments:
-      stage_0_to_stage_1:
-        default_C: 1500
-        schedule:
-          - campaign: ["C2A", "C2A_continuous"]
-            from_campaign_hour: 0
-            to_campaign_hour: 6
-            start_C: 1200
-            end_C: 1650
-          - campaign: ["C2A", "C2A_continuous"]
-            from_campaign_hour: 6
-            start_C: 1650
-            end_C: 1650
-          - campaign: ["C2A_STAGED", "C2A_staged"]
-            from_campaign_hour: 0
-            start_C: 1800
-            end_C: 1800
-          - campaign: ["C3", "C3_K", "C3_NA", "C4", "C5", "C6"]
-            from_campaign_hour: 0
-            start_C: 1500
-            end_C: 1500
+      stage_0_to_stage_1: *upstream_wall_schedule
       stage_1_to_stage_2:
         default_C: 1500
         schedule:

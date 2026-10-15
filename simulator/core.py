@@ -886,7 +886,6 @@ DEFAULT_OVERHEAD_HEADSPACE_CONFIG = {
     'conductance_kg_s': None,
     'conductance_kg_s_per_bar': None,
     'downstream_pressure_bar': None,
-    'liner_temperature_C': 1500.0,
 }
 DEFAULT_FREEZE_GATE_CONFIG = {
     'enabled': False,
