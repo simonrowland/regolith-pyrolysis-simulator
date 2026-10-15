@@ -7539,6 +7539,147 @@ def test_unknown_polymorph_with_multiple_solid_tables_uses_lowest_janaf_gibbs() 
     assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
 
 
+def _unknown_silica_activity_observation():
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        None,
+    )
+    reference = F.observation(
+        "silica-unknown-polymorph-activity-golden",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
+    )
+    return experiment, reference
+
+
+def _corrupt_o037_janaf_source_hash(monkeypatch: pytest.MonkeyPatch) -> None:
+    from copy import deepcopy
+
+    from simulator.battery.generators import janaf
+
+    original_loader = janaf.load_table_document
+
+    def corrupt_o037_hash(path):
+        document = original_loader(path)
+        if path.name != "O-037.yaml":
+            return document
+        corrupted = deepcopy(document)
+        corrupted["extraction"]["source_sha256"] = "0" * 64
+        return corrupted
+
+    monkeypatch.setattr(janaf, "load_table_document", corrupt_o037_hash)
+    janaf._fusion_table_points.cache_clear()
+    janaf._janaf_pure_solid_table_temperature_range.cache_clear()
+
+
+def test_unknown_polymorph_activity_conversion_has_numeric_golden_pin() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    _experiment, reference = _unknown_silica_activity_observation()
+
+    comparison = fusion_comparison_reference(reference)
+
+    assert comparison.value.point == Decimal("0.2859156906189812475869526078")
+    assert float(comparison.value.point).hex() == "0x1.24c715327cb38p-2"
+
+
+def test_corrupt_o037_activity_candidate_hash_refuses_compile_residual(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _corrupt_o037_janaf_source_hash(monkeypatch)
+    experiment, reference = _unknown_silica_activity_observation()
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    notice = residual.refusal.detail["notice"]
+    assert "O-037" in notice
+    assert "JANAF cache hash does not match source sidecar" in notice
+
+
+def test_corrupt_o037_activity_candidate_is_counted_by_score_store_census(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.score import refusal_census
+
+    _corrupt_o037_janaf_source_hash(monkeypatch)
+    experiment, reference = _unknown_silica_activity_observation()
+    context = _context(F.work(), experiment, reference, review="reviewed")
+
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        include_diagnostics=True,
+    )
+
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.reference == reference.observation_id
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert "O-037" in residual.refusal.detail["notice"]
+    assert refusal_census(residuals) == {
+        "identity_incomplete:solid_liquid_reference_conversion_missing_input": 1
+    }
+
+
+def test_unknown_alumina_activity_notice_lists_all_dictionary_crystals() -> None:
+    import json
+
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="Al2O3",
+            T_K=Decimal("1800"),
+            endmember_phase=Phase.CR,
+            component_basis="Al2O3",
+        ),
+        None,
+    )
+    reference = F.observation(
+        "alumina-unknown-polymorph-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
+    )
+
+    comparison = fusion_comparison_reference(reference)
+    notice = next(
+        item
+        for item in comparison.notices
+        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
+    )
+    detail = json.loads(notice.reason.split(": ", 1)[1])
+
+    assert detail["chosen_table"] == "Al-096"
+    assert {item["table"] for item in detail["alternatives"]} == {
+        "Al-097",
+        "Al-098",
+        "Al-099",
+    }
+
+
 def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> None:
     import json
 

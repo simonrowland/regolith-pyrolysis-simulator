@@ -1257,7 +1257,30 @@ def predict_thermo_attempt(
                 origin=origin,
                 extra={"phase": str(getattr(phase, "value", phase))},
             )
-        polymorph = _state_value(identity.species.polymorph)
+        from simulator.battery.score import _source_polymorph_is_unspecified
+
+        source_polymorph = identity.species.polymorph
+        polymorph_unspecified = _source_polymorph_is_unspecified(source_polymorph)
+        polymorph = _state_value(source_polymorph)
+        alternatives: tuple[Polymorph, ...] = ()
+        if polymorph_unspecified:
+            from simulator.battery.generators.janaf import (
+                JANAFFusionPolymorphUnavailable,
+                _janaf_stable_fusion_polymorph,
+            )
+
+            try:
+                polymorph, alternatives = _janaf_stable_fusion_polymorph(
+                    identity.species.formula, temperature_K
+                )
+            except JANAFFusionPolymorphUnavailable as exc:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "fusion-solid-polymorph-unknown",
+                    quantity=quantity,
+                    origin=origin,
+                    extra={"detail": str(exc)},
+                )
         if polymorph is None:
             return _refuse(
                 RefusalReason.IDENTITY_UNKNOWN,
@@ -1299,11 +1322,57 @@ def predict_thermo_attempt(
                 origin=origin,
                 extra={"detail": str(exc), "formula": identity.species.formula},
             )
-        notices: tuple[Notice, ...] = ()
         authority = Authority.BRIDGE
-        notice_list: list[Notice] = []
+        from simulator.battery.generators.janaf import _JANAF_POLYMORPH_BY_TABLE
+
+        solid_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(solid)
+        observed_polymorph = polymorph_token(identity.species)
+        if (
+            not polymorph_unspecified
+            and solid_polymorph is not None
+            and observed_polymorph is not solid_polymorph
+        ):
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-mismatch",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "engine_reference_table": solid,
+                    "engine_reference_polymorph": solid_polymorph.value,
+                    "observed_polymorph": (
+                        None
+                        if observed_polymorph is None
+                        else observed_polymorph.value
+                    ),
+                },
+            )
+        if polymorph_unspecified:
+            other_references = ", ".join(
+                alternative.value for alternative in alternatives
+            )
+            notice_list = [
+                Notice(
+                    kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        "fusion_solid_polymorph_unspecified: source does not state "
+                        f"a solid polymorph; predictor used {solid} "
+                        f"({polymorph.value}); alternatives: "
+                        f"{other_references or 'none defined at this temperature'}"
+                    ),
+                    origin=origin,
+                    band=f"JANAF {solid}/{liquid} common range [{low}, {high}] K",
+                    authority=authority,
+                    certification="NIST-JANAF solid/liquid fusion reference",
+                ),
+            ]
+        else:
+            notice_list = []
         if temperature_K < low or temperature_K > high:
             authority = Authority.EXTRAPOLATED
+            if polymorph_unspecified:
+                notice_list[0] = replace(notice_list[0], authority=authority)
             notice_list.append(
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
