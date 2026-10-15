@@ -38,6 +38,63 @@ KRESS91_MOL_FRACTIONS = {
 }
 
 
+@pytest.mark.parametrize('T_K', [1473.15, 1673.15, 1873.15, 2373.15])
+@pytest.mark.parametrize('pressure_bar', [1e-9, 0.01, 1.0])
+@pytest.mark.parametrize('fO2_log', [-18.0, -9.0, -3.0])
+@pytest.mark.parametrize('alkali', [0.0, 0.04])
+def test_intrinsic_kress91_inverse_round_trip(T_K, pressure_bar, fO2_log, alkali):
+    from simulator.fe_redox import kress91_intrinsic_state
+
+    basis = dict(KRESS91_MOL_FRACTIONS, Na2O=alkali, SiO2=0.48 - alkali)
+    split = kress91_split(
+        fO2_log=fO2_log, mol_fractions=basis, T_K=T_K, pressure_bar=pressure_bar,
+    )
+    state = kress91_intrinsic_state(
+        feo_mol=1.0, fe2o3_mol=split['ratio'], mol_fractions=basis,
+        T_K=T_K, pressure_bar=pressure_bar, exchange_fO2_log=-9.0,
+    )
+    assert state['fO2_log'] == pytest.approx(fO2_log, abs=2e-14)
+    assert not state['exchange_bounded']
+    assert ('OUT_OF_CERTIFIED_BAND' in state['flags']) == (T_K > 1903.15)
+
+
+@pytest.mark.parametrize('feo_mol, fe2o3_mol', [(1.0, 0.0), (0.0, 1.0)])
+@pytest.mark.parametrize('exchange, expected', [(-5.0, -5.0), (0.0, -2.0)])
+def test_intrinsic_kress91_ends_follow_exchange(feo_mol, fe2o3_mol, exchange, expected):
+    from simulator.fe_redox import kress91_intrinsic_state
+
+    state = kress91_intrinsic_state(
+        feo_mol=feo_mol, fe2o3_mol=fe2o3_mol,
+        mol_fractions=KRESS91_MOL_FRACTIONS, T_K=1873.15,
+        pressure_bar=0.01, exchange_fO2_log=exchange,
+    )
+    assert state['fO2_log'] == expected
+    assert state['exchange_bounded']
+    assert 'EXCHANGE_BOUNDED' in state['flags']
+
+
+@pytest.mark.parametrize('kind', ['absolute', 'buffer_offset'])
+def test_intrinsic_kress91_preserves_imposed_state(kind):
+    from simulator.fe_redox import (
+        FE_FEO_BUFFER_STANDARD, RedoxState, _non_absolute_redox_state_kwargs,
+        kress91_intrinsic_state,
+    )
+
+    imposed = (RedoxState.absolute(-7.0) if kind == 'absolute' else
+               RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.5))
+    identity = imposed.cache_identity()
+    kwargs = _non_absolute_redox_state_kwargs(imposed)
+    state = kress91_intrinsic_state(
+        feo_mol=0.0, fe2o3_mol=1.0, mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=1873.15, pressure_bar=0.01, exchange_fO2_log=-5.0,
+        redox_state=imposed,
+    )
+    assert state['fO2_log'] == imposed.log_fO2_at(1873.15)
+    assert not state['exchange_bounded']
+    assert imposed.cache_identity() == identity
+    assert _non_absolute_redox_state_kwargs(imposed) == kwargs
+
+
 @pytest.mark.parametrize('pressure_bar', [0.0, -1.0])
 def test_floor_vacuum_pressure_bar_floors_finite_vacuum_pressure(
     pressure_bar: float,
