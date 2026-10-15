@@ -3569,6 +3569,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         evap_flux: EvaporationFlux,
     ) -> None:
+        self.overhead_model._organic_tar_kg_for_schedule = (
+            self._organic_tar_kg_from_overhead_gas()
+        )
         effective_transport_capacity = getattr(
             self,
             '_effective_transport_capacity_this_tick',
@@ -13972,6 +13975,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         else:
             melt_offgas_O2_kg_hr = self._ledger_o2_kg(
                 'process.overhead_gas')
+        self.overhead_model._organic_tar_kg_for_schedule = (
+            self._organic_tar_kg_from_overhead_gas()
+        )
         self.overhead = self.overhead_model.update(
             overhead_flux,
             self.melt,

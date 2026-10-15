@@ -3751,6 +3751,9 @@ class EvaporationMixin:
         phase_scalar = self._record_phase_context_diagnostic(
             'condensation_feed', scalar_liquid_fraction=1.0)
         if not getattr(self.condensation_model, '_knudsen_policy_configured', False):
+            self.overhead_model._organic_tar_kg_for_schedule = (
+                self._organic_tar_kg_from_overhead_gas()
+            )
             transport = self.overhead_model.estimate_transport_state(
                 evap_flux,
                 self.melt,
@@ -4226,6 +4229,14 @@ class EvaporationMixin:
         self._record_wall_alkali_binding_diagnostic_state(diagnostic)
         return float(diagnostic.get('credited_condensed_kg', 0.0))
 
+    def _organic_tar_kg_from_overhead_gas(self) -> float:
+        return float(
+            self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                'organic_tar', 0.0,
+            )
+            or 0.0
+        )
+
     def _apply_organic_tar_wall_deposit(self) -> None:
         """Move cold-wall tar from overhead_gas onto process.wall_deposit.
 
@@ -4234,12 +4245,7 @@ class EvaporationMixin:
         """
         from simulator.chemistry.organics_pyrolysis import tar_fate
 
-        tar_kg = float(
-            self.atom_ledger.kg_by_account('process.overhead_gas').get(
-                'organic_tar', 0.0,
-            )
-            or 0.0
-        )
+        tar_kg = self._organic_tar_kg_from_overhead_gas()
         if tar_kg <= 1e-12:
             return
         if self.condensation_model.wall_temperature_C is None:

@@ -29,22 +29,23 @@ def test_default_upstream_wall_tracks_each_melt_temperature(setpoints_data, camp
 
 def test_organic_default_wall_is_above_tar_no_coat_threshold(setpoints_data):
     model = OverheadGasModel(setpoints_data["overhead_headspace"])
+    model._organic_tar_kg_for_schedule = 1.0
     melt = MeltState(temperature_C=100.0, campaign=CampaignPhase.C2A)
-    wall_C = model.resolve_pipe_temperature_C(melt, organic_tar_kg=1.0)
+    wall_C = model.resolve_pipe_temperature_C(melt)
     params = load_organics_pyrolysis_params()
 
     assert wall_C > melt.temperature_C
-    assert tar_fate({"C": 1.0, "H": 0.8}, melt.temperature_C, wall_C, params).coat_frac == 0.0
+    assert tar_fate(
+        {"C": 1.0, "H": 0.8}, melt.temperature_C, wall_C, params
+    ).coat_frac == 0.0
 
 
 def test_organic_absent_default_wall_remains_exactly_melt_temperature(setpoints_data):
     model = OverheadGasModel(setpoints_data["overhead_headspace"])
     melt = MeltState(temperature_C=100.0, campaign=CampaignPhase.C2A)
 
-    assert model.resolve_pipe_temperature_C(melt, organic_tar_kg=0.0) == 100.0
-    assert model.resolve_pipe_segment_temperatures_C(
-        NAMES, melt, organic_tar_kg=0.0
-    )[NAMES[0]] == 100.0
+    assert model.resolve_pipe_temperature_C(melt) == 100.0
+    assert model.resolve_pipe_segment_temperatures_C(NAMES, melt)[NAMES[0]] == 100.0
 
 
 @pytest.mark.parametrize("key", ["liner_temperature_C", "pipe_segment_temperatures_C"])
@@ -52,10 +53,9 @@ def test_explicit_scalar_wall_override_is_preserved(setpoints_data, key):
     config = deepcopy(setpoints_data["overhead_headspace"])
     config[key] = 1234.0
     model = OverheadGasModel(config)
+    model._organic_tar_kg_for_schedule = 8.3
     melt = MeltState(temperature_C=2100.0, campaign=CampaignPhase.C2A)
-    assert model.resolve_pipe_segment_temperatures_C(
-        NAMES, melt, organic_tar_kg=8.3
-    )[NAMES[0]] == 1234.0
+    assert model.resolve_pipe_segment_temperatures_C(NAMES, melt)[NAMES[0]] == 1234.0
 
 
 def test_explicit_upstream_recipe_schedule_is_preserved(setpoints_data):
@@ -66,19 +66,16 @@ def test_explicit_upstream_recipe_schedule_is_preserved(setpoints_data):
                       "to_campaign_hour": 6.0, "start_C": 1200.0, "end_C": 1800.0}],
     }
     model = OverheadGasModel(config)
+    model._organic_tar_kg_for_schedule = 8.3
     melt = MeltState(temperature_C=2100.0, campaign=CampaignPhase.C2A, campaign_hour=3.0)
-    assert model.resolve_pipe_segment_temperatures_C(
-        NAMES, melt, organic_tar_kg=8.3
-    )[NAMES[0]] == 1500.0
+    assert model.resolve_pipe_segment_temperatures_C(NAMES, melt)[NAMES[0]] == 1500.0
 
 
 def test_upstream_material_limits_are_separate_notices_without_clamping(setpoints_data):
     melt = MeltState(temperature_C=2100.0)
-    upstream_C = OverheadGasModel(
-        setpoints_data["overhead_headspace"]
-    ).resolve_pipe_segment_temperatures_C(
-        NAMES, melt, organic_tar_kg=8.3
-    )[NAMES[0]]
+    overhead = OverheadGasModel(setpoints_data["overhead_headspace"])
+    overhead._organic_tar_kg_for_schedule = 8.3
+    upstream_C = overhead.resolve_pipe_segment_temperatures_C(NAMES, melt)[NAMES[0]]
     model = CondensationModel(CondensationTrain.create_default())
     model.apply_setpoints_overrides(setpoints_data)
     model.configure_operating_conditions(pipe_segment_temperatures_C={NAMES[0]: upstream_C})

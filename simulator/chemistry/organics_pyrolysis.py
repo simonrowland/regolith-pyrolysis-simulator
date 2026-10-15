@@ -886,6 +886,22 @@ class TarFateResult:
         }
 
 
+def _tar_dewpoint_C(params: Mapping[str, Any] | None = None) -> float:
+    payload = params or load_organics_pyrolysis_params()
+    cfg = dict(payload.get("tar") or {})
+    return _finite(dict(cfg.get("dewpoint_C") or {}).get("value"), 400.0)
+
+
+def tar_no_coat_wall_floor_C(
+    params: Mapping[str, Any] | None = None,
+) -> float:
+    """Return the first representable wall temperature with zero tar coat."""
+    # The existing parameter is a dewpoint in °C, and tar_fate coats at or
+    # below it. The next representable value above that same parameter is
+    # therefore the smallest wall value that makes tar_fate's coat fraction 0.
+    return math.nextafter(_tar_dewpoint_C(params), math.inf)
+
+
 def tar_fate(
     tar_atoms: Mapping[str, float],
     temperature_C: float,
@@ -895,7 +911,7 @@ def tar_fate(
     """Crack / coke / coat. Least-certain leg; class-level kinetics.
 
     Coat uses the existing ``process.wall_deposit`` account (no parallel
-    fouling path). Hot walls (mandate default 1500 C) give coat_frac=0.
+    fouling path). Walls above the configured tar dewpoint give coat_frac=0.
     """
     payload = params or load_organics_pyrolysis_params()
     cfg = dict(payload.get("tar") or {})
@@ -939,7 +955,7 @@ def tar_fate(
             ),
         )
 
-    dew = _finite(dict(cfg.get("dewpoint_C") or {}).get("value"), 400.0)
+    dew = _tar_dewpoint_C(payload)
     crack_t = _finite(dict(cfg.get("crack_above_C") or {}).get("value"), 700.0)
     coke_t = _finite(dict(cfg.get("coke_below_C") or {}).get("value"), 500.0)
     crack_hi = _finite(

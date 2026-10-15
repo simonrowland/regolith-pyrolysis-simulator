@@ -461,6 +461,7 @@ class OverheadGasModel:
         self._pipe_temperature_C = DEFAULT_PIPE_TEMPERATURE_C  # °C — active pipe/liner wall temperature
         self._liner_temperature_config: Any = None  # °C or schedule — explicit liner temperature config
         self._pipe_segment_temperature_config: Any = None  # °C or mapping — per-segment wall temperature config
+        self._organic_tar_kg_for_schedule = 0.0  # kg — current ledger tar inventory supplied by the simulator
         self._degraded_path_engagement_recorder = (
             degraded_path_engagement_recorder
         )
@@ -891,6 +892,15 @@ class OverheadGasModel:
             temperature_C = _required_finite_float(melt.temperature_C, 'melt.temperature_C')
             if temperature_C <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise OverheadConfigurationError('melt.temperature_C must be above absolute zero')
+            if self._organic_tar_kg_for_schedule > 0.0:
+                from simulator.chemistry.organics_pyrolysis import (
+                    tar_no_coat_wall_floor_C,
+                )
+
+                temperature_C = max(
+                    temperature_C,
+                    tar_no_coat_wall_floor_C(),
+                )
             return temperature_C
         if is_declared_real_scalar(config) and isinstance(config, (int, float)):
             return float(config)
