@@ -25,6 +25,17 @@ from simulator.runner import build_sio_yield_report
 from simulator.state import EvaporationFlux, MeltState, PipeSegment
 
 
+def test_explicit_noncondensables_survive_untracked_segment_mass_rates():
+    partials = _segment_species_partial_pressures_pa(
+        {"Fe": 200.0, "O2": 100.0, "N2": 700.0}, 1000.0,
+        {"Fe": 2.0}, {"inlet": {"Fe": 2.0}, "after_capture": {"Fe": 1.0}},
+    )
+    assert partials["inlet"] == pytest.approx({"Fe": 200.0, "O2": 100.0, "N2": 700.0})
+    assert partials["after_capture"] == pytest.approx(
+        {"Fe": 1000.0 / 9.0, "O2": 1000.0 / 9.0, "N2": 7000.0 / 9.0})
+    assert sum(partials["after_capture"].values()) == pytest.approx(1000.0)
+
+
 @lru_cache(maxsize=None)
 def _report_at_wall_T(liner_temperature_c: float) -> tuple[dict[str, Any], dict[str, float]]:
     return build_sio_yield_report(

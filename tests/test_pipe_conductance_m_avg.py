@@ -113,6 +113,67 @@ def test_pure_o2_returns_o2_molar_mass():
     assert M_avg == pytest.approx(MOLAR_MASS["O2"] / 1000.0)
 
 
+def test_complete_stream_dalton_closure_and_carrier_dilution():
+    flux = EvaporationFlux(species_kg_hr={"Fe": 0.11169}, total_kg_hr=0.11169)
+    flows = {"Fe": 2.0, "O2": 1.0, "N2": 7.0}
+    partials = OverheadGasModel.species_partial_pressures(
+        flux, 10.0, molar_flow_by_species=flows,
+    )
+    assert partials == pytest.approx({"Fe": 2.0, "O2": 1.0, "N2": 7.0})
+    assert sum(partials.values()) == pytest.approx(10.0)
+    diluted = OverheadGasModel.species_partial_pressures(
+        flux, 10.0, molar_flow_by_species={**flows, "N2": 17.0},
+    )
+    assert diluted["Fe"] == pytest.approx(1.0)
+    assert diluted["O2"] == pytest.approx(0.5)
+    assert OverheadGasModel.species_partial_pressures(
+        EvaporationFlux(), 10.0, molar_flow_by_species={"N2": 8.0},
+    ) == {"N2": 10.0}
+
+
+def test_two_species_projection_numeric_pin_before_owner_consolidation():
+    flux = EvaporationFlux(species_kg_hr={
+        'Fe': MOLAR_MASS['Fe'] / 1000.0,
+        'O2': MOLAR_MASS['O2'] / 1000.0,
+    })
+    flux.update_totals()
+    partials = OverheadGasModel.species_partial_pressures(flux, 10.0)
+    assert {species: pressure.hex() for species, pressure in partials.items()} == {
+        'Fe': '0x1.4000000000000p+2', 'O2': '0x1.4000000000000p+2',
+    }
+
+
+def test_unknown_stream_species_refuses_instead_of_mass_fraction_fallback():
+    with pytest.raises(OverheadConfigurationError, match="molar mass"):
+        OverheadGasModel.species_partial_pressures(
+            EvaporationFlux(species_kg_hr={"unknown": 1.0}, total_kg_hr=1.0), 10.0,
+        )
+
+
+def test_ideal_regulated_sweep_uses_open_duct_and_flags_inertial_domain():
+    model = OverheadGasModel({"enabled": False})
+    melt = MeltState()
+    melt.atmosphere = Atmosphere.PN2_SWEEP
+    melt.campaign = CampaignPhase.C2A
+    melt.temperature_C = 2105.0
+    melt.p_total_mbar = 10.0
+    flux = EvaporationFlux(species_kg_hr={"Fe": 0.11169}, total_kg_hr=0.11169)
+    transport = model.estimate_transport_state(flux, melt)
+    flows = model.flowing_stream_mol_hr({"Fe": 2.0, "O2": 1.0}, melt, transport)
+    assert flows["Fe"] == 2.0
+    assert flows["O2"] == 1.0
+    assert flows["N2"] > 0.0
+    assert model.last_stream_boundary["provenance"] == "ideal_regulator_open_duct"
+    assert any(n["reason"] == "stream_throughput_out_of_domain"
+               for n in model.stream_physics_notices)
+    capacity = model._pipe_conductance(
+        1000.0, 2105.0, p_downstream_Pa=0.0,
+        species_kg_for_M_avg={"N2": MOLAR_MASS["N2"] / 1000.0},
+    )
+    assert sum(flows.values()) == pytest.approx(
+        capacity * 3600.0 / (MOLAR_MASS["N2"] / 1000.0))
+
+
 def test_pure_sio_returns_sio_molar_mass():
     """SiO sweep window — ~44 g/mol, well above the alkali band."""
     M_avg = _mean_molar_mass_kg_mol({"SiO": 1.0})

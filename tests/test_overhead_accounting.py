@@ -60,6 +60,21 @@ def _install_passthrough_vapour_batch(sim):
     return sim
 
 
+def test_native_metal_feed_projection_does_not_reconstruct_oxide_oxygen(monkeypatch):
+    sim = _gas_train_sim()
+    captured = {}
+    monkeypatch.setattr(sim, '_configure_condensation_operating_conditions',
+                        lambda flux, **kwargs: captured.update(kwargs))
+
+    def stop_after_feed(*_args):
+        raise LookupError('feed captured')
+
+    monkeypatch.setattr(sim.condensation_model, 'route', stop_after_feed)
+    with pytest.raises(LookupError, match='feed captured'):
+        sim._route_native_fe_vapor_to_condensation(2.0, source_account='process.metal_phase')
+    assert captured['source_mol_hr'] == {'Fe': 2.0}
+
+
 def _gas_train_sim(mass_kg=100.0):
     backend = InternalAnalyticalBackend()
     backend.initialize({})

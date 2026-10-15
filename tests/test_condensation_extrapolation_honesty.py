@@ -44,6 +44,25 @@ def test_stage3_unavailable_psat_predicts_flagged_capture():
     assert flag["eta"] == eta
 
 
+@pytest.mark.parametrize('species,stage_number,policy', [
+    ('SiO', 3, 'reactive_product_backstop'),
+    ('Na2', 4, 'declared_pressure_isolated_stage_efficiency'),
+])
+def test_stage_local_pressure_preserves_declared_sink_routes(species, stage_number, policy):
+    model = _stage3_unavailable_psat_model()
+    stage = next(s for s in model.train.stages if s.stage_number == stage_number)
+    outcomes = []
+    eta = model._condensation_efficiency(
+        stage=stage, species=species, T_cond_C=1000.0, residence_s=1.0,
+        available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+        flowing_pressure_pa=25.0,
+    )
+    assert 0.0 < eta <= 1.0
+    flag = next(item for item in outcomes if item['status'] == 'extrapolated')
+    assert flag['flowing_pressure_pa'] == 25.0
+    assert flag['saturation_pressure_policy'] == policy
+
+
 def test_stage3_unavailable_psat_missing_flow_refuses():
     model = _stage3_unavailable_psat_model()
     model.wall_species_partial_pressures_pa = {}
