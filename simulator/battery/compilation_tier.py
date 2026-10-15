@@ -256,6 +256,27 @@ def _score_predicates():
     return is_compilation_source, is_internal_consistency, is_sf04_workbook, parse_species_formula
 
 
+def _is_janaf_compilation_observation(
+    observation: Observation, origin: str | None
+) -> bool:
+    is_compilation_source, is_internal_consistency, is_sf04_workbook, _parse = (
+        _score_predicates()
+    )
+    source_id = observation.source_id or ""
+    janaf_source = source_id in {"janaf", "janaf-4th", "nist-janaf-4th"} or (
+        (origin or "").replace("\\", "/").startswith("compilations-janaf/")
+    )
+    compilation_source = is_compilation_evidence(observation) or is_compilation_source(
+        source_id, origin
+    )
+    return bool(
+        janaf_source
+        and compilation_source
+        and not is_internal_consistency(origin)
+        and not is_sf04_workbook(observation)
+    )
+
+
 def _compilation_series_pairs(
     observation: Observation,
     origin: str | None,
@@ -1991,11 +2012,6 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
     it does not derive a second residual or decision.
     """
 
-    from simulator.battery.score import (
-        is_compilation_source,
-        is_internal_consistency,
-        is_sf04_workbook,
-    )
     from simulator.diagnostic_helpers.species_rail_differential import (
         COMPILATION_JANAF,
         KeyedTablePoint,
@@ -2019,20 +2035,7 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
             temporary_path = Path(stream.name)
             for observation in context.observations.values():
                 origin = context.origins.get(observation.observation_id)
-                source_id = observation.source_id or ""
-                if not (
-                    is_compilation_evidence(observation)
-                    or is_compilation_source(source_id, origin)
-                ):
-                    continue
-                if not (
-                    source_id in {"janaf", "janaf-4th", "nist-janaf-4th"}
-                    or (origin or "").replace("\\", "/").startswith(
-                        "compilations-janaf/"
-                    )
-                ):
-                    continue
-                if is_internal_consistency(origin) or is_sf04_workbook(observation):
+                if not _is_janaf_compilation_observation(observation, origin):
                     continue
 
                 for point in _iter_compilation_series_cells(observation, origin):
