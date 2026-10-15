@@ -3143,7 +3143,7 @@ def test_closed_all_ferrous_vapor_activity_uses_ledger_split_at_iw_bound(
         floor_bar=sim._vacuum_floor_bar(), fe3_over_sigma_fe=0.0,
     )['a_FeO_authoritative']
     assert sim._last_vapor_pressure_diagnostic['activities']['Fe'] == pytest.approx(expected)
-    assert sim._last_vapor_pressure_diagnostic['a_FeO_calphad'][
+    assert sim._last_vapor_pressure_diagnostic['a_FeO_calphad']['kress91_split'][
         'fe3_over_sigma_fe'] == 0.0
 
 
@@ -3165,7 +3165,7 @@ def test_closed_vapor_activity_uses_actual_ferric_inventory(vapor_pressure_data)
         fe3_over_sigma_fe=0.5,
     )
     assert result.diagnostic['activities']['Fe'] == expected['a_FeO_authoritative']
-    assert result.diagnostic['a_FeO_calphad']['fe3_over_sigma_fe'] == 0.5
+    assert result.diagnostic['a_FeO_calphad']['kress91_split']['fe3_over_sigma_fe'] == 0.5
     assert result.diagnostic['activities']['Fe'] != provider.dispatch(imposed).diagnostic['activities']['Fe']
 
 
