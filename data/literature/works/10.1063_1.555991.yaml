@@ -14,24 +14,6 @@ work:
       tag: value
       value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
-    - asset_id: pdf:span-wagner-1996-co2-psat
-      role: pdf
-      path: raw/span-wagner-1996-co2-psat/span-wagner-1996-co2-psat.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:span-wagner-1996-co2-psat
-      role: pdftotext
-      path: text/span-wagner-1996-co2-psat
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:span-wagner-1996-co2-psat
-      role: table_csv
-      path: tables/span-wagner-1996-co2-psat
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:span-wagner-1996-co2-psat
       role: pdftotext
       path: unknown

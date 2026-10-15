@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0306-clinoenstatite.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0306-clinoenstatite:S:shared:T=298.15:col=entropy:name=clinoenstatite:v=6cf88032fb
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0306-clinoenstatite:S:shared:T=298.15:col=entropy:name=clinoenstatite:v=6cf88032fb:poly=clinoenstatite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0306-clinoenstatite:tabulation
   identity:
     quantity:
@@ -14,8 +14,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Clinoenstatite' is not a closed Polymorph token
+        tag: value
+        value: clinoenstatite
       charge:
         tag: value
         value: 0
@@ -77,8 +77,20 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 24
+        pdf_page_index: 30
+        table: b1259-298k-0306-clinoenstatite
+        note: as_published='16.22'; unit='cal deg^-1 gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0306-clinoenstatite.json
+        record: b1259-298k-0306-clinoenstatite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -106,7 +118,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0306-clinoenstatite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=clinoenstatite:v=038ade6e92
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0306-clinoenstatite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=clinoenstatite:v=038ade6e92:poly=clinoenstatite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0306-clinoenstatite:tabulation
   identity:
     quantity:
@@ -118,8 +130,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Clinoenstatite' is not a closed Polymorph token
+        tag: value
+        value: clinoenstatite
       charge:
         tag: value
         value: 0
@@ -145,8 +157,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Clinoenstatite' is not a closed Polymorph token
+              tag: value
+              value: clinoenstatite
             charge:
               tag: value
               value: 0
@@ -263,8 +275,22 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 24
+        pdf_page_index: 30
+        table: b1259-298k-0306-clinoenstatite
+        note: as_published='-349394'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+          formation_basis=from_the_elements; elemental_reference_state_tables=Mg=B1259 reference-state table p.52/PDF p.58,
+          O=B1259 reference-state table p.59/PDF p.65, Si=B1259 reference-state table p.68/PDF p.74
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0306-clinoenstatite.json
+        record: b1259-298k-0306-clinoenstatite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -296,7 +322,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0306-clinoenstatite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=clinoenstatite:v=3db81de059
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0306-clinoenstatite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=clinoenstatite:v=3db81de059:poly=clinoenstatite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0306-clinoenstatite:tabulation
   identity:
     quantity:
@@ -308,8 +334,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Clinoenstatite' is not a closed Polymorph token
+        tag: value
+        value: clinoenstatite
       charge:
         tag: value
         value: 0
@@ -335,8 +361,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Clinoenstatite' is not a closed Polymorph token
+              tag: value
+              value: clinoenstatite
             charge:
               tag: value
               value: 0
@@ -453,8 +479,22 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 24
+        pdf_page_index: 30
+        table: b1259-298k-0306-clinoenstatite
+        note: as_published='-370140'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+          formation_basis=from_the_elements; elemental_reference_state_tables=Mg=B1259 reference-state table p.52/PDF p.58,
+          O=B1259 reference-state table p.59/PDF p.65, Si=B1259 reference-state table p.68/PDF p.74
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0306-clinoenstatite.json
+        record: b1259-298k-0306-clinoenstatite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -486,7 +526,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0306-clinoenstatite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=clinoenstatite:v=410189f889
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0306-clinoenstatite:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=clinoenstatite:v=410189f889:poly=clinoenstatite
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0306-clinoenstatite:tabulation
   identity:
     quantity:
@@ -498,8 +538,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published/phase 'Clinoenstatite' is not a closed Polymorph token
+        tag: value
+        value: clinoenstatite
       charge:
         tag: value
         value: 0
@@ -525,8 +565,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published/phase 'Clinoenstatite' is not a closed Polymorph token
+              tag: value
+              value: clinoenstatite
             charge:
               tag: value
               value: 0
@@ -643,8 +683,22 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 24
+        pdf_page_index: 30
+        table: b1259-298k-0306-clinoenstatite
+        note: as_published='256.112'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+          formation_basis=from_the_elements; elemental_reference_state_tables=Mg=B1259 reference-state table p.52/PDF p.58,
+          O=B1259 reference-state table p.59/PDF p.65, Si=B1259 reference-state table p.68/PDF p.74
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0306-clinoenstatite.json
+        record: b1259-298k-0306-clinoenstatite
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:

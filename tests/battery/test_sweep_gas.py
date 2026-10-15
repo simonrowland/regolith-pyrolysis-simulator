@@ -68,12 +68,11 @@ def test_existing_single_species_migrates_byte_identically(tmp_path) -> None:
     gas = plain["pressure_environment"]["sweep_gas"]["state"]["value"]
     assert gas["species"] == "N2"
     payload = json.dumps(to_plain(experiment), sort_keys=True, separators=(",", ":")).encode()
-    # SC-289 restores the comma-truncated temperature and duration notes in
-    # this extract-derived payload. t-1150 refuses to infer the initial
-    # composition from its unsupported numeric components: 4429 - 545 + 0 = 3884.
-    assert len(payload) == 3884
+    # Pin the extract-derived payload, including its source Table 1 alternatives
+    # and the analyzed 15-component initial composition.
+    assert len(payload) == 12809
     assert hashlib.sha256(payload).hexdigest() == (
-        "5df6893d7216c1be97dc2a24d6e985914e31b463e22dd98f224e43dd549cbe6e"
+        "94e2b996dda59930a3a129419f6988318f74a22c405fa374fb629f580ce3f142"
     )
     assert to_plain(experiment_from_plain(plain)) == plain
 

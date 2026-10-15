@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -73,6 +74,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -130,6 +132,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -187,6 +190,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -244,6 +248,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -301,6 +306,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -358,6 +364,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -415,6 +422,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -472,6 +480,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -529,6 +538,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -586,6 +596,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -643,6 +654,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -700,6 +712,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -757,6 +770,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -804,45 +818,94 @@ observations:
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_figure_only'
+      tag: value
+      value: p_partial
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_melt_12022_12065' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [2000.0, 2500.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier figure_only does not name a reference_state
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'kems_effusion'
-    original_method_class: kems_effusion
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: figure_not_digitized
+    decided_by:
+      worker: t1120-demaria
+      date: '2026-10-03'
+      evidence:
+        figure: '7'
+        paragraph: Al, Al2O, AlO observed; Al partial pressures in Fig. 7
+        line_range: 268-292
+        note: 'bound_not_point_ordering: figure carries a bound, never a point value.'
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   notices: []
   source_id: kems-022-demaria-1971
   locator:
     figure: '7'
     paragraph: Al, Al2O, AlO observed; Al partial pressures in Fig. 7
     line_range: 268-292
+    note: 'bound_not_point_ordering: figure carries a bound, never a point value.'
     source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   read_from: unknown:kems-022-demaria-1971
 - observation_id: kems-022-demaria-1971::demaria_1971_alo_al_o_kp_table8::T=2360.0:h=a4e60df428c0
@@ -859,6 +922,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -913,6 +977,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -967,6 +1032,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1021,6 +1087,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1075,6 +1142,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1129,6 +1197,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1184,6 +1253,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1239,6 +1309,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1294,6 +1365,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1349,6 +1421,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1404,6 +1477,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1449,28 +1523,81 @@ observations:
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_figure_only_not_tabulated'
+      tag: value
+      value: p_partial
     species:
       formula: Ca
       phase:
-        tag: unknown
-        reason: phase string 'Apollo_12_lunar_basalt_melt_12022_12065' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1600.0, 2000.0]; no midpoint invented
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier figure_only_not_tabulated does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ca
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ca
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
     approximate: false
   uncertainty:
     kind: printed
@@ -1478,20 +1605,36 @@ observations:
       note: figure-only; re-evaporation; ≥factor 2 if digitized
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'kems_effusion'
-    original_method_class: kems_effusion
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: figure_not_digitized
+    decided_by:
+      worker: t1120-demaria
+      date: '2026-10-03'
+      evidence:
+        figure: '4'
+        paragraph: Ca partial pressures reported in Fig. 4 only; ion intensity measurement difficult
+        line_range: 169-198
+        note: 'bound_not_point_ordering: figure carries a bound, never a point value.'
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   notices: []
   source_id: kems-022-demaria-1971
   locator:
     figure: '4'
     paragraph: Ca partial pressures reported in Fig. 4 only; ion intensity measurement difficult
     line_range: 169-198
+    note: 'bound_not_point_ordering: figure carries a bound, never a point value.'
     source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   read_from: unknown:kems-022-demaria-1971
+  derivation:
+    relation: identity.reference_state=ideal-gas Ca(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_cr_psat_table2_sample_12022::T=1725.0:row=12022:h=4bd235be028c
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
@@ -1506,6 +1649,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1563,6 +1707,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1620,6 +1765,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1653,6 +1799,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -1724,6 +1871,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1757,6 +1905,7 @@ observations:
           polymorph:
             tag: unknown
             reason: source does not state polymorph
+            rejection_kind: omitted
           charge:
             tag: value
             value: 0
@@ -1828,6 +1977,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1870,6 +2020,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2034,7 +2185,7 @@ observations:
           paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
           note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
     output_unit: Pa
-- observation_id: kems-022-demaria-1971::demaria_1971_k_psat_figure2_digitized::T=1314.06:h=cc9bd204fc72
+- observation_id: kems-022-demaria-1971::demaria_1971_k_psat_figure2_digitized::T=1314.06:h=c853c440dc32
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::experiment::demaria-1971-k-figure2
   identity:
     quantity:
@@ -2076,34 +2227,8 @@ observations:
       tag: not_applicable
       reason: p_partial over multicomponent melt; no single pure-substance reservoir
     composition:
-      tag: value
-      value:
-        basis: sample_catalog_proxy
-        components:
-        - - SiO2
-          - '0.4370300404472189490300406296'
-        - - Al2O3
-          - '0.04992363851472767186779541665'
-        - - FeO
-          - '0.186631857820954309618158003'
-        - - MgO
-          - '0.1832826449540607504498940327'
-        - - CaO
-          - '0.09962773800078939244754301791'
-        - - Na2O
-          - '0.00230361043344815193559034437'
-        - - K2O
-          - '0.0004019960173842589283052064581'
-        - - TiO2
-          - '0.03808571527364136642564305475'
-        - - MnO
-          - '0.002712758537775149297030294361'
-        amount_basis: mole_fraction
-        proxy_flag: composition_from_sample_catalog
-        proxy_source: Smales 1971, as cited by DeMaria et al. 1971 (“reported elsewhere (SMALES, 1971)”); the authors adopt
-          this as the composition of sample 12022. DeMaria's p. 1369 alkaline-components paragraph separately prints Na2O
-          0.36 wt % and K2O 0.068 wt %.
-        analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
+      tag: unknown
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2143,22 +2268,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: composition_from_sample_catalog
-    affected_quantities:
-    - p_partial
-    reason: 'composition_from_sample_catalog: source=Smales 1971, as cited by DeMaria et al. 1971 (“reported elsewhere (SMALES,
-      1971)”); the authors adopt this as the composition of sample 12022. DeMaria''s p. 1369 alkaline-components paragraph
-      separately prints Na2O 0.36 wt % and K2O 0.068 wt %.; analysis_selection_rule=source-declared catalogue analysis; no
-      separate selection rule stated'
-    origin: kems-022-demaria-1971::demaria_1971_k_psat_figure2_digitized::T=1314.06:h=cc9bd204fc72
-    source: Smales 1971, as cited by DeMaria et al. 1971 (“reported elsewhere (SMALES, 1971)”); the authors adopt this as
-      the composition of sample 12022. DeMaria's p. 1369 alkaline-components paragraph separately prints Na2O 0.36 wt % and
-      K2O 0.068 wt %.
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-022-demaria-1971::demaria_1971_k_psat_figure2_digitized::T=1314.06:h=cc9bd204fc72
+    origin: kems-022-demaria-1971::demaria_1971_k_psat_figure2_digitized::T=1314.06:h=c853c440dc32
   source_id: kems-022-demaria-1971
   locator:
     published_page: 1370
@@ -2178,229 +2292,6 @@ observations:
         figure: '2'
         paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
         note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-    composition:
-      state:
-        tag: value
-        value:
-          basis: sample_catalog_proxy
-          components:
-          - - SiO2
-            - '0.4370300404472189490300406296'
-          - - Al2O3
-            - '0.04992363851472767186779541665'
-          - - FeO
-            - '0.186631857820954309618158003'
-          - - MgO
-            - '0.1832826449540607504498940327'
-          - - CaO
-            - '0.09962773800078939244754301791'
-          - - Na2O
-            - '0.00230361043344815193559034437'
-          - - K2O
-            - '0.0004019960173842589283052064581'
-          - - TiO2
-            - '0.03808571527364136642564305475'
-          - - MnO
-            - '0.002712758537775149297030294361'
-          amount_basis: mole_fraction
-          proxy_flag: composition_from_sample_catalog
-          proxy_source: Smales 1971, as cited by DeMaria et al. 1971 (“reported elsewhere (SMALES, 1971)”); the authors adopt
-            this as the composition of sample 12022. DeMaria's p. 1369 alkaline-components paragraph separately prints Na2O
-            0.36 wt % and K2O 0.068 wt %.
-          analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
-      locator:
-        published_page: 1370
-        pdf_page_index: 4
-        figure: '2'
-        paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-        note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '42.3'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '8.2'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '21.6'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '11.9'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '9'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '0.23'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.061'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '4.9'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_MnO_wt_pct
-          - state:
-              tag: value
-              value: '0.31'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_MnO_g_mol
-          - state:
-              tag: value
-              value: '70.937044'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2560,7 +2451,7 @@ observations:
           paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
           note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
     output_unit: Pa
-- observation_id: kems-022-demaria-1971::demaria_1971_k_psat_figure2_digitized::T=1366.12:h=a692719f3ae1
+- observation_id: kems-022-demaria-1971::demaria_1971_k_psat_figure2_digitized::T=1366.12:h=bfaa59948add
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::experiment::demaria-1971-k-figure2
   identity:
     quantity:
@@ -2602,34 +2493,8 @@ observations:
       tag: not_applicable
       reason: p_partial over multicomponent melt; no single pure-substance reservoir
     composition:
-      tag: value
-      value:
-        basis: sample_catalog_proxy
-        components:
-        - - SiO2
-          - '0.4370300404472189490300406296'
-        - - Al2O3
-          - '0.04992363851472767186779541665'
-        - - FeO
-          - '0.186631857820954309618158003'
-        - - MgO
-          - '0.1832826449540607504498940327'
-        - - CaO
-          - '0.09962773800078939244754301791'
-        - - Na2O
-          - '0.00230361043344815193559034437'
-        - - K2O
-          - '0.0004019960173842589283052064581'
-        - - TiO2
-          - '0.03808571527364136642564305475'
-        - - MnO
-          - '0.002712758537775149297030294361'
-        amount_basis: mole_fraction
-        proxy_flag: composition_from_sample_catalog
-        proxy_source: Smales 1971, as cited by DeMaria et al. 1971 (“reported elsewhere (SMALES, 1971)”); the authors adopt
-          this as the composition of sample 12022. DeMaria's p. 1369 alkaline-components paragraph separately prints Na2O
-          0.36 wt % and K2O 0.068 wt %.
-        analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
+      tag: unknown
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2669,22 +2534,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: composition_from_sample_catalog
-    affected_quantities:
-    - p_partial
-    reason: 'composition_from_sample_catalog: source=Smales 1971, as cited by DeMaria et al. 1971 (“reported elsewhere (SMALES,
-      1971)”); the authors adopt this as the composition of sample 12022. DeMaria''s p. 1369 alkaline-components paragraph
-      separately prints Na2O 0.36 wt % and K2O 0.068 wt %.; analysis_selection_rule=source-declared catalogue analysis; no
-      separate selection rule stated'
-    origin: kems-022-demaria-1971::demaria_1971_k_psat_figure2_digitized::T=1366.12:h=a692719f3ae1
-    source: Smales 1971, as cited by DeMaria et al. 1971 (“reported elsewhere (SMALES, 1971)”); the authors adopt this as
-      the composition of sample 12022. DeMaria's p. 1369 alkaline-components paragraph separately prints Na2O 0.36 wt % and
-      K2O 0.068 wt %.
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-022-demaria-1971::demaria_1971_k_psat_figure2_digitized::T=1366.12:h=a692719f3ae1
+    origin: kems-022-demaria-1971::demaria_1971_k_psat_figure2_digitized::T=1366.12:h=bfaa59948add
   source_id: kems-022-demaria-1971
   locator:
     published_page: 1370
@@ -2704,229 +2558,6 @@ observations:
         figure: '2'
         paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
         note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-    composition:
-      state:
-        tag: value
-        value:
-          basis: sample_catalog_proxy
-          components:
-          - - SiO2
-            - '0.4370300404472189490300406296'
-          - - Al2O3
-            - '0.04992363851472767186779541665'
-          - - FeO
-            - '0.186631857820954309618158003'
-          - - MgO
-            - '0.1832826449540607504498940327'
-          - - CaO
-            - '0.09962773800078939244754301791'
-          - - Na2O
-            - '0.00230361043344815193559034437'
-          - - K2O
-            - '0.0004019960173842589283052064581'
-          - - TiO2
-            - '0.03808571527364136642564305475'
-          - - MnO
-            - '0.002712758537775149297030294361'
-          amount_basis: mole_fraction
-          proxy_flag: composition_from_sample_catalog
-          proxy_source: Smales 1971, as cited by DeMaria et al. 1971 (“reported elsewhere (SMALES, 1971)”); the authors adopt
-            this as the composition of sample 12022. DeMaria's p. 1369 alkaline-components paragraph separately prints Na2O
-            0.36 wt % and K2O 0.068 wt %.
-          analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
-      locator:
-        published_page: 1370
-        pdf_page_index: 4
-        figure: '2'
-        paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-        note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '42.3'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '8.2'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '21.6'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '11.9'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '9'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '0.23'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.061'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '4.9'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - original_MnO_wt_pct
-          - state:
-              tag: value
-              value: '0.31'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        - - M_MnO_g_mol
-          - state:
-              tag: value
-              value: '70.937044'
-            locator:
-              published_page: 1370
-              pdf_page_index: 4
-              figure: '2'
-              paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
-              note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
-        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3765,6 +3396,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3822,6 +3454,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3879,6 +3512,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3936,6 +3570,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3993,6 +3628,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4050,6 +3686,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4107,6 +3744,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4164,6 +3802,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4221,6 +3860,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4278,6 +3918,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4335,6 +3976,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4392,6 +4034,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4433,6 +4076,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4520,29 +4164,8 @@ observations:
       tag: not_applicable
       reason: p_partial over multicomponent melt; no single pure-substance reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.4370300404472189490300406296'
-        - - Al2O3
-          - '0.04992363851472767186779541665'
-        - - FeO
-          - '0.186631857820954309618158003'
-        - - MgO
-          - '0.1832826449540607504498940327'
-        - - CaO
-          - '0.09962773800078939244754301791'
-        - - Na2O
-          - '0.00230361043344815193559034437'
-        - - K2O
-          - '0.0004019960173842589283052064581'
-        - - TiO2
-          - '0.03808571527364136642564305475'
-        - - MnO
-          - '0.002712758537775149297030294361'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4728,29 +4351,8 @@ observations:
       tag: not_applicable
       reason: p_partial over multicomponent melt; no single pure-substance reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.4370300404472189490300406296'
-        - - Al2O3
-          - '0.04992363851472767186779541665'
-        - - FeO
-          - '0.186631857820954309618158003'
-        - - MgO
-          - '0.1832826449540607504498940327'
-        - - CaO
-          - '0.09962773800078939244754301791'
-        - - Na2O
-          - '0.00230361043344815193559034437'
-        - - K2O
-          - '0.0004019960173842589283052064581'
-        - - TiO2
-          - '0.03808571527364136642564305475'
-        - - MnO
-          - '0.002712758537775149297030294361'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4936,29 +4538,8 @@ observations:
       tag: not_applicable
       reason: p_partial over multicomponent melt; no single pure-substance reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.4370300404472189490300406296'
-        - - Al2O3
-          - '0.04992363851472767186779541665'
-        - - FeO
-          - '0.186631857820954309618158003'
-        - - MgO
-          - '0.1832826449540607504498940327'
-        - - CaO
-          - '0.09962773800078939244754301791'
-        - - Na2O
-          - '0.00230361043344815193559034437'
-        - - K2O
-          - '0.0004019960173842589283052064581'
-        - - TiO2
-          - '0.03808571527364136642564305475'
-        - - MnO
-          - '0.002712758537775149297030294361'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5144,29 +4725,8 @@ observations:
       tag: not_applicable
       reason: p_partial over multicomponent melt; no single pure-substance reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.4370300404472189490300406296'
-        - - Al2O3
-          - '0.04992363851472767186779541665'
-        - - FeO
-          - '0.186631857820954309618158003'
-        - - MgO
-          - '0.1832826449540607504498940327'
-        - - CaO
-          - '0.09962773800078939244754301791'
-        - - Na2O
-          - '0.00230361043344815193559034437'
-        - - K2O
-          - '0.0004019960173842589283052064581'
-        - - TiO2
-          - '0.03808571527364136642564305475'
-        - - MnO
-          - '0.002712758537775149297030294361'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5352,29 +4912,8 @@ observations:
       tag: not_applicable
       reason: p_partial over multicomponent melt; no single pure-substance reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.4370300404472189490300406296'
-        - - Al2O3
-          - '0.04992363851472767186779541665'
-        - - FeO
-          - '0.186631857820954309618158003'
-        - - MgO
-          - '0.1832826449540607504498940327'
-        - - CaO
-          - '0.09962773800078939244754301791'
-        - - Na2O
-          - '0.00230361043344815193559034437'
-        - - K2O
-          - '0.0004019960173842589283052064581'
-        - - TiO2
-          - '0.03808571527364136642564305475'
-        - - MnO
-          - '0.002712758537775149297030294361'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5560,29 +5099,8 @@ observations:
       tag: not_applicable
       reason: p_partial over multicomponent melt; no single pure-substance reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.4370300404472189490300406296'
-        - - Al2O3
-          - '0.04992363851472767186779541665'
-        - - FeO
-          - '0.186631857820954309618158003'
-        - - MgO
-          - '0.1832826449540607504498940327'
-        - - CaO
-          - '0.09962773800078939244754301791'
-        - - Na2O
-          - '0.00230361043344815193559034437'
-        - - K2O
-          - '0.0004019960173842589283052064581'
-        - - TiO2
-          - '0.03808571527364136642564305475'
-        - - MnO
-          - '0.002712758537775149297030294361'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -11184,6 +10702,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11231,6 +10750,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11272,6 +10792,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11317,6 +10838,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11371,6 +10893,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11425,6 +10948,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11479,6 +11003,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11533,6 +11058,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11587,6 +11113,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11641,6 +11168,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11695,6 +11223,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11749,6 +11278,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11803,6 +11333,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11847,6 +11378,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11892,6 +11424,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11938,6 +11471,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11980,6 +11514,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12026,6 +11561,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12071,6 +11607,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12106,72 +11643,159 @@ observations:
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_figure_only_comparable_to_TiO'
+      tag: value
+      value: p_partial
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_melt_12022_12065' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [2000.0, 2170.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier figure_only_comparable_to_TiO does not name a reference_state
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'kems_effusion'
-    original_method_class: kems_effusion
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: figure_not_digitized
+    decided_by:
+      worker: t1120-demaria
+      date: '2026-10-03'
+      evidence:
+        figure: '6'
+        line_range: 262-268
+        note: 'bound_not_point_ordering: figure carries a comparison, never a point value.'
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   notices: []
   source_id: kems-022-demaria-1971
   locator:
     figure: '6'
     line_range: 262-268
+    note: 'bound_not_point_ordering: figure carries a comparison, never a point value.'
     source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   read_from: unknown:kems-022-demaria-1971
 - observation_id: kems-022-demaria-1971::demaria_1971_tio_tio2_figure6_comparable_pressures
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_figure_only_comparable_to_TiO2'
+      tag: value
+      value: p_partial
     species:
       formula: TiO
       phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_melt_12022_12065' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [2000.0, 2170.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier figure_only_comparable_to_TiO2 does not name a reference_state
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
     approximate: false
   uncertainty:
     kind: printed
@@ -12179,12 +11803,22 @@ observations:
       note: ≥factor 2 absolute; ratio more robust
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'kems_effusion'
-    original_method_class: kems_effusion
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: figure_not_digitized
+    decided_by:
+      worker: t1120-demaria
+      date: '2026-10-03'
+      evidence:
+        table: '6'
+        figure: '6'
+        paragraph: TiO and TiO2 only Ti-containing species; comparable P in 2000–2170 K
+        line_range: 262-268, 324-328
+        note: 'bound_not_point_ordering: figure carries a comparison, never a point value.'
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -12192,5 +11826,6 @@ observations:
     figure: '6'
     paragraph: TiO and TiO2 only Ti-containing species; comparable P in 2000–2170 K
     line_range: 262-268, 324-328
+    note: 'bound_not_point_ordering: figure carries a comparison, never a point value.'
     source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   read_from: unknown:kems-022-demaria-1971

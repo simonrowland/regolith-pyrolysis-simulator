@@ -8,7 +8,13 @@ from __future__ import annotations
 
 import ast
 import re
-from simulator.battery.enums import Polymorph, PrintedQualifierKind, StateTag
+from simulator.battery.enums import (
+    Polymorph,
+    PolymorphRejectionKind,
+    PrintedQualifierKind,
+    StateTag,
+)
+from simulator.state_types import State
 
 _TRAILING_FORMULA_RE = re.compile(r"\s*\([^()]*(?:\([^()]*\)[^()]*)*\)\s*$")
 _PRESSURE_QUALIFIER_RE = re.compile(r"^\d+ Bar$")
@@ -220,6 +226,23 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "reference": Polymorph.REFERENCE,
 }
 
+# Named phases whose tokens are valid only beside their mineral formula.
+# Diopside's two formulas are equivalent ways the cited compilations print
+# CaMgSi2O6; the other labels have one formula here.
+POLYMORPH_FORMULAS: dict[Polymorph, frozenset[str]] = {
+    Polymorph.CLINOENSTATITE: frozenset({"MgSiO3"}),
+    Polymorph.DIOPSIDE: frozenset({"CaMgSi2O6", "CaMg(SiO3)2"}),
+    Polymorph.ALBITE_HIGH: frozenset({"NaAlSi3O8"}),
+    Polymorph.SANIDINE_HIGH: frozenset({"KAlSi3O8"}),
+}
+
+
+def polymorph_matches_formula(formula: str, token: Polymorph) -> bool:
+    """Whether a formula supports a formula-scoped named phase token."""
+
+    allowed = POLYMORPH_FORMULAS.get(token)
+    return allowed is None or formula in allowed
+
 CROSS_SOURCE_EQUIVALENCES: tuple[tuple[str, str, str, Polymorph], ...] = (
     ("Al2O3", "Alpha", "Corundum", Polymorph.CORUNDUM),
     ("Al2SiO5", "Andalusite", "Andalusite", Polymorph.ANDALUSITE),
@@ -296,6 +319,23 @@ def unrecognised_polymorph_reason(spelling: object) -> str:
     """Reason that preserves the original spelling for a later census."""
 
     return f"unrecognised polymorph {str(spelling)!r} is not a closed Polymorph token"
+
+
+def unrecognised_polymorph_state(spelling: object) -> State[Polymorph]:
+    return State.unknown(
+        unrecognised_polymorph_reason(spelling),
+        rejection_kind=PolymorphRejectionKind.UNRECOGNISED,
+    )
+
+
+def contradicting_polymorph_state(
+    value: object, formula: str, *, quoted: bool = False
+) -> State[Polymorph]:
+    printed = repr(value) if quoted else str(value)
+    return State.unknown(
+        f"polymorph {printed} does not denote formula {formula}",
+        rejection_kind=PolymorphRejectionKind.CONTRADICTS_FORMULA,
+    )
 
 
 def unrecognised_polymorph_spelling(reason: str | None) -> str | None:

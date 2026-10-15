@@ -1,0 +1,86 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/978-3-032-13828-6_26
+  citation: Shornikov, S. (2026). High-Temperature Investigation of the Thermodynamic Properties of Ca3SiO5 Hatrurite. The
+    Minerals, Metals & Materials Series, 298–312.
+  source_ids:
+  - shornikov-2026-hatrurite-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:shornikov-2026-hatrurite-evaporation
+      role: pdf
+      path: raw/shornikov-2026-hatrurite-evaporation/shornikov-2026-hatrurite-evaporation.pdf
+      sha256:
+        tag: value
+        value: 75d1e382d3b3e1507a8b45d2d33d3f7b9a490293e8494e3b78d3c0d57771664e
+    - asset_id: unknown:shornikov-2026-hatrurite-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/978-3-032-13828-6_26
+experiments:
+- experiment_id: 10.1007/978-3-032-13828-6_26::experiment::shornikov_2026_hatrurite_kems
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: stoichiometric_Ca3SiO5_oxide_mole_fractions
+          components:
+          - - CaO
+            - '0.75'
+          - - SiO2
+            - '0.25'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 298
+        note: Derived from the stated formula 3CaO·SiO2; 3 mol CaO + 1 mol SiO2 per formula unit, so x_CaO = 3/4; oxide mole-fraction
+          basis.
+    form:
+      state:
+        tag: value
+        value: The sample of tricalcium silicate was kindly provided by Alexandra Boikova (Grebenshchikov Institute of Silicate
+          Chemistry of the Russian Academy of Sciences), the synthesis conditions are described in [14].
+      locator:
+        page: 8
+        published_page: 303
+        pdf_page_index: 7
+        section: Experimental Methodology
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/978-3-032-13828-6_26
+  locator:
+    page: 8
+    published_page: 303
+    pdf_page_index: 7
+    section: Experimental Methodology

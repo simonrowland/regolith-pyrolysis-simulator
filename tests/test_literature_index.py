@@ -795,6 +795,24 @@ def test_compilation_manifest_identity_header_fixture(tmp_path):
     assert (sid_only, doi_only, raw_only) == ("fixture-compilation", "10.9999/fixture-compilation", ())
 
 
+def test_source_files_do_not_register_absent_layers():
+    from simulator.battery.migrate import source_files_for
+
+    files = source_files_for(
+        "fixture-source",
+        {
+            "corpus": {
+                "raw": {"path": "raw/fixture.pdf", "present": False},
+                "text": {"path": "text/fixture", "exists": False},
+                "tables": {"path": "tables/fixture", "exists": False},
+                "ocr": {"path": "ocr/fixture.md", "exists": False},
+            }
+        },
+    )
+
+    assert {asset.asset_id for asset in files.files} == {"unknown:fixture-source"}
+
+
 def _nist_janaf_txt_corpus_absent() -> bool:
     """The NIST .txt cache is an external snapshot, not a checked-in fixture."""
     corpus = Path(

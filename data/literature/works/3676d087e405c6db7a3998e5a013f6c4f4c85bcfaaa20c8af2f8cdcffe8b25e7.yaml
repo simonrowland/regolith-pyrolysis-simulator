@@ -17,18 +17,6 @@ work:
       sha256:
         tag: value
         value: 3a1ed0b83c7b6b4be8dbe8b249128e4b446acc6d0f9b8cf4da9db3eb7091e04e
-    - asset_id: pdftotext:shornikov-2000-cao-silica-vaporization
-      role: pdftotext
-      path: text/shornikov-2000-cao-silica-vaporization
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:shornikov-2000-cao-silica-vaporization
-      role: table_csv
-      path: tables/shornikov-2000-cao-silica-vaporization
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:shornikov-2000-cao-silica-vaporization
       role: pdftotext
       path: unknown

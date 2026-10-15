@@ -58,6 +58,20 @@ def _spawn_child_with_abandoned_pool(connection):
     connection.close()
 
 
+def _run_cleanup_scenario_in_child(scenario):
+    context = multiprocessing.get_context("spawn")
+    child = context.Process(target=scenario)
+    child.start()
+    child.join(timeout=ENGINE_POOL_AUTOMATIC_TOTAL_BUDGET_S + 15.0)
+    if child.is_alive():
+        child.terminate()
+        child.join(timeout=5.0)
+    assert child.exitcode == 0, (
+        f"isolated cleanup scenario {scenario.__name__} exited "
+        f"with status {child.exitcode}"
+    )
+
+
 def _wait_until_running(future, *, timeout_s=5.0):
     deadline = time.monotonic() + timeout_s
     while not future.running() and time.monotonic() < deadline:
@@ -65,7 +79,7 @@ def _wait_until_running(future, *, timeout_s=5.0):
     assert future.running()
 
 
-def test_close_all_reaps_pools_after_callers_drop_references():
+def _close_all_reaps_pools_after_callers_drop_references():
     close_all_engine_pools(cancel_pending=True)
     assert not _direct_spawn_child_pids()
 
@@ -89,7 +103,13 @@ def test_close_all_reaps_pools_after_callers_drop_references():
     assert pool_ref() is None
 
 
-def test_sessionfinish_interrupts_in_flight_job_within_automatic_budget():
+def test_close_all_reaps_pools_after_callers_drop_references():
+    _run_cleanup_scenario_in_child(
+        _close_all_reaps_pools_after_callers_drop_references
+    )
+
+
+def _sessionfinish_interrupts_in_flight_job_within_automatic_budget():
     pool = EngineWorkerPool(
         lambda index: _cleanup_worker(index, call_timeout_s=30.0),
         size=1,
@@ -111,7 +131,13 @@ def test_sessionfinish_interrupts_in_flight_job_within_automatic_budget():
         os.kill(worker_pid, 0)
 
 
-def test_registry_cancel_escalates_concurrent_graceful_close():
+def test_sessionfinish_interrupts_in_flight_job_within_automatic_budget():
+    _run_cleanup_scenario_in_child(
+        _sessionfinish_interrupts_in_flight_job_within_automatic_budget
+    )
+
+
+def _registry_cancel_escalates_concurrent_graceful_close():
     registry_before = set(engine_pool._LIVE_ENGINE_POOLS)
     pool = EngineWorkerPool(
         lambda index: _cleanup_worker(index, call_timeout_s=30.0),
@@ -139,6 +165,12 @@ def test_registry_cancel_escalates_concurrent_graceful_close():
         os.kill(worker_pid, 0)
 
 
+def test_registry_cancel_escalates_concurrent_graceful_close():
+    _run_cleanup_scenario_in_child(
+        _registry_cancel_escalates_concurrent_graceful_close
+    )
+
+
 def test_spawn_child_atexit_reaps_child_local_pool():
     context = multiprocessing.get_context("spawn")
     parent_connection, child_connection = context.Pipe(duplex=False)
@@ -158,7 +190,7 @@ def test_spawn_child_atexit_reaps_child_local_pool():
         os.kill(worker_pid, 0)
 
 
-def test_close_all_surfaces_bounded_shutdown_timeout():
+def _close_all_surfaces_bounded_shutdown_timeout():
     class StuckPool:
         def close(self, **_kwargs):
             time.sleep(1.0)
@@ -181,6 +213,47 @@ def test_close_all_surfaces_bounded_shutdown_timeout():
 
     assert time.monotonic() - started_at < 0.5
     assert exc_info.value.phase == "shutdown"
+
+
+def test_close_all_surfaces_bounded_shutdown_timeout():
+    _run_cleanup_scenario_in_child(_close_all_surfaces_bounded_shutdown_timeout)
+
+
+def test_cleanup_scenarios_preserve_borrowed_vaporock_pool(monkeypatch):
+    from engines.vaporock import VapoRockProvider
+    from simulator.melt_backend import vaporock as vaporock_module
+    from tests.test_vaporock_backend import (
+        test_vaporock_iw_literature_grid_residuals_are_explicit,
+    )
+
+    # This regression owns a private session cache so its teardown cannot close
+    # a backend borrowed by another test in the pytest process.
+    local_cache = {}
+    monkeypatch.setattr(vaporock_module, "_SESSION_BACKEND_CACHE", local_cache)
+    try:
+        provider = VapoRockProvider()
+        backend = provider._ensure_backend()
+        if (
+            backend is None
+            or not backend.is_available()
+            or not backend.uses_warm_pool
+        ):
+            pytest.skip("VapoRock warm backend unavailable")
+
+        for scenario in (
+            _close_all_reaps_pools_after_callers_drop_references,
+            _sessionfinish_interrupts_in_flight_job_within_automatic_budget,
+            _registry_cancel_escalates_concurrent_graceful_close,
+            _close_all_surfaces_bounded_shutdown_timeout,
+        ):
+            _run_cleanup_scenario_in_child(scenario)
+
+        assert provider._ensure_backend() is backend
+        assert backend.is_available()
+        assert not backend._warm_pool._closed
+        test_vaporock_iw_literature_grid_residuals_are_explicit()
+    finally:
+        vaporock_module.clear_session_backend_cache()
 
 
 def test_lazily_initialized_session_provider_survives_module_boundary():

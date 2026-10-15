@@ -93,7 +93,9 @@ from simulator.battery.records import (
 from simulator.battery.oxygen_balance import (
     has_own_engine_solved_oxygen_balance,
 )
-from simulator.battery.source_lineage import coefficient_lineage_sources
+from simulator.battery.source_lineage import (
+    coefficient_lineage_sources,
+)
 from simulator.accounting.formulas import parse_formula
 from simulator.battery.validity import (
     _partial_pressure_observations_by_experiment,
@@ -1135,8 +1137,12 @@ def validate_observation(
                     "raw_inputs not_printed declaration contradicts derived_from",
                 )
             )
+        has_resolved_lineage = any(
+            parent in observations or parent in asset_ids
+            for parent in observation.derived_from or ()
+        )
         if not figure_only_without_value:
-            if not observation.derived_from and not (
+            if not has_resolved_lineage and not (
                 ev.value is EvidenceClass.MEASURED_REDUCED
                 and derivation is not None
                 and derivation.has_located_unprinted_raw_inputs

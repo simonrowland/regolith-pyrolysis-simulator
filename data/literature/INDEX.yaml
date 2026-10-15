@@ -9,14 +9,14 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 313
-  extracts: 311
+  sources: 315
+  extracts: 313
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 59
+  extracts_with_private_locators: 61
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 311
-  alias_groups_needing_resolution: 37
+  extracts_without_pdf: 313
+  alias_groups_needing_resolution: 38
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
@@ -278,6 +278,7 @@ gaps:
   - shaw-2023-vacuum-thermal-sublimation-thesis
   - shornikov-1994-mullite-kems
   - shornikov-1997-cao-alumina-vapor
+  - shornikov-1997-diopside-vaporization
   - shornikov-1998-silica-vaporization
   - shornikov-2000-cao-silica-vaporization
   - shornikov-2007-cao-aluminosilicate-melts
@@ -285,6 +286,7 @@ gaps:
   - shornikov-2021-mgo-feo-silicate
   - shornikov-2024-wollastonite-evaporation
   - shornikov-2025-saratov-alkali-evaporation
+  - shornikov-2026-hatrurite-evaporation
   - slag-001-banya-1993
   - slag-002-banya-hino-nagasaka-1993
   - slag-003-hino-kitagawa-banya-1993
@@ -340,6 +342,7 @@ gaps:
   - bencze-yazhenskikh-2016
   - boulliung-2025-mercury-volatile-metals-magmatic
   - boulliung-wood-2022-so2-solubility-silicate-melts
+  - busemann-2024-noble-gases-ryugu-bennu
   - fegley-2023-chemical-equilibrium-calculations-bu
   - filiberto-lpsc2011-2064-volatiles
   - itoh-hino-banya-1998-spinel
@@ -384,6 +387,7 @@ gaps:
   - mendybaev-2021-cai-low-pressure-h2-evap
   - nagabayashi-hino-banya-1989-phosphorus
   - nasa-cea-thermo
+  - okazaki-2022-ryugu-gas-treasure-box
   - pahlevan-2026-protolunar-volatile-outflows
   - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
   - smales-1971-lpsc-12022
@@ -704,6 +708,12 @@ gaps:
     - kems-036-sesko-2024
     - sesko_2024
     - sesko_2024_vapor_phase_pyrolysis
+    resolution: owner/controller
+  - type: source_id_alias
+    key: shornikov-1997
+    source_ids:
+    - shornikov-1997-cao-alumina-vapor
+    - shornikov-1997-diopside-vaporization
     resolution: owner/controller
   - type: source_id_alias
     key: slag-1993
@@ -2217,6 +2227,7 @@ sources:
   - path: data/literature/extracts/busemann-2024-noble-gases-ryugu-bennu.yaml
     review_status: draft
     rows: 2
+    locator_status: private_path
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -12827,6 +12838,7 @@ sources:
   - path: data/literature/extracts/okazaki-2022-ryugu-gas-treasure-box.yaml
     review_status: draft
     rows: 13
+    locator_status: private_path
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -15779,6 +15791,65 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-1997-diopside-vaporization
+  aliases: []
+  citation: Shornikov, S. I., Stolyarova, V. L., and Shul’ts, M. M. (1997). Vaporization and the Thermodynamic
+    Properties of Diopside. Russian Journal of Physical Chemistry, 71(2), 174–178. Translated from Zhurnal
+    Fizicheskoi Khimii, 71(2), 230–234.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-1997-diopside-vaporization.yaml
+    review_status: draft
+    rows: 25
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-1997-diopside-vaporization/shornikov-1997-diopside-vaporization.pdf
+      present: true
+      sha256: 0747bc15045d6d913ed031e8ff2ac6c05110ec6e2307bd8fca55c83bf1183138
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-1997-diopside-vaporization/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-1997-diopside-vaporization
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-1997-diopside-vaporization
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-1997-diopside-vaporization.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-1997-diopside-vaporization.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: shornikov-1998-silica-vaporization
   aliases: []
   citation: Shornikov, S. I., Archakov, I. Yu., and Shul’ts, M. M. (1998). Mass Spectrometric Study of
@@ -16184,6 +16255,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/shornikov-2025-saratov-alkali-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2026-hatrurite-evaporation
+  aliases: []
+  citation: Shornikov, S. (2026). High-Temperature Investigation of the Thermodynamic Properties of Ca3SiO5
+    Hatrurite. The Minerals, Metals & Materials Series, 298–312.
+  doi: 10.1007/978-3-032-13828-6_26
+  report_number: null
+  identifier: 10.1007/978-3-032-13828-6_26
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2026-hatrurite-evaporation.yaml
+    review_status: draft
+    rows: 10
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2026-hatrurite-evaporation/shornikov-2026-hatrurite-evaporation.pdf
+      present: true
+      sha256: 75d1e382d3b3e1507a8b45d2d33d3f7b9a490293e8494e3b78d3c0d57771664e
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2026-hatrurite-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2026-hatrurite-evaporation
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2026-hatrurite-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2026-hatrurite-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2026-hatrurite-evaporation.yaml
       present: false
       error: null
       last_stage: null

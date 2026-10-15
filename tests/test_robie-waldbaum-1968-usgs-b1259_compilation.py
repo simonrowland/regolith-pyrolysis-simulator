@@ -169,6 +169,26 @@ def test_every_stored_raw_token_matches_its_layout_page(corpus, layout_pages):
     assert attached_ids <= set(ledger_ids)
 
 
+def test_clinoenstatite_formula_matches_image_verified_page_228(layout_pages):
+    record = loader.parse_high_t_page(228, layout_pages[227])
+
+    assert record["page"] == 222
+    assert record["formula_as_published"] == "MgSiO3"
+    assert record["formula"] == "MgSiO3"
+    assert next(
+        correction
+        for correction in record["corrections"]
+        if correction["field"] == "formula_as_published"
+    ) == {
+        "correction_id": "b1259-p228-formula_as_published",
+        "pdf_page": 228,
+        "field": "formula_as_published",
+        "layout_as_extracted": "MgSiO",
+        "printed_token": "MgSiO3",
+        "evidence": "PDF page 228 image visibly prints 'MgSiO3'",
+    }
+
+
 def test_source_grounded_mutation_probe(corpus, layout_pages):
     _, records = corpus
     silver = next(record for record in records if record["record_id"].startswith("b1259-ht-0001"))

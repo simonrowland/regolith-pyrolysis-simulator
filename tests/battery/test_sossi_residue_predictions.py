@@ -121,6 +121,11 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
         gas_activity_inputs.append(dict(activities))
         return original_gas_evaluate(activities, *args, **kwargs)
 
+    monkeypatch.setattr(
+        residue,
+        "_evaluate_openimcc_isolated",
+        lambda evaluate, *, timeout_s, **kwargs: evaluate(**kwargs),
+    )
     monkeypatch.setattr(openimcc_bridge, "evaluate", capture_melt_evaluate)
     monkeypatch.setattr(openimcc, "evaluate_gas", capture_gas_evaluate)
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
@@ -148,14 +153,118 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert "liquid_pack_digest" not in prediction.provenance
     assert evaluated_compositions
     assert all("MnO" not in composition for composition in evaluated_compositions)
-    assert gas_activity_inputs
-    assert gas_activity_inputs[0]["MnO"] == pytest.approx(
+    mno_inputs = [activities for activities in gas_activity_inputs if "MnO" in activities]
+    assert mno_inputs
+    assert mno_inputs[0]["MnO"] == pytest.approx(
         expected_mno_activity.thermodynamic_parent_activity()
     )
     mno_extension = prediction.provenance["melt_activity_extensions"]["MnO"]
     assert mno_extension["authority_level"] == expected_mno_activity.evidence_tier
     assert mno_extension["certified_band_K"] is None
     assert mno_extension["activity_provenance"] == expected_mno_activity.provenance()
+
+
+def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("openimcc")
+    import simulator.battery.residue as residue
+    from simulator.melt_backend import openimcc_bridge
+
+    source = yaml.safe_load(SOURCE.read_text())
+    experiments = source["experiments"][:2]
+    starting_trace = {
+        element: source["species"][element]["observations"][0]["values"][
+            "starting_measured_ppm"
+        ]
+        for element in ("Mn", "Ti")
+    }
+    experiment_ids = {experiment["experiment_id"] for experiment in experiments}
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+
+    def timeout(*_args, **_kwargs):
+        raise TimeoutError("fixture engine deadline")
+
+    monkeypatch.setattr(residue, "_evaluate_openimcc_isolated", timeout)
+    predictions = residue._predict_sossi_residue_cohort(
+        experiments,
+        yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text()),
+        starting_trace_ppm_by_experiment={
+            experiment_id: starting_trace for experiment_id in experiment_ids
+        },
+        buffered_fO2_log_by_experiment={experiment_id: -10.0 for experiment_id in experiment_ids},
+        code_revision="sossi-timeout-fixture",
+        engine="openimcc",
+    )
+
+    assert {prediction.experiment_id for prediction in predictions} == experiment_ids
+    assert all(
+        prediction.provenance["run_refusal"]["reason"]
+        == "engine_timeout:openimcc:sossi_residue_cohort"
+        for prediction in predictions
+    )
+
+
+def test_sossi_worker_start_failure_is_recorded_as_transport_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("openimcc")
+    import multiprocessing
+
+    import simulator.battery.residue as residue
+    from simulator.melt_backend import openimcc_bridge
+
+    spawn_context = multiprocessing.get_context("spawn")
+    connections = []
+
+    class ContextProxy:
+        def Pipe(self, **kwargs):
+            pair = spawn_context.Pipe(**kwargs)
+            connections.extend(pair)
+            return pair
+
+        def Process(self, **kwargs):
+            process = spawn_context.Process(**kwargs)
+
+            def fail_start():
+                raise OSError(24, "forced descriptor exhaustion")
+
+            process.start = fail_start
+            return process
+
+    monkeypatch.setattr(
+        residue.multiprocessing, "get_context", lambda _method: ContextProxy()
+    )
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+    source = yaml.safe_load(SOURCE.read_text())
+    experiment = source["experiments"][0]
+    starting_trace = {
+        element: source["species"][element]["observations"][0]["values"][
+            "starting_measured_ppm"
+        ]
+        for element in ("Mn", "Ti")
+    }
+    experiment_id = experiment["experiment_id"]
+
+    prediction = residue._predict_sossi_residue_cohort(
+        [experiment],
+        yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text()),
+        starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+        buffered_fO2_log_by_experiment={experiment_id: -10.0},
+        code_revision="sossi-worker-start-failure-test",
+        engine="openimcc",
+    )[0]
+
+    assert prediction.provenance["run_refusal"]["reason"] == (
+        "engine_transport_error:openimcc"
+    )
+    assert len(connections) == 2
+    assert all(connection.closed for connection in connections)
+    assert residue._OPENIMCC_EVALUATION_WORKER is None
 
 
 def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) -> None:

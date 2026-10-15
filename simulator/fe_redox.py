@@ -865,6 +865,23 @@ def melt_mol_fractions_for_kress91(comp_wt: Mapping[str, float]) -> dict[str, fl
     return {oxide: mol / total_mol for oxide, mol in mol_counts.items()}
 
 
+def kress91_dropped_components(
+    comp_wt: Mapping[str, float],
+) -> tuple[tuple[str, ...], float | None]:
+    """Report positive composition mass excluded by the KC91 oxide basis."""
+
+    supported = {*KRESS91_MOL_FRACTION_OXIDES, 'FeO', 'Fe2O3'}
+    values = {name: float(amount) for name, amount in comp_wt.items()}
+    dropped = tuple(
+        sorted(name for name, amount in values.items() if name not in supported and amount > 0.0)
+    )
+    total = math.fsum(amount for amount in values.values() if amount > 0.0)
+    if not dropped or total <= 0.0:
+        return (), None
+    dropped_total = math.fsum(values[name] for name in dropped)
+    return dropped, dropped_total / total
+
+
 def _kress91_fe2o3_over_feo_molar(
     *,
     fO2_log: float,
@@ -1256,3 +1273,9 @@ def kress91_split(
         'extrapolation': temperature_band['extrapolation'],
         'high_uncertainty': temperature_band['high_uncertainty'],
     }
+
+
+def _kress91_fe3_fe2_ratio(fe2o3_over_feo_molar: float) -> float:
+    # One Fe2O3 formula unit contains two Fe3+ cations; FeO contains one
+    # Fe2+ cation, so Fe3+/Fe2+ = 2*n(Fe2O3)/n(FeO) = 2*ratio.
+    return 2.0 * float(fe2o3_over_feo_molar)
