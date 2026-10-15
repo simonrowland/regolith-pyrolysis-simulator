@@ -2160,6 +2160,7 @@ def _write_compilation_comparisons_jsonl(
             ):
                 residual = comparison.residual
                 numeric = residual.numeric
+                refusal = residual.refusal
                 record = comparison.record
                 payload = {
                     "reference_id": comparison.reference.observation_id,
@@ -2178,6 +2179,12 @@ def _write_compilation_comparisons_jsonl(
                         None
                         if numeric is None or numeric.decision_band is None
                         else str(numeric.decision_band.value)
+                    ),
+                    "refusal_reason": (
+                        None if refusal is None else refusal.reason.value
+                    ),
+                    "refusal_detail": (
+                        {} if refusal is None else dict(refusal.detail)
                     ),
                 }
                 stream.write(

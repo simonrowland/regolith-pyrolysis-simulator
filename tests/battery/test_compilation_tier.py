@@ -513,7 +513,54 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
         "status",
         "value",
         "band",
+        "refusal_reason",
+        "refusal_detail",
     }
+    assert fit_row["refusal_reason"] is None
+    assert fit_row["refusal_detail"] == {}
+
+
+def test_nasa9_fit_writer_serializes_typed_refusal_fields(tmp_path, monkeypatch) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
+    import simulator.battery.generators.compilation_thermo_fits as fit_generator
+    from simulator.battery.compilation_tier import (
+        ThermoAttempt,
+        _write_compilation_comparisons_jsonl,
+        iter_compilation_comparisons_jsonl,
+    )
+
+    record, context, _printed_cell = _nasa9_fit_test_case()
+    detail = {"reason": "fit-test-refusal", "engine": Engine.THERMOENGINE.value}
+
+    def refuse_fit(_engine, _observation, **_kwargs):
+        return ThermoAttempt(
+            value=None,
+            unit=None,
+            authority=Authority.REFUSED,
+            notices=(),
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail=detail,
+            call_evidence="fit-refusal-test",
+            coefficient_sources=(),
+        )
+
+    monkeypatch.setattr(compilation_tier, "predict_thermo_attempt", refuse_fit)
+    monkeypatch.setattr(fit_generator, "load_sidecar", lambda: [record])
+    path = tmp_path / "refused-compilation-comparisons.jsonl"
+    assert _write_compilation_comparisons_jsonl(
+        context,
+        path,
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=False,
+    ) > 0
+    fit_row = next(
+        row
+        for row in iter_compilation_comparisons_jsonl(path)
+        if str(row["comparison_channel"]).startswith("nasa9_fit:")
+    )
+    assert fit_row["status"] == ResidualStatus.REFUSED.value
+    assert fit_row["refusal_reason"] == RefusalReason.UNSUPPORTED.value
+    assert fit_row["refusal_detail"] == detail
 
 
 def test_nasa9_fit_writer_respects_selected_engines_and_policy(tmp_path, monkeypatch) -> None:

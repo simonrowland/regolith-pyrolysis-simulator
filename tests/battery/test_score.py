@@ -6571,6 +6571,42 @@ def test_battery_report_only_streams_residual_jsonl(
         residual_path,
         root=score_mod.REPO_ROOT,
     )
+    import json
+
+    fit_comparison_path = battery / "compilation-comparisons.jsonl"
+    fit_comparison_path.write_text(
+        "\n".join(
+            json.dumps(row)
+            for row in (
+                {
+                    "reference_id": "nasa9-fit::record::cp::T=1200",
+                    "quantity": "cp",
+                    "comparison_channel": f"nasa9_fit:{Engine.INTERNAL_ANALYTICAL.value}",
+                    "comparison_key": "nasa9-fit::record::cp::T=1200::internal-analytical",
+                    "comparison_quantity": "cp",
+                    "status": "match",
+                    "value": "0.12",
+                    "band": "0.5",
+                    "refusal_reason": None,
+                    "refusal_detail": {},
+                },
+                {
+                    "reference_id": "nasa9-fit::record::cp::T=1300",
+                    "quantity": "cp",
+                    "comparison_channel": f"nasa9_fit:{Engine.INTERNAL_ANALYTICAL.value}",
+                    "comparison_key": "nasa9-fit::record::cp::T=1300::internal-analytical",
+                    "comparison_quantity": "cp",
+                    "status": ResidualStatus.REFUSED.value,
+                    "value": None,
+                    "band": None,
+                    "refusal_reason": RefusalReason.UNSUPPORTED.value,
+                    "refusal_detail": {"reason": "fit-unavailable"},
+                },
+            )
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
     monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
     monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
@@ -6606,16 +6642,100 @@ def test_battery_report_only_streams_residual_jsonl(
     assert "report-only residuals=1" in printed
     assert (battery / "score-report.md").is_file()
     assert (battery / "score-summary.json").is_file()
-    import json
-
+    report = (battery / "score-report.md").read_text(encoding="utf-8")
+    assert "## NASA-9 fit comparison stratum" in report
+    assert "| internal-analytical | cp | 2 | 1 | 1 |" in report
+    assert "`unsupported`" in report and '"reason":"fit-unavailable"' in report
     summary = json.loads((battery / "score-summary.json").read_text(encoding="utf-8"))
     assert all("n_eligible_references" not in row for row in summary["records"])
+    assert all(row["tier"] != "nasa9_fit" for row in summary["records"])
     measured_vapour = next(
         row
         for row in summary["records"]
         if row["tier"] == "measured" and row["rail"] == Rail.VAPOUR.value
     )
+    assert measured_vapour["n"] == 1
     assert measured_vapour["band_width_dex"] is None
+
+
+def test_battery_normal_report_includes_fit_comparison_stratum(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import json
+
+    import simulator.battery.score as score_mod
+    from scripts import battery_score
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    reference = F.observation(
+        "normal-report-row",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    context = _context(work, experiment, reference)
+    root = tmp_path / "normal-report-root"
+    (root / "data" / "battery").mkdir(parents=True)
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    monkeypatch.setattr(score_mod, "derive_store_stamp", lambda _root: stamp)
+    monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "emit_store_stamp_mismatch_warning", lambda *_: None)
+    monkeypatch.setattr(battery_score, "load_legacy_score_rows", lambda _root: [])
+
+    def write_fit_rows(_context, path, *, engines, invoke_pure_phase):
+        assert engines == (Engine.INTERNAL_ANALYTICAL,)
+        assert invoke_pure_phase is True
+        path.write_text(
+            json.dumps(
+                {
+                    "reference_id": "nasa9-fit::record::cp::T=1200",
+                    "quantity": "cp",
+                    "comparison_channel": f"nasa9_fit:{Engine.INTERNAL_ANALYTICAL.value}",
+                    "comparison_key": "nasa9-fit::record::cp::T=1200::internal-analytical",
+                    "comparison_quantity": "cp",
+                    "status": "match",
+                    "value": "0.12",
+                    "band": "0.5",
+                    "refusal_reason": None,
+                    "refusal_detail": {},
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        return 1
+
+    monkeypatch.setattr(
+        battery_score, "_write_compilation_comparisons_jsonl", write_fit_rows
+    )
+    assert (
+        battery_score.main(
+            [
+                "--root",
+                str(root),
+                "--engines",
+                Engine.INTERNAL_ANALYTICAL.value,
+                "--limit",
+                "1",
+            ]
+        )
+        == 0
+    )
+    report = (root / "data" / "battery" / "score-report.md").read_text(
+        encoding="utf-8"
+    )
+    assert "## NASA-9 fit comparison stratum" in report
+    assert "| internal-analytical | cp | 1 | 1 | 0 |" in report
+    residual_rows = score_mod.load_residuals_jsonl(
+        root / "data" / "battery" / "residuals.jsonl"
+    )
+    assert not any(
+        "nasa9_fit" in str(row.get("source_relation")) for row in residual_rows
+    )
 
 
 def test_write_headline_summary_has_tier_and_null_data_scatter_slot(tmp_path: Path) -> None:
