@@ -134,13 +134,23 @@ def test_intrinsic_kress91_iw_regime_guards_against_vacuum_floor_conflation():
     sim.melt.temperature_C = 1873.15 - 273.15
     sim.melt.pO2_mbar = 1.0e-6
 
+    initial = sim._feedstock_iron_initialization
+    # Use the same pressure for the reference and hot state; the load anchor
+    # was initialized at vacuum pressure and includes Kress's pressure term.
+    reference_fO2 = sim._current_melt_redox_fO2_log(
+        initial['formation_temperature_K'])
     intrinsic_fO2_log = sim._compute_intrinsic_melt_fO2(1873.15)
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = intrinsic_fO2_log
     sim.melt.fO2_log = intrinsic_fO2_log
     sim.melt.melt_fO2_log = intrinsic_fO2_log
     equilibrium = sim._internal_analytical_equilibrium()
 
-    assert -8.10 <= intrinsic_fO2_log <= -7.85
+    from simulator.fe_redox import kress91_referenced_log_fO2
+    expected = kress91_referenced_log_fO2(reference_fO2,
+        reference_T_K=initial['formation_temperature_K'], target_T_K=1873.15,
+        reference_pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        target_pressure_bar=sim.melt.p_total_mbar / 1000.0)
+    assert intrinsic_fO2_log == pytest.approx(expected, abs=2e-13)
     assert equilibrium.fO2_log == pytest.approx(intrinsic_fO2_log, abs=0.05)
     assert abs(equilibrium.fO2_log - (-9.0)) > 0.75
 

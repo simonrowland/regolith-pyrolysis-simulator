@@ -24,6 +24,54 @@ from simulator.vapour_rail.catalog import vapor_pressure_compatibility_view
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 
 
+def _seed_melt_redox(sim, fO2_log: float) -> None:
+    """Establish a test split through the real, funded Fe/O2 provider."""
+    from simulator.accounting import MaterialLot
+    from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.fe_redox import kress91_oxygen_demand_mol, melt_mol_fractions_for_kress91
+
+    original_T = sim.melt.temperature_C
+    before_buffer_kg = sim.atom_ledger.kg_by_account('reservoir.fo2_buffer').get('O2', 0.0)
+    if original_T < 1200.0:
+        sim.melt.temperature_C = sim._current_melt_redox_reference_T_K() - 273.15
+    T_K = sim.melt.temperature_C + 273.15
+    inv = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    demand = kress91_oxygen_demand_mol(
+        feo_mol=inv.get('FeO', 0.0), fe2o3_mol=inv.get('Fe2O3', 0.0),
+        fO2_log=fO2_log, T_K=T_K, pressure_bar=max(sim.melt.p_total_mbar/1000, 1e-9),
+        mol_fractions=melt_mol_fractions_for_kress91(sim._melt_oxide_wt_pct()))
+    if demand > 0.0:
+        lot = sim.atom_ledger.load_external_mol('reservoir.fo2_buffer', {'O2': demand},
+            source='test fixture redox oxygen', material_origin='feedstock')
+        key = 'test_redox_fixture_oxygen'
+        sim.inventory.stage0_external_inputs_kg[key] = (
+            sim.inventory.stage0_external_inputs_kg.get(key, 0.0)
+            + lot.total_mass_kg(sim.atom_ledger.registry))
+    controls = {'oxygen_source': 'fo2_buffer', 'internal_o2_capacity_mol': max(demand, 0.0)}
+    result = sim._dispatch_only(ChemistryIntent.FE_REDOX_RESPECIATION,
+        fO2_log=fO2_log, control_inputs=controls)
+    assert result.status == 'ok'
+    if result.transition is not None:
+        sim._commit_proposal(ChemistryIntent.FE_REDOX_RESPECIATION,
+            result.transition, diagnostic=result.diagnostic, control_inputs=controls)
+    # Park released fixture gas outside the test headspace/buffer so later
+    # no-phantom-O2 tests start with the empty gas inventories they specify.
+    gas = max(0.0, sim.atom_ledger.kg_by_account('reservoir.fo2_buffer').get('O2', 0.0)
+              - before_buffer_kg)
+    if gas > 0.0:
+        sim.atom_ledger.transfer('test_fixture_redox_gas_removal',
+            [MaterialLot('reservoir.fo2_buffer', {'O2': gas})],
+            [MaterialLot('terminal.oxygen_melt_offgas_stored', {'O2': gas})])
+    sim._project_cleaned_melt_from_atom_ledger()
+    sim.melt.oxygen_reservoir.reference_T_K = T_K
+    sim._sync_oxygen_reservoir_mirror()
+    store = sim._pt0_store()
+    tolerance = (store.control_quantization.log_fo2_quantum
+                 if store is not None and store.quantize_live_controls else 2e-13)
+    assert sim._current_melt_redox_fO2_log() == pytest.approx(fO2_log, abs=tolerance)
+    sim.melt.temperature_C = original_T
+
+
 def _load_yaml(name: str) -> dict:
     payload = yaml.safe_load((DATA_DIR / name).read_text())
     if name == "vapor_pressures.yaml":

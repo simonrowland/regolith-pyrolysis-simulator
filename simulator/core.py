@@ -4325,6 +4325,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                max(float(self.melt.temperature_C) + 273.15,
                    KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15))
         inventory = self.atom_ledger.mol_by_account('process.cleaned_melt')
+        # A producer can commit before refreshing its kg output projection.
+        # Read both iron ratio and melt-resident composition from the ledger.
+        comp = self._melt_oxide_wt_pct()
         head_o2 = max(0.0, float(self.atom_ledger.mol_by_account(
             'process.overhead_gas').get(OXYGEN_SPECIES, 0.0)))
         ledger_pO2 = self._headspace_ledger_pO2_bar_from_o2_mol(head_o2)
@@ -4334,14 +4337,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         state = kress91_intrinsic_state(
             feo_mol=float(inventory.get('FeO', 0.0)),
             fe2o3_mol=float(inventory.get('Fe2O3', 0.0)),
-            mol_fractions=melt_mol_fractions_for_kress91(self._melt_oxide_wt_pct()),
+            mol_fractions=melt_mol_fractions_for_kress91(comp),
             T_K=T_K,
             pressure_bar=floor_vacuum_pressure_bar(
                 float(self.melt.p_total_mbar) / 1000.0,
                 floor_bar=self._vacuum_floor_bar(),
             ),
             exchange_fO2_log=math.log10(max(exchange_pO2, self._vacuum_floor_bar())),
-            composition_wt_pct=self._melt_oxide_wt_pct(),
+            composition_wt_pct=comp,
         )
         self._last_intrinsic_redox_state = state
         return float(state['fO2_log'])
@@ -6412,6 +6415,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         reservoir.k_O_source = k_source
         reservoir.effective_melt_depth_m = h_eff_m
         reservoir.tau_hr = tau_s / 3600.0
+        if not self._overhead_headspace_enabled():
+            reservoir.exchange_direction = 'none:no_headspace_capacity'
+            return reservoir
         if not self._melt_redox_temperature_shift_is_liquid(
             T_K, gate_authority=gate_authority,
         ):
@@ -6462,7 +6468,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             transferred = (float(diagnostic.get('o2_credit_mol', 0.0))
                            - float(diagnostic.get('o2_debit_mol', 0.0)))
-            reservoir.exchange_unbacked_o2_mol = -uptake - transferred
+            # The inverse/forward Kress round trip can differ by a few ulps
+            # of the much larger Fe inventory. That residual is not oxygen
+            # shortfall; the committing provider owns actual gas funding.
+            # Positive provider demand is gas-to-melt uptake, negative in
+            # the exchange's outward-from-melt signed convention.
+            reservoir.exchange_unbacked_o2_mol = -float(
+                diagnostic.get('unfunded_o2_mol', 0.0))
             reservoir.exchange_clamped = (
                 abs(reservoir.exchange_unbacked_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
             )
@@ -6705,6 +6717,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(cold_train, 'accumulator_enabled', False)
         )
 
+        # Resolving equipment geometry can initialize the melt surface area.
+        # Do it before freezing flux controls so shadow and live calculations
+        # use the same physical vessel, even on the first capacity solve.
+        volume_m3 = self._headspace_volume_m3()
+
         ledger_before = self.atom_ledger.mol_by_account()
         transition_count_before = len(self.atom_ledger.transitions)
         pre_holdup = self._overhead_holdup_mol()
@@ -6852,7 +6869,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ) or 0.0
                 ),
                 temperature_K=self._headspace_temperature_K(),
-                volume_m3=self._headspace_volume_m3(),
+                volume_m3=volume_m3,
                 dt_hr=1.0,
                 bleed_conductance_kg_s=self._headspace_bleed_conductance_kg_s(
                     species_kg_for_M_avg=self._overhead_holdup_species_kg(
@@ -8706,13 +8723,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return (sulfur_kg / melt_total_kg) * 1.0e6
 
     def _melt_oxide_wt_pct(self) -> Dict[str, float]:
-        """Return cleaned-melt oxide composition in wt% (zero-total safe)."""
-        total = sum(self.inventory.melt_oxide_kg.values())
+        """Read melt-resident oxide composition from the ledger (zero-total safe)."""
+        oxide_kg = {species: kg for species, kg in
+                    self._melt_resident_composition_kg_from_atom_ledger().items()
+                    if species in OXIDE_SPECIES}
+        total = sum(oxide_kg.values())
         if total <= 0.0:
             return {}
         return {
             species: (kg / total) * 100.0
-            for species, kg in self.inventory.melt_oxide_kg.items()
+            for species, kg in oxide_kg.items()
             if kg > 0.0
         }
 
