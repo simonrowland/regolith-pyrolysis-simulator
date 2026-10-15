@@ -689,7 +689,7 @@ def _build_high_t_melt_activity_authority(
         "authority_exclusions": {},
     }
     from simulator.melt_backend.openimcc_bridge import (
-        _IMCC_NONCONVERGENCE_ERROR_TYPE,
+        _IMCC_REFUSAL_ERROR_TYPE,
         OpenImccCompositionPolicyRefusal,
         OpenImccUnavailableError,
         evaluate_cleaned_melt,
@@ -699,8 +699,8 @@ def _build_high_t_melt_activity_authority(
         OpenImccCompositionPolicyRefusal,
         OpenImccUnavailableError,
     )
-    if _IMCC_NONCONVERGENCE_ERROR_TYPE is not None:
-        expected_refusal_types += (_IMCC_NONCONVERGENCE_ERROR_TYPE,)
+    if _IMCC_REFUSAL_ERROR_TYPE is not None:
+        expected_refusal_types += (_IMCC_REFUSAL_ERROR_TYPE,)
     try:
         cleaned = evaluate_cleaned_melt(
             composition_mol=composition_mol,
