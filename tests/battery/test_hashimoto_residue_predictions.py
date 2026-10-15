@@ -191,6 +191,7 @@ def test_isolated_openimcc_worker_start_failure_is_typed_and_recoverable(
 
     spawn_context = multiprocessing.get_context("spawn")
     connections = []
+    started_pids = []
     stopped_before_close = []
 
     class ContextProxy:
@@ -202,19 +203,25 @@ def test_isolated_openimcc_worker_start_failure_is_typed_and_recoverable(
         def Process(self, **kwargs):
             process = spawn_context.Process(**kwargs)
             if not stopped_before_close:
-                original_start = process.start
-                original_close = process.close
+                class ProcessProxy:
+                    def __init__(self, delegate):
+                        self._delegate = delegate
 
-                def start_then_fail():
-                    original_start()
-                    raise OSError(24, "forced descriptor exhaustion")
+                    def __getattr__(self, name):
+                        return getattr(self._delegate, name)
 
-                def close_and_record():
-                    stopped_before_close.append(not process.is_alive())
-                    original_close()
+                    def start(self):
+                        self._delegate.start()
+                        started_pids.append(self._delegate.pid)
+                        raise OSError(24, "forced descriptor exhaustion")
 
-                process.start = start_then_fail
-                process.close = close_and_record
+                    def close(self):
+                        stopped_before_close.append(
+                            not self._delegate.is_alive()
+                        )
+                        self._delegate.close()
+
+                return ProcessProxy(process)
             return process
 
     monkeypatch.setattr(
@@ -227,6 +234,8 @@ def test_isolated_openimcc_worker_start_failure_is_typed_and_recoverable(
     assert exc_info.value.reason == "engine_transport_error:openimcc"
     assert len(connections) == 2
     assert all(connection.closed for connection in connections)
+    assert len(started_pids) == 1
+    assert started_pids[0] is not None
     assert stopped_before_close == [True]
     assert residue._OPENIMCC_EVALUATION_WORKER is None
 

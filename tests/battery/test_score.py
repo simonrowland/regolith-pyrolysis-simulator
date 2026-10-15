@@ -9767,10 +9767,17 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         )
         unavailable_stolyarova_refs = {
             obs.observation_id
-            for obs in score_module._refusal_diagnostic_references(filtered)
+            for obs in observations.values()
             if obs.source_id
             in {"kems-053-stolyarova-1991", "stolyarova-1995-cao-alumina-kems"}
+            and obs.admission.status is AdmissionStatus.REJECTED
             and obs.value.kind is ValueKind.UNAVAILABLE
+            and isinstance(obs.identity, Identity)
+            and score_module.rail_for_quantity(
+                quantity_token(obs.identity),
+                species_formula=obs.identity.species.formula,
+            )
+            is not None
         }
         assert unavailable_stolyarova_refs <= {
             row.reference for row in stolyarova_rows
