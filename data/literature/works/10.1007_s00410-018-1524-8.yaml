@@ -12,24 +12,6 @@ work:
       tag: value
       value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
-    - asset_id: pdf:borisov-2018-compilation
-      role: pdf
-      path: raw/borisov-2018-compilation/borisov-2018-compilation.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:borisov-2018-compilation
-      role: pdftotext
-      path: text/borisov-2018-compilation
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:borisov-2018-compilation
-      role: table_csv
-      path: tables/borisov-2018-compilation
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:borisov-2018-compilation
       role: pdftotext
       path: unknown

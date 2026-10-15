@@ -16,6 +16,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -86,7 +87,7 @@ observations:
   locator:
     note: Richter, F. M. et al. (2007), Geochim. Cosmochim. Acta 71:5544-5564, abstract and Fig. 3 pp. 5551-5553, DOI 10.1016/j.gca.2007.09.005
     record: richter_2007_mg_cai_arrhenius_langmuir
-  read_from: pdf:richter-et-al-2007
+  read_from: unknown:richter-et-al-2007
 - observation_id: richter-et-al-2007::richter_2007_si_cai_arrhenius_langmuir
   experiment_id: 10.1016/j.gca.2007.09.005::richter-et-al-2007
   identity:
@@ -101,6 +102,7 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -170,4 +172,4 @@ observations:
   locator:
     note: Richter et al. (2007) GCA 71:5544-5564 abstract; cSi form
     record: richter_2007_si_cai_arrhenius_langmuir
-  read_from: pdf:richter-et-al-2007
+  read_from: unknown:richter-et-al-2007

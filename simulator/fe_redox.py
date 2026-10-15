@@ -607,6 +607,21 @@ class RedoxState:
             'delta_log10': self.delta_log10,
         }
 
+    def cache_identity(self) -> dict[str, str | float] | None:
+        """Return the non-absolute state identity carried beside scalar fO2."""
+        if self.kind == 'absolute':
+            return None
+        return self.to_descriptor()
+
+
+def _non_absolute_redox_state_kwargs(
+    redox_state: RedoxState | None,
+) -> dict[str, RedoxState]:
+    """Forward only redox states that add cache identity beyond scalar fO2."""
+    if redox_state is None or redox_state.cache_identity() is None:
+        return {}
+    return {'redox_state': redox_state}
+
 
 def normalize_redox_state(
     fO2_log: float | None,
@@ -848,6 +863,23 @@ def melt_mol_fractions_for_kress91(comp_wt: Mapping[str, float]) -> dict[str, fl
     if total_mol <= 0.0:
         return {}
     return {oxide: mol / total_mol for oxide, mol in mol_counts.items()}
+
+
+def kress91_dropped_components(
+    comp_wt: Mapping[str, float],
+) -> tuple[tuple[str, ...], float | None]:
+    """Report positive composition mass excluded by the KC91 oxide basis."""
+
+    supported = {*KRESS91_MOL_FRACTION_OXIDES, 'FeO', 'Fe2O3'}
+    values = {name: float(amount) for name, amount in comp_wt.items()}
+    dropped = tuple(
+        sorted(name for name, amount in values.items() if name not in supported and amount > 0.0)
+    )
+    total = math.fsum(amount for amount in values.values() if amount > 0.0)
+    if not dropped or total <= 0.0:
+        return (), None
+    dropped_total = math.fsum(values[name] for name in dropped)
+    return dropped, dropped_total / total
 
 
 def _kress91_fe2o3_over_feo_molar(
@@ -1241,3 +1273,9 @@ def kress91_split(
         'extrapolation': temperature_band['extrapolation'],
         'high_uncertainty': temperature_band['high_uncertainty'],
     }
+
+
+def _kress91_fe3_fe2_ratio(fe2o3_over_feo_molar: float) -> float:
+    # One Fe2O3 formula unit contains two Fe3+ cations; FeO contains one
+    # Fe2+ cation, so Fe3+/Fe2+ = 2*n(Fe2O3)/n(FeO) = 2*ratio.
+    return 2.0 * float(fe2o3_over_feo_molar)

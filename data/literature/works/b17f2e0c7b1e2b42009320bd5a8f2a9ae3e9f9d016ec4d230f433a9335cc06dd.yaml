@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  citation: Shornikov, S. I., Stolyarova, V. L., and Shul’ts, M. M. (1997). Vaporization and the Thermodynamic Properties
+    of Diopside. Russian Journal of Physical Chemistry, 71(2), 174–178. Translated from Zhurnal Fizicheskoi Khimii, 71(2),
+    230–234.
+  source_ids:
+  - shornikov-1997-diopside-vaporization
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:shornikov-1997-diopside-vaporization
+      role: pdf
+      path: raw/shornikov-1997-diopside-vaporization/shornikov-1997-diopside-vaporization.pdf
+      sha256:
+        tag: value
+        value: 0747bc15045d6d913ed031e8ff2ac6c05110ec6e2307bd8fca55c83bf1183138
+    - asset_id: unknown:shornikov-1997-diopside-vaporization
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::experiment::shornikov-1997-diopside-kems
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  locator:
+    page: 174
+    published_page: 174
+    pdf_page_index: 0
+    section: Experimental
+    note: The study used mass-spectrometric effusion Knudsen measurements on diopside in molybdenum cells.

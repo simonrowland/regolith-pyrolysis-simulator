@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import re
 import subprocess
@@ -31,6 +32,7 @@ from typing import Callable, Iterable, Mapping, Sequence
 from simulator.battery.enums import (
     EQUILIBRIUM_FIT_QUANTITIES,
     FORMATION_QUANTITIES,
+    FUSION_QUANTITIES,
     PURE_STANDARD_THERMO,
     QUANTITY_UNITS,
     Authority,
@@ -40,6 +42,7 @@ from simulator.battery.enums import (
     NoticeKind,
     PerBasis,
     Phase,
+    Polymorph,
     Quantity,
     RefusalReason,
     MetricOperation,
@@ -58,6 +61,7 @@ from simulator.battery.records import (
     DecisionBand,
     Notice,
     Observation,
+    Residual,
     State,
     Uncertainty,
     Value,
@@ -98,15 +102,18 @@ _TE_FORMULA: dict[str, str] = {
     "Sil": "Al2SiO5",
 }
 
-_THERMO_QUANTITIES = FORMATION_QUANTITIES | EQUILIBRIUM_FIT_QUANTITIES | PURE_STANDARD_THERMO
-_ENGINE_ELLINGHAM_QUANTITIES = frozenset(
-    {Quantity.DELTA_FG, Quantity.LOG10_KF}
+_THERMO_QUANTITIES = (
+    FORMATION_QUANTITIES
+    | EQUILIBRIUM_FIT_QUANTITIES
+    | PURE_STANDARD_THERMO
+    | FUSION_QUANTITIES
 )
+_ENGINE_ELLINGHAM_QUANTITIES = frozenset({Quantity.DELTA_FG, Quantity.LOG10_KF})
 _ENGINE_PURE_PHASE_QUANTITIES = frozenset(
     {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
 )
 _ENGINE_THERMO_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
-    Engine.INTERNAL_ANALYTICAL: _ENGINE_ELLINGHAM_QUANTITIES,
+    Engine.INTERNAL_ANALYTICAL: _ENGINE_ELLINGHAM_QUANTITIES | FUSION_QUANTITIES,
     Engine.VAPOROCK: _ENGINE_PURE_PHASE_QUANTITIES,
     Engine.THERMOENGINE: _ENGINE_PURE_PHASE_QUANTITIES,
     Engine.MAGEMIN: _ENGINE_PURE_PHASE_QUANTITIES,
@@ -160,6 +167,17 @@ class ThermoAttempt:
     refusal_reason: RefusalReason | None
     refusal_detail: dict[str, object]
     call_evidence: str
+    coefficient_sources: tuple[str, ...] | None = None
+
+
+@dataclass(frozen=True)
+class _Nasa9FitComparison:
+    record: Mapping[str, object]
+    quantity: Quantity
+    temperature_K: Decimal
+    engine: Engine
+    reference: Observation
+    residual: Residual
 
 
 def _decimal_token(value: Decimal) -> str:
@@ -248,6 +266,27 @@ def _score_predicates():
     )
 
     return is_compilation_source, is_internal_consistency, is_sf04_workbook, parse_species_formula
+
+
+def _is_janaf_compilation_observation(
+    observation: Observation, origin: str | None
+) -> bool:
+    is_compilation_source, is_internal_consistency, is_sf04_workbook, _parse = (
+        _score_predicates()
+    )
+    source_id = observation.source_id or ""
+    janaf_source = source_id in {"janaf", "janaf-4th", "nist-janaf-4th"} or (
+        (origin or "").replace("\\", "/").startswith("compilations-janaf/")
+    )
+    compilation_source = is_compilation_evidence(observation) or is_compilation_source(
+        source_id, origin
+    )
+    return bool(
+        janaf_source
+        and compilation_source
+        and not is_internal_consistency(origin)
+        and not is_sf04_workbook(observation)
+    )
 
 
 def _compilation_series_pairs(
@@ -414,6 +453,7 @@ def _refuse(
         refusal_reason=reason,
         refusal_detail=payload,
         call_evidence=call_evidence,
+        coefficient_sources=() if quantity in FUSION_QUANTITIES else None,
     )
 
 
@@ -447,7 +487,7 @@ def _ellingham_attempt(
     K2O at 298.15 K is outside the 1100 K K(g) segment and is refused.
     """
 
-    if quantity not in _engine_thermo_quantities(Engine.INTERNAL_ANALYTICAL):
+    if quantity not in _ENGINE_ELLINGHAM_QUANTITIES:
         return _refuse(
             RefusalReason.UNSUPPORTED,
             "ellingham-emits-reaction-dg-only",
@@ -1218,6 +1258,240 @@ def predict_thermo_attempt(
             quantity=quantity,
             origin=origin,
         )
+    if quantity in {Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION}:
+        if engine is not Engine.INTERNAL_ANALYTICAL:
+            return _refuse(
+                RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+                "engine-does-not-report-solid-and-liquid-endmembers-at-fixed-T",
+                quantity=quantity,
+                origin=origin,
+                extra={"engine": engine.value},
+            )
+        if _state_value(identity.subtype) != "solid_to_liquid":
+            return _refuse(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                "fusion-transition-subtype-unknown",
+                quantity=quantity,
+                origin=origin,
+            )
+        phase = _state_value(identity.species.phase)
+        if phase is None:
+            return _refuse(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                "fusion-solid-phase-unknown",
+                quantity=quantity,
+                origin=origin,
+            )
+        if phase is not Phase.CR:
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-phase-must-be-crystal",
+                quantity=quantity,
+                origin=origin,
+                extra={"phase": str(getattr(phase, "value", phase))},
+            )
+        from simulator.battery.score import (
+            _source_polymorph_is_rejected,
+            _source_polymorph_is_unspecified,
+        )
+
+        source_polymorph = identity.species.polymorph
+        if _source_polymorph_is_rejected(source_polymorph):
+            assert source_polymorph is not None
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-rejected",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "formula": identity.species.formula,
+                    "polymorph_reason": source_polymorph.reason,
+                },
+            )
+        polymorph_unspecified = _source_polymorph_is_unspecified(source_polymorph)
+        polymorph = _state_value(source_polymorph)
+        alternatives: tuple[Polymorph, ...] = ()
+        if polymorph_unspecified:
+            from simulator.battery.generators.janaf import (
+                JANAFFusionPolymorphUnavailable,
+                _janaf_stable_fusion_polymorph,
+            )
+
+            try:
+                polymorph, alternatives = _janaf_stable_fusion_polymorph(
+                    identity.species.formula, temperature_K
+                )
+            except JANAFFusionPolymorphUnavailable as exc:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "fusion-solid-polymorph-unknown",
+                    quantity=quantity,
+                    origin=origin,
+                    extra={"detail": str(exc)},
+                )
+        if polymorph is None:
+            return _refuse(
+                RefusalReason.IDENTITY_UNKNOWN,
+                "fusion-solid-polymorph-unknown",
+                quantity=quantity,
+                origin=origin,
+            )
+        if not isinstance(polymorph, Polymorph):
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-not-closed",
+                quantity=quantity,
+                origin=origin,
+                extra={"polymorph": str(polymorph)},
+            )
+        try:
+            from simulator.battery.generators.janaf import (
+                JANAFFusionPolymorphUnavailable,
+                janaf_fusion_enthalpy,
+                _janaf_fusion_entropy_with_crossing_reason,
+            )
+
+            enthalpy_J_mol, low, high, solid, liquid, hashes = janaf_fusion_enthalpy(
+                identity.species.formula, temperature_K, polymorph
+            )
+        except JANAFFusionPolymorphUnavailable as exc:
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-not-in-janaf",
+                quantity=quantity,
+                origin=origin,
+                extra={"detail": str(exc), "formula": identity.species.formula},
+            )
+        except (KeyError, ValueError) as exc:
+            return _refuse(
+                RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+                "JANAF-fusion-endmembers-unavailable",
+                quantity=quantity,
+                origin=origin,
+                extra={"detail": str(exc), "formula": identity.species.formula},
+            )
+        authority = Authority.BRIDGE
+        from simulator.battery.generators.janaf import _JANAF_POLYMORPH_BY_TABLE
+
+        solid_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(solid)
+        observed_polymorph = polymorph_token(identity.species)
+        if (
+            not polymorph_unspecified
+            and solid_polymorph is not None
+            and observed_polymorph is not solid_polymorph
+        ):
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-mismatch",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "engine_reference_table": solid,
+                    "engine_reference_polymorph": solid_polymorph.value,
+                    "observed_polymorph": (
+                        None
+                        if observed_polymorph is None
+                        else observed_polymorph.value
+                    ),
+                },
+            )
+        if polymorph_unspecified:
+            other_references = ", ".join(
+                alternative.value for alternative in alternatives
+            )
+            notice_list = [
+                Notice(
+                    kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        "fusion_solid_polymorph_unspecified: source does not state "
+                        f"a solid polymorph; predictor used {solid} "
+                        f"({polymorph.value}); alternatives: "
+                        f"{other_references or 'none defined at this temperature'}"
+                    ),
+                    origin=origin,
+                    band=f"JANAF {solid}/{liquid} common range [{low}, {high}] K",
+                    authority=authority,
+                    certification="NIST-JANAF solid/liquid fusion reference",
+                ),
+            ]
+        else:
+            notice_list = []
+        if temperature_K < low or temperature_K > high:
+            authority = Authority.EXTRAPOLATED
+            if polymorph_unspecified:
+                notice_list[0] = replace(notice_list[0], authority=authority)
+            notice_list.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(quantity,),
+                    reason="janaf_fusion_enthalpy_extrapolated",
+                    origin=origin,
+                    band=f"[{low}, {high}] K",
+                    authority=Authority.EXTRAPOLATED,
+                )
+            )
+        if quantity is Quantity.ENTHALPY_OF_FUSION:
+            # JANAF formation enthalpies are kJ/mol; their endmember difference
+            # cancels the elemental reference. Convert to the declared unit.
+            predicted = enthalpy_J_mol / Decimal(1000)
+        else:
+            # At the JANAF crossing, ΔG=0 gives ΔS=ΔH/T_fus. Away from
+            # that crossing, ΔS_fus(T) is the two curves' entropy difference.
+            try:
+                (
+                    predicted,
+                    crossing_K,
+                    crossing_error,
+                ) = _janaf_fusion_entropy_with_crossing_reason(
+                    identity.species.formula, temperature_K, polymorph
+                )
+            except (KeyError, ValueError) as exc:
+                return _refuse(
+                    RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+                    "JANAF-fusion-endmembers-unavailable",
+                    quantity=quantity,
+                    origin=origin,
+                    extra={"detail": str(exc), "formula": identity.species.formula},
+                )
+            if crossing_error is not None:
+                notice_list.append(
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(quantity,),
+                        reason=(
+                            "janaf_fusion_crossing_undetermined: "
+                            f"{crossing_error}"
+                        ),
+                        origin=origin,
+                        authority=authority,
+                    )
+                )
+            elif temperature_K != crossing_K:
+                notice_list.append(
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(quantity,),
+                        reason="janaf_fusion_transition_off_equilibrium",
+                        origin=origin,
+                        band=f"fusion crossing at {crossing_K} K",
+                        authority=authority,
+                    )
+                )
+        notices = tuple(notice_list)
+        return ThermoAttempt(
+            value=predicted,
+            unit=QUANTITY_UNITS[quantity],
+            authority=authority,
+            notices=notices,
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence=(
+                f"janaf-fusion:{solid}/{liquid}:T={temperature_K}:"
+                f"source_sha256={hashes[0]}/{hashes[1]}"
+            ),
+            coefficient_sources=(solid, liquid),
+        )
     if engine is Engine.INTERNAL_ANALYTICAL:
         return _ellingham_attempt(identity, quantity, temperature_K, origin=origin)
     if engine is Engine.VAPOROCK:
@@ -1750,11 +2024,25 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
     it does not derive a second residual or decision.
     """
 
-    from simulator.battery.score import (
-        is_compilation_source,
-        is_internal_consistency,
-        is_sf04_workbook,
+    from simulator.battery.score import SCORE_ENGINE_SET
+
+    return _write_compilation_comparisons_jsonl(
+        context,
+        path,
+        engines=SCORE_ENGINE_SET,
+        invoke_pure_phase=True,
     )
+
+
+def _write_compilation_comparisons_jsonl(
+    context,
+    path: Path,
+    *,
+    engines: Sequence[Engine],
+    invoke_pure_phase: bool,
+) -> int:
+    """Write comparison rows for the selected engine execution policy."""
+
     from simulator.diagnostic_helpers.species_rail_differential import (
         COMPILATION_JANAF,
         KeyedTablePoint,
@@ -1778,20 +2066,7 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
             temporary_path = Path(stream.name)
             for observation in context.observations.values():
                 origin = context.origins.get(observation.observation_id)
-                source_id = observation.source_id or ""
-                if not (
-                    is_compilation_evidence(observation)
-                    or is_compilation_source(source_id, origin)
-                ):
-                    continue
-                if not (
-                    source_id in {"janaf", "janaf-4th", "nist-janaf-4th"}
-                    or (origin or "").replace("\\", "/").startswith(
-                        "compilations-janaf/"
-                    )
-                ):
-                    continue
-                if is_internal_consistency(origin) or is_sf04_workbook(observation):
+                if not _is_janaf_compilation_observation(observation, origin):
                     continue
 
                 for point in _iter_compilation_series_cells(observation, origin):
@@ -1878,6 +2153,50 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
                             + "\n"
                         )
                         written += 1
+            for comparison in _nasa9_fit_comparisons(
+                context,
+                engines=engines,
+                invoke_pure_phase=invoke_pure_phase,
+            ):
+                residual = comparison.residual
+                numeric = residual.numeric
+                refusal = residual.refusal
+                record = comparison.record
+                payload = {
+                    "reference_id": comparison.reference.observation_id,
+                    "quantity": comparison.quantity.value,
+                    "comparison_channel": f"nasa9_fit:{comparison.engine.value}",
+                    "comparison_key": (
+                        f"nasa9-fit::{record.get('record_id')}::"
+                        f"{comparison.quantity.value}::T="
+                        f"{_decimal_token(comparison.temperature_K)}::"
+                        f"{comparison.engine.value}"
+                    ),
+                    "comparison_quantity": comparison.quantity.value,
+                    "status": residual.status.value,
+                    "value": None if numeric is None else str(numeric.value),
+                    "band": (
+                        None
+                        if numeric is None or numeric.decision_band is None
+                        else str(numeric.decision_band.value)
+                    ),
+                    "refusal_reason": (
+                        None if refusal is None else refusal.reason.value
+                    ),
+                    "refusal_detail": (
+                        {} if refusal is None else dict(refusal.detail)
+                    ),
+                }
+                stream.write(
+                    json.dumps(
+                        payload,
+                        sort_keys=True,
+                        ensure_ascii=False,
+                        separators=(",", ":"),
+                    )
+                    + "\n"
+                )
+                written += 1
             stream.flush()
         os.replace(temporary_path, path)
         temporary_path = None
@@ -1904,17 +2223,20 @@ def iter_compilation_comparisons_jsonl(path: Path) -> Iterable[dict[str, object]
 def _prediction_from_attempt(engine: Engine, observation: Observation, attempt: ThermoAttempt):
     from simulator.battery.score import (
         ENGINE_CHANNELS,
-        ENGINE_COEFFICIENT_SOURCES,
         EnginePrediction,
         Execution,
         ExecutionState,
+        _attempt_coefficient_sources,
     )
 
     if attempt.value is not None:
         state = ExecutionState.PRODUCED
     elif attempt.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE:
         state = ExecutionState.ATTEMPTED_UNAVAILABLE
-    elif attempt.refusal_reason is RefusalReason.UNSUPPORTED:
+    elif attempt.refusal_reason in {
+        RefusalReason.UNSUPPORTED,
+        RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+    }:
         state = ExecutionState.UNSUPPORTED
     else:
         state = ExecutionState.NOT_PROBED
@@ -1927,7 +2249,9 @@ def _prediction_from_attempt(engine: Engine, observation: Observation, attempt: 
         unit=attempt.unit,
         authority=attempt.authority,
         notices=attempt.notices,
-        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        coefficient_sources=_attempt_coefficient_sources(
+            engine, attempt.coefficient_sources
+        ),
         lineage_complete=False,
         refusal_reason=attempt.refusal_reason,
         refusal_detail=attempt.refusal_detail,
@@ -1940,6 +2264,249 @@ def _refusal_key(reason: RefusalReason, detail: Mapping[str, object]) -> str:
     if isinstance(token, str) and token:
         return f"{reason.value}:{token}"
     return reason.value
+
+
+def _nasa9_fit_phase_label(identity: Identity) -> str | None:
+    phase = phase_token(identity.species)
+    if not isinstance(phase, Phase):
+        return None
+    label = phase.value
+    polymorph = polymorph_token(identity.species)
+    if isinstance(polymorph, Polymorph):
+        label += f":{polymorph.value}"
+    elif isinstance(polymorph, str) and polymorph:
+        label += f":{polymorph}"
+    return label
+
+
+def _nasa9_fit_comparisons(
+    context,
+    *,
+    engines: Sequence[Engine],
+    invoke_pure_phase: bool,
+    fit_records: Sequence[Mapping[str, object]] | None = None,
+) -> list[_Nasa9FitComparison]:
+    """Score precision-qualified NASA-9 grid points with the shared residual owner."""
+
+    from simulator.battery.generators.compilation_thermo_fits import (
+        evaluate_sidecar_fit,
+        load_sidecar,
+        sidecar_element_reference_curves,
+    )
+    from simulator.battery.score import compile_residual
+
+    records = list(load_sidecar() if fit_records is None else fit_records)
+    reference_curves = sidecar_element_reference_curves(records)
+    source_cells: dict[
+        str, dict[tuple[str, str, str, Decimal], Observation | _CompilationSeriesCell]
+    ] = {}
+    for observation in context.observations.values():
+        origin = context.origins.get(observation.observation_id)
+        if not _is_janaf_compilation_observation(observation, origin):
+            continue
+        locator = observation.locator
+        table_id = (
+            None
+            if locator is None
+            else locator.record or locator.table
+        )
+        if not table_id:
+            continue
+        for point in _iter_compilation_series_cells(observation, origin):
+            identity = point.identity
+            if not isinstance(identity, Identity):
+                continue
+            quantity = quantity_token(identity)
+            temperature = identity.temperature_K
+            phase_label = _nasa9_fit_phase_label(identity)
+            if (
+                quantity is None
+                or not isinstance(temperature, State)
+                or not temperature.is_value
+                or temperature.value is None
+                or phase_label is None
+            ):
+                continue
+            key = (
+                identity.species.formula,
+                phase_label,
+                quantity.value,
+                as_decimal(temperature.value),
+            )
+            source_cells.setdefault(str(table_id), {}).setdefault(key, point)
+
+    comparisons: list[_Nasa9FitComparison] = []
+    fit_quantities = (
+        Quantity.CP,
+        Quantity.H_MINUS_H298,
+        Quantity.S,
+        Quantity.DELTA_FH,
+        Quantity.DELTA_FG,
+    )
+    for record in records:
+        if record.get("status") != "accepted":
+            continue
+        record_id = str(record.get("record_id") or "")
+        table_id = str(record.get("source_record_id") or "")
+        formula = str(record.get("formula") or "")
+        phase = str(record.get("phase") or "")
+        table_points = source_cells.get(table_id, {})
+        h_anchor_points = [
+            point
+            for (point_formula, _point_phase, point_quantity, temperature), point
+            in table_points.items()
+            if point_formula == formula
+            and point_quantity == Quantity.DELTA_FH.value
+            and temperature == Decimal("298.15")
+        ]
+        h_anchor_point = h_anchor_points[0] if len(h_anchor_points) == 1 else None
+        if (
+            h_anchor_point is not None
+            and h_anchor_point.value.kind is ValueKind.POINT
+            and h_anchor_point.value.point is not None
+        ):
+            # The source table owns ΔfH°(298.15 K), which is the integration
+            # constant carried by the high-temperature NASA-9 H coefficients.
+            h_anchor_kJ_mol: float | None = float(
+                as_decimal(h_anchor_point.value.point)
+            )
+        elif record.get("is_element_reference") or record.get(
+            "formation_reason_code"
+        ) == "missing_formation_h_anchor":
+            # The generator uses a zero integration constant for these records.
+            h_anchor_kJ_mol = 0.0
+        else:
+            h_anchor_kJ_mol = None
+        validity = record.get("validity")
+        summary = record.get("residual_summary")
+        if not isinstance(validity, Mapping) or not isinstance(summary, Mapping):
+            continue
+        try:
+            valid_min = float(validity["T_min_K"])
+            valid_max = float(validity["T_max_K"])
+        except (KeyError, TypeError, ValueError):
+            continue
+
+        for quantity in fit_quantities:
+            if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG} and not record.get(
+                "formation_capable"
+            ):
+                continue
+            stats = summary.get(quantity.value)
+            if not isinstance(stats, Mapping):
+                continue
+            try:
+                n = int(stats["n"])
+                max_abs = float(stats["max_abs"])
+                gate_tolerance = float(stats["gate_tolerance"])
+            except (KeyError, TypeError, ValueError):
+                continue
+            if (
+                n <= 0
+                or not math.isfinite(max_abs)
+                or not math.isfinite(gate_tolerance)
+                or gate_tolerance < 0.0
+                or max_abs > gate_tolerance
+            ):
+                continue
+
+            fit_points: list[tuple[Decimal, Observation | _CompilationSeriesCell]] = []
+            if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG}:
+                refs = record.get("printed_formation_cells")
+                if not isinstance(refs, Sequence) or isinstance(refs, (str, bytes)):
+                    continue
+                requested = [
+                    (str(reference["table_id"]), temperature)
+                    for reference in refs
+                    if isinstance(reference, Mapping)
+                    and reference.get("quantity") == quantity.value
+                    and reference.get("table_id")
+                    and isinstance(reference.get("T_K"), Sequence)
+                    and not isinstance(reference.get("T_K"), (str, bytes))
+                    for temperature in reference["T_K"]
+                ]
+                for ref_table_id, raw_temperature in requested:
+                    try:
+                        temperature = as_decimal(raw_temperature)
+                    except (TypeError, ValueError):
+                        continue
+                    point = source_cells.get(ref_table_id, {}).get(
+                        (formula, phase, quantity.value, temperature)
+                    )
+                    if point is not None:
+                        fit_points.append((temperature, point))
+            else:
+                fit_points = [
+                    (temperature, point)
+                    for (point_formula, point_phase, point_quantity, temperature), point
+                    in table_points.items()
+                    if point_formula == formula
+                    and point_phase == phase
+                    and point_quantity == quantity.value
+                ]
+
+            for temperature, point in sorted(fit_points, key=lambda item: item[0]):
+                temperature_K = float(temperature)
+                if temperature_K < valid_min or temperature_K > valid_max:
+                    continue
+                if point.value.kind is not ValueKind.POINT or point.value.point is None:
+                    continue
+                fit_value, refusal = evaluate_sidecar_fit(
+                    record,
+                    quantity,
+                    temperature_K,
+                    reference_curves=reference_curves,
+                    formation_enthalpy_anchor_kJ_mol=h_anchor_kJ_mol,
+                )
+                if refusal is not None or fit_value is None:
+                    continue
+                printed_value = float(as_decimal(point.value.point))
+                # gate_tolerance is the generator's least precise cell allowance;
+                # applying it to the accepted observation here verifies the fit
+                # still reproduces the value resolved from JANAF at read time.
+                if abs(fit_value - printed_value) > gate_tolerance:
+                    continue
+                source_observation = (
+                    point.parent if isinstance(point, _CompilationSeriesCell) else point
+                )
+                fit_reference_id = (
+                    f"nasa9-fit::{record_id}::{quantity.value}::"
+                    f"T={_decimal_token(temperature)}"
+                )
+                fit_reference = replace(
+                    source_observation,
+                    observation_id=fit_reference_id,
+                    identity=point.identity,
+                    value=Value.point_of(as_decimal(fit_value)),
+                )
+                for engine in engines:
+                    attempt = predict_thermo_attempt(
+                        engine,
+                        fit_reference,
+                        invoke_pure_phase=invoke_pure_phase,
+                    )
+                    prediction = _prediction_from_attempt(
+                        engine, fit_reference, attempt
+                    )
+                    residual, _candidate = compile_residual(
+                        fit_reference,
+                        engine,
+                        context=context,
+                        prediction=prediction,
+                        comparison_ids={source_observation.observation_id},
+                        lineage_observation_id=source_observation.observation_id,
+                    )
+                    comparisons.append(
+                        _Nasa9FitComparison(
+                            record=record,
+                            quantity=quantity,
+                            temperature_K=temperature,
+                            engine=engine,
+                            reference=fit_reference,
+                            residual=residual,
+                        )
+                    )
+    return comparisons
 
 
 def compilation_tier_census(
@@ -2217,6 +2784,61 @@ def compilation_tier_census(
     for stratum in decision_strata:
         row = bucket(str(stratum["family"]), str(stratum["quantity"]))
         row["decision_strata"].append(stratum)
+    fit_comparisons = _nasa9_fit_comparisons(
+        context,
+        engines=engine_set,
+        invoke_pure_phase=invoke_pure_phase,
+    )
+    fit_buckets: dict[tuple[str, str, str, str], dict[str, object]] = {}
+    for comparison in fit_comparisons:
+        record = comparison.record
+        residual = comparison.residual
+        key = (
+            str(record.get("formula") or "unknown"),
+            str(record.get("phase") or "unknown"),
+            comparison.quantity.value,
+            comparison.engine.value,
+        )
+        row = fit_buckets.setdefault(
+            key,
+            {"reachable": 0, "numeric": 0, "refused": defaultdict(int)},
+        )
+        row["reachable"] += 1
+        if residual.numeric is None or residual.status is ResidualStatus.REFUSED:
+            refusal_key = (
+                _refusal_key(residual.refusal.reason, residual.refusal.detail)
+                if residual.refusal is not None
+                else residual.status.value
+            )
+            row["refused"][refusal_key] += 1
+        else:
+            row["numeric"] += 1
+    fit_rows = [
+        {
+            "formula": formula,
+            "phase": phase,
+            "quantity": quantity,
+            "engine": engine,
+            "reachable": row["reachable"],
+            "numeric": row["numeric"],
+            "refused": dict(sorted(row["refused"].items())),
+        }
+        for (formula, phase, quantity, engine), row in sorted(fit_buckets.items())
+    ]
+    from simulator.reference_data.janaf import formula_composition
+
+    regolith_elements = {"Na", "K", "Mg", "Fe", "Si", "Ca", "Al", "Ti", "Mn", "Cr"}
+    regolith_fit_rows = []
+    for row in fit_rows:
+        composition = formula_composition(str(row["formula"])) or ()
+        elements = {element for element, _count in composition}
+        phase = str(row["phase"]).split(":", 1)[0].lower()
+        is_regolith_oxide = "O" in elements and bool(elements & regolith_elements)
+        is_regolith_gas = phase in {"g", "gas"} and (
+            bool(elements & regolith_elements) or str(row["formula"]) in {"O", "O2"}
+        )
+        if is_regolith_oxide or is_regolith_gas:
+            regolith_fit_rows.append(row)
     rendered = []
     for (family, quantity), row in sorted(buckets.items()):
         rendered.append(
@@ -2245,4 +2867,10 @@ def compilation_tier_census(
         "banded_series_cells_expanded": banded_series_cells,
         "transition_temperature_series_cells_left": transition_series_cells,
         "rows": rendered,
+        "fit_rows": fit_rows,
+        "fit_comparison_points": len(fit_comparisons),
+        "regolith_species_table": {
+            "elements": sorted(regolith_elements),
+            "rows": regolith_fit_rows,
+        },
     }

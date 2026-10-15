@@ -11,6 +11,7 @@ import re
 import subprocess
 import sys
 import unicodedata
+from collections import Counter
 from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
@@ -34,6 +35,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Polymorph,
+    PolymorphRejectionKind,
     Quantity,
     Rail,
     ResidualStatus,
@@ -423,9 +425,14 @@ def _migrate_real_extract(
     *,
     write: bool = False,
     use_repository_index_row: bool = False,
+    extract_doc: dict | None = None,
 ):
     src = REPO_ROOT / "data" / "literature" / "extracts" / name
-    doc = yaml.safe_load(src.read_text(encoding="utf-8"))
+    doc = (
+        extract_doc
+        if extract_doc is not None
+        else yaml.safe_load(src.read_text(encoding="utf-8"))
+    )
     assert isinstance(doc, dict)
     root = tmp_path / "tree"
     extracts = root / "data" / "literature" / "extracts"
@@ -453,8 +460,162 @@ def _migrate_real_extract(
         yaml.safe_dump(index, sort_keys=False),
         encoding="utf-8",
     )
-    (extracts / name).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+    extract_text = (
+        yaml.safe_dump(doc, sort_keys=False)
+        if extract_doc is not None
+        else src.read_text(encoding="utf-8")
+    )
+    (extracts / name).write_text(extract_text, encoding="utf-8")
     return migrate(root, write=write)
+
+
+def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
+    tmp_path: Path,
+) -> None:
+    name = "holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml"
+    result = _migrate_real_extract(tmp_path / "baseline", name)
+    table2_ids = (
+        "holzheid_1997_table2_page23_feo",
+        "holzheid_1997_table2_page24_feo",
+        "holzheid_1997_table2_page25_feo",
+    )
+    table3_ids = (
+        "holzheid_1997_table3_pages27_bk_feo",
+        *(f"holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_{i}" for i in range(1, 8)),
+    )
+
+    def rows_for(ids: tuple[str, ...]):
+        return [
+            observation
+            for observation in result.observations.values()
+            if any(f"::{identifier}::" in observation.observation_id for identifier in ids)
+        ]
+
+    table2 = rows_for(table2_ids)
+    table3 = rows_for(table3_ids)
+    all_rows = [*table2, *table3]
+    assert (len(table2), len(table3), len(all_rows)) == (57, 15, 72)
+
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
+    source_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    activity_sources = [
+        observation
+        for observation in source_doc["species"]["FeO"]["observations"]
+        if observation.get("type") == "activity_coefficient"
+    ]
+    assert len(activity_sources) == 11
+    for source_observation in activity_sources:
+        standard_state = source_observation["standard_state"]
+        assert standard_state["locator"] == {
+            "published_page": 31,
+            "section": "4.1 Activity coefficients",
+        }
+        assert (
+            'For FeO we have chosen an "FeO"-wüstite(l) standard state.'
+            in standard_state["note"]
+        )
+
+    for observation in all_rows:
+        standard_state = observation.identity.reference_state
+        assert standard_state.is_value
+        reference = standard_state.value
+        assert reference.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert reference.endmember.formula == "Fe(1-x)O"
+        assert reference.endmember.phase.value is Phase.L
+        assert reference.endmember.charge.is_value
+        assert reference.endmember.charge.value == 0
+        assert observation.identity.species.phase.is_value
+        assert observation.identity.species.phase.value is Phase.L
+        assert reference.component_basis == "Fe(1-x)O"
+        assert reference.reference_pressure_bar == Decimal("1.01325")
+        assert identity_equal(observation.identity, observation.identity).kind is (
+            IdentityEqualKind.IDENTITY_UNKNOWN
+        )
+
+    assert all(observation.identity.composition.is_value for observation in table2)
+    assert all(observation.identity.composition.is_unknown for observation in table3)
+    for observation in table2:
+        temperature = observation.point_conditions["temperature_K"]
+        composition = observation.point_conditions["composition"]
+        assert temperature.state.is_value and temperature.locator is not None
+        assert composition.state.is_value and composition.locator is not None
+        assert composition.state.value == observation.identity.composition.value
+        assert composition.inference is not None
+        assert len(composition.inference.inputs) == 3
+        assert "Table 1" in composition.inference.inputs[0]
+        assert "Table 2 run" in composition.inference.inputs[1]
+        assert "other oxide ratios assumed to persist" in composition.inference.inputs[2]
+        assert "not a renormalisation of a partial analysis (d-131)" in (
+            composition.inference.inputs[2]
+        )
+        assert abs(
+            sum(
+                (value for _, value in composition.state.value.components),
+                Decimal("0"),
+            )
+            - 1
+        ) < Decimal("1e-24")
+    assert Counter(issue.reason.value for issue in result.validation.hard_issues) == Counter(
+        {"conditional_field": 4}
+    )
+
+    expected = {
+        "::T=1677:row=ad-10:": {
+            "SiO2": "0.4735",
+            "CaO": "0.2482",
+            "MgO": "0.1442",
+            "Al2O3": "0.0757",
+            "FeO": "0.0556",
+            "NiO": "0.0003",
+            "CoO": "0.0025",
+        },
+        "::T=1672:row=bk-59-a:": {
+            "SiO2": "0.4686",
+            "CaO": "0.1963",
+            "MgO": "0.1508",
+            "Al2O3": "0.0793",
+            "FeO": "0.0437",
+            "NiO": "0.0000",
+            "CoO": "0.0612",
+        },
+        "::T=1672:row=bk-59-b:": {
+            "SiO2": "0.4990",
+            "CaO": "0.2091",
+            "MgO": "0.1606",
+            "Al2O3": "0.0844",
+            "FeO": "0.0407",
+            "NiO": "0.0062",
+            "CoO": "0.0000",
+        },
+    }
+    for key_fragment, expected_components in expected.items():
+        observation = next(row for row in table2 if key_fragment in row.observation_id)
+        composition = observation.identity.composition.value
+        assert {
+            name: f"{value:.4f}" for name, value in composition.components
+        } == expected_components
+        condition = observation.point_conditions["composition"]
+        assert condition.inference.relation == (
+            "calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios"
+        )
+
+    # Mutating a persisted run composition must fail the three-run expected-value pin.
+    mutated_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    mutated_doc["species"]["FeO"]["observations"][0]["values"]["series"][0][
+        "composition_mol"
+    ]["SiO2"] = "0.9999"
+    mutated = _migrate_real_extract(
+        tmp_path / "mutation", name, extract_doc=mutated_doc
+    )
+    mutated_row = next(
+        observation
+        for observation in mutated.observations.values()
+        if "::holzheid_1997_table2_page23_feo::T=1677:row=ad-10:" in observation.observation_id
+    )
+    assert mutated_row.identity.composition.value.components[0][1] == Decimal("0.9999")
+    assert f"{mutated_row.identity.composition.value.components[0][1]:.4f}" != expected[
+        "::T=1677:row=ad-10:"
+    ]["SiO2"]
 
 
 def _extract_observations(name: str) -> list[dict]:
@@ -1348,7 +1509,19 @@ def test_kor_sulfur_tables_are_typed_refusals_and_keep_24_hour_footnote() -> Non
     assert len(activities) == 2
     assert all(obs.admission.status is AdmissionStatus.ADMITTED for obs in activities)
     assert migrator.result.validation is not None
-    assert migrator.result.validation.hard_issues == ()
+    activity_ids = {
+        "kor-1967-thesis-sulphur-oxides-slags::"
+        "kor_1967_table_xxiv_cas_sat_lime_activities::T=1773:"
+        f"{suffix}"
+        for suffix in ("h=496a7a098edd", "h=b5bde09ebf68")
+    }
+    migrated_activity_ids = {obs.observation_id for obs in activities}
+    assert migrated_activity_ids == activity_ids
+    expected = set()
+    assert {
+        (issue.path, issue.reason, issue.detail)
+        for issue in migrator.result.validation.hard_issues
+    } == expected
 
 
 def test_identity_complete_compilation_cells_are_admitted_at_source_level() -> None:
@@ -1514,6 +1687,159 @@ def test_h12_costa_2015_reviewed_alias_collapses_three_ids() -> None:
         aliases=REVIEWED_ALIASES,
     )
     assert steurer_85 != steurer_92
+
+
+def test_costa_2015_fo93fa7_composition_reaches_migrated_observations(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-007-costa-2015.yaml")
+    expected = {
+        "MgO": Decimal("0.62"),
+        "FeO": Decimal("0.046666666667"),
+        "SiO2": Decimal("0.333333333333"),
+    }
+    identity_rows = {
+        "costa_2015_fe_partial_pressure_ir_digitized",
+        "costa_2015_fe_partial_pressure_mo_digitized",
+        "costa_2015_fe_vaporization_coefficient_alpha_digitized",
+        "costa_2015_mg_partial_pressure_ir_digitized",
+        "costa_2015_mg_partial_pressure_mo_digitized",
+    }
+    mapped = [
+        observation
+        for observation in result.observations.values()
+        if any(f"::{row_id}::" in observation.observation_id for row_id in identity_rows)
+    ]
+    assert len(mapped) == 23
+    for observation in mapped:
+        composition = observation.identity.composition
+        assert composition is not None and composition.is_value
+        assert composition.value.basis == "normalized_mole_fraction_from_published_Fo93Fa7"
+        assert composition.value.amount_basis.value == "mole_fraction"
+        assert dict(composition.value.components) == expected
+        assert observation.identity.species.phase.is_value
+        assert observation.identity.species.phase.value is Phase.G
+        assert observation.identity.temperature_K.is_value
+        conditions = observation.point_conditions
+        assert conditions is not None
+        temperature = conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == observation.identity.temperature_K.value
+        assert temperature.inference is None
+        located_composition = conditions["composition"]
+        assert located_composition.state.is_value
+        assert located_composition.state.value == composition.value
+        assert located_composition.locator.page == 1
+        assert located_composition.locator.pdf_page_index == 0
+
+    first_digitized_point = next(
+        observation
+        for observation in mapped
+        if observation.identity.temperature_K.value == Decimal("2014.83")
+    )
+    assert first_digitized_point.identity.temperature_K.value == Decimal("2014.83")
+    assert first_digitized_point.point_conditions["temperature_K"].state.value == Decimal(
+        "2014.83"
+    )
+
+    measured_points = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+    ]
+    assert len(measured_points) == 109
+    assert all(
+        observation.point_conditions is not None
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].state.value
+        == observation.identity.temperature_K.value
+        for observation in measured_points
+    )
+
+    comparator_rows = [
+        observation
+        for observation in result.observations.values()
+        if "costa_2015_fe_partial_pressure_re_piacente_comparator" in observation.observation_id
+        or "costa_2015_mg_partial_pressure_re_piacente_comparator" in observation.observation_id
+    ]
+    assert len(comparator_rows) == 30
+    assert all(
+        observation.identity.composition is not None
+        and observation.identity.composition.is_unknown
+        and observation.identity.composition.reason == "no composition mapped from source"
+        for observation in comparator_rows
+    )
+
+    closed_cell_pressure_rows = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            f"::{row_id}::" in observation.observation_id
+            for row_id in {
+                "costa_2015_fe_partial_pressure_ir_digitized",
+                "costa_2015_fe_partial_pressure_mo_digitized",
+                "costa_2015_mg_partial_pressure_ir_digitized",
+                "costa_2015_mg_partial_pressure_mo_digitized",
+            }
+        )
+    ]
+    assert len(closed_cell_pressure_rows) == 18
+    assert all(observation.identity.fO2_Pa.is_unknown for observation in closed_cell_pressure_rows)
+    assert all(
+        observation.identity.total_pressure_Pa.is_unknown
+        and observation.identity.total_pressure_Pa.reason == "in_cell_total_pressure_not_derivable"
+        for observation in closed_cell_pressure_rows
+    )
+
+    ion_current_rows = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            f"::{row_id}::" in observation.observation_id
+            for row_id in {
+                "costa_2015_fe_time_equilibrium_mo_1669",
+                "costa_2015_fe_time_equilibrium_ir_1851",
+                "costa_2015_fe_siO_ion_intensity_ratio_digitized",
+                "costa_2015_mg_time_equilibrium_mo_1669",
+                "costa_2015_mg_time_equilibrium_ir_1851",
+                "costa_2015_mg_siO_ion_intensity_ratio_digitized",
+            }
+        )
+    ]
+    assert len(ion_current_rows) == 56
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.G
+        for observation in ion_current_rows
+    )
+
+    placeholders = {
+        "costa_2015_fe_olivine_kems_alpha_multicell",
+        "costa_2015_fe_olivine_class_and_motzfeldt_absence_b1",
+        "costa_2015_sio_olivine_kems_alpha_multicell",
+        "costa_2015_sio_olivine_class_and_motzfeldt_absence_b1",
+    }
+    for row_id in placeholders:
+        observation = next(
+            item
+            for item in result.observations.values()
+            if item.observation_id.endswith(f"::{row_id}")
+        )
+        assert quantity_token(observation.identity) is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.value.unavailable_reason == "figure_not_digitized"
+        assert observation.value.point is None
+        assert observation.value.series is None
+        assert observation.admission.status is AdmissionStatus.REJECTED
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        assert observation.identity.species.phase.is_value
+        assert observation.identity.species.phase.value is Phase.G
+        assert observation.identity.temperature_K.is_unknown
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_value
+        assert dict(observation.identity.composition.value.components) == expected
 
 
 def test_doi_canonicalisation_and_alias_registry() -> None:
@@ -1846,6 +2172,41 @@ def test_to_plain_state_serialization_omits_absent_keys() -> None:
     assert value_bytes == b'{"tag":"value","value":"fixture"}'
 
 
+def test_polymorph_rejection_kind_round_trips_and_loads_legacy_states() -> None:
+    from simulator.battery.migrate import _species_from_plain
+    from simulator.battery.records import Species, State
+
+    rejected = Species(
+        "MgO",
+        State.of(Phase.CR),
+        State.unknown(
+            "unrecognised polymorph 'not-a-form' is not a closed Polymorph token",
+            rejection_kind=PolymorphRejectionKind.UNRECOGNISED,
+        ),
+    )
+    payload = to_plain(rejected)
+    assert payload["polymorph"]["rejection_kind"] == "unrecognised"
+    assert _species_from_plain(payload) == rejected
+
+    for reason, expected in (
+        ("source does not state polymorph", PolymorphRejectionKind.OMITTED),
+        (
+            "unrecognised polymorph 'not-a-form' is not a closed Polymorph token",
+            PolymorphRejectionKind.UNRECOGNISED,
+        ),
+        (
+            "polymorph clinoenstatite does not denote formula MgO",
+            PolymorphRejectionKind.CONTRADICTS_FORMULA,
+        ),
+    ):
+        legacy = {
+            "formula": "MgO",
+            "phase": {"tag": "value", "value": "cr"},
+            "polymorph": {"tag": "unknown", "reason": reason},
+        }
+        assert _species_from_plain(legacy).polymorph.rejection_kind is expected
+
+
 @pytest.mark.parametrize(
     ("value_payload", "expected_status"),
     [
@@ -2058,8 +2419,8 @@ def test_lineage_parents_from_source_never_invents_pointer() -> None:
         "src",
         set(),
     )
-    assert parents == ("tables:src",)
-    assert prose == ("tables:src/t2.csv",)
+    assert parents == ("tables:src", "tables:src/t2.csv")
+    assert prose == ()
 
     parents, prose = lineage_parents_from_source(
         {"derived_from": ["tables:src/t2.csv"]},
@@ -2164,6 +2525,66 @@ def test_h05_corrupted_extracts_v2_yaml_fails_store_load(tmp_path: Path) -> None
 
 def _phase_state(obs):
     return obs.identity.species.phase
+
+
+@pytest.mark.parametrize(
+    ("spelling", "printed_name", "expected"),
+    (
+        (" CLINOENSTATITE ", "clinoenstatite", Polymorph.CLINOENSTATITE),
+        ("  Diopside  ", "Diopside", Polymorph.DIOPSIDE),
+        ("High   albite", "High albite", Polymorph.ALBITE_HIGH),
+        ("HIGH SANIDINE", "High sanidine", Polymorph.SANIDINE_HIGH),
+    ),
+)
+def test_extract_named_polymorphs_are_formula_scoped(
+    spelling: str, printed_name: str, expected: Polymorph
+) -> None:
+    from simulator.battery.migrate import polymorph_from_extract
+
+    source_path = (
+        REPO_ROOT
+        / "data/literature/extracts/richet-bottinga-1986-silicate-thermochemistry.yaml"
+    )
+    source = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    matching_formulas = {
+        formula
+        for formula, body in source["species"].items()
+        for row in body.get("observations", ())
+        if row.get("condensed_form", {}).get("polymorph") == printed_name
+    }
+    assert len(matching_formulas) == 1
+    formula = matching_formulas.pop()
+    unrelated_formula = next(
+        candidate for candidate in source["species"] if candidate != formula
+    )
+
+    observation = {"condensed_form": {"polymorph": spelling}}
+    resolved = polymorph_from_extract(observation, formula)
+    assert resolved is not None and resolved.is_value
+    assert resolved.value is expected
+
+    typed = polymorph_from_extract(
+        {"condensed_form": {"polymorph": {"tag": "value", "value": spelling}}},
+        formula,
+    )
+    assert typed is not None and typed.is_value
+    assert typed.value is expected
+
+    unrelated = polymorph_from_extract(observation, unrelated_formula)
+    assert unrelated is not None and unrelated.is_unknown
+    assert unrelated_formula in (unrelated.reason or "")
+
+
+def test_unqualified_cristobalite_is_not_assigned_a_structural_state() -> None:
+    from simulator.battery.migrate import make_species, polymorph_from_extract
+
+    raw = polymorph_from_extract(
+        {"condensed_form": {"polymorph": "Cristobalite"}}, "SiO2"
+    )
+    assert raw is not None and raw.is_value
+    assert raw.value == "Cristobalite"
+    species = make_species("SiO2", Phase.CR, polymorph=raw)
+    assert species.polymorph is not None and species.polymorph.is_unknown
 
 
 def test_unrecognised_polymorph_is_counted_and_queued(tmp_path: Path) -> None:
@@ -3315,7 +3736,7 @@ def test_source_derivation_reports_relation_and_inputs_independently() -> None:
             (),
         ),
         (
-            "kems-012-sossi-2019.yaml",
+            "synthetic-offer7-derivation.yaml",
             "sossi_2019_k_table5_experimental",
             (
                 "invalid derivation annotation: derivation relation (author method) is required",
@@ -3323,7 +3744,7 @@ def test_source_derivation_reports_relation_and_inputs_independently() -> None:
             ),
         ),
         (
-            "kems-ms2000-044.yaml",
+            "synthetic-offer7-derivation.yaml",
             "ms2000_044_sio2_activity_na_system_xsio2_0805_t1473_class_quote_r2",
             (
                 "invalid derivation annotation: derivation relation (author method) is required",
@@ -3331,7 +3752,7 @@ def test_source_derivation_reports_relation_and_inputs_independently() -> None:
             ),
         ),
         (
-            "okazaki-2022-ryugu-gas-treasure-box.yaml",
+            "synthetic-offer7-derivation.yaml",
             "okazaki_2022_fragmentation_assumptions_and_model_output",
             (
                 "invalid derivation annotation: derivation relation (author method) is required",
@@ -3339,7 +3760,7 @@ def test_source_derivation_reports_relation_and_inputs_independently() -> None:
             ),
         ),
         (
-            "busemann-2024-noble-gases-ryugu-bennu.yaml",
+            "synthetic-offer7-derivation.yaml",
             "busemann_2024_preliminary_ryugu_exposure_ages",
             (
                 "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
@@ -3353,8 +3774,25 @@ def test_offer7_derivation_issue_classification_is_pinned(
     observation_id: str,
     expected_details: tuple[str, ...],
 ) -> None:
-    result = _migrate_real_extract(tmp_path, extract_name)
-    source_id = extract_name.removesuffix(".yaml")
+    if extract_name == "synthetic-offer7-derivation.yaml":
+        extract = _raw_inputs_extract("calculated")
+        child = extract["species"]["Na"]["observations"][0]
+        child["observation_id"] = observation_id
+        child["values"].pop("series", None)
+        child["values"]["pressure_atm"] = 1.0
+        derivation = child["values"].pop("derivation")
+        derivation.pop("raw_inputs")
+        if len(expected_details) == 1:
+            derivation["relation"] = "author calculation"
+        else:
+            derivation.pop("relation")
+            derivation.pop("inputs", None)
+        child["values"]["derivation"] = derivation
+        result = migrate(_write_min_tree(tmp_path, extract), write=False)
+        source_id = "fixture-source"
+    else:
+        result = _migrate_real_extract(tmp_path, extract_name)
+        source_id = extract_name.removesuffix(".yaml")
     path_prefix = f"observations.{source_id}::{observation_id}."
     details = tuple(
         issue.detail
@@ -3364,6 +3802,320 @@ def test_offer7_derivation_issue_classification_is_pinned(
     )
 
     assert details == expected_details
+
+
+def test_t1235_real_derivation_rows_are_valid_after_repair(tmp_path: Path) -> None:
+    target_rows = {
+        "kems-012-sossi-2019": {
+            "sossi_2019_k_table5_experimental",
+            "sossi_2019_mn_table5_pure_system_not_experimental",
+            "sossi_2019_mn_table6_te1_pure_system_derived",
+            "sossi_2019_li_logKstar_table3_Li_g",
+            "sossi_2019_li_logKstar_table3_LiO_g",
+            "sossi_2019_li_table4_gamma_this_work",
+            "sossi_2019_li_table5_experimental_Li_g",
+            "sossi_2019_rb_logKstar_table3",
+            "sossi_2019_rb_table4_gamma_this_work",
+            "sossi_2019_rb_table5_experimental",
+            "sossi_2019_cu_logKstar_table3",
+            "sossi_2019_cu_table4_gamma_this_work",
+            "sossi_2019_cu_table5_experimental",
+            "sossi_2019_ag_logKstar_table3",
+            "sossi_2019_ag_table4_gamma_this_work",
+            "sossi_2019_zn_logKstar_table3",
+            "sossi_2019_zn_table4_gamma_this_work",
+            "sossi_2019_zn_table5_experimental",
+            "sossi_2019_ge_logKstar_table3",
+            "sossi_2019_ge_table4_gamma_this_work",
+            "sossi_2019_ge_table5_experimental",
+            "sossi_2019_cd_logKstar_table3",
+            "sossi_2019_cd_table4_gamma_this_work",
+            "sossi_2019_ga_logKstar_table3_Ga_g",
+            "sossi_2019_ga_logKstar_table3_GaO_g",
+            "sossi_2019_ga_table5_experimental_Ga_g",
+            "sossi_2019_pb_logKstar_table3_PbO_g",
+            "sossi_2019_pb_logKstar_table3_Pb_g",
+            "sossi_2019_pb_table4_gamma_this_work",
+            "sossi_2019_pb_table5_experimental_PbO_g",
+            "sossi_2019_mo_logKstar_table3_MoO3_congruent",
+            "sossi_2019_mo_logKstar_table3_MoO2_ox",
+            "sossi_2019_mo_table5_experimental_MoO3",
+            "sossi_2019_cr_logKstar_table3_CrO_ox",
+            "sossi_2019_cr_table5_experimental_CrO_ox",
+        },
+        "kems-ms2000-044": {
+            "ms2000_044_sio2_activity_na_system_xsio2_0805_t1473_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0753_t1273_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0709_t1673_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0671_t1173_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0625_t1573_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0573_t1473_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0524_t1573_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0477_t1373_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0430_t1473_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0405_t1423_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0382_t1383_class_quote_r2",
+            "ms2000_044_sio2_activity_na_system_xsio2_0349_t1373_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0892_t1723_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0848_t1573_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0811_t1173_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0770_t1073_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0722_t1323_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0722_t1673_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0674_t1373_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0630_t1323_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0630_t1523_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0591_t1323_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0543_t1473_class_quote_r2",
+            "ms2000_044_sio2_activity_k_system_xsio2_0500_t1473_class_quote_r2",
+        },
+        "okazaki-2022-ryugu-gas-treasure-box": {
+            "okazaki_2022_fragmentation_assumptions_and_model_output",
+            "okazaki_2022_surface_pulverization_model",
+        },
+        "busemann-2024-noble-gases-ryugu-bennu": {
+            "busemann_2024_preliminary_ryugu_exposure_ages",
+        },
+    }
+    assert sum(map(len, target_rows.values())) == 62
+
+    extract_dir = REPO_ROOT / "data" / "literature" / "extracts"
+    root = tmp_path / "t1235-real-index"
+    copied_extracts = root / "data" / "literature" / "extracts"
+    copied_extracts.mkdir(parents=True)
+    (root / "data" / "literature" / "compilations").mkdir()
+    index_path = REPO_ROOT / "data" / "literature" / "INDEX.yaml"
+    (root / "data" / "literature" / "INDEX.yaml").write_text(
+        index_path.read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    index_doc = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    index_rows = {row["source_id"]: row for row in index_doc["sources"]}
+    source_rows: dict[str, dict[str, dict]] = {}
+    for source_id in target_rows:
+        path = extract_dir / f"{source_id}.yaml"
+        (copied_extracts / path.name).write_text(
+            path.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        source_rows[source_id] = {
+            row["observation_id"]: row
+            for block in document["species"].values()
+            for row in block.get("observations", [])
+        }
+        assert target_rows[source_id] <= source_rows[source_id].keys()
+
+    def assert_registered_assets(rows: list[tuple[str, dict]]) -> None:
+        for source_id, row in rows:
+            values = row.get("values") or {}
+            for payload in (row, values):
+                derivation = payload.get("derivation") or {}
+                refs = payload.get("derived_from") or ()
+                if isinstance(refs, str):
+                    refs = (refs,)
+                refs = (*refs, *(derivation.get("inputs") or ()))
+                for ref in refs:
+                    if not isinstance(ref, str) or ":" not in ref:
+                        continue
+                    asset_kind, asset_source = ref.split(":", 1)
+                    if asset_kind not in {"pdf", "tables"}:
+                        continue
+                    asset_index = index_rows.get(asset_source) or {}
+                    corpus = asset_index.get("corpus") or {}
+                    if asset_kind == "pdf":
+                        assert (corpus.get("raw") or {}).get("path") or asset_index.get(
+                            "pdf_path"
+                        ), (source_id, row["observation_id"], ref)
+                    else:
+                        # source_files_for may register a table path despite exists=false.
+                        table_asset = corpus.get("tables") or {}
+                        assert table_asset.get("exists") is True and int(
+                            table_asset.get("file_count") or 0
+                        ) > 0, (source_id, row["observation_id"], ref)
+
+    def assert_target_rows_clean(issues: tuple) -> None:
+        qualified_ids = {
+            f"{source_id}::{observation_id}"
+            for source_id, observation_ids in target_rows.items()
+            for observation_id in observation_ids
+        }
+        failures = []
+        for issue in issues:
+            if not any(
+                f"{qualified_id}]" in issue.path
+                or f"{qualified_id}." in issue.path
+                for qualified_id in qualified_ids
+            ):
+                continue
+            if issue.reason in {
+                RefusalReason.INVALID_SOURCE,
+                RefusalReason.REFERENTIAL_INTEGRITY,
+            } or (
+                issue.reason is RefusalReason.CONDITIONAL_FIELD
+                and (".derived_from" in issue.path or ".derivation" in issue.path)
+            ):
+                failures.append(issue)
+        assert failures == [], failures
+
+    rows_to_check = [
+        (source_id, source_rows[source_id][observation_id])
+        for source_id, observation_ids in target_rows.items()
+        for observation_id in observation_ids
+    ]
+    assert_registered_assets(rows_to_check)
+
+    sossi_observation_parents = {
+        "sossi_2019_k_table5_experimental": ("sossi_2019_k_logKstar_table3",),
+        "sossi_2019_mn_table6_te1_pure_system_derived": (
+            "sossi_2019_mn_table5_pure_system_not_experimental",
+        ),
+        "sossi_2019_li_table4_gamma_this_work": (
+            "sossi_2019_li_logKstar_table3_Li_g",
+        ),
+        "sossi_2019_li_table5_experimental_Li_g": (
+            "sossi_2019_li_logKstar_table3_Li_g",
+        ),
+        "sossi_2019_rb_table4_gamma_this_work": (
+            "sossi_2019_rb_logKstar_table3",
+        ),
+        "sossi_2019_rb_table5_experimental": (
+            "sossi_2019_rb_logKstar_table3",
+        ),
+        "sossi_2019_cu_table4_gamma_this_work": (
+            "sossi_2019_cu_logKstar_table3",
+        ),
+        "sossi_2019_cu_table5_experimental": (
+            "sossi_2019_cu_logKstar_table3",
+        ),
+        "sossi_2019_ag_table4_gamma_this_work": (
+            "sossi_2019_ag_logKstar_table3",
+        ),
+        "sossi_2019_zn_table4_gamma_this_work": (
+            "sossi_2019_zn_logKstar_table3",
+        ),
+        "sossi_2019_zn_table5_experimental": (
+            "sossi_2019_zn_logKstar_table3",
+        ),
+        "sossi_2019_ge_table4_gamma_this_work": (
+            "sossi_2019_ge_logKstar_table3",
+        ),
+        "sossi_2019_ge_table5_experimental": (
+            "sossi_2019_ge_logKstar_table3",
+        ),
+        "sossi_2019_cd_table4_gamma_this_work": (
+            "sossi_2019_cd_logKstar_table3",
+        ),
+        "sossi_2019_ga_table5_experimental_Ga_g": (
+            "sossi_2019_ga_logKstar_table3_Ga_g",
+        ),
+        "sossi_2019_pb_table4_gamma_this_work": (
+            "sossi_2019_pb_logKstar_table3_Pb_g",
+        ),
+        "sossi_2019_pb_table5_experimental_PbO_g": (
+            "sossi_2019_pb_logKstar_table3_PbO_g",
+        ),
+        "sossi_2019_mo_table5_experimental_MoO3": (
+            "sossi_2019_mo_logKstar_table3_MoO3_congruent",
+        ),
+        "sossi_2019_cr_table5_experimental_CrO_ox": (
+            "sossi_2019_cr_logKstar_table3_CrO_ox",
+        ),
+    }
+    sossi_footnote = (
+        "* denotes elements for which logK* was measured at only 1 temperature, "
+        "∆S* and ∆H* determined by assuming γi remains constant over all temperatures."
+    )
+    for observation_id in (
+        "sossi_2019_k_table5_experimental",
+        "sossi_2019_li_table5_experimental_Li_g",
+        "sossi_2019_mo_table5_experimental_MoO3",
+        "sossi_2019_cr_table5_experimental_CrO_ox",
+    ):
+        row = source_rows["kems-012-sossi-2019"][observation_id]
+        derivation = row["values"]["derivation"]
+        assert derivation["relation"] == sossi_footnote
+        assert row["locator"]["table"] == "5"
+        assert row["locator"]["line_range"] == "1121-1127"
+
+    for observation_id in target_rows["kems-ms2000-044"]:
+        row = source_rows["kems-ms2000-044"][observation_id]
+        assert row["derived_from"] == ["tables:kems-ms2000-044"]
+        assert row["derivation"]["inputs"] == ["tables:kems-ms2000-044"]
+    okazaki_id = "okazaki-2022-ryugu-gas-treasure-box"
+    assert source_rows[okazaki_id][
+        "okazaki_2022_fragmentation_assumptions_and_model_output"
+    ]["derived_from"] == ["pdf:okazaki-2022-ryugu-gas-treasure-box"]
+    assert source_rows[okazaki_id]["okazaki_2022_surface_pulverization_model"][
+        "derived_from"
+    ] == [
+        "pdf:okazaki-2022-ryugu-gas-treasure-box",
+        "okazaki_2022_solar_wind_helium_abundance",
+    ]
+    busemann_id = "busemann-2024-noble-gases-ryugu-bennu"
+    assert source_rows[busemann_id][
+        "busemann_2024_preliminary_ryugu_exposure_ages"
+    ]["derived_from"] == ["pdf:busemann-2024-noble-gases-ryugu-bennu"]
+
+    result = migrate(root, write=False)
+    assert result.validation is not None
+    assert_target_rows_clean(result.validation.hard_issues)
+    sossi_source_id = "kems-012-sossi-2019"
+    for observation_id, expected_parents in sossi_observation_parents.items():
+        observation = result.observations[f"{sossi_source_id}::{observation_id}"]
+        qualified_parents = (
+            f"tables:{sossi_source_id}",
+            *(f"{sossi_source_id}::{parent_id}" for parent_id in expected_parents),
+        )
+        assert observation.derived_from == qualified_parents
+        assert observation.derivation is not None
+        assert observation.derivation.inputs == qualified_parents
+
+    fragmentation = result.observations[
+        f"{okazaki_id}::okazaki_2022_fragmentation_assumptions_and_model_output"
+    ]
+    assert fragmentation.derived_from == (
+        f"pdf:{okazaki_id}",
+    )
+    pulverization = result.observations[
+        f"{okazaki_id}::okazaki_2022_surface_pulverization_model"
+    ]
+    assert pulverization.derived_from == (
+        f"pdf:{okazaki_id}",
+        f"{okazaki_id}::okazaki_2022_solar_wind_helium_abundance",
+    )
+    exposure_ages = result.observations[
+        f"{busemann_id}::busemann_2024_preliminary_ryugu_exposure_ages"
+    ]
+    assert exposure_ages.derived_from == (
+        f"pdf:{busemann_id}",
+    )
+
+    from simulator.battery.validate import validate_corpus
+
+    mutated_observations = dict(result.observations)
+    mutated_id = (
+        "busemann-2024-noble-gases-ryugu-bennu::"
+        "busemann_2024_preliminary_ryugu_exposure_ages"
+    )
+    mutated_observations[mutated_id] = replace(
+        mutated_observations[mutated_id], derived_from=("pdf:not-registered",)
+    )
+    mutated_report = validate_corpus(
+        result.works, result.experiments, mutated_observations
+    )
+    assert any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        and mutated_id in issue.path
+        for issue in mutated_report.hard_issues
+    )
+    with pytest.raises(AssertionError):
+        assert_target_rows_clean(mutated_report.hard_issues)
+
+    mutant_row = deepcopy(
+        source_rows[busemann_id]["busemann_2024_preliminary_ryugu_exposure_ages"]
+    )
+    mutant_row["derived_from"] = ["tables:not-registered"]
+    with pytest.raises(AssertionError):
+        assert_registered_assets([(busemann_id, mutant_row)])
 
 
 @pytest.mark.parametrize("location", ["values", "observation"])
@@ -5792,6 +6544,82 @@ def test_printed_mole_fraction_composition_maps_without_wt_conversion(
         assert obs.identity.composition.value.as_map() == expected
 
 
+def test_borisov_combined_iron_composition_migrates_without_a_redox_split(
+    tmp_path: Path,
+) -> None:
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/borisov-2018-compilation.yaml")
+        .read_text(encoding="utf-8")
+    )
+    rows = source["species"]["Fe"]["observations"]
+    assert len(rows) == 435
+
+    # Bound closure by half a unit of the last printed decimal place for each
+    # component, rather than imposing a tolerance unrelated to row precision.
+    for row in rows:
+        printed = row["values"]["composition_mol"]
+        amounts = [as_decimal(amount) for amount in printed.values()]
+        rounding_bound = sum(
+            (Decimal("0.5").scaleb(amount.as_tuple().exponent) for amount in amounts),
+            Decimal("0"),
+        )
+        assert abs(
+            sum(amounts, Decimal("0")) - Decimal("1")
+        ) <= rounding_bound
+        converted, omitted = _mole_fraction_composition_from_values(row["values"])
+        assert omitted == ()
+        assert converted is not None
+        assert converted.as_map()["FeO"] == as_decimal(printed["FeO+FeO1.5"])
+        assert abs(
+            sum(converted.as_map().values(), Decimal("0"))
+            - sum(amounts, Decimal("0"))
+        ) == 0
+
+    result = _migrate_real_extract(tmp_path, "borisov-2018-compilation.yaml")
+    assert len(result.observations) == 435
+    for observation in result.observations.values():
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.is_value
+        assert observation.point_conditions is not None
+        assert {"temperature_K", "fO2_log"} <= set(observation.point_conditions)
+    by_id = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in result.observations.values()
+    }
+    for row_id, expected_total_iron, expected_temperature in (
+        ("borisov_2018_table2_row_4", "0.0753203", "1775.15"),
+        ("borisov_2018_table2_row_155", "0.0428978", "1574.15"),
+        ("borisov_2018_table2_row_438", "0.0342061", "1523.15"),
+    ):
+        observation = by_id[row_id]
+        composition = observation.identity.composition.value
+        assert composition.as_map()["FeO"] == as_decimal(expected_total_iron)
+        assert observation.identity.species.phase.is_unknown
+        assert (
+            observation.identity.species.phase.reason
+            == "source does not state phase"
+        )
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert observation.evidence.original_method_class == "measured_reduced"
+        assert observation.identity.temperature_K.value == as_decimal(expected_temperature)
+        assert observation.point_conditions is not None
+        assert "fO2_log" in observation.point_conditions
+
+
+def test_unknown_mole_fraction_component_is_queued_and_withholds_composition() -> None:
+    composition, omitted = _mole_fraction_composition_from_values(
+        {
+            "composition_mol": {
+                "SiO2": "0.6",
+                "MgO": "0.3",
+                "unrecognized oxide": "0.1",
+            }
+        }
+    )
+    assert composition is None
+    assert omitted == ("unrecognized oxide",)
+
+
 def test_dacko_partial_composition_is_typed_refusal_not_scored(tmp_path: Path) -> None:
     result = _migrate_real_extract(
         tmp_path, "ta-dacko-conradt-low-p-transpiration.yaml"
@@ -6067,6 +6895,83 @@ def test_k01_source_activity_is_quantity_activity(tmp_path: Path) -> None:
     assert obs.identity.per.value is PerBasis.DIMENSIONLESS
     assert obs.value.kind is ValueKind.POINT
     assert obs.value.point == as_decimal("7.19e-10")
+
+
+@pytest.mark.parametrize(
+    ("per", "expected", "reason", "invalid"),
+    [
+        ("mol_species", PerBasis.MOL_SPECIES, None, False),
+        (
+            {"tag": "unknown", "reason": "basis not printed"},
+            None,
+            "basis not printed",
+            False,
+        ),
+        ("widgets", None, "unrecognised per basis 'widgets'", True),
+    ],
+)
+def test_extract_nonactivity_per_preserves_typed_state(
+    tmp_path: Path,
+    per: object,
+    expected: PerBasis | None,
+    reason: str | None,
+    invalid: bool,
+) -> None:
+    extract = _scalar_extract(
+        quantity="delta_fG",
+        units="kJ/mol",
+        values={
+            "quantity": "delta_fG",
+            "delta_fG_kJ_mol": -1.2,
+            "method_class": "measured_direct",
+        },
+    )
+    extract["species"]["Na"]["observations"][0]["per"] = per
+
+    baseline_extract = _scalar_extract(
+        quantity="delta_fG",
+        units="kJ/mol",
+        values={
+            "quantity": "delta_fG",
+            "delta_fG_kJ_mol": -1.2,
+            "method_class": "measured_direct",
+        },
+    )
+    baseline = migrate(
+        _write_min_tree(tmp_path / "before", baseline_extract), write=False
+    )
+    result = migrate(_write_min_tree(tmp_path / "after", extract), write=False)
+
+    obs = next(iter(result.observations.values()))
+    before = next(iter(baseline.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.DELTA_FG
+    assert obs.identity.per is not None
+    assert before.identity.per is not None and before.identity.per.is_unknown
+    per_outcome = identity_equal(before.identity, obs.identity)
+    assert per_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "per" in per_outcome.fields
+    from dataclasses import fields
+
+    changed_axes = [
+        field.name
+        for field in fields(before.identity)
+        if getattr(before.identity, field.name) != getattr(obs.identity, field.name)
+    ]
+    assert changed_axes == ["per"]
+    assert before.value == obs.value
+    invalid_per_issues = [
+        issue
+        for issue in result.validation.issues
+        if issue.path == f"observations.{obs.observation_id}.identity.per"
+        and issue.reason is RefusalReason.INVALID_IDENTITY
+    ]
+    assert bool(invalid_per_issues) is invalid
+    if expected is not None:
+        assert obs.identity.per.is_value
+        assert obs.identity.per.value is expected
+    else:
+        assert obs.identity.per.is_unknown
+        assert obs.identity.per.reason == reason
 
 
 def test_k01_dimensionless_activity_field_without_activity_units(tmp_path: Path) -> None:
@@ -7369,7 +8274,7 @@ def test_ohta_feto_standard_state_lifts_liquid_reference(tmp_path: Path) -> None
     assert reference_state.value.endmember.phase.value is Phase.L
 
 
-def test_stolyarova_table3_137_row_ids_and_reference_states_unchanged(
+def test_stolyarova_table3_137_content_ids_and_reference_states_are_stable(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(
@@ -7387,9 +8292,9 @@ def test_stolyarova_table3_137_row_ids_and_reference_states_unchanged(
             payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
         ).encode()
     ).hexdigest()
-    # Pinned to the digest on green c9b6e545d, whose Stolyarova 1996 locator notes carry the
-    # Table 1 caption and Eq. (13) quotes; this change must leave it unchanged.
-    assert digest == "a3f9988c9f64bb73c07eefa07b1d2edaac77abb0b2496799dba925c6bedaa968"
+    # Adding the published point compositions changes content-stable point ids. This pin
+    # keeps their migrated ids and the existing reference states stable from this extract shape.
+    assert digest == "1c09862823fb9dd8daebaf6ed44053644f4330d5fec0dd0023cba7a32d564259"
 
 
 def test_schaefer_photochemical_lifetimes_retain_table4_rate_ancestry(
@@ -7476,6 +8381,121 @@ def test_stolyarova_1996_comparison_provenance_is_activity_only(
         }.intersection(obs.provenance)
         for obs in pressures
     )
+
+
+def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
+    tmp_path: Path,
+) -> None:
+    from collections import Counter
+
+    from simulator.battery.identity import Identity
+    from simulator.battery.score import (
+        ScoreContext,
+        comparison_candidates,
+        rail_for_quantity,
+    )
+
+    result = _migrate_real_extract(
+        tmp_path, "stolyarova-1996-cao-alumina-silica-kems.yaml"
+    )
+    rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+    ]
+    composition_rows = [
+        obs
+        for obs in rows
+        if isinstance(obs.identity, Identity)
+        and obs.identity.composition is not None
+        and obs.identity.composition.is_value
+    ]
+    assert len(composition_rows) == 300
+    for obs in composition_rows:
+        assert obs.identity.temperature_K.is_value
+        assert obs.identity.temperature_K.value == Decimal("1933")
+        condition = obs.point_conditions["composition"]
+        assert condition.state.is_value
+        assert condition.locator is not None
+        assert condition.locator.page in {20, 23}
+        assert condition.locator.table in {"2", "3"}
+
+    table2_cao = next(
+        obs
+        for obs in composition_rows
+        if "stolyarova_1996_table2_pCa_1933k" in obs.observation_id
+        and "xA/xC=0.11, xS=0.44"
+        in obs.point_conditions["composition"].locator.note
+    )
+    assert dict(table2_cao.identity.composition.value.components) == {
+        "CaO": Decimal("0.504504504505"),
+        "Al2O3": Decimal("0.055495495495"),
+        "SiO2": Decimal("0.44"),
+    }
+
+    table3_alumina = next(
+        obs
+        for obs in composition_rows
+        if "stolyarova_1996_table3_al2o3_activity_column_2_1933k"
+        in obs.observation_id
+        and "xA/xC=0.16, xS=0.50"
+        in obs.point_conditions["composition"].locator.note
+    )
+    assert dict(table3_alumina.identity.composition.value.components) == {
+        "CaO": Decimal("0.431034482759"),
+        "Al2O3": Decimal("0.068965517241"),
+        "SiO2": Decimal("0.50"),
+    }
+
+    ion_currents = [obs for obs in rows if "table1_" in obs.observation_id]
+    assert len(ion_currents) == 6
+    assert all(obs.identity.species.phase.value is Phase.G for obs in ion_currents)
+    assert all(quantity_token(obs.identity) is Quantity.ION_INTENSITY for obs in ion_currents)
+    figure_rows = [obs for obs in rows if "figure_only" in obs.observation_id]
+    assert len(figure_rows) == 6
+    assert all(obs.identity.quantity.is_value for obs in figure_rows)
+    assert all(obs.identity.quantity.value is Quantity.ACTIVITY for obs in figure_rows)
+    assert all(obs.value.kind is ValueKind.UNAVAILABLE for obs in figure_rows)
+    assert all(obs.value.unavailable_reason == "figure_not_digitized" for obs in figure_rows)
+    assert all(obs.admission.status is AdmissionStatus.REJECTED for obs in figure_rows)
+    assert all(obs.locator is not None and obs.locator.figure in {"1", "2"} for obs in figure_rows)
+    assert all(
+        "bound_not_point_ordering" in obs.locator.note
+        and "never a point value" in obs.locator.note
+        for obs in figure_rows
+    )
+    assert all(obs.value.kind is not ValueKind.POINT for obs in figure_rows)
+    assert all(obs.identity.species.phase.value is Phase.L for obs in figure_rows)
+    candidates = comparison_candidates(
+        ScoreContext(
+            works=result.works,
+            experiments=result.experiments,
+            observations=result.observations,
+        )
+    )
+    assert {obs.observation_id for obs in figure_rows}.isdisjoint(
+        obs.observation_id for obs in candidates
+    )
+    candidates = [
+        obs
+        for obs in candidates
+        if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+    ]
+    candidate_rails = Counter(
+        str(
+            rail_for_quantity(
+                obs.identity.quantity.value if obs.identity.quantity.is_value else None,
+                species_formula=obs.identity.species.formula,
+            )
+        )
+        for obs in candidates
+    )
+    assert candidate_rails == {
+        "None": 6,
+        "SiO_evolution": 45,
+        "melt_activity": 137,
+        "vapour": 63,
+    }
 
 
 def test_comparison_provenance_is_not_inherited_by_unknown_quantity_points(
@@ -7825,6 +8845,103 @@ def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> No
         polymorph = reference.value.endmember.polymorph
         assert polymorph is not None and polymorph.is_unknown
         assert polymorph.reason == "source does not state polymorph"
+
+
+def test_demaria_partial_alkalis_do_not_become_a_complete_composition(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
+    rows = {
+        obs.observation_id.split("::", 1)[1]: obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-022-demaria-1971"
+    }
+    for prefix in (
+        "demaria_1971_na_psat_figure1_sample_12022_digitized",
+        "demaria_1971_na_psat_figure1_sample_12065_digitized",
+    ):
+        related = [obs for key, obs in rows.items() if key.startswith(prefix)]
+        assert related
+        assert all(obs.identity.composition is not None for obs in related)
+        assert all(obs.identity.composition.is_unknown for obs in related)
+        assert all(
+            obs.identity.composition.reason == "no composition mapped from source"
+            for obs in related
+        )
+
+    extract_rows = _extract_observations("kems-022-demaria-1971.yaml")
+    sample_12022 = next(
+        row
+        for row in extract_rows
+        if row.get("observation_id")
+        == "demaria_1971_na_psat_figure1_sample_12022_digitized"
+    )
+    values = sample_12022["values"]
+    assert values["sample_alkali_content_wt_pct"] == {
+        "Na2O": 0.36,
+        "K2O": 0.068,
+    }
+    assert "reported elsewhere (SMALES, 1971)" in values["composition_source_gap"]
+    assert "composition_from_sample_catalog" not in values
+    assert "sample_oxide_composition_wt_pct" not in values
+    assert "printed_composition" not in values
+    sample_12065 = next(
+        row
+        for row in extract_rows
+        if row.get("observation_id")
+        == "demaria_1971_na_psat_figure1_sample_12065_digitized"
+    )
+    assert "does not print a bulk composition" in sample_12065["values"][
+        "composition_source_gap"
+    ]
+
+
+def test_demaria_undigitized_pressure_figures_are_unavailable_not_points(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import ScoreContext, comparison_candidates
+
+    result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
+    expected = {
+        "demaria_1971_ca_figure_only_and_measurement_difficulty",
+        "demaria_1971_tio_tio2_figure6_comparable_pressures",
+        "demaria_1971_tio2_figure6_comparable_to_tio",
+        "demaria_1971_al_monatomic_figure7",
+    }
+    rows = {
+        obs.observation_id.split("::", 1)[1]: obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-022-demaria-1971"
+    }
+    assert expected <= rows.keys()
+    extract_rows = {
+        row["observation_id"]: row
+        for row in _extract_observations("kems-022-demaria-1971.yaml")
+    }
+    for observation_id in expected:
+        obs = rows[observation_id]
+        source_values = extract_rows[observation_id]["values"]
+        assert "points" not in source_values
+        assert source_values["pressure_atm"] is None
+        assert quantity_token(obs.identity) is Quantity.P_PARTIAL
+        assert obs.identity.species.phase.is_value
+        assert obs.identity.species.phase.value is Phase.G
+        assert obs.evidence.class_.is_value
+        assert obs.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        assert obs.value.kind is ValueKind.UNAVAILABLE
+        assert obs.value.unavailable_reason
+        assert obs.admission.status is AdmissionStatus.REJECTED
+
+    candidates = comparison_candidates(
+        ScoreContext(
+            works=result.works,
+            experiments=result.experiments,
+            observations=result.observations,
+        )
+    )
+    assert expected.isdisjoint(
+        obs.observation_id.split("::", 1)[1] for obs in candidates
+    )
 
 
 def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None:
@@ -8391,7 +9508,7 @@ def test_kume_tables3_and4_derivation_evidence_fresh_migration_and_mutations(
     ] == "derived observation requires derivation"
 
 
-def test_unregistered_table_derivation_input_is_not_retained(
+def test_unregistered_table_assets_are_referential_issues(
     tmp_path: Path,
 ) -> None:
     name = "kume-2000-cao-activities.yaml"
@@ -8402,30 +9519,146 @@ def test_unregistered_table_derivation_input_is_not_retained(
     )
     extract["source_id"] = "fixture-source"
     observation_id = "kume_2000_table2_sample_101"
-    unregistered = "tables:fixture-source/not-registered.csv"
+    unregistered_parent = "tables:fixture-source"
+    unregistered_input = "tables:fixture-source/not-registered.csv"
+    unregistered_placeholder = "unknown:unregistered-fixture"
     row = next(
         row
         for block in extract["species"].values()
         for row in block["observations"]
         if row.get("observation_id") == observation_id
     )
-    row["derivation"]["inputs"] = [unregistered]
+    row["values"]["method_class"] = "calculated"
+    row["derived_from"] = [unregistered_parent]
+    row["derivation"]["inputs"] = [unregistered_input, unregistered_placeholder]
+    no_inputs_row = deepcopy(row)
+    no_inputs_row["observation_id"] = f"{observation_id}_without_inputs"
+    no_inputs_row["derivation"]["inputs"] = []
+    next(
+        block
+        for block in extract["species"].values()
+        if row in block["observations"]
+    )["observations"].append(no_inputs_row)
 
-    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    root = _write_min_tree(tmp_path, extract)
+    index_path = root / "data" / "literature" / "INDEX.yaml"
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    index["sources"][0]["corpus"]["tables"] = {
+        "exists": False,
+        "path": "tables/fixture-source",
+    }
+    index_path.write_text(yaml.safe_dump(index, sort_keys=False), encoding="utf-8")
+    result = migrate(root, write=False)
     observation = next(
         obs
         for obs in result.observations.values()
         if obs.observation_id.endswith(f"::{observation_id}")
     )
-    assert unregistered not in (observation.derived_from or ())
-    assert observation.derivation is None or unregistered not in observation.derivation.inputs
-
-    report = validate_corpus(
-        result.works, result.experiments, result.observations, residuals=None
+    work = result.works[result.experiments[observation.experiment_id].work_id]
+    registered_assets = {asset.asset_id for asset in work.source_files.files}
+    assert "unknown:fixture-source" in registered_assets
+    assert unregistered_placeholder not in registered_assets
+    assert observation.derived_from == (unregistered_parent,)
+    assert observation.derivation is not None
+    assert observation.derivation.inputs == (
+        unregistered_input,
+        unregistered_placeholder,
     )
+    assert observation.evidence.class_.is_unknown
+    issues = [
+        issue
+        for issue in result.validation.hard_issues
+        if issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    ]
+    assert {
+        (issue.path.rsplit(".", 1)[-1], issue.detail)
+        for issue in issues
+    } >= {
+        ("derived_from", f"derived_from {unregistered_parent!r} does not resolve"),
+        (
+            "inputs",
+            f"derivation input {unregistered_input!r} does not resolve",
+        ),
+        (
+            "inputs",
+            f"derivation input {unregistered_placeholder!r} does not resolve",
+        ),
+    }
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(f"::{observation_id}_without_inputs.derivation")
+        and issue.detail
+        == (
+            "invalid derivation annotation: Derivation.inputs is required unless "
+            "raw_inputs is located not_printed"
+        )
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_registered_table_asset_resolves_as_lineage(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    table_asset = "tables:fixture-source"
+    row["values"]["method_class"] = "measured_reduced"
+    row["derived_from"] = [table_asset]
+    row["derivation"] = {
+        "relation": "author_mass_balance_reduction",
+        "inputs": [table_asset],
+        "output_unit": "Pa",
+    }
+    root = _write_min_tree(tmp_path, extract)
+    index_path = root / "data" / "literature" / "INDEX.yaml"
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    index["sources"][0]["corpus"]["tables"] = {
+        "exists": True,
+        "path": "tables/fixture-source",
+    }
+    index_path.write_text(yaml.safe_dump(index, sort_keys=False), encoding="utf-8")
+
+    result = migrate(root, write=False)
+
+    observation = next(iter(result.observations.values()))
+    work = result.works[result.experiments[observation.experiment_id].work_id]
+    assert table_asset in {asset.asset_id for asset in work.source_files.files}
+    assert observation.derived_from == (table_asset,)
+    assert observation.derivation is not None
+    assert observation.derivation.inputs == (table_asset,)
     assert not any(
         issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
-        for issue in report.hard_issues
+        and table_asset in issue.detail
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_registered_unknown_placeholder_resolves_as_lineage(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    placeholder_asset = "unknown:fixture-source"
+    row["values"]["method_class"] = "measured_reduced"
+    row["derived_from"] = [placeholder_asset]
+    row["derivation"] = {
+        "relation": "author_mass_balance_reduction",
+        "inputs": [placeholder_asset],
+        "output_unit": "Pa",
+    }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(iter(result.observations.values()))
+    work = result.works[result.experiments[observation.experiment_id].work_id]
+    assert placeholder_asset in {asset.asset_id for asset in work.source_files.files}
+    assert observation.derived_from == (placeholder_asset,)
+    assert observation.derivation is not None
+    assert observation.derivation.inputs == (placeholder_asset,)
+    lineage_paths = {
+        f"observation[{observation.observation_id}].derived_from",
+        f"observation[{observation.observation_id}].derivation.inputs",
+    }
+    assert not any(
+        issue.path in lineage_paths
+        and issue.reason
+        in {RefusalReason.CONDITIONAL_FIELD, RefusalReason.REFERENTIAL_INTEGRITY}
+        for issue in result.validation.hard_issues
     )
 
 
@@ -8483,7 +9716,15 @@ def test_kume_measured_reduced_activity_without_derivation_stays_queued(
             if row.get("observation_id") == observation_id:
                 row.pop("derivation")
 
-    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    root = _write_min_tree(tmp_path, extract)
+    index_path = root / "data" / "literature" / "INDEX.yaml"
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    index["sources"][0]["corpus"]["tables"] = {
+        "exists": True,
+        "path": "tables/fixture-source",
+    }
+    index_path.write_text(yaml.safe_dump(index, sort_keys=False), encoding="utf-8")
+    result = migrate(root, write=False)
     observation = next(
         obs
         for obs in result.observations.values()
@@ -13157,3 +14398,830 @@ def test_fusion_temperature_requires_melting_and_matching_crystal_identity(
     if fusion.point_conditions is not None:
         temperature = fusion.point_conditions.get("temperature_K")
         assert temperature is None or temperature.state.is_unknown
+def test_stolyarova_1995_printed_compositions_reach_migrated_observations(
+    tmp_path: Path,
+) -> None:
+    from collections import Counter
+
+    from simulator.battery.identity import Identity
+    from simulator.battery.score import (
+        ScoreContext,
+        comparison_candidates,
+        rail_for_quantity,
+    )
+
+    source_id = "stolyarova-1995-cao-alumina-kems"
+    result = _migrate_real_extract(
+        tmp_path, "stolyarova-1995-cao-alumina-kems.yaml"
+    )
+    rows = [obs for obs in result.observations.values() if obs.source_id == source_id]
+    pressure_rows = [
+        obs
+        for obs in rows
+        if isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+    ]
+
+    assert len(rows) == 56
+    assert len(pressure_rows) == 50
+    for obs in pressure_rows:
+        assert obs.identity.species.phase.is_value
+        assert obs.identity.species.phase.value is Phase.G
+        assert obs.identity.temperature_K.is_value
+        assert obs.identity.temperature_K.value == Decimal("1933")
+        assert obs.identity.composition is not None
+        assert obs.identity.composition.is_value
+        condition = obs.point_conditions["composition"]
+        assert condition.state.is_value
+        assert condition.locator is not None
+        assert condition.locator.page == 687
+        assert condition.locator.table == "2"
+        assert "binary complement" in condition.locator.note
+        assert condition.state.value == obs.identity.composition.value
+        assert obs.identity.fO2_Pa.is_unknown
+        assert obs.identity.total_pressure_Pa.is_unknown
+        assert (
+            obs.identity.total_pressure_Pa.reason
+            == "in_cell_total_pressure_not_derivable"
+        )
+
+    ca_0143 = next(
+        obs
+        for obs in pressure_rows
+        if "stolyarova_1995_ca_partial_pressure_table2" in obs.observation_id
+        and obs.point_conditions["composition"].state.value.components[0][1]
+        == Decimal("0.143")
+    )
+    assert dict(ca_0143.identity.composition.value.components) == {
+        "CaO": Decimal("0.143"),
+        "Al2O3": Decimal("0.857"),
+    }
+
+    al_0000 = next(
+        obs
+        for obs in pressure_rows
+        if "stolyarova_1995_al_partial_pressure_table2" in obs.observation_id
+        and obs.point_conditions["composition"].state.value.components[0][1]
+        == Decimal("0.000")
+    )
+    assert dict(al_0000.identity.composition.value.components) == {
+        "CaO": Decimal("0.000"),
+        "Al2O3": Decimal("1.000"),
+    }
+
+    figure_rows = [obs for obs in rows if "figure_only" in obs.observation_id]
+    activities = [
+        obs
+        for obs in figure_rows
+        if "activity_fig1" in obs.observation_id
+    ]
+    assert len(figure_rows) == 6
+    assert all(obs.value.kind is ValueKind.UNAVAILABLE for obs in figure_rows)
+    assert len(activities) == 2
+
+    candidates = [
+        obs
+        for obs in comparison_candidates(
+            ScoreContext(
+                works=result.works,
+                experiments=result.experiments,
+                observations=result.observations,
+            )
+        )
+        if obs.source_id == source_id
+    ]
+    rails = Counter(
+        str(
+            rail_for_quantity(
+                quantity_token(obs.identity),
+                species_formula=obs.identity.species.formula,
+            )
+        )
+        for obs in candidates
+    )
+    assert len(candidates) == 24
+    assert rails == {"vapour": 24}
+
+
+def test_stolyarova_1995_composition_mutation_removes_identity_map(
+    tmp_path: Path,
+) -> None:
+    source_id = "stolyarova-1995-cao-alumina-kems"
+    name = "stolyarova-1995-cao-alumina-kems.yaml"
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    first = extract["species"]["Ca"]["observations"][0]["values"]["points"][0]
+    del first["composition_mol"]
+
+    root = tmp_path / "mutant"
+    extracts = root / "data" / "literature" / "extracts"
+    extracts.mkdir(parents=True)
+    (root / "data" / "literature" / "compilations").mkdir(parents=True)
+    (extracts / name).write_text(yaml.safe_dump(extract, sort_keys=False), encoding="utf-8")
+    (root / "data" / "literature" / "INDEX.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "literature_index.v1",
+                "sources": [
+                    {
+                        "source_id": source_id,
+                        "citation": extract["source"]["citation"],
+                        "doi": extract["source"].get("doi"),
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    mutated = next(
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == source_id
+        and "stolyarova_1995_ca_partial_pressure_table2::T=1933" in obs.observation_id
+        and obs.point_conditions["composition"].state.value.components[0][1]
+        == Decimal("0.143")
+    )
+    assert mutated.point_conditions["composition"].state.is_value
+    assert mutated.identity.composition.is_unknown
+
+
+def test_stolyarova_1991_printed_compositions_reach_migrated_observations(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.identity import Identity
+
+    result = _migrate_real_extract(
+        tmp_path, "kems-053-stolyarova-1991.yaml", write=False
+    )
+    rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-053-stolyarova-1991"
+    ]
+    table_rows = [
+        obs
+        for obs in rows
+        if obs.locator is not None
+        and obs.locator.table in {"Ia", "Ib", "IIa", "IIb"}
+        and obs.point_conditions
+        and "composition" in obs.point_conditions
+    ]
+    assert len(table_rows) == 130
+    for obs in table_rows:
+        assert isinstance(obs.identity, Identity)
+        assert obs.identity.composition is not None
+        assert obs.identity.composition.is_value
+        assert obs.identity.temperature_K.is_value
+        condition = obs.point_conditions["composition"]
+        assert condition.state.is_value
+        assert condition.locator is not None
+        assert "CaO=1-X(SiO2)" in condition.locator.note
+        assert "T_C is derived as T_K−273.15" in condition.locator.note
+        assert dict(obs.identity.composition.value.components) == dict(
+            condition.state.value.components
+        )
+        expected_temperature = Decimal(
+            "1993" if obs.locator.table == "Ia" else "1933"
+        )
+        assert obs.identity.temperature_K.value == expected_temperature
+
+    ca = next(
+        obs
+        for obs in table_rows
+        if "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation"
+        in obs.observation_id
+        and "Printed X(SiO2)=0.44" in obs.point_conditions["composition"].locator.note
+    )
+    assert dict(ca.identity.composition.value.components) == {
+        "CaO": Decimal("0.56"),
+        "SiO2": Decimal("0.44"),
+    }
+
+    ion_current_rows = [obs for obs in rows if "_ion_comparison" in obs.observation_id]
+    assert len(ion_current_rows) == 36
+    assert all(obs.identity.species.phase.value is Phase.G for obs in ion_current_rows)
+
+    pressure_rows = [
+        obs
+        for obs in table_rows
+        if obs.identity.quantity.value is Quantity.P_PARTIAL
+    ]
+    assert pressure_rows
+    assert all(obs.identity.fO2_Pa.is_unknown for obs in pressure_rows)
+    assert all(obs.identity.total_pressure_Pa.is_unknown for obs in pressure_rows)
+
+
+def test_stolyarova_1991_composition_map_mutation_removes_identity(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import shutil
+
+    module = sys.modules[__name__]
+    mutated_root = tmp_path / "mutated_repo"
+    extracts = mutated_root / "data" / "literature" / "extracts"
+    extracts.mkdir(parents=True)
+    original = REPO_ROOT / "data" / "literature" / "extracts" / (
+        "kems-053-stolyarova-1991.yaml"
+    )
+    shutil.copyfile(original, extracts / original.name)
+    document = yaml.safe_load(original.read_text(encoding="utf-8"))
+    point = document["species"]["Ca"]["observations"][0]["values"]["points"][0]
+    point.pop("composition_mol")
+    (extracts / original.name).write_text(
+        yaml.safe_dump(document, sort_keys=False), encoding="utf-8"
+    )
+    monkeypatch.setattr(module, "REPO_ROOT", mutated_root)
+
+    result = _migrate_real_extract(tmp_path / "migration", original.name, write=False)
+    mutated = next(
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-053-stolyarova-1991"
+        and "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation"
+        in obs.observation_id
+        and "T=1993.00" in obs.observation_id
+        and obs.identity.composition.is_unknown
+        and obs.point_conditions["composition"].state.is_value
+    )
+    assert mutated.identity.composition.reason == "no composition mapped from source"
+
+def test_shornikov_1994_printed_mullite_composition_reaches_every_point(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import Phase, Quantity
+
+    source_id = "shornikov-1994-mullite-kems"
+    result = _migrate_real_extract(
+        tmp_path / source_id, f"{source_id}.yaml"
+    )
+    rows = [obs for obs in result.observations.values() if obs.source_id == source_id]
+    assert len(rows) == 41
+    assert all("::T=" in obs.observation_id for obs in rows)
+
+    named = {
+        "shornikov_1994_al2o3_activity_1833k": Decimal("1833"),
+        "shornikov_1994_sio2_activity_2033k": Decimal("2033"),
+    }
+    found_named: set[str] = set()
+    for obs in rows:
+        identity = obs.identity
+        composition = identity.composition
+        assert composition is not None and composition.is_value, obs.observation_id
+        assert composition.value.basis == "derived_from_formula"
+        assert composition.value.amount_basis.value == "mole_fraction"
+        assert composition.value.components == (
+            ("Al2O3", Decimal("0.6")),
+            ("SiO2", Decimal("0.4")),
+        )
+        conditions = obs.point_conditions or {}
+        assert conditions["composition"].state.value == composition.value
+        assert conditions["composition"].locator is not None
+        assert identity.temperature_K is not None and identity.temperature_K.is_value
+        assert identity.temperature_K.value == conditions["temperature_K"].state.value
+        assert conditions["temperature_K"].locator is not None
+        for row_id, temperature in named.items():
+            if row_id in obs.observation_id:
+                found_named.add(row_id)
+                assert identity.temperature_K.value == temperature
+        if identity.quantity.value is Quantity.P_PARTIAL:
+            assert identity.species.phase.is_value
+            assert identity.species.phase.value is Phase.G
+            assert identity.fO2_Pa.is_unknown
+            assert identity.total_pressure_Pa.is_unknown
+
+    assert found_named == set(named)
+
+def test_ohara_1987_printed_compositions_reach_migrated_observations(
+    tmp_path: Path,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_scoring import (
+        feto_fe2_fe3_to_feo_fe2o3_moles,
+    )
+    from simulator.battery.stable_ids import series_row_extra
+
+    source_id = "kems-058-ohara-1987"
+    result = _migrate_real_extract(tmp_path, f"{source_id}.yaml", write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source_id
+    ]
+    table1 = [
+        observation
+        for observation in rows
+        if observation.locator is not None and observation.locator.table == "1"
+    ]
+    pressures = [
+        observation
+        for observation in table1
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+    ]
+    ion_currents = [
+        observation
+        for observation in table1
+        if quantity_token(observation.identity) is Quantity.ION_INTENSITY_RATIO
+    ]
+    for observation in pressures + ion_currents:
+        temperature = observation.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        assert temperature.value == Decimal("1643.0")
+        assert observation.point_conditions is not None
+        point_temperature = observation.point_conditions["temperature_K"]
+        assert point_temperature.state.is_value
+        assert point_temperature.state.value == Decimal("1643.0")
+        assert point_temperature.inference is None
+
+    assert all(
+        observation.identity.fO2_Pa is not None
+        and observation.identity.fO2_Pa.is_unknown
+        and observation.identity.total_pressure_Pa is not None
+        and observation.identity.total_pressure_Pa.is_unknown
+        for observation in pressures
+    )
+    for observation in pressures:
+        condition = observation.point_conditions["composition"]
+        assert condition.locator is not None
+        if observation.identity.composition.is_value:
+            assert condition.state.is_value
+            assert condition.locator.table == "2"
+            assert "sample " in (condition.locator.note or "")
+        else:
+            assert condition.state.is_unknown
+            assert condition.locator.table == "1"
+    sample20_pressures = [
+        observation
+        for observation in pressures
+        if observation.identity.composition is not None
+        and observation.identity.composition.is_unknown
+    ]
+    for observation in sample20_pressures:
+        condition = observation.point_conditions["composition"]
+        assert condition.state.is_unknown
+        assert "sample 20" in (condition.state.reason or "")
+        assert condition.locator is not None and condition.locator.table == "1"
+
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.G
+        for observation in ion_currents
+    )
+    current_conditions = [
+        observation.point_conditions["composition"] for observation in ion_currents
+    ]
+    assert all(
+        condition.locator is not None and condition.locator.table == "2"
+        for condition in current_conditions
+        if condition.state.is_value
+    )
+    current_sample20 = [
+        condition for condition in current_conditions if condition.state.is_unknown
+    ]
+    assert "sample 20" in (current_sample20[0].state.reason or "")
+
+    table2 = [
+        observation
+        for observation in rows
+        if observation.locator is not None and observation.locator.table == "2"
+    ]
+    assert all(
+        observation.identity.composition is not None
+        and observation.identity.composition.is_value
+        and observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value == Decimal("1643.0")
+        for observation in table2
+    )
+    assert all(
+        observation.point_conditions is not None
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].state.value
+        == Decimal("1643.0")
+        and observation.point_conditions["temperature_K"].inference is None
+        for observation in table2
+    )
+    assert all(
+        sum(observation.identity.composition.value.as_map().values())
+        == pytest.approx(Decimal("1"))
+        for observation in table2
+    )
+    table2_compositions = {
+        int(observation.observation_id.rsplit("_", 1)[-1]):
+        observation.identity.composition.value
+        for observation in table2
+    }
+    source_observations = _extract_observations(f"{source_id}.yaml")
+    table2_source_rows = [
+        source["values"]["row"]
+        for source in source_observations
+        if source.get("locator", {}).get("table") == "2"
+        and isinstance(source.get("values", {}).get("row"), dict)
+        and "sample_no" in source["values"]["row"]
+    ]
+    assert sorted(table2_compositions) == sorted(
+        int(source_row["sample_no"]) for source_row in table2_source_rows
+    )
+
+    expected_table2_compositions = {}
+    for source_row in table2_source_rows:
+        sample_number = int(source_row["sample_no"])
+        printed_moles = {
+            key.removesuffix("_mol_percent"): as_decimal(value)
+            for key, value in source_row.items()
+            if key.endswith("_mol_percent") and key != "FetO_mol_percent"
+        }
+        n_feo, n_fe2o3 = feto_fe2_fe3_to_feo_fe2o3_moles(
+            source_row["FetO_mol_percent"], source_row["Fe2_over_Fe3"]
+        )
+        printed_moles["FeO"] = as_decimal(n_feo)
+        printed_moles["Fe2O3"] = as_decimal(n_fe2o3)
+        total_moles = sum(printed_moles.values())
+        expected_table2_compositions[sample_number] = {
+            component: amount / total_moles
+            for component, amount in printed_moles.items()
+        }
+    for sample_number, expected_composition in expected_table2_compositions.items():
+        assert table2_compositions[sample_number].as_map() == pytest.approx(
+            expected_composition
+        ), f"Table 2 composition does not match printed sample {sample_number}"
+    pressure_rows_by_species = {
+        "PO": "ohara_1987_table1_partial_pressures_1643k",
+        "PO2": "ohara_1987_po2_table1_partial_pressure",
+        "P2": "ohara_1987_p2_table1_partial_pressure",
+    }
+    pressure_source_rows = {
+        formula: next(
+            row["values"]["rows"]
+            for row in source_observations
+            if row.get("observation_id") == source_observation_id
+        )
+        for formula, source_observation_id in pressure_rows_by_species.items()
+    }
+    current_source_rows = next(
+        row["values"]["rows"]
+        for row in source_observations
+        if row.get("observation_id") == "ohara_1987_table1_ion_current_ratios_1643k"
+    )
+
+    def assert_row_composition_matches_sample(observations, source_rows) -> None:
+        matched_sample_numbers = []
+        for observation in observations:
+            matching_rows = [
+                row
+                for row in source_rows
+                if observation.observation_id.endswith(
+                    series_row_extra(row, include_locator=False)
+                )
+            ]
+            assert len(matching_rows) == 1
+            sample_number = int(matching_rows[0]["sample_no"])
+            matched_sample_numbers.append(sample_number)
+            condition = observation.point_conditions["composition"]
+            if sample_number in table2_compositions:
+                expected_composition = table2_compositions[sample_number]
+                if quantity_token(observation.identity) is Quantity.P_PARTIAL:
+                    assert observation.identity.composition.value == expected_composition, (
+                        f"pressure composition does not match source sample {sample_number}"
+                    )
+                else:
+                    assert observation.identity.composition.is_not_applicable
+                assert condition.state.value == expected_composition
+                assert condition.locator.table == "2"
+                assert f"sample {sample_number}" in condition.locator.note
+            else:
+                assert sample_number == 20
+                if quantity_token(observation.identity) is Quantity.P_PARTIAL:
+                    assert observation.identity.composition.is_unknown
+                else:
+                    assert observation.identity.composition.is_not_applicable
+                assert condition.state.is_unknown
+                assert condition.locator.table == "1"
+                assert "sample 20" in condition.locator.note
+        assert sorted(matched_sample_numbers) == sorted(
+            int(row["sample_no"]) for row in source_rows
+        )
+
+    for formula, source_rows in pressure_source_rows.items():
+        assert_row_composition_matches_sample(
+            [
+                observation
+                for observation in pressures
+                if observation.identity.species.formula == formula
+            ],
+            source_rows,
+        )
+    assert_row_composition_matches_sample(ion_currents, current_source_rows)
+
+    sample19 = next(
+        observation
+        for observation in table2
+        if observation.observation_id.endswith("sample_19")
+    )
+    assert set(sample19.identity.composition.value.as_map()) == {
+        "P2O5",
+        "FeO",
+        "Fe2O3",
+        "CaO",
+        "SiO2",
+    }
+
+    figure_rows = [
+        observation
+        for observation in rows
+        if "figure_only" in observation.observation_id
+    ]
+    assert len(figure_rows) == 3
+    assert all(observation.value.kind is ValueKind.UNAVAILABLE for observation in figure_rows)
+    assert all(
+        observation.admission.status is AdmissionStatus.REJECTED
+        for observation in figure_rows
+    )
+    assert all(
+        observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        for observation in figure_rows
+    )
+    assert all(
+        observation.admission.reason == "figure_not_digitized"
+        for observation in figure_rows
+    )
+    assert all(observation.value.kind is not ValueKind.POINT for observation in figure_rows)
+    # No closed quantity token represents L_P; preserve its typed unavailable refusal.
+    figure3 = next(
+        observation for observation in figure_rows if "fig3" in observation.observation_id
+    )
+    assert figure3.identity.quantity.is_unknown
+
+
+def test_ohara_1987_sample_swap_mutation_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source_id = "kems-058-ohara-1987"
+    name = f"{source_id}.yaml"
+    mutated = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / name).read_text(
+            encoding="utf-8"
+        )
+    )
+    pressure_parent = next(
+        row
+        for block in mutated["species"].values()
+        for row in block.get("observations", [])
+        if row.get("observation_id") == "ohara_1987_table1_partial_pressures_1643k"
+    )
+    sample2, sample3 = pressure_parent["values"]["rows"][1:3]
+    for key in ("composition_mol", "point_conditions"):
+        sample2[key], sample3[key] = sample3[key], sample2[key]
+
+    mutation_root = tmp_path / "mutation-repository"
+    extract_dir = mutation_root / "data" / "literature" / "extracts"
+    extract_dir.mkdir(parents=True)
+    (extract_dir / name).write_text(
+        yaml.safe_dump(mutated, sort_keys=False), encoding="utf-8"
+    )
+    monkeypatch.setattr(sys.modules[__name__], "REPO_ROOT", mutation_root)
+
+    with pytest.raises(AssertionError, match="source sample 2"):
+        test_ohara_1987_printed_compositions_reach_migrated_observations(
+            tmp_path / "mutated-migration"
+        )
+
+
+def test_ohara_1987_point_condition_locator_mutation_proof(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source_id = "kems-058-ohara-1987"
+    name = f"{source_id}.yaml"
+    mutation_note = "mutation locator proves explicit row condition is read"
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
+    mutated = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    source_parent = next(
+        row
+        for block in mutated["species"].values()
+        for row in block.get("observations", [])
+        if row.get("observation_id") == "ohara_1987_table1_partial_pressures_1643k"
+    )
+    for key in ("T_range_K", "T_K", "temperature_K"):
+        source_parent.pop(key, None)
+    source_parent["values"].pop("T_K", None)
+    source_parent["values"].pop("T_C_as_printed", None)
+    target_row = next(
+        row
+        for row in source_parent["values"]["rows"]
+        if row.get("sample_no") == 1
+    )
+    target_row.pop("T_K", None)
+    target_row["point_conditions"]["composition"]["locator"]["note"] = mutation_note
+
+    mutation_root = tmp_path / "mutation-repository"
+    extract_dir = mutation_root / "data" / "literature" / "extracts"
+    extract_dir.mkdir(parents=True)
+    (extract_dir / name).write_text(
+        yaml.safe_dump(mutated, sort_keys=False), encoding="utf-8"
+    )
+    monkeypatch.setattr(sys.modules[__name__], "REPO_ROOT", mutation_root)
+    result = _migrate_real_extract(tmp_path / "migration", name, write=False)
+    row_observations = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source_id
+        and observation.observation_id.startswith(
+            f"{source_id}::ohara_1987_table1_partial_pressures_1643k::T="
+        )
+    ]
+    assert len(row_observations) == 20
+    converted_row = next(
+        observation
+        for observation in row_observations
+        if observation.point_conditions is not None
+        and observation.point_conditions["composition"].locator is not None
+        and observation.point_conditions["composition"].locator.note == mutation_note
+    )
+    assert converted_row.identity.temperature_K.value == Decimal("1643.15")
+    assert all(
+        observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value == Decimal("1643.0")
+        for observation in row_observations
+        if observation is not converted_row
+    )
+    mutated_conditions = [
+        observation
+        for observation in row_observations
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and observation.point_conditions is not None
+        and observation.point_conditions["composition"].locator is not None
+        and observation.point_conditions["composition"].locator.note == mutation_note
+    ]
+    assert len(mutated_conditions) == 1
+    assert mutated_conditions[0].point_conditions["composition"].state.is_value
+def _kambayashi_table4_compositions(doc: dict) -> dict[int, dict[str, Decimal]]:
+    from decimal import ROUND_HALF_UP
+
+    from simulator.accounting.formulas import parse_formula
+
+    table4 = next(
+        observation
+        for observation in doc["species"]["P2O5"]["observations"]
+        if observation["observation_id"]
+        == "kambayashi_1985_table4_feto_p2o5_compositions"
+    )
+    oxides = ("P2O5", "FeO", "Fe2O3")
+    molar_masses = {
+        oxide: Decimal(str(parse_formula(oxide).molar_mass_g_per_mol()))
+        for oxide in oxides
+    }
+    expected = {}
+    for row in table4["values"]["rows"]:
+        moles = {
+            oxide: Decimal(str(row[f"{oxide}_wt_percent"])) / molar_masses[oxide]
+            for oxide in oxides
+        }
+        total = sum(moles.values())
+        p2o5 = (moles["P2O5"] / total).quantize(
+            Decimal("0.000000000001"), rounding=ROUND_HALF_UP
+        )
+        feo = (moles["FeO"] / total).quantize(
+            Decimal("0.000000000001"), rounding=ROUND_HALF_UP
+        )
+        expected[int(row["sample_no"])] = {
+            "P2O5": p2o5,
+            "FeO": feo,
+            "Fe2O3": Decimal("1") - p2o5 - feo,
+        }
+    return expected
+
+
+def _assert_kambayashi_sample_associations(doc: dict, result) -> None:
+    source_id = "kems-057-kambayashi-1985"
+    samples = _kambayashi_table4_compositions(doc)
+
+    def source_observation(observation_id: str) -> dict:
+        return next(
+            observation
+            for species in doc["species"].values()
+            for observation in species["observations"]
+            if observation["observation_id"] == observation_id
+        )
+
+    def migrated_rows(observation_id: str):
+        prefix = f"{source_id}::{observation_id}::"
+        return [
+            observation
+            for key, observation in result.observations.items()
+            if key.startswith(prefix)
+        ]
+
+    def assert_composition_condition(observation, expected, source_table):
+        located = (observation.point_conditions or {}).get("composition")
+        assert located is not None and located.state.is_value
+        assert dict(located.state.value.components) == expected
+        assert located.locator is not None
+        assert located.locator.table == source_table
+
+    def assert_temperature(observation, row, table):
+        expected = Decimal(str(row["T_C"])) + Decimal("273.15")
+        located = (observation.point_conditions or {}).get("temperature_K")
+        assert located is not None and located.state.is_value
+        assert located.state.value == expected
+        assert located.locator is not None
+        assert located.locator.table == table
+
+    # Table 3 has no sample number: its printed X_P2O5 cell identifies each
+    # binary composition and is independent of the composition locator.
+    for observation_id in (
+        "kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c",
+        "kambayashi_1985_pbo_table3_ion_current_ratios_1300c",
+    ):
+        source = source_observation(observation_id)
+        rows = source["values"]["rows"]
+        migrated = migrated_rows(observation_id)
+        assert len(migrated) == len(rows) == 3
+        for observation, row in zip(migrated, rows, strict=True):
+            x_p2o5 = Decimal(str(row["X_P2O5"]))
+            expected = {"PbO": Decimal("1") - x_p2o5, "P2O5": x_p2o5}
+            assert_composition_condition(observation, expected, "3")
+            assert_temperature(observation, {"T_C": 1300}, "3")
+            assert observation.identity.species.phase.is_value
+            assert observation.identity.species.phase.value is Phase.G
+
+    table4_id = "kambayashi_1985_table4_feto_p2o5_compositions"
+    table4_rows = source_observation(table4_id)["values"]["rows"]
+    migrated = migrated_rows(table4_id)
+    assert len(migrated) == len(table4_rows) == 8
+    for observation, row in zip(migrated, table4_rows, strict=True):
+        expected = samples[int(row["sample_no"])]
+        assert_composition_condition(observation, expected, "4")
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_value
+        assert dict(observation.identity.composition.value.components) == expected
+
+    sample_linked_series = (
+        ("kambayashi_1985_table5_feto_p2o5_ion_current_ratios", "5", False),
+        ("kambayashi_1985_table6_partial_pressures_and_dg", "6", True),
+        ("kambayashi_1985_po2_table6_partial_pressure", "6", True),
+        ("kambayashi_1985_p2_table6_partial_pressure", "6", True),
+        ("kambayashi_1985_table7_raoultian_a_p2o5", "7", True),
+    )
+    for observation_id, table, composition_is_identity in sample_linked_series:
+        source_rows = source_observation(observation_id)["values"]["rows"]
+        migrated = migrated_rows(observation_id)
+        assert len(migrated) == len(source_rows)
+        for observation, row in zip(migrated, source_rows, strict=True):
+            # Bind by the printed sample_no and row order; do not use the
+            # composition locator under test to choose the expected sample.
+            expected = samples[int(row["sample_no"])]
+            assert_composition_condition(observation, expected, "4")
+            assert_temperature(observation, row, table)
+            if composition_is_identity:
+                assert observation.identity.composition is not None
+                assert observation.identity.composition.is_value
+                assert dict(observation.identity.composition.value.components) == expected
+            if observation_id in {
+                "kambayashi_1985_po2_table6_partial_pressure",
+                "kambayashi_1985_p2_table6_partial_pressure",
+            }:
+                assert observation.identity.fO2_Pa is not None
+                assert observation.identity.fO2_Pa.is_unknown
+                assert observation.identity.fO2_Pa.reason == "no fO2_Pa mapped from source"
+                assert observation.identity.total_pressure_Pa is not None
+                assert observation.identity.total_pressure_Pa.is_unknown
+                assert observation.identity.total_pressure_Pa.reason == (
+                    "in_cell_total_pressure_not_derivable"
+                )
+
+
+def test_kambayashi_printed_compositions_and_conditions_reach_observations(
+    tmp_path: Path,
+) -> None:
+    path = REPO_ROOT / "data/literature/extracts/kems-057-kambayashi-1985.yaml"
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    result = _migrate_real_extract(
+        tmp_path, "kems-057-kambayashi-1985.yaml", write=False
+    )
+    _assert_kambayashi_sample_associations(doc, result)
+
+    figure_quantities = {
+        "kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only": Quantity.ION_INTENSITY_RATIO,
+        "kambayashi_1985_fig3_time_dependence_figure_only": Quantity.ION_INTENSITY_RATIO,
+        "kambayashi_1985_fig4_time_dependence_figure_only": Quantity.ION_INTENSITY_RATIO,
+        "kambayashi_1985_fig5_temperature_dependence_figure_only": Quantity.ION_INTENSITY_RATIO,
+        "kambayashi_1985_fig6_henrian_a_p2o5_figure_only": Quantity.ACTIVITY,
+        "kambayashi_1985_fig7_raoultian_activities_figure_only": Quantity.ACTIVITY,
+        "kambayashi_1985_feto_raoultian_gibbs_duhem_fig7_figure_only": Quantity.ACTIVITY,
+        "kambayashi_1985_fig8_ion_current_vs_1T_figure_only": Quantity.ION_INTENSITY,
+    }
+    for observation_id, quantity in figure_quantities.items():
+        observation = result.observations[
+            f"kems-057-kambayashi-1985::{observation_id}"
+        ]
+        assert quantity_token(observation.identity) is quantity
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.value.unavailable_reason == "figure_not_digitized"
+        assert observation.value.point is None
+        assert observation.admission.status is AdmissionStatus.REJECTED
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        assert observation.locator is not None
+        assert "bound_not_point_ordering" in observation.locator.note

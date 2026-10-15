@@ -774,7 +774,7 @@
         "terminal.product:Cl": {
           "quantity_kg": 0.015407403867280558,
           "accumulated_cost": {
-            "electrical_kWh": 1.0583432648408159e-06,
+            "electrical_kWh": 1.0583432648675014e-06,
             "thermal_flux_h": 347.45253828657945,
             "furnace_h": 0.3784267693585791,
             "launch_penalty_kg": 0.0,
@@ -785,7 +785,7 @@
         "terminal.product:Co": {
           "quantity_kg": 0.035950609023654635,
           "accumulated_cost": {
-            "electrical_kWh": 2.4694676179619037e-06,
+            "electrical_kWh": 2.46946761802417e-06,
             "thermal_flux_h": 810.722589335352,
             "furnace_h": 0.882995795170018,
             "launch_penalty_kg": 0.0,
@@ -818,7 +818,7 @@
         "terminal.product:Fe": {
           "quantity_kg": 1.6184661018241288e-06,
           "accumulated_cost": {
-            "electrical_kWh": 1.1117334970859476e-10,
+            "electrical_kWh": 1.1117334971139794e-10,
             "thermal_flux_h": 0.036498047305930294,
             "furnace_h": 3.9751726086075575e-05,
             "launch_penalty_kg": 0.0,
@@ -829,7 +829,7 @@
         "terminal.product:K": {
           "quantity_kg": 0.00012451052204125195,
           "accumulated_cost": {
-            "electrical_kWh": 8.552698010598167e-09,
+            "electrical_kWh": 8.55269801081382e-09,
             "thermal_flux_h": 2.8078381860613773,
             "furnace_h": 0.0030581475641903574,
             "launch_penalty_kg": 0.0,
@@ -873,7 +873,7 @@
         "terminal.product:Na": {
           "quantity_kg": 0.0012161984938829896,
           "accumulated_cost": {
-            "electrical_kWh": 8.354136075085518e-08,
+            "electrical_kWh": 8.354136075296163e-08,
             "thermal_flux_h": 27.42650594480357,
             "furnace_h": 0.029871487169638476,
             "launch_penalty_kg": 0.0,
@@ -906,7 +906,7 @@
         "terminal.product:Ni": {
           "quantity_kg": 0.20543205156374078,
           "accumulated_cost": {
-            "electrical_kWh": 1.4111243531210877e-05,
+            "electrical_kWh": 1.4111243531566686e-05,
             "thermal_flux_h": 4632.700510487726,
             "furnace_h": 5.045690258114388,
             "launch_penalty_kg": 0.0,
@@ -939,7 +939,7 @@
         "terminal.product:S": {
           "quantity_kg": 0.7190121804730926,
           "accumulated_cost": {
-            "electrical_kWh": 4.9389352359238064e-05,
+            "electrical_kWh": 4.938935236048339e-05,
             "thermal_flux_h": 16214.451786707039,
             "furnace_h": 17.659915903400357,
             "launch_penalty_kg": 0.0,
@@ -950,7 +950,7 @@
         "terminal.product:Si": {
           "quantity_kg": 1.6125115359243955e-08,
           "accumulated_cost": {
-            "electrical_kWh": 1.1076432721724458e-12,
+            "electrical_kWh": 1.1076432722003745e-12,
             "thermal_flux_h": 0.00036363765823204275,
             "furnace_h": 3.96054738585245e-07,
             "launch_penalty_kg": 0.0,
@@ -972,7 +972,7 @@
         "terminal.product:SiO2": {
           "quantity_kg": 3.449689535800087e-08,
           "accumulated_cost": {
-            "electrical_kWh": 2.3696112060508116e-12,
+            "electrical_kWh": 2.36961120611056e-12,
             "thermal_flux_h": 0.000777939876074624,
             "furnace_h": 8.472906127262691e-07,
             "launch_penalty_kg": 0.0,
@@ -1102,9 +1102,9 @@
         "components_kWh": {
           "condenser": 6.712021651243588e-05,
           "pumping": 0.0,
-          "turbine": 4.0077167472085065e-10
+          "turbine": 4.007733671323907e-10
         },
-        "auxiliary_electrical_kWh": 6.71206172841106e-05
+        "auxiliary_electrical_kWh": 6.7120617285803e-05
       },
       "run_input_cost": {
         "thermal_proxy": "thermal_flux_h = absolute_temperature_K * duration_h",
@@ -1196,20 +1196,17 @@
       "SiO2_gas": 8.293494367282039e-08,
       "TiO2_gas": 7.192105716394483e-10
     },
-    "process.overhead_gas": {
-      "Cr": 1.936339531979066e-15,
-      "CrO": 8.603629098276342e-12,
-      "SiO": 6.617444900424222e-24,
-      "TiO2_gas": 6.177808508639097e-13
-    },
+    "process.overhead_gas": {},
     "reservoir.fo2_buffer": {
-      "O2": 0.014036224237077021
+      "O2": 0.014036224234432463
     },
     "terminal.drain_tap_material": {
       "Co": 0.6100230885781387,
       "Ni": 3.5000877707500466
     },
     "terminal.offgas": {
+      "Cr": 1.936339531979066e-15,
+      "CrO": 8.603629098276342e-12,
       "Fe": 2.668907039134688e-05,
       "K": 0.001387299231268179,
       "Mg": 1.3671942499819879e-07,
@@ -1220,11 +1217,12 @@
       "Na2O_gas": 2.3578028536205127e-11,
       "PO": 1.531753752964332e-09,
       "PO2": 9.271044652879476e-08,
-      "SiO": 5.128276935187517e-08,
-      "SiO2_gas": 1.3149348589359118e-09
+      "SiO": 5.1282769351875174e-08,
+      "SiO2_gas": 1.3149348589359058e-09,
+      "TiO2_gas": 6.177808508639097e-13
     },
     "terminal.oxygen_melt_offgas_stored": {
-      "O2": 6.262448820564577e-07
+      "O2": 6.262475266147739e-07
     },
     "terminal.slag": {
       "ThO2": 0.008854169139988908,
@@ -1803,8 +1801,8 @@
             "charge_unprocessed": 0.0,
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
-            "offgas_vented": 0.0,
-            "overhead_terminal_inventory": 8.605565437808321e-12
+            "offgas_vented": 8.605565437808321e-12,
+            "overhead_terminal_inventory": 0.0
           },
           "destination_fractions": {
             "product_condensed": 2.091884631377755e-10,
@@ -1817,14 +1815,14 @@
             "charge_unprocessed": 0.0,
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
-            "offgas_vented": 0.0,
-            "overhead_terminal_inventory": 1.8190971473939912e-13
+            "offgas_vented": 1.8190971473939912e-13,
+            "overhead_terminal_inventory": 0.0
           },
           "attribution_method": "tracked",
           "attribution_method_by_destination": {
             "product_condensed": "tracked",
             "melt_retained": "tracked",
-            "overhead_terminal_inventory": "tracked"
+            "offgas_vented": "tracked"
           },
           "closure_residual_fraction": 0.0,
           "closure_residual_mol_atoms": 0.0,
@@ -2888,30 +2886,30 @@
           "destination_mol_atoms": {
             "product_condensed": 1.324685969953555e-06,
             "product_tapped": 0.0,
-            "product_oxygen": 1.2524897641129154e-06,
+            "product_oxygen": 1.2524950532295479e-06,
             "cleanup_volatile_product": 0.0,
             "melt_retained": 26570.022642513537,
             "metal_phase_retained": 0.0,
             "wall_deposit": 0.0,
             "charge_unprocessed": 0.0,
-            "redox_buffer_retained": 0.028072448474154042,
+            "redox_buffer_retained": 0.028072448468864926,
             "cleanup_sequestered": 0.0,
-            "offgas_vented": 2.4114344290675506e-07,
-            "overhead_terminal_inventory": 9.839190800010779e-12
+            "offgas_vented": 2.4115328209755507e-07,
+            "overhead_terminal_inventory": 0.0
           },
           "destination_fractions": {
             "product_condensed": 4.985635834963205e-11,
             "product_tapped": 0.0,
-            "product_oxygen": 4.713915593976511e-11,
+            "product_oxygen": 4.713935500286396e-11,
             "cleanup_volatile_product": 0.0,
             "melt_retained": 0.9999989433491452,
             "metal_phase_retained": 0.0,
             "wall_deposit": 0.0,
             "charge_unprocessed": 0.0,
-            "redox_buffer_retained": 1.056544783159496e-06,
+            "redox_buffer_retained": 1.0565447829604329e-06,
             "cleanup_sequestered": 0.0,
-            "offgas_vented": 9.075761483036422e-12,
-            "overhead_terminal_inventory": 3.7031132926767493e-16
+            "offgas_vented": 9.076131794365689e-12,
+            "overhead_terminal_inventory": 0.0
           },
           "attribution_method": "tracked",
           "attribution_method_by_destination": {
@@ -2919,8 +2917,7 @@
             "product_oxygen": "tracked",
             "melt_retained": "tracked",
             "redox_buffer_retained": "tracked",
-            "offgas_vented": "tracked",
-            "overhead_terminal_inventory": "tracked"
+            "offgas_vented": "tracked"
           },
           "closure_residual_fraction": 0.0,
           "closure_residual_mol_atoms": 0.0,
@@ -3343,7 +3340,7 @@
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
             "offgas_vented": 5.259770421081108e-08,
-            "overhead_terminal_inventory": 6.617444900424222e-24
+            "overhead_terminal_inventory": 0.0
           },
           "destination_fractions": {
             "product_condensed": 1.6184420437199763e-10,
@@ -3357,14 +3354,13 @@
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
             "offgas_vented": 6.9138535988975776e-12,
-            "overhead_terminal_inventory": 8.698487115888307e-28
+            "overhead_terminal_inventory": 0.0
           },
           "attribution_method": "tracked",
           "attribution_method_by_destination": {
             "product_condensed": "tracked",
             "melt_retained": "tracked",
-            "offgas_vented": "tracked",
-            "overhead_terminal_inventory": "tracked"
+            "offgas_vented": "tracked"
           },
           "closure_residual_fraction": 0.0,
           "closure_residual_mol_atoms": 9.094947017729282e-13,
@@ -3625,8 +3621,8 @@
             "charge_unprocessed": 0.0,
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
-            "offgas_vented": 0.0,
-            "overhead_terminal_inventory": 6.177808508639097e-13
+            "offgas_vented": 6.177808508639097e-13,
+            "overhead_terminal_inventory": 0.0
           },
           "destination_fractions": {
             "product_condensed": 3.728061703241559e-12,
@@ -3639,14 +3635,14 @@
             "charge_unprocessed": 0.0,
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
-            "offgas_vented": 0.0,
-            "overhead_terminal_inventory": 3.202295992190059e-15
+            "offgas_vented": 3.202295992190059e-15,
+            "overhead_terminal_inventory": 0.0
           },
           "attribution_method": "tracked",
           "attribution_method_by_destination": {
             "product_condensed": "tracked",
             "melt_retained": "tracked",
-            "overhead_terminal_inventory": "tracked"
+            "offgas_vented": "tracked"
           },
           "closure_residual_fraction": -1.1102230246251565e-16,
           "closure_residual_mol_atoms": 0.0,
@@ -5704,13 +5700,13 @@
       },
       {
         "source": "feedstock_element:Cr",
-        "target": "destination:overhead_terminal_inventory",
+        "target": "destination:offgas_vented",
         "element": "Cr",
-        "destination": "overhead_terminal_inventory",
+        "destination": "offgas_vented",
         "mol_atoms": 8.605565437808321e-12,
         "fraction_of_feedstock_element": 1.8190971473939912e-13,
         "source_accounts": [
-          "process.overhead_gas"
+          "terminal.offgas"
         ],
         "attribution_method": "tracked"
       },
@@ -6175,8 +6171,8 @@
         "target": "destination:product_oxygen",
         "element": "O",
         "destination": "product_oxygen",
-        "mol_atoms": 1.2524897641129154e-06,
-        "fraction_of_feedstock_element": 4.713915593976511e-11,
+        "mol_atoms": 1.2524950532295479e-06,
+        "fraction_of_feedstock_element": 4.713935500286396e-11,
         "source_accounts": [
           "terminal.oxygen_melt_offgas_stored"
         ],
@@ -6200,8 +6196,8 @@
         "target": "destination:redox_buffer_retained",
         "element": "O",
         "destination": "redox_buffer_retained",
-        "mol_atoms": 0.028072448474154042,
-        "fraction_of_feedstock_element": 1.056544783159496e-06,
+        "mol_atoms": 0.028072448468864926,
+        "fraction_of_feedstock_element": 1.0565447829604329e-06,
         "source_accounts": [
           "reservoir.fo2_buffer"
         ],
@@ -6212,22 +6208,10 @@
         "target": "destination:offgas_vented",
         "element": "O",
         "destination": "offgas_vented",
-        "mol_atoms": 2.4114344290675506e-07,
-        "fraction_of_feedstock_element": 9.075761483036422e-12,
+        "mol_atoms": 2.4115328209755507e-07,
+        "fraction_of_feedstock_element": 9.076131794365689e-12,
         "source_accounts": [
           "terminal.offgas"
-        ],
-        "attribution_method": "tracked"
-      },
-      {
-        "source": "feedstock_element:O",
-        "target": "destination:overhead_terminal_inventory",
-        "element": "O",
-        "destination": "overhead_terminal_inventory",
-        "mol_atoms": 9.839190800010779e-12,
-        "fraction_of_feedstock_element": 3.7031132926767493e-16,
-        "source_accounts": [
-          "process.overhead_gas"
         ],
         "attribution_method": "tracked"
       },
@@ -6400,18 +6384,6 @@
         "attribution_method": "tracked"
       },
       {
-        "source": "feedstock_element:Si",
-        "target": "destination:overhead_terminal_inventory",
-        "element": "Si",
-        "destination": "overhead_terminal_inventory",
-        "mol_atoms": 6.617444900424222e-24,
-        "fraction_of_feedstock_element": 8.698487115888307e-28,
-        "source_accounts": [
-          "process.overhead_gas"
-        ],
-        "attribution_method": "tracked"
-      },
-      {
         "source": "feedstock_element:Sm",
         "target": "destination:melt_retained",
         "element": "Sm",
@@ -6509,13 +6481,13 @@
       },
       {
         "source": "feedstock_element:Ti",
-        "target": "destination:overhead_terminal_inventory",
+        "target": "destination:offgas_vented",
         "element": "Ti",
-        "destination": "overhead_terminal_inventory",
+        "destination": "offgas_vented",
         "mol_atoms": 6.177808508639097e-13,
         "fraction_of_feedstock_element": 3.202295992190059e-15,
         "source_accounts": [
-          "process.overhead_gas"
+          "terminal.offgas"
         ],
         "attribution_method": "tracked"
       },
@@ -7349,52 +7321,8 @@
         "campaign_scope": "terminal",
         "subdisposition": null,
         "species": "O2",
-        "terminal_mol": 0.014036224237077021,
-        "terminal_kg": 0.0004491311031379905,
-        "origin_scope": "typed_material_origin",
-        "attribution_method": "tracked"
-      },
-      {
-        "destination": "overhead_terminal_inventory",
-        "account": "process.overhead_gas",
-        "campaign_scope": "terminal",
-        "subdisposition": null,
-        "species": "Cr",
-        "terminal_mol": 1.936339531979066e-15,
-        "terminal_kg": 1.0068210393873672e-16,
-        "origin_scope": "typed_material_origin",
-        "attribution_method": "tracked"
-      },
-      {
-        "destination": "overhead_terminal_inventory",
-        "account": "process.overhead_gas",
-        "campaign_scope": "terminal",
-        "subdisposition": null,
-        "species": "CrO",
-        "terminal_mol": 8.603629098276342e-12,
-        "terminal_kg": 5.850046209002096e-13,
-        "origin_scope": "typed_material_origin",
-        "attribution_method": "tracked"
-      },
-      {
-        "destination": "overhead_terminal_inventory",
-        "account": "process.overhead_gas",
-        "campaign_scope": "terminal",
-        "subdisposition": null,
-        "species": "SiO",
-        "terminal_mol": 6.617444900424222e-24,
-        "terminal_kg": 2.917234409903014e-25,
-        "origin_scope": "typed_material_origin",
-        "attribution_method": "tracked"
-      },
-      {
-        "destination": "overhead_terminal_inventory",
-        "account": "process.overhead_gas",
-        "campaign_scope": "terminal",
-        "subdisposition": null,
-        "species": "TiO2_gas",
-        "terminal_mol": 6.177808508639097e-13,
-        "terminal_kg": 4.933906765424614e-14,
+        "terminal_mol": 0.014036224234432463,
+        "terminal_kg": 0.00044913110305336995,
         "origin_scope": "typed_material_origin",
         "attribution_method": "tracked"
       },
@@ -7546,6 +7474,28 @@
         "account": "terminal.offgas",
         "campaign_scope": "terminal",
         "subdisposition": null,
+        "species": "Cr",
+        "terminal_mol": 1.936339531979066e-15,
+        "terminal_kg": 1.0068210393873672e-16,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "offgas_vented",
+        "account": "terminal.offgas",
+        "campaign_scope": "terminal",
+        "subdisposition": null,
+        "species": "CrO",
+        "terminal_mol": 8.603629098276342e-12,
+        "terminal_kg": 5.850046209002096e-13,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "offgas_vented",
+        "account": "terminal.offgas",
+        "campaign_scope": "terminal",
+        "subdisposition": null,
         "species": "Fe",
         "terminal_mol": 2.668907039134688e-05,
         "terminal_kg": 1.4904511360047664e-06,
@@ -7657,8 +7607,8 @@
         "campaign_scope": "terminal",
         "subdisposition": null,
         "species": "SiO",
-        "terminal_mol": 5.128276935187517e-08,
-        "terminal_kg": 2.260749604108065e-09,
+        "terminal_mol": 5.1282769351875174e-08,
+        "terminal_kg": 2.2607496041080655e-09,
         "origin_scope": "typed_material_origin",
         "attribution_method": "tracked"
       },
@@ -7668,8 +7618,19 @@
         "campaign_scope": "terminal",
         "subdisposition": null,
         "species": "SiO2_gas",
-        "terminal_mol": 1.3149348589359118e-09,
-        "terminal_kg": 7.900523112944639e-11,
+        "terminal_mol": 1.3149348589359058e-09,
+        "terminal_kg": 7.900523112944602e-11,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "offgas_vented",
+        "account": "terminal.offgas",
+        "campaign_scope": "terminal",
+        "subdisposition": null,
+        "species": "TiO2_gas",
+        "terminal_mol": 6.177808508639097e-13,
+        "terminal_kg": 4.933906765424614e-14,
         "origin_scope": "typed_material_origin",
         "attribution_method": "tracked"
       },
@@ -7679,8 +7640,8 @@
         "campaign_scope": "terminal",
         "subdisposition": null,
         "species": "O2",
-        "terminal_mol": 6.262448820564577e-07,
-        "terminal_kg": 2.0038583736042532e-08,
+        "terminal_mol": 6.262475266147739e-07,
+        "terminal_kg": 2.0038668356619537e-08,
         "origin_scope": "typed_material_origin",
         "attribution_method": "tracked"
       }
@@ -8197,13 +8158,13 @@
           "Mn": 7.650672955293973e-09
         },
         "metals_total_kg": 0.0013423558106052914,
-        "O2_kg": 2.0038583736042532e-08,
+        "O2_kg": 2.0038668356619537e-08,
         "O2_partition_kg": {
-          "stored": 2.0038583736042532e-08,
-          "total": 2.0038583736042532e-08,
-          "melt_offgas_stored": 2.0038583736042532e-08
+          "stored": 2.0038668356619537e-08,
+          "total": 2.0038668356619537e-08,
+          "melt_offgas_stored": 2.0038668356619537e-08
         },
-        "class_total_kg": 0.0013423758491890275
+        "class_total_kg": 0.001342375849273648
       },
       "ingots_metals": {
         "species_kg": {
@@ -8218,13 +8179,13 @@
         "class_total_kg": 0.0013423558106052914
       },
       "oxygen": {
-        "O2_kg": 2.0038583736042532e-08,
+        "O2_kg": 2.0038668356619537e-08,
         "partition_kg": {
-          "stored": 2.0038583736042532e-08,
-          "total": 2.0038583736042532e-08,
-          "melt_offgas_stored": 2.0038583736042532e-08
+          "stored": 2.0038668356619537e-08,
+          "total": 2.0038668356619537e-08,
+          "melt_offgas_stored": 2.0038668356619537e-08
         },
-        "class_total_kg": 2.0038583736042532e-08
+        "class_total_kg": 2.0038668356619537e-08
       },
       "pure_silica_glass": {
         "stage_3_capture_kg": 1.4275744424712029e-08,
@@ -8247,8 +8208,8 @@
       },
       "captured_volatiles": {
         "kg_by_species": {
-          "Cr": 7.343907408772102e-11,
-          "CrO": 5.76845933728429e-10,
+          "Cr": 7.343917476982496e-11,
+          "CrO": 5.774309383493292e-10,
           "Fe": 1.6184661018241288e-06,
           "K": 0.00012451052204125195,
           "Mg": 4.479351736488569e-09,
@@ -8260,12 +8221,12 @@
           "PO": 7.195070447753686e-11,
           "PO2": 5.838140173539569e-09,
           "Si": 1.6125115359243955e-08,
-          "SiO": 2.260749604108065e-09,
+          "SiO": 2.2607496041080655e-09,
           "SiO2": 3.449689535800087e-08,
           "SiO2_gas": 5.0619854518235135e-09,
-          "TiO2_gas": 5.743975230398453e-11
+          "TiO2_gas": 5.7489091371638774e-11
         },
-        "class_total_kg": 0.0013424043296142729
+        "class_total_kg": 0.0013424043302487172
       },
       "process_inventory_spent_reductant": {
         "kg_by_species": {},
@@ -8792,12 +8753,12 @@
   "thermal_train_report": {
     "capacity": {
       "basis": "hardware_rating_minimum",
-      "capture_shortfall_kg": 2.0038583736042535e-09,
+      "capture_shortfall_kg": 2.0038668356619563e-09,
       "capture_status": {
         "reason": null,
         "status": "captured"
       },
-      "captured_batch_kg": 1.803472536243828e-08,
+      "captured_batch_kg": 1.803480152095758e-08,
       "cavern_capacity_kg": 2850000.0,
       "deposition_gate": {
         "criterion": "p_O2 > P_sub(T_wall)",
@@ -8918,18 +8879,18 @@
       }
     },
     "display_costs": {
-      "amortized_per_campaign_usd": 4337.464904604473,
-      "captured_o2_display_value_usd": 1.8034725362438278e-06,
+      "amortized_per_campaign_usd": 4337.464904604474,
+      "captured_o2_display_value_usd": 1.803480152095758e-06,
       "compressor_installed_usd": 12290.836658882421,
       "cryo_installed_basis": "cold_load_W_not_net_shaft_work",
       "cryo_installed_usd": 65781.35167769429,
       "fixed_run_cost_usd": 1200.0,
-      "radiator_installed_usd": 8677.109755512758,
+      "radiator_installed_usd": 8677.109755512765,
       "source_tag": "owner-ratified-2026-07-13",
       "status": "display_only_not_optimizer_objective",
       "storage_keeping_psr_usd": 0.0,
-      "storage_keeping_warm_overburden_usd": 9.01736268121914e-09,
-      "total_installed_usd": 86749.29809208946
+      "storage_keeping_warm_overburden_usd": 9.01740076047879e-09,
+      "total_installed_usd": 86749.29809208948
     },
     "excluded_major_heat_carrier_species": [
       "Cr",
@@ -9161,8 +9122,8 @@
       "transport_saturation_peak_pct": 109.66414681888511
     },
     "peaks": {
-      "cold_o2_kg_hr": 1.9260186726594925e-08,
-      "cold_o2_mol_hr": 6.019184551095358e-07,
+      "cold_o2_kg_hr": 1.926021212843622e-08,
+      "cold_o2_mol_hr": 6.019192489666924e-07,
       "cold_o2_status": "complete",
       "hot_species_basis": "per_species_design_maxima_not_concurrent_sum",
       "hot_species_kg_hr": {
@@ -9193,8 +9154,8 @@
       "cavern_regeneration": {
         "cavern_walls_J": 468049999.9999999,
         "integration_segment_K": 50.0,
-        "oxygen_fusion_J": 0.0002502474548697605,
-        "oxygen_sensible_J": 0.00024321597925343056,
+        "oxygen_fusion_J": 0.0002502485116352637,
+        "oxygen_sensible_J": 0.00024321700632584105,
         "total_J": 468050000.00049335
       },
       "cold_end_cycle": {
@@ -9594,7 +9555,7 @@
       },
       "hot_radiator": {
         "active_lift_W": 0.0,
-        "area_m2": 9.29536412876756e-07,
+        "area_m2": 9.295364129156155e-07,
         "latent_area_m2": 1.0551032369694875e-08,
         "latent_crossings": {
           "Fe": {
@@ -9604,8 +9565,8 @@
           }
         },
         "latent_load_W": 0.0027371022583816173,
-        "sensible_area_m2": 9.18985380507061e-07,
-        "sensible_load_W": 0.09709656329277964,
+        "sensible_area_m2": 9.189853805459206e-07,
+        "sensible_load_W": 0.09709656329691266,
         "sizing_basis": "per_species_maxima_conservative",
         "status": "sized"
       },
@@ -9642,25 +9603,25 @@
         "status": "sized"
       },
       "o2_passive_radiator_day": {
-        "active_lift_W": 4.519045503501118e-06,
+        "active_lift_W": 4.519051463571928e-06,
         "area_m2": null,
         "inlet_basis": "post_separator_S_B",
         "inlet_temperature_K": 1000.0,
         "latent_load_W": 0.0,
         "reason": "target_not_above_effective_sink_margin",
-        "sensible_load_W": 4.519045503501118e-06,
+        "sensible_load_W": 4.519051463571928e-06,
         "status": "passive_refused"
       },
       "o2_passive_radiator_night": {
         "active_lift_W": 0.0,
-        "area_m2": 9.964489719554326e-09,
+        "area_m2": 9.964502861503056e-09,
         "inlet_basis": "post_separator_S_B",
         "inlet_temperature_K": 1000.0,
         "latent_area_m2": 0.0,
         "latent_crossings": {},
         "latent_load_W": 0.0,
-        "sensible_area_m2": 9.964489719554326e-09,
-        "sensible_load_W": 4.519045503501119e-06,
+        "sensible_area_m2": 9.964502861503056e-09,
+        "sensible_load_W": 4.519051463571928e-06,
         "status": "sized"
       },
       "reject_radiator": {
@@ -27917,7 +27878,7 @@
     },
     "pipe_m_avg_fallback": {
       "engaged": true,
-      "total_count": 52,
+      "total_count": 55,
       "by_hour": [
         {
           "campaign": "C0",
@@ -28022,10 +27983,22 @@
           "count": 1
         },
         {
+          "campaign": "C0",
+          "hour": 17,
+          "campaign_hour": 17,
+          "count": 1
+        },
+        {
+          "campaign": "C0",
+          "hour": 18,
+          "campaign_hour": 18,
+          "count": 1
+        },
+        {
           "campaign": "C2A_STAGED",
           "hour": 23,
           "campaign_hour": 1,
-          "count": 3
+          "count": 4
         }
       ]
     }
@@ -144690,7 +144663,7 @@
       "hour": 18,
       "campaign": "C0",
       "T_C": 925.0,
-      "P_total_bar": 1.827143401897363e-12,
+      "P_total_bar": 0.0,
       "pO2_bar": 0.0,
       "mass_balance_pct": 1.1368683772161604e-14,
       "O2_yield_kg_cumulative": 1.1424289887148204e-11,
@@ -155271,26 +155244,26 @@
       "hour": 19,
       "campaign": "C0",
       "T_C": 950.0,
-      "P_total_bar": 1.8652676643414927e-12,
+      "P_total_bar": 0.0,
       "pO2_bar": 0.0,
       "mass_balance_pct": 0.0,
-      "O2_yield_kg_cumulative": 3.5761286212046406e-11,
-      "O2_source_side_potential_kg_cumulative": 3.5761286212046406e-11,
+      "O2_yield_kg_cumulative": 3.5792568358553175e-11,
+      "O2_source_side_potential_kg_cumulative": 3.5792568358553175e-11,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_electrical_plus_evaporation_kWh": 8.41337081430157e-05,
-      "energy_electrical_kWh": 2.2299683819601845e-06,
+      "energy_electrical_plus_evaporation_kWh": 8.413370814364134e-05,
+      "energy_electrical_kWh": 2.2299683825858276e-06,
       "energy_evaporation_thermal_kWh": 8.190373976105552e-05,
       "energy_scope": "electrical_plus_known_evaporation_enthalpy",
       "furnace_heat_status": "partial",
       "energy_latent_kWh": 2.4366478556790096e-05,
       "energy_dissociation_kWh": 5.7537261204265426e-05,
-      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0020358544193986553,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.002035854419399281,
       "energy_cumulative_breakdown_kWh": {
-        "electrical": 2.8668194435790477e-05,
+        "electrical": 2.8668194436416123e-05,
         "evaporation_thermal": 0.002007186224962865,
         "latent": 0.0006398160558252982,
         "dissociation": 0.0013673701691375663,
-        "electrical_plus_evaporation": 0.0020358544193986553
+        "electrical_plus_evaporation": 0.002035854419399281
       },
       "energy_evaporation_breakdown_kWh": {
         "evaporation_enthalpy_sink": 8.190373976105552e-05,
@@ -166075,8 +166048,8 @@
       "P_total_bar": 0.009000000000000001,
       "pO2_bar": 0.009000000000000001,
       "mass_balance_pct": 0.0,
-      "O2_yield_kg_cumulative": 1.0511815637227515e-10,
-      "O2_source_side_potential_kg_cumulative": 1.0511815637227515e-10,
+      "O2_yield_kg_cumulative": 1.051494385187819e-10,
+      "O2_source_side_potential_kg_cumulative": 1.051494385187819e-10,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "energy_electrical_plus_evaporation_kWh": 1.0801301603908655e-09,
       "energy_electrical_kWh": 2.8272280653076475e-11,
@@ -166085,13 +166058,13 @@
       "furnace_heat_status": "partial",
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 1.0518578797377891e-09,
-      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0020358554995288155,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0020358554995294413,
       "energy_cumulative_breakdown_kWh": {
-        "electrical": 2.866822270807113e-05,
+        "electrical": 2.8668222708696774e-05,
         "evaporation_thermal": 0.002007187276820745,
         "latent": 0.0006398160558252982,
         "dissociation": 0.001367371220995446,
-        "electrical_plus_evaporation": 0.0020358554995288155
+        "electrical_plus_evaporation": 0.0020358554995294413
       },
       "energy_evaporation_breakdown_kWh": {
         "evaporation_enthalpy_sink": 1.0518578797377891e-09,
@@ -172376,8 +172349,8 @@
       "P_total_bar": 0.009000000000000001,
       "pO2_bar": 0.009000000000000001,
       "mass_balance_pct": 0.0,
-      "O2_yield_kg_cumulative": 2.921782657089358e-10,
-      "O2_source_side_potential_kg_cumulative": 2.921782657089358e-10,
+      "O2_yield_kg_cumulative": 2.922095478554426e-10,
+      "O2_source_side_potential_kg_cumulative": 2.922095478554426e-10,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "energy_electrical_plus_evaporation_kWh": 2.8865886169422033e-09,
       "energy_electrical_kWh": 7.542182799616119e-11,
@@ -172386,13 +172359,13 @@
       "furnace_heat_status": "partial",
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 2.8111667889460423e-09,
-      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0020358583861174325,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0020358583861180583,
       "energy_cumulative_breakdown_kWh": {
-        "electrical": 2.8668298129899125e-05,
+        "electrical": 2.866829813052477e-05,
         "evaporation_thermal": 0.0020071900879875338,
         "latent": 0.0006398160558252982,
         "dissociation": 0.0013673740321622349,
-        "electrical_plus_evaporation": 0.0020358583861174325
+        "electrical_plus_evaporation": 0.0020358583861180583
       },
       "energy_evaporation_breakdown_kWh": {
         "evaporation_enthalpy_sink": 2.8111667889460423e-09,
@@ -178677,8 +178650,8 @@
       "P_total_bar": 0.009000000000000001,
       "pO2_bar": 0.009000000000000001,
       "mass_balance_pct": 0.0,
-      "O2_yield_kg_cumulative": 7.783970094476082e-10,
-      "O2_source_side_potential_kg_cumulative": 7.783970094476082e-10,
+      "O2_yield_kg_cumulative": 7.78428291594115e-10,
+      "O2_source_side_potential_kg_cumulative": 7.78428291594115e-10,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "energy_electrical_plus_evaporation_kWh": 7.4013204824727955e-09,
       "energy_electrical_kWh": 1.9258757496736117e-10,
@@ -178687,13 +178660,13 @@
       "furnace_heat_status": "partial",
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 7.208732907505434e-09,
-      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0020358657874379148,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0020358657874385406,
       "energy_cumulative_breakdown_kWh": {
-        "electrical": 2.8668490717474092e-05,
+        "electrical": 2.8668490718099738e-05,
         "evaporation_thermal": 0.0020071972967204412,
         "latent": 0.0006398160558252982,
         "dissociation": 0.0013673812408951424,
-        "electrical_plus_evaporation": 0.0020358657874379148
+        "electrical_plus_evaporation": 0.0020358657874385406
       },
       "energy_evaporation_breakdown_kWh": {
         "evaporation_enthalpy_sink": 7.208732907505434e-09,
@@ -184986,23 +184959,23 @@
       "p_carrier_bar": 0.01,
       "carrier_identity": "N2",
       "mass_balance_pct": 1.1368683772161604e-14,
-      "O2_yield_kg_cumulative": 2.0038583736042532e-08,
-      "O2_source_side_potential_kg_cumulative": 2.0038583736042532e-08,
+      "O2_yield_kg_cumulative": 2.0038640420030337e-08,
+      "O2_source_side_potential_kg_cumulative": 2.0038640420030337e-08,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_electrical_plus_evaporation_kWh": 0.0027402408318925233,
-      "energy_electrical_kWh": 3.845212656663649e-05,
+      "energy_electrical_plus_evaporation_kWh": 0.002740240831893031,
+      "energy_electrical_kWh": 3.8452126567144525e-05,
       "energy_evaporation_thermal_kWh": 0.0027017887053258868,
       "energy_scope": "electrical_plus_known_evaporation_enthalpy",
       "furnace_heat_status": "partial",
       "energy_latent_kWh": 0.0008625413111222538,
       "energy_dissociation_kWh": 0.0018392473942036329,
-      "energy_electrical_plus_evaporation_cumulative_kWh": 0.004776106619330438,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.004776106619331572,
       "energy_cumulative_breakdown_kWh": {
-        "electrical": 6.712061728411058e-05,
+        "electrical": 6.712061728524426e-05,
         "evaporation_thermal": 0.0047089860020463285,
         "latent": 0.001502357366947552,
         "dissociation": 0.003206628635098775,
-        "electrical_plus_evaporation": 0.004776106619330438
+        "electrical_plus_evaporation": 0.004776106619331572
       },
       "energy_evaporation_breakdown_kWh": {
         "evaporation_enthalpy_sink": 0.0027017887053258868,
@@ -185049,7 +185022,7 @@
         "Mg": 1.156386111907348e-09,
         "MgO_gas": 2.36182460838545e-11,
         "Na": 0.000769715214702006,
-        "O2": 2.0038583736042532e-08,
+        "O2": 2.0038640420030337e-08,
         "Si": 1.6125115359243955e-08,
         "SiO2": 3.449689535800087e-08,
         "SiO2_gas": 4.982980220694067e-09,
@@ -198850,23 +198823,23 @@
       "p_carrier_bar": 0.01,
       "carrier_identity": "N2",
       "mass_balance_pct": 1.1368683772161604e-14,
-      "O2_yield_kg_cumulative": 2.0038583736042532e-08,
-      "O2_source_side_potential_kg_cumulative": 2.0038583736042532e-08,
+      "O2_yield_kg_cumulative": 2.0038668356619537e-08,
+      "O2_source_side_potential_kg_cumulative": 2.0038668356619537e-08,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_electrical_plus_evaporation_kWh": 0.0,
-      "energy_electrical_kWh": 0.0,
+      "energy_electrical_plus_evaporation_kWh": 5.587317839415285e-16,
+      "energy_electrical_kWh": 5.587317839415285e-16,
       "energy_evaporation_thermal_kWh": 0.0,
       "energy_scope": "electrical_plus_known_evaporation_enthalpy",
       "furnace_heat_status": "partial",
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 0.0,
-      "energy_electrical_plus_evaporation_cumulative_kWh": 0.004776106619330438,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.00477610661933213,
       "energy_cumulative_breakdown_kWh": {
-        "electrical": 6.712061728411058e-05,
+        "electrical": 6.712061728580299e-05,
         "evaporation_thermal": 0.0047089860020463285,
         "latent": 0.001502357366947552,
         "dissociation": 0.003206628635098775,
-        "electrical_plus_evaporation": 0.004776106619330438
+        "electrical_plus_evaporation": 0.00477610661933213
       },
       "energy_evaporation_breakdown_kWh": {
         "evaporation_enthalpy_sink": 0,
@@ -198913,7 +198886,7 @@
         "Mg": 1.156386111907348e-09,
         "MgO_gas": 2.36182460838545e-11,
         "Na": 0.000769715214702006,
-        "O2": 2.0038583736042532e-08,
+        "O2": 2.0038668356619537e-08,
         "Si": 1.6125115359243955e-08,
         "SiO2": 3.449689535800087e-08,
         "SiO2_gas": 4.982980220694067e-09,

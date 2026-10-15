@@ -481,8 +481,8 @@ def test_exploded_rows_inherit_parent_temperature_provenance(tmp_path: Path) -> 
     assert "fixture-source::na_psat" not in result.observations
 
 
-def test_kambayashi_table3_children_keep_1573_K() -> None:
-    """The 1300 C table loses its waypoint when rows replace the parent."""
+def test_kambayashi_table3_children_keep_printed_celsius_temperature() -> None:
+    """Each row keeps the source's 1300 C condition after replacing the parent."""
 
     path = (
         Path(__file__).resolve().parents[2]
@@ -500,7 +500,8 @@ def test_kambayashi_table3_children_keep_1573_K() -> None:
     assert all("::point:" not in obs.observation_id for obs in children)
     for obs in children:
         located = obs.point_conditions["temperature_K"]
-        assert located.state.value == Decimal("1573")
+        # Exact source pin: 1300 C is converted once to 1573.15 K.
+        assert located.state.value == Decimal("1573.15")
         experiment = migrator.result.experiments[obs.experiment_id]
         bench = migrator.result.benches.get(experiment.bench_id)
         if bench is None:
@@ -512,7 +513,7 @@ def test_kambayashi_table3_children_keep_1573_K() -> None:
         assert bench is not None
         selected = collect_consumer_inputs(experiment, bench, obs).waypoints["temperature_K"].selected
         assert selected is not None
-        assert selected.value.point == Decimal("1573")
+        assert selected.value.point == Decimal("1573.15")
 
 
 def test_no_temperature_ids_follow_the_printed_row(tmp_path: Path) -> None:

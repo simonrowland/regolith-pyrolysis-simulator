@@ -1916,6 +1916,66 @@ def test_provider_forwards_liquid_fraction_and_domain_refuses():
     assert provider.capability_profile().is_authoritative_for == frozenset()
 
 
+@pytest.mark.parametrize(
+    ("failure_kind", "warning_fragment"),
+    [
+        ("timeout", "timed out after 0.025s"),
+        ("none", "no equilibrium result"),
+        ("empty", "payload_absent"),
+        ("invalid", "discarded 2"),
+    ],
+)
+def test_provider_empty_speciation_always_has_a_reason(
+    failure_kind, warning_fragment
+):
+    class FakeBackend:
+        def is_available(self):
+            return True
+
+        def equilibrate(self, **_kwargs):
+            if failure_kind == "timeout":
+                raise vaporock_module.EngineWorkerTimeout(
+                    "vaporock-test", 0.025, phase="job"
+                )
+            if failure_kind == "none":
+                return None
+            if failure_kind == "empty":
+                return types.SimpleNamespace(
+                    vapor_pressures_Pa={},
+                    vaporock_full_speciation_Pa={},
+                    warnings=(),
+                    status="not_converged",
+                    diagnostics={"empty_speciation_cause": "payload_absent"},
+                )
+            return types.SimpleNamespace(
+                vapor_pressures_Pa={},
+                vaporock_full_speciation_Pa={"Na": float("nan"), "Cr": -1.0},
+                warnings=(),
+                status="not_converged",
+                diagnostics={},
+            )
+
+    provider = VapoRockProvider(backend=FakeBackend(), vapor_pressure_data={})
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+                species_formula_registry={},
+            ),
+            temperature_C=1600.0,
+            pressure_bar=1e-6,
+            fO2_log=-8.0,
+            control_inputs={"pO2_bar": 1e-6},
+        )
+    )
+
+    assert result.status == "non_authoritative"
+    assert result.diagnostic["vaporock_full_speciation_Pa"] == {}
+    assert result.warnings
+    assert warning_fragment in " ".join(result.warnings)
+
+
 def test_fresh_system_per_request_in_process(monkeypatch):
     track = {"constructs": 0}
     fake_module, FakeSystem = _fake_system_module(
@@ -2326,7 +2386,10 @@ def test_session_warm_boot_cache_reuses_identical_config(monkeypatch):
     """
     from simulator.melt_backend import vaporock as vaporock_mod
 
-    vaporock_mod.clear_session_backend_cache()
+    shared_cache = vaporock_mod._SESSION_BACKEND_CACHE
+    # Keep this unit test's cache teardown from closing a warm backend that
+    # another test or provider already owns in this process.
+    monkeypatch.setattr(vaporock_mod, "_SESSION_BACKEND_CACHE", {})
     monkeypatch.setenv(vaporock_mod.SESSION_WARM_ENV, "0")
     assert vaporock_mod.session_warm_enabled() is False
     assert vaporock_mod.get_or_create_session_backend({}) is None
@@ -2352,6 +2415,20 @@ def test_session_warm_boot_cache_reuses_identical_config(monkeypatch):
             self._warm_pool = None
 
     monkeypatch.setattr(vaporock_mod, "VapoRockBackend", TrackingBackend)
+
+    class UnrelatedBackend:
+        available = True
+
+        def close(self) -> None:
+            self.available = False
+
+        def is_available(self) -> bool:
+            return self.available
+
+    shared_backend = UnrelatedBackend()
+    shared_key = (("test-owned-by-another-provider", True),)
+    previous_backend = shared_cache.get(shared_key)
+    shared_cache[shared_key] = shared_backend
     vaporock_mod.clear_session_backend_cache()
     try:
         first = vaporock_mod.get_or_create_session_backend({})
@@ -2360,8 +2437,21 @@ def test_session_warm_boot_cache_reuses_identical_config(monkeypatch):
         assert first is second
         assert len(created) == 1
         assert created[0].get("warm_worker") is True
+
+        vaporock_mod.clear_session_backend_cache()
+        assert first.is_available() is False
+
+        reopened = vaporock_mod.get_or_create_session_backend({})
+        assert reopened is not None and reopened is not first
+        assert len(created) == 2
     finally:
         vaporock_mod.clear_session_backend_cache()
+        assert shared_backend.is_available() is True
+        shared_backend.close()
+        if previous_backend is None:
+            shared_cache.pop(shared_key, None)
+        else:
+            shared_cache[shared_key] = previous_backend
 
 
 class _WarmPayloadFuture:

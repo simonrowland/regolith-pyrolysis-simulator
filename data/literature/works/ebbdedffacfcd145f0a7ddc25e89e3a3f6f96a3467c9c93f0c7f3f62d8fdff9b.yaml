@@ -11,42 +11,12 @@ work:
       tag: value
       value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
-    - asset_id: pdf:janaf-4th
-      role: pdf
-      path: raw/janaf-4th/janaf-4th.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:janaf-4th
-      role: pdftotext
-      path: text/janaf-4th
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:janaf-4th
-      role: table_csv
-      path: tables/janaf-4th
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:janaf-4th
       role: pdftotext
       path: unknown
       sha256:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
-    - asset_id: pdf:nist-janaf-4th
-      role: pdf
-      path: raw/nist-janaf-4th/nist-janaf-4th.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:nist-janaf-4th
-      role: pdftotext
-      path: text/nist-janaf-4th
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
     - asset_id: tables:nist-janaf-4th
       role: table_csv
       path: raw/janaf-nist-txt

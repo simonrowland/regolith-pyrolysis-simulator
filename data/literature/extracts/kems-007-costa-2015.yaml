@@ -836,7 +836,7 @@ species:
       T_range_K:
       - 1700.0
       - 1800.0
-      phase: solid_solution_olivine
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: olivine
@@ -851,10 +851,21 @@ species:
       regime: kems_effusion
       units: dimensionless
       values:
+        composition_mol:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          MgO: "0.62"
+          FeO: "0.046666666667"
+          SiO2: "0.333333333333"
+        composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
+        quantity: evaporation_coefficient_alpha
+        method_class: figure_only
+        evidence_class: figure_only
+        status: typed_refusal
+        unavailable_reason: figure_not_digitized
         alpha: null
         alpha_range: null
-        admission_status: rejected_no_figure_reading
-        reason: The source has no numbered numeric table; repaired-table review rejects figure digitization.
+        admission_status: figure_only
+        reason: figure_not_digitized
         inadmissible_figure_alpha: 0.02
         inadmissible_figure_alpha_range:
         - 0.011
@@ -940,7 +951,7 @@ species:
       T_range_K:
       - 1700.0
       - 1800.0
-      phase: solid_solution_olivine
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: olivine
@@ -955,10 +966,20 @@ species:
       regime: kems_effusion
       units: dimensionless
       values:
+        composition_mol:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          MgO: "0.62"
+          FeO: "0.046666666667"
+          SiO2: "0.333333333333"
+        composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
+        quantity: evaporation_coefficient_alpha
+        evidence_class: figure_only
+        status: typed_refusal
+        unavailable_reason: figure_not_digitized
         alpha: null
         alpha_range: null
-        admission_status: rejected_no_figure_reading
-        reason: The source has no numbered numeric table; repaired-table review rejects figure digitization.
+        admission_status: figure_only
+        reason: figure_not_digitized
         inadmissible_figure_alpha: 0.02
         inadmissible_figure_alpha_range:
         - 0.011
@@ -966,7 +987,7 @@ species:
         gas_species: Fe(g)
         material: Fo93Fa7_olivine
         method: Whitman-Motzfeld multi-cell (three Mo Knudsen cells, different orifice sizes)
-        method_class: measured_direct
+        method_class: figure_only
         system_class: solid_solution_silicate
         transformation_class: redox_reduction_required
         interfacial_reaction: FeO(olivine_ss) -> Fe(g) + 1/2 O2
@@ -1699,6 +1720,7 @@ species:
       regime: kems_effusion
       units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
       values:
+        composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
         quantity: partial_pressure
         method_class: measured_direct
         admission_status: admitted
@@ -1707,6 +1729,27 @@ species:
           pixel_y: 900.0
           inv_T_times_1e4_K_inv: 4.963195
           T_K: 2014.83
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 2.91564
           p_kPa: 0.001214395462
           p_Pa: 1.214395462383
@@ -1724,6 +1767,27 @@ species:
           pixel_y: 950.0
           inv_T_times_1e4_K_inv: 5.103259
           T_K: 1959.53
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 3.20082
           p_kPa: 0.000629767066
           p_Pa: 0.6297670661
@@ -1741,6 +1805,27 @@ species:
           pixel_y: 1013.0
           inv_T_times_1e4_K_inv: 5.229188
           T_K: 1912.34
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 3.56015
           p_kPa: 0.000275329601
           p_Pa: 0.275329600922
@@ -1758,6 +1843,27 @@ species:
           pixel_y: 1095.0
           inv_T_times_1e4_K_inv: 5.392382
           T_K: 1854.47
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 4.02784
           p_kPa: 9.3790185e-05
           p_Pa: 0.093790185077
@@ -1870,6 +1976,7 @@ species:
       regime: kems_effusion
       units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
       values:
+        composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
         quantity: partial_pressure
         method_class: measured_direct
         admission_status: admitted
@@ -1878,6 +1985,27 @@ species:
           pixel_y: 962.0
           inv_T_times_1e4_K_inv: 5.558146
           T_K: 1799.16
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 3.26926
           p_kPa: 0.000537943544
           p_Pa: 0.537943543733
@@ -1895,6 +2023,27 @@ species:
           pixel_y: 981.0
           inv_T_times_1e4_K_inv: 5.573566
           T_K: 1794.18
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 3.37763
           p_kPa: 0.0004191488
           p_Pa: 0.419148800058
@@ -1912,6 +2061,27 @@ species:
           pixel_y: 1019.0
           inv_T_times_1e4_K_inv: 5.702065
           T_K: 1753.75
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 3.59437
           p_kPa: 0.00025446689
           p_Pa: 0.254466890213
@@ -1929,6 +2099,27 @@ species:
           pixel_y: 1051.0
           inv_T_times_1e4_K_inv: 5.801009
           T_K: 1723.84
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 3.77688
           p_kPa: 0.000167153687
           p_Pa: 0.167153686998
@@ -1946,6 +2137,27 @@ species:
           pixel_y: 1074.0
           inv_T_times_1e4_K_inv: 5.880678
           T_K: 1700.48
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 3.90807
           p_kPa: 0.000123575698
           p_Pa: 0.123575698193
@@ -2510,6 +2722,7 @@ species:
       regime: kems_effusion
       units: dimensionless
       values:
+        composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
         quantity: evaporation_coefficient_alpha
         method_class: measured_direct
         admission_status: admitted
@@ -2517,6 +2730,27 @@ species:
         - pixel_x: 509.0
           pixel_y: 1415.0
           T_K: 1700.75
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           alpha: 0.016269
           sigma: 0.000358
           axis_conversion: T_K and dimensionless D(alpha) read from calibrated linear
@@ -2531,6 +2765,27 @@ species:
         - pixel_x: 702.0
           pixel_y: 1436.0
           T_K: 1722.97
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           alpha: 0.015517
           sigma: 0.000358
           axis_conversion: T_K and dimensionless D(alpha) read from calibrated linear
@@ -2545,6 +2800,27 @@ species:
         - pixel_x: 970.0
           pixel_y: 1317.0
           T_K: 1753.84
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           alpha: 0.01978
           sigma: 0.000358
           axis_conversion: T_K and dimensionless D(alpha) read from calibrated linear
@@ -2559,6 +2835,27 @@ species:
         - pixel_x: 1321.0
           pixel_y: 1548.0
           T_K: 1794.26
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           alpha: 0.011505
           sigma: 0.000358
           axis_conversion: T_K and dimensionless D(alpha) read from calibrated linear
@@ -2573,6 +2870,27 @@ species:
         - pixel_x: 1368.0
           pixel_y: 1505.0
           T_K: 1799.68
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           alpha: 0.013045
           sigma: 0.000358
           axis_conversion: T_K and dimensionless D(alpha) read from calibrated linear
@@ -3344,6 +3662,7 @@ species:
       regime: kems_effusion
       units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
       values:
+        composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
         quantity: partial_pressure
         method_class: measured_direct
         admission_status: admitted
@@ -3352,6 +3671,27 @@ species:
           pixel_y: 955.0
           inv_T_times_1e4_K_inv: 4.963195
           T_K: 2014.83
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 3.22934
           p_kPa: 0.000589741821
           p_Pa: 0.589741820715
@@ -3369,6 +3709,27 @@ species:
           pixel_y: 1048.0
           inv_T_times_1e4_K_inv: 5.103259
           T_K: 1959.53
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 3.75977
           p_kPa: 0.000173870848
           p_Pa: 0.173870847867
@@ -3386,6 +3747,27 @@ species:
           pixel_y: 1144.0
           inv_T_times_1e4_K_inv: 5.229188
           T_K: 1912.34
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 4.30732
           p_kPa: 4.9281147e-05
           p_Pa: 0.04928114687
@@ -3403,6 +3785,27 @@ species:
           pixel_y: 1253.0
           inv_T_times_1e4_K_inv: 5.392382
           T_K: 1854.47
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 4.92901
           p_kPa: 1.1775734e-05
           p_Pa: 0.011775734108
@@ -3515,6 +3918,7 @@ species:
       regime: kems_effusion
       units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
       values:
+        composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
         quantity: partial_pressure
         method_class: measured_direct
         admission_status: admitted
@@ -3523,6 +3927,27 @@ species:
           pixel_y: 1103.0
           inv_T_times_1e4_K_inv: 5.556861
           T_K: 1799.58
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 4.07347
           p_kPa: 8.4436177e-05
           p_Pa: 0.084436177149
@@ -3540,6 +3965,27 @@ species:
           pixel_y: 1110.0
           inv_T_times_1e4_K_inv: 5.573566
           T_K: 1794.18
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 4.1134
           p_kPa: 7.7019968e-05
           p_Pa: 0.07701996833
@@ -3557,6 +4003,27 @@ species:
           pixel_y: 1188.0
           inv_T_times_1e4_K_inv: 5.702065
           T_K: 1753.75
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 4.55828
           p_kPa: 2.7651726e-05
           p_Pa: 0.0276517256
@@ -3574,6 +4041,27 @@ species:
           pixel_y: 1230.0
           inv_T_times_1e4_K_inv: 5.804864
           T_K: 1722.69
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 4.79783
           p_kPa: 1.5928353e-05
           p_Pa: 0.015928353245
@@ -3591,6 +4079,27 @@ species:
           pixel_y: 1274.0
           inv_T_times_1e4_K_inv: 5.880678
           T_K: 1700.48
+          composition_mol:
+            basis: normalized_mole_fraction_from_published_Fo93Fa7
+            MgO: "0.62"
+            FeO: "0.046666666667"
+            SiO2: "0.333333333333"
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: normalized_mole_fraction_from_published_Fo93Fa7
+                  amount_basis: mole_fraction
+                  components:
+                  - [MgO, "0.62"]
+                  - [FeO, "0.046666666667"]
+                  - [SiO2, "0.333333333333"]
+              locator:
+                page: 1
+                pdf_page_index: 0
+                section: Introduction
+                note: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
           minus_log10_P_kPa_as_plotted: 5.04879
           p_kPa: 8.937423e-06
           p_Pa: 0.008937422953
@@ -4322,7 +4831,7 @@ species:
       T_range_K:
       - 1700.0
       - 1800.0
-      phase: solid_solution_olivine
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: olivine
@@ -4337,10 +4846,21 @@ species:
       regime: kems_effusion
       units: dimensionless
       values:
+        composition_mol:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          MgO: "0.62"
+          FeO: "0.046666666667"
+          SiO2: "0.333333333333"
+        composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
+        quantity: evaporation_coefficient_alpha
+        method_class: figure_only
+        evidence_class: figure_only
+        status: typed_refusal
+        unavailable_reason: figure_not_digitized
         alpha: null
         alpha_range: null
-        admission_status: rejected_no_figure_reading
-        reason: The source has no numbered numeric table; repaired-table review rejects figure digitization.
+        admission_status: figure_only
+        reason: figure_not_digitized
         inadmissible_figure_alpha_range:
         - 0.003
         - 0.036
@@ -4409,7 +4929,7 @@ species:
       T_range_K:
       - 1700.0
       - 1800.0
-      phase: solid_solution_olivine
+      phase: gas
       condensed_form:
         state: crystalline
         polymorph_name: olivine
@@ -4423,16 +4943,26 @@ species:
       regime: kems_effusion
       units: dimensionless
       values:
+        composition_mol:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          MgO: "0.62"
+          FeO: "0.046666666667"
+          SiO2: "0.333333333333"
+        composition_derivation: "Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07 Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions."
+        quantity: evaporation_coefficient_alpha
+        evidence_class: figure_only
+        status: typed_refusal
+        unavailable_reason: figure_not_digitized
         alpha: null
         alpha_range: null
-        admission_status: rejected_no_figure_reading
-        reason: The source has no numbered numeric table; repaired-table review rejects figure digitization.
+        admission_status: figure_only
+        reason: figure_not_digitized
         inadmissible_figure_alpha_range:
         - 0.003
         - 0.036
         gas_species: SiO(g)
         material: Fo93Fa7_olivine
-        method_class: measured_direct
+        method_class: figure_only
         system_class: solid_solution_silicate
         transformation_class: network_former_dissociation
         interfacial_reaction: SiO2(olivine_ss) -> SiO(g) + 1/2 O2

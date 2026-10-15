@@ -1819,6 +1819,9 @@ class _OpenImccBatteryBackend:
             "pack": self._pack_name,
             "pack_version": str(getattr(self._pack, "version", "unknown")),
             "pack_digest": str(openimcc_bridge._pack_digest(self._pack)),
+            "openimcc_commit": (
+                openimcc_bridge.imported_openimcc_commit() or "unverified"
+            ),
         }
         self._load_gas()
 
@@ -2461,6 +2464,8 @@ def _internal_analytical_vapor_pressure_adapter(
                 }
             )
 
+    imcc_notices = [*oxygen_notices]
+    imcc_notices.extend(core_flags)
     vapor_authority = core_diagnostic.get("vapor_pressure_authority")
     authority_status = (
         str(vapor_authority.get("status") or "unknown")
@@ -2491,7 +2496,7 @@ def _internal_analytical_vapor_pressure_adapter(
             else "bridge" if authority_is_authoritative else authority_status
         ),
         "vapor_pressure_diagnostic": core_diagnostic,
-        "imcc_notices": oxygen_notices,
+        "imcc_notices": imcc_notices,
     }
     activities = dict(core_diagnostic.get("activities") or {})
     from simulator.chemistry.melt_activity import (

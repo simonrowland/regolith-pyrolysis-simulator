@@ -32,12 +32,31 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux, MeltState
 from scripts import evaporation_selectivity_map as selectivity_map
+from tests.magemin_test_support import close_test_owned_magemin_backend
 
 
 # stateful redox simulation matrix flakes under xdist coscheduling.
 pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
 
 ROOT = Path(__file__).resolve().parents[1]
+_TEST_OWNED_SIMULATORS: list[PyrolysisSimulator] = []
+
+
+def _create_test_owned_simulator(*args, **kwargs) -> PyrolysisSimulator:
+    sim = PyrolysisSimulator(*args, **kwargs)
+    _TEST_OWNED_SIMULATORS.append(sim)
+    return sim
+
+
+@pytest.fixture(autouse=True)
+def _close_test_owned_magemin_backends():
+    _TEST_OWNED_SIMULATORS.clear()
+    yield
+    try:
+        for sim in _TEST_OWNED_SIMULATORS:
+            close_test_owned_magemin_backend(sim)
+    finally:
+        _TEST_OWNED_SIMULATORS.clear()
 
 
 def _load_yaml(name: str) -> dict[str, Any]:
@@ -52,7 +71,7 @@ def _make_sim(
     setpoints = _load_yaml("setpoints.yaml")
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
     setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"] = True
-    sim = PyrolysisSimulator(
+    sim = _create_test_owned_simulator(
         InternalAnalyticalBackend(),
         setpoints,
         _load_yaml("feedstocks.yaml"),
@@ -270,7 +289,7 @@ def _make_custom_feedstock_sim(
     setpoints = _load_yaml("setpoints.yaml")
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
     setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"] = True
-    sim = PyrolysisSimulator(
+    sim = _create_test_owned_simulator(
         InternalAnalyticalBackend(),
         setpoints,
         feedstocks,
@@ -1537,7 +1556,7 @@ def test_c7_external_al_credit_lowers_fO2_from_committed_transition(
     setpoints["campaigns"]["C7"].update(
         {"enabled": True, "al_credit_limit_kg": 20.0, "extent_fraction": 0.1}
     )
-    sim = PyrolysisSimulator(
+    sim = _create_test_owned_simulator(
         InternalAnalyticalBackend(),
         setpoints,
         _load_yaml("feedstocks.yaml"),
@@ -1601,7 +1620,7 @@ def test_c7_in_situ_al_route_does_not_double_count_prior_reducing_power(
     setpoints["campaigns"]["C7"].update(
         {"enabled": True, "al_credit_limit_kg": 0.0, "extent_fraction": 0.1}
     )
-    sim = PyrolysisSimulator(
+    sim = _create_test_owned_simulator(
         InternalAnalyticalBackend(),
         setpoints,
         _load_yaml("feedstocks.yaml"),
@@ -1657,7 +1676,7 @@ def test_c7_mixed_in_situ_and_external_al_counts_only_external_credit_sink(
     setpoints["campaigns"]["C7"].update(
         {"enabled": True, "al_credit_limit_kg": 20.0, "extent_fraction": 0.1}
     )
-    sim = PyrolysisSimulator(
+    sim = _create_test_owned_simulator(
         InternalAnalyticalBackend(),
         setpoints,
         _load_yaml("feedstocks.yaml"),
@@ -1735,7 +1754,7 @@ def test_c7_transport_diagnostic_uses_provider_route_gate(monkeypatch) -> None:
             "ca_condenser_temperature_C": 1000.0,
         }
     )
-    sim = PyrolysisSimulator(
+    sim = _create_test_owned_simulator(
         InternalAnalyticalBackend(),
         setpoints,
         _load_yaml("feedstocks.yaml"),
@@ -1783,7 +1802,7 @@ def test_c7_transport_refusal_preserves_preexisting_overhead_ca(monkeypatch) -> 
             "ca_condenser_temperature_C": 1000.0,
         }
     )
-    sim = PyrolysisSimulator(
+    sim = _create_test_owned_simulator(
         InternalAnalyticalBackend(),
         setpoints,
         _load_yaml("feedstocks.yaml"),
@@ -2604,6 +2623,21 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
     assert seen_sulfsat_fO2 == pytest.approx([-6.5])
     assert sim.melt.fO2_log == pytest.approx(-6.5)
     assert sim.melt.melt_fO2_log == pytest.approx(-6.5)
+
+
+def test_cleanup_leaves_injected_gate_fallback_backend_alone() -> None:
+    from tests.binding_admission_fixtures import register_synthetic_gate_curve_producer
+
+    sim = _make_sim()
+    register_synthetic_gate_curve_producer(sim)
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    backend = provider._backend
+
+    close_test_owned_magemin_backend(sim)
+
+    assert provider._backend is backend
 
 
 def test_step_does_not_reseed_live_fO2_from_heuristic() -> None:

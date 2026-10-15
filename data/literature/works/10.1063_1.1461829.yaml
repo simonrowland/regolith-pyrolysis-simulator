@@ -13,24 +13,6 @@ work:
       tag: value
       value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
-    - asset_id: pdf:iapws-95-psat-liquid
-      role: pdf
-      path: raw/iapws-95-psat-liquid/iapws-95-psat-liquid.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:iapws-95-psat-liquid
-      role: pdftotext
-      path: text/iapws-95-psat-liquid
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:iapws-95-psat-liquid
-      role: table_csv
-      path: tables/iapws-95-psat-liquid
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:iapws-95-psat-liquid
       role: pdftotext
       path: unknown

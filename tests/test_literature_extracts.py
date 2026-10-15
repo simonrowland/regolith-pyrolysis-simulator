@@ -4223,7 +4223,7 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
 def test_richet_bottinga_1986_review_fixes_migrate_and_pin_table4() -> None:
     """Keep the reviewed provenance, pressure, widths, and context in migration."""
     from unittest.mock import patch
-    from simulator.battery.enums import Phase, Quantity
+    from simulator.battery.enums import Phase, Polymorph, Quantity
 
     source_path = EXTRACTS / "richet-bottinga-1986-silicate-thermochemistry.yaml"
     source = battery_migrate.load_yaml(source_path)
@@ -4263,13 +4263,49 @@ def test_richet_bottinga_1986_review_fixes_migrate_and_pin_table4() -> None:
     assert len(result.works) == 1
     assert sum(map(len, result.context_by_work.values())) == 12
     assert not result.validation.hard_issues
-    assert result.unrecognised_polymorphs == {
-        "Cristobalite": 2,
-        "clinoenstatite": 3,
-        "High albite": 2,
-        "High sanidine": 2,
-        "Diopside": 2,
+    assert result.unrecognised_polymorphs == {}
+
+    expected_polymorphs = {
+        "rb86_1986_cristobalite_transition_table5": Polymorph.CRISTOBALITE_HIGH,
+        "rb86_1986_cristobalite_entropy_of_fusion_table5": Polymorph.CRISTOBALITE_HIGH,
+        "rb86_1986_mgsio3_transition_table4": Polymorph.CLINOENSTATITE,
+        "rb86_1986_mgsio3_heat_of_fusion_table4": Polymorph.CLINOENSTATITE,
+        "rb86_1986_mgsio3_entropy_of_fusion_table4": Polymorph.CLINOENSTATITE,
+        "rb86_1986_high_albite_transition_table5": Polymorph.ALBITE_HIGH,
+        "rb86_1986_high_albite_entropy_of_fusion_table5": Polymorph.ALBITE_HIGH,
+        "rb86_1986_high_sanidine_transition_table5": Polymorph.SANIDINE_HIGH,
+        "rb86_1986_high_sanidine_entropy_of_fusion_table5": Polymorph.SANIDINE_HIGH,
+        "rb86_1986_diopside_transition_table5": Polymorph.DIOPSIDE,
+        "rb86_1986_diopside_entropy_of_fusion_table5": Polymorph.DIOPSIDE,
     }
+    for observation_id, expected_polymorph in expected_polymorphs.items():
+        polymorph = observations[observation_id].identity.species.polymorph
+        assert polymorph.is_value
+        assert polymorph.value is expected_polymorph
+
+    for observation_id in (
+        "rb86_1986_cristobalite_transition_table5",
+        "rb86_1986_cristobalite_entropy_of_fusion_table5",
+    ):
+        source_row = source_observations[observation_id]
+        assert source_row["locator"]["row"] == "Cristobalite"
+        note = source_row["condensed_form"]["note"]
+        assert "only cristobalite stable at 1999 K is high (beta) cristobalite" in note
+        assert "alpha-beta inversion is near 500 K" in note
+    context_row = next(
+        row
+        for rows in result.context_by_work.values()
+        for row in rows
+        if row["observation_id"] == "rb86_1986_cristobalite_table5_entropy_context"
+    )
+    assert context_row["locator"]["row"] == "Cristobalite"
+    assert context_row["condensed_form"]["polymorph"] == "cristobalite_high"
+    assert "only cristobalite stable at 1999 K is high (beta) cristobalite" in (
+        context_row["condensed_form"]["note"]
+    )
+    assert "alpha-beta inversion is near 500 K" in (
+        context_row["condensed_form"]["note"]
+    )
 
     transition_values = {
         "rb86_1986_cristobalite_transition_table5": 1999,

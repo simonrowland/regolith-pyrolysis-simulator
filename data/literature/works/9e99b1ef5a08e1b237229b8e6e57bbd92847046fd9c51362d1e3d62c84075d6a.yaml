@@ -16,18 +16,6 @@ work:
       sha256:
         tag: value
         value: 9822bdf342023a55d81701b7f9977271126e900897b7e46e3e1be27545d142a0
-    - asset_id: pdftotext:shornikov-2007-cao-aluminosilicate-melts
-      role: pdftotext
-      path: text/shornikov-2007-cao-aluminosilicate-melts
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:shornikov-2007-cao-aluminosilicate-melts
-      role: table_csv
-      path: tables/shornikov-2007-cao-aluminosilicate-melts
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:shornikov-2007-cao-aluminosilicate-melts
       role: pdftotext
       path: unknown

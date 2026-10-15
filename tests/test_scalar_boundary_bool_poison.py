@@ -546,9 +546,10 @@ def _magemin_config(field: str, value: Any) -> bool:
         "worker_startup_timeout_s": 1.0,
     }
     config[field] = value
-    return backend.initialize(
-        config
-    )
+    try:
+        return backend.initialize(config)
+    finally:
+        backend.close()
 
 
 def _thermoengine_config(field: str, value: Any) -> bool:
