@@ -33,13 +33,13 @@ _TEMPERATURE_ROUTES = (
     ("kems-049-kato-1993-ms-review", "kato_1993_table1_fe_psat_1873k", "1873.0", "table", "1"),
     ("kems-049-kato-1993-ms-review", "kato_1993_table1_si_psat_1873k", "1873.0", "table", "1"),
     ("kems-049-kato-1993-ms-review", "kato_1993_table1_w_psat_1873k", "1873.0", "table", "1"),
-    # Table 3 "at 1300 C"; the extract documents the authors' T_C + 273 convention.
-    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::rows:h=979ecc7f3c6b", "1573.0", "table", "3"),
-    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::rows:h=cedcb5fddf77", "1573.0", "table", "3"),
-    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::rows:h=535271423e81", "1573.0", "table", "3"),
-    ("kems-057-kambayashi-1985", "kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only", "1573.0", "figure", "2"),
+    # The locator prints 1300 C; the migrator applies its Celsius-to-Kelvin conversion once.
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=7be86db87718", "1573.15", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=0537dd72731f", "1573.15", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=7b2b66dd3504", "1573.15", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only", "1573.15", "figure", "2"),
     # Fig. 8 slope: "Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C".
-    ("kems-057-kambayashi-1985", "kambayashi_1985_fe_sublimation_enthalpy_1370c", "1643.0", "figure", "8"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_fe_sublimation_enthalpy_1370c", "1643.15", "figure", "8"),
     # eq. (5) prints "at 1600 C"; the extract documents T_K = 1600 + 273.15.
     ("kems-048-turkdogan-2001-sio2-gamma", "turkdogan_2001_eq5_log_gamma_sio2_cao_saturated_model_derived", "1873.15", "equation", "5"),
     ("kems-048-turkdogan-2001-sio2-gamma", "turkdogan_2001_eq5_log_gamma_p2o5_model_derived", "1873.15", "equation", "5"),

@@ -15022,3 +15022,172 @@ def test_ohara_1987_point_condition_locator_mutation_proof(
     ]
     assert len(mutated_conditions) == 1
     assert mutated_conditions[0].point_conditions["composition"].state.is_value
+def _kambayashi_table4_compositions(doc: dict) -> dict[int, dict[str, Decimal]]:
+    from decimal import ROUND_HALF_UP
+
+    from simulator.accounting.formulas import parse_formula
+
+    table4 = next(
+        observation
+        for observation in doc["species"]["P2O5"]["observations"]
+        if observation["observation_id"]
+        == "kambayashi_1985_table4_feto_p2o5_compositions"
+    )
+    oxides = ("P2O5", "FeO", "Fe2O3")
+    molar_masses = {
+        oxide: Decimal(str(parse_formula(oxide).molar_mass_g_per_mol()))
+        for oxide in oxides
+    }
+    expected = {}
+    for row in table4["values"]["rows"]:
+        moles = {
+            oxide: Decimal(str(row[f"{oxide}_wt_percent"])) / molar_masses[oxide]
+            for oxide in oxides
+        }
+        total = sum(moles.values())
+        p2o5 = (moles["P2O5"] / total).quantize(
+            Decimal("0.000000000001"), rounding=ROUND_HALF_UP
+        )
+        feo = (moles["FeO"] / total).quantize(
+            Decimal("0.000000000001"), rounding=ROUND_HALF_UP
+        )
+        expected[int(row["sample_no"])] = {
+            "P2O5": p2o5,
+            "FeO": feo,
+            "Fe2O3": Decimal("1") - p2o5 - feo,
+        }
+    return expected
+
+
+def _assert_kambayashi_sample_associations(doc: dict, result) -> None:
+    source_id = "kems-057-kambayashi-1985"
+    samples = _kambayashi_table4_compositions(doc)
+
+    def source_observation(observation_id: str) -> dict:
+        return next(
+            observation
+            for species in doc["species"].values()
+            for observation in species["observations"]
+            if observation["observation_id"] == observation_id
+        )
+
+    def migrated_rows(observation_id: str):
+        prefix = f"{source_id}::{observation_id}::"
+        return [
+            observation
+            for key, observation in result.observations.items()
+            if key.startswith(prefix)
+        ]
+
+    def assert_composition_condition(observation, expected, source_table):
+        located = (observation.point_conditions or {}).get("composition")
+        assert located is not None and located.state.is_value
+        assert dict(located.state.value.components) == expected
+        assert located.locator is not None
+        assert located.locator.table == source_table
+
+    def assert_temperature(observation, row, table):
+        expected = Decimal(str(row["T_C"])) + Decimal("273.15")
+        located = (observation.point_conditions or {}).get("temperature_K")
+        assert located is not None and located.state.is_value
+        assert located.state.value == expected
+        assert located.locator is not None
+        assert located.locator.table == table
+
+    # Table 3 has no sample number: its printed X_P2O5 cell identifies each
+    # binary composition and is independent of the composition locator.
+    for observation_id in (
+        "kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c",
+        "kambayashi_1985_pbo_table3_ion_current_ratios_1300c",
+    ):
+        source = source_observation(observation_id)
+        rows = source["values"]["rows"]
+        migrated = migrated_rows(observation_id)
+        assert len(migrated) == len(rows) == 3
+        for observation, row in zip(migrated, rows, strict=True):
+            x_p2o5 = Decimal(str(row["X_P2O5"]))
+            expected = {"PbO": Decimal("1") - x_p2o5, "P2O5": x_p2o5}
+            assert_composition_condition(observation, expected, "3")
+            assert_temperature(observation, {"T_C": 1300}, "3")
+            assert observation.identity.species.phase.is_value
+            assert observation.identity.species.phase.value is Phase.G
+
+    table4_id = "kambayashi_1985_table4_feto_p2o5_compositions"
+    table4_rows = source_observation(table4_id)["values"]["rows"]
+    migrated = migrated_rows(table4_id)
+    assert len(migrated) == len(table4_rows) == 8
+    for observation, row in zip(migrated, table4_rows, strict=True):
+        expected = samples[int(row["sample_no"])]
+        assert_composition_condition(observation, expected, "4")
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_value
+        assert dict(observation.identity.composition.value.components) == expected
+
+    sample_linked_series = (
+        ("kambayashi_1985_table5_feto_p2o5_ion_current_ratios", "5", False),
+        ("kambayashi_1985_table6_partial_pressures_and_dg", "6", True),
+        ("kambayashi_1985_po2_table6_partial_pressure", "6", True),
+        ("kambayashi_1985_p2_table6_partial_pressure", "6", True),
+        ("kambayashi_1985_table7_raoultian_a_p2o5", "7", True),
+    )
+    for observation_id, table, composition_is_identity in sample_linked_series:
+        source_rows = source_observation(observation_id)["values"]["rows"]
+        migrated = migrated_rows(observation_id)
+        assert len(migrated) == len(source_rows)
+        for observation, row in zip(migrated, source_rows, strict=True):
+            # Bind by the printed sample_no and row order; do not use the
+            # composition locator under test to choose the expected sample.
+            expected = samples[int(row["sample_no"])]
+            assert_composition_condition(observation, expected, "4")
+            assert_temperature(observation, row, table)
+            if composition_is_identity:
+                assert observation.identity.composition is not None
+                assert observation.identity.composition.is_value
+                assert dict(observation.identity.composition.value.components) == expected
+            if observation_id in {
+                "kambayashi_1985_po2_table6_partial_pressure",
+                "kambayashi_1985_p2_table6_partial_pressure",
+            }:
+                assert observation.identity.fO2_Pa is not None
+                assert observation.identity.fO2_Pa.is_unknown
+                assert observation.identity.fO2_Pa.reason == "no fO2_Pa mapped from source"
+                assert observation.identity.total_pressure_Pa is not None
+                assert observation.identity.total_pressure_Pa.is_unknown
+                assert observation.identity.total_pressure_Pa.reason == (
+                    "in_cell_total_pressure_not_derivable"
+                )
+
+
+def test_kambayashi_printed_compositions_and_conditions_reach_observations(
+    tmp_path: Path,
+) -> None:
+    path = REPO_ROOT / "data/literature/extracts/kems-057-kambayashi-1985.yaml"
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    result = _migrate_real_extract(
+        tmp_path, "kems-057-kambayashi-1985.yaml", write=False
+    )
+    _assert_kambayashi_sample_associations(doc, result)
+
+    figure_quantities = {
+        "kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only": Quantity.ION_INTENSITY_RATIO,
+        "kambayashi_1985_fig3_time_dependence_figure_only": Quantity.ION_INTENSITY_RATIO,
+        "kambayashi_1985_fig4_time_dependence_figure_only": Quantity.ION_INTENSITY_RATIO,
+        "kambayashi_1985_fig5_temperature_dependence_figure_only": Quantity.ION_INTENSITY_RATIO,
+        "kambayashi_1985_fig6_henrian_a_p2o5_figure_only": Quantity.ACTIVITY,
+        "kambayashi_1985_fig7_raoultian_activities_figure_only": Quantity.ACTIVITY,
+        "kambayashi_1985_feto_raoultian_gibbs_duhem_fig7_figure_only": Quantity.ACTIVITY,
+        "kambayashi_1985_fig8_ion_current_vs_1T_figure_only": Quantity.ION_INTENSITY,
+    }
+    for observation_id, quantity in figure_quantities.items():
+        observation = result.observations[
+            f"kems-057-kambayashi-1985::{observation_id}"
+        ]
+        assert quantity_token(observation.identity) is quantity
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert observation.value.unavailable_reason == "figure_not_digitized"
+        assert observation.value.point is None
+        assert observation.admission.status is AdmissionStatus.REJECTED
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        assert observation.locator is not None
+        assert "bound_not_point_ordering" in observation.locator.note

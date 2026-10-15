@@ -8782,6 +8782,8 @@ def _selection_from_named_field(
     if q_token in {
         Quantity.ACTIVITY,
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        Quantity.ION_INTENSITY,
+        Quantity.ION_INTENSITY_RATIO,
     } and payload.get("unavailable_reason"):
         field_name = {
             Quantity.EVAPORATION_COEFFICIENT_ALPHA: "alpha",
