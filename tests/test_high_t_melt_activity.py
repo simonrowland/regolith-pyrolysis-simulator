@@ -12,6 +12,7 @@ from types import SimpleNamespace
 
 import pytest
 import yaml
+from openimcc import ImccNonconvergenceError
 
 from engines.builtin import vapor_pressure as vapor_pressure_module
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
@@ -29,8 +30,9 @@ from simulator.melt_backend.openimcc_bridge import (
 )
 import simulator.melt_backend.openimcc_bridge as openimcc_bridge_module
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
+from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun
-from simulator.state import MOLAR_MASS
+from simulator.state import CampaignPhase, MOLAR_MASS
 
 
 pytest.importorskip("openimcc")
@@ -584,9 +586,12 @@ def test_missing_present_parent_refuses_and_labels_provider_fallback(
         _request(composition, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
     )
     high_t = result.diagnostic["high_t_melt_activity"]
+    # Keep this typed result-shape refusal as a prediction, with its reason
+    # made explicit on the extrapolated authority ladder.
     assert result.status == "ok"
     assert high_t["provider"] == "constant_gamma"
     assert high_t["fallback"] is True
+    assert high_t["authority"] == "extrapolated"
     assert high_t["fallback_reason"]["code"] == "openimcc_result_shape"
     provenance = result.diagnostic["vapor_pressure_numerator_provenance"]
     for species in ("Na", "Na2", "Na2O_gas"):
@@ -594,6 +599,96 @@ def test_missing_present_parent_refuses_and_labels_provider_fallback(
         assert provenance[species]["openimcc_refusal"]["code"] == (
             "openimcc_result_shape"
         )
+
+
+def test_unexpected_openimcc_activity_error_propagates(monkeypatch) -> None:
+    def fail(**kwargs):
+        raise RuntimeError("unexpected evaluator bug")
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", fail)
+
+    with pytest.raises(RuntimeError, match="unexpected evaluator bug"):
+        _provider().dispatch(
+            _request(
+                BASE_MELT_MOL,
+                CAP_PLUS_T_K,
+                high_t_melt_activity="openimcc",
+            )
+        )
+
+
+def test_nonconvergence_keeps_prediction_and_emits_run_notice(monkeypatch) -> None:
+    diagnostics = {"iterations": 8, "residual_inf": 0.25}
+
+    def nonconverge(**kwargs):
+        raise ImccNonconvergenceError(
+            "IMCC-SF04 parent-balance solve did not converge",
+            diagnostics,
+        )
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
+    request = _request(
+        BASE_MELT_MOL,
+        CAP_PLUS_T_K,
+        high_t_melt_activity="openimcc",
+    )
+    predicted = _provider().dispatch(request)
+    constant_gamma = _provider().dispatch(
+        _request(
+            BASE_MELT_MOL,
+            CAP_PLUS_T_K,
+            high_t_melt_activity="constant_gamma",
+        )
+    )
+
+    assert predicted.status == "ok"
+    assert predicted.diagnostic["vapor_pressures_Pa"] == constant_gamma.diagnostic[
+        "vapor_pressures_Pa"
+    ]
+    high_t = predicted.diagnostic["high_t_melt_activity"]
+    assert high_t["provider"] == "constant_gamma"
+    assert high_t["authority"] == "extrapolated"
+    assert high_t["fallback_reason"]["code"] == "imcc_nonconvergence"
+    assert high_t["fallback_reason"]["residual_inf"] == 0.25
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=0,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.temperature_C = CAP_PLUS_T_K - 273.15
+    sim._refresh_vapor_pressures_from_kernel(
+        SimpleNamespace(
+            vapor_pressures_Pa={},
+            vapor_pressures_source={},
+            liquid_fraction=1.0,
+            fO2_log=sim.melt.fO2_log,
+            activity_coefficients={},
+        )
+    )
+    sim.melt.hour = 1
+
+    execution = RunExecutor().execute_session(session, hours=0)
+    output = run._build_output(execution)
+    notice = output["run_metadata"]["high_t_melt_activity_fallback_notice"]
+    assert notice["authority"] == "extrapolated"
+    assert notice["reason"] == "imcc_nonconvergence"
+    assert notice["notices"][0]["residual_inf"] == 0.25
+    assert notice["affected_tick_count"] == 1
+    assert notice["affected_parent_count"] == len(
+        notice["affected_parent_oxides"]
+    )
+    assert notice["first_hour"] == notice["last_hour"] == 1
+    assert notice["campaign"] == "C2A"
+    assert output["product_classification"][
+        "high_t_melt_activity_fallback_notice"
+    ] == notice
+    assert "IMCC" in output["product_classification"]["markdown"]
 
 
 def test_absent_parent_stays_out_of_openimcc_authority() -> None:
@@ -816,6 +911,7 @@ def test_projection_over_one_percent_refuses_and_provider_flags_fallback() -> No
     assert result.status == "ok"
     assert high_t["provider"] == "constant_gamma"
     assert high_t["fallback"] is True
+    assert high_t["authority"] == "extrapolated"
     assert high_t["fallback_reason"]["code"] == "openimcc_projection_over_threshold"
     assert any(
         "openimcc_refused_constant_gamma_fallback" in source
@@ -1039,6 +1135,7 @@ print(json.dumps({
     "provider": high_t["provider"],
     "fallback": high_t["fallback"],
     "code": high_t["fallback_reason"]["code"],
+    "authority": high_t["authority"],
 }))
 '''
     environment = dict(os.environ)
@@ -1058,6 +1155,7 @@ print(json.dumps({
         "provider": "constant_gamma",
         "fallback": True,
         "code": "openimcc_not_importable",
+        "authority": "extrapolated",
     }
 
 
