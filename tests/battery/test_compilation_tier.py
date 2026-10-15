@@ -2187,6 +2187,182 @@ def test_pure_phase_enthalpy_increment_uses_injected_accessor() -> None:
     assert calls == []
 
 
+def test_pure_phase_apparent_gibbs_uses_accepted_element_fit_curves() -> None:
+    from simulator.battery.compilation_tier import _pure_phase_attempt
+    from simulator.battery.generators.compilation_thermo_fits import (
+        _evaluate,
+        evaluate_sidecar_fit,
+        load_sidecar,
+        sidecar_element_reference_curves,
+    )
+    from simulator.battery.generators.janaf import generate_table
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+    from simulator.vapour_rail.nasa_cea import Nasa9Segment
+
+    records = load_sidecar()
+    record = next(
+        row
+        for row in records
+        if row["source_record_id"] == "Al-096"
+        and row["status"] == "accepted"
+        and row["phase"] == "cr:corundum"
+    )
+    curves = sidecar_element_reference_curves(records)
+    segment_record = next(
+        item
+        for item in record["thermo_record"]["segments"]
+        if float(item["T_min_K"]) <= 1000.0 <= float(item["T_max_K"])
+    )
+    segment = Nasa9Segment(
+        T_min_K=float(segment_record["T_min_K"]),
+        T_max_K=float(segment_record["T_max_K"]),
+        coefficients=tuple(float(value) for value in segment_record["a_coefficients"]),
+        b1=float(segment_record["b1"]),
+        b2=float(segment_record["b2"]),
+    )
+    apparent_g_J_mol = _evaluate(segment, 1000.0)[3]
+    identity = F.oxide_identity(
+        "Al2O3",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Al",
+        nu_metal=Fraction(2),
+        nu_o2=Fraction(3, 2),
+        polymorph=Polymorph.CORUNDUM.value,
+    )
+
+    class _Props:
+        formula = "Al2O3"
+        G_J_mol = apparent_g_J_mol
+        absences = ()
+
+    attempt = _pure_phase_attempt(
+        Engine.THERMOENGINE,
+        identity,
+        Quantity.DELTA_FG,
+        Decimal("1000"),
+        origin="janaf::Al-096:T=1000",
+        invoke_pure_phase=True,
+        pure_phase=lambda *_args: _Props(),
+        element_reference_curves=curves,
+    )
+    fitted, error = evaluate_sidecar_fit(
+        record,
+        Quantity.DELTA_FG,
+        1000.0,
+        reference_curves=curves,
+    )
+    assert error is None and fitted is not None
+    assert float(attempt.value) == pytest.approx(fitted, abs=1e-9)
+    assert attempt.unit == "kJ_per_declared_mol_basis"
+
+    table_path = TABLES_DIR / "Al-096.yaml"
+    owner = generate_table(
+        load_table_document(table_path), source_path=str(table_path)
+    )
+    printed = next(
+        value
+        for observation in owner.observations
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.DELTA_FG
+        for temperature, value in observation.value.series or ()
+        if temperature == Decimal("1000")
+    )
+    fit_error = record["residual_summary"][Quantity.DELTA_FG.value]["max_abs"]
+    assert float(printed) == pytest.approx(-1361.437)
+    assert abs(float(attempt.value) - float(printed)) <= fit_error + 1e-9
+
+    missing_reference = _pure_phase_attempt(
+        Engine.THERMOENGINE,
+        identity,
+        Quantity.DELTA_FG,
+        Decimal("1000"),
+        origin="janaf::Al-096:T=1000",
+        invoke_pure_phase=True,
+        pure_phase=lambda *_args: _Props(),
+        element_reference_curves={},
+    )
+    assert missing_reference.value is None
+    assert missing_reference.refusal_detail["reason"] == (
+        "pure-phase-element-reference-unavailable"
+    )
+
+
+def test_nasa9_fit_gibbs_routes_through_element_reference_path(monkeypatch) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
+    from simulator.battery.compilation_tier import ThermoAttempt, _nasa9_fit_phase_label
+    from simulator.battery.enums import QUANTITY_UNITS
+    from simulator.battery.generators.compilation_thermo_fits import load_sidecar
+    from simulator.battery.generators.janaf import generate_table
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    record = next(
+        row
+        for row in load_sidecar()
+        if row["source_record_id"] == "Al-001"
+        and row["status"] == "accepted"
+        and row["phase"] == "cr"
+        and row["residual_summary"][Quantity.DELTA_FG.value]["n"] > 0
+    )
+    table_path = TABLES_DIR / "Al-001.yaml"
+    owner = generate_table(
+        load_table_document(table_path), source_path=str(table_path)
+    )
+    observation = next(
+        item
+        for item in owner.observations
+        if item.locator is not None
+        and item.locator.record == "Al-001"
+        and item.identity.quantity.is_value
+        and item.identity.quantity.value is Quantity.DELTA_FG
+        and _nasa9_fit_phase_label(item.identity) == "cr"
+    )
+    experiment = replace(
+        F.tabulation_experiment(), experiment_id=observation.experiment_id
+    )
+    context = _context(
+        observation,
+        experiments={experiment.experiment_id: experiment},
+    )
+    calls = []
+
+    def route(engine, identity, quantity, temperature, **kwargs):
+        calls.append((engine, identity.species.formula, quantity, temperature))
+        assert kwargs["element_reference_curves"].get("Al")
+        return ThermoAttempt(
+            value=Decimal("0"),
+            unit=QUANTITY_UNITS[Quantity.DELTA_FG],
+            authority=Authority.BRIDGE,
+            notices=(),
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence="fit-route-test",
+        )
+
+    original_predict = compilation_tier.predict_thermo_attempt
+
+    def reject_unconverted_gibbs(engine, fit_reference, **kwargs):
+        quantity = fit_reference.identity.quantity.value
+        if quantity is Quantity.DELTA_FG:
+            pytest.fail("NASA-9 ΔfG bypassed the element-reference fit route")
+        return original_predict(engine, fit_reference, **kwargs)
+
+    monkeypatch.setattr(compilation_tier, "_pure_phase_attempt", route)
+    monkeypatch.setattr(
+        compilation_tier, "predict_thermo_attempt", reject_unconverted_gibbs
+    )
+    comparisons = compilation_tier._nasa9_fit_comparisons(
+        context,
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=False,
+        fit_records=(record,),
+    )
+    assert calls
+    assert all(call[2] is Quantity.DELTA_FG for call in calls)
+    assert any(item.quantity is Quantity.DELTA_FG for item in comparisons)
+
+
 def test_thermoengine_import_failure_is_typed_in_score_and_census(monkeypatch) -> None:
     from simulator.battery import compilation_tier
 

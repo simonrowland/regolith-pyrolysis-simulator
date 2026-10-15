@@ -845,7 +845,7 @@ def default_pure_phase(engine: Engine, symbol: str, temperature_K: float, pressu
 
 
 def _property_value(props: object, quantity: Quantity, temperature_K: float, second: object | None):
-    """Cp and S as returned. H−H298 from two apparent enthalpies.
+    """Cp and S as returned. H−H298 from two apparent enthalpies; G is apparent.
 
     Derivation: H_app(T) = ΔfH°298 + [H(T)−H(298.15)]. The formation
     term cancels in the difference, which is the printed enthalpy
@@ -858,6 +858,8 @@ def _property_value(props: object, quantity: Quantity, temperature_K: float, sec
         return getattr(props, "Cp_J_K_mol", None), "Cp"
     if quantity is Quantity.S:
         return getattr(props, "S_J_K_mol", None), "S"
+    if quantity is Quantity.DELTA_FG:
+        return getattr(props, "G_J_mol", None), "G"
     if quantity is Quantity.H_MINUS_H298:
         if second is None:
             return None, "H"
@@ -882,8 +884,11 @@ def _pure_phase_attempt(
     origin: str,
     invoke_pure_phase: bool,
     pure_phase: Callable | None,
+    element_reference_curves: Mapping[str, Sequence] | None = None,
 ) -> ThermoAttempt:
-    if quantity in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
+    if quantity is Quantity.LOG10_KF or (
+        quantity is Quantity.DELTA_FG and element_reference_curves is None
+    ):
         return _refuse(
             RefusalReason.UNSUPPORTED,
             "apparent-gibbs-is-not-delta-fG",
@@ -899,7 +904,10 @@ def _pure_phase_attempt(
             origin=origin,
             extra={"engine": engine.value},
         )
-    if quantity not in _engine_thermo_quantities(engine):
+    engine_quantities = _engine_thermo_quantities(engine)
+    if quantity is Quantity.DELTA_FG and element_reference_curves is not None:
+        engine_quantities = engine_quantities | {Quantity.DELTA_FG}
+    if quantity not in engine_quantities:
         return _refuse(
             RefusalReason.UNSUPPORTED,
             "engine-thermo-does-not-emit",
@@ -996,6 +1004,52 @@ def _pure_phase_attempt(
             extra={"engine": engine.value, "returned": str(returned)},
         )
     raw, prop_name = _property_value(props, quantity, float(temperature_K), second)
+    if raw is not None and quantity is Quantity.DELTA_FG:
+        from simulator.battery.generators.compilation_thermo_fits import (
+            _element_reference_terms,
+        )
+        from simulator.melt_backend.pure_phase_janaf_score import (
+            formation_g_from_apparent_kJ_mol,
+        )
+
+        standard_pressure = identity.standard_pressure_Pa
+        pressure_Pa = float(as_decimal(standard_pressure.value))
+        resolved, reference_error = _element_reference_terms(
+            identity.species.formula,
+            float(temperature_K),
+            pressure_Pa,
+            element_reference_curves,
+        )
+        if reference_error is not None or resolved is None:
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                "pure-phase-element-reference-unavailable",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "engine": engine.value,
+                    "detail": reference_error or "element-reference-conversion-empty",
+                },
+            )
+        # Premise and algebra are owned by formation_g_from_apparent_kJ_mol:
+        # G_app(T) = ΔfH(298.15) + [H(T)-H(298.15)] - T*S(T), then
+        # ΔfG(T) = G_app(T) - Σν_i*G_i,ref(T). The accepted continuous fit
+        # curves provide G_i,ref in J/mol; convert both sides to kJ/mol here.
+        # Al-096 corundum at 1000 K (-1361.437 kJ/mol) is pinned in
+        # test_pure_phase_apparent_gibbs_uses_accepted_element_fit_curves.
+        reference_counts = {
+            curve.formula: coefficient
+            for coefficient, _h_ref, _g_ref, curve in resolved
+        }
+        reference_g_kJ_mol = {
+            curve.formula: g_ref / 1000.0
+            for _coefficient, _h_ref, g_ref, curve in resolved
+        }
+        raw = formation_g_from_apparent_kJ_mol(
+            float(raw) / 1000.0,
+            reference_counts,
+            reference_g_kJ_mol,
+        )
     if raw is None:
         absence = ""
         for item in getattr(props, "absences", ()) or ():
@@ -1221,8 +1275,9 @@ def predict_thermo_attempt(
 
     Internal-analytical uses the Ellingham fit (JANAF-4th refit).
     ThermoEngine and MAGEMin use pure-phase Cp, S, and H−H298.
-    Apparent G is not ΔfG(T) and is refused. Other engines have no
-    thermochemistry branch. A refusal carries no numeric value.
+    Standalone apparent G is not ΔfG(T) and is refused; the NASA-9 fit
+    comparison route can convert it when accepted elemental curves are present.
+    Other engines have no thermochemistry branch. A refusal carries no value.
     """
 
     identity = observation.identity
@@ -2480,11 +2535,28 @@ def _nasa9_fit_comparisons(
                     value=Value.point_of(as_decimal(fit_value)),
                 )
                 for engine in engines:
-                    attempt = predict_thermo_attempt(
-                        engine,
-                        fit_reference,
-                        invoke_pure_phase=invoke_pure_phase,
-                    )
+                    if quantity is Quantity.DELTA_FG and engine in {
+                        Engine.THERMOENGINE,
+                        Engine.MAGEMIN,
+                    }:
+                        # Route B is available only here, where the accepted
+                        # fit record supplies continuous elemental references.
+                        attempt = _pure_phase_attempt(
+                            engine,
+                            fit_reference.identity,
+                            quantity,
+                            as_decimal(temperature),
+                            origin=fit_reference.observation_id,
+                            invoke_pure_phase=invoke_pure_phase,
+                            pure_phase=None,
+                            element_reference_curves=reference_curves,
+                        )
+                    else:
+                        attempt = predict_thermo_attempt(
+                            engine,
+                            fit_reference,
+                            invoke_pure_phase=invoke_pure_phase,
+                        )
                     prediction = _prediction_from_attempt(
                         engine, fit_reference, attempt
                     )
