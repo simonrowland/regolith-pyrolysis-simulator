@@ -237,6 +237,8 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.ACTIVITY: MetricOperation.DEX,
     Quantity.ACTIVITY_COEFFICIENT: MetricOperation.DEX,
     Quantity.DELTA_FG: MetricOperation.ABSOLUTE,
+    Quantity.ENTHALPY_OF_FUSION: MetricOperation.ABSOLUTE,
+    Quantity.ENTROPY_OF_FUSION: MetricOperation.ABSOLUTE,
     Quantity.H_MINUS_H298: MetricOperation.ABSOLUTE,
     Quantity.PARTIAL_MOLAR_ENTHALPY: MetricOperation.ABSOLUTE,
     Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW: MetricOperation.ABSOLUTE,
@@ -329,6 +331,20 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.OPENIMCC: (),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
 }
+
+
+def _attempt_coefficient_sources(
+    engine: Engine, coefficient_sources: tuple[str, ...] | None
+) -> tuple[str, ...]:
+    """Use explicit attempt ancestry, falling back only when it was unspecified."""
+
+    return (
+        ENGINE_COEFFICIENT_SOURCES[engine]
+        if coefficient_sources is None
+        else coefficient_sources
+    )
+
+
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
 # Unmapped aliases (MELTS calibration DBs) stay incomplete; do not invent
 # a work. VapoRock/Ellingham consume JANAF; Antoine sidecar is NIST WebBook;
@@ -1448,6 +1464,7 @@ def fusion_comparison_reference(
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     from simulator.battery.generators.janaf import (
+        _FUSION_TABLE_POLYMORPHS,
         JANAF_R_J_PER_MOL_K,
         _janaf_fusion_energy_for_pair,
         janaf_fusion_energy,
@@ -1494,12 +1511,7 @@ def fusion_comparison_reference(
     # Thus ΔG_fus=+28.47061 kJ/mol and Δlog10(a)=ΔG_fus*1000/(R*T*ln(10))
     # = +0.793984 dex (R=8.31441 J mol^-1 K^-1). Their branches cross at
     # 3104.945598 K, where ΔG_fus and the reference shift go to zero.
-    expected_polymorph = {
-        "Ca-027": Polymorph.LIME,
-        "Al-096": Polymorph.CORUNDUM,
-        "Mg-008": Polymorph.PERICLASE,
-        "O-035": Polymorph.CRISTOBALITE_HIGH,
-    }.get(fusion.crystal_table)
+    expected_polymorph = _FUSION_TABLE_POLYMORPHS.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
     tridymite_to_cristobalite = (
         formula == "SiO2"
@@ -4551,7 +4563,10 @@ def predict_with_engine(
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
-        if quantity not in _engine_thermo_quantities(engine):
+        if (
+            quantity not in _engine_thermo_quantities(engine)
+            and quantity not in FUSION_QUANTITIES
+        ):
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
@@ -4751,15 +4766,30 @@ def predict_with_engine(
     # Formation and pure-standard quantities are not melt activities or
     # partial pressures. A missing branch used to read those maps and
     # return the wrong unit. Refuse instead of emitting 0.
-    if quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO:
+    if (
+        quantity in FORMATION_QUANTITIES
+        or quantity in PURE_STANDARD_THERMO
+        or quantity in FUSION_QUANTITIES
+    ):
         from simulator.battery.compilation_tier import predict_thermo_attempt
 
         attempt = predict_thermo_attempt(engine, observation)
+        coefficient_sources = _attempt_coefficient_sources(
+            engine, attempt.coefficient_sources
+        )
+        lineage_complete = (
+            lineage_complete_for(coefficient_sources)
+            if attempt.value is not None
+            else False
+        )
         if attempt.value is not None:
             exec_state = ExecutionState.PRODUCED
         elif attempt.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE:
             exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
-        elif attempt.refusal_reason is RefusalReason.UNSUPPORTED:
+        elif attempt.refusal_reason in {
+            RefusalReason.UNSUPPORTED,
+            RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+        }:
             exec_state = ExecutionState.UNSUPPORTED
         else:
             exec_state = ExecutionState.NOT_PROBED
@@ -4773,8 +4803,8 @@ def predict_with_engine(
             unit=attempt.unit,
             authority=attempt.authority,
             notices=attempt.notices,
-            coefficient_sources=sources,
-            lineage_complete=lineage_complete_for(sources) if attempt.value is not None else False,
+            coefficient_sources=coefficient_sources,
+            lineage_complete=lineage_complete,
             refusal_reason=attempt.refusal_reason,
             refusal_detail=attempt.refusal_detail,
             identity=identity,
@@ -6467,6 +6497,13 @@ def compile_residual(
             if _kc91_calibration_source_overlap(attribution)
             else SourceRelation.INDEPENDENT
         )
+    if (
+        quantity in FUSION_QUANTITIES
+        and prediction.engine is Engine.INTERNAL_ANALYTICAL
+        and reference.read_from in prediction.coefficient_sources
+        and source_relation is SourceRelation.SAME_INPUT
+    ):
+        source_relation = SourceRelation.TRAINING
     compilation = is_compilation_evidence(reference) or is_compilation_source(
         reference.source_id, origin
     )

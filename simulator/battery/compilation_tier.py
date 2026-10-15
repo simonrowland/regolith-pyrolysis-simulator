@@ -31,6 +31,7 @@ from typing import Callable, Iterable, Mapping, Sequence
 from simulator.battery.enums import (
     EQUILIBRIUM_FIT_QUANTITIES,
     FORMATION_QUANTITIES,
+    FUSION_QUANTITIES,
     PURE_STANDARD_THERMO,
     QUANTITY_UNITS,
     Authority,
@@ -40,6 +41,7 @@ from simulator.battery.enums import (
     NoticeKind,
     PerBasis,
     Phase,
+    Polymorph,
     Quantity,
     RefusalReason,
     MetricOperation,
@@ -98,15 +100,18 @@ _TE_FORMULA: dict[str, str] = {
     "Sil": "Al2SiO5",
 }
 
-_THERMO_QUANTITIES = FORMATION_QUANTITIES | EQUILIBRIUM_FIT_QUANTITIES | PURE_STANDARD_THERMO
-_ENGINE_ELLINGHAM_QUANTITIES = frozenset(
-    {Quantity.DELTA_FG, Quantity.LOG10_KF}
+_THERMO_QUANTITIES = (
+    FORMATION_QUANTITIES
+    | EQUILIBRIUM_FIT_QUANTITIES
+    | PURE_STANDARD_THERMO
+    | FUSION_QUANTITIES
 )
+_ENGINE_ELLINGHAM_QUANTITIES = frozenset({Quantity.DELTA_FG, Quantity.LOG10_KF})
 _ENGINE_PURE_PHASE_QUANTITIES = frozenset(
     {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
 )
 _ENGINE_THERMO_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
-    Engine.INTERNAL_ANALYTICAL: _ENGINE_ELLINGHAM_QUANTITIES,
+    Engine.INTERNAL_ANALYTICAL: _ENGINE_ELLINGHAM_QUANTITIES | FUSION_QUANTITIES,
     Engine.VAPOROCK: _ENGINE_PURE_PHASE_QUANTITIES,
     Engine.THERMOENGINE: _ENGINE_PURE_PHASE_QUANTITIES,
     Engine.MAGEMIN: _ENGINE_PURE_PHASE_QUANTITIES,
@@ -160,6 +165,7 @@ class ThermoAttempt:
     refusal_reason: RefusalReason | None
     refusal_detail: dict[str, object]
     call_evidence: str
+    coefficient_sources: tuple[str, ...] | None = None
 
 
 def _decimal_token(value: Decimal) -> str:
@@ -414,6 +420,7 @@ def _refuse(
         refusal_reason=reason,
         refusal_detail=payload,
         call_evidence=call_evidence,
+        coefficient_sources=() if quantity in FUSION_QUANTITIES else None,
     )
 
 
@@ -447,7 +454,7 @@ def _ellingham_attempt(
     K2O at 298.15 K is outside the 1100 K K(g) segment and is refused.
     """
 
-    if quantity not in _engine_thermo_quantities(Engine.INTERNAL_ANALYTICAL):
+    if quantity not in _ENGINE_ELLINGHAM_QUANTITIES:
         return _refuse(
             RefusalReason.UNSUPPORTED,
             "ellingham-emits-reaction-dg-only",
@@ -1218,6 +1225,156 @@ def predict_thermo_attempt(
             quantity=quantity,
             origin=origin,
         )
+    if quantity in {Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION}:
+        if engine is not Engine.INTERNAL_ANALYTICAL:
+            return _refuse(
+                RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+                "engine-does-not-report-solid-and-liquid-endmembers-at-fixed-T",
+                quantity=quantity,
+                origin=origin,
+                extra={"engine": engine.value},
+            )
+        if _state_value(identity.subtype) != "solid_to_liquid":
+            return _refuse(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                "fusion-transition-subtype-unknown",
+                quantity=quantity,
+                origin=origin,
+            )
+        phase = _state_value(identity.species.phase)
+        if phase is None:
+            return _refuse(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                "fusion-solid-phase-unknown",
+                quantity=quantity,
+                origin=origin,
+            )
+        if phase is not Phase.CR:
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-phase-must-be-crystal",
+                quantity=quantity,
+                origin=origin,
+                extra={"phase": str(getattr(phase, "value", phase))},
+            )
+        polymorph = _state_value(identity.species.polymorph)
+        if polymorph is None:
+            return _refuse(
+                RefusalReason.IDENTITY_UNKNOWN,
+                "fusion-solid-polymorph-unknown",
+                quantity=quantity,
+                origin=origin,
+            )
+        if not isinstance(polymorph, Polymorph):
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-not-closed",
+                quantity=quantity,
+                origin=origin,
+                extra={"polymorph": str(polymorph)},
+            )
+        try:
+            from simulator.battery.generators.janaf import (
+                JANAFFusionPolymorphUnavailable,
+                janaf_fusion_enthalpy,
+                _janaf_fusion_entropy_with_crossing_reason,
+            )
+
+            enthalpy_J_mol, low, high, solid, liquid, hashes = janaf_fusion_enthalpy(
+                identity.species.formula, temperature_K, polymorph
+            )
+        except JANAFFusionPolymorphUnavailable as exc:
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-not-in-janaf",
+                quantity=quantity,
+                origin=origin,
+                extra={"detail": str(exc), "formula": identity.species.formula},
+            )
+        except (KeyError, ValueError) as exc:
+            return _refuse(
+                RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+                "JANAF-fusion-endmembers-unavailable",
+                quantity=quantity,
+                origin=origin,
+                extra={"detail": str(exc), "formula": identity.species.formula},
+            )
+        notices: tuple[Notice, ...] = ()
+        authority = Authority.BRIDGE
+        notice_list: list[Notice] = []
+        if temperature_K < low or temperature_K > high:
+            authority = Authority.EXTRAPOLATED
+            notice_list.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(quantity,),
+                    reason="janaf_fusion_enthalpy_extrapolated",
+                    origin=origin,
+                    band=f"[{low}, {high}] K",
+                    authority=Authority.EXTRAPOLATED,
+                )
+            )
+        if quantity is Quantity.ENTHALPY_OF_FUSION:
+            # JANAF formation enthalpies are kJ/mol; their endmember difference
+            # cancels the elemental reference. Convert to the declared unit.
+            predicted = enthalpy_J_mol / Decimal(1000)
+        else:
+            # At the JANAF crossing, ΔG=0 gives ΔS=ΔH/T_fus. Away from
+            # that crossing, ΔS_fus(T) is the two curves' entropy difference.
+            try:
+                (
+                    predicted,
+                    crossing_K,
+                    crossing_error,
+                ) = _janaf_fusion_entropy_with_crossing_reason(
+                    identity.species.formula, temperature_K, polymorph
+                )
+            except (KeyError, ValueError) as exc:
+                return _refuse(
+                    RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+                    "JANAF-fusion-endmembers-unavailable",
+                    quantity=quantity,
+                    origin=origin,
+                    extra={"detail": str(exc), "formula": identity.species.formula},
+                )
+            if crossing_error is not None:
+                notice_list.append(
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(quantity,),
+                        reason=(
+                            "janaf_fusion_crossing_undetermined: "
+                            f"{crossing_error}"
+                        ),
+                        origin=origin,
+                        authority=authority,
+                    )
+                )
+            elif temperature_K != crossing_K:
+                notice_list.append(
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(quantity,),
+                        reason="janaf_fusion_transition_off_equilibrium",
+                        origin=origin,
+                        band=f"fusion crossing at {crossing_K} K",
+                        authority=authority,
+                    )
+                )
+        notices = tuple(notice_list)
+        return ThermoAttempt(
+            value=predicted,
+            unit=QUANTITY_UNITS[quantity],
+            authority=authority,
+            notices=notices,
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence=(
+                f"janaf-fusion:{solid}/{liquid}:T={temperature_K}:"
+                f"source_sha256={hashes[0]}/{hashes[1]}"
+            ),
+            coefficient_sources=(solid, liquid),
+        )
     if engine is Engine.INTERNAL_ANALYTICAL:
         return _ellingham_attempt(identity, quantity, temperature_K, origin=origin)
     if engine is Engine.VAPOROCK:
@@ -1904,17 +2061,20 @@ def iter_compilation_comparisons_jsonl(path: Path) -> Iterable[dict[str, object]
 def _prediction_from_attempt(engine: Engine, observation: Observation, attempt: ThermoAttempt):
     from simulator.battery.score import (
         ENGINE_CHANNELS,
-        ENGINE_COEFFICIENT_SOURCES,
         EnginePrediction,
         Execution,
         ExecutionState,
+        _attempt_coefficient_sources,
     )
 
     if attempt.value is not None:
         state = ExecutionState.PRODUCED
     elif attempt.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE:
         state = ExecutionState.ATTEMPTED_UNAVAILABLE
-    elif attempt.refusal_reason is RefusalReason.UNSUPPORTED:
+    elif attempt.refusal_reason in {
+        RefusalReason.UNSUPPORTED,
+        RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+    }:
         state = ExecutionState.UNSUPPORTED
     else:
         state = ExecutionState.NOT_PROBED
@@ -1927,7 +2087,9 @@ def _prediction_from_attempt(engine: Engine, observation: Observation, attempt: 
         unit=attempt.unit,
         authority=attempt.authority,
         notices=attempt.notices,
-        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        coefficient_sources=_attempt_coefficient_sources(
+            engine, attempt.coefficient_sources
+        ),
         lineage_complete=False,
         refusal_reason=attempt.refusal_reason,
         refusal_detail=attempt.refusal_detail,
