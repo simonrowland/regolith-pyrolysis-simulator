@@ -607,6 +607,12 @@ class RedoxState:
             'delta_log10': self.delta_log10,
         }
 
+    def cache_identity(self) -> dict[str, str | float] | None:
+        """Return the non-absolute state identity carried beside scalar fO2."""
+        if self.kind == 'absolute':
+            return None
+        return self.to_descriptor()
+
 
 def normalize_redox_state(
     fO2_log: float | None,
