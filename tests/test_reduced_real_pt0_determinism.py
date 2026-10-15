@@ -12,6 +12,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any
 
 import pytest
 import yaml
@@ -61,6 +62,10 @@ from simulator.reduced_real_determinism import (
 from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
+from tests.binding_admission_fixtures import (
+    register_synthetic_gate_curve_producer,
+    seed_gate_curve_memo_record,
+)
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -106,20 +111,31 @@ def _build_pt0_sim(store: PT0DeterminismStore | None):
 
 
 def _select_synthetic_gate_curve_binding(
+    tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from simulator import engine_binding_admission as admission
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
 
     identity = admission.BindingIdentity(
-        engine_id="synthetic-fake",
-        model_id="fixture-model-v1",
-        binding_revision="synthetic-r1",
+        engine_id="magemin",
+        model_id="ig",
+        binding_revision="magemin-ig-r1",
         transport="subprocess",
     )
     provenance = {
         "binding_provenance_verifiable": True,
-        "test_fixture": "binding_admission_synthetic/synthetic-fake.json",
+        "runtime_artifacts": {
+            "magemin_selected_binary": {"sha256": "a" * 64},
+        },
     }
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=identity,
+        provenance_override=provenance,
+    )
     monkeypatch.setattr(
         admission,
         "selected_binding_identities",
@@ -161,6 +177,10 @@ def _repair_notice_test_record() -> tuple[dict[str, str], dict[str, object]]:
             "artifact": "freeze_gate_curve",
             "schema_version": "test",
             "tag": "notice-recapture",
+            "namespace_id": "test:notice-recapture",
+            "vapor_pressure_provider_selection": "test-vapor-provider",
+            "sulfur_side": {},
+            "model": {},
         },
         {"curve": {"status": "in_range", "tag": "notice-recapture"}},
     )
@@ -557,7 +577,9 @@ def _run_capped_c2a_with_equilibrium_counter(
         "liquidus_T_C": 1320.0,
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
     }
-    sim._freeze_gate_curve_from_gate_dispatch = lambda reasons, *, fO2_log, redox_state=None: dict(freeze_curve)
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: dict(freeze_curve)
+    )
     original_equilibrate = sim.backend.equilibrate
     calls = 0
 
@@ -657,6 +679,39 @@ def _silicate_equilibrium_key(
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
     )
     return store._equilibrium_key(sim)
+
+
+def _pt0_equilibrium_capture_context(
+    store: PT0DeterminismStore,
+) -> tuple[Any, EquilibriumResult]:
+    class AlphaMELTSBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.ALPHAMELTS
+
+        def get_engine_version(self) -> str:
+            return "non-stub-test"
+
+    provider = _CountingSilicateEquilibriumProvider(
+        provider_id="alphamelts-diagnostic",
+        engine_version="alpha-v1",
+    )
+    sim = _build_pt0_sim(store)
+    sim.backend = AlphaMELTSBackend()
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    result = EquilibriumResult(
+        temperature_C=float(sim.melt.temperature_C),
+        pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
+        phases_present=["liquid"],
+        phase_masses_kg={"liquid": 1.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct={"SiO2": 45.0, "FeO": 10.0},
+        vapor_pressures_Pa={"SiO": 1.0},
+        vapor_pressures_source={"SiO": "test"},
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+    )
+    return sim, result
 
 
 def _alphamelts_silicate_equilibrium_key(
@@ -1509,10 +1564,11 @@ def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
     capture = PT0DeterminismStore("capture", db_path=db_path)
     sim = _build_pt0_sim(capture)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
-    sim._freeze_gate_liquid_fraction_cache = {
-        "key": ("test",),
-        "curve": {"source": "test", "solidus_T_C": 1000.0, "liquidus_T_C": 1300.0},
-    }
+    seed_gate_curve_memo_record(
+        sim,
+        {"source": "test", "solidus_T_C": 1000.0, "liquidus_T_C": 1300.0},
+        key=("test",),
+    )
     sim.melt.temperature_C = 1450.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim.melt.oxygen_reservoir.reference_T_K = 1450.0 + 273.15
@@ -1524,6 +1580,7 @@ def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
     }
 
+    seed_gate_curve_memo_record(sim, curve)
     capture.capture_gate_curve(
         sim,
         fO2_log=sim._current_melt_redox_fO2_log(),
@@ -1592,10 +1649,7 @@ def test_pt0_production_gate_curve_cold_replays_across_isochemical_ramp(
         pressure_bar=capture_sim.melt.p_total_mbar / 1000.0,
         fO2_log=capture_redox_key_fO2_log,
     )
-    capture_sim._freeze_gate_liquid_fraction_cache = {
-        "key": capture_local_key,
-        "curve": curve,
-    }
+    seed_gate_curve_memo_record(capture_sim, curve, key=capture_local_key)
 
     assert capture_sim._freeze_gate_curve() == curve
     capture_key = capture.capture_sequence[-1]["key"]
@@ -1664,10 +1718,7 @@ def test_pt0_gate_curve_rekeys_from_live_fo2_after_first_liquid_seed(
         pressure_bar=capture_sim.melt.p_total_mbar / 1000.0,
         fO2_log=preseed_redox_key_fO2_log,
     )
-    capture_sim._freeze_gate_liquid_fraction_cache = {
-        "key": preseed_local_key,
-        "curve": curve,
-    }
+    seed_gate_curve_memo_record(capture_sim, curve, key=preseed_local_key)
 
     assert capture_sim._freeze_gate_curve() == curve
     preseed_controls = capture.capture_sequence[-1]["key"]["controls"]
@@ -2205,6 +2256,113 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
     assert counts["cached_exact"] == 0
 
 
+def test_pt0_exact_route_refuses_dependency_vector_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    source_key = capture.capture_sequence[-1]["key"]
+    source_entry = capture.entries[_key_hash(source_key)]
+    query_key = copy.deepcopy(source_key)
+    query_key["model"]["model"] = "different-admitted-model"
+    monkeypatch.setattr(
+        capture,
+        "_entry_for_key",
+        lambda *_args, **_kwargs: source_entry,
+    )
+
+    with pytest.raises(PT0CacheMiss):
+        capture._lookup("equilibrium_post_record", query_key)
+
+    assert capture.hits == 0
+
+
+def test_pt0_approximate_route_refuses_dependency_vector_mismatch() -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    source_key = capture.capture_sequence[-1]["key"]
+    query_key = copy.deepcopy(source_key)
+    query_key["model"]["model"] = "different-admitted-model"
+    query_bucket = canonical_physics_bucket_key_from_replay_key(query_key)
+    source_hash = _key_hash(source_key)
+    query_bucket_hash = _key_hash(query_bucket)
+    capture.physics_bucket_entries[query_bucket_hash] = source_hash
+    capture.cache_tier_ceiling = "cached_physics_bucket"
+
+    payload = capture._lookup_optional(
+        "equilibrium_post_record",
+        query_key,
+        physics_bucket_key=query_bucket,
+    )
+
+    assert payload is None
+    assert capture.hits == 0
+
+
+@pytest.mark.parametrize(
+    "rung_tag",
+    ("h40", "h30", "h40c", "h30c"),
+)
+def test_pt0_physics_ladder_route_refuses_dependency_vector_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+    rung_tag: str,
+) -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    source_key = capture.capture_sequence[-1]["key"]
+    source_hash = _key_hash(source_key)
+    source_entry = capture.entries[source_hash]
+    query_key = copy.deepcopy(source_key)
+    query_key["model"]["model"] = "different-admitted-model"
+    query_bucket = canonical_physics_bucket_key_from_replay_key(query_key)
+    capture.cache_tier_ceiling = "cached_physics_bucket"
+    monkeypatch.setattr(
+        capture,
+        "_entry_for_physics_bucket",
+        lambda *_args, **_kwargs: None,
+    )
+
+    def ladder_entry(_artifact, candidate_rung, *_args, **_kwargs):
+        return source_entry if candidate_rung == rung_tag else None
+
+    monkeypatch.setattr(
+        capture,
+        "_entry_for_physics_ladder_bucket",
+        ladder_entry,
+    )
+
+    payload = capture._lookup_optional(
+        "equilibrium_post_record",
+        query_key,
+        physics_bucket_key=query_bucket,
+    )
+
+    assert payload is None
+    assert capture.hits == 0
+
+
+def test_pt0_capture_refuses_dependency_vector_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    original_key = capture._equilibrium_key
+
+    def mismatched_key(current_sim):
+        key = original_key(current_sim)
+        key["model"]["model"] = "different-admitted-model"
+        return key
+
+    monkeypatch.setattr(capture, "_equilibrium_key", mismatched_key)
+    capture.capture_equilibrium(sim, result)
+
+    assert capture.capture_sequence == []
+    assert capture.entries == {}
+
+
 def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
     tmp_path: Path,
 ) -> None:
@@ -2504,11 +2662,16 @@ def test_pt0_replay_miss_fails_loudly() -> None:
         )
 
 
-def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
+def test_pt1_persistent_store_round_trips_exact_payload(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
     db_path = tmp_path / "pt1-reduced-real.db"
     capture = PT0DeterminismStore("capture", db_path=db_path)
     sim = _build_pt0_sim(capture)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(sim)
     fO2_log = sim._compute_intrinsic_melt_fO2()
     curve = {
         "source": "gate_liquid_fraction:fallback:magemin-shadow",
@@ -2522,8 +2685,21 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
         intent=ChemistryIntent.GATE_LIQUID_FRACTION,
         fO2_log=fO2_log,
         fe_redox_policy="intrinsic",
+        provider_role="fallback",
     )
 
+    runtime_record = seed_gate_curve_memo_record(sim, curve)
+    assert set(runtime_record) == {
+        "curve",
+        "origin",
+        "repair_notices",
+        "disposition",
+    }
+    assert set(runtime_record["origin"]) == {
+        "producer_pid",
+        "producer_configuration",
+        "producer_evidence",
+    }
     capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=curve)
 
     with sqlite3.connect(db_path) as conn:
@@ -2565,6 +2741,9 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
     )
     payload = json.loads(row[3])
     assert set(payload) == {"curve"}
+    assert b"producer_pid" not in row[3]
+    assert b"producer_configuration" not in row[3]
+    assert b"producer_evidence" not in row[3]
     assert set(payload["curve"]) == {
         "liquidus_T_C",
         "path",
@@ -2578,6 +2757,7 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
     replay = PT0DeterminismStore("replay", db_path=db_path)
     replay_sim = _build_pt0_sim(replay)
     replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(replay_sim)
     replay_fO2_log = replay_sim._compute_intrinsic_melt_fO2()
     replay_key = canonical_replay_key(
         replay_sim,
@@ -2585,6 +2765,7 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
         intent=ChemistryIntent.GATE_LIQUID_FRACTION,
         fO2_log=replay_fO2_log,
         fe_redox_policy="intrinsic",
+        provider_role="fallback",
     )
 
     assert replay_key == key
@@ -2603,18 +2784,39 @@ def test_pt1_repair_notices_are_outside_payload_and_reemit_on_exact_replay(
         "liquidus_T_C": 1600.0,
         "path": ((1100.0, 0.0), (1600.0, 1.0)),
     }
-    notice = {"kind": "test_repair", "field": "SiO2"}
+    notices = [
+        {
+            "type": "typed_notice",
+            "kind": "freeze_gate_curve_point_repaired",
+            "site": "SR18",
+            "temperature_C": 1200.0,
+            "raw_fraction": -0.2,
+            "action": "clamp_fraction",
+        },
+        {
+            "type": "typed_notice",
+            "kind": "freeze_gate_curve_source_replaced",
+            "site": "SR19",
+            "failed_source": "gate_liquid_fraction",
+            "replacement_source": "liquidus_solidus:backend",
+        },
+    ]
     rows = []
     db_paths = (tmp_path / "without-notice.db", tmp_path / "with-notice.db")
-    for db_path, notices in zip(db_paths, ([], [notice]), strict=True):
+    for db_path, captured_notices in zip(db_paths, ([], notices), strict=True):
         capture = PT0DeterminismStore("capture", db_path=db_path)
         sim = _build_pt0_sim(capture)
         sim.start_campaign(CampaignPhase.C2A_STAGED)
+        seed_gate_curve_memo_record(
+            sim,
+            curve,
+            repair_notices=captured_notices,
+        )
         capture.capture_gate_curve(
             sim,
             fO2_log=sim._compute_intrinsic_melt_fO2(),
             curve=curve,
-            repair_notices=notices,
+            repair_notices=captured_notices,
         )
         with sqlite3.connect(db_path) as conn:
             rows.append(
@@ -2628,7 +2830,7 @@ def test_pt1_repair_notices_are_outside_payload_and_reemit_on_exact_replay(
 
     assert rows[0][:2] == rows[1][:2]
     assert rows[0][2] == "[]"
-    assert rows[1][2] == canonical_json_bytes([notice]).decode("utf-8")
+    assert rows[1][2] == canonical_json_bytes(notices).decode("utf-8")
 
     replay = PT0DeterminismStore("replay", db_path=db_paths[1])
     replay_sim = _build_pt0_sim(replay)
@@ -2637,7 +2839,8 @@ def test_pt1_repair_notices_are_outside_payload_and_reemit_on_exact_replay(
         replay_sim,
         fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
     ) == curve
-    assert replay_sim._reduced_real_repair_notices == [notice]
+    assert replay_sim._reduced_real_repair_notices == notices
+    assert replay_sim._last_reduced_real_replay_notices == notices
 
 
 def test_pt1_legacy_null_repair_notices_emit_typed_unavailable_notice(
@@ -2654,6 +2857,7 @@ def test_pt1_legacy_null_repair_notices_emit_typed_unavailable_notice(
         "liquidus_T_C": 1600.0,
         "path": ((1100.0, 0.0), (1600.0, 1.0)),
     }
+    seed_gate_curve_memo_record(sim, curve)
     capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=curve, repair_notices=[])
     with sqlite3.connect(db_path) as conn:
         conn.execute(
@@ -2688,6 +2892,7 @@ def test_pt1_attached_legacy_table_without_notice_column_reads_as_null(
         "liquidus_T_C": 1600.0,
         "path": ((1100.0, 0.0), (1600.0, 1.0)),
     }
+    seed_gate_curve_memo_record(capture_sim, curve)
     capture.capture_gate_curve(
         capture_sim,
         fO2_log=fO2_log,
@@ -2942,6 +3147,7 @@ def test_pt1_projected_gate_notice_replays_into_run_metadata(tmp_path: Path) -> 
     capture_sim = _build_pt0_sim(capture)
     capture_sim.start_campaign(CampaignPhase.C2A_STAGED)
     capture_fO2_log = capture_sim._compute_intrinsic_melt_fO2()
+    seed_gate_curve_memo_record(capture_sim, curve)
     capture.capture_gate_curve(
         capture_sim,
         fO2_log=capture_fO2_log,
@@ -3234,6 +3440,7 @@ def test_pt1_capture_gate_curve_skips_non_cacheable_status(
     assert sim._last_reduced_real_cache_state is None
     assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 0
 
+    seed_gate_curve_memo_record(sim, ok_curve)
     capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=ok_curve)
 
     assert capture.summary()["entries"] == 1
@@ -3245,19 +3452,13 @@ def test_pt1_capture_gate_curve_skips_non_cacheable_status(
     assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 1
 
 
-def test_pt0_gate_memo_hit_does_not_capture_without_receipt(
+def test_gate_capture_rechecks_receipt_after_memo_hit(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
     from simulator.engine_binding_admission import binding_receipt_path
 
-    install_synthetic_binding_receipt(
-        tmp_path,
-        monkeypatch,
-        bind_direct_backend=True,
-    )
-    _select_synthetic_gate_curve_binding(monkeypatch)
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
     receipt_path = binding_receipt_path()
     receipt_path.unlink()
 
@@ -3265,6 +3466,7 @@ def test_pt0_gate_memo_hit_does_not_capture_without_receipt(
     capture = PT0DeterminismStore("capture", db_path=db_path)
     sim = _build_pt0_sim(capture)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(sim)
     curve = {
         "source": "gate_liquid_fraction:fallback:synthetic-fake",
         "status": "ok",
@@ -3274,8 +3476,9 @@ def test_pt0_gate_memo_hit_does_not_capture_without_receipt(
     }
     provider_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, redox_state=None: provider_calls.append(fO2_log)
-        or dict(curve)
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
+            provider_calls.append(fO2_log) or dict(curve)
+        )
     )
     store_calls = []
     persistent_put_calls = []
@@ -3307,18 +3510,12 @@ def test_pt0_gate_capture_with_receipt_covers_fresh_curve_and_memo_hit(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
-
-    install_synthetic_binding_receipt(
-        tmp_path,
-        monkeypatch,
-        bind_direct_backend=True,
-    )
-    _select_synthetic_gate_curve_binding(monkeypatch)
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
     db_path = tmp_path / "pt0-gate-memo-with-receipt.db"
     capture = PT0DeterminismStore("capture", db_path=db_path)
     sim = _build_pt0_sim(capture)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(sim)
     curve = {
         "source": "gate_liquid_fraction:fallback:synthetic-fake",
         "status": "ok",
@@ -3328,8 +3525,9 @@ def test_pt0_gate_capture_with_receipt_covers_fresh_curve_and_memo_hit(
     }
     provider_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, redox_state=None: provider_calls.append(fO2_log)
-        or dict(curve)
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
+            provider_calls.append(fO2_log) or dict(curve)
+        )
     )
     capture_calls = []
     original_capture = capture.capture_gate_curve
@@ -3353,18 +3551,12 @@ def test_pt0_equilibrium_lookup_capture_and_replay_stay_receipt_gated(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
     from simulator.engine_binding_admission import (
         EngineBindingAdmissionError,
         binding_receipt_path,
     )
 
-    install_synthetic_binding_receipt(
-        tmp_path,
-        monkeypatch,
-        bind_direct_backend=True,
-    )
-    _select_synthetic_gate_curve_binding(monkeypatch)
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
     db_path = tmp_path / "pt0-other-artifacts-receipt-gated.db"
     capture = PT0DeterminismStore("capture", db_path=db_path)
     sim = _build_pt0_sim(capture)
@@ -3376,6 +3568,7 @@ def test_pt0_equilibrium_lookup_capture_and_replay_stay_receipt_gated(
         "liquidus_T_C": 1320.0,
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
     }
+    seed_gate_curve_memo_record(sim, curve)
     capture.capture_gate_curve(
         sim,
         fO2_log=sim._compute_intrinsic_melt_fO2(),
@@ -3561,16 +3754,14 @@ def test_pt1_verify_on_hit_fails_loudly(
     sim = _build_pt0_sim(capture)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     fO2_log = sim._compute_intrinsic_melt_fO2()
-    capture.capture_gate_curve(
-        sim,
-        fO2_log=fO2_log,
-        curve={
-            "source": "unit-test",
-            "solidus_T_C": 1210.0,
-            "liquidus_T_C": 1320.0,
-            "path": ((1210.0, 0.0), (1320.0, 1.0)),
-        },
-    )
+    curve = {
+        "source": "unit-test",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+    seed_gate_curve_memo_record(sim, curve)
+    capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=curve)
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {column} = ?",

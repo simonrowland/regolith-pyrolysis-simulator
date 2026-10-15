@@ -402,23 +402,27 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
     )
 
     def fail_then_recover(self):
+        from simulator.engine_binding_admission import write_gate_curve_memo_record
+
         nonlocal curve_calls
         if not pin_window:
-            return {
+            curve = {
                 'source': 'test_setup_real_curve',
                 'solidus_T_C': 1000.0,
                 'liquidus_T_C': 1700.0,
                 'path': ((1000.0, 0.0), (1700.0, 1.0)),
             }
+            return write_gate_curve_memo_record(self, curve)
         curve_calls += 1
         if curve_calls == 1:
             raise ProviderUnavailableError('validation row pin failure')
-        return {
+        curve = {
             'source': 'test_recovered_real_curve',
             'solidus_T_C': 1000.0,
             'liquidus_T_C': 1700.0,
             'path': ((1000.0, 0.0), (1700.0, 1.0)),
         }
+        return write_gate_curve_memo_record(self, curve)
 
     def record_establish(self):
         nonlocal pin_window
@@ -440,7 +444,11 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
         pin_window = False
         return result
 
-    monkeypatch.setattr(simulator_type, '_freeze_gate_curve', fail_then_recover)
+    monkeypatch.setattr(
+        simulator_type,
+        '_freeze_gate_curve_record',
+        fail_then_recover,
+    )
     monkeypatch.setattr(
         simulator_type,
         '_establish_melt_redox_gate_authority_for_current_hour',
