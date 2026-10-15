@@ -86,6 +86,7 @@ from simulator.runner import (
     _attach_sulfur_saturation_notice,
     _composition_projected_liquidus_notice,
     _deep_merge_setpoints,
+    _oxygen_reservoir_exchange_observables,
 )
 from simulator.session import (
     DecisionPolicy,
@@ -2129,6 +2130,7 @@ def _tick_payload(
         'condensation': {
             k: round(v, 3) for k, v in snapshot.condensation_totals.items()
         },
+        **_oxygen_reservoir_exchange_observables(snapshot),
         'stage_purity_report': stage_purity_report(sim.train),
         'energy_electrical_plus_evaporation_kWh': round(
             snapshot.energy.electrical_plus_evaporation_kWh, 4),
