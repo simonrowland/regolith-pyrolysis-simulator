@@ -33,6 +33,7 @@ Covers:
 from __future__ import annotations
 
 from dataclasses import replace
+import weakref
 from unittest.mock import patch
 
 import copy
@@ -76,7 +77,71 @@ from simulator.state import (
     CampaignPhase,
     DecisionType,
 )
-from tests.chemistry.conftest import _atom_check, _build_sim
+from tests.chemistry.conftest import (
+    _atom_check,
+    _build_sim as _build_chemistry_sim,
+)
+from tests.magemin_test_support import close_test_owned_magemin_backend
+
+
+_TEST_OWNED_SIMULATORS: list[PyrolysisSimulator] = []
+_GATE_BACKEND_CLEANUP_REGRESSIONS: list[tuple[object, weakref.finalize]] = []
+
+
+def _build_sim(*args, **kwargs) -> PyrolysisSimulator:
+    sim = _build_chemistry_sim(*args, **kwargs)
+    _TEST_OWNED_SIMULATORS.append(sim)
+    return sim
+
+
+@pytest.fixture(autouse=True)
+def _close_test_owned_magemin_backends():
+    _TEST_OWNED_SIMULATORS.clear()
+    yield
+    try:
+        for sim in _TEST_OWNED_SIMULATORS:
+            close_test_owned_magemin_backend(sim)
+    finally:
+        _TEST_OWNED_SIMULATORS.clear()
+
+
+class _CloseTrackingGateBackend:
+    def __init__(self):
+        self.closed = False
+
+    def close(self):
+        self.closed = True
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _assert_metallothermic_gate_backend_closed_after_test():
+    yield
+    for backend, finalizer in _GATE_BACKEND_CLEANUP_REGRESSIONS:
+        assert backend.closed, "test-owned gate backend remained open after its test"
+        assert not finalizer.alive, "test-owned gate backend finalizer remained attached"
+
+
+def test_metallothermic_simulator_closes_its_gate_backend_after_test(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    backend = _CloseTrackingGateBackend()
+    finalizer = weakref.finalize(provider, lambda: None)
+    provider._backend = backend
+    provider._backend_finalizer = finalizer
+    provider._backend_initialised = True
+    _GATE_BACKEND_CLEANUP_REGRESSIONS.append((backend, finalizer))
 
 
 def _hkl_only_setpoints(setpoints_data):
@@ -2404,9 +2469,11 @@ def test_c6_static_hold_exercises_c6_proceed_decision_path(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    request,
 ):
     readiness_timeout_s = 10.0
     magemin = MAGEMinBackend()
+    request.addfinalizer(magemin.close)
     if not magemin.initialize({}):
         pytest.skip("MAGEMin live backend unavailable: binary not located")
     readiness = magemin.equilibrate(

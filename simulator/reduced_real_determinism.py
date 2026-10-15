@@ -40,6 +40,8 @@ from simulator.grind_preflight import (
     assert_strict_vapor_pt1_row,
 )
 from simulator.fe_redox import (
+    RedoxState,
+    _non_absolute_redox_state_kwargs,
     _kress91_gate_key_referenced_log_fO2,
 )
 from simulator.fidelity_vocabulary import EvidenceClass
@@ -656,6 +658,7 @@ class PT0DeterminismStore:
         fO2_log: float,
         curve: Mapping[str, Any],
         repair_notices: Sequence[Mapping[str, Any]] | None = None,
+        redox_state: RedoxState | None = None,
     ) -> None:
         if uncacheable_replay_disposition(sim):
             self._mark_uncacheable_capture(sim)
@@ -663,6 +666,7 @@ class PT0DeterminismStore:
         if not _is_cacheable_gate_curve(curve):
             self._mark_uncacheable_capture(sim)
             return
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         from simulator.engine_binding_admission import (
             gate_curve_memo_evidence,
             gate_curve_memo_origin_matches,
@@ -683,6 +687,7 @@ class PT0DeterminismStore:
                 curve,
                 active_record.get("origin"),
                 fresh_evidence=False,
+                **redox_state_kwargs,
             )
         ):
             self._mark_uncacheable_capture(sim)
@@ -699,6 +704,7 @@ class PT0DeterminismStore:
                 active_record.get("origin"),
                 fresh_evidence=True,
                 evidence=evidence,
+                **redox_state_kwargs,
             )
             or not evidence.eligible
         ):
@@ -713,6 +719,7 @@ class PT0DeterminismStore:
             fe_redox_policy="intrinsic",
             provider_role=provider_role,
             control_quantization=self._control_quantization,
+            **redox_state_kwargs,
         )
         if dependency_vector_from_replay_key(key) != record_dependency_vector(
             sim,
@@ -739,7 +746,13 @@ class PT0DeterminismStore:
         self.last_cache_state = None
         sim._last_reduced_real_cache_state = None
 
-    def replay_gate_curve(self, sim: Any, *, fO2_log: float) -> dict[str, Any]:
+    def replay_gate_curve(
+        self,
+        sim: Any,
+        *,
+        fO2_log: float,
+        redox_state: RedoxState | None = None,
+    ) -> dict[str, Any]:
         roles = _gate_provider_roles_for_replay(sim)
         from simulator.engine_binding_admission import EngineBindingAdmissionError
 
@@ -763,6 +776,7 @@ class PT0DeterminismStore:
             raise PT0CacheMiss(
                 "PT-0 cached replay miss: no admitted gate candidates"
             )
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         keys = tuple(
             canonical_replay_key(
                 sim,
@@ -772,6 +786,7 @@ class PT0DeterminismStore:
                 fe_redox_policy="intrinsic",
                 provider_role=provider_role,
                 control_quantization=self._control_quantization,
+                **redox_state_kwargs,
             )
             for provider_role in roles
         )
@@ -2515,6 +2530,11 @@ def replay_scope_dependency_vector(key: Mapping[str, Any]) -> dict[str, Any]:
         ),
         "model": _json_ready(key.get("model", {})),
     }
+    redox = key.get("redox", {})
+    if isinstance(redox, Mapping) and redox.get("redox_state_identity") is not None:
+        vector["redox_state_identity"] = _json_ready(
+            redox["redox_state_identity"]
+        )
     sulfur_input_ppm = _sulfur_input_ppm_from_replay_key(key)
     if sulfur_input_ppm and sulfur_input_ppm > 0.0:
         vector["sulfsat"] = {
@@ -2562,6 +2582,8 @@ def replay_dependency_vectors_match(
 def gate_curve_memo_producer_configuration(
     sim: Any,
     curve: Mapping[str, Any],
+    *,
+    redox_state: RedoxState | None = None,
 ) -> dict[str, Any]:
     # Match the provider selection used by gate dispatch before a cache read.
     # Gate providers are otherwise registered lazily by the dispatch path,
@@ -2579,6 +2601,9 @@ def gate_curve_memo_producer_configuration(
     )
     sulfur_side = dependency_vector["sulfur_side"]
     model = dependency_vector["model"]
+    redox_identity = (
+        None if redox_state is None else redox_state.cache_identity()
+    )
     return {
         "namespace_id": dependency_vector["namespace_id"],
         "vapor_pressure_provider_selection": dependency_vector[
@@ -2594,6 +2619,11 @@ def gate_curve_memo_producer_configuration(
             name: model[name]
             for name in ("model", "mode", "magemin_database")
         },
+        **(
+            {"redox_state_identity": redox_identity}
+            if redox_identity is not None
+            else {}
+        ),
     }
 
 
@@ -2649,6 +2679,7 @@ def canonical_replay_key(
     fe_redox_policy: str,
     provider_role: str | None = None,
     control_quantization: ControlQuantization | None = None,
+    redox_state: RedoxState | None = None,
 ) -> dict[str, Any]:
     quantization = control_quantization or _PRODUCTION_QUANTIZATION
     if intent == ChemistryIntent.GATE_LIQUID_FRACTION:
@@ -2753,6 +2784,14 @@ def canonical_replay_key(
             "non-finite vapor transport pO2 passed to PT-0 cache key"
         )
     dependency_vector.pop("namespace_id")
+    redox_key: dict[str, Any] = {
+        "fe_redox_policy": str(fe_redox_policy),
+    }
+    redox_identity = (
+        None if redox_state is None else redox_state.cache_identity()
+    )
+    if redox_identity is not None:
+        redox_key["redox_state_identity"] = redox_identity
     key = {
         "namespace_id": namespace_id,
         "composition_mol_fraction": _backend_boundary_composition(
@@ -2769,9 +2808,7 @@ def canonical_replay_key(
             "pO2_bar": quantized_pO2_bar,
             "vapor_transport_pO2_bar": quantized_transport_pO2,
         },
-        "redox": {
-            "fe_redox_policy": str(fe_redox_policy),
-        },
+        "redox": redox_key,
         **dependency_vector,
     }
     if include_amount:
@@ -2810,6 +2847,7 @@ def canonical_physics_bucket_key(
     fe_redox_policy: str,
     provider_role: str | None = None,
     control_quantization: ControlQuantization | None = None,
+    redox_state: RedoxState | None = None,
 ) -> dict[str, Any]:
     return canonical_physics_bucket_key_from_replay_key(
         canonical_replay_key(
@@ -2820,6 +2858,7 @@ def canonical_physics_bucket_key(
             fe_redox_policy=fe_redox_policy,
             provider_role=provider_role,
             control_quantization=control_quantization,
+            redox_state=redox_state,
         )
     )
 
