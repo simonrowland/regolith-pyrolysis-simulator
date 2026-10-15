@@ -1,0 +1,2130 @@
+schema_version: literature_extract.v1
+source_id: shimaoka-nakamura-1991-iau-colloq126-79
+source:
+  citation: Shimaoka, T. & Nakamura, N. (1991), "The effect of total pressure on vaporization of alkalis from partially molten
+    chondritic material", IAU Colloq. 126, 79–82.
+  doi: 10.1017/S0252921100066513
+  year: 1991
+extraction:
+  method: manual table and page-image transcription
+  date: '2026-10-05'
+  worker: codex-resume-78187-1791233874
+  provenance_path: raw/shimaoka-nakamura-1991-iau-colloq126-79/shimaoka-nakamura-1991-iau-colloq126-79.pdf
+review_status: draft
+benches:
+- id: prior-described-heating-apparatus
+  identity:
+    basis: cited_by_author
+    ref:
+      work_id: null
+      cited_as: Shimaoka and Nakamura (1989)
+      for_parameters:
+      - apparatus_family
+      - cell_material_and_liner
+      - geometry
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+        note: Apparatus and general procedure referred to the earlier paper; no details imported.
+  apparatus_family:
+    state:
+      tag: value
+      value: furnace-based heating/vaporization apparatus; full apparatus description referred to Shimaoka and Nakamura (1989)
+    locator:
+      published_page: 80
+      pdf_page_index: 1
+      section: 2. Experimental
+      note: The power supply of the furnace is cut off after the 40 min hold.
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: in_cited_source
+    locator:
+      published_page: 79
+      pdf_page_index: 0
+      section: 2. Experimental
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+  heating_method:
+    state:
+      tag: value
+      value: Sample heated at approximately 30 °C/min to 1300 °C in high-purity helium; furnace power cut after hold.
+    locator:
+      published_page: 80
+      pdf_page_index: 1
+      section: 2. Experimental
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: No sensor stated in this paper.
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: No calibration stated in this paper.
+  other_facts:
+  - name: temperature_uncertainty_as_reported
+    unit: °C
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+experiments:
+- experiment_id: run-89a
+  bench_id: prior-described-heating-apparatus
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    row: 89A
+    note: Run conditions are in Table 1; shared 1300 °C hold.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 1300 °C + 273.15 = 1573.15 K.
+    temperature_as_printed: 1300 °C
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Etter (L5) chondrite; fine-grained (<10 μm)
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+    initial_composition_ppm:
+      Na: 6550
+      K: 506
+      Rb: 1.32
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10.2658'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 89A
+        note: 0.077 torr as printed × 133.32236842105263 Pa/torr; He total pressure.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: High-purity helium used to adjust total pressure; separate He partial pressure and flow are not stated.
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 79
+          pdf_page_index: 0
+          section: 2. Experimental
+          note: Apparatus and general procedure are referred to the 1989 paper.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1573.15'
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 1300 °C + 273.15 K conversion.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '2400'
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 40 min × 60 s/min = 2400 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched at approximately 600 °C/min
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+- experiment_id: run-88a
+  bench_id: prior-described-heating-apparatus
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    row: 88A
+    note: Run conditions are in Table 1; shared 1300 °C hold.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 1300 °C + 273.15 = 1573.15 K.
+    temperature_as_printed: 1300 °C
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Etter (L5) chondrite; fine-grained (<10 μm)
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+    initial_composition_ppm:
+      Na: 6550
+      K: 506
+      Rb: 1.32
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.02658'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 88A
+        note: 0.0077 torr as printed × 133.32236842105263 Pa/torr; He total pressure.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: High-purity helium used to adjust total pressure; separate He partial pressure and flow are not stated.
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 79
+          pdf_page_index: 0
+          section: 2. Experimental
+          note: Apparatus and general procedure are referred to the 1989 paper.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1573.15'
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 1300 °C + 273.15 K conversion.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '2400'
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 40 min × 60 s/min = 2400 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched at approximately 600 °C/min
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+- experiment_id: run-86a
+  bench_id: prior-described-heating-apparatus
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    row: 86A
+    note: Run conditions are in Table 1; shared 1300 °C hold.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 1300 °C + 273.15 = 1573.15 K.
+    temperature_as_printed: 1300 °C
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Etter (L5) chondrite; fine-grained (<10 μm)
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+    initial_composition_ppm:
+      Na: 6550
+      K: 506
+      Rb: 1.32
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.102658'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 86A
+        note: 0.00077 torr as printed × 133.32236842105263 Pa/torr; He total pressure.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: High-purity helium used to adjust total pressure; separate He partial pressure and flow are not stated.
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 79
+          pdf_page_index: 0
+          section: 2. Experimental
+          note: Apparatus and general procedure are referred to the 1989 paper.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1573.15'
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 1300 °C + 273.15 K conversion.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '2400'
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 40 min × 60 s/min = 2400 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched at approximately 600 °C/min
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+- experiment_id: run-87a
+  bench_id: prior-described-heating-apparatus
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    row: 87A
+    note: Run conditions are in Table 1; shared 1300 °C hold.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 1300 °C + 273.15 = 1573.15 K.
+    temperature_as_printed: 1300 °C
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Etter (L5) chondrite; fine-grained (<10 μm)
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+    initial_composition_ppm:
+      Na: 6550
+      K: 506
+      Rb: 1.32
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0102658'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 87A
+        note: 7.7e-05 torr as printed × 133.32236842105263 Pa/torr; He total pressure.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: High-purity helium used to adjust total pressure; separate He partial pressure and flow are not stated.
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 79
+          pdf_page_index: 0
+          section: 2. Experimental
+          note: Apparatus and general procedure are referred to the 1989 paper.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1573.15'
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 1300 °C + 273.15 K conversion.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '2400'
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 40 min × 60 s/min = 2400 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched at approximately 600 °C/min
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+- experiment_id: run-90a
+  bench_id: prior-described-heating-apparatus
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    row: 90A
+    note: Run conditions are in Table 1; shared 1300 °C hold.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 1300 °C + 273.15 = 1573.15 K.
+    temperature_as_printed: 1300 °C
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Etter (L5) chondrite; fine-grained (<10 μm)
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+    initial_composition_ppm:
+      Na: 6550
+      K: 506
+      Rb: 1.32
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00102658'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 90A
+        note: 7.7e-06 torr as printed × 133.32236842105263 Pa/torr; He total pressure.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: High-purity helium used to adjust total pressure; separate He partial pressure and flow are not stated.
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 79
+          pdf_page_index: 0
+          section: 2. Experimental
+          note: Apparatus and general procedure are referred to the 1989 paper.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1573.15'
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 1300 °C + 273.15 K conversion.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '2400'
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 40 min × 60 s/min = 2400 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched at approximately 600 °C/min
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+fidelity_samples:
+- path: species.Na.observations[shimaoka_1991_na_run_89a_concentration].values.residue_ppm
+  value: 2074
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    row: 89A
+    column: Na (ppm)
+- path: species.Na.observations[shimaoka_1991_na_run_89a_vaporization_rate].values.evaporation_rate
+  value: 0.000107
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    row: 89A
+    column: k Na
+species:
+  Na:
+    observations:
+    - observation_id: shimaoka_1991_na_run_89a_concentration
+      experiment: run-89a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 89A
+        column: Na (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Na
+        residue_ppm: 2074
+        starting_residue_ppm: 6550
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: atomic absorption spectroscopy
+        run_id: 89A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.077
+        run_product_composition_ppm:
+          Na: 2074
+          K: 454
+          Rb: 1.32
+        holes_percent_estimated: 10.4
+        degree_of_melt_percent_estimated: 41.9
+        olivine_Fa_mol_percent: 27.5
+    - observation_id: shimaoka_1991_na_run_88a_concentration
+      experiment: run-88a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 88A
+        column: Na (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Na
+        residue_ppm: 790
+        starting_residue_ppm: 6550
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: atomic absorption spectroscopy
+        run_id: 88A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.0077
+        run_product_composition_ppm:
+          Na: 790
+          K: 315
+          Rb: 0.962
+        holes_percent_estimated: 9.2
+        degree_of_melt_percent_estimated: 48.9
+        olivine_Fa_mol_percent: 26.9
+    - observation_id: shimaoka_1991_na_run_86a_concentration
+      experiment: run-86a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 86A
+        column: Na (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Na
+        residue_ppm: 239
+        starting_residue_ppm: 6550
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: atomic absorption spectroscopy
+        run_id: 86A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.00077
+        run_product_composition_ppm:
+          Na: 239
+          K: 235
+          Rb: 0.836
+        holes_percent_estimated: 11.0
+        degree_of_melt_percent_estimated: 43.6
+        olivine_Fa_mol_percent: 25.1
+    - observation_id: shimaoka_1991_na_run_87a_concentration
+      experiment: run-87a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 87A
+        column: Na (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Na
+        residue_ppm: 384
+        starting_residue_ppm: 6550
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: atomic absorption spectroscopy
+        run_id: 87A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 7.7e-05
+        run_product_composition_ppm:
+          Na: 384
+          K: 238
+          Rb: 0.822
+        holes_percent_estimated: 8.3
+        degree_of_melt_percent_estimated: 55.9
+        olivine_Fa_mol_percent: 25.0
+    - observation_id: shimaoka_1991_na_run_90a_concentration
+      experiment: run-90a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 90A
+        column: Na (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Na
+        residue_ppm: 548
+        starting_residue_ppm: 6550
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: atomic absorption spectroscopy
+        run_id: 90A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 7.7e-06
+        run_product_composition_ppm:
+          Na: 548
+          K: 286
+          Rb: 0.979
+        holes_percent_estimated: 9.5
+        degree_of_melt_percent_estimated: 39.2
+        olivine_Fa_mol_percent: 26.3
+    - observation_id: shimaoka_1991_na_run_89a_vaporization_rate
+      experiment: run-89a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 89A
+        column: k Na
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_na_run_89a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_na_run_89a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: Na
+        evaporation_rate: 0.000107
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.077
+        run_id: 89A
+        f_as_used: 1.0
+    - observation_id: shimaoka_1991_na_run_88a_vaporization_rate
+      experiment: run-88a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 88A
+        column: k Na
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_na_run_88a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_na_run_88a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: Na
+        evaporation_rate: 0.000189
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.0077
+        run_id: 88A
+        f_as_used: 1.0
+    - observation_id: shimaoka_1991_na_run_86a_vaporization_rate
+      experiment: run-86a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 86A
+        column: k Na
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_na_run_86a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_na_run_86a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: Na
+        evaporation_rate: 0.000243
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.00077
+        run_id: 86A
+        f_as_used: 1.0
+    - observation_id: shimaoka_1991_na_run_87a_vaporization_rate
+      experiment: run-87a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 87A
+        column: k Na
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_na_run_87a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_na_run_87a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: Na
+        evaporation_rate: 0.000293
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 7.7e-05
+        run_id: 87A
+        f_as_used: 1.0
+    - observation_id: shimaoka_1991_na_run_90a_vaporization_rate
+      experiment: run-90a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 90A
+        column: k Na
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_na_run_90a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_na_run_90a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: Na
+        evaporation_rate: 0.000281
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 7.7e-06
+        run_id: 90A
+        f_as_used: 1.0
+    context:
+    - observation_id: shimaoka_1991_table1_transcription
+      type: thermodynamic_example
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: Complete row and column transcription; see tables/shimaoka-nakamura-1991-iau-colloq126-79/t1.csv
+      units: concentration ppm; pressure torr; rates cm3 min-1 cm-2; composition percent as printed
+      values:
+        quantity: run_product_results_table
+        method_class: measured_tabulated
+        table_id: '1'
+        row_count: 5
+        rows:
+        - Run_no: 89A
+          Duration_min: 40
+          Total_pressure_torr: 0.077
+          Holes_percent: 10.4
+          Degree_of_melt_percent: 41.9
+          Olivine_Fa_mol_percent: 27.5
+          Na_ppm: 2074
+          K_ppm: 454
+          Rb_ppm: 1.32
+          kNa_cm3_min_cm2: 0.000107
+          kK_cm3_min_cm2: 9.83e-06
+          kRb_cm3_min_cm2: 0
+        - Run_no: 88A
+          Duration_min: 40
+          Total_pressure_torr: 0.0077
+          Holes_percent: 9.2
+          Degree_of_melt_percent: 48.9
+          Olivine_Fa_mol_percent: 26.9
+          Na_ppm: 790
+          K_ppm: 315
+          Rb_ppm: 0.962
+          kNa_cm3_min_cm2: 0.000189
+          kK_cm3_min_cm2: 4.18e-05
+          kRb_cm3_min_cm2: 2.79e-05
+        - Run_no: 86A
+          Duration_min: 40
+          Total_pressure_torr: 0.00077
+          Holes_percent: 11.0
+          Degree_of_melt_percent: 43.6
+          Olivine_Fa_mol_percent: 25.1
+          Na_ppm: 239
+          K_ppm: 235
+          Rb_ppm: 0.836
+          kNa_cm3_min_cm2: 0.000243
+          kK_cm3_min_cm2: 5.59e-05
+          kRb_cm3_min_cm2: 3.33e-05
+        - Run_no: 87A
+          Duration_min: 40
+          Total_pressure_torr: 7.7e-05
+          Holes_percent: 8.3
+          Degree_of_melt_percent: 55.9
+          Olivine_Fa_mol_percent: 25.0
+          Na_ppm: 384
+          K_ppm: 238
+          Rb_ppm: 0.822
+          kNa_cm3_min_cm2: 0.000293
+          kK_cm3_min_cm2: 7.69e-05
+          kRb_cm3_min_cm2: 4.84e-05
+        - Run_no: 90A
+          Duration_min: 40
+          Total_pressure_torr: 7.7e-06
+          Holes_percent: 9.5
+          Degree_of_melt_percent: 39.2
+          Olivine_Fa_mol_percent: 26.3
+          Na_ppm: 548
+          K_ppm: 286
+          Rb_ppm: 0.979
+          kNa_cm3_min_cm2: 0.000281
+          kK_cm3_min_cm2: 6.39e-05
+          kRb_cm3_min_cm2: 3.34e-05
+        evidence_by_column:
+          Na_ppm: 'measured_direct: atomic absorption spectroscopy'
+          K_ppm: 'measured_direct: isotope dilution mass spectrometry'
+          Rb_ppm: 'measured_direct: isotope dilution mass spectrometry'
+          Holes_percent: author_estimate from SEM back-scattered electron images; method referred to Shimaoka and Nakamura
+            (1989)
+          Degree_of_melt_percent: author_estimate from SEM back-scattered electron images; method referred to Shimaoka and
+            Nakamura (1989)
+          Olivine_Fa_mol_percent: measured_tabulated; measurement procedure is not specified here
+          kNa_cm3_min_cm2: model_derived with f=1 as stated in Table 1 footnote *2
+          kK_cm3_min_cm2: model_derived with f=1 as stated in Table 1 footnote *2
+          kRb_cm3_min_cm2: model_derived with f=1 as stated in Table 1 footnote *2
+    - observation_id: shimaoka_1991_experiment_and_apparatus_context
+      type: method
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+        note: General apparatus and procedure are referred to Shimaoka and Nakamura (1989).
+      units: as reported
+      values:
+        quantity: experimental_setup_and_sample_context
+        method_class: measured_direct
+        method_as_printed: heating/vaporization experiment on partially molten chondritic material under varied He total pressure
+        standardized_method_token:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            published_page: 79
+            pdf_page_index: 0
+            section: 2. Experimental
+            note: The source does not identify Knudsen effusion or Langmuir free evaporation; exact method token is not stated.
+        apparatus_and_procedure_reference: Shimaoka and Nakamura (1989); details are not repeated in this paper.
+        cell_material_and_liner:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          locator:
+            published_page: 79
+            pdf_page_index: 0
+            section: 2. Experimental
+            note: This paper refers apparatus/procedure to Shimaoka and Nakamura (1989); no cell or liner material is stated
+              here.
+        orifice_diameter_m:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          locator:
+            published_page: 79
+            pdf_page_index: 0
+            section: 2. Experimental
+        orifice_channel_length_m:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          locator:
+            published_page: 79
+            pdf_page_index: 0
+            section: 2. Experimental
+        pressure_intensity_conversion_calibration:
+          state:
+            tag: not_applicable
+            reason: not_applicable
+          locator:
+            published_page: 80
+            pdf_page_index: 1
+            section: 2. Experimental
+            note: No vapor partial pressures or ion-current-to-pressure conversions are reported; mass spectrometry is for
+              post-run K and Rb analyses.
+        ionization_cross_sections_and_source:
+          state:
+            tag: not_applicable
+            reason: not_applicable
+          locator:
+            published_page: 80
+            pdf_page_index: 1
+            section: 2. Experimental
+            note: No gas-phase ion-current pressure analysis is reported.
+        ionization_energy_eV:
+          state:
+            tag: not_applicable
+            reason: not_applicable
+          locator:
+            published_page: 80
+            pdf_page_index: 1
+            section: 2. Experimental
+            note: No gas-phase ion-current pressure analysis is reported.
+        multiplier_or_isotope_corrections:
+          state:
+            tag: not_applicable
+            reason: not_applicable
+          locator:
+            published_page: 80
+            pdf_page_index: 1
+            section: 2. Experimental
+            note: No gas-phase ion-current pressure analysis is reported; K and Rb isotope dilution is used for sample analyses.
+        temperature_measurement:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          locator:
+            published_page: 80
+            pdf_page_index: 1
+            section: 2. Experimental
+            note: 1300 °C setpoint is reported; measurement sensor is not stated.
+        temperature_calibration:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          locator:
+            published_page: 80
+            pdf_page_index: 1
+            section: 2. Experimental
+            note: No temperature calibration or uncertainty is stated here.
+        temperature_uncertainty:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            published_page: 80
+            pdf_page_index: 1
+            section: 2. Experimental
+        starting_material: Newly prepared fine-grained sample from Etter (L5) chondrite; similar to sample A of the 1989 work.
+        grain_size_upper_bound_um:
+          kind: bound
+          bound_operator: <
+          bound_value: '10'
+        helium_purity_percent: 99.999
+        initial_composition_ppm:
+          Na: 6550
+          K: 506
+          Rb: 1.32
+        post_run_preparation:
+          description: Run product broken into fragments and divided into two parts; one prepared as a thin section, the other crushed to fine powder for Na, K and Rb analysis.
+          locator: {published_page: 80, pdf_page_index: 1, section: 2. Experimental}
+        post_run_analysis_methods:
+          Na: atomic absorption spectroscopy
+          K: isotope dilution mass spectrometry
+          Rb: isotope dilution mass spectrometry
+        holes_and_melt_fraction_method: Estimated from SEM back-scattered electron images; source refers to Shimaoka and Nakamura
+          (1989).
+        olivine_Fa_method:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            published_page: 81
+            pdf_page_index: 2
+            table: '1'
+            column: Olivine Fa
+        sample_mass_kg:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            published_page: 79
+            pdf_page_index: 0
+            section: 2. Experimental
+        starting_pressure_range_torr:
+          low: 1.0e-05
+          high: 0.1
+          approximate: true
+        setpoint_temperature_C: 1300
+        heating_rate_C_min:
+          nominal: 30
+          approximate: true
+        hold_duration_min: 40
+        quench_rate_C_min:
+          nominal: 600
+          approximate: true
+        activities_reported:
+          state:
+            tag: not_applicable
+            reason: not_applicable
+          locator:
+            published_page: 79
+            pdf_page_index: 0
+            note: No oxide activities are measured or tabulated in this source.
+        activity_defining_ions:
+          state:
+            tag: not_applicable
+            reason: not_applicable
+          locator:
+            published_page: 79
+            pdf_page_index: 0
+            note: No activities are reported.
+        activity_reference_states:
+          state:
+            tag: not_applicable
+            reason: not_applicable
+          locator:
+            published_page: 79
+            pdf_page_index: 0
+            note: No activities are reported; no standard states apply.
+        oxygen_fugacity_or_partial_pressure:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            published_page: 81
+            pdf_page_index: 2
+            table: '1'
+            note: Only total He pressure is reported for present runs; pO2 is not reported.
+        pressure_values_by_run:
+        - run_id: 89A
+          total_pressure_torr: 0.077
+        - run_id: 88A
+          total_pressure_torr: 0.0077
+        - run_id: 86A
+          total_pressure_torr: 0.00077
+        - run_id: 87A
+          total_pressure_torr: 7.7e-05
+        - run_id: 90A
+          total_pressure_torr: 7.7e-06
+    - observation_id: shimaoka_1991_equation1_prior_model
+      type: thermodynamic_example
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 3.1 Previous Study
+        equation: '1'
+      units: as printed
+      values:
+        quantity: prior_vaporization_relation_and_assumptions
+        method_class: quoted_attributed
+        attribution: Shimaoka and Nakamura (1989), as cited by the authors.
+        equation: ln(C/C0) = -k(f S_tot/V_p)t
+        symbol_definitions: C and C0 are concentrations in run product and starting material; k vaporization rate; S_tot overall
+          charge surface area; V_p partial-melt volume; t heating duration; f effective melt surface area divided by total
+          charge surface area.
+        f_estimate:
+          value: 0.2
+          qualification: tentatively estimated
+        stated_assumption: f, S_tot, and V_p are constant during heating; a linear relation of t and ln(C/C0) is expected.
+    - observation_id: shimaoka_1991_figure2_relative_concentration
+      type: thermodynamic_example
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        figure: '2'
+      units: axes as printed
+      values:
+        quantity: relative_Na_concentration_corrected_for_holes_and_partial_melts_vs_heating_duration
+        method_class: figure_only
+        reason: Figure 2 curve and points not digitized. Stars represent this work; circles represent the previous Shimaoka and Nakamura (1989) results.
+        temperature_C: 1300
+        heating_duration_axis_min:
+        - 0
+        - 200
+    - observation_id: shimaoka_1991_figure3_regressions
+      type: thermodynamic_example
+      locator:
+        published_page: 82
+        pdf_page_index: 3
+        figure: '3'
+      units: f·k as plotted; total pressure torr
+      values:
+        quantity: evaporation_rate_vs_total_pressure_regression_lines
+        method_class: model_derived
+        printed_fit_equations:
+        - (1) log(f·k) = -0.142 log P_tot - 4.08
+        - (2) log(f·k) = -1.34 exp(log P_tot) - 3.54
+        - (3) log(f·k) = -2.79 exp(log P_tot) - 4.08
+        curves_and_points_digitized: false
+        note: The printed fit equations are transcribed; plotted points and curves are not digitized.
+    - observation_id: shimaoka_1991_quoted_tsuchiyama_comparison
+      type: thermodynamic_example
+      locator:
+        published_page: 82
+        pdf_page_index: 3
+        section: 3.2 Effect of Total Pressure
+      units: cm3 min-1 cm-2; atm
+      values:
+        quantity: comparison_with_prior_sodium_vaporization_measurements
+        method_class: quoted_attributed
+        attribution: Tsuchiyama, Nagahara and Kushiro (1981), as quoted by Shimaoka and Nakamura (1991).
+        prior_rate_range_cm3_min_cm2:
+        - 5.0e-05
+        - 0.00017
+        temperature_C: 1300
+        oxygen_partial_pressure_atm:
+          mantissa: 1
+          power10: -11.6
+        statement: Prior comparison range at 1300°C and oxygen partial pressure 10^-11.6 atm; this oxygen pressure belongs to Tsuchiyama's experiment, not the present runs.
+    - observation_id: shimaoka_1991_author_extrapolated_sodium_rate
+      type: thermodynamic_example
+      locator: {published_page: 82, pdf_page_index: 3, section: 3.2 Effect of Total Pressure}
+      units: cm3 min-1 cm-2; atm
+      values:
+        quantity: author_extrapolated_sodium_vaporization_rate
+        method_class: model_derived
+        attribution: Shimaoka and Nakamura (1991), own extrapolation of Figure 3 linear regression (1) to 1 atm.
+        author_extrapolated_evaporation_rate: 0.00016
+        temperature_C: 1300
+        author_extrapolation_pressure_atm: 1.0
+        author_estimate_f: 0.2
+        statement: Authors say this value seems consistent with the prior comparison. Exponential fits are better least-squares fits but their physical meaning is unclear; linear fit used for simplicity. High-pressure data remain limited and more work may be needed to confirm the result.
+    - observation_id: shimaoka_1991_olivine_fa_and_run_composition
+      type: thermodynamic_example
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+      units: mol% Fa; percent for holes and degree of melt
+      values:
+        quantity: run_product_composition_and_texture
+        method_class: measured_tabulated
+        evidence_by_column:
+          Olivine_Fa_mol_percent: measured_tabulated; measurement procedure not published in this paper.
+          holes_percent: author_estimate from SEM back-scattered electron images.
+          degree_of_melt_percent: author_estimate from SEM back-scattered electron images.
+        notes: Holes and degree of melt estimated from SEM back-scattered electron images; methods referred to Shimaoka and
+          Nakamura (1989). Olivine Fa measurement method not stated in this paper.
+        series:
+        - run_id: 89A
+          temperature_C_as_printed: 1300
+          total_pressure_torr: 0.077
+          Olivine_Fa_mol_percent: 27.5
+          holes_percent: 10.4
+          degree_of_melt_percent: 41.9
+        - run_id: 88A
+          temperature_C_as_printed: 1300
+          total_pressure_torr: 0.0077
+          Olivine_Fa_mol_percent: 26.9
+          holes_percent: 9.2
+          degree_of_melt_percent: 48.9
+        - run_id: 86A
+          temperature_C_as_printed: 1300
+          total_pressure_torr: 0.00077
+          Olivine_Fa_mol_percent: 25.1
+          holes_percent: 11.0
+          degree_of_melt_percent: 43.6
+        - run_id: 87A
+          temperature_C_as_printed: 1300
+          total_pressure_torr: 7.7e-05
+          Olivine_Fa_mol_percent: 25.0
+          holes_percent: 8.3
+          degree_of_melt_percent: 55.9
+        - run_id: 90A
+          temperature_C_as_printed: 1300
+          total_pressure_torr: 7.7e-06
+          Olivine_Fa_mol_percent: 26.3
+          holes_percent: 9.5
+          degree_of_melt_percent: 39.2
+    - observation_id: shimaoka_1991_abstract_pressure_minimum
+      type: method
+      locator: {published_page: 79, pdf_page_index: 0, section: Abstract}
+      units: torr as printed
+      values:
+        quantity: source_qualifying_statement
+        quote: The rate of vaporization decreased in the order of Na > K > Rb with the increasing of the pressure, and reached a minimum at ~10^-1 torr.
+    - observation_id: shimaoka_1991_high_pressure_alkali_conclusions
+      type: method
+      locator: {published_page: 81, pdf_page_index: 2, section: 3.2 Effect of Total Pressure}
+      units: torr as printed
+      values:
+        quantity: source_qualifying_statements
+        statements:
+        - The rate of vaporization decreases gradually for Na but abruptly for K and Rb at ~10^-1 torr.
+        - Almost no vaporization loss of Rb was detected for the run product at ~10^-1 torr.
+        - The pressure effect is greatest for Rb and smallest for Na.
+    - observation_id: shimaoka_1991_affiliation_and_intro_metadata
+      type: method
+      locator: {published_page: 79, pdf_page_index: 0, section: Affiliations and introduction}
+      units: metadata as printed
+      values:
+        quantity: source_metadata
+        description: Kobe University affiliation postcode 657; introduction cites Gibson and Hubbard 1972, Kreutzberger et al. 1985, Tsuchiyama et al. 1981, Matsuda et al. 1990 and Shimaoka and Nakamura 1989. Copyright 1991 Kluwer Academic Publishers; volume pages 79–82.
+    - observation_id: shimaoka_1991_reference_numeric_metadata
+      type: method
+      locator: {published_page: 82, pdf_page_index: 3, section: References}
+      units: bibliographic identifiers as printed
+      values:
+        quantity: reference_numeric_context
+        description: Gibson and Hubbard (1972), Proc. Lunar Sci. Conf. 3rd, 2003–2014; Kreutzberger et al. (1985), GCA 49, 91–98; Matsuda et al. (1990), Meteoritics 25, 137–143; Shimaoka and Nakamura (1989), Proc. NIPR Symp. Antarct. Meteorites 2, 252–267; Tsuchiyama et al. (1981), GCA 45, 1357–1367.
+  K:
+    observations:
+    - observation_id: shimaoka_1991_k_run_89a_concentration
+      experiment: run-89a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 89A
+        column: K (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: K
+        residue_ppm: 454
+        starting_residue_ppm: 506
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: isotope dilution mass spectrometry
+        run_id: 89A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.077
+        run_product_composition_ppm:
+          Na: 2074
+          K: 454
+          Rb: 1.32
+        holes_percent_estimated: 10.4
+        degree_of_melt_percent_estimated: 41.9
+        olivine_Fa_mol_percent: 27.5
+    - observation_id: shimaoka_1991_k_run_88a_concentration
+      experiment: run-88a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 88A
+        column: K (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: K
+        residue_ppm: 315
+        starting_residue_ppm: 506
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: isotope dilution mass spectrometry
+        run_id: 88A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.0077
+        run_product_composition_ppm:
+          Na: 790
+          K: 315
+          Rb: 0.962
+        holes_percent_estimated: 9.2
+        degree_of_melt_percent_estimated: 48.9
+        olivine_Fa_mol_percent: 26.9
+    - observation_id: shimaoka_1991_k_run_86a_concentration
+      experiment: run-86a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 86A
+        column: K (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: K
+        residue_ppm: 235
+        starting_residue_ppm: 506
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: isotope dilution mass spectrometry
+        run_id: 86A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.00077
+        run_product_composition_ppm:
+          Na: 239
+          K: 235
+          Rb: 0.836
+        holes_percent_estimated: 11.0
+        degree_of_melt_percent_estimated: 43.6
+        olivine_Fa_mol_percent: 25.1
+    - observation_id: shimaoka_1991_k_run_87a_concentration
+      experiment: run-87a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 87A
+        column: K (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: K
+        residue_ppm: 238
+        starting_residue_ppm: 506
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: isotope dilution mass spectrometry
+        run_id: 87A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 7.7e-05
+        run_product_composition_ppm:
+          Na: 384
+          K: 238
+          Rb: 0.822
+        holes_percent_estimated: 8.3
+        degree_of_melt_percent_estimated: 55.9
+        olivine_Fa_mol_percent: 25.0
+    - observation_id: shimaoka_1991_k_run_90a_concentration
+      experiment: run-90a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 90A
+        column: K (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: K
+        residue_ppm: 286
+        starting_residue_ppm: 506
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: isotope dilution mass spectrometry
+        run_id: 90A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 7.7e-06
+        run_product_composition_ppm:
+          Na: 548
+          K: 286
+          Rb: 0.979
+        holes_percent_estimated: 9.5
+        degree_of_melt_percent_estimated: 39.2
+        olivine_Fa_mol_percent: 26.3
+    - observation_id: shimaoka_1991_k_run_89a_vaporization_rate
+      experiment: run-89a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 89A
+        column: k K
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_k_run_89a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_k_run_89a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: K
+        evaporation_rate: 9.83e-06
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.077
+        run_id: 89A
+        f_as_used: 1.0
+    - observation_id: shimaoka_1991_k_run_88a_vaporization_rate
+      experiment: run-88a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 88A
+        column: k K
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_k_run_88a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_k_run_88a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: K
+        evaporation_rate: 4.18e-05
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.0077
+        run_id: 88A
+        f_as_used: 1.0
+    - observation_id: shimaoka_1991_k_run_86a_vaporization_rate
+      experiment: run-86a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 86A
+        column: k K
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_k_run_86a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_k_run_86a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: K
+        evaporation_rate: 5.59e-05
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.00077
+        run_id: 86A
+        f_as_used: 1.0
+    - observation_id: shimaoka_1991_k_run_87a_vaporization_rate
+      experiment: run-87a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 87A
+        column: k K
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_k_run_87a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_k_run_87a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: K
+        evaporation_rate: 7.69e-05
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 7.7e-05
+        run_id: 87A
+        f_as_used: 1.0
+    - observation_id: shimaoka_1991_k_run_90a_vaporization_rate
+      experiment: run-90a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 90A
+        column: k K
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_k_run_90a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_k_run_90a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: K
+        evaporation_rate: 6.39e-05
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 7.7e-06
+        run_id: 90A
+        f_as_used: 1.0
+    context: []
+  Rb:
+    observations:
+    - observation_id: shimaoka_1991_rb_run_89a_concentration
+      experiment: run-89a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 89A
+        column: Rb (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Rb
+        residue_ppm: 1.32
+        starting_residue_ppm: 1.32
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: isotope dilution mass spectrometry
+        run_id: 89A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.077
+        run_product_composition_ppm:
+          Na: 2074
+          K: 454
+          Rb: 1.32
+        holes_percent_estimated: 10.4
+        degree_of_melt_percent_estimated: 41.9
+        olivine_Fa_mol_percent: 27.5
+    - observation_id: shimaoka_1991_rb_run_88a_concentration
+      experiment: run-88a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 88A
+        column: Rb (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Rb
+        residue_ppm: 0.962
+        starting_residue_ppm: 1.32
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: isotope dilution mass spectrometry
+        run_id: 88A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.0077
+        run_product_composition_ppm:
+          Na: 790
+          K: 315
+          Rb: 0.962
+        holes_percent_estimated: 9.2
+        degree_of_melt_percent_estimated: 48.9
+        olivine_Fa_mol_percent: 26.9
+    - observation_id: shimaoka_1991_rb_run_86a_concentration
+      experiment: run-86a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 86A
+        column: Rb (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Rb
+        residue_ppm: 0.836
+        starting_residue_ppm: 1.32
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: isotope dilution mass spectrometry
+        run_id: 86A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.00077
+        run_product_composition_ppm:
+          Na: 239
+          K: 235
+          Rb: 0.836
+        holes_percent_estimated: 11.0
+        degree_of_melt_percent_estimated: 43.6
+        olivine_Fa_mol_percent: 25.1
+    - observation_id: shimaoka_1991_rb_run_87a_concentration
+      experiment: run-87a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 87A
+        column: Rb (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Rb
+        residue_ppm: 0.822
+        starting_residue_ppm: 1.32
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: isotope dilution mass spectrometry
+        run_id: 87A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 7.7e-05
+        run_product_composition_ppm:
+          Na: 384
+          K: 238
+          Rb: 0.822
+        holes_percent_estimated: 8.3
+        degree_of_melt_percent_estimated: 55.9
+        olivine_Fa_mol_percent: 25.0
+    - observation_id: shimaoka_1991_rb_run_90a_concentration
+      experiment: run-90a
+      type: concentration_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 90A
+        column: Rb (ppm)
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: ppm
+      phase: run product
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Rb
+        residue_ppm: 0.979
+        starting_residue_ppm: 1.32
+        starting_material: Etter (L5) chondrite; initial alkali concentrations as printed in Table 1
+        analytical_method: isotope dilution mass spectrometry
+        run_id: 90A
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 7.7e-06
+        run_product_composition_ppm:
+          Na: 548
+          K: 286
+          Rb: 0.979
+        holes_percent_estimated: 9.5
+        degree_of_melt_percent_estimated: 39.2
+        olivine_Fa_mol_percent: 26.3
+    - observation_id: shimaoka_1991_rb_run_89a_vaporization_rate
+      experiment: run-89a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 89A
+        column: k Rb
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_rb_run_89a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_rb_run_89a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: Rb
+        evaporation_rate: 0
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.077
+        run_id: 89A
+        f_as_used: 1.0
+    - observation_id: shimaoka_1991_rb_run_88a_vaporization_rate
+      experiment: run-88a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 88A
+        column: k Rb
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_rb_run_88a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_rb_run_88a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: Rb
+        evaporation_rate: 2.79e-05
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.0077
+        run_id: 88A
+        f_as_used: 1.0
+    - observation_id: shimaoka_1991_rb_run_86a_vaporization_rate
+      experiment: run-86a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 86A
+        column: k Rb
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_rb_run_86a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_rb_run_86a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: Rb
+        evaporation_rate: 3.33e-05
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 0.00077
+        run_id: 86A
+        f_as_used: 1.0
+    - observation_id: shimaoka_1991_rb_run_87a_vaporization_rate
+      experiment: run-87a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 87A
+        column: k Rb
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_rb_run_87a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_rb_run_87a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: Rb
+        evaporation_rate: 4.84e-05
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 7.7e-05
+        run_id: 87A
+        f_as_used: 1.0
+    - observation_id: shimaoka_1991_rb_run_90a_vaporization_rate
+      experiment: run-90a
+      type: rate_series
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        row: 90A
+        column: k Rb
+      T_range_K:
+      - 1573.15
+      - 1573.15
+      units: cm3 min-1 cm-2 as printed
+      phase: alkali vaporization
+      derived_from:
+      - shimaoka_1991_rb_run_90a_concentration
+      derivation:
+        relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+          *2.
+        inputs:
+        - shimaoka_1991_rb_run_90a_concentration
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+        analyte: Rb
+        evaporation_rate: 3.34e-05
+        temperature_C_as_printed: 1300
+        temperature_K: 1573.15
+        temperature_conversion: 1300 °C + 273.15 = 1573.15 K
+        total_pressure_torr: 7.7e-06
+        run_id: 90A
+        f_as_used: 1.0
+    context: []

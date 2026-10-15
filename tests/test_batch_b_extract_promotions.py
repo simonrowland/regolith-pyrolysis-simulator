@@ -105,3 +105,20 @@ def test_gaillard_2003_migrates_printed_activity_cells() -> None:
         and observation.point_conditions["temperature_K"].locator is not None
         for observation in located
     )
+
+
+def test_shimaoka_nakamura_1991_migrates_table1_cells() -> None:
+    result = _migrate("shimaoka-nakamura-1991-iau-colloq126-79.yaml")
+    assert len(result.observations) == 30
+    assert _point(result, "shimaoka_1991_na_run_89a_concentration") == Decimal(
+        "2074"
+    )
+    assert _point(result, "shimaoka_1991_na_run_89a_vaporization_rate") == Decimal(
+        "0.000107"
+    )
+    assert all(
+        observation.identity.temperature_K.is_value
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].locator is not None
+        for observation in result.observations.values()
+    )
