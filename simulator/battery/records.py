@@ -45,6 +45,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Polymorph,
+    PolymorphRejectionKind,
     Quantity,
     RawInputStatus,
     Rail,
@@ -184,9 +185,9 @@ def _coerce_polymorph_state(polymorph: State[object] | None) -> State[Polymorph]
     try:
         token = _coerce_polymorph_value(polymorph.value)
     except ValueError:
-        from simulator.battery.polymorph_dictionary import unrecognised_polymorph_reason
+        from simulator.battery.polymorph_dictionary import unrecognised_polymorph_state
 
-        return State.unknown(unrecognised_polymorph_reason(polymorph.value))
+        return unrecognised_polymorph_state(polymorph.value)
     return State.of(token)
 
 
@@ -247,8 +248,22 @@ class Species:
             and polymorph.is_value
             and not polymorph_matches_formula(self.formula, polymorph.value)
         ):
+            from simulator.battery.polymorph_dictionary import contradicting_polymorph_state
+
+            polymorph = contradicting_polymorph_state(
+                polymorph.value.value, self.formula
+            )
+        elif (
+            polymorph is not None
+            and polymorph.is_unknown
+            and polymorph.rejection_kind is None
+        ):
+            # New in-memory unknowns without a specific rejection came from an
+            # omitted polymorph; legacy persisted rejections are classified by
+            # the polymorph loader before they reach Species.
             polymorph = State.unknown(
-                f"polymorph {polymorph.value.value} does not denote formula {self.formula}"
+                polymorph.reason or "source does not state polymorph",
+                rejection_kind=PolymorphRejectionKind.OMITTED,
             )
         object.__setattr__(self, "polymorph", polymorph)
 

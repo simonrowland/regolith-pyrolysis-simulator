@@ -8063,6 +8063,36 @@ def test_rejected_cao_reference_polymorph_is_not_converted_or_scored() -> None:
     assert residual.refusal.detail["polymorph_reason"] == source_polymorph.reason
 
 
+def test_source_polymorph_classification_pin() -> None:
+    from simulator.battery.score import (
+        _source_polymorph_is_rejected,
+        _source_polymorph_is_unspecified,
+    )
+
+    from simulator.battery.migrate import make_species
+
+    omitted = make_species("MgO", Phase.CR).polymorph
+    assert omitted is not None
+    unrecognised = Species("MgO", Phase.CR, State.of("unknown-form")).polymorph
+    contradictory_mgo = Species(
+        "MgO", Phase.CR, State.of(Polymorph.CLINOENSTATITE)
+    ).polymorph
+    contradictory_cao = Species(
+        "CaO", Phase.CR, State.of(Polymorph.CLINOENSTATITE)
+    ).polymorph
+    recognised = State.of(Polymorph.PERICLASE)
+
+    for state in (omitted,):
+        assert _source_polymorph_is_unspecified(state)
+        assert not _source_polymorph_is_rejected(state)
+    for state in (unrecognised, contradictory_mgo, contradictory_cao):
+        assert state is not None
+        assert not _source_polymorph_is_unspecified(state)
+        assert _source_polymorph_is_rejected(state)
+    assert not _source_polymorph_is_unspecified(recognised)
+    assert not _source_polymorph_is_rejected(recognised)
+
+
 def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
     from simulator.battery.enums import Polymorph
     from simulator.battery.generators.janaf import (
