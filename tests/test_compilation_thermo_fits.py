@@ -1071,6 +1071,28 @@ def test_sidecar_fit_matches_an_independent_accepted_janaf_cell() -> None:
     ]["gate_tolerance"])
 
 
+def test_al091_enthalpy_evaluator_current_output_pin() -> None:
+    from simulator.battery.generators.compilation_thermo_fits import load_sidecar
+
+    record = next(
+        item
+        for item in load_sidecar()
+        if item["source_record_id"] == "Al-091"
+        and item["phase"] == "l"
+        and item["status"] == "accepted"
+    )
+
+    fitted, reason = evaluate_sidecar_fit(
+        record,
+        Quantity.H_MINUS_H298,
+        2500.0,
+        reference_curves={},
+    )
+
+    assert reason is None
+    assert fitted == pytest.approx(-1686.0569999998672, abs=1e-9)
+
+
 def test_janaf_formation_anchor_does_not_require_element_fit_at_298_15_k() -> None:
     expected_missing_comparison_reference = {
         "Al-009": ("g", "Br, none, no accepted reference fit covers 200 K"),

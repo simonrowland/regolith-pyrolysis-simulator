@@ -544,6 +544,52 @@ def test_nasa9_fit_mutations_produce_no_comparison(mutation, monkeypatch) -> Non
     )
 
 
+def test_al091_h_minus_h298_current_comparison_count_pin() -> None:
+    from simulator.battery.compilation_tier import _nasa9_fit_comparisons
+    from simulator.battery.generators.compilation_thermo_fits import load_sidecar
+    from simulator.battery.generators.janaf import generate_table
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    record = next(
+        item
+        for item in load_sidecar()
+        if item["record_id"] == "nist-janaf-4th:Al-091:l:2500:4000"
+    )
+    table_path = TABLES_DIR / "Al-091.yaml"
+    source = generate_table(
+        load_table_document(table_path), source_path=str(table_path)
+    )
+    observations = tuple(
+        observation
+        for observation in source.observations
+        if observation.locator is not None
+        and observation.locator.record == "Al-091"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        in {Quantity.H_MINUS_H298, Quantity.DELTA_FH}
+    )
+    experiments = {
+        observation.experiment_id: replace(
+            F.tabulation_experiment(), experiment_id=observation.experiment_id
+        )
+        for observation in observations
+    }
+    context = _context(*observations, experiments=experiments)
+
+    comparisons = _nasa9_fit_comparisons(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        invoke_pure_phase=False,
+        fit_records=(record,),
+    )
+
+    assert not [
+        comparison
+        for comparison in comparisons
+        if comparison.quantity is Quantity.H_MINUS_H298
+    ]
+
+
 def test_nasa9_fit_census_is_separate_and_lists_regolith_species() -> None:
     from simulator.battery.compilation_tier import compilation_tier_census
 
