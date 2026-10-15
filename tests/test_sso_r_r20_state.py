@@ -72,6 +72,35 @@ def _cleaned_melt_debit_mol(sim: PyrolysisSimulator, transition, species: str) -
     )
 
 
+@pytest.mark.parametrize("equilibrated, na_kg", [(False, 0.001), (True, 0.020)])
+def test_evaporation_batch_preserves_preplanned_fe_debit(equilibrated, na_kg) -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 0.2
+    ceiling = math.log10(2e-4)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = ceiling - (0.001 if equilibrated else 0.0)
+    sim.melt.oxygen_reservoir.reference_T_K = 1873.15
+    sim._sync_oxygen_reservoir_mirror()
+    if equilibrated:
+        sim.atom_ledger.load_external_mol(
+            "process.overhead_gas", {"O2": 1000.0},
+            source="test funded initial liquid split", material_origin="feedstock",
+        )
+        sim._apply_fe_redox_respeciation()
+    fe_data = sim.vapor_pressures["metals"]["Fe"]
+    feo_before = sim.atom_ledger.kg_by_account("process.cleaned_melt")["FeO"]
+    # The batch caps its Fe rate against the parent oxide BEFORE any carrier
+    # commits. Reuse the production stoichiometry; no copied chemistry formula.
+    fe_rate = feo_before / sim._evaporation_stoich("Fe", fe_data)["oxide_per_product_kg"]
+    sim._credit_evaporation_transition("Na", na_kg, na_kg, sim.vapor_pressures["metals"]["Na"])
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt")["FeO"] == feo_before
+    _, transition = sim._credit_evaporation_transition(
+        "Fe", fe_rate, fe_rate, fe_data, return_transition=True,
+    )
+    assert transition is not None
+    transition.validate_conservation(sim.species_formula_registry)
+
+
 @pytest.mark.parametrize("liquid", [True, False])
 def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, liquid) -> None:
     sim = _make_sim()
