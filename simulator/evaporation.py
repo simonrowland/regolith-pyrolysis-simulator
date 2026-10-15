@@ -2084,13 +2084,19 @@ class EvaporationMixin:
             float(self._current_melt_redox_fO2_log())
         )
         fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
+        redox_state_kwargs = (
+            {"redox_state": redox_state}
+            if redox_state is not None
+            and redox_state.cache_identity() is not None
+            else {}
+        )
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
         key = self._freeze_gate_cache_key(
             pressure_bar=pressure_bar,
             fO2_log=redox_key_fO2_log,
-            redox_state=redox_state,
+            **redox_state_kwargs,
         )
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
@@ -2102,7 +2108,7 @@ class EvaporationMixin:
             curve = store.replay_gate_curve(
                 self,
                 fO2_log=fO2_log,
-                redox_state=redox_state,
+                **redox_state_kwargs,
             )
             self._record_composition_projected_liquidus_notice_from_curve(curve)
             replay_notices = getattr(
@@ -2129,7 +2135,7 @@ class EvaporationMixin:
                 cached_curve,
                 cache.get('origin'),
                 fresh_evidence=True,
-                redox_state=redox_state,
+                **redox_state_kwargs,
             )
         ):
             curve = dict(cached_curve)
@@ -2142,7 +2148,7 @@ class EvaporationMixin:
                     fO2_log=fO2_log,
                     curve=curve,
                     repair_notices=cached_notices,
-                    redox_state=redox_state,
+                    **redox_state_kwargs,
                 )
             return gate_curve_memo_record(
                 curve,
@@ -2180,7 +2186,7 @@ class EvaporationMixin:
                     shared_value,
                     shared_origin,
                     fresh_evidence=True,
-                    redox_state=redox_state,
+                    **redox_state_kwargs,
                 )
             ):
                 curve = shared_value
@@ -2203,7 +2209,7 @@ class EvaporationMixin:
                         fO2_log=fO2_log,
                         curve=curve,
                         repair_notices=shared_notices,
-                        redox_state=redox_state,
+                        **redox_state_kwargs,
                     )
                 return record
 
@@ -2358,7 +2364,7 @@ class EvaporationMixin:
                 curve,
                 repair_notices,
                 evidence=evidence,
-                redox_state=redox_state,
+                **redox_state_kwargs,
             )
             origin = record['origin']
             if cache_eligible:
@@ -2393,7 +2399,7 @@ class EvaporationMixin:
                 fO2_log=fO2_log,
                 curve=curve,
                 repair_notices=repair_notices,
-                redox_state=redox_state,
+                **redox_state_kwargs,
             )
         return record
 

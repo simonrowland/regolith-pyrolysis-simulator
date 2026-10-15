@@ -665,6 +665,12 @@ class PT0DeterminismStore:
         if not _is_cacheable_gate_curve(curve):
             self._mark_uncacheable_capture(sim)
             return
+        redox_state_kwargs = (
+            {"redox_state": redox_state}
+            if redox_state is not None
+            and redox_state.cache_identity() is not None
+            else {}
+        )
         from simulator.engine_binding_admission import (
             gate_curve_memo_evidence,
             gate_curve_memo_origin_matches,
@@ -685,7 +691,7 @@ class PT0DeterminismStore:
                 curve,
                 active_record.get("origin"),
                 fresh_evidence=False,
-                redox_state=redox_state,
+                **redox_state_kwargs,
             )
         ):
             self._mark_uncacheable_capture(sim)
@@ -702,7 +708,7 @@ class PT0DeterminismStore:
                 active_record.get("origin"),
                 fresh_evidence=True,
                 evidence=evidence,
-                redox_state=redox_state,
+                **redox_state_kwargs,
             )
             or not evidence.eligible
         ):
@@ -717,7 +723,7 @@ class PT0DeterminismStore:
             fe_redox_policy="intrinsic",
             provider_role=provider_role,
             control_quantization=self._control_quantization,
-            redox_state=redox_state,
+            **redox_state_kwargs,
         )
         if dependency_vector_from_replay_key(key) != record_dependency_vector(
             sim,
@@ -774,6 +780,12 @@ class PT0DeterminismStore:
             raise PT0CacheMiss(
                 "PT-0 cached replay miss: no admitted gate candidates"
             )
+        redox_state_kwargs = (
+            {"redox_state": redox_state}
+            if redox_state is not None
+            and redox_state.cache_identity() is not None
+            else {}
+        )
         keys = tuple(
             canonical_replay_key(
                 sim,
@@ -783,7 +795,7 @@ class PT0DeterminismStore:
                 fe_redox_policy="intrinsic",
                 provider_role=provider_role,
                 control_quantization=self._control_quantization,
-                redox_state=redox_state,
+                **redox_state_kwargs,
             )
             for provider_role in roles
         )

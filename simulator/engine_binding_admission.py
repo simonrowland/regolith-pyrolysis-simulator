@@ -759,12 +759,18 @@ def write_gate_curve_memo_origin(
         gate_curve_memo_producer_configuration,
     )
 
+    redox_state_kwargs = (
+        {"redox_state": redox_state}
+        if redox_state is not None
+        and redox_state.cache_identity() is not None
+        else {}
+    )
     return {
         "producer_pid": os.getpid(),
         "producer_configuration": gate_curve_memo_producer_configuration(
             sim,
             curve,
-            redox_state=redox_state,
+            **redox_state_kwargs,
         ),
         "producer_evidence": evidence.producer_evidence,
     }
@@ -807,11 +813,17 @@ def write_gate_curve_memo_record(
             "unproven gate producer; register its adapter; in-process reuse "
             "of this producer's gate curves is off",
         )
+    redox_state_kwargs = (
+        {"redox_state": redox_state}
+        if redox_state is not None
+        and redox_state.cache_identity() is not None
+        else {}
+    )
     origin = write_gate_curve_memo_origin(
         sim,
         curve,
         evidence,
-        redox_state=redox_state,
+        **redox_state_kwargs,
     )
     return gate_curve_memo_record(
         curve,
@@ -846,11 +858,17 @@ def gate_curve_memo_origin_matches(
         or producer_pid != os.getpid()
     ):
         return False
+    redox_state_kwargs = (
+        {"redox_state": redox_state}
+        if redox_state is not None
+        and redox_state.cache_identity() is not None
+        else {}
+    )
     try:
         configuration = gate_curve_memo_producer_configuration(
             sim,
             curve,
-            redox_state=redox_state,
+            **redox_state_kwargs,
         )
     except Exception:  # noqa: BLE001 - malformed configuration is a miss
         return False

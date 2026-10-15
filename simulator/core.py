@@ -4678,6 +4678,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         redox_state: RedoxState | None = None,
     ) -> _MeltRedoxGateAuthority:
+        redox_state_kwargs = (
+            {"redox_state": redox_state}
+            if redox_state is not None
+            and redox_state.cache_identity() is not None
+            else {}
+        )
         if gate_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
             pinned_hour = getattr(
                 self,
@@ -4695,7 +4701,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ):
                 if self._melt_redox_gate_record_is_admitted(
                     pinned_authority,
-                    redox_state=redox_state,
+                    **redox_state_kwargs,
                 ):
                     return pinned_authority['curve']
                 if not isinstance(pinned_authority, Mapping):
@@ -4705,7 +4711,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 self._melt_redox_gate_authority_tick_hour = None
             return self._melt_redox_liquidus_gate_curve(
-                redox_state=redox_state,
+                **redox_state_kwargs,
             )
         if (
             gate_authority is None
@@ -4716,7 +4722,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if gate_authority.get('disposition') in {'live', 'memo-hit', 'replay'}:
                 if self._melt_redox_gate_record_is_admitted(
                     gate_authority,
-                    redox_state=redox_state,
+                    **redox_state_kwargs,
                 ):
                     return gate_authority['curve']
                 return None
@@ -4739,12 +4745,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_curve_memo_origin_matches,
         )
 
+        redox_state_kwargs = (
+            {"redox_state": redox_state}
+            if redox_state is not None
+            and redox_state.cache_identity() is not None
+            else {}
+        )
         return gate_curve_memo_origin_matches(
             self,
             value['curve'],
             value.get('origin'),
             fresh_evidence=False,
-            redox_state=redox_state,
+            **redox_state_kwargs,
         )
 
     def _establish_melt_redox_gate_authority_for_current_hour(
@@ -4819,8 +4831,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         redox_state: RedoxState | None = None,
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
+        redox_state_kwargs = (
+            {"redox_state": redox_state}
+            if redox_state is not None
+            and redox_state.cache_identity() is not None
+            else {}
+        )
         authority = self._melt_redox_liquidus_gate_record(
-            redox_state=redox_state,
+            **redox_state_kwargs,
         )
         if (
             isinstance(authority, Mapping)
@@ -4851,13 +4869,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             fO2_log,
             redox_state,
         )
+        redox_state_kwargs = (
+            {"redox_state": redox_state}
+            if redox_state is not None
+            and redox_state.cache_identity() is not None
+            else {}
+        )
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
         key = self._freeze_gate_cache_key(
             pressure_bar=pressure_bar,
             fO2_log=redox_key_fO2_log,
-            redox_state=redox_state,
+            **redox_state_kwargs,
         )
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         curve = cache.get('curve') if isinstance(cache, dict) else None
@@ -4875,7 +4899,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 curve,
                 cache.get('origin'),
                 fresh_evidence=False,
-                redox_state=redox_state,
+                **redox_state_kwargs,
             )
         )
         if not cache_hit:
@@ -4905,7 +4929,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     memoized_record['curve'],
                     memoized_record.get('origin'),
                     fresh_evidence=False,
-                    redox_state=redox_state,
+                    **redox_state_kwargs,
                 )
             ):
                 record = gate_curve_memo_record(
@@ -4953,7 +4977,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 cache = None
             try:
                 record = self._freeze_gate_curve_record(
-                    redox_state=redox_state,
+                    **redox_state_kwargs,
                 )
                 curve = record['curve']
                 replay_notices = getattr(
@@ -5055,7 +5079,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 normalized_curve,
                 validated_cache.get('origin'),
                 fresh_evidence=False,
-                redox_state=redox_state,
+                **redox_state_kwargs,
             )
             and isinstance(validated_cache.get('repair_notices'), list)
         ):
