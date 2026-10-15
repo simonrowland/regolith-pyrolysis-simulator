@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from simulator.fe_redox import _non_absolute_redox_state_kwargs
 from simulator.state_types import State
 
 
@@ -750,6 +751,8 @@ def write_gate_curve_memo_origin(
     sim: Any,
     curve: Mapping[str, Any],
     evidence: GateCurveEvidence,
+    *,
+    redox_state: Any | None = None,
 ) -> dict[str, Any]:
     import os
 
@@ -757,10 +760,13 @@ def write_gate_curve_memo_origin(
         gate_curve_memo_producer_configuration,
     )
 
+    redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
     return {
         "producer_pid": os.getpid(),
         "producer_configuration": gate_curve_memo_producer_configuration(
-            sim, curve
+            sim,
+            curve,
+            **redox_state_kwargs,
         ),
         "producer_evidence": evidence.producer_evidence,
     }
@@ -772,6 +778,7 @@ def write_gate_curve_memo_record(
     repair_notices: Sequence[Mapping[str, Any]] | None = None,
     *,
     evidence: GateCurveEvidence | None = None,
+    redox_state: Any | None = None,
 ) -> dict[str, Any]:
     """Write one origin-bearing runtime record for production or a fixture."""
 
@@ -802,7 +809,13 @@ def write_gate_curve_memo_record(
             "unproven gate producer; register its adapter; in-process reuse "
             "of this producer's gate curves is off",
         )
-    origin = write_gate_curve_memo_origin(sim, curve, evidence)
+    redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
+    origin = write_gate_curve_memo_origin(
+        sim,
+        curve,
+        evidence,
+        **redox_state_kwargs,
+    )
     return gate_curve_memo_record(
         curve,
         origin,
@@ -818,6 +831,7 @@ def gate_curve_memo_origin_matches(
     *,
     fresh_evidence: bool,
     evidence: GateCurveEvidence | None = None,
+    redox_state: Any | None = None,
 ) -> bool:
     import os
 
@@ -835,8 +849,13 @@ def gate_curve_memo_origin_matches(
         or producer_pid != os.getpid()
     ):
         return False
+    redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
     try:
-        configuration = gate_curve_memo_producer_configuration(sim, curve)
+        configuration = gate_curve_memo_producer_configuration(
+            sim,
+            curve,
+            **redox_state_kwargs,
+        )
     except Exception:  # noqa: BLE001 - malformed configuration is a miss
         return False
 

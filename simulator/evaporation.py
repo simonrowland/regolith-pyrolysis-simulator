@@ -21,6 +21,7 @@ from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     RedoxState,
+    _non_absolute_redox_state_kwargs,
     _kress91_gate_key_referenced_log_fO2,
     kress91_temperature_band_case,
     normalize_redox_state,
@@ -2084,12 +2085,14 @@ class EvaporationMixin:
             float(self._current_melt_redox_fO2_log())
         )
         fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
         key = self._freeze_gate_cache_key(
             pressure_bar=pressure_bar,
             fO2_log=redox_key_fO2_log,
+            **redox_state_kwargs,
         )
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
@@ -2098,7 +2101,11 @@ class EvaporationMixin:
         )
 
         if store is not None and getattr(store, 'replay_enabled', False):
-            curve = store.replay_gate_curve(self, fO2_log=fO2_log)
+            curve = store.replay_gate_curve(
+                self,
+                fO2_log=fO2_log,
+                **redox_state_kwargs,
+            )
             self._record_composition_projected_liquidus_notice_from_curve(curve)
             replay_notices = getattr(
                 self, '_last_reduced_real_replay_notices', None
@@ -2124,6 +2131,7 @@ class EvaporationMixin:
                 cached_curve,
                 cache.get('origin'),
                 fresh_evidence=True,
+                **redox_state_kwargs,
             )
         ):
             curve = dict(cached_curve)
@@ -2136,6 +2144,7 @@ class EvaporationMixin:
                     fO2_log=fO2_log,
                     curve=curve,
                     repair_notices=cached_notices,
+                    **redox_state_kwargs,
                 )
             return gate_curve_memo_record(
                 curve,
@@ -2173,6 +2182,7 @@ class EvaporationMixin:
                     shared_value,
                     shared_origin,
                     fresh_evidence=True,
+                    **redox_state_kwargs,
                 )
             ):
                 curve = shared_value
@@ -2195,6 +2205,7 @@ class EvaporationMixin:
                         fO2_log=fO2_log,
                         curve=curve,
                         repair_notices=shared_notices,
+                        **redox_state_kwargs,
                     )
                 return record
 
@@ -2349,6 +2360,7 @@ class EvaporationMixin:
                 curve,
                 repair_notices,
                 evidence=evidence,
+                **redox_state_kwargs,
             )
             origin = record['origin']
             if cache_eligible:
@@ -2383,6 +2395,7 @@ class EvaporationMixin:
                 fO2_log=fO2_log,
                 curve=curve,
                 repair_notices=repair_notices,
+                **redox_state_kwargs,
             )
         return record
 
@@ -2427,6 +2440,7 @@ class EvaporationMixin:
         *,
         pressure_bar: float,
         fO2_log: float,
+        redox_state: RedoxState | None = None,
     ) -> tuple:
         cleaned_mol = self.atom_ledger.project_account_mol(
             _FREEZE_GATE_ACCOUNT
@@ -2474,12 +2488,18 @@ class EvaporationMixin:
         # components are omitted before this arithmetic. No physical-
         # equivalence error bound for these pressure/fO2 quanta is established
         # here.
-        return (
+        key = (
             'oxide_mol_fraction_p_fO2_v3',
             round(pressure_bucket, 6),
             round(fO2_bucket, 6),
             tuple(sorted(composition_key)),
         )
+        redox_identity = (
+            None if redox_state is None else redox_state.cache_identity()
+        )
+        if redox_identity is None:
+            return key
+        return (*key, tuple(sorted(redox_identity.items())))
 
     def _freeze_gate_curve_from_gate_dispatch(
         self,

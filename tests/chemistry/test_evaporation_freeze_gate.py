@@ -15,6 +15,7 @@ import pytest
 from simulator import evaporation as evaporation_module
 from simulator import engine_binding_admission as admission_module
 from simulator import engine_binding_admission
+import simulator.fe_redox as fe_redox_module
 from simulator.chemistry.kernel import (
     CapabilityProfile,
     ChemistryIntent,
@@ -175,6 +176,65 @@ def _build_freeze_gate_sim(
     )
 
 
+def _freeze_gate_redox_state_pair(*, distinct_buffers, monkeypatch):
+    if not distinct_buffers:
+        return (
+            RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.1),
+            RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2),
+        )
+
+    lines = dict(fe_redox_module.REDOX_BUFFER_LINES)
+    first_buffer = FE_FEO_BUFFER_STANDARD
+    second_buffer = 'test_wustite_parallel_line'
+    first_line = lines[first_buffer]
+
+    def second_line(T_K):
+        return first_line(T_K) + 0.5 + 0.0001 * (
+            T_K - REDOX_STATE_REFERENCE_T_K
+        )
+
+    lines[second_buffer] = second_line
+    monkeypatch.setattr(fe_redox_module, 'REDOX_BUFFER_LINES', lines)
+    common_fO2_log = -9.0
+    return (
+        RedoxState.buffer_offset(
+            first_buffer,
+            common_fO2_log - first_line(REDOX_STATE_REFERENCE_T_K),
+        ),
+        RedoxState.buffer_offset(
+            second_buffer,
+            common_fO2_log - second_line(REDOX_STATE_REFERENCE_T_K),
+        ),
+    )
+
+
+def _set_freeze_gate_redox_state(sim, redox_state):
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = redox_state.log_fO2_at(
+        REDOX_STATE_REFERENCE_T_K
+    )
+    sim.melt.oxygen_reservoir.reference_T_K = REDOX_STATE_REFERENCE_T_K
+    sim._sync_oxygen_reservoir_mirror()
+
+
+def _install_redox_sensitive_gate_curve(sim, calls):
+    def produce_curve(
+        _reasons,
+        *,
+        fO2_log,
+        repair_notices=None,
+        redox_state=None,
+    ):
+        calls.append((fO2_log, redox_state))
+        return {
+            'source': 'gate_liquid_fraction:analytical-test',
+            'status': 'ok',
+            'solidus_T_C': 900.0,
+            'liquidus_T_C': 1300.0 + 10.0 * len(calls),
+        }
+
+    sim._freeze_gate_curve_from_gate_dispatch = produce_curve
+
+
 def _build_opaque_gate_supplier_sim(
     vapor_pressure_data,
     feedstocks_data,
@@ -224,13 +284,18 @@ def _configure_tick_authority_retry_sim(
     return sim
 
 
-def _freeze_gate_key_for_current_state(sim) -> tuple:
+def _freeze_gate_key_for_current_state(
+    sim,
+    *,
+    redox_state: RedoxState | None = None,
+) -> tuple:
     pressure_bar = float(sim.melt.p_total_mbar) / 1000.0
     fO2_log = float(sim._current_melt_redox_fO2_log())
     redox_key_fO2_log = sim._freeze_gate_redox_key_fO2_log(fO2_log=fO2_log)
     return sim._freeze_gate_cache_key(
         pressure_bar=pressure_bar,
         fO2_log=redox_key_fO2_log,
+        redox_state=redox_state,
     )
 
 
@@ -2836,6 +2901,227 @@ def test_freeze_gate_cache_key_includes_pressure_and_fo2(
     assert same == baseline
     assert different_pressure != baseline
     assert different_fO2 != baseline
+
+
+@pytest.mark.parametrize('distinct_buffers', [False, True])
+def test_freeze_gate_local_key_distinguishes_nonabsolute_redox_states(
+    distinct_buffers,
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    states = _freeze_gate_redox_state_pair(
+        distinct_buffers=distinct_buffers,
+        monkeypatch=monkeypatch,
+    )
+    fO2_values = [
+        state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+        for state in states
+    ]
+
+    keys = [
+        sim._freeze_gate_cache_key(
+            pressure_bar=1.0,
+            fO2_log=fO2_log,
+            redox_state=state,
+        )
+        for state, fO2_log in zip(states, fO2_values)
+    ]
+
+    assert keys[0] != keys[1]
+
+
+@pytest.mark.parametrize('memo_site', ['local', 'keyed', 'shared'])
+@pytest.mark.parametrize(
+    'distinct_buffers',
+    [False, True],
+    ids=['same-buffer-different-offsets', 'different-buffers-same-fO2'],
+)
+def test_freeze_gate_memos_do_not_alias_nonabsolute_redox_states(
+    memo_site,
+    distinct_buffers,
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    states = _freeze_gate_redox_state_pair(
+        distinct_buffers=distinct_buffers,
+        monkeypatch=monkeypatch,
+    )
+    if memo_site == 'shared':
+        sims = [
+            _build_freeze_gate_sim(
+                vapor_pressure_data,
+                feedstocks_data,
+                setpoints_data,
+                enabled=True,
+            )
+            for _ in states
+        ]
+        for sim in sims:
+            sim.backend = sims[0].backend
+        shared_cache = {}
+        for sim in sims:
+            sim._freeze_gate_shared_curve_cache = shared_cache
+    else:
+        sims = [
+            _build_freeze_gate_sim(
+                vapor_pressure_data,
+                feedstocks_data,
+                setpoints_data,
+                enabled=True,
+            )
+        ]
+
+    calls = []
+    curves = []
+    expected_shared_keys = []
+    for index, state in enumerate(states):
+        sim = sims[index] if memo_site == 'shared' else sims[0]
+        _set_freeze_gate_redox_state(sim, state)
+        _install_redox_sensitive_gate_curve(sim, calls)
+        if memo_site == 'shared':
+            expected_key = _freeze_gate_key_for_current_state(
+                sim,
+                redox_state=state,
+            )
+            identity = state.cache_identity()
+            assert identity is not None
+            assert expected_key[-1] == tuple(sorted(identity.items()))
+            expected_shared_keys.append(expected_key)
+        if memo_site == 'keyed':
+            record = sim._melt_redox_liquidus_gate_record(
+                redox_state=state,
+            )
+            curves.append(record['curve'])
+        else:
+            curves.append(sim._freeze_gate_curve(redox_state=state))
+
+    assert len(calls) == 2
+    assert curves[0] != curves[1]
+    if memo_site == 'shared':
+        assert set(shared_cache) == set(expected_shared_keys)
+
+
+def test_keyed_freeze_gate_memo_hits_without_local_slot_and_keeps_redox_key(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    state_a, state_b = _freeze_gate_redox_state_pair(
+        distinct_buffers=False,
+        monkeypatch=monkeypatch,
+    )
+    calls = []
+    _set_freeze_gate_redox_state(sim, state_a)
+    _install_redox_sensitive_gate_curve(sim, calls)
+
+    first = sim._melt_redox_liquidus_gate_record(redox_state=state_a)
+    key_a = _freeze_gate_key_for_current_state(sim, redox_state=state_a)
+    identity_a = state_a.cache_identity()
+    assert identity_a is not None
+    assert key_a[-1] == tuple(sorted(identity_a.items()))
+    assert key_a in sim._freeze_gate_liquid_fraction_curve_memo
+
+    sim._freeze_gate_liquid_fraction_cache = None
+    same_state_hit = sim._melt_redox_liquidus_gate_record(
+        redox_state=state_a,
+    )
+    assert same_state_hit['disposition'] == 'memo-hit'
+    assert same_state_hit['curve'] == first['curve']
+    assert len(calls) == 1
+
+    sim._freeze_gate_liquid_fraction_cache = None
+    _set_freeze_gate_redox_state(sim, state_b)
+    second = sim._melt_redox_liquidus_gate_record(redox_state=state_b)
+    key_b = _freeze_gate_key_for_current_state(sim, redox_state=state_b)
+    identity_b = state_b.cache_identity()
+    assert identity_b is not None
+    assert key_b[-1] == tuple(sorted(identity_b.items()))
+    assert key_b in sim._freeze_gate_liquid_fraction_curve_memo
+    assert key_a != key_b
+    assert second['curve'] != first['curve']
+    assert len(calls) == 2
+
+
+def test_absolute_redox_states_keep_freeze_gate_cache_reuse(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    states = (RedoxState.absolute(-9.0), RedoxState.absolute(-9.0))
+    calls = []
+    _install_redox_sensitive_gate_curve(sim, calls)
+
+    curves = []
+    for state in states:
+        _set_freeze_gate_redox_state(sim, state)
+        curves.append(sim._freeze_gate_curve(redox_state=state))
+
+    assert len(calls) == 1
+    assert curves[0] == curves[1]
+
+
+def test_gate_curve_origin_compares_query_redox_state(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    state_a = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.1)
+    state_b = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    curve = {
+        'source': 'gate_liquid_fraction:analytical-test',
+        'status': 'ok',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1300.0,
+    }
+    record = admission_module.write_gate_curve_memo_record(
+        sim,
+        curve,
+        redox_state=state_a,
+    )
+
+    assert admission_module.gate_curve_memo_origin_matches(
+        sim,
+        curve,
+        record['origin'],
+        fresh_evidence=False,
+        redox_state=state_a,
+    )
+    assert not admission_module.gate_curve_memo_origin_matches(
+        sim,
+        curve,
+        record['origin'],
+        fresh_evidence=False,
+        redox_state=state_b,
+    )
 
 
 def test_shared_freeze_gate_curve_cache_reuses_same_analytical_producer(
