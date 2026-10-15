@@ -100,7 +100,10 @@ def test_respeciation_at_intrinsic_potential_keeps_spent_oxide_equilibrium(
         'process.spent_reductant_residue': {'Na2O': 50.0},
     }
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
-    sim.atom_ledger = AtomLedger(formula_registry, initial_balances=accounts)
+    sim.atom_ledger = AtomLedger(formula_registry)
+    for account, species_mol in accounts.items():
+        sim.atom_ledger.load_external_mol(
+            account, species_mol, source='fixture', material_origin='feedstock')
     composition = sim._melt_oxide_wt_pct()
     intrinsic = kress91_intrinsic_state(
         feo_mol=100.0, fe2o3_mol=1.0,
@@ -116,13 +119,14 @@ def test_respeciation_at_intrinsic_potential_keeps_spent_oxide_equilibrium(
         account_view=view, temperature_C=2150.0, pressure_bar=1e-9,
         fO2_log=intrinsic,
     )
+    before_mol = sim.atom_ledger.mol_by_account()
 
     result = provider.dispatch(request)
 
     assert result.status == 'ok'
     assert result.transition is None
     assert result.diagnostic['delta_fe2o3_mol'] == pytest.approx(0.0, abs=1e-12)
-    assert sim.atom_ledger.mol_by_account() == accounts
+    assert sim.atom_ledger.mol_by_account() == before_mol
 
 
 def test_oxidizing_respeciation_consumes_explicit_o2_and_matches_kress91(

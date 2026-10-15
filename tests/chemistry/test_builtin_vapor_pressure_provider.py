@@ -3051,6 +3051,45 @@ def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(
     assert oxidized_activity < reduced_activity
 
 
+def test_spent_oxide_provenance_does_not_change_physical_vapour_activity(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from dataclasses import replace
+    from simulator.accounting.ledger import AtomLedger
+    from simulator.chemistry.kernel.account_filters import build_provider_account_view
+
+    sim = _build_sim('lunar_mare_low_ti', vapor_pressure_data,
+                     feedstocks_data, setpoints_data)
+    registry = sim.species_formula_registry
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = _fe_redox_request(species_formula_registry=registry,
+                               intrinsic_fO2_log=-10.0)
+    cleaned = {'SiO2': 200.0, 'FeO': 100.0, 'Fe2O3': 1.0}
+    results = []
+    for accounts in (
+        {'process.cleaned_melt': {**cleaned, 'Na2O': 50.0}},
+        {'process.cleaned_melt': cleaned,
+         'process.spent_reductant_residue': {'Na2O': 50.0}},
+    ):
+        ledger = AtomLedger(registry)
+        for account, species_mol in accounts.items():
+            ledger.load_external_mol(
+                account, species_mol, source='fixture', material_origin='feedstock')
+        view = build_provider_account_view(
+            ledger, provider.capability_profile().declared_accounts, registry)
+        before_mol = ledger.mol_by_account()
+        result = provider.dispatch(replace(request, account_view=view))
+        assert result.transition is None
+        assert ledger.mol_by_account() == before_mol
+        results.append(result.diagnostic)
+
+    # Account provenance cannot change the chemical potential of the same
+    # physical melt. Fe/O2 inventory availability remains a separate input.
+    assert results[1]['source_reaction_composition_wt_pct'] == pytest.approx(
+        results[0]['source_reaction_composition_wt_pct'])
+    assert results[1]['activities'] == pytest.approx(results[0]['activities'])
+
+
 def test_kress91_ferrous_feo_activity_no_iron_guards() -> None:
     assert kress91_ferrous_feo_activity(
         comp_wt={},
