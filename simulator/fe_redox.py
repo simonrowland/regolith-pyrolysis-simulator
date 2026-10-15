@@ -1105,11 +1105,13 @@ def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, di
     stage0 = dict(feedstock.get('anhydrous_silicate_after_degassing', {}) or {})
     if stage0:
         stage0_comp = stage0.get('composition_wt_pct', {})
-        if 'Fe2O3' not in stage0_comp and stage0_comp.get('FeO'):
+        if 'Fe2O3' not in stage0_comp and iron_oxide_values(stage0_comp)[0]:
             stage0['composition_wt_pct'] = split_feot_composition(
                 stage0_comp, T_K, redox_state=state)['composition_wt_pct']
         prepared['anhydrous_silicate_after_degassing'] = stage0
     gaps = list(result['certification_gaps'])
+    if stated and anchor.get('estimated', True):
+        gaps.append('intrinsic_delta_iw')
     if 'formation_temperature_K' not in anchor or anchor.get('formation_temperature_estimated', True):
         gaps.append('formation_temperature_K')
     gaps.append('measured_feedstock_iron_split')
