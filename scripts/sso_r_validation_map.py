@@ -843,10 +843,7 @@ def manual_fO2_anchors(
         )
         sim.melt.temperature_C = 1600.0
         sim.melt.p_total_mbar = 10.0
-        sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log
-        sim.melt.oxygen_reservoir.reference_T_K = 1600.0 + 273.15
-        sim._sync_oxygen_reservoir_mirror()
-        split = sim._compute_fe_redox_split_diagnostic()
+        split = sim._compute_native_fe_saturation_extent(fO2_log=fO2_log)
         anchors.append({
             "mode": "manual_fO2_diagnostic_anchor",
             "temperature_C": 1600.0,
