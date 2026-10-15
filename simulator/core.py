@@ -430,6 +430,7 @@ from simulator.fe_redox import (
     feot_equivalent_wt_pct,
     floor_vacuum_pressure_bar,
     kress91_intrinsic_state,
+    initialize_feedstock_iron,
     kress91_oxygen_demand_mol,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_split,
@@ -1506,6 +1507,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             additives[species] = additive_kg
         self._validate_feedstock_composition_declarations(fs)
         self._validate_stage0_preload_declarations(fs, mass_value, additives)
+        self._feedstock_fe_redox_split_unknown = (
+            resolve_feedstock_composition(fs).fe_redox_split_unknown
+        )
+        fs, self._feedstock_iron_initialization = initialize_feedstock_iron(fs)
         ledger_additives = dict(additives)
 
         previous_registry = self.species_formula_registry
@@ -1524,9 +1529,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._stage0_carbonate_decomposition_specs = previous_carbonate_specs
             self._stage0_foulant_diagnostics = previous_foulant_diagnostics
             raise
-        self._feedstock_fe_redox_split_unknown = (
-            resolve_feedstock_composition(fs).fe_redox_split_unknown
-        )
 
         self._activated_additive_reagents = set()
         self.atom_ledger = self._new_atom_ledger()
@@ -1582,7 +1584,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.body = feedstock_body(fs)
         self.melt.p_total_mbar = self.melt.ambient_pressure_mbar
         self.melt.pO2_mbar = 0.0
-        base_intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
+        formation_T_K = self._feedstock_iron_initialization.get(
+            'formation_temperature_K', KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15)
+        base_intrinsic_fO2_log = self._compute_intrinsic_melt_fO2(formation_T_K)
         self.melt.fO2_log = base_intrinsic_fO2_log
         self.melt.melt_fO2_log = base_intrinsic_fO2_log
         self.melt.campaign = CampaignPhase.IDLE
@@ -1626,7 +1630,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._configure_freeze_gate()
         self._refresh_oxygen_reservoir_without_exchange(
             melt_intrinsic_fO2_log=base_intrinsic_fO2_log,
-            reference_T_K=None,
+            reference_T_K=formation_T_K,
         )
 
         # Record
@@ -4337,6 +4341,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 floor_bar=self._vacuum_floor_bar(),
             ),
             exchange_fO2_log=math.log10(max(exchange_pO2, self._vacuum_floor_bar())),
+            composition_wt_pct=self._melt_oxide_wt_pct(),
         )
         self._last_intrinsic_redox_state = state
         return float(state['fO2_log'])
@@ -5352,6 +5357,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if not math.isfinite(T_now) or T_now <= 0.0:
             raise AccountingError('melt fO2 requires finite positive T_K')
         reference_T_K = self._current_melt_redox_reference_T_K()
+        if reference_T_K == T_now:
+            return self._current_melt_redox_fO2_log(T_now), reference_T_K
         if self._melt_redox_temperature_shift_is_liquid(
             T_now, gate_authority=gate_authority,
         ):
@@ -5785,32 +5792,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if actual_injected_mol > OXYGEN_RESERVOIR_NOOP_MOL
                 else 'at_or_above_target'
             )
-        elif not self._melt_redox_temperature_shift_is_liquid(
-            T_K, gate_authority=gate_authority,
-        ):
-            requested_absorbed_mol = max(0.0, commanded_mol * eta_absorb)
-            reason = 'no_melt_redox_capacity'
-            if requested_absorbed_mol > OXYGEN_RESERVOIR_NOOP_MOL:
-                reservoir = self._apply_oxygen_reservoir_redox_source_terms(
-                    {'redox_source:o2_bubbler': requested_absorbed_mol},
-                    exchange_direction='redox_source:o2_bubbler',
-                    temperature_K=T_K,
-                    gate_authority=gate_authority,
-                )
-                reason = str(
-                    getattr(reservoir, 'redox_source_skip_reason', '')
-                    or reason
-                )
-            absorption_respeciation = {
-                'status': 'refused',
-                'reason': reason,
-                'oxygen_source': FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER,
-                'applied_o2_mol': 0.0,
-                'internal_o2_capacity_mol': requested_absorbed_mol,
-            }
-            actual_injected_mol = min(commanded_mol, char_o2_need_mol)
-            if actual_injected_mol > OXYGEN_RESERVOIR_NOOP_MOL:
-                reason = 'char_lance_only_no_melt_redox_capacity'
         else:
             target_need_mol = max(
                 0.0,
@@ -6473,6 +6454,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 fe2o3_mol=max(0.0, ferric + 2.0 * uptake),
                 mol_fractions=basis, T_K=T_K, pressure_bar=pressure,
                 exchange_fO2_log=gas_log,
+                composition_wt_pct=self._melt_oxide_wt_pct(),
             )
             diagnostic = self._apply_fe_redox_respeciation(
                 fO2_log_override=float(target['fO2_log']),
@@ -7166,6 +7148,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 fO2_log=fO2_log,
                 T_K=T_K,
                 pressure_bar=pressure_bar,
+                fe3_over_sigma_fe=fe3,
             )
             a_feo = float(activity.get('a_FeO_authoritative', 0.0) or 0.0)
             pure_feo_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
@@ -9246,14 +9229,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _record_equilibrium_status(self, result):
         """Record the per-call backend outcome and run the post-equilibrium
         SULFUR_SATURATION_GATE; returns ``result`` unchanged."""
-        if self._feedstock_fe_redox_split_unknown:
+        if getattr(self, '_feedstock_iron_initialization', None):
             diagnostics = dict(getattr(result, 'diagnostics', {}) or {})
             diagnostics['feedstock_iron_notice'] = {
-                'code': 'fe_redox_split_unknown',
-                'message': (
-                    'Iron was treated as all-ferrous using the existing FeO '
-                    'value because fe_redox_split_unknown is true.'
-                ),
+                'code': 'feedstock_iron_initialization',
+                **self._feedstock_iron_initialization,
             }
             result.diagnostics = diagnostics
         self._last_backend_status = getattr(result, 'status', 'ok')

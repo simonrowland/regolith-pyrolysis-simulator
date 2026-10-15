@@ -15,6 +15,8 @@ from simulator.accounting.formulas import (
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
+# Fe2O3 contains two Fe atoms: its FeOt mass is 2*M_FeO/M_Fe2O3
+# times its reported mass (dimensionless, about 0.8998).
 FEOT_FROM_FE2O3 = 2.0 * 71.844 / 159.687
 OXYGEN_IN_FEO = 15.999 / 71.844
 DEFAULT_FEO_TO_FE2O3_EQUIVALENT_FACTOR = 1.1113

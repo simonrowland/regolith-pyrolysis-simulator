@@ -12,6 +12,15 @@
 # ---------------------------------------------------------------------------
 
 lunar_mare_low_ti:
+  intrinsic_redox:
+    delta_iw: -1.0
+    source: wadhwa-2008-redox-small-bodies
+    observation_id: wadh08_lunar_karner_glasses
+    locator: {published_page: 497, pdf_page_index: 4, note: very-low-Ti glasses; family proxy}
+    estimated: true
+    formation_temperature_K: 1673.15
+    formation_temperature_estimated: true
+    formation_temperature_source: predicted liquid reference; no family quench temperature captured
   label: "Lunar Mare Basalt (Low-Ti)"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 12/15 low-Ti basaltic soils"
   confidence: "High"
@@ -1932,6 +1941,15 @@ e_type_enstatite_aubrite:
 # degassing + trap cartridges + bonus volatiles.
 
 ci_carbonaceous_chondrite:
+  intrinsic_redox:
+    delta_iw: 2.0  # Predicted midpoint of carbonaceous-class IW+1 to IW+3.
+    source: wadhwa-2008-redox-small-bodies
+    observation_id: wadh08_carbonaceous_chondrite_redox
+    locator: {published_page: 494, pdf_page_index: 1, note: class proxy; not CI-specific}
+    estimated: true
+    formation_temperature_K: 1673.15
+    formation_temperature_estimated: true
+    formation_temperature_source: predicted liquid reference; CI quench temperature unavailable
   label: "CI Carbonaceous Chondrite"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: CI meteorites; Hayabusa2 Ryugu return; OSIRIS-REx Bennu return"
   confidence: "High"
@@ -2487,6 +2505,15 @@ mars_global_mgs1:
   process_notes: "Loadable for oxide-only comparisons; not experiment-grade for Mars volatile chemistry without sidecar salts/perchlorates."
 
 mars_basalt:
+  intrinsic_redox:
+    delta_iw: 1.5  # Predicted midpoint of shergottite IW+0.5 to IW+2.5.
+    source: wadhwa-2008-redox-small-bodies
+    observation_id: wadh08_mars_herd_fe_ti_range
+    locator: {published_page: 502, pdf_page_index: 9, note: shergottite proxy; not APXS soil}
+    estimated: true
+    formation_temperature_K: 1673.15
+    formation_temperature_estimated: true
+    formation_temperature_source: predicted liquid reference; modeled soil quench temperature unavailable
   label: "Mars Basalt (General)"
   stage0_profile: "mars_carbon_cleanup"
   stage0_carrier_keys:

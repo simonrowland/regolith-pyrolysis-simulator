@@ -39,7 +39,7 @@ KRESS91_MOL_FRACTIONS = {
 
 
 def test_initial_feot_split_conserves_iron_and_normalizes_without_oxygen_import():
-    from simulator.fe_redox import initialize_feedstock_iron
+    from simulator.fe_redox import split_feot_composition, RedoxState, FE_FEO_BUFFER_STANDARD
     from simulator.state import MOLAR_MASS
 
     feedstock = {
@@ -50,23 +50,20 @@ def test_initial_feot_split_conserves_iron_and_normalizes_without_oxygen_import(
             'estimated': True,
         },
     }
-    initialized, diagnostic = initialize_feedstock_iron(feedstock)
-    comp = initialized['composition_wt_pct']
+    diagnostic = split_feot_composition(feedstock['composition_wt_pct'], 1673.15,
+        redox_state=RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -1.0))
+    comp = diagnostic['composition_wt_pct']
     factor = diagnostic['renormalization_factor']
     assert sum(comp.values()) == pytest.approx(100.0, abs=1e-12)
     assert comp['Fe2O3'] > 0.0
     assert comp['SiO2'] == 80.0 * factor
     iron = comp['FeO'] / MOLAR_MASS['FeO'] + 2 * comp['Fe2O3'] / MOLAR_MASS['Fe2O3']
     assert iron == pytest.approx(factor * 20.0 / MOLAR_MASS['FeO'], rel=2e-15)
-    recovered = intrinsic_from_composition(comp, 1673.15)
-    assert recovered == pytest.approx(feo_iw_log10_fO2_bar(1673.15) - 1.0, abs=2e-14)
-    assert diagnostic['certification_gaps']
-    assert feedstock['composition_wt_pct'] == {'SiO2': 80.0, 'FeO': 20.0}
-
-
-def intrinsic_from_composition(comp, T_K):
     from simulator.fe_redox import intrinsic_melt_fO2
-    return intrinsic_melt_fO2(comp, T_K)
+    recovered = intrinsic_melt_fO2(comp, 1673.15)
+    assert recovered == pytest.approx(feo_iw_log10_fO2_bar(1673.15) - 1.0, abs=2e-14)
+    assert diagnostic['condition'] == 'condition_stated'
+    assert feedstock['composition_wt_pct'] == {'SiO2': 80.0, 'FeO': 20.0}
 
 
 def test_measured_initial_split_is_preserved_without_kress_reanchoring():
@@ -86,6 +83,55 @@ def test_missing_initial_anchor_is_predicted_and_explicitly_flagged():
         {'composition_wt_pct': {'SiO2': 80.0, 'FeO': 20.0}})
     assert initialized['composition_wt_pct']['Fe2O3'] > 0.0
     assert set(diagnostic['certification_gaps']) >= {'intrinsic_delta_iw', 'formation_temperature_K'}
+
+
+def test_exhausted_ferric_inventory_has_an_activity_corrected_iw_lower_bound():
+    from simulator.fe_redox import kress91_intrinsic_state, calphad_ferrous_feo_activity_diagnostic
+    comp = {'SiO2': 80.0, 'FeO': 20.0}
+    T_K = 1873.15
+    activity = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=comp, T_K=T_K, pressure_bar=0.01,
+        fO2_log=feo_iw_log10_fO2_bar(T_K), fe3_over_sigma_fe=0.0)['a_FeO_authoritative']
+    from simulator.fe_redox import holzheid_stoich_feo_gamma_band
+    assert activity == pytest.approx(min(1.0,
+        melt_mol_fractions_for_kress91(comp)['FeOt'] *
+        holzheid_stoich_feo_gamma_band(T_K)['central']))
+    result = kress91_intrinsic_state(
+        feo_mol=1.0, fe2o3_mol=0.0,
+        mol_fractions=melt_mol_fractions_for_kress91(comp),
+        composition_wt_pct=comp, T_K=T_K, pressure_bar=0.01,
+        exchange_fO2_log=-9.0)
+    assert result['fO2_log'] == feo_iw_log10_fO2_bar(T_K, a_feo=activity)
+    assert result['bound'] == 'lower'
+    assert 'FE_FEO_SATURATION_BOUND' in result['flags']
+    assert result['fO2_log'] != -9.0
+
+
+def test_exhausted_ferric_inventory_without_activity_is_a_typed_refusal():
+    from simulator.fe_redox import kress91_intrinsic_state
+    with pytest.raises(Kress91InvalidControls, match='FeO activity'):
+        kress91_intrinsic_state(feo_mol=1.0, fe2o3_mol=0.0,
+            mol_fractions=KRESS91_MOL_FRACTIONS, T_K=1873.15,
+            pressure_bar=0.01, exchange_fO2_log=-9.0)
+
+
+def test_lab_feot_split_collapse_round_trip_and_stated_iw_condition():
+    from simulator.fe_redox import (split_feot_composition, collapse_feot_composition,
+                                    RedoxState, FE_FEO_BUFFER_STANDARD)
+    comp = {'SiO2': 80.0, 'FeO': 20.0}
+    T_K = 1873.15  # Lab condition: IW-1 at 1600 C.
+    result = split_feot_composition(comp, T_K,
+        redox_state=RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -1.0))
+    assert collapse_feot_composition(result['composition_wt_pct']) == pytest.approx(comp, abs=2e-14)
+    expected = kress91_fe3_over_sigma_fe(fO2_log=feo_iw_log10_fO2_bar(T_K)-1,
+        mol_fractions=melt_mol_fractions_for_kress91(comp), T_K=T_K, pressure_bar=1e-9)
+    assert result['fe3_over_sigma_fe'] == expected
+    assert result['condition'] == 'condition_stated'
+    assert result['temperature_band']['authoritative']
+    defaulted = split_feot_composition(comp, 2373.15)
+    assert defaulted['condition'] == 'condition_defaulted'
+    assert defaulted['certification_gaps'] == ['intrinsic_delta_iw']
+    assert defaulted['temperature_band']['extrapolation']
 
 
 @pytest.mark.parametrize('T_K', [1473.15, 1673.15, 1873.15, 2373.15])
@@ -112,6 +158,16 @@ def test_intrinsic_kress91_inverse_round_trip(T_K, pressure_bar, fO2_log, alkali
 @pytest.mark.parametrize('exchange, expected', [(-5.0, -5.0), (0.0, -2.0)])
 def test_intrinsic_kress91_ends_follow_exchange(feo_mol, fe2o3_mol, exchange, expected):
     from simulator.fe_redox import kress91_intrinsic_state
+
+    if feo_mol > 0.0:
+        # A reducing endpoint needs an activity-grounded stability bound;
+        # the gas pressure alone cannot establish that bound (d-147).
+        with pytest.raises(Kress91InvalidControls, match='FeO activity'):
+            kress91_intrinsic_state(
+                feo_mol=feo_mol, fe2o3_mol=fe2o3_mol,
+                mol_fractions=KRESS91_MOL_FRACTIONS, T_K=1873.15,
+                pressure_bar=0.01, exchange_fO2_log=exchange)
+        return
 
     state = kress91_intrinsic_state(
         feo_mol=feo_mol, fe2o3_mol=fe2o3_mol,
