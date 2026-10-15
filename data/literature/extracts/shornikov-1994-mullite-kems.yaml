@@ -100,7 +100,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1833.0, 1833.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "Al(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -122,7 +122,11 @@ species:
         temperature_K: 1833.0
         pressure_scale_as_printed: "p_Al · 10^-8"
         points:
-          - temperature_K: 1833.0
+          - T_C: '1559.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_Al_times_10^-8_atm_as_printed: "0.355 ± 0.018"
             pressure_atm: 3.55e-9
             sigma: 1.8e-10
@@ -148,7 +152,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1933.0, 1933.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "Al(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -170,7 +174,11 @@ species:
         temperature_K: 1933.0
         pressure_scale_as_printed: "p_Al · 10^-8"
         points:
-          - temperature_K: 1933.0
+          - T_C: '1659.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_Al_times_10^-8_atm_as_printed: "3.29 ± 0.15"
             pressure_atm: 3.2900000000000003e-8
             sigma: 1.5e-9
@@ -196,7 +204,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1983.0, 1983.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "Al(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -218,7 +226,11 @@ species:
         temperature_K: 1983.0
         pressure_scale_as_printed: "p_Al · 10^-8"
         points:
-          - temperature_K: 1983.0
+          - T_C: '1709.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_Al_times_10^-8_atm_as_printed: "7.50 ± 0.30"
             pressure_atm: 7.5e-8
             sigma: 3e-9
@@ -244,7 +256,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [2033.0, 2033.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "Al(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -266,7 +278,11 @@ species:
         temperature_K: 2033.0
         pressure_scale_as_printed: "p_Al · 10^-8"
         points:
-          - temperature_K: 2033.0
+          - T_C: '1759.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_Al_times_10^-8_atm_as_printed: "21.1 ± 0.8"
             pressure_atm: 2.1100000000000002e-7
             sigma: 8e-9
@@ -294,7 +310,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1933.0, 1933.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "AlO(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -316,7 +332,11 @@ species:
         temperature_K: 1933.0
         pressure_scale_as_printed: "p_AlO · 10^-8"
         points:
-          - temperature_K: 1933.0
+          - T_C: '1659.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_AlO_times_10^-8_atm_as_printed: "0.553 ± 0.040"
             pressure_atm: 5.5300000000000005e-9
             sigma: 4e-10
@@ -342,7 +362,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1983.0, 1983.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "AlO(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -364,7 +384,11 @@ species:
         temperature_K: 1983.0
         pressure_scale_as_printed: "p_AlO · 10^-8"
         points:
-          - temperature_K: 1983.0
+          - T_C: '1709.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_AlO_times_10^-8_atm_as_printed: "1.58 ± 0.09"
             pressure_atm: 1.5800000000000003e-8
             sigma: 9e-10
@@ -390,7 +414,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [2033.0, 2033.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "AlO(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -412,7 +436,11 @@ species:
         temperature_K: 2033.0
         pressure_scale_as_printed: "p_AlO · 10^-8"
         points:
-          - temperature_K: 2033.0
+          - T_C: '1759.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_AlO_times_10^-8_atm_as_printed: "4.21 ± 0.18"
             pressure_atm: 4.21e-8
             sigma: 1.8e-9
@@ -440,7 +468,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1933.0, 1933.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "Al2O(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -462,7 +490,11 @@ species:
         temperature_K: 1933.0
         pressure_scale_as_printed: "p_Al2O · 10^-8"
         points:
-          - temperature_K: 1933.0
+          - T_C: '1659.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_Al2O_times_10^-8_atm_as_printed: "2.10 ± 0.15"
             pressure_atm: 2.1000000000000003e-8
             sigma: 1.5e-9
@@ -488,7 +520,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1983.0, 1983.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "Al2O(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -510,7 +542,11 @@ species:
         temperature_K: 1983.0
         pressure_scale_as_printed: "p_Al2O · 10^-8"
         points:
-          - temperature_K: 1983.0
+          - T_C: '1709.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_Al2O_times_10^-8_atm_as_printed: "4.47 ± 0.25"
             pressure_atm: 4.4699999999999997e-8
             sigma: 2.5e-9
@@ -536,7 +572,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [2033.0, 2033.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "Al2O(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -558,7 +594,11 @@ species:
         temperature_K: 2033.0
         pressure_scale_as_printed: "p_Al2O · 10^-8"
         points:
-          - temperature_K: 2033.0
+          - T_C: '1759.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_Al2O_times_10^-8_atm_as_printed: "14.5 ± 0.8"
             pressure_atm: 1.4500000000000001e-7
             sigma: 8e-9
@@ -586,7 +626,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1933.0, 1933.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "AlSiO(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -608,7 +648,11 @@ species:
         temperature_K: 1933.0
         pressure_scale_as_printed: "p_AlSiO · 10^-10"
         points:
-          - temperature_K: 1933.0
+          - T_C: '1659.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_AlSiO_times_10^-10_atm_as_printed: "0.341 ± 0.030"
             pressure_atm: 3.4100000000000004e-11
             sigma: 3e-12
@@ -634,7 +678,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1983.0, 1983.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "AlSiO(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -656,7 +700,11 @@ species:
         temperature_K: 1983.0
         pressure_scale_as_printed: "p_AlSiO · 10^-10"
         points:
-          - temperature_K: 1983.0
+          - T_C: '1709.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_AlSiO_times_10^-10_atm_as_printed: "1.41 ± 0.11"
             pressure_atm: 1.41e-10
             sigma: 1.1e-11
@@ -682,7 +730,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [2033.0, 2033.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "AlSiO(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -704,7 +752,11 @@ species:
         temperature_K: 2033.0
         pressure_scale_as_printed: "p_AlSiO · 10^-10"
         points:
-          - temperature_K: 2033.0
+          - T_C: '1759.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_AlSiO_times_10^-10_atm_as_printed: "5.34 ± 0.40"
             pressure_atm: 5.34e-10
             sigma: 4.0000000000000004e-11
@@ -732,7 +784,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1833.0, 1833.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "SiO(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -754,7 +806,11 @@ species:
         temperature_K: 1833.0
         pressure_scale_as_printed: "p_SiO · 10^-5"
         points:
-          - temperature_K: 1833.0
+          - T_C: '1559.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_SiO_times_10^-5_atm_as_printed: "3.95 ± 0.80"
             pressure_atm: 0.000039500000000000005
             sigma: 0.000008000000000000001
@@ -780,7 +836,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1933.0, 1933.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "SiO(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -802,7 +858,11 @@ species:
         temperature_K: 1933.0
         pressure_scale_as_printed: "p_SiO · 10^-5"
         points:
-          - temperature_K: 1933.0
+          - T_C: '1659.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_SiO_times_10^-5_atm_as_printed: "4.08 ± 0.15"
             pressure_atm: 0.0000408
             sigma: 0.0000015
@@ -828,7 +888,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1983.0, 1983.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "SiO(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -850,7 +910,11 @@ species:
         temperature_K: 1983.0
         pressure_scale_as_printed: "p_SiO · 10^-5"
         points:
-          - temperature_K: 1983.0
+          - T_C: '1709.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_SiO_times_10^-5_atm_as_printed: "8.58 ± 0.25"
             pressure_atm: 0.00008580000000000001
             sigma: 0.0000025
@@ -876,7 +940,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [2033.0, 2033.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "SiO(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -898,7 +962,11 @@ species:
         temperature_K: 2033.0
         pressure_scale_as_printed: "p_SiO · 10^-5"
         points:
-          - temperature_K: 2033.0
+          - T_C: '1759.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_SiO_times_10^-5_atm_as_printed: "23.2 ± 0.7"
             pressure_atm: 0.000232
             sigma: 0.000007
@@ -926,7 +994,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1833.0, 1833.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "MoO2(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -948,7 +1016,11 @@ species:
         temperature_K: 1833.0
         pressure_scale_as_printed: "p_MoO2 · 10^-8"
         points:
-          - temperature_K: 1833.0
+          - T_C: '1559.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_MoO2_times_10^-8_atm_as_printed: "0.526 ± 0.050"
             pressure_atm: 5.26e-9
             sigma: 5e-10
@@ -974,7 +1046,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1933.0, 1933.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "MoO2(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -996,7 +1068,11 @@ species:
         temperature_K: 1933.0
         pressure_scale_as_printed: "p_MoO2 · 10^-8"
         points:
-          - temperature_K: 1933.0
+          - T_C: '1659.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_MoO2_times_10^-8_atm_as_printed: "1.91 ± 0.15"
             pressure_atm: 1.91e-8
             sigma: 1.5e-9
@@ -1022,7 +1098,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1983.0, 1983.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "MoO2(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1044,7 +1120,11 @@ species:
         temperature_K: 1983.0
         pressure_scale_as_printed: "p_MoO2 · 10^-8"
         points:
-          - temperature_K: 1983.0
+          - T_C: '1709.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_MoO2_times_10^-8_atm_as_printed: "3.40 ± 0.25"
             pressure_atm: 3.4e-8
             sigma: 2.5e-9
@@ -1070,7 +1150,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [2033.0, 2033.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "MoO2(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1092,7 +1172,11 @@ species:
         temperature_K: 2033.0
         pressure_scale_as_printed: "p_MoO2 · 10^-8"
         points:
-          - temperature_K: 2033.0
+          - T_C: '1759.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_MoO2_times_10^-8_atm_as_printed: "5.78 ± 0.30"
             pressure_atm: 5.78e-8
             sigma: 3e-9
@@ -1120,7 +1204,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1833.0, 1833.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "MoO3(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1142,7 +1226,11 @@ species:
         temperature_K: 1833.0
         pressure_scale_as_printed: "p_MoO3 · 10^-9"
         points:
-          - temperature_K: 1833.0
+          - T_C: '1559.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_MoO3_times_10^-9_atm_as_printed: "1.24 ± 0.08"
             pressure_atm: 1.24e-9
             sigma: 8e-11
@@ -1168,7 +1256,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1933.0, 1933.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "MoO3(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1190,7 +1278,11 @@ species:
         temperature_K: 1933.0
         pressure_scale_as_printed: "p_MoO3 · 10^-9"
         points:
-          - temperature_K: 1933.0
+          - T_C: '1659.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_MoO3_times_10^-9_atm_as_printed: "4.22 ± 0.25"
             pressure_atm: 4.22e-9
             sigma: 2.5e-10
@@ -1216,7 +1308,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1983.0, 1983.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "MoO3(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1238,7 +1330,11 @@ species:
         temperature_K: 1983.0
         pressure_scale_as_printed: "p_MoO3 · 10^-9"
         points:
-          - temperature_K: 1983.0
+          - T_C: '1709.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_MoO3_times_10^-9_atm_as_printed: "7.64 ± 0.40"
             pressure_atm: 7.64e-9
             sigma: 4e-10
@@ -1264,7 +1360,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [2033.0, 2033.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "MoO3(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1286,7 +1382,11 @@ species:
         temperature_K: 2033.0
         pressure_scale_as_printed: "p_MoO3 · 10^-9"
         points:
-          - temperature_K: 2033.0
+          - T_C: '1759.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_MoO3_times_10^-9_atm_as_printed: "12.4 ± 0.6"
             pressure_atm: 1.24e-8
             sigma: 6e-10
@@ -1314,7 +1414,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1833.0, 1833.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "O2(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1342,7 +1442,11 @@ species:
         temperature_K: 1833.0
         pressure_scale_as_printed: "p_O2 · 10^-11"
         points:
-          - temperature_K: 1833.0
+          - T_C: '1559.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_O2_times_10^-11_atm_as_printed: "0.521 ± 0.050"
             pressure_atm: 5.21e-12
             sigma: 5e-13
@@ -1368,7 +1472,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1933.0, 1933.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "O2(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1396,7 +1500,11 @@ species:
         temperature_K: 1933.0
         pressure_scale_as_printed: "p_O2 · 10^-11"
         points:
-          - temperature_K: 1933.0
+          - T_C: '1659.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_O2_times_10^-11_atm_as_printed: "4.59 ± 0.26"
             pressure_atm: 4.59e-11
             sigma: 2.6e-12
@@ -1422,7 +1530,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1983.0, 1983.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "O2(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1450,7 +1558,11 @@ species:
         temperature_K: 1983.0
         pressure_scale_as_printed: "p_O2 · 10^-11"
         points:
-          - temperature_K: 1983.0
+          - T_C: '1709.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_O2_times_10^-11_atm_as_printed: "13.7 ± 0.6"
             pressure_atm: 1.37e-10
             sigma: 6e-12
@@ -1476,7 +1588,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [2033.0, 2033.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "O2(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1504,7 +1616,11 @@ species:
         temperature_K: 2033.0
         pressure_scale_as_printed: "p_O2 · 10^-11"
         points:
-          - temperature_K: 2033.0
+          - T_C: '1759.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_O2_times_10^-11_atm_as_printed: "34.3 ± 1.7"
             pressure_atm: 3.43e-10
             sigma: 1.7e-11
@@ -1532,7 +1648,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1833.0, 1833.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "O(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1561,7 +1677,11 @@ species:
         temperature_K: 1833.0
         pressure_scale_as_printed: "p_O · 10^-9"
         points:
-          - temperature_K: 1833.0
+          - T_C: '1559.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_O_times_10^-9_atm_as_printed: "0.375 ± 0.040"
             pressure_atm: 3.7500000000000005e-10
             sigma: 4.0000000000000004e-11
@@ -1587,7 +1707,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1933.0, 1933.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "O(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1616,7 +1736,11 @@ species:
         temperature_K: 1933.0
         pressure_scale_as_printed: "p_O · 10^-9"
         points:
-          - temperature_K: 1933.0
+          - T_C: '1659.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_O_times_10^-9_atm_as_printed: "2.65 ± 0.15"
             pressure_atm: 2.65e-9
             sigma: 1.5e-10
@@ -1642,7 +1766,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [1983.0, 1983.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "O(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1671,7 +1795,11 @@ species:
         temperature_K: 1983.0
         pressure_scale_as_printed: "p_O · 10^-9"
         points:
-          - temperature_K: 1983.0
+          - T_C: '1709.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_O_times_10^-9_atm_as_printed: "6.83 ± 0.30"
             pressure_atm: 6.830000000000001e-9
             sigma: 3e-10
@@ -1697,7 +1825,7 @@ species:
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
       T_range_K: [2033.0, 2033.0]
-      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      phase: gas
       standard_state: "O(g) partial pressure; source unit atm"
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
@@ -1726,7 +1854,11 @@ species:
         temperature_K: 2033.0
         pressure_scale_as_printed: "p_O · 10^-9"
         points:
-          - temperature_K: 2033.0
+          - T_C: '1759.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             p_O_times_10^-9_atm_as_printed: "15.8 ± 0.8"
             pressure_atm: 1.5800000000000003e-8
             sigma: 8.000000000000001e-10
@@ -1777,11 +1909,32 @@ species:
         composition_basis: "fixed stoichiometric mullite (3Al2O3·2SiO2)"
         temperature_K: 1833.0
         points:
-          - temperature_K: 1833.0
+          - T_C: '1559.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             a_Al2O3_as_printed: "1.05 ± 0.07"
             activity: 1.05
             sigma: 0.07
             locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6", note: "Table 6 row a_Al2O3, column 1833 K; value printed as 1.05 ± 0.07"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator:
+                  page: 479
+                  published_page: 479
+                  table: "6"
+                  note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
     - observation_id: shornikov_1994_al2o3_activity_1933k
       type: activity_coefficient
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
@@ -1809,11 +1962,32 @@ species:
         composition_basis: "fixed stoichiometric mullite (3Al2O3·2SiO2)"
         temperature_K: 1933.0
         points:
-          - temperature_K: 1933.0
+          - T_C: '1659.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             a_Al2O3_as_printed: "1.01 ± 0.05"
             activity: 1.01
             sigma: 0.05
             locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6", note: "Table 6 row a_Al2O3, column 1933 K; value printed as 1.01 ± 0.05"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator:
+                  page: 479
+                  published_page: 479
+                  table: "6"
+                  note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
     - observation_id: shornikov_1994_al2o3_activity_1983k
       type: activity_coefficient
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
@@ -1841,11 +2015,32 @@ species:
         composition_basis: "fixed stoichiometric mullite (3Al2O3·2SiO2)"
         temperature_K: 1983.0
         points:
-          - temperature_K: 1983.0
+          - T_C: '1709.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             a_Al2O3_as_printed: "1.01 ± 0.05"
             activity: 1.01
             sigma: 0.05
             locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6", note: "Table 6 row a_Al2O3, column 1983 K; value printed as 1.01 ± 0.05"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator:
+                  page: 479
+                  published_page: 479
+                  table: "6"
+                  note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
     - observation_id: shornikov_1994_al2o3_activity_2033k
       type: activity_coefficient
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
@@ -1873,11 +2068,32 @@ species:
         composition_basis: "fixed stoichiometric mullite (3Al2O3·2SiO2)"
         temperature_K: 2033.0
         points:
-          - temperature_K: 2033.0
+          - T_C: '1759.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             a_Al2O3_as_printed: "1.01 ± 0.03"
             activity: 1.01
             sigma: 0.03
             locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6", note: "Table 6 row a_Al2O3, column 2033 K; value printed as 1.01 ± 0.03"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator:
+                  page: 479
+                  published_page: 479
+                  table: "6"
+                  note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
   SiO2:
     observations:
     - observation_id: shornikov_1994_sio2_activity_1833k
@@ -1907,11 +2123,32 @@ species:
         composition_basis: "fixed stoichiometric mullite (3Al2O3·2SiO2)"
         temperature_K: 1833.0
         points:
-          - temperature_K: 1833.0
+          - T_C: '1559.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             a_SiO2_as_printed: "0.37 ± 0.09"
             activity: 0.37
             sigma: 0.09
             locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6", note: "Table 6 row a_SiO2, column 1833 K; value printed as 0.37 ± 0.09"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator:
+                  page: 479
+                  published_page: 479
+                  table: "6"
+                  note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
     - observation_id: shornikov_1994_sio2_activity_1933k
       type: activity_coefficient
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
@@ -1939,11 +2176,32 @@ species:
         composition_basis: "fixed stoichiometric mullite (3Al2O3·2SiO2)"
         temperature_K: 1933.0
         points:
-          - temperature_K: 1933.0
+          - T_C: '1659.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             a_SiO2_as_printed: "0.19 ± 0.02"
             activity: 0.19
             sigma: 0.02
             locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6", note: "Table 6 row a_SiO2, column 1933 K; value printed as 0.19 ± 0.02"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator:
+                  page: 479
+                  published_page: 479
+                  table: "6"
+                  note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
     - observation_id: shornikov_1994_sio2_activity_1983k
       type: activity_coefficient
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
@@ -1971,11 +2229,32 @@ species:
         composition_basis: "fixed stoichiometric mullite (3Al2O3·2SiO2)"
         temperature_K: 1983.0
         points:
-          - temperature_K: 1983.0
+          - T_C: '1709.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             a_SiO2_as_printed: "0.18 ± 0.02"
             activity: 0.18
             sigma: 0.02
             locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6", note: "Table 6 row a_SiO2, column 1983 K; value printed as 0.18 ± 0.02"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator:
+                  page: 479
+                  published_page: 479
+                  table: "6"
+                  note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."
     - observation_id: shornikov_1994_sio2_activity_2033k
       type: activity_coefficient
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
@@ -2003,8 +2282,29 @@ species:
         composition_basis: "fixed stoichiometric mullite (3Al2O3·2SiO2)"
         temperature_K: 2033.0
         points:
-          - temperature_K: 2033.0
+          - T_C: '1759.85'
+            composition_mol:
+              basis: derived_from_formula
+              Al2O3: '0.6'
+              SiO2: '0.4'
             a_SiO2_as_printed: "0.17 ± 0.01"
             activity: 0.17
             sigma: 0.01
             locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6", note: "Table 6 row a_SiO2, column 2033 K; value printed as 0.17 ± 0.01"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator:
+                  page: 479
+                  published_page: 479
+                  table: "6"
+                  note: "Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4."

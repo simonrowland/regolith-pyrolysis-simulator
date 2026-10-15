@@ -3062,6 +3062,13 @@ _COMPOSITION_COMPONENTS: dict[str, tuple[str, str, bool]] = {
     "SO3": ("SO3", "SO3", False),
     "S": ("S", "S", False),
     "B2O3": ("B2O3", "B2O3", False),
+    "Li2O": ("Li2O", "Li2O", False),
+    "MnO2": ("MnO2", "MnO2", False),
+    "ZrO2": ("ZrO2", "ZrO2", False),
+    "SrO": ("SrO", "SrO", False),
+    "Cs2O": ("Cs2O", "Cs2O", False),
+    "RuO2": ("RuO2", "RuO2", False),
+    "Re2O7": ("Re2O7", "Re2O7", False),
     # Total iron printed as FeO is converted with the FeO mass and key.
     "FeOT": ("FeO", "FeO", False),
 }
@@ -8779,11 +8786,19 @@ def _selection_from_named_field(
     units: str | None,
     condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
 ) -> SourceSelection | None:
-    if q_token is Quantity.ACTIVITY and payload.get("unavailable_reason"):
+    if q_token in {
+        Quantity.ACTIVITY,
+        Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        Quantity.ION_INTENSITY,
+        Quantity.ION_INTENSITY_RATIO,
+    } and payload.get("unavailable_reason"):
+        field_name = {
+            Quantity.EVAPORATION_COEFFICIENT_ALPHA: "alpha",
+        }.get(q_token, q_token.value)
         return _unavailable_selection(
             str(payload["unavailable_reason"]),
             condition_ranges=condition_ranges,
-            field_name="activity",
+            field_name=field_name,
         )
     if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
         for key, unit in _PRESSURE_SERIES_KEYS:

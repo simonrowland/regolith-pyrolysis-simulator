@@ -1916,6 +1916,66 @@ def test_provider_forwards_liquid_fraction_and_domain_refuses():
     assert provider.capability_profile().is_authoritative_for == frozenset()
 
 
+@pytest.mark.parametrize(
+    ("failure_kind", "warning_fragment"),
+    [
+        ("timeout", "timed out after 0.025s"),
+        ("none", "no equilibrium result"),
+        ("empty", "payload_absent"),
+        ("invalid", "discarded 2"),
+    ],
+)
+def test_provider_empty_speciation_always_has_a_reason(
+    failure_kind, warning_fragment
+):
+    class FakeBackend:
+        def is_available(self):
+            return True
+
+        def equilibrate(self, **_kwargs):
+            if failure_kind == "timeout":
+                raise vaporock_module.EngineWorkerTimeout(
+                    "vaporock-test", 0.025, phase="job"
+                )
+            if failure_kind == "none":
+                return None
+            if failure_kind == "empty":
+                return types.SimpleNamespace(
+                    vapor_pressures_Pa={},
+                    vaporock_full_speciation_Pa={},
+                    warnings=(),
+                    status="not_converged",
+                    diagnostics={"empty_speciation_cause": "payload_absent"},
+                )
+            return types.SimpleNamespace(
+                vapor_pressures_Pa={},
+                vaporock_full_speciation_Pa={"Na": float("nan"), "Cr": -1.0},
+                warnings=(),
+                status="not_converged",
+                diagnostics={},
+            )
+
+    provider = VapoRockProvider(backend=FakeBackend(), vapor_pressure_data={})
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+                species_formula_registry={},
+            ),
+            temperature_C=1600.0,
+            pressure_bar=1e-6,
+            fO2_log=-8.0,
+            control_inputs={"pO2_bar": 1e-6},
+        )
+    )
+
+    assert result.status == "non_authoritative"
+    assert result.diagnostic["vaporock_full_speciation_Pa"] == {}
+    assert result.warnings
+    assert warning_fragment in " ".join(result.warnings)
+
+
 def test_fresh_system_per_request_in_process(monkeypatch):
     track = {"constructs": 0}
     fake_module, FakeSystem = _fake_system_module(

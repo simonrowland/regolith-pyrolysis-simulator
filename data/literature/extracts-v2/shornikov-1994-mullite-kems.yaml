@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/shornikov-1994-mullite-kems.yaml
 observations:
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1833k::T=1833.0:h=7d5682e2072f
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1833k::T=1833.00:h=0216d6d510a6
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -45,8 +45,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -111,9 +118,52 @@ observations:
         pdf_page_index: 1
         table: '6'
         note: Table 6 row a_Al2O3, column 1833 K; value printed as 1.05 ± 0.07
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1559.85'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_Al2O3, column 1833 K; value printed as 1.05 ± 0.07
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_Al2O3, column 1833 K; value printed as 1.05 ± 0.07
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.0:h=743c0b2be08a
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=75ece12ebffd
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.00:h=4de074fdc8b4
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
   derivation:
     relation: as_published
     inputs:
@@ -141,7 +191,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1933k::T=1933.0:h=964791e2b98a
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1933k::T=1933.00:h=1fe0934af9e0
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -184,8 +234,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -250,9 +307,52 @@ observations:
         pdf_page_index: 1
         table: '6'
         note: Table 6 row a_Al2O3, column 1933 K; value printed as 1.01 ± 0.05
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1659.85'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_Al2O3, column 1933 K; value printed as 1.01 ± 0.05
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_Al2O3, column 1933 K; value printed as 1.01 ± 0.05
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.0:h=8c32ba33c045
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=6b0b63a7fa98
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.00:h=90cfcf09c8cf
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
   derivation:
     relation: as_published
     inputs:
@@ -280,7 +380,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1983k::T=1983.0:h=1b3299377aeb
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1983k::T=1983.00:h=5a27e7ac6cbe
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -323,8 +423,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -389,9 +496,52 @@ observations:
         pdf_page_index: 1
         table: '6'
         note: Table 6 row a_Al2O3, column 1983 K; value printed as 1.01 ± 0.05
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1709.85'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_Al2O3, column 1983 K; value printed as 1.01 ± 0.05
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_Al2O3, column 1983 K; value printed as 1.01 ± 0.05
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.0:h=62fe7ea06a9c
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=cef43b1ef525
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.00:h=e6af00593244
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
   derivation:
     relation: as_published
     inputs:
@@ -419,7 +569,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_2033k::T=2033.0:h=af5051576046
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_2033k::T=2033.00:h=af3f7c458e52
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -462,8 +612,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -528,9 +685,52 @@ observations:
         pdf_page_index: 1
         table: '6'
         note: Table 6 row a_Al2O3, column 2033 K; value printed as 1.01 ± 0.03
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1759.85'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_Al2O3, column 2033 K; value printed as 1.01 ± 0.03
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_Al2O3, column 2033 K; value printed as 1.01 ± 0.03
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.0:h=1790e13711c3
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=664cdb5e7181
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.00:h=d4599ed98706
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
   derivation:
     relation: as_published
     inputs:
@@ -558,7 +758,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1933k::T=1933.0:h=101cbe59442c
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1933k::T=1933.00:h=60b503755c0b
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -614,8 +814,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -679,6 +886,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1659.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -754,7 +988,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1983k::T=1983.0:h=b481031f8fd7
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1983k::T=1983.00:h=6e79223cf9ad
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -810,8 +1044,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -875,6 +1116,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1709.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -950,7 +1218,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_2033k::T=2033.0:h=851208a10b67
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_2033k::T=2033.00:h=40f0f7234c4a
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1006,8 +1274,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1071,6 +1346,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1759.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -1146,7 +1448,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.0:h=743c0b2be08a
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.00:h=4de074fdc8b4
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1202,8 +1504,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1267,6 +1576,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1559.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -1342,7 +1678,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.0:h=8c32ba33c045
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.00:h=90cfcf09c8cf
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1398,8 +1734,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1463,6 +1806,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1659.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -1538,7 +1908,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.0:h=62fe7ea06a9c
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.00:h=e6af00593244
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1594,8 +1964,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1659,6 +2036,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1709.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -1734,7 +2138,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.0:h=1790e13711c3
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.00:h=d4599ed98706
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1790,8 +2194,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1855,6 +2266,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1759.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -1930,7 +2368,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1933k::T=1933.0:h=46a9453d47c2
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1933k::T=1933.00:h=18ee5f44f0d3
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1986,8 +2424,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2051,6 +2496,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1659.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -2126,7 +2598,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1983k::T=1983.0:h=f121c8aeaa39
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1983k::T=1983.00:h=dae9139a595b
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2182,8 +2654,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2247,6 +2726,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1709.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -2322,7 +2828,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_2033k::T=2033.0:h=57bccb271ea8
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_2033k::T=2033.00:h=8eb99dea8a52
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2378,8 +2884,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2443,6 +2956,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1759.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -2518,7 +3058,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1933k::T=1933.0:h=19aeb6d0542e
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1933k::T=1933.00:h=b9dc41cccc5c
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2574,8 +3114,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2639,6 +3186,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1659.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10
+        output_unit: K
     composition:
       state:
         tag: value
@@ -2714,7 +3288,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1983k::T=1983.0:h=f5ebd28af352
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1983k::T=1983.00:h=d24e8d16bb70
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2770,8 +3344,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2835,6 +3416,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1709.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10
+        output_unit: K
     composition:
       state:
         tag: value
@@ -2910,7 +3518,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_2033k::T=2033.0:h=b913b7f09063
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_2033k::T=2033.00:h=48ed0357f63c
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2966,8 +3574,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3031,6 +3646,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1759.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10
+        output_unit: K
     composition:
       state:
         tag: value
@@ -3106,7 +3748,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.0:h=11b9cf0af49b
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.00:h=96ee96960eb1
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3162,8 +3804,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3227,6 +3876,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO2, column 1833 K; value printed as 0.526 ± 0.050 under p_MoO2 · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1559.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO2, column 1833 K; value printed as 0.526 ± 0.050 under p_MoO2 · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO2, column 1833 K; value printed as 0.526 ± 0.050 under p_MoO2 · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -3302,7 +3978,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.0:h=4c075eac1c32
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.00:h=5f4934d9373a
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3358,8 +4034,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3423,6 +4106,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO2, column 1933 K; value printed as 1.91 ± 0.15 under p_MoO2 · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1659.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO2, column 1933 K; value printed as 1.91 ± 0.15 under p_MoO2 · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO2, column 1933 K; value printed as 1.91 ± 0.15 under p_MoO2 · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -3498,7 +4208,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.0:h=49ca4fb6359c
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.00:h=ca69236b2015
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3554,8 +4264,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3619,6 +4336,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO2, column 1983 K; value printed as 3.40 ± 0.25 under p_MoO2 · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1709.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO2, column 1983 K; value printed as 3.40 ± 0.25 under p_MoO2 · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO2, column 1983 K; value printed as 3.40 ± 0.25 under p_MoO2 · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -3694,7 +4438,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.0:h=6894f2932d0c
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.00:h=e4fc7486ece4
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3750,8 +4494,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3815,6 +4566,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO2, column 2033 K; value printed as 5.78 ± 0.30 under p_MoO2 · 10^-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1759.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO2, column 2033 K; value printed as 5.78 ± 0.30 under p_MoO2 · 10^-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO2, column 2033 K; value printed as 5.78 ± 0.30 under p_MoO2 · 10^-8
+        output_unit: K
     composition:
       state:
         tag: value
@@ -3890,7 +4668,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.0:h=502dc81cede6
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.00:h=4238cad08175
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3946,8 +4724,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4011,6 +4796,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO3, column 1833 K; value printed as 1.24 ± 0.08 under p_MoO3 · 10^-9
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1559.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO3, column 1833 K; value printed as 1.24 ± 0.08 under p_MoO3 · 10^-9
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO3, column 1833 K; value printed as 1.24 ± 0.08 under p_MoO3 · 10^-9
+        output_unit: K
     composition:
       state:
         tag: value
@@ -4086,7 +4898,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.0:h=18325524f78a
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.00:h=fafa8bfc1e7e
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4142,8 +4954,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4207,6 +5026,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO3, column 1933 K; value printed as 4.22 ± 0.25 under p_MoO3 · 10^-9
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1659.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO3, column 1933 K; value printed as 4.22 ± 0.25 under p_MoO3 · 10^-9
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO3, column 1933 K; value printed as 4.22 ± 0.25 under p_MoO3 · 10^-9
+        output_unit: K
     composition:
       state:
         tag: value
@@ -4282,7 +5128,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.0:h=e8a8d18ece93
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.00:h=459b34325a55
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4338,8 +5184,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4403,6 +5256,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO3, column 1983 K; value printed as 7.64 ± 0.40 under p_MoO3 · 10^-9
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1709.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO3, column 1983 K; value printed as 7.64 ± 0.40 under p_MoO3 · 10^-9
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO3, column 1983 K; value printed as 7.64 ± 0.40 under p_MoO3 · 10^-9
+        output_unit: K
     composition:
       state:
         tag: value
@@ -4478,7 +5358,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.0:h=d8e17bb85ab8
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.00:h=542f6f0a10b0
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4534,8 +5414,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4599,6 +5486,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO3, column 2033 K; value printed as 12.4 ± 0.6 under p_MoO3 · 10^-9
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1759.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO3, column 2033 K; value printed as 12.4 ± 0.6 under p_MoO3 · 10^-9
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_MoO3, column 2033 K; value printed as 12.4 ± 0.6 under p_MoO3 · 10^-9
+        output_unit: K
     composition:
       state:
         tag: value
@@ -4674,7 +5588,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1833k::T=1833.0:h=bb47c1f6da19
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1833k::T=1833.00:h=b1a2b51043bb
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4730,8 +5644,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4796,6 +5717,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O2, column 1833 K; value printed as 0.521 ± 0.050 under p_O2 · 10^-11
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1559.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O2, column 1833 K; value printed as 0.521 ± 0.050 under p_O2 · 10^-11
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O2, column 1833 K; value printed as 0.521 ± 0.050 under p_O2 · 10^-11
+        output_unit: K
     composition:
       state:
         tag: value
@@ -4825,12 +5773,12 @@ observations:
         parameters: []
         output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=75ece12ebffd
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
   derivation:
     relation: p_O2 calculated from the same-temperature p_O by O2 ⇌ 2O, reaction (2); p. 479. Table 1 identifies MoO2+ and
       MoO3+ but not O+ or O2+, and the text says oxygen pressures were calculated.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=75ece12ebffd
+    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
     parameters:
     - - original
       - state:
@@ -4901,7 +5849,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1933k::T=1933.0:h=50b6472e60a3
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1933k::T=1933.00:h=dd50e282c25a
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4957,8 +5905,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5023,6 +5978,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O2, column 1933 K; value printed as 4.59 ± 0.26 under p_O2 · 10^-11
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1659.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O2, column 1933 K; value printed as 4.59 ± 0.26 under p_O2 · 10^-11
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O2, column 1933 K; value printed as 4.59 ± 0.26 under p_O2 · 10^-11
+        output_unit: K
     composition:
       state:
         tag: value
@@ -5052,12 +6034,12 @@ observations:
         parameters: []
         output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=6b0b63a7fa98
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
   derivation:
     relation: p_O2 calculated from the same-temperature p_O by O2 ⇌ 2O, reaction (2); p. 479. Table 1 identifies MoO2+ and
       MoO3+ but not O+ or O2+, and the text says oxygen pressures were calculated.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=6b0b63a7fa98
+    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
     parameters:
     - - original
       - state:
@@ -5128,7 +6110,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1983k::T=1983.0:h=48be02bbd1a9
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1983k::T=1983.00:h=2fe89daf607b
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -5184,8 +6166,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5250,6 +6239,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O2, column 1983 K; value printed as 13.7 ± 0.6 under p_O2 · 10^-11
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1709.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O2, column 1983 K; value printed as 13.7 ± 0.6 under p_O2 · 10^-11
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O2, column 1983 K; value printed as 13.7 ± 0.6 under p_O2 · 10^-11
+        output_unit: K
     composition:
       state:
         tag: value
@@ -5279,12 +6295,12 @@ observations:
         parameters: []
         output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=cef43b1ef525
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
   derivation:
     relation: p_O2 calculated from the same-temperature p_O by O2 ⇌ 2O, reaction (2); p. 479. Table 1 identifies MoO2+ and
       MoO3+ but not O+ or O2+, and the text says oxygen pressures were calculated.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=cef43b1ef525
+    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
     parameters:
     - - original
       - state:
@@ -5355,7 +6371,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_2033k::T=2033.0:h=010c28ee5494
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_2033k::T=2033.00:h=cafacf77c076
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -5411,8 +6427,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5477,6 +6500,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O2, column 2033 K; value printed as 34.3 ± 1.7 under p_O2 · 10^-11
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1759.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O2, column 2033 K; value printed as 34.3 ± 1.7 under p_O2 · 10^-11
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O2, column 2033 K; value printed as 34.3 ± 1.7 under p_O2 · 10^-11
+        output_unit: K
     composition:
       state:
         tag: value
@@ -5506,12 +6556,12 @@ observations:
         parameters: []
         output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=664cdb5e7181
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
   derivation:
     relation: p_O2 calculated from the same-temperature p_O by O2 ⇌ 2O, reaction (2); p. 479. Table 1 identifies MoO2+ and
       MoO3+ but not O+ or O2+, and the text says oxygen pressures were calculated.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=664cdb5e7181
+    - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
     parameters:
     - - original
       - state:
@@ -5582,7 +6632,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=75ece12ebffd
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -5638,8 +6688,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5704,6 +6761,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1559.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
+        output_unit: K
     composition:
       state:
         tag: value
@@ -5733,15 +6817,15 @@ observations:
         parameters: []
         output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.0:h=11b9cf0af49b
-  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.0:h=502dc81cede6
+  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.00:h=96ee96960eb1
+  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.00:h=4238cad08175
   derivation:
     relation: p_O calculated from the same-temperature MoO3 and MoO2 partial pressures by MoO3 ⇌ MoO2 + O, reaction (1); reaction
       (2) is used downstream to calculate p_O2, not as an input to p_O. The Al/Si reactions (3)–(6) are a consistency check
       reported within about 15%, not calculation inputs; see p. 479.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.0:h=11b9cf0af49b
-    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.0:h=502dc81cede6
+    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.00:h=96ee96960eb1
+    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.00:h=4238cad08175
     parameters:
     - - original
       - state:
@@ -5812,7 +6896,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=6b0b63a7fa98
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -5868,8 +6952,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5934,6 +7025,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1659.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
+        output_unit: K
     composition:
       state:
         tag: value
@@ -5963,15 +7081,15 @@ observations:
         parameters: []
         output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.0:h=4c075eac1c32
-  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.0:h=18325524f78a
+  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.00:h=5f4934d9373a
+  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.00:h=fafa8bfc1e7e
   derivation:
     relation: p_O calculated from the same-temperature MoO3 and MoO2 partial pressures by MoO3 ⇌ MoO2 + O, reaction (1); reaction
       (2) is used downstream to calculate p_O2, not as an input to p_O. The Al/Si reactions (3)–(6) are a consistency check
       reported within about 15%, not calculation inputs; see p. 479.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.0:h=4c075eac1c32
-    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.0:h=18325524f78a
+    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.00:h=5f4934d9373a
+    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.00:h=fafa8bfc1e7e
     parameters:
     - - original
       - state:
@@ -6042,7 +7160,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=cef43b1ef525
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6098,8 +7216,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6164,6 +7289,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1709.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
+        output_unit: K
     composition:
       state:
         tag: value
@@ -6193,15 +7345,15 @@ observations:
         parameters: []
         output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.0:h=49ca4fb6359c
-  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.0:h=e8a8d18ece93
+  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.00:h=ca69236b2015
+  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.00:h=459b34325a55
   derivation:
     relation: p_O calculated from the same-temperature MoO3 and MoO2 partial pressures by MoO3 ⇌ MoO2 + O, reaction (1); reaction
       (2) is used downstream to calculate p_O2, not as an input to p_O. The Al/Si reactions (3)–(6) are a consistency check
       reported within about 15%, not calculation inputs; see p. 479.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.0:h=49ca4fb6359c
-    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.0:h=e8a8d18ece93
+    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.00:h=ca69236b2015
+    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.00:h=459b34325a55
     parameters:
     - - original
       - state:
@@ -6272,7 +7424,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=664cdb5e7181
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6328,8 +7480,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6394,6 +7553,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1759.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
+        output_unit: K
     composition:
       state:
         tag: value
@@ -6423,15 +7609,15 @@ observations:
         parameters: []
         output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.0:h=6894f2932d0c
-  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.0:h=d8e17bb85ab8
+  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.00:h=e4fc7486ece4
+  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.00:h=542f6f0a10b0
   derivation:
     relation: p_O calculated from the same-temperature MoO3 and MoO2 partial pressures by MoO3 ⇌ MoO2 + O, reaction (1); reaction
       (2) is used downstream to calculate p_O2, not as an input to p_O. The Al/Si reactions (3)–(6) are a consistency check
       reported within about 15%, not calculation inputs; see p. 479.
     inputs:
-    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.0:h=6894f2932d0c
-    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.0:h=d8e17bb85ab8
+    - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.00:h=e4fc7486ece4
+    - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.00:h=542f6f0a10b0
     parameters:
     - - original
       - state:
@@ -6502,7 +7688,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1833k::T=1833.0:h=e68f8087a949
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1833k::T=1833.00:h=da45c378f885
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6545,8 +7731,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6611,9 +7804,52 @@ observations:
         pdf_page_index: 1
         table: '6'
         note: Table 6 row a_SiO2, column 1833 K; value printed as 0.37 ± 0.09
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1559.85'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_SiO2, column 1833 K; value printed as 0.37 ± 0.09
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_SiO2, column 1833 K; value printed as 0.37 ± 0.09
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.0:h=0b601ffb3b61
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=75ece12ebffd
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.00:h=0c083bf8ccd6
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.00:h=aafc455b3cfc
   derivation:
     relation: as_published
     inputs:
@@ -6641,7 +7877,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1933k::T=1933.0:h=1146ac75825f
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1933k::T=1933.00:h=5e4209c62148
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6684,8 +7920,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6750,9 +7993,52 @@ observations:
         pdf_page_index: 1
         table: '6'
         note: Table 6 row a_SiO2, column 1933 K; value printed as 0.19 ± 0.02
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1659.85'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_SiO2, column 1933 K; value printed as 0.19 ± 0.02
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_SiO2, column 1933 K; value printed as 0.19 ± 0.02
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.0:h=a5cdfc44a10f
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=6b0b63a7fa98
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.00:h=eb7c088af742
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.00:h=04fbb9fb6c34
   derivation:
     relation: as_published
     inputs:
@@ -6780,7 +8066,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1983k::T=1983.0:h=adcda04a9bab
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1983k::T=1983.00:h=7d91ade06f5d
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6823,8 +8109,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6889,9 +8182,52 @@ observations:
         pdf_page_index: 1
         table: '6'
         note: Table 6 row a_SiO2, column 1983 K; value printed as 0.18 ± 0.02
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1709.85'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_SiO2, column 1983 K; value printed as 0.18 ± 0.02
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_SiO2, column 1983 K; value printed as 0.18 ± 0.02
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.0:h=528fe3c411bf
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=cef43b1ef525
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.00:h=2e233f99fb9e
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.00:h=9a306043d3d7
   derivation:
     relation: as_published
     inputs:
@@ -6919,7 +8255,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_2033k::T=2033.0:h=0c654364c902
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_2033k::T=2033.00:h=8973e04a5688
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6962,8 +8298,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7028,9 +8371,52 @@ observations:
         pdf_page_index: 1
         table: '6'
         note: Table 6 row a_SiO2, column 2033 K; value printed as 0.17 ± 0.01
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1759.85'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_SiO2, column 2033 K; value printed as 0.17 ± 0.01
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 479
+              published_page: 479
+              pdf_page_index: 1
+              table: '6'
+              note: Table 6 row a_SiO2, column 2033 K; value printed as 0.17 ± 0.01
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 479
+        published_page: 479
+        table: '6'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; normalized as x(Al2O3)=0.6 and x(SiO2)=0.4.
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.0:h=84544cf3337a
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=664cdb5e7181
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.00:h=4f4aec7a1a57
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.00:h=fff73f934080
   derivation:
     relation: as_published
     inputs:
@@ -7058,7 +8444,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.0:h=0b601ffb3b61
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.00:h=0c083bf8ccd6
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -7114,8 +8500,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7179,6 +8572,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1559.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5
+        output_unit: K
     composition:
       state:
         tag: value
@@ -7254,7 +8674,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.0:h=a5cdfc44a10f
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.00:h=eb7c088af742
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -7310,8 +8730,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7375,6 +8802,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1659.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5
+        output_unit: K
     composition:
       state:
         tag: value
@@ -7450,7 +8904,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.0:h=528fe3c411bf
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.00:h=2e233f99fb9e
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -7506,8 +8960,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7571,6 +9032,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1709.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5
+        output_unit: K
     composition:
       state:
         tag: value
@@ -7646,7 +9134,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.0:h=84544cf3337a
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.00:h=4f4aec7a1a57
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -7702,8 +9190,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: derived_from_formula
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7767,6 +9262,33 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1759.85'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 478
+              published_page: 478
+              pdf_page_index: 0
+              table: '2'
+              note: Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5
+        output_unit: K
     composition:
       state:
         tag: value
