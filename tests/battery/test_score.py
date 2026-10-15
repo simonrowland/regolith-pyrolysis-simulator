@@ -5147,6 +5147,105 @@ def test_hashimoto_worker_infrastructure_failures_are_not_cohort_cached(
     assert prediction.refusal_detail["reason"] == reason
 
 
+@pytest.mark.parametrize(
+    ("failure_kind", "expected_reason", "expected_state", "expected_refusal"),
+    (
+        (
+            "timeout",
+            "engine_timeout:openimcc:hashimoto_residue_cohort",
+            "attempted_unavailable",
+            "attempted_unavailable",
+        ),
+        (
+            "transport",
+            "engine_transport_error:openimcc",
+            "attempted_unavailable",
+            "attempted_unavailable",
+        ),
+        (
+            "nonconvergence",
+            "engine_nonconvergence",
+            "not_probed",
+            "unsupported",
+        ),
+    ),
+)
+def test_hashimoto_integrator_preserves_failure_reason_for_scorer(
+    monkeypatch: pytest.MonkeyPatch,
+    failure_kind: str,
+    expected_reason: str,
+    expected_state: str,
+    expected_refusal: str,
+) -> None:
+    pytest.importorskip("openimcc")
+    from simulator.battery import residue, score
+    from simulator.battery.enums import Engine, Quantity
+    from simulator.battery.score import load_score_context, quantity_token
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+    context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    reference = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-015-hashimoto-1983"
+        and "::hashimoto_1983_table3_residue_composition_series::"
+        in row.observation_id
+        and quantity_token(row.identity)
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+
+    def fail_engine(*_args, **_kwargs):
+        if failure_kind == "timeout":
+            raise TimeoutError("forced Hashimoto call deadline")
+        raise residue.ResidueEngineTransportError("forced worker transport failure")
+
+    integration_calls = 0
+
+    def fail_inventory(
+        inventory,
+        _channels,
+        pressure_model,
+        **_kwargs,
+    ):
+        if failure_kind == "nonconvergence":
+            raise residue.ResidueEngineNonconvergence(
+                "openimcc", "forced solver nonconvergence"
+            )
+        pressure_model(inventory, -9.0)
+        raise AssertionError("injected engine failure unexpectedly returned")
+
+    original_integrate_geometry = residue._hashimoto_integrate_geometry
+
+    def track_integrate_geometry(*args, **kwargs):
+        nonlocal integration_calls
+        integration_calls += 1
+        return original_integrate_geometry(*args, **kwargs)
+
+    monkeypatch.setattr(residue, "_evaluate_openimcc_isolated", fail_engine)
+    monkeypatch.setattr(residue, "integrate_residue_inventory", fail_inventory)
+    monkeypatch.setattr(
+        residue, "_hashimoto_integrate_geometry", track_integrate_geometry
+    )
+    cache = {}
+    prediction = score._hashimoto_residue_prediction(
+        context, reference, Engine.OPENIMCC, cache
+    )
+
+    assert integration_calls > 0
+    assert prediction.value is None
+    assert prediction.refusal_detail["reason"] == expected_reason
+    assert prediction.execution.state.value == expected_state
+    assert prediction.refusal_reason.value == expected_refusal
+    if failure_kind in {"timeout", "transport"}:
+        assert ("kems-015-hashimoto-1983", Engine.OPENIMCC) in cache
+        assert "__cohort_error__" not in cache[
+            ("kems-015-hashimoto-1983", Engine.OPENIMCC)
+        ]
+
+
 def test_residue_area_is_not_identity_but_per_area_rate_still_requires_it() -> None:
     context = load_score_context(sources=("kems-015-hashimoto-1983",))
     residue_identity = next(

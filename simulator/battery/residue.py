@@ -173,7 +173,27 @@ def _evaluate_openimcc_isolated(
             args=(child, evaluate),
             daemon=True,
         )
-        process.start()
+        try:
+            process.start()
+        except Exception as exc:
+            try:
+                if process.pid is not None:
+                    if process.is_alive():
+                        process.terminate()
+                    process.join()
+            except (AssertionError, OSError, ValueError):
+                pass
+            try:
+                process.close()
+            except (AssertionError, OSError, ValueError):
+                pass
+            finally:
+                parent.close()
+                child.close()
+                _OPENIMCC_EVALUATION_WORKER = None
+            raise ResidueEngineTransportError(
+                f"OpenIMCC worker failed to start: {exc}"
+            ) from exc
         child.close()
         worker = (process, parent, evaluate)
         _OPENIMCC_EVALUATION_WORKER = worker
@@ -1001,6 +1021,7 @@ def _hashimoto_integrate_geometry(
                     step=step_number,
                     time_reached_s=elapsed_s,
                     retry="one interval halving; refined substep still failed",
+                    reason=exc.reason,
                 )
                 break
 

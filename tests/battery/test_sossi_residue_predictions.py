@@ -207,6 +207,66 @@ def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
     )
 
 
+def test_sossi_worker_start_failure_is_recorded_as_transport_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("openimcc")
+    import multiprocessing
+
+    import simulator.battery.residue as residue
+    from simulator.melt_backend import openimcc_bridge
+
+    spawn_context = multiprocessing.get_context("spawn")
+    connections = []
+
+    class ContextProxy:
+        def Pipe(self, **kwargs):
+            pair = spawn_context.Pipe(**kwargs)
+            connections.extend(pair)
+            return pair
+
+        def Process(self, **kwargs):
+            process = spawn_context.Process(**kwargs)
+
+            def fail_start():
+                raise OSError(24, "forced descriptor exhaustion")
+
+            process.start = fail_start
+            return process
+
+    monkeypatch.setattr(
+        residue.multiprocessing, "get_context", lambda _method: ContextProxy()
+    )
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+    source = yaml.safe_load(SOURCE.read_text())
+    experiment = source["experiments"][0]
+    starting_trace = {
+        element: source["species"][element]["observations"][0]["values"][
+            "starting_measured_ppm"
+        ]
+        for element in ("Mn", "Ti")
+    }
+    experiment_id = experiment["experiment_id"]
+
+    prediction = residue._predict_sossi_residue_cohort(
+        [experiment],
+        yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text()),
+        starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+        buffered_fO2_log_by_experiment={experiment_id: -10.0},
+        code_revision="sossi-worker-start-failure-test",
+        engine="openimcc",
+    )[0]
+
+    assert prediction.provenance["run_refusal"]["reason"] == (
+        "engine_transport_error:openimcc"
+    )
+    assert len(connections) == 2
+    assert all(connection.closed for connection in connections)
+    assert residue._OPENIMCC_EVALUATION_WORKER is None
+
+
 def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) -> None:
     from simulator.battery.enums import (
         Engine,
