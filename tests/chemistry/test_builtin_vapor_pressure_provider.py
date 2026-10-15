@@ -3143,6 +3143,45 @@ def test_closed_all_ferrous_vapor_activity_uses_ledger_split_at_iw_bound(
         floor_bar=sim._vacuum_floor_bar(), fe3_over_sigma_fe=0.0,
     )['a_FeO_authoritative']
     assert sim._last_vapor_pressure_diagnostic['activities']['Fe'] == pytest.approx(expected)
+    assert sim._last_vapor_pressure_diagnostic['a_FeO_calphad'][
+        'fe3_over_sigma_fe'] == 0.0
+
+
+def test_closed_vapor_activity_uses_actual_ferric_inventory(vapor_pressure_data):
+    from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    imposed = _fe_redox_request(species_formula_registry={}, intrinsic_fO2_log=-4.0)
+    closed = replace(imposed, control_inputs={
+        **imposed.control_inputs,
+        'melt_redox_state': {'origin': 'closed_ledger', 'bound': None, 'flags': []},
+    })
+    result = provider.dispatch(closed)
+    comp = composition_wt_pct_from_account_view(closed.account_view, 'process.cleaned_melt')
+    # The fixture contains 1 mol FeO and 0.5 mol Fe2O3: one of two mol Fe
+    # atoms is ferric. The imposed potential must not replace that inventory.
+    expected = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=comp, fO2_log=-4.0, T_K=1773.15, pressure_bar=1e-9,
+        fe3_over_sigma_fe=0.5,
+    )
+    assert result.diagnostic['activities']['Fe'] == expected['a_FeO_authoritative']
+    assert result.diagnostic['a_FeO_calphad']['fe3_over_sigma_fe'] == 0.5
+    assert result.diagnostic['activities']['Fe'] != provider.dispatch(imposed).diagnostic['activities']['Fe']
+
+
+def test_imposed_vapor_request_retains_exact_serialized_result(vapor_pressure_data):
+    import hashlib
+    import json
+
+    request = _fe_redox_request(species_formula_registry={}, intrinsic_fO2_log=-4.0)
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(request)
+    serialized = json.dumps({
+        'diagnostic': result.diagnostic, 'warnings': result.warnings,
+    }, sort_keys=True, default=str).encode()
+    # Behavior-preserving pin recorded at 76581ad1d before the closed-ledger
+    # discriminator. Absent discriminator retains imposed-condition semantics.
+    assert hashlib.sha256(serialized).hexdigest() == (
+        '14399bf211cc94825554be19e6b78bcdf43e1f7199038be932514571d75c73ad')
 
 
 # ---------------------------------------------------------------------------

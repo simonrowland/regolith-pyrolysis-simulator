@@ -340,6 +340,31 @@ def test_above_cap_openimcc_provenance_carries_complex_saturation_notice() -> No
     assert result["openimcc_extrapolated"] is False
 
 
+def test_closed_vapor_openimcc_folds_actual_ledger_ferric_inventory(monkeypatch):
+    from dataclasses import replace
+
+    composition = {**BASE_MELT_MOL, 'Fe2O3': 0.5}
+    request = _request(composition, CAP_PLUS_T_K, intrinsic_fO2_log=-4.0)
+    request = replace(request, control_inputs={
+        **request.control_inputs,
+        'melt_redox_state': {'origin': 'closed_ledger', 'bound': None, 'flags': []},
+    })
+    seen = []
+    original = openimcc_bridge_module.evaluate
+
+    def capture(composition_mol, *args, **kwargs):
+        seen.append(dict(composition_mol))
+        return original(composition_mol, *args, **kwargs)
+
+    monkeypatch.setattr(openimcc_bridge_module, 'evaluate', capture)
+    result = _provider().dispatch(request)
+    assert result.diagnostic['high_t_melt_activity']['fallback'] is False
+    # FeOt has one Fe atom per formula unit: 1 FeO + 0.5 Fe2O3 is 2 mol
+    # FeO-equivalent, irrespective of the supplied stability potential.
+    assert seen and all(row['FeO'] == 2.0 for row in seen)
+    assert all('Fe2O3' not in row for row in seen)
+
+
 def test_relaxed_openimcc_preserves_constant_gamma_carrier_set() -> None:
     composition = _moles_from_wt(_cr_mn_projection_weights())
     provider = _provider()
