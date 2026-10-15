@@ -14361,3 +14361,49 @@ def test_stolyarova_1991_composition_map_mutation_removes_identity(
     )
     assert mutated.identity.composition.reason == "no composition mapped from source"
 
+def test_shornikov_1994_printed_mullite_composition_reaches_every_point(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import Phase, Quantity
+
+    source_id = "shornikov-1994-mullite-kems"
+    result = _migrate_real_extract(
+        tmp_path / source_id, f"{source_id}.yaml"
+    )
+    rows = [obs for obs in result.observations.values() if obs.source_id == source_id]
+    assert len(rows) == 41
+    assert all("::T=" in obs.observation_id for obs in rows)
+
+    named = {
+        "shornikov_1994_al2o3_activity_1833k": Decimal("1833"),
+        "shornikov_1994_sio2_activity_2033k": Decimal("2033"),
+    }
+    found_named: set[str] = set()
+    for obs in rows:
+        identity = obs.identity
+        composition = identity.composition
+        assert composition is not None and composition.is_value, obs.observation_id
+        assert composition.value.basis == "derived_from_formula"
+        assert composition.value.amount_basis.value == "mole_fraction"
+        assert composition.value.components == (
+            ("Al2O3", Decimal("0.6")),
+            ("SiO2", Decimal("0.4")),
+        )
+        conditions = obs.point_conditions or {}
+        assert conditions["composition"].state.value == composition.value
+        assert conditions["composition"].locator is not None
+        assert identity.temperature_K is not None and identity.temperature_K.is_value
+        assert identity.temperature_K.value == conditions["temperature_K"].state.value
+        assert conditions["temperature_K"].locator is not None
+        for row_id, temperature in named.items():
+            if row_id in obs.observation_id:
+                found_named.add(row_id)
+                assert identity.temperature_K.value == temperature
+        if identity.quantity.value is Quantity.P_PARTIAL:
+            assert identity.species.phase.is_value
+            assert identity.species.phase.value is Phase.G
+            assert identity.fO2_Pa.is_unknown
+            assert identity.total_pressure_Pa.is_unknown
+
+    assert found_named == set(named)
+
