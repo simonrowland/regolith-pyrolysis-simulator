@@ -189,12 +189,21 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
     sim.start_campaign(CampaignPhase.C2A)
     sim.melt.temperature_C = 1700.0
 
+    # This reference is the closed runtime request, including its intrinsic
+    # potential; a lab request with only transport pO2 is a different control.
+    intrinsic = sim._compute_intrinsic_melt_fO2()
     kernel = sim._chem_kernel.dispatch(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
-        control_inputs={"pO2_bar": sim._vapor_pressure_dispatch_pO2_bar()},
-        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        control_inputs={
+            "pO2_bar": sim._vapor_pressure_dispatch_pO2_bar(),
+            "intrinsic_fO2_log": intrinsic,
+            "melt_redox_state": {
+                "origin": "closed_ledger", **sim._last_intrinsic_redox_state,
+            },
+        },
+        fO2_log=intrinsic,
     )
     kernel_vp = dict((kernel.diagnostic or {}).get("vapor_pressures_Pa") or {})
     kernel_provenance = dict(
