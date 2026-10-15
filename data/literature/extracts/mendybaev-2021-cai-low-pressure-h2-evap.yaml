@@ -10,6 +10,10 @@ extraction:
   source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
   note: 'The supplied manuscript PDF clips the right-hand continuation of Tables 1-2. Only readable cells are transcribed; clipped residue oxide compositions, final weights, and clipped rate columns are absent.'
 review_status: draft
+fidelity_samples:
+- path: species.Mg.observations[mendybaev_2021_mg_evaporation_rates_by_arm].values.arms[0].value_as_printed
+  value: '(3.6±0.4)×10−9'
+  locator: {published_page: 11, paragraph: 'average evaporation rates JMg', note: 'Vacuum-arm JMg.'}
 benches:
 - id: hokkaido-low-pressure-h2-furnace
   identity: {basis: described_in_this_work}
