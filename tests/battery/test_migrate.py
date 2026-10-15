@@ -14687,8 +14687,6 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
         for observation in table1
         if quantity_token(observation.identity) is Quantity.ION_INTENSITY_RATIO
     ]
-    assert len(pressures) == 60
-    assert len(ion_currents) == 20
     for observation in pressures + ion_currents:
         temperature = observation.identity.temperature_K
         assert temperature is not None and temperature.is_value
@@ -14706,11 +14704,6 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
         and observation.identity.total_pressure_Pa.is_unknown
         for observation in pressures
     )
-    pressure_compositions = [observation.identity.composition for observation in pressures]
-    assert sum(
-        composition is not None and composition.is_value
-        for composition in pressure_compositions
-    ) == 57
     for observation in pressures:
         condition = observation.point_conditions["composition"]
         assert condition.locator is not None
@@ -14727,7 +14720,6 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
         if observation.identity.composition is not None
         and observation.identity.composition.is_unknown
     ]
-    assert len(sample20_pressures) == 3
     for observation in sample20_pressures:
         condition = observation.point_conditions["composition"]
         assert condition.state.is_unknown
@@ -14742,7 +14734,6 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
     current_conditions = [
         observation.point_conditions["composition"] for observation in ion_currents
     ]
-    assert sum(condition.state.is_value for condition in current_conditions) == 19
     assert all(
         condition.locator is not None and condition.locator.table == "2"
         for condition in current_conditions
@@ -14751,7 +14742,6 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
     current_sample20 = [
         condition for condition in current_conditions if condition.state.is_unknown
     ]
-    assert len(current_sample20) == 1
     assert "sample 20" in (current_sample20[0].state.reason or "")
 
     table2 = [
@@ -14759,7 +14749,6 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
         for observation in rows
         if observation.locator is not None and observation.locator.table == "2"
     ]
-    assert len(table2) == 19
     assert all(
         observation.identity.composition is not None
         and observation.identity.composition.is_value
@@ -14787,6 +14776,39 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
         for observation in table2
     }
     source_observations = _extract_observations(f"{source_id}.yaml")
+    table2_source_rows = [
+        source["values"]["row"]
+        for source in source_observations
+        if source.get("locator", {}).get("table") == "2"
+        and isinstance(source.get("values", {}).get("row"), dict)
+        and "sample_no" in source["values"]["row"]
+    ]
+    assert sorted(table2_compositions) == sorted(
+        int(source_row["sample_no"]) for source_row in table2_source_rows
+    )
+
+    expected_table2_compositions = {}
+    for source_row in table2_source_rows:
+        sample_number = int(source_row["sample_no"])
+        printed_moles = {
+            key.removesuffix("_mol_percent"): as_decimal(value)
+            for key, value in source_row.items()
+            if key.endswith("_mol_percent") and key != "FetO_mol_percent"
+        }
+        n_feo, n_fe2o3 = feto_fe2_fe3_to_feo_fe2o3_moles(
+            source_row["FetO_mol_percent"], source_row["Fe2_over_Fe3"]
+        )
+        printed_moles["FeO"] = as_decimal(n_feo)
+        printed_moles["Fe2O3"] = as_decimal(n_fe2o3)
+        total_moles = sum(printed_moles.values())
+        expected_table2_compositions[sample_number] = {
+            component: amount / total_moles
+            for component, amount in printed_moles.items()
+        }
+    for sample_number, expected_composition in expected_table2_compositions.items():
+        assert table2_compositions[sample_number].as_map() == pytest.approx(
+            expected_composition
+        ), f"Table 2 composition does not match printed sample {sample_number}"
     pressure_rows_by_species = {
         "PO": "ohara_1987_table1_partial_pressures_1643k",
         "PO2": "ohara_1987_po2_table1_partial_pressure",
@@ -14807,6 +14829,7 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
     )
 
     def assert_row_composition_matches_sample(observations, source_rows) -> None:
+        matched_sample_numbers = []
         for observation in observations:
             matching_rows = [
                 row
@@ -14817,6 +14840,7 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
             ]
             assert len(matching_rows) == 1
             sample_number = int(matching_rows[0]["sample_no"])
+            matched_sample_numbers.append(sample_number)
             condition = observation.point_conditions["composition"]
             if sample_number in table2_compositions:
                 expected_composition = table2_compositions[sample_number]
@@ -14838,6 +14862,9 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
                 assert condition.state.is_unknown
                 assert condition.locator.table == "1"
                 assert "sample 20" in condition.locator.note
+        assert sorted(matched_sample_numbers) == sorted(
+            int(row["sample_no"]) for row in source_rows
+        )
 
     for formula, source_rows in pressure_source_rows.items():
         assert_row_composition_matches_sample(
@@ -14850,35 +14877,6 @@ def test_ohara_1987_printed_compositions_reach_migrated_observations(
         )
     assert_row_composition_matches_sample(ion_currents, current_source_rows)
 
-    sample1_source = next(
-        row
-        for row in _extract_observations(f"{source_id}.yaml")
-        if row.get("observation_id")
-        == "ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_1"
-    )["values"]["row"]
-    n_feo, n_fe2o3 = feto_fe2_fe3_to_feo_fe2o3_moles(
-        sample1_source["FetO_mol_percent"], sample1_source["Fe2_over_Fe3"]
-    )
-    printed_moles = {
-        "P2O5": sample1_source["P2O5_mol_percent"],
-        "FeO": n_feo,
-        "Fe2O3": n_fe2o3,
-        "CaO": sample1_source["CaO_mol_percent"],
-    }
-    total_moles = sum(printed_moles.values())
-    expected_sample1 = {
-        component: amount / total_moles
-        for component, amount in printed_moles.items()
-    }
-    migrated_sample1 = next(
-        observation
-        for observation in table2
-        if observation.observation_id.endswith("sample_1")
-    )
-    assert {
-        component: float(amount)
-        for component, amount in migrated_sample1.identity.composition.value.as_map().items()
-    } == pytest.approx(expected_sample1)
     sample19 = next(
         observation
         for observation in table2
