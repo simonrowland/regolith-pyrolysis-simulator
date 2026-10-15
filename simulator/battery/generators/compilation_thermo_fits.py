@@ -25,8 +25,10 @@ import hashlib
 import json
 import math
 import re
+import subprocess
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -74,6 +76,7 @@ class FittedCurve:
     is_element_reference: bool
     segments: tuple[Nasa9Segment, ...] = ()
     fit_error: Mapping[str, float | None] = field(default_factory=dict)
+    input_digest: str | None = None
 
     def segment_at(self, temperature_K: float) -> Nasa9Segment:
         """Return the right-hand segment at a shared endpoint."""
@@ -289,7 +292,9 @@ def _record_base(
         "source_id": metadata["source_id"],
         "source_record_id": metadata["source_record_id"],
         "source_locator": metadata["source_locator"],
-        "input_digest": metadata["input_digest"],
+        "input_digests": {
+            str(metadata["source_record_id"]): metadata["input_digest"]
+        },
         "formula": metadata["formula"],
         "charge": metadata["charge"],
         "charge_source": metadata["charge_source"],
@@ -1027,6 +1032,7 @@ def _fit_piecewise_candidate(
         "delta_fH_kJ_per_mol": [],
         "delta_fG_kJ_per_mol": [],
     }
+    input_digests = dict(base["input_digests"])
     formation_precision_failures: list[dict[str, Any]] = []
     formation_consistency_failures: list[dict[str, Any]] = []
     formation_precision_complete = True
@@ -1063,6 +1069,9 @@ def _fit_piecewise_candidate(
                         formation_diagnostics_available = False
                         break
                     assert resolved is not None
+                    for _coefficient, _h_ref, _g_ref, curve in resolved:
+                        if curve.input_digest:
+                            input_digests[curve.source_record_id] = curve.input_digest
                     references = [
                         (coefficient, h_ref if quantity is Quantity.DELTA_FH else g_ref)
                         for coefficient, h_ref, g_ref, _curve in resolved
@@ -1452,6 +1461,7 @@ def _fit_piecewise_candidate(
     ]
     record_out = {
         **base,
+        "input_digests": input_digests,
         "status": "accepted",
         "acceptance_tier": "table_equivalent" if t1_pass else "smooth_fit",
         "basis_terms": basis_terms,
@@ -1491,6 +1501,7 @@ def _fit_piecewise_candidate(
             is_element_reference=is_element_reference,
             segments=tuple(segments),
             fit_error=fit_error,
+            input_digest=str(metadata["input_digest"]),
         )
     return FitResult(record_out, curve)
 
@@ -1545,40 +1556,56 @@ def fit_compilation_thermo_range(
         if excluded:
             output["excluded_cells"] = excluded
             changed = True
-        if (
-            result.record.get("status") == "accepted"
-            and metadata["charge"] == 0
-            and metadata["reference_pressure_Pa"] is not None
-            and formula_composition(str(metadata["formula"]))
-        ):
-            # Keep source formation cells as a separate pointwise comparison
-            # path. These values come directly from the compilation table;
-            # they are not evaluated from the NASA-9 fit or extrapolated.
-            printed_cells = [
-                {
-                    "quantity": quantity.value,
-                    "T_K": cell.temperature_K,
-                    "value_kJ_per_mol": cell.value,
-                    "raw_token": cell.raw_token,
-                    "source_unit": cell.source_unit,
-                    "rounding_allowance_kJ_per_mol": cell.uncertainty,
-                    "provenance": "printed formation cell",
-                }
-                for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG)
+        if result.curve is not None:
+            output["validity"] = {
+                "T_min_K": result.curve.T_min_K,
+                "T_max_K": result.curve.T_max_K,
+            }
+
+        # A strict per-quantity precision gate uses the least precise allowance
+        # among its fitted source cells, so max_abs <= gate_tolerance proves
+        # every summarized source cell is reproduced within its own precision.
+        statistics = output.get("fit_statistics", {})
+        statistics = statistics if isinstance(statistics, Mapping) else {}
+        gate_lo = result.curve.T_min_K if result.curve is not None else T_min_K
+        gate_hi = result.curve.T_max_K if result.curve is not None else T_max_K
+        summary_specs = (
+            (Quantity.CP, "cp_J_per_mol_K"),
+            (Quantity.H_MINUS_H298, "H_minus_H298_kJ_per_mol"),
+            (Quantity.S, "S_J_per_mol_K"),
+            (Quantity.DELTA_FH, "derived_formation_H_kJ_per_mol"),
+            (Quantity.DELTA_FG, "derived_formation_G_kJ_per_mol"),
+        )
+        residual_summary: dict[str, dict[str, float | int | None]] = {}
+        for quantity, statistic_key in summary_specs:
+            stat = statistics.get(statistic_key)
+            cells = tuple(
+                cell
                 for cell in channels.get(quantity, ())
-                if cell.raw_token is not None
-                and (T_min_K is None or cell.temperature_K >= T_min_K)
-                and (T_max_K is None or cell.temperature_K <= T_max_K)
-            ]
-            if printed_cells:
-                output["printed_formation_cells"] = sorted(
-                    printed_cells,
-                    key=lambda cell: (cell["T_K"], cell["quantity"]),
-                )
-                changed = True
-        if not changed:
-            return result
-        return FitResult(output, result.curve)
+                if (gate_lo is None or cell.temperature_K >= gate_lo)
+                and (gate_hi is None or cell.temperature_K <= gate_hi)
+            )
+            tolerances = [cell.uncertainty for cell in cells]
+            gate_tolerance = (
+                min(tolerances)
+                if tolerances and all(value is not None for value in tolerances)
+                else None
+            )
+            residual_summary[quantity.value] = {
+                "n": int(stat.get("cell_count", 0))
+                if isinstance(stat, Mapping)
+                else 0,
+                "max_abs": float(stat["max_abs"])
+                if isinstance(stat, Mapping)
+                else None,
+                "rms": float(stat["rms"])
+                if isinstance(stat, Mapping)
+                else None,
+                "gate_tolerance": gate_tolerance,
+            }
+        output["residual_summary"] = residual_summary
+        changed = True
+        return FitResult(output, result.curve) if changed else result
 
     if not in_range_temperatures:
         return with_exclusions(_rejected(
@@ -1766,14 +1793,279 @@ def fit_compilation_thermo_range(
         start, end = bounds[split_index]
         bounds[split_index : split_index + 1] = [(start, join_K), (join_K, end)]
 
+@lru_cache(maxsize=1)
+def _generator_commit() -> str:
+    repo_root = Path(__file__).resolve().parents[3]
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip()
+
+
+def _compact_sidecar_record(
+    record: Mapping[str, Any], *, generator_commit: str
+) -> dict[str, Any]:
+    keys = (
+        "record_id",
+        "record_kind",
+        "source_id",
+        "source_record_id",
+        "source_locator",
+        "formula",
+        "charge",
+        "charge_source",
+        "phase",
+        "source_standard_state",
+        "source_standard_state_convention",
+        "reference_pressure_Pa",
+        "validity",
+        "lineage",
+        "circularity",
+        "status",
+        "acceptance_tier",
+        "reason_code",
+        "reason",
+        "formation_capable",
+        "formation_reason_code",
+        "formation_reason",
+        "is_element_reference",
+    )
+    compact = {key: record[key] for key in keys if key in record}
+    input_digests = record.get("input_digests")
+    if not isinstance(input_digests, Mapping):
+        source_record_id = str(record.get("source_record_id") or "unknown")
+        input_digest = record.get("input_digest")
+        input_digests = (
+            {source_record_id: input_digest} if input_digest is not None else {}
+        )
+    compact["input_digests"] = dict(sorted(input_digests.items()))
+    compact["generator_commit"] = generator_commit
+    compact["formation_capable"] = bool(record.get("formation_capable", False))
+    compact["is_element_reference"] = bool(record.get("is_element_reference", False))
+
+    validity = record.get("validity")
+    if isinstance(validity, Mapping):
+        compact["validity"] = {
+            key: validity.get(key) for key in ("T_min_K", "T_max_K")
+        }
+
+    summary = record.get("residual_summary")
+    if isinstance(summary, Mapping):
+        compact["residual_summary"] = {
+            str(quantity): {
+                key: values.get(key)
+                for key in ("n", "max_abs", "rms", "gate_tolerance")
+            }
+            for quantity, values in sorted(summary.items())
+            if isinstance(values, Mapping)
+        }
+    else:
+        compact["residual_summary"] = {}
+
+    thermo = record.get("thermo_record")
+    if isinstance(thermo, Mapping):
+        segments = thermo.get("segments")
+        compact["thermo_record"] = {
+            key: thermo[key]
+            for key in (
+                "evaluator_family",
+                "standard_state",
+                "standard_state_convention",
+                "formula",
+                "reference_pressure_Pa",
+            )
+            if key in thermo
+        }
+        compact["thermo_record"]["segments"] = [
+            {
+                key: segment[key]
+                for key in ("T_min_K", "T_max_K", "a_coefficients", "b1", "b2")
+                if key in segment
+            }
+            for segment in segments or ()
+            if isinstance(segment, Mapping)
+        ]
+
+    refs = record.get("printed_formation_cells")
+    if isinstance(refs, Sequence) and not isinstance(refs, (str, bytes)):
+        compact["printed_formation_cells"] = [
+            {
+                "table_id": str(reference["table_id"]),
+                "quantity": str(reference["quantity"]),
+                "T_K": sorted(float(temperature) for temperature in reference["T_K"]),
+            }
+            for reference in refs
+            if isinstance(reference, Mapping)
+            and reference.get("table_id")
+            and reference.get("quantity")
+            and isinstance(reference.get("T_K"), Sequence)
+        ]
+    return compact
+
+
 def render_sidecar(records: Sequence[Mapping[str, Any]]) -> str:
     ordered = sorted(records, key=lambda record: str(record.get("record_id", "")))
+    commit = _generator_commit()
+    compact = [
+        _compact_sidecar_record(record, generator_commit=commit)
+        for record in ordered
+    ]
     return json.dumps(
-        {"schema_version": "compilation_thermo_fits.v1", "records": ordered},
+        {"schema_version": "compilation_thermo_fits.v2", "records": compact},
         indent=2,
         sort_keys=True,
         allow_nan=False,
     ) + "\n"
+
+
+def load_sidecar(path: Path = DEFAULT_SIDECAR_PATH) -> list[dict[str, Any]]:
+    """Load the generated v2 fits; a missing derived artifact means no fit channel."""
+
+    if not path.is_file():
+        return []
+    document = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(document, Mapping) or document.get("schema_version") != (
+        "compilation_thermo_fits.v2"
+    ):
+        raise ValueError(f"unsupported compilation thermochemistry sidecar at {path}")
+    records = document.get("records")
+    if not isinstance(records, list) or any(not isinstance(row, dict) for row in records):
+        raise ValueError(f"invalid records in compilation thermochemistry sidecar at {path}")
+    return records
+
+
+def sidecar_element_reference_curves(
+    records: Sequence[Mapping[str, Any]],
+) -> dict[str, list[FittedCurve]]:
+    """Rebuild only the accepted element curves required for formation fits."""
+
+    result: dict[str, list[FittedCurve]] = {}
+    for record in records:
+        if (
+            record.get("status") != "accepted"
+            or not record.get("is_element_reference")
+        ):
+            continue
+        composition = formula_composition(str(record.get("formula") or ""))
+        if not composition or len(composition) != 1:
+            continue
+        validity = record.get("validity")
+        thermo = record.get("thermo_record")
+        if not isinstance(validity, Mapping) or not isinstance(thermo, Mapping):
+            continue
+        pressure = record.get("reference_pressure_Pa")
+        if pressure is None:
+            continue
+        segments = tuple(
+            Nasa9Segment(
+                T_min_K=float(item["T_min_K"]),
+                T_max_K=float(item["T_max_K"]),
+                coefficients=tuple(float(value) for value in item["a_coefficients"]),
+                b1=float(item["b1"]),
+                b2=float(item["b2"]),
+            )
+            for item in thermo.get("segments", ())
+        )
+        if not segments:
+            continue
+        curve = FittedCurve(
+            formula=str(record["formula"]),
+            phase_label=str(record.get("phase") or ""),
+            source_id=str(record.get("source_id") or ""),
+            source_record_id=str(record.get("source_record_id") or ""),
+            T_min_K=float(validity["T_min_K"]),
+            T_max_K=float(validity["T_max_K"]),
+            reference_pressure_Pa=float(pressure),
+            segment=segments[0],
+            is_element_reference=True,
+            segments=segments,
+            input_digest=None,
+        )
+        result.setdefault(composition[0][0], []).append(curve)
+    return result
+
+
+def evaluate_sidecar_fit(
+    record: Mapping[str, Any],
+    quantity: Quantity,
+    temperature_K: float,
+    *,
+    reference_curves: Mapping[str, Sequence[FittedCurve]],
+) -> tuple[float | None, str | None]:
+    """Evaluate one accepted fit quantity without crossing its declared range."""
+
+    if record.get("status") != "accepted":
+        return None, "fit_not_accepted"
+    validity = record.get("validity")
+    thermo = record.get("thermo_record")
+    if not isinstance(validity, Mapping) or not isinstance(thermo, Mapping):
+        return None, "fit_payload_missing"
+    try:
+        lo = float(validity["T_min_K"])
+        hi = float(validity["T_max_K"])
+    except (KeyError, TypeError, ValueError):
+        return None, "fit_validity_missing"
+    if temperature_K < lo or temperature_K > hi:
+        return None, "outside_validity"
+    segments = tuple(
+        Nasa9Segment(
+            T_min_K=float(item["T_min_K"]),
+            T_max_K=float(item["T_max_K"]),
+            coefficients=tuple(float(value) for value in item["a_coefficients"]),
+            b1=float(item["b1"]),
+            b2=float(item["b2"]),
+        )
+        for item in thermo.get("segments", ())
+        if isinstance(item, Mapping)
+    )
+    segment = next(
+        (
+            item
+            for item in reversed(segments)
+            if item.T_min_K <= temperature_K <= item.T_max_K
+        ),
+        None,
+    )
+    if segment is None:
+        return None, "outside_segments"
+    cp, enthalpy, entropy, gibbs = _evaluate(segment, temperature_K)
+    if quantity is Quantity.CP:
+        return cp, None
+    if quantity is Quantity.H_MINUS_H298:
+        return enthalpy / 1000.0, None
+    if quantity is Quantity.S:
+        return entropy, None
+    if quantity not in {Quantity.DELTA_FH, Quantity.DELTA_FG}:
+        return None, "quantity_not_fitted"
+    if not record.get("formation_capable"):
+        return None, str(record.get("formation_reason_code") or "formation_not_capable")
+    species_property = enthalpy if quantity is Quantity.DELTA_FH else gibbs
+    if record.get("is_element_reference"):
+        references = [(1.0, species_property)]
+    else:
+        pressure = record.get("reference_pressure_Pa")
+        if pressure is None:
+            return None, "reference_pressure_missing"
+        resolved, error = _element_reference_terms(
+            str(record.get("formula") or ""),
+            temperature_K,
+            float(pressure),
+            reference_curves,
+        )
+        if error is not None or resolved is None:
+            return None, (error or "element_reference_unavailable").split(":", 1)[0]
+        references = [
+            (
+                coefficient,
+                h_ref if quantity is Quantity.DELTA_FH else g_ref,
+            )
+            for coefficient, h_ref, g_ref, _curve in resolved
+        ]
+    return formation_subtraction_kJ_mol(species_property, references), None
 
 
 def _phase_standard_state(phase: str) -> str | None:
@@ -1866,27 +2158,40 @@ def _add_janaf_table(
             reference_curves=reference_curves,
         )
         output = dict(result.record)
-        printed_cells = output.get("printed_formation_cells")
-        if printed_cells:
+        output["is_element_reference"] = is_element_reference
+        if (
+            output.get("status") == "accepted"
+            and metadata["charge"] == 0
+            and metadata["reference_pressure_Pa"] is not None
+            and formula_composition(str(metadata["formula"]))
+        ):
             eligible = eligible_formation_cells.get(
                 phase_range["phase_label"], frozenset()
             )
-            # Preserve the accepted Cp/H/S fit and apply JANAF's pointwise
-            # source-cell decisions only to the separate printed-cell output.
-            printed_cells = [
-                cell
-                for cell in printed_cells
-                if (
-                    cell["quantity"],
-                    cell["T_K"],
-                    cell["value_kJ_per_mol"],
+            validity = output.get("validity", {})
+            lo = validity.get("T_min_K") if isinstance(validity, Mapping) else None
+            hi = validity.get("T_max_K") if isinstance(validity, Mapping) else None
+            references = []
+            for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG):
+                temperatures = sorted(
+                    temperature
+                    for quantity_token, temperature, _value in eligible
+                    if quantity_token == quantity.value
+                    and (lo is None or temperature >= lo)
+                    and (hi is None or temperature <= hi)
                 )
-                in eligible
-            ]
-            if printed_cells:
-                output["printed_formation_cells"] = printed_cells
-            else:
-                output.pop("printed_formation_cells")
+                if temperatures:
+                    references.append(
+                        {
+                            "table_id": metadata["source_record_id"],
+                            "quantity": quantity.value,
+                            "T_K": temperatures,
+                        }
+                    )
+            if references:
+                # JANAF's accepted-observation owner remains the value source;
+                # only its source-cell identity and grid are serialized here.
+                output["printed_formation_cells"] = references
         records.append(output)
         if result.curve is not None:
             curves.append(result.curve)

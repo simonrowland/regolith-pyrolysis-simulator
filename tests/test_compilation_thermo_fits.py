@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import Counter
 from copy import deepcopy
+import json
 import math
 from decimal import Decimal
 
@@ -25,6 +26,7 @@ from simulator.battery.generators.compilation_thermo_fits import (
     _fit_piecewise_candidate,
     _interpolation_ringing,
     fit_compilation_thermo_range,
+    evaluate_sidecar_fit,
     generate_janaf_sidecar,
     main as fit_cli_main,
     render_sidecar,
@@ -252,7 +254,19 @@ def test_sidecar_rendering_is_deterministic_and_sorted() -> None:
 
     first = [generate_record(), {"record_id": "zz", "status": "rejected"}]
     second = [generate_record(), {"record_id": "zz", "status": "rejected"}]
-    assert render_sidecar(first) == render_sidecar(list(reversed(second)))
+    rendered = render_sidecar(first)
+    assert rendered == render_sidecar(list(reversed(second)))
+    document = json.loads(rendered)
+    assert document["schema_version"] == "compilation_thermo_fits.v2"
+    serialized_fit = document["records"][0]
+    assert len(serialized_fit["generator_commit"]) == 40
+    assert serialized_fit["input_digests"]
+    assert serialized_fit["residual_summary"][Quantity.CP.value][
+        "gate_tolerance"
+    ] is not None
+    assert "fit_statistics" not in serialized_fit
+    assert "fit_error" not in serialized_fit
+    assert "basis_terms" not in serialized_fit
 
 
 def test_compound_fit_anchors_and_formation_acceptance_across_fe_reference_transition() -> None:
@@ -912,10 +926,16 @@ def test_printed_formation_cells_are_a_separate_pointwise_path() -> None:
     oxygen_cell = next(
         cell for cell in oxygen["printed_formation_cells"]
         if cell["quantity"] == Quantity.DELTA_FG.value
-        and cell["T_K"] == 298.15
+        and 298.15 in cell["T_K"]
     )
-    assert oxygen_cell["value_kJ_per_mol"] == 0.0
-    assert oxygen_cell["provenance"] == "printed formation cell"
+    assert set(oxygen_cell) == {"table_id", "quantity", "T_K"}
+    assert oxygen_cell["table_id"] == "O-029"
+    assert 298.15 in oxygen_cell["T_K"]
+    compact_oxygen = json.loads(render_sidecar([oxygen]))["records"][0]
+    assert all(
+        set(reference) == {"table_id", "quantity", "T_K"}
+        for reference in compact_oxygen["printed_formation_cells"]
+    )
 
     iron_oxide = by_id["Fe-018"]
     assert iron_oxide["formation_capable"] is False
@@ -925,7 +945,7 @@ def test_printed_formation_cells_are_a_separate_pointwise_path() -> None:
     for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG):
         oxide_cell = next(
             cell for cell in iron_oxide["printed_formation_cells"]
-            if cell["quantity"] == quantity.value and cell["T_K"] == 298.15
+            if cell["quantity"] == quantity.value and 298.15 in cell["T_K"]
         )
         source_cell = next(
             (value, token, unit, uncertainty)
@@ -939,11 +959,10 @@ def test_printed_formation_cells_are_a_separate_pointwise_path() -> None:
             )
             if temperature == Decimal("298.15")
         )
-        assert oxide_cell["value_kJ_per_mol"] == float(source_cell[0])
-        assert oxide_cell["raw_token"] == source_cell[1]
-        assert oxide_cell["source_unit"] == source_cell[2]
-        assert oxide_cell["rounding_allowance_kJ_per_mol"] == float(source_cell[3])
-        assert oxide_cell["provenance"] == "printed formation cell"
+        assert set(oxide_cell) == {"table_id", "quantity", "T_K"}
+        assert oxide_cell["table_id"] == "Fe-018"
+        assert 298.15 in oxide_cell["T_K"]
+        assert source_cell[1] is not None
 
     charged = by_id["Al-006"]
     assert charged["charge"] == 1
@@ -965,16 +984,27 @@ def test_printed_formation_cells_respect_janaf_source_cell_refusals() -> None:
 
     def cells_at_298(records: list[dict]) -> list[dict]:
         return [
-            cell
+            {
+                "table_id": cell["table_id"],
+                "quantity": cell["quantity"],
+                "T_K": temperature,
+            }
             for record in records
             for cell in record.get("printed_formation_cells", ())
+            for temperature in cell["T_K"]
             if cell["quantity"] == Quantity.DELTA_FG.value
-            and cell["T_K"] == 298.15
+            and temperature == 298.15
         ]
 
     healthy = deepcopy(load_table_document(path))
     healthy_cells = cells_at_298(fit(healthy))
-    assert [cell["value_kJ_per_mol"] for cell in healthy_cells] == [-251.429]
+    assert healthy_cells == [
+        {
+            "table_id": "Fe-018",
+            "quantity": Quantity.DELTA_FG.value,
+            "T_K": 298.15,
+        }
+    ]
 
     mutated = deepcopy(healthy)
     row = next(
@@ -1002,6 +1032,43 @@ def test_printed_formation_cells_respect_janaf_source_cell_refusals() -> None:
         for observation in owner.observations
     )
     assert cells_at_298(fit(mutated)) == []
+
+
+def test_sidecar_fit_matches_an_independent_accepted_janaf_cell() -> None:
+    table_id = "O-029"
+    table_path = TABLES_DIR / f"{table_id}.yaml"
+    table = load_table_document(table_path)
+    accepted_owner = generate_table(table, source_path=str(table_path))
+    printed = next(
+        (temperature, value)
+        for observation in accepted_owner.observations
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.DELTA_FG
+        for temperature, value in observation.value.series or ()
+        if temperature == Decimal("298.15")
+    )
+    record = next(
+        item
+        for item in generate_janaf_sidecar(table_ids=[table_id])
+        if item["source_record_id"] == table_id
+        and item["status"] == "accepted"
+        and item.get("formation_capable")
+        and any(
+            reference["quantity"] == Quantity.DELTA_FG.value
+            and 298.15 in reference["T_K"]
+            for reference in item.get("printed_formation_cells", ())
+        )
+    )
+    fitted, reason = evaluate_sidecar_fit(
+        record,
+        Quantity.DELTA_FG,
+        float(printed[0]),
+        reference_curves={},
+    )
+    assert reason is None
+    assert fitted == pytest.approx(float(printed[1]), abs=record["residual_summary"][
+        Quantity.DELTA_FG.value
+    ]["gate_tolerance"])
 
 
 def test_janaf_formation_anchor_does_not_require_element_fit_at_298_15_k() -> None:
