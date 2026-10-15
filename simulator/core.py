@@ -6456,6 +6456,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         head_o2 = max(0.0, float(self.atom_ledger.mol_by_account(
             'process.overhead_gas').get(OXYGEN_SPECIES, 0.0)))
         available = max(0.0, head_o2 - self._headspace_floor_o2_mol())
+        reservoir.melt_redox_capacity_mol_per_ln_fO2 = self._melt_redox_source_capacity_mol_per_ln_fO2(
+            fO2_log=reservoir.melt_intrinsic_fO2_log, T_K=T_K,
+            gate_authority=gate_authority,
+        )
+        reservoir.headspace_capacity_mol_per_ln_pO2 = max(head_o2, self._effective_headspace_floor_o2_mol())
         uptake = alpha * _kress91_exchange_uptake_mol(
             feo_mol=feo, fe2o3_mol=ferric, mol_fractions=basis,
             T_K=T_K, pressure_bar=pressure, head_o2_mol=head_o2,
