@@ -639,6 +639,9 @@ def test_janaf_high_temperature_liquid_uses_printed_h298_baseline(table_id: str)
     assert fit.record["fit_statistics"]["smooth_fit_checks"][
         "maximum_relative_Cp_residual"
     ] <= 3e-5
+    assert fit.record["fit_statistics"]["H_minus_H298_kJ_per_mol"][
+        "max_abs"
+    ].hex() == "0x1.15277d6b40000p-11"
     segment_data = fit.record["thermo_record"]["segments"][0]
     segment = Nasa9Segment(
         segment_data["T_min_K"],
