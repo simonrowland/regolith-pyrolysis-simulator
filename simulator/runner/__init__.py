@@ -3572,13 +3572,20 @@ def _diagnostic_gate_authority_sentence(notice: Mapping[str, Any]) -> str:
 
 def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
     reason = str(notice.get("reason") or "openimcc_evaluation_refused")
-    campaign = str(notice.get("campaign") or "unspecified")
+    campaign = notice.get("campaign")
+    campaigns = notice.get("campaigns")
+    if campaign:
+        campaign_text = f"campaign `{campaign}`"
+    elif isinstance(campaigns, (list, tuple)) and campaigns:
+        campaign_text = f"campaigns `{', '.join(map(str, campaigns))}`"
+    else:
+        campaign_text = "campaign `unspecified`"
     return (
         f"**High-temperature melt activity**: OpenIMCC refusal `{reason}` "
         "used a constant-gamma extrapolated prediction for "
         f"{notice.get('affected_tick_count', 0)} tick(s) and "
         f"{notice.get('affected_parent_count', 0)} parent oxide(s), "
-        f"campaign `{campaign}`, hours {notice.get('first_hour')}-"
+        f"{campaign_text}, hours {notice.get('first_hour')}-"
         f"{notice.get('last_hour')}."
     )
 
