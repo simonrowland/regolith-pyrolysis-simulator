@@ -9428,7 +9428,17 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             if row.reference in stolyarova_1996_derived_pressures
             and row.key.rsplit("::", 1)[-1] == engine.value
         )
-        assert len(stolyarova_rows) == 235
+        unavailable_stolyarova_refs = {
+            obs.observation_id
+            for obs in score_module._refusal_diagnostic_references(filtered)
+            if obs.source_id
+            in {"kems-053-stolyarova-1991", "stolyarova-1995-cao-alumina-kems"}
+            and obs.value.kind is ValueKind.UNAVAILABLE
+        }
+        assert unavailable_stolyarova_refs <= {
+            row.reference for row in stolyarova_rows
+        }
+        assert len(stolyarova_rows) == 235 + len(unavailable_stolyarova_refs)
         activity_rows = [
             row for row in stolyarova_rows if row.reference in stolyarova_activities
         ]
@@ -10215,9 +10225,25 @@ def test_score_store_refuses_synthetic_unknown_reference_activity_point() -> Non
     assert residual.refusal.detail["fields"] == ["reference_state"]
 
 
+def _migrated_extract_context(*extract_names: str) -> ScoreContext:
+    from simulator.battery.migrate import Migrator
+
+    root = Path(__file__).resolve().parents[2]
+    migrator = Migrator(root)
+    for extract_name in extract_names:
+        migrator._migrate_extract(root / "data/literature/extracts" / extract_name)
+    return ScoreContext(
+        works=migrator.result.works,
+        experiments=migrator.result.experiments,
+        observations=migrator.result.observations,
+        benches=migrator.result.benches,
+        root=root,
+    )
+
+
 def test_score_store_refuses_unavailable_stolyarova_figure_only_rows() -> None:
     source_id = "stolyarova-1996-cao-alumina-silica-kems"
-    context = load_score_context(sources=(source_id,))
+    context = _migrated_extract_context(f"{source_id}.yaml")
     figure_row_keys = {
         "stolyarova_1996_fig1_al2o3_activity_figure_only",
         "stolyarova_1996_fig1_cao_activity_figure_only",
@@ -10275,6 +10301,70 @@ def test_score_store_refuses_unavailable_stolyarova_figure_only_rows() -> None:
         assert refusal.reason is RefusalReason.METRIC_DOMAIN
         assert refusal.detail == {
             "reason": "figure_not_digitized",
+            "value_kind": ValueKind.UNAVAILABLE.value,
+        }
+
+
+def test_score_store_refuses_rejected_unavailable_stolyarova_rows_by_state() -> None:
+    from simulator.battery.score import comparison_candidates, rail_for_quantity
+
+    context = _migrated_extract_context(
+        "kems-053-stolyarova-1991.yaml",
+        "stolyarova-1995-cao-alumina-kems.yaml",
+    )
+
+    root = context.root
+    expected_row_keys = {
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=cd704583d7d4",
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=a5d8822cf03d",
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=cc225cf7fcf4",
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=90a9faf3168d",
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=3f4c707e2ac9",
+        "stolyarova_1995_cao_activity_fig1_figure_only",
+        "stolyarova_1995_alumina_activity_fig1_figure_only",
+    }
+    observations = {
+        observation.observation_id: observation
+        for observation in context.observations.values()
+        if observation.observation_id.partition("::")[2] in expected_row_keys
+    }
+    assert {key.partition("::")[2] for key in observations} == expected_row_keys
+    context = replace(context, observations=observations)
+    assert not {
+        observation.observation_id
+        for observation in comparison_candidates(context)
+    } & observations.keys()
+
+    def prediction_must_not_run(*_args, **_kwargs):
+        pytest.fail("unavailable observations must refuse before prediction")
+
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=prediction_must_not_run,
+    )
+    assert {residual.reference for residual in residuals} == observations.keys()
+    for residual in residuals:
+        observation = observations[residual.reference]
+        expected_rail = (
+            Rail.MELT_ACTIVITY
+            if observation.source_id == "stolyarova-1995-cao-alumina-kems"
+            else Rail.THERMOCHEMISTRY
+        )
+        assert observation.admission.status is AdmissionStatus.REJECTED
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert rail_for_quantity(
+            quantity_token(observation.identity),
+            species_formula=observation.identity.species.formula,
+        ) is expected_rail
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.score_eligible is False
+        assert residual.rail is expected_rail
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
+        assert residual.refusal.detail == {
+            "reason": observation.value.unavailable_reason,
             "value_kind": ValueKind.UNAVAILABLE.value,
         }
 

@@ -6934,11 +6934,9 @@ def _refusal_diagnostic_references(context: ScoreContext) -> tuple[Observation, 
             and obs.value.kind is ValueKind.CATEGORICAL
             and obs.identity.quantity.is_unknown
         )
-        unavailable_figure_only = (
+        unavailable_on_known_rail = (
             status is AdmissionStatus.REJECTED
             and obs.value.kind is ValueKind.UNAVAILABLE
-            and evidence_class.is_value
-            and evidence_class.value is EvidenceClass.FIGURE_ONLY
             and rail_for_quantity(
                 quantity_token(obs.identity),
                 species_formula=obs.identity.species.formula,
@@ -6947,7 +6945,7 @@ def _refusal_diagnostic_references(context: ScoreContext) -> tuple[Observation, 
         if (
             activity_reference_unknown
             or categorical_quantity_unknown
-            or unavailable_figure_only
+            or unavailable_on_known_rail
         ):
             out.append(obs)
     return tuple(sorted(out, key=lambda o: o.observation_id))
