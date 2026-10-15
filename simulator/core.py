@@ -2991,10 +2991,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             terms,
             exchange_direction=exchange_direction,
         )
-        if internal_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL and (
+        return reservoir
+
+    def _settle_evaporative_redox_after_batch(self) -> None:
+        # Parent/shared-O2 caps reserve inventory for the whole carrier batch.
+        # Only after every carrier commits may Fe re-speciation consume FeO.
+        reservoir = self.melt.oxygen_reservoir
+        saturated = (
+            self._fe_redox_internal_o2_capacity_mol_this_hr > OXYGEN_RESERVOIR_NOOP_MOL
+        ) and (
             reservoir.melt_intrinsic_fO2_log >= self._melt_redox_fO2_upper_bound_log()
             or reservoir.melt_redox_capacity_mol_per_ln_fO2 <= OXYGEN_RESERVOIR_NOOP_MOL
-        ):
+        )
+        if saturated:
             # The evaporation transition already credited its O2 to the buffer.
             # At saturation, solve the finite Fe split BEFORE moving the remainder:
             # 2 FeO + 1/2 O2 = Fe2O3, so uptake is Δn(Fe2O3)/2 mol O2.
@@ -3020,7 +3029,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 diagnostic['excess_o2_to_headspace_mol'] = excess_o2_mol
                 diagnostic.setdefault('flags', []).append('EXCESS_OXYGEN_TO_GAS')
                 self._fe_redox_respeciation_diagnostics_this_hr[-1].update(diagnostic)
-        return reservoir
+        elif self._has_remaining_fe_redox_internal_o2_capacity():
+            self._apply_fe_redox_respeciation(
+                oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
+            )
+        else:
+            self._apply_fe_redox_respeciation()
 
     def _c6_back_reduction_redox_source_terms_from_transition(
         self,
@@ -5095,21 +5109,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_authority=gate_authority,
         )
         reservoir = self.melt.oxygen_reservoir
-        reservoir.melt_intrinsic_fO2_log = min(
-            fO2_log, self._melt_redox_fO2_upper_bound_log(),
-        )
+        reservoir.melt_intrinsic_fO2_log = fO2_log
         reservoir.reference_T_K = reference_T_K
         self._sync_oxygen_reservoir_mirror()
 
     def _melt_redox_fO2_upper_bound_log(self) -> float:
-        # Premise: the dilute overhead gas is ideal (f_O2 = p_O2) and controls
-        # the melt/gas boundary. Mole fraction y_O2 <= 1 gives
+        # INTERIM rapid-release/local-equilibrium sanity bound at the liquid
+        # interface, not a rewrite of the bulk or quenched reference. Premise:
+        # the gas is ideal (f_O2 = p_O2). Mole fraction y_O2 <= 1 gives
         # f_O2/bar = y_O2 * P_total/bar <= P_total/bar. P[bar] = P[mbar]/1000;
         # hence log10(f_O2/bar) <= log10(max(P_total[mbar]/1000, vacuum_floor)).
         # This is dimensionless and independent of T in the ideal-gas limit.
         # At 1400 C, 0.2 mbar gives 2e-4 bar and -3.6989700043 dex (pure O2);
-        # dilution lowers the allowed potential; as P -> 0 the model's vacuum
-        # floor is its pressure-resolution limit, not a new oxygen inventory.
+        # N2-sweep passive exchange uses actual headspace pO2 below this bound;
+        # the ceiling does not mean equilibrium with pure O2. As P -> 0 the
+        # vacuum floor is numerical pressure resolution, not physics.
         return math.log10(floor_vacuum_pressure_bar(
             float(self.melt.p_total_mbar) / 1000.0,
             floor_bar=self._vacuum_floor_bar(),
@@ -6085,6 +6099,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
         oxygen_source = str(oxygen_source or FE_REDOX_OXYGEN_SOURCE_OVERHEAD)
+        if (
+            oxygen_source == FE_REDOX_OXYGEN_SOURCE_OVERHEAD
+            and abs(self.melt.oxygen_reservoir.exchange_o2_mol)
+            > OXYGEN_RESERVOIR_NOOP_MOL
+        ):
+            # Passive exchange already moved the physical O2 between overhead
+            # and this buffer. The finite Fe split must settle that same move,
+            # not draw/release gas again. Select by the signed exchange, not a
+            # positive balance: release may have depleted the buffer to zero.
+            # The existing provider caps uptake by real buffer mol and flags
+            # any finite Kress demand beyond the differential exchange step.
+            oxygen_source = FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER
         buffer_capacity_mol = 0.0
         if internal_o2_capacity_mol is not None:
             buffer_capacity_mol = max(0.0, float(internal_o2_capacity_mol))
@@ -13748,12 +13774,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 6. Update melt composition ---
         # Subtract evaporated mass from the melt.
         self._update_melt_composition(evap_flux)
-        if self._has_remaining_fe_redox_internal_o2_capacity():
-            self._apply_fe_redox_respeciation(
-                oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
-            )
-        else:
-            self._apply_fe_redox_respeciation()
+        self._settle_evaporative_redox_after_batch()
 
         # --- 7. Overhead gas (with cold-train capacity feedback) ---   [LOOP-2]
         # Equipment sizing also supplies the runtime pipe/throat geometry used
