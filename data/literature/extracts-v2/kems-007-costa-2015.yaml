@@ -6,26 +6,76 @@ observations:
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::kems-007-costa-2015
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'solid_solution_olivine' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1700.0, 1800.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
-      to pick a number
+    unavailable_reason: figure_not_digitized
     approximate: false
   uncertainty:
     kind: printed
@@ -37,11 +87,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: figure_only
+    original_method_class: figure_only
   admission:
     status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    reason: figure_not_digitized
     decided_by:
       worker: codex-assisted
       date: '2026-10-01'
@@ -62,26 +112,76 @@ observations:
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::kems-007-costa-2015
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'solid_solution_olivine' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1700.0, 1800.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
-      to pick a number
+    unavailable_reason: figure_not_digitized
     approximate: false
   uncertainty:
     kind: printed
@@ -92,12 +192,12 @@ observations:
       - '0.02'
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'kems_effusion'
-    original_method_class: kems_effusion
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
   admission:
     status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    reason: figure_not_digitized
     decided_by:
       worker: codex-assisted
       date: '2026-10-01'
@@ -116,7 +216,7 @@ observations:
       docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/images/142292b86695fb9b3d3098881d5279bbb57f83f1b18d4ecac847962321570fd5.jpg
     source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
   read_from: unknown:kems-007-costa-2015
-- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_ir_digitized::T=1854.47:h=989e3786d145
+- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_ir_digitized::T=1854.47:h=0adeb14c7c4f
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_ir
   identity:
     quantity:
@@ -172,8 +272,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -239,6 +348,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker center pixel=(914.0,1095.0) at 300 dpi;
           pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -316,7 +444,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_ir_digitized::T=1912.34:h=898c96173c11
+- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_ir_digitized::T=1912.34:h=ae53103f3ae2
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_ir
   identity:
     quantity:
@@ -372,8 +500,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -439,6 +576,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker center pixel=(787.0,1013.0) at 300 dpi;
           pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -516,7 +672,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_ir_digitized::T=1959.53:h=13fb8229c6ad
+- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_ir_digitized::T=1959.53:h=ab2879545e2e
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_ir
   identity:
     quantity:
@@ -572,8 +728,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -639,6 +804,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker center pixel=(689.0,950.0) at 300 dpi;
           pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -716,7 +900,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_ir_digitized::T=2014.83:h=e7da93a38e60
+- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_ir_digitized::T=2014.83:h=662577b045c0
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_ir
   identity:
     quantity:
@@ -772,8 +956,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -839,6 +1032,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker center pixel=(580.0,900.0) at 300 dpi;
           pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -916,7 +1128,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_mo_digitized::T=1700.48:h=ad0f88ecf2dd
+- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_mo_digitized::T=1700.48:h=f7794f317b6a
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_mo
   identity:
     quantity:
@@ -972,8 +1184,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1039,6 +1260,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker center pixel=(1294.0,1074.0) at 300
           dpi; pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -1116,7 +1356,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_mo_digitized::T=1723.84:h=5fc208aa83b6
+- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_mo_digitized::T=1723.84:h=3a48d8c47ece
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_mo
   identity:
     quantity:
@@ -1172,8 +1412,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1239,6 +1488,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker center pixel=(1232.0,1051.0) at 300
           dpi; pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -1316,7 +1584,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_mo_digitized::T=1753.75:h=d649644b07c1
+- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_mo_digitized::T=1753.75:h=0141a3e723e9
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_mo
   identity:
     quantity:
@@ -1372,8 +1640,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1439,6 +1716,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker center pixel=(1155.0,1019.0) at 300
           dpi; pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -1516,7 +1812,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_mo_digitized::T=1794.18:h=75af75e3c504
+- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_mo_digitized::T=1794.18:h=bf92c4fe9bfb
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_mo
   identity:
     quantity:
@@ -1572,8 +1868,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1639,6 +1944,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker center pixel=(1055.0,981.0) at 300 dpi;
           pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -1716,7 +2040,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_mo_digitized::T=1799.16:h=143ac5ecb776
+- observation_id: kems-007-costa-2015::costa_2015_fe_partial_pressure_mo_digitized::T=1799.16:h=8aeb6c387a5d
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_mo
   identity:
     quantity:
@@ -1772,8 +2096,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1839,6 +2172,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker center pixel=(1043.0,962.0) at 300 dpi;
           pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -8882,7 +9234,7 @@ observations:
     paper_page_number: not printed; page is the one-based PDF page
     panel_temperature_K_as_printed: 1669
     ion_species_as_plotted: Fe+
-- observation_id: kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized::T=1700.75:h=682762865c33
+- observation_id: kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized::T=1700.75:h=9cb8e47fdf06
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::alpha_mo_multi_orifice
   identity:
     quantity:
@@ -8924,8 +9276,17 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -8987,6 +9348,25 @@ observations:
         pdf_page_index: 10
         figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure caption)
         note: Panel Fe+; digitized marker center pixel=(509.0,1415.0) at 300 dpi; pixel uncertainty +/-(10.0,10.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: as_published
     inputs:
@@ -9048,7 +9428,7 @@ observations:
     printed_cell_configuration: three Mo Knudsen cells with different orifice sizes
     orifice_diameters: different sizes stated; numeric diameters not printed
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized::T=1722.97:h=62173258382a
+- observation_id: kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized::T=1722.97:h=eea659ca04e2
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::alpha_mo_multi_orifice
   identity:
     quantity:
@@ -9090,8 +9470,17 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9153,6 +9542,25 @@ observations:
         pdf_page_index: 10
         figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure caption)
         note: Panel Fe+; digitized marker center pixel=(702.0,1436.0) at 300 dpi; pixel uncertainty +/-(10.0,10.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: as_published
     inputs:
@@ -9214,7 +9622,7 @@ observations:
     printed_cell_configuration: three Mo Knudsen cells with different orifice sizes
     orifice_diameters: different sizes stated; numeric diameters not printed
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized::T=1753.84:h=987cbef2f63c
+- observation_id: kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized::T=1753.84:h=2b12efddd06e
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::alpha_mo_multi_orifice
   identity:
     quantity:
@@ -9256,8 +9664,17 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9319,6 +9736,25 @@ observations:
         pdf_page_index: 10
         figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure caption)
         note: Panel Fe+; digitized marker center pixel=(970.0,1317.0) at 300 dpi; pixel uncertainty +/-(10.0,10.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: as_published
     inputs:
@@ -9380,7 +9816,7 @@ observations:
     printed_cell_configuration: three Mo Knudsen cells with different orifice sizes
     orifice_diameters: different sizes stated; numeric diameters not printed
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized::T=1794.26:h=733623c7db8d
+- observation_id: kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized::T=1794.26:h=f84d73c2ad36
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::alpha_mo_multi_orifice
   identity:
     quantity:
@@ -9422,8 +9858,17 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9485,6 +9930,25 @@ observations:
         pdf_page_index: 10
         figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure caption)
         note: Panel Fe+; digitized marker center pixel=(1321.0,1548.0) at 300 dpi; pixel uncertainty +/-(10.0,10.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: as_published
     inputs:
@@ -9546,7 +10010,7 @@ observations:
     printed_cell_configuration: three Mo Knudsen cells with different orifice sizes
     orifice_diameters: different sizes stated; numeric diameters not printed
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized::T=1799.68:h=aaacb48a2180
+- observation_id: kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized::T=1799.68:h=a60253b90e66
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::alpha_mo_multi_orifice
   identity:
     quantity:
@@ -9588,8 +10052,17 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9651,6 +10124,25 @@ observations:
         pdf_page_index: 10
         figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure caption)
         note: Panel Fe+; digitized marker center pixel=(1368.0,1505.0) at 300 dpi; pixel uncertainty +/-(10.0,10.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: as_published
     inputs:
@@ -9712,7 +10204,7 @@ observations:
     printed_cell_configuration: three Mo Knudsen cells with different orifice sizes
     orifice_diameters: different sizes stated; numeric diameters not printed
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_ir_digitized::T=1854.47:h=51938f1aefd5
+- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_ir_digitized::T=1854.47:h=cd275a00cd61
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_ir
   identity:
     quantity:
@@ -9768,8 +10260,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9835,6 +10336,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker center pixel=(914.0,1253.0) at 300 dpi;
           pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -9912,7 +10432,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_ir_digitized::T=1912.34:h=441d871dfec4
+- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_ir_digitized::T=1912.34:h=131ec1b848a8
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_ir
   identity:
     quantity:
@@ -9968,8 +10488,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10035,6 +10564,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker center pixel=(787.0,1144.0) at 300 dpi;
           pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -10112,7 +10660,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_ir_digitized::T=1959.53:h=2199b124e05e
+- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_ir_digitized::T=1959.53:h=6162d22092bc
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_ir
   identity:
     quantity:
@@ -10168,8 +10716,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10235,6 +10792,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker center pixel=(689.0,1048.0) at 300 dpi;
           pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -10312,7 +10888,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_ir_digitized::T=2014.83:h=4d6a6837951e
+- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_ir_digitized::T=2014.83:h=591981c5477a
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_ir
   identity:
     quantity:
@@ -10368,8 +10944,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10435,6 +11020,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker center pixel=(580.0,955.0) at 300 dpi;
           pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -10512,7 +11116,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_mo_digitized::T=1700.48:h=07fc052c86c3
+- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_mo_digitized::T=1700.48:h=92888a4961fd
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_mo
   identity:
     quantity:
@@ -10568,8 +11172,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10635,6 +11248,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker center pixel=(1294.0,1274.0) at 300
           dpi; pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -10712,7 +11344,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_mo_digitized::T=1722.69:h=8faa621c3742
+- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_mo_digitized::T=1722.69:h=1549d88f9355
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_mo
   identity:
     quantity:
@@ -10768,8 +11400,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10835,6 +11476,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker center pixel=(1235.0,1230.0) at 300
           dpi; pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -10912,7 +11572,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_mo_digitized::T=1753.75:h=6ad76a19fab9
+- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_mo_digitized::T=1753.75:h=c880b0566eb5
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_mo
   identity:
     quantity:
@@ -10968,8 +11628,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -11035,6 +11704,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker center pixel=(1155.0,1188.0) at 300
           dpi; pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -11112,7 +11800,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_mo_digitized::T=1794.18:h=fb94072cea56
+- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_mo_digitized::T=1794.18:h=c374a9acb2a9
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_mo
   identity:
     quantity:
@@ -11168,8 +11856,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -11235,6 +11932,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker center pixel=(1055.0,1110.0) at 300
           dpi; pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -11312,7 +12028,7 @@ observations:
     series_attribution: Costa & Jacobson (2015), this study
     fit_equations_printed_beside_plot: not digitized; only marker points are extracted
     printed_calibration: Au melting point temperature calibration is printed; no pressure calibration is printed
-- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_mo_digitized::T=1799.58:h=1f59318b1319
+- observation_id: kems-007-costa-2015::costa_2015_mg_partial_pressure_mo_digitized::T=1799.58:h=4f3217723d6b
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::experiment::pressure_mo
   identity:
     quantity:
@@ -11368,8 +12084,17 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -11435,6 +12160,25 @@ observations:
         figure: van't Hoff plot of the main species vaporized from the olivine samples (unnumbered figure caption)
         note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker center pixel=(1042.0,1103.0) at 300
           dpi; pixel uncertainty +/-(11.0,11.0) px
+    composition:
+      state:
+        tag: value
+        value:
+          basis: normalized_mole_fraction_from_published_Fo93Fa7
+          components:
+          - - MgO
+            - '0.62'
+          - - FeO
+            - '0.046666666667'
+          - - SiO2
+            - '0.333333333333'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+        note: Paper prints Fo93Fa7 (93% forsterite, 7% fayalite), p. 1. Using Fo = Mg2SiO4 and Fa = Fe2SiO4, 0.93 Fo + 0.07
+          Fa normalizes to MgO 0.62, FeO 0.046666666667, SiO2 0.333333333333 oxide mole fractions.
   derivation:
     relation: identity:Pa
     inputs:
@@ -20492,26 +21236,76 @@ observations:
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::kems-007-costa-2015
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'solid_solution_olivine' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1700.0, 1800.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
-      to pick a number
+    unavailable_reason: figure_not_digitized
     approximate: false
   uncertainty:
     kind: printed
@@ -20523,11 +21317,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: figure_only
+    original_method_class: figure_only
   admission:
     status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    reason: figure_not_digitized
     decided_by:
       worker: codex-assisted
       date: '2026-10-01'
@@ -20546,26 +21340,76 @@ observations:
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::kems-007-costa-2015
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'solid_solution_olivine' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1700.0, 1800.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: normalized_mole_fraction_from_published_Fo93Fa7
+        components:
+        - - MgO
+          - '0.62'
+        - - FeO
+          - '0.046666666667'
+        - - SiO2
+          - '0.333333333333'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
-      to pick a number
+    unavailable_reason: figure_not_digitized
     approximate: false
   uncertainty:
     kind: printed
@@ -20576,12 +21420,12 @@ observations:
       - '0.036'
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'kems_effusion'
-    original_method_class: kems_effusion
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
   admission:
     status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    reason: figure_not_digitized
     decided_by:
       worker: codex-assisted
       date: '2026-10-01'

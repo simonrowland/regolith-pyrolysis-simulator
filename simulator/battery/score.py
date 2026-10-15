@@ -237,6 +237,8 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.ACTIVITY: MetricOperation.DEX,
     Quantity.ACTIVITY_COEFFICIENT: MetricOperation.DEX,
     Quantity.DELTA_FG: MetricOperation.ABSOLUTE,
+    Quantity.ENTHALPY_OF_FUSION: MetricOperation.ABSOLUTE,
+    Quantity.ENTROPY_OF_FUSION: MetricOperation.ABSOLUTE,
     Quantity.H_MINUS_H298: MetricOperation.ABSOLUTE,
     Quantity.PARTIAL_MOLAR_ENTHALPY: MetricOperation.ABSOLUTE,
     Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW: MetricOperation.ABSOLUTE,
@@ -329,6 +331,20 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.OPENIMCC: (),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
 }
+
+
+def _attempt_coefficient_sources(
+    engine: Engine, coefficient_sources: tuple[str, ...] | None
+) -> tuple[str, ...]:
+    """Use explicit attempt ancestry, falling back only when it was unspecified."""
+
+    return (
+        ENGINE_COEFFICIENT_SOURCES[engine]
+        if coefficient_sources is None
+        else coefficient_sources
+    )
+
+
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
 # Unmapped aliases (MELTS calibration DBs) stay incomplete; do not invent
 # a work. VapoRock/Ellingham consume JANAF; Antoine sidecar is NIST WebBook;
@@ -1218,6 +1234,26 @@ def _is_flagged_stratum_notice(notice: Notice) -> bool:
     return bool(flagged_strata((notice,)))
 
 
+def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
+    if source_polymorph is None:
+        return True
+    if not source_polymorph.is_unknown:
+        return False
+    reason = source_polymorph.reason or ""
+    rejected = reason.startswith("unrecognised polymorph ") or (
+        reason.startswith("polymorph ") and " does not denote formula " in reason
+    )
+    return not rejected
+
+
+def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
+    return (
+        source_polymorph is not None
+        and source_polymorph.is_unknown
+        and not _source_polymorph_is_unspecified(source_polymorph)
+    )
+
+
 def _score_eligibility_notices(notices: Sequence[Notice]) -> tuple[Notice, ...]:
     """Remove diagnostic engine band flags; authority gates eligibility."""
 
@@ -1291,8 +1327,6 @@ def _janaf_pure_solid_table_temperature_range(
     if len(set(temperatures)) < 2:
         return None
     return min(temperatures), max(temperatures)
-
-
 @lru_cache(maxsize=1)
 def _b1259_tridymite_cristobalite_offset_rows() -> tuple[
     tuple[Decimal, Decimal, Decimal], ...
@@ -1448,8 +1482,12 @@ def fusion_comparison_reference(
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     from simulator.battery.generators.janaf import (
+        _JANAF_POLYMORPH_BY_TABLE,
         JANAF_R_J_PER_MOL_K,
+        JANAFFusionPolymorphUnavailable,
+        _janaf_eligible_pure_crystal_tables,
         _janaf_fusion_energy_for_pair,
+        _janaf_stable_crystal_set,
         janaf_fusion_energy,
     )
 
@@ -1467,6 +1505,7 @@ def fusion_comparison_reference(
                 "needed JANAF table node row missing or changed",
                 "JANAF cached table is incomplete",
                 "JANAF table values are missing",
+                "JANAF cache hash does not match source sidecar",
                 "JANAF table has fewer than two Gibbs points",
                 "spans missing grid node",
             )
@@ -1494,12 +1533,7 @@ def fusion_comparison_reference(
     # Thus ΔG_fus=+28.47061 kJ/mol and Δlog10(a)=ΔG_fus*1000/(R*T*ln(10))
     # = +0.793984 dex (R=8.31441 J mol^-1 K^-1). Their branches cross at
     # 3104.945598 K, where ΔG_fus and the reference shift go to zero.
-    expected_polymorph = {
-        "Ca-027": Polymorph.LIME,
-        "Al-096": Polymorph.CORUNDUM,
-        "Mg-008": Polymorph.PERICLASE,
-        "O-035": Polymorph.CRISTOBALITE_HIGH,
-    }.get(fusion.crystal_table)
+    expected_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
     tridymite_to_cristobalite = (
         formula == "SiO2"
@@ -1509,11 +1543,10 @@ def fusion_comparison_reference(
     source_polymorph = standard_state.endmember.polymorph
     source_polymorph_is_unknown = (
         source_polymorph is not None
-        and source_polymorph.is_unknown
-        and not (source_polymorph.reason or "").startswith("unrecognised polymorph ")
+        and _source_polymorph_is_unspecified(source_polymorph)
     )
-    source_polymorph_is_unspecified = (
-        source_polymorph is None or source_polymorph_is_unknown
+    source_polymorph_is_unspecified = _source_polymorph_is_unspecified(
+        source_polymorph
     )
     unique_unknown_polymorph_table = False
     inferred_reference_notice: Notice | None = None
@@ -1523,48 +1556,49 @@ def fusion_comparison_reference(
         and observed_polymorph is not expected_polymorph
         and source_polymorph_is_unspecified
     ):
-        eligible_solid_tables = tuple(
-            (table_id, table_polymorph)
-            for candidate_formula, table_id, table_polymorph
-            in _janaf_pure_solid_table_index()
-            if candidate_formula == formula
-            and (
-                table_range := _janaf_pure_solid_table_temperature_range(table_id)
-            ) is not None
-            and table_range[0] <= temperature_K <= table_range[1]
-        )
+        stability = None
+        try:
+            eligible_solid_tables = _janaf_eligible_pure_crystal_tables(
+                formula, temperature_K
+            )
+            if len(eligible_solid_tables) > 1:
+                stability = _janaf_stable_crystal_set(
+                    formula,
+                    temperature_K,
+                    eligible_solid_tables,
+                )
+        except JANAFFusionPolymorphUnavailable as exc:
+            notice = fusion_missing_input_notice(str(exc))
+            if notice is None:
+                notice = Notice(
+                    kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                    affected_quantities=(Quantity.ACTIVITY,),
+                    reason=(
+                        f"fusion conversion missing input for {formula}: "
+                        f"incomplete JANAF stability candidate set: {exc}"
+                    ),
+                    origin=reference.observation_id,
+                    band=f"JANAF stability data for {formula}: {exc}",
+                )
+            return replace(
+                reference,
+                notices=union_notices(reference.notices, (notice,)),
+            )
         if len(eligible_solid_tables) == 1:
             unique_unknown_polymorph_table = eligible_solid_tables[0][0] == (
                 fusion.crystal_table
             )
         elif len(eligible_solid_tables) > 1:
-            from simulator.battery.generators import janaf as janaf_tables
-
-            candidates: list[tuple[str, Polymorph, Decimal]] = []
-            for table_id, table_polymorph in eligible_solid_tables:
-                if table_polymorph is None:
-                    candidates = []
-                    break
-                try:
-                    points, _source_sha256 = janaf_tables._fusion_table_points(
-                        table_id
-                    )
-                    gibbs_kJ_per_mol = janaf_tables._interpolate_formation_gibbs(
-                        points, temperature_K
-                    )
-                except ValueError:
-                    continue
-                candidates.append((table_id, table_polymorph, gibbs_kJ_per_mol))
-
-            if len(candidates) == len(eligible_solid_tables) and candidates:
-                stable_table, stable_polymorph, stable_gibbs_kJ_per_mol = min(
-                    candidates, key=lambda item: item[2]
-                )
-                alternatives = tuple(
-                    item for item in candidates if item[0] != stable_table
-                )
-                if alternatives:
-                    # For equal chemical potential, changing the pure-solid
+            assert stability is not None
+            stable_table = stability.selected.table_id
+            stable_polymorph = stability.selected.polymorph
+            stable_gibbs_kJ_per_mol = stability.selected.gibbs_kJ_per_mol
+            alternatives = tuple(
+                (item.table_id, item.polymorph, item.gibbs_kJ_per_mol)
+                for item in stability.alternatives
+            )
+            if alternatives:
+                # For equal chemical potential, changing the pure-solid
                     # standard state shifts activity by exp(dG/RT). Therefore
                     # d log10(a) = dG / (R T ln 10); J/mol divided by
                     # (J/mol/K) K is dimensionless, and ln(10) converts ln to
@@ -3941,11 +3975,23 @@ def _comparison_identity(
         prediction.engine, prediction.notices
     )
     redox = quantity_token(identity) is Quantity.FE3_FE2_RATIO
+    fusion_polymorph_flag = (
+        quantity_token(identity) in FUSION_QUANTITIES
+        and any(
+            notice.reason.startswith("fusion_solid_polymorph_unspecified:")
+            for notice in prediction.notices
+        )
+    )
     comparison_activity = (
         quantity_token(identity) in MELT_ACTIVITY_QUANTITIES
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
-    if not solved_oxygen_balance and not comparison_activity and not redox:
+    if (
+        not solved_oxygen_balance
+        and not comparison_activity
+        and not redox
+        and not fusion_polymorph_flag
+    ):
         return identity
     updates: dict[str, State] = {}
     if redox and isinstance(prediction.identity, Identity):
@@ -3956,6 +4002,17 @@ def _comparison_identity(
             used = getattr(prediction.identity, field_name)
             if (actual is None or not actual.is_value) and used is not None and used.is_value:
                 updates[field_name] = used
+    if fusion_polymorph_flag:
+        call_evidence = prediction.execution.call_evidence or ""
+        fusion_pair = call_evidence.partition("janaf-fusion:")[2].partition(":")[0]
+        solid_table = fusion_pair.partition("/")[0]
+        from simulator.battery.generators.janaf import _JANAF_POLYMORPH_BY_TABLE
+
+        solid_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(solid_table)
+        if solid_polymorph is not None:
+            updates["species"] = replace(
+                identity.species, polymorph=State.of(solid_polymorph)
+            )
     if identity.composition is None or not identity.composition.is_value:
         point = _printed_point_composition(reference)
         if point is not None:
@@ -4551,7 +4608,10 @@ def predict_with_engine(
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
-        if quantity not in _engine_thermo_quantities(engine):
+        if (
+            quantity not in _engine_thermo_quantities(engine)
+            and quantity not in FUSION_QUANTITIES
+        ):
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
@@ -4751,15 +4811,30 @@ def predict_with_engine(
     # Formation and pure-standard quantities are not melt activities or
     # partial pressures. A missing branch used to read those maps and
     # return the wrong unit. Refuse instead of emitting 0.
-    if quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO:
+    if (
+        quantity in FORMATION_QUANTITIES
+        or quantity in PURE_STANDARD_THERMO
+        or quantity in FUSION_QUANTITIES
+    ):
         from simulator.battery.compilation_tier import predict_thermo_attempt
 
         attempt = predict_thermo_attempt(engine, observation)
+        coefficient_sources = _attempt_coefficient_sources(
+            engine, attempt.coefficient_sources
+        )
+        lineage_complete = (
+            lineage_complete_for(coefficient_sources)
+            if attempt.value is not None
+            else False
+        )
         if attempt.value is not None:
             exec_state = ExecutionState.PRODUCED
         elif attempt.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE:
             exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
-        elif attempt.refusal_reason is RefusalReason.UNSUPPORTED:
+        elif attempt.refusal_reason in {
+            RefusalReason.UNSUPPORTED,
+            RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+        }:
             exec_state = ExecutionState.UNSUPPORTED
         else:
             exec_state = ExecutionState.NOT_PROBED
@@ -4773,8 +4848,8 @@ def predict_with_engine(
             unit=attempt.unit,
             authority=attempt.authority,
             notices=attempt.notices,
-            coefficient_sources=sources,
-            lineage_complete=lineage_complete_for(sources) if attempt.value is not None else False,
+            coefficient_sources=coefficient_sources,
+            lineage_complete=lineage_complete,
             refusal_reason=attempt.refusal_reason,
             refusal_detail=attempt.refusal_detail,
             identity=identity,
@@ -6254,6 +6329,27 @@ def compile_residual(
             candidate,
         )
 
+    if (
+        quantity is Quantity.ACTIVITY
+        and isinstance(identity, Identity)
+        and identity.reference_state is not None
+        and identity.reference_state.is_value
+        and isinstance(identity.reference_state.value, StandardState)
+    ):
+        source_polymorph = identity.reference_state.value.endmember.polymorph
+        if _source_polymorph_is_rejected(source_polymorph):
+            assert source_polymorph is not None
+            return _refused(
+                RefusalReason.IDENTITY_MISMATCH,
+                {
+                    "reason": "solid_reference_polymorph_rejected",
+                    "formula": identity.reference_state.value.endmember.formula,
+                    "polymorph_reason": source_polymorph.reason,
+                },
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                exclusions=("identity_equal", "status_match_or_mismatch"),
+            )
+
     if quantity is None:
         detail: dict[str, object] = {"reason": "quantity_unknown"}
         if reference.value.kind is ValueKind.CATEGORICAL:
@@ -6467,6 +6563,13 @@ def compile_residual(
             if _kc91_calibration_source_overlap(attribution)
             else SourceRelation.INDEPENDENT
         )
+    if (
+        quantity in FUSION_QUANTITIES
+        and prediction.engine is Engine.INTERNAL_ANALYTICAL
+        and reference.read_from in prediction.coefficient_sources
+        and source_relation is SourceRelation.SAME_INPUT
+    ):
+        source_relation = SourceRelation.TRAINING
     compilation = is_compilation_evidence(reference) or is_compilation_source(
         reference.source_id, origin
     )

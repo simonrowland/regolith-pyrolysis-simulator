@@ -201,13 +201,39 @@ class VapoRockProvider(ChemistryProvider):
         # rather than re-raising -- the only legitimate raise on the
         # provider surface is the up-front ``ProviderUnavailableError``
         # above when the library itself is missing.
-        equilibrium = self._run_backend(
-            backend,
-            request,
-            composition_mol_by_account=composition_mol_by_account,
-            species_formula_registry=species_registry,
-            fO2_log_resolved=fO2_log_resolved,
-        )
+        backend_failure_warning = None
+        try:
+            equilibrium = self._run_backend(
+                backend,
+                request,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_registry,
+                fO2_log_resolved=fO2_log_resolved,
+            )
+        except Exception as exc:  # noqa: BLE001 - keep shadow failures diagnostic
+            if isinstance(exc, TimeoutError):
+                timeout_s = getattr(exc, 'timeout_s', None)
+                if (
+                    timeout_s is None
+                    and getattr(backend, '_warm_worker_enabled', False)
+                ):
+                    timeout_s = getattr(backend, '_warm_call_timeout_s', None)
+                timeout_detail = ' (timeout value unavailable)'
+                if timeout_s is not None:
+                    try:
+                        timeout_detail = f' after {float(timeout_s):g}s'
+                    except (TypeError, ValueError):
+                        timeout_detail = f' after {timeout_s!r}'
+                backend_failure_warning = (
+                    f'VapoRock backend call timed out{timeout_detail}: '
+                    f'{type(exc).__name__}: {exc}'
+                )
+            else:
+                backend_failure_warning = (
+                    'VapoRock backend call failed: '
+                    f'{type(exc).__name__}: {exc}'
+                )
+            equilibrium = None
         melt_envelope = consume_melt_extrapolation_envelope(
             melt_diagnostic,
             temperature_K=temperature_K,
@@ -220,6 +246,7 @@ class VapoRockProvider(ChemistryProvider):
             engine_version=self._engine_version(backend),
             allowed_species=self._allowed_species,
             melt_envelope=melt_envelope,
+            backend_failure_warning=backend_failure_warning,
         )
         return IntentResult(
             intent=ChemistryIntent.VAPOR_PRESSURE,
@@ -380,33 +407,30 @@ class VapoRockProvider(ChemistryProvider):
 
         The adapter handles its own library-boundary catches and
         surfaces failure via ``EquilibriumResult.status`` /
-        ``warnings``; we wrap one final broad except as a safety net
-        for unexpected exceptions.  Returns the adapter's
-        :class:`EquilibriumResult` or ``None`` on catastrophic failure.
+        ``warnings``. Unexpected exceptions propagate to :meth:`dispatch`,
+        which converts them to a warning instead of silently returning an
+        empty result.
         """
-        try:
-            controls = request.control_inputs or {}
-            liquid_fraction = None
-            if controls.get('liquid_fraction') is not None:
-                try:
-                    if not is_declared_real_scalar(
-                        controls['liquid_fraction'],
-                        allow_numeric_str=True,
-                    ):
-                        raise TypeError
-                    liquid_fraction = float(controls['liquid_fraction'])
-                except (TypeError, ValueError):
-                    liquid_fraction = None
-            return backend.equilibrate(
-                temperature_C=float(request.temperature_C),
-                pressure_bar=float(request.pressure_bar),
-                fO2_log=fO2_log_resolved,
-                composition_mol_by_account=composition_mol_by_account,
-                species_formula_registry=species_formula_registry,
-                liquid_fraction=liquid_fraction,
-            )
-        except Exception:  # noqa: BLE001 - library-boundary catch
-            return None
+        controls = request.control_inputs or {}
+        liquid_fraction = None
+        if controls.get('liquid_fraction') is not None:
+            try:
+                if not is_declared_real_scalar(
+                    controls['liquid_fraction'],
+                    allow_numeric_str=True,
+                ):
+                    raise TypeError
+                liquid_fraction = float(controls['liquid_fraction'])
+            except (TypeError, ValueError):
+                liquid_fraction = None
+        return backend.equilibrate(
+            temperature_C=float(request.temperature_C),
+            pressure_bar=float(request.pressure_bar),
+            fO2_log=fO2_log_resolved,
+            composition_mol_by_account=composition_mol_by_account,
+            species_formula_registry=species_formula_registry,
+            liquid_fraction=liquid_fraction,
+        )
 
     @staticmethod
     def _project_equilibrium(
@@ -417,6 +441,7 @@ class VapoRockProvider(ChemistryProvider):
         engine_version: str,
         allowed_species: frozenset[str],
         melt_envelope: MeltExtrapolationEnvelope,
+        backend_failure_warning: Optional[str] = None,
     ) -> VapoRockDiagnostics:
         """Convert an adapter :class:`EquilibriumResult` into VapoRock diagnostics.
 
@@ -437,6 +462,10 @@ class VapoRockProvider(ChemistryProvider):
                 mode=mode,
                 engine_version=engine_version,
                 backend_status='unavailable',
+                backend_warnings=(
+                    backend_failure_warning
+                    or 'VapoRock backend returned no equilibrium result.',
+                ),
             )
         raw_vapor = dict(
             getattr(equilibrium, 'vapor_pressures_Pa', {}) or {}
@@ -449,12 +478,16 @@ class VapoRockProvider(ChemistryProvider):
             ) or {}
         )
         vaporock_full_speciation_Pa: dict[str, float] = {}
+        rejected_pressure_count = 0
         for species, value in raw_full_speciation.items():
             if not _is_finite(value):
+                rejected_pressure_count += 1
                 continue
             pressure = float(value)
             if pressure >= 0.0:
                 vaporock_full_speciation_Pa[str(species)] = pressure
+            else:
+                rejected_pressure_count += 1
         del allowed_species
         vapor_pressures_Pa: dict[str, float] = {}
         warnings = tuple(
@@ -463,6 +496,31 @@ class VapoRockProvider(ChemistryProvider):
         backend_status = str(
             getattr(equilibrium, 'status', None) or 'unavailable'
         )
+        if not vaporock_full_speciation_Pa and not warnings:
+            backend_diagnostics = getattr(equilibrium, 'diagnostics', None)
+            empty_cause = None
+            if isinstance(backend_diagnostics, Mapping):
+                empty_cause = (
+                    backend_diagnostics.get('empty_speciation_cause')
+                    or backend_diagnostics.get('backend_status_reason')
+                )
+            if rejected_pressure_count:
+                reason = (
+                    'VapoRock provider discarded '
+                    f'{rejected_pressure_count} non-finite or negative vapor '
+                    'pressure value(s); no usable speciation remains.'
+                )
+            elif empty_cause:
+                reason = (
+                    'VapoRock returned no vapor speciation: backend reason '
+                    f'{empty_cause}.'
+                )
+            else:
+                reason = (
+                    'VapoRock returned empty vapor speciation '
+                    f'(backend_status={backend_status}).'
+                )
+            warnings = (reason,)
         # Validate the ENGINE-OUTCOME token here, because it never reaches the
         # DTO's own validation the way the other providers' tokens do.
         #

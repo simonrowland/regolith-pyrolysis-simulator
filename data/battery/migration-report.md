@@ -4,7 +4,7 @@ rows in: 49020
 records out (observations): 123875
 works: 317
 experiments: 3713
-queue size: 79021
+queue size: 78962
 identical-payload dedupe aliases: 342
 metadata files: 48
 index sources: 315
@@ -17,7 +17,7 @@ hard issues: 3334
 | citations | 147 | 314 (mismatch) |
 | doi_works | 56 | 160 (mismatch) |
 | no_doi_works | 91 | 157 (mismatch) |
-| admission_statuses | 374 | 1959 (mismatch) |
+| admission_statuses | 374 | 1963 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
 | series | 60 | 632 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
@@ -25,18 +25,18 @@ hard issues: 3334
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2103 (mismatch) |
 | equipment_payloads | 670 | 955 (mismatch) |
-| absent_admissions | 3511 | 5442 (mismatch) |
-| absent_classes | 2174 | 2104 (mismatch) |
-| range_only_T | 3125 | 2586 (mismatch) |
-| system_like_phases | 1065 | 2678 (mismatch) |
-| missing_phases | 237 | 966 (mismatch) |
+| absent_admissions | 3511 | 5438 (mismatch) |
+| absent_classes | 2174 | 2097 (mismatch) |
+| range_only_T | 3125 | 2570 (mismatch) |
+| system_like_phases | 1065 | 2653 (mismatch) |
+| missing_phases | 237 | 961 (mismatch) |
 | tabulated_lists | — | 6 |
 
 ## Evidence-class fall-throughs
 
 | source method_class | count |
 |---|---:|
-| `absent` | 445 |
+| `absent` | 438 |
 | `method_only` | 36 |
 | `derived_from_kems_equilibrium_constants` | 8 |
 | `third_law_kems` | 8 |
@@ -18045,7 +18045,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-003-pound-1972.yaml` | 18 | 18 | 65 |
 | `data/literature/extracts/kems-005-fedkin-2006.yaml` | 14 | 27 | 73 |
 | `data/literature/extracts/kems-006-zhang-2021.yaml` | 13 | 15 | 48 |
-| `data/literature/extracts/kems-007-costa-2015.yaml` | 17 | 113 | 24 |
+| `data/literature/extracts/kems-007-costa-2015.yaml` | 17 | 113 | 14 |
 | `data/literature/extracts/kems-008-schaefer-fegley-2004.yaml` | 78 | 78 | 338 |
 | `data/literature/extracts/kems-009-safarian-2013.yaml` | 2 | 2 | 10 |
 | `data/literature/extracts/kems-010-richter-2007.yaml` | 156 | 156 | 415 |
@@ -18059,12 +18059,12 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-019-miller-armatys-2013.yaml` | 28 | 28 | 60 |
 | `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 42 | 112 | 321 |
 | `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 10 | 25 | 40 |
-| `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 190 |
+| `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 178 |
 | `data/literature/extracts/kems-023-demaria-1973.yaml` | 30 | 75 | 58 |
 | `data/literature/extracts/kems-024-gibson-hubbard-1972.yaml` | 102 | 108 | 292 |
 | `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 44 | 63 |
 | `data/literature/extracts/kems-026-markova-1984.yaml` | 15 | 147 | 57 |
-| `data/literature/extracts/kems-027-plante-hastie-1983.yaml` | 26 | 48 | 128 |
+| `data/literature/extracts/kems-027-plante-hastie-1983.yaml` | 26 | 48 | 115 |
 | `data/literature/extracts/kems-028-yakovlev-1984.yaml` | 19 | 29 | 55 |
 | `data/literature/extracts/kems-029-yakovlev-shornikov-2011.yaml` | 5 | 15 | 26 |
 | `data/literature/extracts/kems-031-halwax-2024.yaml` | 28 | 30 | 115 |
@@ -18087,8 +18087,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-050-gorokhov-1977.yaml` | 3 | 3 | 10 |
 | `data/literature/extracts/kems-051-allibert-1981.yaml` | 9 | 99 | 56 |
 | `data/literature/extracts/kems-053-stolyarova-1991.yaml` | 18 | 145 | 27 |
-| `data/literature/extracts/kems-057-kambayashi-1985.yaml` | 25 | 145 | 300 |
-| `data/literature/extracts/kems-058-ohara-1987.yaml` | 34 | 110 | 255 |
+| `data/literature/extracts/kems-057-kambayashi-1985.yaml` | 25 | 145 | 275 |
+| `data/literature/extracts/kems-058-ohara-1987.yaml` | 34 | 110 | 256 |
 | `data/literature/extracts/kems-066-ichise-1977.yaml` | 45 | 49 | 235 |
 | `data/literature/extracts/kems-067-yamada-1980.yaml` | 18 | 48 | 87 |
 | `data/literature/extracts/kems-069-furukawa-1976.yaml` | 18 | 52 | 103 |
@@ -18357,8 +18357,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 220728
+advisory issues: 220377
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 220728 |
+| `identity_incomplete` | 220377 |
