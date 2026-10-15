@@ -3106,6 +3106,45 @@ def test_kress91_ferrous_feo_activity_no_iron_guards() -> None:
     ) == 0.0
 
 
+def test_closed_all_ferrous_vapor_activity_uses_ledger_split_at_iw_bound(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.fe_redox import (
+        calphad_ferrous_feo_activity_diagnostic,
+        kress91_furnace_activity_pressure_bar,
+    )
+
+    definitions = copy.deepcopy(feedstocks_data)
+    feedstock = definitions['lunar_mare_low_ti']
+    feedstock['composition_wt_pct']['Fe2O3'] = 0.0
+    feedstock['fe_redox_split_unknown'] = False
+    feedstock['intrinsic_redox']['formation_temperature_K'] = 1873.15
+    for oxide in ('FeO', 'Fe2O3'):
+        feedstock.setdefault('composition_basis', {})[oxide] = {
+            'method': 'defined all-ferrous endpoint fixture',
+            'source': 'test_closed_all_ferrous_vapor_activity_uses_ledger_split_at_iw_bound',
+        }
+    sim = _build_sim('lunar_mare_low_ti', vapor_pressure_data,
+                     definitions, setpoints_data)
+    sim.melt.temperature_C = 1600.0
+    potential = sim._current_melt_redox_fO2_log()
+    assert 'FE_FEO_SATURATION_BOUND' in sim._last_intrinsic_redox_state['flags']
+    assert sim.atom_ledger.mol_by_account('process.cleaned_melt').get('Fe2O3', 0.0) == 0.0
+    before = sim.atom_ledger.mol_by_account()
+    sim._get_equilibrium()
+    assert sim.atom_ledger.mol_by_account() == before
+
+    # A stability bound is not a finite inverse Kress solution. The closed
+    # runtime request must use the zero ferric fraction actually in its ledger.
+    expected = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=sim._melt_oxide_wt_pct(), fO2_log=potential, T_K=1873.15,
+        pressure_bar=kress91_furnace_activity_pressure_bar(
+            floor_bar=sim._vacuum_floor_bar()),
+        floor_bar=sim._vacuum_floor_bar(), fe3_over_sigma_fe=0.0,
+    )['a_FeO_authoritative']
+    assert sim._last_vapor_pressure_diagnostic['activities']['Fe'] == pytest.approx(expected)
+
+
 # ---------------------------------------------------------------------------
 # 2. Kernel filter scopes the account view
 # ---------------------------------------------------------------------------
