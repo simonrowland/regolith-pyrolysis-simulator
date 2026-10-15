@@ -2535,7 +2535,33 @@ def test_c2a_staged_po2_hold_uses_managed_exchange_not_direct_refresh(
     }
 
 
-def test_live_paths_do_not_call_intrinsic_heuristic(monkeypatch) -> None:
+def test_live_paths_do_not_call_intrinsic_heuristic(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    from simulator.engine_binding_admission import (
+        BindingIdentity,
+        write_gate_curve_memo_record,
+    )
+    from tests.binding_admission_fixtures import (
+        install_synthetic_binding_receipt,
+        register_synthetic_gate_curve_producer,
+    )
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=BindingIdentity(
+            "magemin", "ig", "magemin-ig-r1", "subprocess"
+        ),
+        provenance_override={
+            "binding_provenance_verifiable": True,
+            "runtime_artifacts": {
+                "magemin_selected_binary": {"sha256": "a" * 64},
+            },
+        },
+    )
     sim = _make_sim()
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1150.0
@@ -2543,17 +2569,16 @@ def test_live_paths_do_not_call_intrinsic_heuristic(monkeypatch) -> None:
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -6.5
     sim._sync_oxygen_reservoir_mirror()
     pressure_bar = sim.melt.p_total_mbar / 1000.0
-    sim._freeze_gate_liquid_fraction_cache = {
-        "key": sim._freeze_gate_cache_key(
-            pressure_bar=pressure_bar,
-            fO2_log=-6.5,
-        ),
-        "curve": {
-            "source": "test_cached_curve",
-            "solidus_T_C": 1000.0,
-            "liquidus_T_C": 1300.0,
-        },
+    curve_source = "test:fallback:cached_curve"
+    curve = {
+        "source": curve_source,
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1300.0,
     }
+    key = sim._freeze_gate_cache_key(
+        pressure_bar=pressure_bar,
+        fO2_log=-6.5,
+    )
     seen_sulfsat_fO2: list[float] = []
 
     def fail_heuristic(*_args, **_kwargs):
@@ -2566,8 +2591,13 @@ def test_live_paths_do_not_call_intrinsic_heuristic(monkeypatch) -> None:
     monkeypatch.setattr(sim, "_compute_intrinsic_melt_fO2", fail_heuristic)
     monkeypatch.setattr(sim, "_stage0_sulfur_input_ppm", lambda: 100.0)
     monkeypatch.setattr(sim._sulfsat_gate, "compute_sulfur_saturation", fake_sulfsat)
+    register_synthetic_gate_curve_producer(sim)
+    sim._freeze_gate_liquid_fraction_cache = {
+        "key": key,
+        **write_gate_curve_memo_record(sim, curve),
+    }
 
-    assert sim._freeze_gate_curve()["source"] == "test_cached_curve"
+    assert sim._freeze_gate_curve()["source"] == curve_source
     assert sim._internal_analytical_equilibrium().fO2_log == pytest.approx(-6.5)
     sim._attach_post_equilibrium_sulfsat(SimpleNamespace(warnings=[]))
 

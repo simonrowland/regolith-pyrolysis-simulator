@@ -2574,7 +2574,9 @@ def test_c6_ci_empty_window_records_binding_refusal_without_transitions(
         raise ProviderUnavailableError("C6 routing fixture: liquidus unavailable")
 
     monkeypatch.setattr(
-        PyrolysisSimulator, "_freeze_gate_curve", unavailable_liquidus_curve
+        PyrolysisSimulator,
+        "_freeze_gate_curve_record",
+        unavailable_liquidus_curve,
     )
     patched_setpoints = _hkl_only_setpoints(setpoints_data)
     sim = _build_sim(

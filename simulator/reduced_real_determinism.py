@@ -508,6 +508,11 @@ class PT0DeterminismStore:
         *,
         repair_notices: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
+        if uncacheable_replay_disposition(sim) or _openimcc_fallback_is_uncacheable(
+            sim
+        ):
+            self._mark_uncacheable_capture(sim)
+            return
         if not self._cached_real_binding_eligible(sim):
             self._mark_uncacheable_capture(sim)
             return
@@ -516,6 +521,14 @@ class PT0DeterminismStore:
             return
         intent = _equilibrium_payload_intent(sim)
         key = self._equilibrium_key(sim)
+        expected_dependency_vector = record_dependency_vector(
+            sim,
+            intent,
+            artifact="equilibrium_post_record",
+        )
+        if dependency_vector_from_replay_key(key) != expected_dependency_vector:
+            self._mark_uncacheable_capture(sim)
+            return
         payload = canonical_replay_output_projection(
             "equilibrium_post_record", sim, result
         )
@@ -644,10 +657,51 @@ class PT0DeterminismStore:
         curve: Mapping[str, Any],
         repair_notices: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
+        if uncacheable_replay_disposition(sim):
+            self._mark_uncacheable_capture(sim)
+            return
         if not _is_cacheable_gate_curve(curve):
             self._mark_uncacheable_capture(sim)
             return
-        if not self.gate_curve_cache_eligible(sim, curve):
+        from simulator.engine_binding_admission import (
+            gate_curve_memo_evidence,
+            gate_curve_memo_origin_matches,
+        )
+
+        active_record = getattr(
+            sim,
+            "_freeze_gate_liquid_fraction_cache",
+            None,
+        )
+        if not (
+            isinstance(active_record, Mapping)
+            and active_record.get("disposition") in {"live", "memo-hit"}
+            and isinstance(active_record.get("curve"), Mapping)
+            and dict(active_record["curve"]) == dict(curve)
+            and gate_curve_memo_origin_matches(
+                sim,
+                curve,
+                active_record.get("origin"),
+                fresh_evidence=False,
+            )
+        ):
+            self._mark_uncacheable_capture(sim)
+            return
+        evidence = gate_curve_memo_evidence(
+            sim,
+            curve,
+            include_selected_bindings=True,
+        )
+        if (
+            not gate_curve_memo_origin_matches(
+                sim,
+                curve,
+                active_record.get("origin"),
+                fresh_evidence=True,
+                evidence=evidence,
+            )
+            or not evidence.eligible
+        ):
             self._mark_uncacheable_capture(sim)
             return
         provider_role = _gate_provider_role_for_capture(sim, curve)
@@ -660,6 +714,14 @@ class PT0DeterminismStore:
             provider_role=provider_role,
             control_quantization=self._control_quantization,
         )
+        if dependency_vector_from_replay_key(key) != record_dependency_vector(
+            sim,
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+            artifact="freeze_gate_curve",
+            provider_role=provider_role,
+        ):
+            self._mark_uncacheable_capture(sim)
+            return
         self._store(
             "freeze_gate_curve",
             key,
@@ -957,7 +1019,10 @@ class PT0DeterminismStore:
             key_hash = _sha256(key_bytes)
             checked.append((key, key_bytes, key_hash))
             entry = self._entry_for_key(artifact, key, key_bytes, key_hash)
-            if entry is None:
+            if entry is None or not replay_dependency_vectors_match(
+                key,
+                entry.get("key", {}),
+            ):
                 continue
             self.replay_sequence.append(
                 {
@@ -980,7 +1045,12 @@ class PT0DeterminismStore:
             self.hits += 1
             self.last_cache_state = "cached_exact"
             self._record_cache_event(artifact, "cached_exact")
-            _emit_repair_notices(sim, (entry.get("repair_notices_json"),))
+            replay_notices = _emit_repair_notices(
+                sim,
+                (entry.get("repair_notices_json"),),
+            )
+            if artifact == "freeze_gate_curve" and sim is not None:
+                sim._last_reduced_real_replay_notices = replay_notices
             return copy.deepcopy(entry["payload"])
 
         key, _key_bytes, key_hash = checked[0]
@@ -1072,6 +1142,11 @@ class PT0DeterminismStore:
                             )
                             physics_bucket_rung = rung_tag
                             break
+            if entry is not None and not replay_dependency_vectors_match(
+                candidate_key,
+                entry.get("key", {}),
+            ):
+                entry = None
             if entry is not None:
                 break
             if tier_ceiling == "cached_interpolated":
@@ -2215,6 +2290,8 @@ def _effective_magemin_database(
     sim: Any,
     intent: ChemistryIntent,
     provider_role: str | None,
+    *,
+    resolve_default: bool = True,
 ) -> str | None:
     candidates: list[Any] = []
     registry = getattr(sim, "_chem_registry", None)
@@ -2231,6 +2308,14 @@ def _effective_magemin_database(
         database = getattr(candidate, "_database", None)
         if database is not None and str(database).strip():
             return str(database).strip()
+    if resolve_default and any(
+        getattr(candidate, "real_backend_family", None)
+        is RealBackendFamily.MAGEMIN
+        for candidate in candidates
+    ):
+        from simulator.melt_backend.magemin import MAGEMinBackend
+
+        return MAGEMinBackend._DEFAULT_DATABASE
     return None
 
 
@@ -2255,6 +2340,8 @@ def _resolved_backend_for_cache_identity(
             is RealBackendFamily.MAGEMIN
         ):
             return provider
+        if provider is not None and intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            return None
     backend = getattr(sim, "backend", None)
     return getattr(backend, "_live_backend", None) or backend
 
@@ -2330,7 +2417,10 @@ def record_dependency_vector(
     *,
     artifact: str,
     provider_role: str | None = None,
+    resolve_magemin_database_default: bool = False,
 ) -> dict[str, Any]:
+    # PT0 keys keep an unset MAGEMin database as recorded; memo admission opts
+    # into resolving that default so lazy and initialized producers compare equal.
     provider = _provider_identity(sim, intent, provider_role=provider_role)
     vapor_provider = _provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
     resolved_backend = _resolved_backend_for_cache_identity(
@@ -2365,7 +2455,10 @@ def record_dependency_vector(
             "model": provider.get("model"),
             "mode": provider.get("mode"),
             "magemin_database": _effective_magemin_database(
-                sim, intent, provider_role
+                sim,
+                intent,
+                provider_role,
+                resolve_default=resolve_magemin_database_default,
             ),
         },
     }
@@ -2433,6 +2526,118 @@ def replay_scope_dependency_vector(key: Mapping[str, Any]) -> dict[str, Any]:
             if sulfur_side.get(name) is not None
         }
     return vector
+
+
+def dependency_vector_from_replay_key(
+    key: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Read the complete dependency selection already carried by a replay key."""
+
+    fields = (
+        "namespace_id",
+        "vapor_pressure_provider_selection",
+        "sulfur_side",
+        "model",
+    )
+    if any(field not in key for field in fields):
+        return None
+    if not isinstance(key.get("sulfur_side"), Mapping):
+        return None
+    if not isinstance(key.get("model"), Mapping):
+        return None
+    return _json_ready({field: key[field] for field in fields})
+
+
+def replay_dependency_vectors_match(
+    query_key: Mapping[str, Any],
+    candidate_key: Mapping[str, Any],
+) -> bool:
+    query_vector = dependency_vector_from_replay_key(query_key)
+    return (
+        query_vector is not None
+        and dependency_vector_from_replay_key(candidate_key) == query_vector
+    )
+
+
+def gate_curve_memo_producer_configuration(
+    sim: Any,
+    curve: Mapping[str, Any],
+) -> dict[str, Any]:
+    # Match the provider selection used by gate dispatch before a cache read.
+    # Gate providers are otherwise registered lazily by the dispatch path,
+    # after an uninitialized receiver has already refused a shared memo.
+    _register_gate_providers_for_key(sim)
+    provider_role = _gate_curve_provider_role(curve)
+    if provider_role is None:
+        provider_role = _gate_provider_role_for_key(sim)
+    dependency_vector = record_dependency_vector(
+        sim,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact="freeze_gate_curve",
+        provider_role=provider_role,
+        resolve_magemin_database_default=True,
+    )
+    sulfur_side = dependency_vector["sulfur_side"]
+    model = dependency_vector["model"]
+    return {
+        "namespace_id": dependency_vector["namespace_id"],
+        "vapor_pressure_provider_selection": dependency_vector[
+            "vapor_pressure_provider_selection"
+        ],
+        "sulfur_side": {
+            "sulfsat_available": sulfur_side["sulfsat_available"],
+            "sulfsat_provider_selection": (
+                sulfur_side["sulfsat_provider_selection"]
+            ),
+        },
+        "model": {
+            name: model[name]
+            for name in ("model", "mode", "magemin_database")
+        },
+    }
+
+
+def gate_curve_memo_record(
+    curve: Mapping[str, Any],
+    origin: Mapping[str, Any] | None,
+    repair_notices: Sequence[Mapping[str, Any]] | None,
+    disposition: str,
+) -> dict[str, Any]:
+    """Build the runtime record shared by the producer and core reader."""
+
+    return {
+        "curve": dict(curve),
+        "origin": dict(origin) if isinstance(origin, Mapping) else None,
+        "repair_notices": [dict(notice) for notice in repair_notices or ()],
+        "disposition": disposition,
+    }
+
+
+def uncacheable_replay_disposition(sim: Any) -> bool:
+    reasons = getattr(sim, "_reduced_real_uncacheable_reasons", None)
+    return bool(reasons)
+
+
+def mark_uncacheable_replay_disposition(sim: Any, reason: str) -> None:
+    reasons = getattr(sim, "_reduced_real_uncacheable_reasons", None)
+    if not isinstance(reasons, list):
+        reasons = []
+        sim._reduced_real_uncacheable_reasons = reasons
+    text = str(reason)
+    if text and text not in reasons:
+        reasons.append(text)
+
+
+def _openimcc_fallback_is_uncacheable(sim: Any) -> bool:
+    diagnostic = getattr(sim, "_last_vapor_pressure_diagnostic", None)
+    if not isinstance(diagnostic, Mapping):
+        return False
+    high_t = diagnostic.get("high_t_melt_activity")
+    if not isinstance(high_t, Mapping):
+        return False
+    return bool(high_t.get("fallback")) or str(high_t.get("provider")) == (
+        "constant_gamma"
+    )
 
 
 def canonical_replay_key(
@@ -3285,9 +3490,9 @@ def _emit_repair_notices(
     groups: Sequence[str | None],
     *,
     approximation_cache_state: str | None = None,
-) -> None:
+) -> list[dict[str, Any]]:
     if sim is None:
-        return
+        return []
     collected: list[dict[str, Any]] = []
     seen: set[bytes] = set()
     legacy_history_unavailable = False
@@ -3312,6 +3517,7 @@ def _emit_repair_notices(
         )
     for notice in collected:
         record_repair_notice(sim, notice)
+    return copy.deepcopy(collected)
 
 
 def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:

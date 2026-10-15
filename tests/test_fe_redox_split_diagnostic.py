@@ -41,17 +41,20 @@ def _make_sim(feedstock_id: str, *, temperature_C: float = 1600.0) -> PyrolysisS
 
 
 def _seed_redox_liquidus_curve(sim: PyrolysisSimulator) -> None:
+    from simulator.engine_binding_admission import write_gate_curve_memo_record
+
+    curve = {
+        "source": "test",
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1300.0,
+        "path": (
+            (1000.0, 0.0),
+            (1300.0, 1.0),
+        ),
+    }
     sim._freeze_gate_liquid_fraction_cache = {
         "key": ("test",),
-        "curve": {
-            "source": "test",
-            "solidus_T_C": 1000.0,
-            "liquidus_T_C": 1300.0,
-            "path": (
-                (1000.0, 0.0),
-                (1300.0, 1.0),
-            ),
-        },
+        **write_gate_curve_memo_record(sim, curve),
     }
 
 

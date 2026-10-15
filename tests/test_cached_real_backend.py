@@ -23,6 +23,7 @@ from simulator.backends import (
     resolve_backend,
 )
 from simulator.engine_binding_admission import (
+    BindingIdentity,
     EngineBindingAdmissionError,
     binding_admission_run_notice,
 )
@@ -51,6 +52,11 @@ from simulator.reduced_real_determinism import (
     equilibrium_payload,
 )
 from simulator.state import CampaignPhase
+from tests.binding_admission_fixtures import (
+    install_synthetic_binding_receipt,
+    register_synthetic_gate_curve_producer,
+    seed_gate_curve_memo_record,
+)
 
 _DEFAULT_MELTS_REPLAY_KEY_HASH = (
     "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e"
@@ -66,12 +72,42 @@ def _synthetic_binding_receipt_for_cache_tests(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Keep cache-mechanics tests on a test-only binding, never real pins."""
-    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
-
     install_synthetic_binding_receipt(
         tmp_path,
         monkeypatch,
         bind_direct_backend=True,
+    )
+
+
+def _install_gate_curve_binding_receipt(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    engine_id: str,
+) -> None:
+    if engine_id == "magemin":
+        identity = BindingIdentity(
+            "magemin", "ig", "magemin-ig-r1", "subprocess"
+        )
+        artifact_name = "magemin_selected_binary"
+    elif engine_id == "alphamelts":
+        identity = BindingIdentity(
+            "alphamelts",
+            "MELTSv1.0.2",
+            "alphamelts-r1",
+            "subprocess",
+        )
+        artifact_name = "alphamelts_selected_binary"
+    else:
+        raise ValueError(f"unsupported gate-curve test engine: {engine_id}")
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=identity,
+        provenance_override={
+            "binding_provenance_verifiable": True,
+            "runtime_artifacts": {artifact_name: {"sha256": "a" * 64}},
+        },
     )
 
 
@@ -1975,7 +2011,9 @@ def test_cached_real_gate_curve_key_uses_alphamelts_authoritative_provenance(
 
 def test_cached_real_authoritative_gate_curve_live_fill_replay_hits(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    _install_gate_curve_binding_receipt(tmp_path, monkeypatch, "alphamelts")
     db_path = tmp_path / "cached-real.db"
     live_config = _cache_config(
         db_path,
@@ -1996,6 +2034,7 @@ def test_cached_real_authoritative_gate_curve_live_fill_replay_hits(
     fO2_log = live_sim._compute_intrinsic_melt_fO2()
     curve = _authoritative_gate_curve()
 
+    seed_gate_curve_memo_record(live_sim, curve)
     live_sim._pt0_store().capture_gate_curve(
         live_sim,
         fO2_log=fO2_log,
@@ -2063,17 +2102,21 @@ def test_cached_real_skips_direct_alphamelts_unavailable_equilibrium_cache(
 
 def test_direct_alphamelts_fallback_gate_curve_replay_exact_hits(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    _install_gate_curve_binding_receipt(tmp_path, monkeypatch, "magemin")
     db_path = tmp_path / "direct-alphamelts-fallback-gate.db"
     direct_sim = _build_direct_real_sim(
         AlphaMELTSBackend(),
         db_path=db_path,
     )
+    register_synthetic_gate_curve_producer(direct_sim)
     fallback_curve = {
         **_authoritative_gate_curve(),
         "source": "gate_liquid_fraction:fallback:magemin-shadow",
     }
 
+    seed_gate_curve_memo_record(direct_sim, fallback_curve)
     direct_sim._pt0_store().capture_gate_curve(
         direct_sim,
         fO2_log=direct_sim._compute_intrinsic_melt_fO2(),
@@ -2082,6 +2125,7 @@ def test_direct_alphamelts_fallback_gate_curve_replay_exact_hits(
     live_key = direct_sim._pt0_store().capture_sequence[-1]["key"]
 
     replay_sim = _build_direct_real_sim(AlphaMELTSBackend())
+    register_synthetic_gate_curve_producer(replay_sim)
     replay_store = PT0DeterminismStore("replay", db_path=db_path)
     replay_sim.configure_pt0_determinism_store(replay_store)
     replay_curve = replay_store.replay_gate_curve(
@@ -2102,14 +2146,17 @@ def test_direct_alphamelts_fallback_gate_curve_replay_exact_hits(
 
 def test_cached_real_direct_alphamelts_gate_curve_engine_change_is_key_neutral(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     db_path = tmp_path / "cached-real.db"
+    _install_gate_curve_binding_receipt(tmp_path, monkeypatch, "alphamelts")
     direct_backend = AlphaMELTSBackend()
     assert direct_backend.initialize({})
     from simulator.engine_binding_admission import publish_live_backend_admission
 
     publish_live_backend_admission(direct_backend)
     direct_sim = _build_direct_real_sim(direct_backend, db_path=db_path)
+    seed_gate_curve_memo_record(direct_sim, _authoritative_gate_curve())
     direct_sim._pt0_store().capture_gate_curve(
         direct_sim,
         fO2_log=direct_sim._compute_intrinsic_melt_fO2(),
