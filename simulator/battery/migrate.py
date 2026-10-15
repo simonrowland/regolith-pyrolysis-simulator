@@ -6666,13 +6666,11 @@ def make_species(
         if polymorph is None:
             polymorph = State.unknown(
                 "source does not state polymorph",
-                rejection_kind=PolymorphRejectionKind.OMITTED,
             )
     elif token is None:
         if polymorph is None:
             polymorph = State.unknown(
                 "phase unknown; polymorph unresolved",
-                rejection_kind=PolymorphRejectionKind.OMITTED,
             )
     else:
         if polymorph is None or polymorph.is_value:
