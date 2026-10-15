@@ -82,3 +82,26 @@ def test_ostrovski_2000_migrates_printed_activity_cells() -> None:
         and observation.point_conditions["temperature_K"].locator is not None
         for observation in located
     )
+
+
+def test_gaillard_2003_migrates_printed_activity_cells() -> None:
+    result = _migrate("gaillard-2003-hydrous-silicic-melt-activity.yaml")
+    assert len(result.observations) == 260
+    assert _point(
+        result, "gaillard_2003_table4_run7_a_fe2o3::point:1"
+    ) == Decimal("0.102")
+    assert _point(
+        result, "gaillard_2003_table4_run7_a_feo::point:0"
+    ) == Decimal("0.017")
+    located = [
+        observation
+        for observation in result.observations.values()
+        if observation.point_conditions
+    ]
+    assert len(located) == 96
+    assert all(
+        observation.identity.temperature_K.is_value
+        and observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].locator is not None
+        for observation in located
+    )
