@@ -389,7 +389,7 @@
             "status": "UNCERTIFIED",
             "output_status": "status_bearing",
             "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1923.15,
+            "alpha_s_temperature_K": 1443.15,
             "alpha_s_extrapolated": false,
             "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
             "citation_status": "UNCERTIFIED",
@@ -719,7 +719,7 @@
             "status": "sourced",
             "output_status": "status_bearing",
             "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1473.15,
+            "alpha_s_temperature_K": 1338.15,
             "alpha_s_extrapolated": true,
             "alpha_s_valid_range_K": [
               1700.0,
@@ -729,7 +729,7 @@
               1700.0,
               1800.0
             ],
-            "alpha_s_extrapolation_warning": "Fe alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 1800] at 1473.15 K",
+            "alpha_s_extrapolation_warning": "Fe alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 1800] at 1338.15 K",
             "alpha_s_temperature_below_valid_range": true,
             "source_url": "https://ntrs.nasa.gov/citations/20150002321",
             "citation_status": "CITED",
@@ -1176,7 +1176,7 @@
             "status": "UNCERTIFIED",
             "output_status": "status_bearing",
             "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1473.15,
+            "alpha_s_temperature_K": 1338.15,
             "alpha_s_extrapolated": true,
             "alpha_s_valid_range_K": [
               1700.0,
@@ -1186,7 +1186,7 @@
               1700.0,
               2273.0
             ],
-            "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 1473.15 K",
+            "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 1338.15 K",
             "alpha_s_temperature_below_valid_range": true,
             "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
             "citation_status": "UNCERTIFIED",
@@ -2000,7 +2000,7 @@
             "status": "sourced",
             "output_status": "status_bearing",
             "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1473.15,
+            "alpha_s_temperature_K": 1338.15,
             "alpha_s_extrapolated": true,
             "alpha_s_valid_range_K": [
               1873.0,
@@ -2010,7 +2010,7 @@
               1873.0,
               2373.0
             ],
-            "alpha_s_extrapolation_warning": "Mg alpha_s scalar coefficient extrapolated beyond valid_range_K [1873, 2373] at 1473.15 K",
+            "alpha_s_extrapolation_warning": "Mg alpha_s scalar coefficient extrapolated beyond valid_range_K [1873, 2373] at 1338.15 K",
             "alpha_s_temperature_below_valid_range": true,
             "source_url": "https://doi.org/10.1016/S0016-7037(01)00782-7",
             "citation_status": "CITED",
@@ -2691,7 +2691,7 @@
             "status": "UNCERTIFIED",
             "output_status": "status_bearing",
             "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1473.15,
+            "alpha_s_temperature_K": 1338.15,
             "alpha_s_extrapolated": false,
             "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
             "citation_status": "UNCERTIFIED",
@@ -2792,7 +2792,7 @@
             "status": "UNCERTIFIED",
             "output_status": "status_bearing",
             "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 1473.15,
+            "alpha_s_temperature_K": 1338.15,
             "alpha_s_extrapolated": true,
             "alpha_s_valid_range_K": [
               1700.0,
@@ -2802,7 +2802,7 @@
               1700.0,
               2273.0
             ],
-            "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 1473.15 K",
+            "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 1338.15 K",
             "alpha_s_temperature_below_valid_range": true,
             "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
             "citation_status": "UNCERTIFIED",
@@ -3839,28 +3839,26 @@
         "SiO": {
           "stage_0_to_stage_1": {
             "species": "SiO",
-            "alpha_s": 0.07080594980098856,
+            "alpha_s": 0.03832794384219791,
             "source": "Wetzel & Gail 2013 A&A 553 A92 use 0.52*exp(-3685/T) as a solid-SiO particle-growth coefficient, not a silicate-melt free-evaporation coefficient. Runtime retains the numeric form only as an explicitly uncertified hot-source proxy. Cold-wall condensation below the valid_range_K floor separately uses the cited Pound high-supersaturation limit.",
             "source_class": "solid_film_growth_proxy_not_evaporation_evidence",
             "status": "UNCERTIFIED",
             "output_status": "status_bearing",
             "alpha_s_form": "arrhenius",
-            "alpha_s_temperature_K": 1848.15,
+            "alpha_s_temperature_K": 1413.15,
             "alpha_s_A": 0.52,
             "alpha_s_B": 3685.0,
             "alpha_s_valid_range_K": [
               1000.0,
               1800.0
             ],
-            "alpha_s_extrapolated": true,
+            "alpha_s_extrapolated": false,
             "alpha_s_uncertainty_envelope": [
               0.003,
               0.067
             ],
             "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
             "alpha_s_status": "UNCERTIFIED",
-            "alpha_s_temperature_above_valid_range": true,
-            "alpha_s_extrapolation_warning": "SiO alpha_s arrhenius coefficient extrapolated beyond valid_range_K [1000, 1800] at 1848.15 K",
             "source_url": "https://doi.org/10.1051/0004-6361/201220803",
             "citation_status": "UNCERTIFIED",
             "temperature_range_K": [
@@ -3895,8 +3893,8 @@
                 "source": "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
               }
             },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false
+            "alpha_s_domain_status": "in_domain",
+            "alpha_s_authoritative_at_temperature": true
           },
           "stage_1_to_stage_2": {
             "species": "SiO",
@@ -9437,7 +9435,7 @@
       "wall_saturation_pressure_extrapolations_by_species": {
         "K": {
           "stage_0_to_stage_1": {
-            "temperature_K": 1473.15,
+            "temperature_K": 1338.15,
             "valid_range_K": [
               679.4,
               1033.0
@@ -9477,7 +9475,7 @@
             "status": "extrapolated"
           },
           "stage_0_to_stage_1#2": {
-            "temperature_K": 1623.15,
+            "temperature_K": 1368.15,
             "valid_range_K": [
               679.4,
               1033.0
@@ -9517,7 +9515,7 @@
             "status": "extrapolated"
           },
           "stage_0_to_stage_1#3": {
-            "temperature_K": 1773.15,
+            "temperature_K": 1398.15,
             "valid_range_K": [
               679.4,
               1033.0
@@ -9557,7 +9555,7 @@
             "status": "extrapolated"
           },
           "stage_0_to_stage_1#4": {
-            "temperature_K": 1923.15,
+            "temperature_K": 1428.15,
             "valid_range_K": [
               679.4,
               1033.0
@@ -9588,6 +9586,86 @@
           },
           "stage_3_to_stage_4#4": {
             "temperature_K": 1923.15,
+            "valid_range_K": [
+              679.4,
+              1033.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#5": {
+            "temperature_K": 1458.15,
+            "valid_range_K": [
+              679.4,
+              1033.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#6": {
+            "temperature_K": 1488.15,
+            "valid_range_K": [
+              679.4,
+              1033.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#7": {
+            "temperature_K": 1518.15,
+            "valid_range_K": [
+              679.4,
+              1033.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#8": {
+            "temperature_K": 1548.15,
+            "valid_range_K": [
+              679.4,
+              1033.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#9": {
+            "temperature_K": 1578.15,
+            "valid_range_K": [
+              679.4,
+              1033.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#10": {
+            "temperature_K": 1600.65,
+            "valid_range_K": [
+              679.4,
+              1033.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#11": {
+            "temperature_K": 1615.65,
+            "valid_range_K": [
+              679.4,
+              1033.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#12": {
+            "temperature_K": 1630.65,
             "valid_range_K": [
               679.4,
               1033.0
@@ -9598,16 +9676,6 @@
           }
         },
         "Mg": {
-          "stage_0_to_stage_1": {
-            "temperature_K": 1473.15,
-            "valid_range_K": [
-              701,
-              1361
-            ],
-            "authority_level": "extrapolated",
-            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1473.150 source_certified_range_K=[701, 1361]",
-            "status": "extrapolated"
-          },
           "stage_1_to_stage_2": {
             "temperature_K": 1473.15,
             "valid_range_K": [
@@ -9638,14 +9706,14 @@
             "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1473.150 source_certified_range_K=[701, 1361]",
             "status": "extrapolated"
           },
-          "stage_0_to_stage_1#2": {
-            "temperature_K": 1623.15,
+          "stage_0_to_stage_1": {
+            "temperature_K": 1368.15,
             "valid_range_K": [
               701,
               1361
             ],
             "authority_level": "extrapolated",
-            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1623.150 source_certified_range_K=[701, 1361]",
+            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1368.150 source_certified_range_K=[701, 1361]",
             "status": "extrapolated"
           },
           "stage_1_to_stage_2#2": {
@@ -9678,14 +9746,14 @@
             "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1623.150 source_certified_range_K=[701, 1361]",
             "status": "extrapolated"
           },
-          "stage_0_to_stage_1#3": {
-            "temperature_K": 1773.15,
+          "stage_0_to_stage_1#2": {
+            "temperature_K": 1398.15,
             "valid_range_K": [
               701,
               1361
             ],
             "authority_level": "extrapolated",
-            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1773.150 source_certified_range_K=[701, 1361]",
+            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1398.150 source_certified_range_K=[701, 1361]",
             "status": "extrapolated"
           },
           "stage_1_to_stage_2#3": {
@@ -9718,14 +9786,14 @@
             "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1773.150 source_certified_range_K=[701, 1361]",
             "status": "extrapolated"
           },
-          "stage_0_to_stage_1#4": {
-            "temperature_K": 1923.15,
+          "stage_0_to_stage_1#3": {
+            "temperature_K": 1428.15,
             "valid_range_K": [
               701,
               1361
             ],
             "authority_level": "extrapolated",
-            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1923.150 source_certified_range_K=[701, 1361]",
+            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1428.150 source_certified_range_K=[701, 1361]",
             "status": "extrapolated"
           },
           "stage_1_to_stage_2#4": {
@@ -9756,12 +9824,92 @@
             ],
             "authority_level": "extrapolated",
             "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1923.150 source_certified_range_K=[701, 1361]",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#4": {
+            "temperature_K": 1458.15,
+            "valid_range_K": [
+              701,
+              1361
+            ],
+            "authority_level": "extrapolated",
+            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1458.150 source_certified_range_K=[701, 1361]",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#5": {
+            "temperature_K": 1488.15,
+            "valid_range_K": [
+              701,
+              1361
+            ],
+            "authority_level": "extrapolated",
+            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1488.150 source_certified_range_K=[701, 1361]",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#6": {
+            "temperature_K": 1518.15,
+            "valid_range_K": [
+              701,
+              1361
+            ],
+            "authority_level": "extrapolated",
+            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1518.150 source_certified_range_K=[701, 1361]",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#7": {
+            "temperature_K": 1548.15,
+            "valid_range_K": [
+              701,
+              1361
+            ],
+            "authority_level": "extrapolated",
+            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1548.150 source_certified_range_K=[701, 1361]",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#8": {
+            "temperature_K": 1578.15,
+            "valid_range_K": [
+              701,
+              1361
+            ],
+            "authority_level": "extrapolated",
+            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1578.150 source_certified_range_K=[701, 1361]",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#9": {
+            "temperature_K": 1600.65,
+            "valid_range_K": [
+              701,
+              1361
+            ],
+            "authority_level": "extrapolated",
+            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1600.650 source_certified_range_K=[701, 1361]",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#10": {
+            "temperature_K": 1615.65,
+            "valid_range_K": [
+              701,
+              1361
+            ],
+            "authority_level": "extrapolated",
+            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1615.650 source_certified_range_K=[701, 1361]",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#11": {
+            "temperature_K": 1630.65,
+            "valid_range_K": [
+              701,
+              1361
+            ],
+            "authority_level": "extrapolated",
+            "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1630.650 source_certified_range_K=[701, 1361]",
             "status": "extrapolated"
           }
         },
         "Na": {
           "stage_0_to_stage_1": {
-            "temperature_K": 1473.15,
+            "temperature_K": 1338.15,
             "valid_range_K": [
               924.0,
               1118.0
@@ -9801,7 +9949,7 @@
             "status": "extrapolated"
           },
           "stage_0_to_stage_1#2": {
-            "temperature_K": 1623.15,
+            "temperature_K": 1368.15,
             "valid_range_K": [
               924.0,
               1118.0
@@ -9841,7 +9989,7 @@
             "status": "extrapolated"
           },
           "stage_0_to_stage_1#3": {
-            "temperature_K": 1773.15,
+            "temperature_K": 1398.15,
             "valid_range_K": [
               924.0,
               1118.0
@@ -9881,7 +10029,7 @@
             "status": "extrapolated"
           },
           "stage_0_to_stage_1#4": {
-            "temperature_K": 1923.15,
+            "temperature_K": 1428.15,
             "valid_range_K": [
               924.0,
               1118.0
@@ -9915,6 +10063,178 @@
             "valid_range_K": [
               924.0,
               1118.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#5": {
+            "temperature_K": 1458.15,
+            "valid_range_K": [
+              924.0,
+              1118.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#6": {
+            "temperature_K": 1488.15,
+            "valid_range_K": [
+              924.0,
+              1118.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#7": {
+            "temperature_K": 1518.15,
+            "valid_range_K": [
+              924.0,
+              1118.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#8": {
+            "temperature_K": 1548.15,
+            "valid_range_K": [
+              924.0,
+              1118.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#9": {
+            "temperature_K": 1578.15,
+            "valid_range_K": [
+              924.0,
+              1118.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#10": {
+            "temperature_K": 1600.65,
+            "valid_range_K": [
+              924.0,
+              1118.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#11": {
+            "temperature_K": 1615.65,
+            "valid_range_K": [
+              924.0,
+              1118.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#12": {
+            "temperature_K": 1630.65,
+            "valid_range_K": [
+              924.0,
+              1118.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          }
+        },
+        "Cr": {
+          "stage_0_to_stage_1": {
+            "temperature_K": 1443.15,
+            "valid_range_K": [
+              1889.0,
+              2755.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#2": {
+            "temperature_K": 1458.15,
+            "valid_range_K": [
+              1889.0,
+              2755.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#3": {
+            "temperature_K": 1488.15,
+            "valid_range_K": [
+              1889.0,
+              2755.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#4": {
+            "temperature_K": 1518.15,
+            "valid_range_K": [
+              1889.0,
+              2755.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#5": {
+            "temperature_K": 1548.15,
+            "valid_range_K": [
+              1889.0,
+              2755.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#6": {
+            "temperature_K": 1578.15,
+            "valid_range_K": [
+              1889.0,
+              2755.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#7": {
+            "temperature_K": 1600.65,
+            "valid_range_K": [
+              1889.0,
+              2755.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#8": {
+            "temperature_K": 1615.65,
+            "valid_range_K": [
+              1889.0,
+              2755.0
+            ],
+            "authority_level": "extrapolated",
+            "reason": "wall_saturation_pressure_out_of_validated_range",
+            "status": "extrapolated"
+          },
+          "stage_0_to_stage_1#9": {
+            "temperature_K": 1630.65,
+            "valid_range_K": [
+              1889.0,
+              2755.0
             ],
             "authority_level": "extrapolated",
             "reason": "wall_saturation_pressure_out_of_validated_range",
@@ -10054,11 +10374,11 @@
         "SiO": {
           "stage_0_to_stage_1": {
             "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1848.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1413.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
             "output_status": "status_bearing",
-            "wall_temperature_K": 1848.15,
+            "wall_temperature_K": 1413.15,
             "wall_saturation_pressure_pa": null,
-            "temperature_K": 1848.15,
+            "temperature_K": 1413.15,
             "authority_level": "unavailable",
             "valid_range_K": [
               1400.0,
@@ -10084,11 +10404,11 @@
           },
           "stage_0_to_stage_1#2": {
             "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1923.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1443.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
             "output_status": "status_bearing",
-            "wall_temperature_K": 1923.15,
+            "wall_temperature_K": 1443.15,
             "wall_saturation_pressure_pa": null,
-            "temperature_K": 1923.15,
+            "temperature_K": 1443.15,
             "authority_level": "unavailable",
             "valid_range_K": [
               1400.0,
@@ -10104,6 +10424,126 @@
             "wall_temperature_K": 1923.15,
             "wall_saturation_pressure_pa": null,
             "temperature_K": 1923.15,
+            "authority_level": "unavailable",
+            "valid_range_K": [
+              1400.0,
+              2273.15
+            ],
+            "band_scope": "wall_saturation_pressure",
+            "refusal_type": "WallSaturationPressureRefusal"
+          },
+          "stage_0_to_stage_1#3": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1473.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1473.15,
+            "wall_saturation_pressure_pa": null,
+            "temperature_K": 1473.15,
+            "authority_level": "unavailable",
+            "valid_range_K": [
+              1400.0,
+              2273.15
+            ],
+            "band_scope": "wall_saturation_pressure",
+            "refusal_type": "WallSaturationPressureRefusal"
+          },
+          "stage_0_to_stage_1#4": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1503.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1503.15,
+            "wall_saturation_pressure_pa": null,
+            "temperature_K": 1503.15,
+            "authority_level": "unavailable",
+            "valid_range_K": [
+              1400.0,
+              2273.15
+            ],
+            "band_scope": "wall_saturation_pressure",
+            "refusal_type": "WallSaturationPressureRefusal"
+          },
+          "stage_0_to_stage_1#5": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1533.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1533.15,
+            "wall_saturation_pressure_pa": null,
+            "temperature_K": 1533.15,
+            "authority_level": "unavailable",
+            "valid_range_K": [
+              1400.0,
+              2273.15
+            ],
+            "band_scope": "wall_saturation_pressure",
+            "refusal_type": "WallSaturationPressureRefusal"
+          },
+          "stage_0_to_stage_1#6": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1563.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1563.15,
+            "wall_saturation_pressure_pa": null,
+            "temperature_K": 1563.15,
+            "authority_level": "unavailable",
+            "valid_range_K": [
+              1400.0,
+              2273.15
+            ],
+            "band_scope": "wall_saturation_pressure",
+            "refusal_type": "WallSaturationPressureRefusal"
+          },
+          "stage_0_to_stage_1#7": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1593.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1593.15,
+            "wall_saturation_pressure_pa": null,
+            "temperature_K": 1593.15,
+            "authority_level": "unavailable",
+            "valid_range_K": [
+              1400.0,
+              2273.15
+            ],
+            "band_scope": "wall_saturation_pressure",
+            "refusal_type": "WallSaturationPressureRefusal"
+          },
+          "stage_0_to_stage_1#8": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1608.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1608.15,
+            "wall_saturation_pressure_pa": null,
+            "temperature_K": 1608.15,
+            "authority_level": "unavailable",
+            "valid_range_K": [
+              1400.0,
+              2273.15
+            ],
+            "band_scope": "wall_saturation_pressure",
+            "refusal_type": "WallSaturationPressureRefusal"
+          },
+          "stage_0_to_stage_1#9": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1623.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1623.15,
+            "wall_saturation_pressure_pa": null,
+            "temperature_K": 1623.15,
+            "authority_level": "unavailable",
+            "valid_range_K": [
+              1400.0,
+              2273.15
+            ],
+            "band_scope": "wall_saturation_pressure",
+            "refusal_type": "WallSaturationPressureRefusal"
+          },
+          "stage_0_to_stage_1#10": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1638.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1638.15,
+            "wall_saturation_pressure_pa": null,
+            "temperature_K": 1638.15,
             "authority_level": "unavailable",
             "valid_range_K": [
               1400.0,

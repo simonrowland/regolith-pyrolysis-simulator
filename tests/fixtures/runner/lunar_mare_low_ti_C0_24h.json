@@ -476,7 +476,7 @@
           "cumulative_wall_deposit_kg": null,
           "wall_saturation_pressure_extrapolations": {
             "stage_0_to_stage_1": {
-              "temperature_K": 1773.15,
+              "temperature_K": 798.15,
               "valid_range_K": [
                 924.0,
                 1118.0
@@ -516,7 +516,27 @@
               "status": "extrapolated"
             },
             "stage_0_to_stage_1#2": {
-              "temperature_K": 2073.15,
+              "temperature_K": 898.15,
+              "valid_range_K": [
+                924.0,
+                1118.0
+              ],
+              "authority_level": "extrapolated",
+              "reason": "wall_saturation_pressure_out_of_validated_range",
+              "status": "extrapolated"
+            },
+            "stage_0_to_stage_1#3": {
+              "temperature_K": 1198.15,
+              "valid_range_K": [
+                924.0,
+                1118.0
+              ],
+              "authority_level": "extrapolated",
+              "reason": "wall_saturation_pressure_out_of_validated_range",
+              "status": "extrapolated"
+            },
+            "stage_0_to_stage_1#4": {
+              "temperature_K": 1523.15,
               "valid_range_K": [
                 924.0,
                 1118.0
@@ -564,16 +584,6 @@
           "current_wall_deposit_flux_kg_hr": null,
           "cumulative_wall_deposit_kg": null,
           "wall_saturation_pressure_extrapolations": {
-            "stage_0_to_stage_1": {
-              "temperature_K": 1773.15,
-              "valid_range_K": [
-                679.4,
-                1033.0
-              ],
-              "authority_level": "extrapolated",
-              "reason": "wall_saturation_pressure_out_of_validated_range",
-              "status": "extrapolated"
-            },
             "stage_1_to_stage_2": {
               "temperature_K": 1773.15,
               "valid_range_K": [
@@ -604,8 +614,38 @@
               "reason": "wall_saturation_pressure_out_of_validated_range",
               "status": "extrapolated"
             },
+            "stage_0_to_stage_1": {
+              "temperature_K": 1048.15,
+              "valid_range_K": [
+                679.4,
+                1033.0
+              ],
+              "authority_level": "extrapolated",
+              "reason": "wall_saturation_pressure_out_of_validated_range",
+              "status": "extrapolated"
+            },
             "stage_0_to_stage_1#2": {
-              "temperature_K": 2073.15,
+              "temperature_K": 1148.15,
+              "valid_range_K": [
+                679.4,
+                1033.0
+              ],
+              "authority_level": "extrapolated",
+              "reason": "wall_saturation_pressure_out_of_validated_range",
+              "status": "extrapolated"
+            },
+            "stage_0_to_stage_1#3": {
+              "temperature_K": 1223.15,
+              "valid_range_K": [
+                679.4,
+                1033.0
+              ],
+              "authority_level": "extrapolated",
+              "reason": "wall_saturation_pressure_out_of_validated_range",
+              "status": "extrapolated"
+            },
+            "stage_0_to_stage_1#4": {
+              "temperature_K": 1523.15,
               "valid_range_K": [
                 679.4,
                 1033.0
@@ -649,17 +689,17 @@
         },
         "SiO": {
           "status": "unavailable",
-          "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=2073.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+          "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1523.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
           "current_wall_deposit_flux_kg_hr": null,
           "cumulative_wall_deposit_kg": null,
           "wall_saturation_pressure_refusals": {
             "stage_0_to_stage_1": {
               "status": "refused",
-              "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=2073.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+              "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1523.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
               "output_status": "status_bearing",
-              "wall_temperature_K": 2073.15,
+              "wall_temperature_K": 1523.15,
               "wall_saturation_pressure_pa": null,
-              "temperature_K": 2073.15,
+              "temperature_K": 1523.15,
               "authority_level": "unavailable",
               "valid_range_K": [
                 1400.0,
@@ -691,6 +731,54 @@
           "current_wall_deposit_flux_kg_hr": null,
           "cumulative_wall_deposit_kg": null
         },
+        "Mn": {
+          "status": "unavailable",
+          "reason": "species_absent_from_latest_evaporation_series_diagnostic",
+          "current_wall_deposit_flux_kg_hr": null,
+          "cumulative_wall_deposit_kg": null,
+          "wall_saturation_pressure_extrapolations": {
+            "stage_0_to_stage_1": {
+              "temperature_K": 1198.15,
+              "valid_range_K": [
+                1228.0,
+                1519.0
+              ],
+              "authority_level": "extrapolated",
+              "reason": "wall_saturation_pressure_out_of_validated_range",
+              "status": "extrapolated"
+            },
+            "stage_0_to_stage_1#2": {
+              "temperature_K": 1223.15,
+              "valid_range_K": [
+                1228.0,
+                1519.0
+              ],
+              "authority_level": "extrapolated",
+              "reason": "wall_saturation_pressure_out_of_validated_range",
+              "status": "extrapolated"
+            }
+          },
+          "authority_level": "extrapolated"
+        },
+        "Cr": {
+          "status": "unavailable",
+          "reason": "species_absent_from_latest_evaporation_series_diagnostic",
+          "current_wall_deposit_flux_kg_hr": null,
+          "cumulative_wall_deposit_kg": null,
+          "wall_saturation_pressure_extrapolations": {
+            "stage_0_to_stage_1": {
+              "temperature_K": 1523.15,
+              "valid_range_K": [
+                1889.0,
+                2755.0
+              ],
+              "authority_level": "extrapolated",
+              "reason": "wall_saturation_pressure_out_of_validated_range",
+              "status": "extrapolated"
+            }
+          },
+          "authority_level": "extrapolated"
+        },
         "Mg": {
           "status": "unavailable",
           "reason": "species_absent_from_latest_evaporation_series_diagnostic",
@@ -698,13 +786,13 @@
           "cumulative_wall_deposit_kg": null,
           "wall_saturation_pressure_extrapolations": {
             "stage_0_to_stage_1": {
-              "temperature_K": 2073.15,
+              "temperature_K": 1523.15,
               "valid_range_K": [
                 701,
                 1361
               ],
               "authority_level": "extrapolated",
-              "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=2073.150 source_certified_range_K=[701, 1361]",
+              "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1523.150 source_certified_range_K=[701, 1361]",
               "status": "extrapolated"
             },
             "stage_1_to_stage_2": {
@@ -27578,7 +27666,7 @@
     },
     "condensation_antoine_extrapolation": {
       "engaged": true,
-      "total_count": 2179,
+      "total_count": 2186,
       "by_hour": [
         {
           "campaign": "C0",
@@ -27602,7 +27690,7 @@
           "campaign": "C0",
           "hour": 11,
           "campaign_hour": 11,
-          "count": 118
+          "count": 119
         },
         {
           "campaign": "C0",
@@ -27620,7 +27708,7 @@
           "campaign": "C0",
           "hour": 14,
           "campaign_hour": 14,
-          "count": 96
+          "count": 97
         },
         {
           "campaign": "C0",
@@ -27632,25 +27720,25 @@
           "campaign": "C0",
           "hour": 16,
           "campaign_hour": 16,
-          "count": 94
+          "count": 95
         },
         {
           "campaign": "C0",
           "hour": 17,
           "campaign_hour": 17,
-          "count": 120
+          "count": 122
         },
         {
           "campaign": "C0",
           "hour": 18,
           "campaign_hour": 18,
-          "count": 96
+          "count": 97
         },
         {
           "campaign": "C2A_STAGED",
           "hour": 22,
           "campaign_hour": 0,
-          "count": 1019
+          "count": 1020
         }
       ]
     },
@@ -63776,8 +63864,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -63786,6 +63874,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -63809,8 +63899,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -67360,16 +67450,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=status_bearing, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -72760,8 +72840,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -72770,6 +72850,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -72793,8 +72875,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -73212,8 +73294,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -73222,6 +73304,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -73245,8 +73329,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -76796,16 +76880,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=status_bearing, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -76839,7 +76913,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -82238,8 +82312,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -82248,6 +82322,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -82271,8 +82347,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -82690,8 +82766,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -82700,6 +82776,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -82723,8 +82801,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -86274,16 +86352,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=status_bearing, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -86317,7 +86385,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -91716,8 +91784,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -91726,6 +91794,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -91749,8 +91819,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -92168,8 +92238,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -92178,6 +92248,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -92201,8 +92273,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -95752,16 +95824,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=status_bearing, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -95795,7 +95857,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -95826,6 +95888,16 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 898.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -101194,8 +101266,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -101204,6 +101276,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -101227,8 +101301,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -101646,8 +101720,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -101656,6 +101730,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -101679,8 +101755,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -105230,16 +105306,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=status_bearing, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -105273,7 +105339,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -105304,6 +105370,16 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 898.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -110672,8 +110748,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -110682,6 +110758,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -110705,8 +110783,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -111124,8 +111202,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -111134,6 +111212,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -111157,8 +111237,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -114708,16 +114788,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=status_bearing, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -114751,7 +114821,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -114782,6 +114852,16 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 898.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -120614,8 +120694,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -120624,6 +120704,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -120647,8 +120729,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -121066,8 +121148,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -121076,6 +121158,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -121099,8 +121183,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -124650,16 +124734,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=status_bearing, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -124682,6 +124756,16 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1048.15,
                   "valid_range_K": [
                     679.4,
                     1033.0
@@ -124693,7 +124777,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -124724,6 +124808,16 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 898.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -130354,8 +130448,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -130364,6 +130458,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -130387,8 +130483,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -130806,8 +130902,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -130816,6 +130912,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -130839,8 +130937,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -134390,16 +134488,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=status_bearing, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -134422,6 +134510,16 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1048.15,
                   "valid_range_K": [
                     679.4,
                     1033.0
@@ -134433,7 +134531,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -134464,6 +134562,16 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 898.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -140127,8 +140235,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -140137,6 +140245,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -140160,8 +140270,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -140579,8 +140689,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -140589,6 +140699,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -140612,8 +140724,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -144163,16 +144275,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=status_bearing, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -144195,6 +144297,26 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1048.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 1148.15,
                   "valid_range_K": [
                     679.4,
                     1033.0
@@ -144206,7 +144328,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -144237,6 +144359,16 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 898.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -150149,10 +150281,10 @@
                   "source": "REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.",
                   "source_class": "cited_hkl_accommodation",
                   "status": "sourced",
-                  "output_status": "sourced_with_surface_proxy",
+                  "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 1198.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     1800.0
@@ -150161,6 +150293,8 @@
                     1700.0,
                     1800.0
                   ],
+                  "alpha_s_extrapolation_warning": "Fe alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 1800] at 1198.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://ntrs.nasa.gov/citations/20150002321",
                   "citation_status": "CITED",
                   "temperature_range_K": [
@@ -150184,8 +150318,8 @@
                       1800.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_0": {
                   "species": "Fe",
@@ -150381,8 +150515,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -150391,6 +150525,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -150414,8 +150550,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -150833,7 +150969,7 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
+                  "alpha_s_temperature_K": 1198.15,
                   "alpha_s_extrapolated": false,
                   "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
                   "citation_status": "UNCERTIFIED",
@@ -150934,8 +151070,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -150944,6 +151080,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -150967,8 +151105,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -154747,16 +154885,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=status_bearing, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -154779,6 +154907,26 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1048.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 1148.15,
                   "valid_range_K": [
                     679.4,
                     1033.0
@@ -154790,7 +154938,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -154824,6 +154972,38 @@
                   "valid_range_K": [
                     924.0,
                     1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 898.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                }
+              },
+              "Mn": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
                   ],
                   "authority_level": "extrapolated",
                   "reason": "wall_saturation_pressure_out_of_validated_range",
@@ -160721,10 +160901,10 @@
                   "source": "REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.",
                   "source_class": "cited_hkl_accommodation",
                   "status": "sourced",
-                  "output_status": "sourced_with_surface_proxy",
+                  "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 1198.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     1800.0
@@ -160733,6 +160913,8 @@
                     1700.0,
                     1800.0
                   ],
+                  "alpha_s_extrapolation_warning": "Fe alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 1800] at 1198.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://ntrs.nasa.gov/citations/20150002321",
                   "citation_status": "CITED",
                   "temperature_range_K": [
@@ -160756,8 +160938,8 @@
                       1800.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_0": {
                   "species": "Fe",
@@ -160953,8 +161135,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -160963,6 +161145,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -160986,8 +161170,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -161405,7 +161589,7 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
+                  "alpha_s_temperature_K": 1198.15,
                   "alpha_s_extrapolated": false,
                   "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
                   "citation_status": "UNCERTIFIED",
@@ -161506,8 +161690,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -161516,6 +161700,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -161539,8 +161725,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -165548,16 +165734,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=status_bearing, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -165580,6 +165756,36 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1048.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 1148.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1223.15,
                   "valid_range_K": [
                     679.4,
                     1033.0
@@ -165591,7 +165797,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -165625,6 +165831,48 @@
                   "valid_range_K": [
                     924.0,
                     1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 898.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                }
+              },
+              "Mn": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 1223.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
                   ],
                   "authority_level": "extrapolated",
                   "reason": "wall_saturation_pressure_out_of_validated_range",
@@ -167464,10 +167712,10 @@
                   "source": "REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.",
                   "source_class": "cited_hkl_accommodation",
                   "status": "sourced",
-                  "output_status": "sourced_with_surface_proxy",
+                  "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 1198.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     1800.0
@@ -167476,6 +167724,8 @@
                     1700.0,
                     1800.0
                   ],
+                  "alpha_s_extrapolation_warning": "Fe alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 1800] at 1198.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://ntrs.nasa.gov/citations/20150002321",
                   "citation_status": "CITED",
                   "temperature_range_K": [
@@ -167499,8 +167749,8 @@
                       1800.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_0": {
                   "species": "Fe",
@@ -167696,8 +167946,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -167706,6 +167956,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -167729,8 +167981,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -168148,7 +168400,7 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
+                  "alpha_s_temperature_K": 1198.15,
                   "alpha_s_extrapolated": false,
                   "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
                   "citation_status": "UNCERTIFIED",
@@ -168249,8 +168501,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -168259,6 +168511,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -168282,8 +168536,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -171931,16 +172185,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=refused, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -171963,6 +172207,36 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1048.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 1148.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1223.15,
                   "valid_range_K": [
                     679.4,
                     1033.0
@@ -171974,7 +172248,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -172008,6 +172282,48 @@
                   "valid_range_K": [
                     924.0,
                     1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 898.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                }
+              },
+              "Mn": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 1223.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
                   ],
                   "authority_level": "extrapolated",
                   "reason": "wall_saturation_pressure_out_of_validated_range",
@@ -173765,10 +174081,10 @@
                   "source": "REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.",
                   "source_class": "cited_hkl_accommodation",
                   "status": "sourced",
-                  "output_status": "sourced_with_surface_proxy",
+                  "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 1198.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     1800.0
@@ -173777,6 +174093,8 @@
                     1700.0,
                     1800.0
                   ],
+                  "alpha_s_extrapolation_warning": "Fe alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 1800] at 1198.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://ntrs.nasa.gov/citations/20150002321",
                   "citation_status": "CITED",
                   "temperature_range_K": [
@@ -173800,8 +174118,8 @@
                       1800.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_0": {
                   "species": "Fe",
@@ -173997,8 +174315,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -174007,6 +174325,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -174030,8 +174350,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -174449,7 +174769,7 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
+                  "alpha_s_temperature_K": 1198.15,
                   "alpha_s_extrapolated": false,
                   "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
                   "citation_status": "UNCERTIFIED",
@@ -174550,8 +174870,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -174560,6 +174880,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -174583,8 +174905,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -178232,16 +178554,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=refused, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -178264,6 +178576,36 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1048.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 1148.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1223.15,
                   "valid_range_K": [
                     679.4,
                     1033.0
@@ -178275,7 +178617,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -178309,6 +178651,48 @@
                   "valid_range_K": [
                     924.0,
                     1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 898.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                }
+              },
+              "Mn": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 1223.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
                   ],
                   "authority_level": "extrapolated",
                   "reason": "wall_saturation_pressure_out_of_validated_range",
@@ -180066,10 +180450,10 @@
                   "source": "REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.",
                   "source_class": "cited_hkl_accommodation",
                   "status": "sourced",
-                  "output_status": "sourced_with_surface_proxy",
+                  "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 1198.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     1800.0
@@ -180078,6 +180462,8 @@
                     1700.0,
                     1800.0
                   ],
+                  "alpha_s_extrapolation_warning": "Fe alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 1800] at 1198.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://ntrs.nasa.gov/citations/20150002321",
                   "citation_status": "CITED",
                   "temperature_range_K": [
@@ -180101,8 +180487,8 @@
                       1800.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_0": {
                   "species": "Fe",
@@ -180298,8 +180684,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -180308,6 +180694,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -180331,8 +180719,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -180750,7 +181138,7 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
+                  "alpha_s_temperature_K": 1198.15,
                   "alpha_s_extrapolated": false,
                   "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
                   "citation_status": "UNCERTIFIED",
@@ -180851,8 +181239,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -180861,6 +181249,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -180884,8 +181274,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -184533,16 +184923,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=refused, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=status_bearing, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -184565,6 +184945,36 @@
                 },
                 "stage_3_to_stage_4": {
                   "temperature_K": 1773.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1048.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 1148.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1223.15,
                   "valid_range_K": [
                     679.4,
                     1033.0
@@ -184576,7 +184986,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -184610,6 +185020,48 @@
                   "valid_range_K": [
                     924.0,
                     1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 898.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                }
+              },
+              "Mn": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 1223.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
                   ],
                   "authority_level": "extrapolated",
                   "reason": "wall_saturation_pressure_out_of_validated_range",
@@ -190957,7 +191409,7 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 2073.15,
+                  "alpha_s_temperature_K": 1523.15,
                   "alpha_s_extrapolated": false,
                   "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
                   "citation_status": "UNCERTIFIED",
@@ -191516,7 +191968,7 @@
                   "status": "sourced",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 2073.15,
+                  "alpha_s_temperature_K": 1198.15,
                   "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
@@ -191526,8 +191978,8 @@
                     1700.0,
                     1800.0
                   ],
-                  "alpha_s_extrapolation_warning": "Fe alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 1800] at 2073.15 K",
-                  "alpha_s_temperature_above_valid_range": true,
+                  "alpha_s_extrapolation_warning": "Fe alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 1800] at 1198.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://ntrs.nasa.gov/citations/20150002321",
                   "citation_status": "CITED",
                   "temperature_range_K": [
@@ -191973,8 +192425,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -191983,6 +192435,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -192006,8 +192460,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -192558,10 +193012,10 @@
                   "source": "REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer & Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.",
                   "source_class": "cited_hkl_accommodation",
                   "status": "sourced",
-                  "output_status": "sourced_with_surface_proxy",
+                  "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 2073.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 1523.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1873.0,
                     2373.0
@@ -192570,6 +193024,8 @@
                     1873.0,
                     2373.0
                   ],
+                  "alpha_s_extrapolation_warning": "Mg alpha_s scalar coefficient extrapolated beyond valid_range_K [1873, 2373] at 1523.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/S0016-7037(01)00782-7",
                   "citation_status": "CITED",
                   "temperature_range_K": [
@@ -192593,8 +193049,8 @@
                       2373.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Mg",
@@ -193243,7 +193699,7 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
+                  "alpha_s_temperature_K": 1198.15,
                   "alpha_s_extrapolated": false,
                   "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
                   "citation_status": "UNCERTIFIED",
@@ -193344,8 +193800,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -193354,6 +193810,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -193377,8 +193835,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -194383,28 +194841,26 @@
               "SiO": {
                 "stage_0_to_stage_1": {
                   "species": "SiO",
-                  "alpha_s": 0.08791236345638125,
+                  "alpha_s": 0.04627030737718148,
                   "source": "Wetzel & Gail 2013 A&A 553 A92 use 0.52*exp(-3685/T) as a solid-SiO particle-growth coefficient, not a silicate-melt free-evaporation coefficient. Runtime retains the numeric form only as an explicitly uncertified hot-source proxy. Cold-wall condensation below the valid_range_K floor separately uses the cited Pound high-supersaturation limit.",
                   "source_class": "solid_film_growth_proxy_not_evaporation_evidence",
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "arrhenius",
-                  "alpha_s_temperature_K": 2073.15,
+                  "alpha_s_temperature_K": 1523.15,
                   "alpha_s_A": 0.52,
                   "alpha_s_B": 3685.0,
                   "alpha_s_valid_range_K": [
                     1000.0,
                     1800.0
                   ],
-                  "alpha_s_extrapolated": true,
+                  "alpha_s_extrapolated": false,
                   "alpha_s_uncertainty_envelope": [
                     0.003,
                     0.067
                   ],
                   "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
                   "alpha_s_status": "UNCERTIFIED",
-                  "alpha_s_temperature_above_valid_range": true,
-                  "alpha_s_extrapolation_warning": "SiO alpha_s arrhenius coefficient extrapolated beyond valid_range_K [1000, 1800] at 2073.15 K",
                   "source_url": "https://doi.org/10.1051/0004-6361/201220803",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -194439,8 +194895,8 @@
                       "source": "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
                     }
                   },
-                  "alpha_s_domain_status": "out_of_domain",
-                  "alpha_s_authoritative_at_temperature": false
+                  "alpha_s_domain_status": "in_domain",
+                  "alpha_s_authoritative_at_temperature": true
                 },
                 "stage_1_to_stage_2": {
                   "species": "SiO",
@@ -198199,16 +198655,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=refused, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=refused, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -198239,8 +198685,38 @@
                   "reason": "wall_saturation_pressure_out_of_validated_range",
                   "status": "extrapolated"
                 },
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1048.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
                 "stage_0_to_stage_1#2": {
-                  "temperature_K": 2073.15,
+                  "temperature_K": 1148.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1223.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#4": {
+                  "temperature_K": 1523.15,
                   "valid_range_K": [
                     679.4,
                     1033.0
@@ -198282,7 +198758,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -198322,7 +198798,27 @@
                   "status": "extrapolated"
                 },
                 "stage_0_to_stage_1#2": {
-                  "temperature_K": 2073.15,
+                  "temperature_K": 898.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#4": {
+                  "temperature_K": 1523.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -198362,15 +198858,49 @@
                   "status": "extrapolated"
                 }
               },
+              "Mn": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 1223.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                }
+              },
+              "Cr": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1523.15,
+                  "valid_range_K": [
+                    1889.0,
+                    2755.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                }
+              },
               "Mg": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 2073.15,
+                  "temperature_K": 1523.15,
                   "valid_range_K": [
                     701,
                     1361
                   ],
                   "authority_level": "extrapolated",
-                  "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=2073.150 source_certified_range_K=[701, 1361]",
+                  "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1523.150 source_certified_range_K=[701, 1361]",
                   "status": "extrapolated"
                 },
                 "stage_1_to_stage_2": {
@@ -198537,11 +199067,11 @@
               "SiO": {
                 "stage_0_to_stage_1": {
                   "status": "refused",
-                  "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=2073.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+                  "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1523.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
                   "output_status": "status_bearing",
-                  "wall_temperature_K": 2073.15,
+                  "wall_temperature_K": 1523.15,
                   "wall_saturation_pressure_pa": null,
-                  "temperature_K": 2073.15,
+                  "temperature_K": 1523.15,
                   "authority_level": "unavailable",
                   "valid_range_K": [
                     1400.0,
@@ -203181,7 +203711,7 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 2073.15,
+                  "alpha_s_temperature_K": 1523.15,
                   "alpha_s_extrapolated": false,
                   "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
                   "citation_status": "UNCERTIFIED",
@@ -203740,7 +204270,7 @@
                   "status": "sourced",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 2073.15,
+                  "alpha_s_temperature_K": 1198.15,
                   "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
@@ -203750,8 +204280,8 @@
                     1700.0,
                     1800.0
                   ],
-                  "alpha_s_extrapolation_warning": "Fe alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 1800] at 2073.15 K",
-                  "alpha_s_temperature_above_valid_range": true,
+                  "alpha_s_extrapolation_warning": "Fe alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 1800] at 1198.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://ntrs.nasa.gov/citations/20150002321",
                   "citation_status": "CITED",
                   "temperature_range_K": [
@@ -204197,8 +204727,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 748.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -204207,6 +204737,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 748.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -204230,8 +204762,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "K",
@@ -204782,10 +205314,10 @@
                   "source": "REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer & Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.",
                   "source_class": "cited_hkl_accommodation",
                   "status": "sourced",
-                  "output_status": "sourced_with_surface_proxy",
+                  "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 2073.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 1523.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1873.0,
                     2373.0
@@ -204794,6 +205326,8 @@
                     1873.0,
                     2373.0
                   ],
+                  "alpha_s_extrapolation_warning": "Mg alpha_s scalar coefficient extrapolated beyond valid_range_K [1873, 2373] at 1523.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/S0016-7037(01)00782-7",
                   "citation_status": "CITED",
                   "temperature_range_K": [
@@ -204817,8 +205351,8 @@
                       2373.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Mg",
@@ -205467,7 +206001,7 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
+                  "alpha_s_temperature_K": 1198.15,
                   "alpha_s_extrapolated": false,
                   "source_url": "https://doi.org/10.1016/j.gca.2005.08.014",
                   "citation_status": "UNCERTIFIED",
@@ -205568,8 +206102,8 @@
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "scalar",
-                  "alpha_s_temperature_K": 1773.15,
-                  "alpha_s_extrapolated": false,
+                  "alpha_s_temperature_K": 798.15,
+                  "alpha_s_extrapolated": true,
                   "alpha_s_valid_range_K": [
                     1700.0,
                     2273.0
@@ -205578,6 +206112,8 @@
                     1700.0,
                     2273.0
                   ],
+                  "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
+                  "alpha_s_temperature_below_valid_range": true,
                   "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -205601,8 +206137,8 @@
                       2273.0
                     ]
                   },
-                  "alpha_s_domain_status": "in_domain",
-                  "alpha_s_authoritative_at_temperature": true
+                  "alpha_s_domain_status": "out_of_domain",
+                  "alpha_s_authoritative_at_temperature": false
                 },
                 "stage_1_to_stage_2": {
                   "species": "Na",
@@ -206607,28 +207143,26 @@
               "SiO": {
                 "stage_0_to_stage_1": {
                   "species": "SiO",
-                  "alpha_s": 0.08791236345638125,
+                  "alpha_s": 0.04627030737718148,
                   "source": "Wetzel & Gail 2013 A&A 553 A92 use 0.52*exp(-3685/T) as a solid-SiO particle-growth coefficient, not a silicate-melt free-evaporation coefficient. Runtime retains the numeric form only as an explicitly uncertified hot-source proxy. Cold-wall condensation below the valid_range_K floor separately uses the cited Pound high-supersaturation limit.",
                   "source_class": "solid_film_growth_proxy_not_evaporation_evidence",
                   "status": "UNCERTIFIED",
                   "output_status": "status_bearing",
                   "alpha_s_form": "arrhenius",
-                  "alpha_s_temperature_K": 2073.15,
+                  "alpha_s_temperature_K": 1523.15,
                   "alpha_s_A": 0.52,
                   "alpha_s_B": 3685.0,
                   "alpha_s_valid_range_K": [
                     1000.0,
                     1800.0
                   ],
-                  "alpha_s_extrapolated": true,
+                  "alpha_s_extrapolated": false,
                   "alpha_s_uncertainty_envelope": [
                     0.003,
                     0.067
                   ],
                   "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
                   "alpha_s_status": "UNCERTIFIED",
-                  "alpha_s_temperature_above_valid_range": true,
-                  "alpha_s_extrapolation_warning": "SiO alpha_s arrhenius coefficient extrapolated beyond valid_range_K [1000, 1800] at 2073.15 K",
                   "source_url": "https://doi.org/10.1051/0004-6361/201220803",
                   "citation_status": "UNCERTIFIED",
                   "temperature_range_K": [
@@ -206663,8 +207197,8 @@
                       "source": "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
                     }
                   },
-                  "alpha_s_domain_status": "out_of_domain",
-                  "alpha_s_authoritative_at_temperature": false
+                  "alpha_s_domain_status": "in_domain",
+                  "alpha_s_authoritative_at_temperature": true
                 },
                 "stage_1_to_stage_2": {
                   "species": "SiO",
@@ -210423,16 +210957,6 @@
             "message": "Wall routing carried non-authoritative vapour evidence (Al=refused, Al2=refused, Al2O=refused, Al2O2=refused, Al2O3_gas=refused, AlO=refused, AlO2=refused, Bi=refused, Ca=refused, Ca2=refused, CaO_gas=refused, Cr=refused, Cr2O3_gas=refused, CrO=refused, CrO2=refused, CrO3=refused, Fe=refused, FeO_association_gas=refused, K=refused, K2=refused, K2O_gas=refused, Mg=refused, Mg2=refused, MgO_gas=refused, Mn=refused, MnO_gas=refused, Na=refused, Na2=refused, Na2O_gas=refused, P2=refused, P2O5_gas=refused, P4=refused, P4O10=refused, P4O6=refused, PO=refused, PO2=refused, Si=refused, Si2=refused, Si3=refused, SiO=refused, SiO2_gas=refused, Ti=refused, TiO=refused, TiO2_gas=refused); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
             "wall_saturation_pressure_extrapolations_by_species": {
               "K": {
-                "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
-                  "valid_range_K": [
-                    679.4,
-                    1033.0
-                  ],
-                  "authority_level": "extrapolated",
-                  "reason": "wall_saturation_pressure_out_of_validated_range",
-                  "status": "extrapolated"
-                },
                 "stage_1_to_stage_2": {
                   "temperature_K": 1773.15,
                   "valid_range_K": [
@@ -210463,8 +210987,38 @@
                   "reason": "wall_saturation_pressure_out_of_validated_range",
                   "status": "extrapolated"
                 },
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1048.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
                 "stage_0_to_stage_1#2": {
-                  "temperature_K": 2073.15,
+                  "temperature_K": 1148.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1223.15,
+                  "valid_range_K": [
+                    679.4,
+                    1033.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#4": {
+                  "temperature_K": 1523.15,
                   "valid_range_K": [
                     679.4,
                     1033.0
@@ -210506,7 +211060,7 @@
               },
               "Na": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 1773.15,
+                  "temperature_K": 798.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -210546,7 +211100,27 @@
                   "status": "extrapolated"
                 },
                 "stage_0_to_stage_1#2": {
-                  "temperature_K": 2073.15,
+                  "temperature_K": 898.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#3": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    924.0,
+                    1118.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#4": {
+                  "temperature_K": 1523.15,
                   "valid_range_K": [
                     924.0,
                     1118.0
@@ -210586,15 +211160,49 @@
                   "status": "extrapolated"
                 }
               },
+              "Mn": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1198.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                },
+                "stage_0_to_stage_1#2": {
+                  "temperature_K": 1223.15,
+                  "valid_range_K": [
+                    1228.0,
+                    1519.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                }
+              },
+              "Cr": {
+                "stage_0_to_stage_1": {
+                  "temperature_K": 1523.15,
+                  "valid_range_K": [
+                    1889.0,
+                    2755.0
+                  ],
+                  "authority_level": "extrapolated",
+                  "reason": "wall_saturation_pressure_out_of_validated_range",
+                  "status": "extrapolated"
+                }
+              },
               "Mg": {
                 "stage_0_to_stage_1": {
-                  "temperature_K": 2073.15,
+                  "temperature_K": 1523.15,
                   "valid_range_K": [
                     701,
                     1361
                   ],
                   "authority_level": "extrapolated",
-                  "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=2073.150 source_certified_range_K=[701, 1361]",
+                  "reason": "metal_vapor_pressure_out_of_source_certified_range: species=Mg consumer=wall_condensation temperature_K=1523.150 source_certified_range_K=[701, 1361]",
                   "status": "extrapolated"
                 },
                 "stage_1_to_stage_2": {
@@ -210761,11 +211369,11 @@
               "SiO": {
                 "stage_0_to_stage_1": {
                   "status": "refused",
-                  "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=2073.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+                  "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1523.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
                   "output_status": "status_bearing",
-                  "wall_temperature_K": 2073.15,
+                  "wall_temperature_K": 1523.15,
                   "wall_saturation_pressure_pa": null,
-                  "temperature_K": 2073.15,
+                  "temperature_K": 1523.15,
                   "authority_level": "unavailable",
                   "valid_range_K": [
                     1400.0,
