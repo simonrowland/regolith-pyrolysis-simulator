@@ -842,6 +842,7 @@ species:
     - observation_id: homma_1966_mn_olette_theoretical_quoted_deep
       class: model
       type: alpha
+      attribution: Homma, Ohno, and Ishida (1966), theoretical value calculated using Olette's equation
       locator:
         page: '517'
         table: '1'
@@ -850,7 +851,7 @@ species:
       regime: olette_relative_evaporation_coefficient
       units: dimensionless
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
         olette_alpha_theoretical: 1095
         not_hkl_langmuir_coefficient: true
         note: Author-calculated relative evaporation coefficient. Not an experimental HKL coefficient; retained
@@ -1424,6 +1425,7 @@ species:
     - observation_id: homma_1966_cu_olette_theoretical_quoted_deep
       class: model
       type: alpha
+      attribution: Homma, Ohno, and Ishida (1966), theoretical value calculated using Olette's equation
       locator:
         page: 517–518
         table: '2'
@@ -1432,7 +1434,7 @@ species:
       regime: olette_relative_evaporation_coefficient
       units: dimensionless
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
         olette_alpha_theoretical: 143
         not_hkl_langmuir_coefficient: true
         note: Author-calculated relative evaporation coefficient. Not an experimental HKL coefficient; retained
@@ -1948,6 +1950,7 @@ species:
     - observation_id: homma_1966_sn_olette_theoretical_quoted_deep
       class: model
       type: alpha
+      attribution: Homma, Ohno, and Ishida (1966), theoretical value calculated using Olette's equation
       locator:
         page: '518'
         table: '3'
@@ -1956,7 +1959,7 @@ species:
       regime: olette_relative_evaporation_coefficient
       units: dimensionless
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
         olette_alpha_theoretical: 20
         not_hkl_langmuir_coefficient: true
         note: Author-calculated relative evaporation coefficient. Not an experimental HKL coefficient; retained

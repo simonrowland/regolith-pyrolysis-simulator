@@ -99,6 +99,10 @@ def test_image_verified_fixture_matches_records():
     _assert_fixture(_records(), fixture)
 
 
+def test_published_equation_loader_reports_no_equations_when_source_has_none():
+    assert b592_loader.load_published_curves() == ()
+
+
 def test_image_verified_fixture_mutation_is_detected():
     fixture = json.loads((COMPILATION_ROOT / "source/image-verified-fixture.json").read_text())
     mutated = copy.deepcopy(_records())
@@ -727,7 +731,9 @@ def test_all_public_loader_entry_points_preserve_suspect_safety(tmp_path):
         for name, value in inspect.getmembers(b592_loader, inspect.isfunction)
         if value.__module__ == b592_loader.__name__ and not name.startswith("_")
     }
-    assert public_functions == {"load_manifest", "load_records", "lookup_temperature"}
+    assert public_functions == {
+        "load_manifest", "load_published_curves", "load_records", "lookup_temperature"
+    }
     with pytest.raises(OCRSuspectRow):
         load_manifest()
     manifest = load_manifest(include_ocr_suspect=True)

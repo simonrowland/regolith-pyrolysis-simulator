@@ -1,6 +1,7 @@
 import json
 import math
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -14,6 +15,7 @@ from simulator.melt_backend.base import (
 )
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.melt_backend.magemin import MAGEMinBackend
+from simulator.core import PyrolysisSimulator
 
 
 @pytest.mark.parametrize('liquid_fraction', [math.nan, 1.5])
@@ -22,6 +24,82 @@ def test_ok_equilibrium_result_requires_finite_unit_liquid_fraction(
 ):
     with pytest.raises(LiquidFractionInvalidError):
         EquilibriumResult(status='ok', liquid_fraction=liquid_fraction)
+
+
+@pytest.mark.parametrize(
+    ('liquid_fraction', 'message'),
+    [
+        (None, 'liquid_fraction_missing'),
+        (math.nan, 'liquid_fraction_invalid: nan'),
+        (math.inf, 'liquid_fraction_invalid: inf'),
+        (-0.1, 'liquid_fraction_invalid: -0.1'),
+        (0.0, None),
+        (0.5, None),
+        (1.0, None),
+        (1.2, 'liquid_fraction_invalid: 1.2'),
+    ],
+)
+def test_equilibrium_result_liquid_fraction_validation_contract(
+    liquid_fraction, message
+):
+    constructor = lambda: EquilibriumResult(
+        status='ok', liquid_fraction=liquid_fraction
+    )
+
+    if message is None:
+        result = constructor()
+        assert result.liquid_fraction == liquid_fraction
+    else:
+        with pytest.raises(LiquidFractionInvalidError) as exc_info:
+            constructor()
+        assert str(exc_info.value) == message
+
+
+@pytest.mark.parametrize(
+    ('liquid_fraction', 'message'),
+    [
+        (None, None),
+        (math.nan, 'Authoritative VAPOR_PRESSURE liquid_fraction_invalid: nan'),
+        (math.inf, 'Authoritative VAPOR_PRESSURE liquid_fraction_invalid: inf'),
+        (-0.1, 'Authoritative VAPOR_PRESSURE liquid_fraction_invalid: -0.1'),
+        (0.0, None),
+        (0.5, None),
+        (1.0, None),
+        (1.2, 'Authoritative VAPOR_PRESSURE liquid_fraction_invalid: 1.2'),
+    ],
+)
+def test_authoritative_vapor_pressure_liquid_fraction_validation_contract(
+    monkeypatch, liquid_fraction, message
+):
+    class ReachedVaporPressureDispatch(Exception):
+        pass
+
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = SimpleNamespace(temperature_C=1000.0)
+    sim._last_high_t_melt_activity = {}
+    result = SimpleNamespace(
+        liquid_fraction=liquid_fraction,
+        vapor_pressures_Pa={},
+        vapor_pressures_source={},
+    )
+
+    def stop_after_validation():
+        raise ReachedVaporPressureDispatch
+
+    monkeypatch.setattr(
+        sim, '_vapor_pressure_dispatch_pO2_bar', stop_after_validation
+    )
+    if message is None:
+        if liquid_fraction == 0.0:
+            sim._refresh_vapor_pressures_from_kernel(result)
+            return
+        with pytest.raises(ReachedVaporPressureDispatch):
+            sim._refresh_vapor_pressures_from_kernel(result)
+    else:
+        with pytest.raises(RuntimeError) as exc_info:
+            sim._refresh_vapor_pressures_from_kernel(result)
+        assert type(exc_info.value) is RuntimeError
+        assert str(exc_info.value) == message
 
 
 

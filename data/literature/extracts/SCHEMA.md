@@ -174,12 +174,39 @@ species:
         units: dimensionless                        # required when values present
         uncertainty:                                # FIRST-CLASS (owner 2026-08-02)
           note: "high-side of measured D(Fe+) band"
+          confidence_level: one_sigma              # optional; default not_stated; source-stated level only
           alpha_range: [0.011, 0.02]                # retain stated uncertainty verbatim
         values: { alpha: 0.02 }                     # VERBATIM; no fitted coefficients
         equipment: {}                               # optional; see equipment metadata
 ```
 
 ## Observation types
+
+### Derived observation lineage
+
+`model_derived` and `measured_reduced` observations require a derivation
+recording the stated method; the observation's required `locator` locates that
+method. They also require `derived_from`, except a `measured_reduced`
+derivation may declare that the source does not print the raw inputs:
+
+```yaml
+locator: {page: 164, section: '3.3'}
+derivation:
+  relation: "calculated from measured quantities"
+  output_unit: dimensionless
+  raw_inputs:
+    state: {tag: value, value: not_printed}
+    locator: {page: 164, section: '3.3'}
+```
+
+When the source does not print raw inputs, omit `inputs` entirely. The paper
+is never an input, and no invented observation may stand in for the unprinted
+inputs.
+
+`raw_inputs` is a typed `not_printed` value with its own source locator. It is
+valid only for `measured_reduced`, cannot appear with `derived_from`, and does
+not replace the required derivation method or locator. Model-derived rows
+always require `derived_from`.
 
 Exactly one of:
 
@@ -285,6 +312,12 @@ envelopes / ranges / ± terms. `tools/extract_merge.py` **propagates** uncertain
 into the by-species view (`observation.uncertainty`, group
 `winner_uncertainty`, group `uncertainties[]`) so catalog fits inherit an error
 budget input.
+
+An uncertainty mapping may include `confidence_level`, which records only a
+level explicitly stated by the source: `one_sigma`, `two_sigma`, `ci95`, or
+`not_stated`. Omission defaults to `not_stated`; a field name such as `sigma`
+does not establish a confidence level. Keep the source locator on the enclosing
+observation.
 
 ## Locators (per observation AND per equipment field)
 

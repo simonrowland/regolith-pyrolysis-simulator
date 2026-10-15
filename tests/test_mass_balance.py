@@ -162,7 +162,13 @@ def _install_liquidus_stub(sim) -> None:
         liquidus_T_C=1300.0,
     )
 
-    def gate_dispatch_unavailable(reasons, *, fO2_log):
+    def gate_dispatch_unavailable(
+        reasons,
+        *,
+        fO2_log,
+        repair_notices=None,
+        redox_state=None,
+    ):
         reasons.append("test liquidus stub bypasses gate dispatch")
         return None
 

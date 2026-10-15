@@ -309,7 +309,16 @@ def test_activity_coefficient_uses_the_same_contract():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
+    internal_analytical = next(
+        item for item in results if item.readiness.engine == "internal-analytical"
+    )
+    assert internal_analytical.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert internal_analytical.payload is None
+    assert all(
+        item.readiness.status is ReadinessStatus.READY
+        for item in results
+        if item.readiness.engine != "internal-analytical"
+    )
     assert results[0].payload["quantity"] == "activity_coefficient"
     assert results[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
     activity = _melt(*_case(
@@ -433,6 +442,7 @@ def test_measured_gallium_requires_oxygen_when_the_bulk_is_cmas():
 def test_mismatched_reference_state_is_refused(convention, phase, basis, formula):
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        oxygen=Decimal("-9"),
     )
     state = StandardState(convention, Species(formula, phase), basis, Decimal("1"))
     observation = replace(
@@ -462,6 +472,34 @@ def test_accepted_reference_is_named_on_the_payload():
     assert results[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
     assert results[0].payload["quantity"] == "activity"
     assert "fO2_log" not in results[0].payload
+
+
+def test_internal_analytical_reports_activity_but_not_coefficient():
+    experiment, bench, observation = _case(
+        composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        formula="SiO2",
+    )
+    activity = next(
+        item for item in _melt(experiment, bench, observation)
+        if item.readiness.engine == "internal-analytical"
+    )
+    assert activity.readiness.status is ReadinessStatus.READY
+    assert activity.payload is not None
+    assert activity.payload["quantity"] == "activity"
+
+    coefficient_experiment, coefficient_bench, coefficient_observation = _case(
+        composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        formula="SiO2",
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+    )
+    coefficient = next(
+        item for item in _melt(
+            coefficient_experiment, coefficient_bench, coefficient_observation,
+        )
+        if item.readiness.engine == "internal-analytical"
+    )
+    assert coefficient.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert coefficient.payload is None
 
 
 def test_scorer_refuses_a_multivalent_gap_before_the_engine_default(monkeypatch):
@@ -877,6 +915,7 @@ def test_na2sio3_endmember_is_not_ready_for_imcc(monkeypatch):
 def test_formula_basis_does_not_broaden_parent_oxide_recognition(formula, basis):
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        oxygen=Decimal("-9"),
         formula=formula,
         basis=basis,
     )
@@ -895,6 +934,7 @@ def test_formula_basis_does_not_broaden_parent_oxide_recognition(formula, basis)
 def test_formula_basis_does_not_hide_tridymite_phase_mismatch():
     experiment, bench, observation = _case(
         composition=_composition(("SiO2", "0.6"), ("Na2O", "0.4")),
+        oxygen=Decimal("-9"),
         formula="SiO2",
         basis="SiO2",
         phase=Phase.CR,

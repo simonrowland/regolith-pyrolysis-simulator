@@ -1,12 +1,58 @@
 from dataclasses import replace
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 
 from simulator.battery.enums import AmountBasis, BenchIdentityBasis, ValueKind
 from simulator.battery.records import Bench, BenchIdentity, Composition, Located, Sample, State, Value
-from simulator.battery.waypoints import ReadinessStatus, WaypointAuthority, consumer_readiness, pressure_boundary, thermal_path
+from simulator.battery.migrate import Migrator
+from simulator.battery.waypoints import ReadinessStatus, WaypointAuthority, consumer_readiness, oxygen_condition, pressure_boundary, thermal_path
 from tests.battery import factories
+
+
+def test_sossi_2020_table_s4_oxygen_values_migrate_to_all_observation_waypoints():
+    extract = Path(__file__).resolve().parents[2] / "data/literature/extracts/sossi-2020-magma-ocean-redox.yaml"
+    migrator = Migrator()
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    result = migrator.result
+
+    assert len(result.observations) == 12
+    assert all(
+        observation.derived_from
+        and observation.derived_from == observation.derivation.inputs
+        for observation in result.observations.values()
+    )
+    assert not result.validation.hard_issues  # b-882 supplies the measured-reduction lineage
+    expected_by_observation = {
+        "sossi_2020_per_f_o2_1_xanes": "0.00",
+        "sossi_2020_per_f_o2_2_xanes": "-2.49",
+        "sossi_2020_per_f_o2_3_xanes": "-2.53",
+        "sossi_2020_per_f_o2_6_xanes": "-2.58",
+        "sossi_2020_per_ts1_xanes": "-2.72",
+        "sossi_2020_per_f_o2_7_xanes": "-2.72",
+        "sossi_2020_per_ts2_xanes": "-2.72",
+        "sossi_2020_per_f_o2_8_xanes": "-3.00",
+        "sossi_2020_per_f_o2_9_xanes": "-3.92",
+        "sossi_2020_per_f_o2_10_xanes": "-5.32",
+        "sossi_2020_per_f_o2_11_xanes": "-6.74",
+        "sossi_2020_per_f_o2_12_xanes": "-7.86",
+    }
+    expected_by_observation = {
+        f"sossi-2020-magma-ocean-redox::{observation_id}": value
+        for observation_id, value in expected_by_observation.items()
+    }
+    selected_by_observation = {}
+    for observation in result.observations.values():
+        experiment = result.experiments[observation.experiment_id]
+        bench = result.benches[experiment.bench_id]
+        waypoint = oxygen_condition(experiment, bench, observation)
+        assert waypoint.selected is not None, observation.observation_id
+        assert waypoint.selected.authority is WaypointAuthority.PRINTED
+        assert observation.point_conditions["fO2_log"].locator.table == "S4"
+        selected_by_observation[observation.observation_id] = str(waypoint.selected.value.point)
+    assert selected_by_observation == expected_by_observation
 
 
 @pytest.mark.parametrize("key,route", [("temperature_K", thermal_path), ("total_pressure_Pa", pressure_boundary)])

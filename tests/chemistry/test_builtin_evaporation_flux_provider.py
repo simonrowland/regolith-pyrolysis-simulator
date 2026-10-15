@@ -312,7 +312,7 @@ def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
         setpoints_data,
     )
     sim.melt.temperature_C = 1500.0
-    sim._dispatch_only = lambda intent, *, control_inputs: SimpleNamespace(
+    sim._dispatch_only = lambda intent, *, control_inputs, redox_state=None: SimpleNamespace(
         status="ok",
         diagnostic={
             "evaporation_flux_kg_hr": {},

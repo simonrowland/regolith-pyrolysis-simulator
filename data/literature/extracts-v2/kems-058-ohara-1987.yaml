@@ -73,6 +73,7 @@ observations:
     kind: printed
     verbatim:
       as_printed: -23 +/- 3 (95% confidence)
+      confidence_level: ci95
   evidence:
     class:
       tag: value
@@ -237,9 +238,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Ohara et al. (1987), Kambayashi, Awaka & Kato (1985), FetO-P2O5 slag-metal distribution model curve in Fig.
+      3
   admission:
     status: pending
     reason: source admission_status=figure_only is not a closed v2.1 token
@@ -338,6 +340,7 @@ observations:
       epsilon_P2O5_MnO: 1
       epsilon_P2O5_SiO2: 1
       as_printed: errors are 95% confidence limits
+      confidence_level: ci95
   evidence:
     class:
       tag: value
@@ -490,6 +493,7 @@ observations:
     kind: printed
     verbatim:
       as_printed: -20 +/- 2 (95% confidence)
+      confidence_level: ci95
   evidence:
     class:
       tag: value
@@ -586,6 +590,7 @@ observations:
     kind: printed
     verbatim:
       as_printed: -13 +/- 1 (95% confidence)
+      confidence_level: ci95
   evidence:
     class:
       tag: value
@@ -3342,9 +3347,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Ohara et al. (1987), JANAF Thermochemical Tables NSRDS-NBS (1971), Supplement (1974), extrapolated P4O10(s)
+      free energy from 1500 K to 1643 K
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -6137,6 +6143,7 @@ observations:
     kind: printed
     verbatim:
       as_printed: -4 +/- 1 (95% confidence)
+      confidence_level: ci95
   evidence:
     class:
       tag: value

@@ -170,6 +170,18 @@ def test_greedy_nn_prefers_along_trajectory_neighbors() -> None:
     assert [neighbor["label"] for neighbor in neighbors] == ["same-near", "same-far"]
 
 
+def test_interpolation_refuses_dependency_vector_mismatch() -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    candidate_key = copy.deepcopy(query)
+    candidate_key["model"]["model"] = "other-binding"
+    candidate = _candidate(
+        candidate_key,
+        _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0),
+    )
+
+    assert rci.greedy_nearest_neighbors(query, [candidate]) == []
+
+
 def test_linear_interpolation_brackets_temperature() -> None:
     query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
     low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1400.0)
@@ -403,10 +415,19 @@ def test_interpolation_reemits_union_from_every_used_neighbor(tmp_path: Path) ->
     db_path = tmp_path / "interpolation-repair-notices.sqlite"
     notices_by_hash = {
         hashlib.sha256(canonical_json_bytes(low)).hexdigest(): {
-            "kind": "low_neighbor_repair"
+            "type": "typed_notice",
+            "kind": "freeze_gate_curve_point_repaired",
+            "site": "SR18",
+            "temperature_C": 1490.0,
+            "raw_fraction": -0.2,
+            "action": "clamp_fraction",
         },
         hashlib.sha256(canonical_json_bytes(high)).hexdigest(): {
-            "kind": "high_neighbor_repair"
+            "type": "typed_notice",
+            "kind": "freeze_gate_curve_source_replaced",
+            "site": "SR19",
+            "failed_source": "gate_liquid_fraction",
+            "replacement_source": "liquidus_solidus:backend",
         },
     }
     _put_interpolation_row(db_path, low, liquid_fraction=0.7, sio_pa=7.0)
@@ -448,6 +469,66 @@ def test_interpolation_reemits_union_from_every_used_neighbor(tmp_path: Path) ->
             "cache_state": "cached_interpolated",
         },
     ]
+
+
+def test_interpolation_candidates_refuse_corrupt_replay_scope(
+    tmp_path: Path,
+) -> None:
+    key = _interpolation_key("stored", feo_fraction=0.20, temperature_K=1500.0)
+    db_path = tmp_path / "corrupt-scope.sqlite"
+    _put_interpolation_row(db_path, key, liquid_fraction=0.7, sio_pa=7.0)
+    corrupt_scope = "0" * 64
+
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET replay_scope_sha256 = ?",
+            (corrupt_scope,),
+        )
+
+    store = rrd.PT1PersistentEquilibriumStore(db_path)
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="exact key replay scope mismatch",
+    ):
+        store.list_interpolation_candidates(
+            artifact="equilibrium_post_record",
+            replay_scope_sha256=corrupt_scope,
+        )
+
+
+def test_interpolation_refuses_attached_base_dependency_vector_mismatch(
+    tmp_path: Path,
+) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1490.0)
+    high = _interpolation_key("high", feo_fraction=0.20, temperature_K=1510.0)
+    high["model"]["model"] = "other-binding"
+    local_db = tmp_path / "local-binding.sqlite"
+    base_db = tmp_path / "attached-other-binding.sqlite"
+    _put_interpolation_row(local_db, low, liquid_fraction=0.7, sio_pa=7.0)
+    _put_interpolation_row(base_db, high, liquid_fraction=0.71, sio_pa=7.05)
+
+    with sqlite3.connect(base_db) as conn:
+        stored_scope = conn.execute(
+            f"SELECT replay_scope_sha256 FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+    assert stored_scope == rci.replay_scope_for_interpolation(high)
+    assert stored_scope != rci.replay_scope_for_interpolation(query)
+
+    store = PT0DeterminismStore(
+        "capture",
+        db_path=local_db,
+        read_only_base_db_path=base_db,
+    )
+    payload = store._lookup_optional(
+        "equilibrium_post_record",
+        query,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
+    )
+
+    assert payload is None
+    assert store.hits == 0
 
 
 def test_interpolation_unions_known_notice_with_legacy_attached_base(

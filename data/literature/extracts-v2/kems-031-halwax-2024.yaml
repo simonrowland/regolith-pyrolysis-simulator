@@ -2,6 +2,319 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/kems-031-halwax-2024.yaml
 observations:
+- observation_id: kems-031-halwax-2024::halwax_2024_cao_isothermal_ca_pressure_figure_only
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2077'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, admission_status,
+      gas_species, condensed_phase, caption, note'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      temperature_K: '5'
+      quote: a systematic error of ± 5 K is estimated
+      locator:
+        page: 825
+        section: III. Experimental
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 826
+    published_page: 826
+    pdf_page_index: 5
+    figure: '7'
+    note: d-129; upper panel
+  read_from: pdf:kems-031-halwax-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2077'
+      locator:
+        page: 826
+        published_page: 826
+        pdf_page_index: 5
+        figure: '7'
+        note: d-129; upper panel
+- observation_id: kems-031-halwax-2024::halwax_2024_cao_isothermal_o2_pressure_figure_only
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2077'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, admission_status,
+      gas_species, formula, condensed_phase, caption, note'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      temperature_K: '5'
+      quote: a systematic error of ± 5 K is estimated
+      locator:
+        page: 825
+        section: III. Experimental
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 826
+    published_page: 826
+    pdf_page_index: 5
+    figure: '7'
+    note: 'Upper panel: isothermal O2(g) partial pressure over pure CaO at 2077 ± 5 K; pressure plotted against time, no numeric
+      point table.'
+  read_from: pdf:kems-031-halwax-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2077'
+      locator:
+        page: 826
+        published_page: 826
+        pdf_page_index: 5
+        figure: '7'
+        note: 'Upper panel: isothermal O2(g) partial pressure over pure CaO at 2077 ± 5 K; pressure plotted against time,
+          no numeric point table.'
+- observation_id: kems-031-halwax-2024::halwax_2024_cao_isothermal_o_pressure_figure_only
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2077'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, admission_status,
+      gas_species, formula, condensed_phase, caption, note'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      temperature_K: '5'
+      quote: a systematic error of ± 5 K is estimated
+      locator:
+        page: 825
+        section: III. Experimental
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 826
+    published_page: 826
+    pdf_page_index: 5
+    figure: '7'
+    note: 'Upper panel: isothermal O(g) partial pressure over pure CaO at 2077 ± 5 K; pressure plotted against time, no numeric
+      point table.'
+  read_from: pdf:kems-031-halwax-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2077'
+      locator:
+        page: 826
+        published_page: 826
+        pdf_page_index: 5
+        figure: '7'
+        note: 'Upper panel: isothermal O(g) partial pressure over pure CaO at 2077 ± 5 K; pressure plotted against time, no
+          numeric point table.'
 - observation_id: kems-031-halwax-2024::halwax_2024_cao_kems_geometry_package
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
@@ -196,11 +509,324 @@ observations:
   locator:
     page: 825
     published_page: 825
-    pdf_page_index: 5
+    pdf_page_index: 4
     paragraph: experimental
     note: quote=To prevent reactions between the Knudsen cell and the sample, an iridium cell was used. The orifice in the
       lid of the cell had a diameter of 0.3 mm.
   read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_mgo_isothermal_mg_pressure_figure_only
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1926'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, admission_status,
+      gas_species, formula, condensed_phase, caption, note'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      temperature_K: '5'
+      quote: a systematic error of ± 5 K is estimated
+      locator:
+        page: 825
+        section: III. Experimental
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 826
+    published_page: 826
+    pdf_page_index: 5
+    figure: '7'
+    note: 'Lower panel: isothermal Mg(g) partial pressure over pure MgO at 1926 ± 5 K; pressure plotted against time, no numeric
+      point table.'
+  read_from: pdf:kems-031-halwax-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1926'
+      locator:
+        page: 826
+        published_page: 826
+        pdf_page_index: 5
+        figure: '7'
+        note: 'Lower panel: isothermal Mg(g) partial pressure over pure MgO at 1926 ± 5 K; pressure plotted against time,
+          no numeric point table.'
+- observation_id: kems-031-halwax-2024::halwax_2024_mgo_isothermal_o2_pressure_figure_only
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1926'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, admission_status,
+      gas_species, formula, condensed_phase, caption, note'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      temperature_K: '5'
+      quote: a systematic error of ± 5 K is estimated
+      locator:
+        page: 825
+        section: III. Experimental
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 826
+    published_page: 826
+    pdf_page_index: 5
+    figure: '7'
+    note: 'Lower panel: isothermal O2(g) partial pressure over pure MgO at 1926 ± 5 K; pressure plotted against time, no numeric
+      point table.'
+  read_from: pdf:kems-031-halwax-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1926'
+      locator:
+        page: 826
+        published_page: 826
+        pdf_page_index: 5
+        figure: '7'
+        note: 'Lower panel: isothermal O2(g) partial pressure over pure MgO at 1926 ± 5 K; pressure plotted against time,
+          no numeric point table.'
+- observation_id: kems-031-halwax-2024::halwax_2024_mgo_isothermal_o_pressure_figure_only
+  experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1926'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, admission_status,
+      gas_species, formula, condensed_phase, caption, note'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      temperature_K: '5'
+      quote: a systematic error of ± 5 K is estimated
+      locator:
+        page: 825
+        section: III. Experimental
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 826
+    published_page: 826
+    pdf_page_index: 5
+    figure: '7'
+    note: d-129; lower panel
+  read_from: pdf:kems-031-halwax-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1926'
+      locator:
+        page: 826
+        published_page: 826
+        pdf_page_index: 5
+        figure: '7'
+        note: d-129; lower panel
 - observation_id: kems-031-halwax-2024::halwax_2024_mgo_kems_geometry_psat_package
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -353,7 +979,7 @@ observations:
   source_id: kems-031-halwax-2024
   locator:
     page: 825
-    pdf_page_index: 5
+    pdf_page_index: 4
     table: I
   read_from: tables:kems-031-halwax-2024
   point_conditions:
@@ -363,7 +989,7 @@ observations:
         value: '0.00005393'
       locator:
         page: 825
-        pdf_page_index: 5
+        pdf_page_index: 4
         table: I
       inference:
         relation: mg_to_kg
@@ -379,7 +1005,7 @@ observations:
               value: '53.93'
             locator:
               page: 825
-              pdf_page_index: 5
+              pdf_page_index: 4
               table: I
         - - factor
           - state:
@@ -387,7 +1013,7 @@ observations:
               value: '1000000'
             locator:
               page: 825
-              pdf_page_index: 5
+              pdf_page_index: 4
               table: I
         output_unit: kg
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses::point:1
@@ -433,7 +1059,7 @@ observations:
   source_id: kems-031-halwax-2024
   locator:
     page: 825
-    pdf_page_index: 5
+    pdf_page_index: 4
     table: I
   read_from: tables:kems-031-halwax-2024
   point_conditions:
@@ -443,7 +1069,7 @@ observations:
         value: '0.00004951'
       locator:
         page: 825
-        pdf_page_index: 5
+        pdf_page_index: 4
         table: I
       inference:
         relation: mg_to_kg
@@ -459,7 +1085,7 @@ observations:
               value: '49.51'
             locator:
               page: 825
-              pdf_page_index: 5
+              pdf_page_index: 4
               table: I
         - - factor
           - state:
@@ -467,7 +1093,7 @@ observations:
               value: '1000000'
             locator:
               page: 825
-              pdf_page_index: 5
+              pdf_page_index: 4
               table: I
         output_unit: kg
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses::point:0
@@ -513,7 +1139,7 @@ observations:
   source_id: kems-031-halwax-2024
   locator:
     page: 825
-    pdf_page_index: 5
+    pdf_page_index: 4
     table: I
   read_from: tables:kems-031-halwax-2024
   point_conditions:
@@ -523,7 +1149,7 @@ observations:
         value: '0.00005367'
       locator:
         page: 825
-        pdf_page_index: 5
+        pdf_page_index: 4
         table: I
       inference:
         relation: mg_to_kg
@@ -539,7 +1165,7 @@ observations:
               value: '53.67'
             locator:
               page: 825
-              pdf_page_index: 5
+              pdf_page_index: 4
               table: I
         - - factor
           - state:
@@ -547,7 +1173,7 @@ observations:
               value: '1000000'
             locator:
               page: 825
-              pdf_page_index: 5
+              pdf_page_index: 4
               table: I
         output_unit: kg
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses::point:1
@@ -593,7 +1219,7 @@ observations:
   source_id: kems-031-halwax-2024
   locator:
     page: 825
-    pdf_page_index: 5
+    pdf_page_index: 4
     table: I
   read_from: tables:kems-031-halwax-2024
   point_conditions:
@@ -603,7 +1229,7 @@ observations:
         value: '0.00005158'
       locator:
         page: 825
-        pdf_page_index: 5
+        pdf_page_index: 4
         table: I
       inference:
         relation: mg_to_kg
@@ -619,7 +1245,7 @@ observations:
               value: '51.58'
             locator:
               page: 825
-              pdf_page_index: 5
+              pdf_page_index: 4
               table: I
         - - factor
           - state:
@@ -627,7 +1253,7 @@ observations:
               value: '1000000'
             locator:
               page: 825
-              pdf_page_index: 5
+              pdf_page_index: 4
               table: I
         output_unit: kg
 - observation_id: kems-031-halwax-2024::halwax_2024_table_ii_ni_sublimation_literature
@@ -684,7 +1310,7 @@ observations:
   locator:
     page: 826
     published_page: 826
-    pdf_page_index: 6
+    pdf_page_index: 5
     table: II
     source_path: tables/kems-031-halwax-2024/t2.csv
   read_from: tables:kems-031-halwax-2024
@@ -719,6 +1345,7 @@ observations:
       quote: 422 ± 4
       locator:
         page: 826
+        pdf_page_index: 5
         table: II
       basis: author_reported
   evidence:
@@ -734,7 +1361,7 @@ observations:
   locator:
     page: 826
     published_page: 826
-    pdf_page_index: 6
+    pdf_page_index: 5
     table: II
     note: row=This Study
     source_path: tables/kems-031-halwax-2024/t2.csv
@@ -747,7 +1374,7 @@ observations:
       locator:
         page: 826
         published_page: 826
-        pdf_page_index: 6
+        pdf_page_index: 5
         table: II
         note: row=This Study
         source_path: tables/kems-031-halwax-2024/t2.csv
@@ -799,7 +1426,7 @@ observations:
   locator:
     page: 826
     published_page: 826
-    pdf_page_index: 6
+    pdf_page_index: 5
     table: III
     source_path: tables/kems-031-halwax-2024/t3.csv
   read_from: tables:kems-031-halwax-2024

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -37,6 +39,255 @@ SYNTHETIC_CURVE = {
     "liquidus_T_C": 1300.0,
     "path": ((1000.0, 0.0), (1300.0, 1.0)),
 }
+
+
+def _configured_alphamelts_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    content: bytes | None,
+) -> tuple[BindingIdentity, Path]:
+    from simulator import engine_local_config
+
+    binary = tmp_path / "alphamelts"
+    if content is not None:
+        binary.write_bytes(content)
+    (tmp_path / "engines.local.toml").write_text(
+        "[paths]\n" f"alphamelts_binary_path = {json.dumps(str(binary))}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: tmp_path / "engines.local.toml",
+    )
+    return BindingIdentity(
+        "alphamelts", "MELTSv1.0.2", "fixture-r1", "subprocess"
+    ), binary
+
+
+def test_artifact_digest_matches_independent_file_and_directory_composition(
+    tmp_path: Path,
+) -> None:
+    first = tmp_path / "first.bin"
+    second = tmp_path / "second.bin"
+    first_bytes = b"first fixture contents\x00"
+    second_bytes = b"second fixture contents\x01"
+    first.write_bytes(first_bytes)
+    second.write_bytes(second_bytes)
+
+    expected_file = hashlib.sha256(first_bytes).hexdigest()
+    entries = [
+        ("first.bin", hashlib.sha256(first_bytes).hexdigest()),
+        ("second.bin", hashlib.sha256(second_bytes).hexdigest()),
+    ]
+    encoded_entries = json.dumps(
+        entries, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    expected_directory = hashlib.sha256(encoded_entries).hexdigest()
+
+    assert admission._artifact_digest(first) == expected_file
+    assert admission._artifact_digest(tmp_path) == expected_directory
+
+
+def test_install_provenance_repeats_equal_mapping_and_fingerprint(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    identity, _binary = _configured_alphamelts_identity(
+        tmp_path, monkeypatch, b"stable engine bytes"
+    )
+
+    first = install_provenance(identity)
+    second = install_provenance(identity)
+
+    assert first == second
+    assert admission.admission_fingerprint(
+        identity, first
+    ) == admission.admission_fingerprint(identity, second)
+
+
+@pytest.mark.parametrize(
+    ("change", "initial", "replacement"),
+    [
+        ("different_size", b"old", b"replacement"),
+        ("same_size_mtime", b"old bytes", b"new bytes"),
+        ("replace_same_size_mtime", b"old bytes", b"new bytes"),
+        ("appears", None, b"newly present"),
+        ("deleted", b"present", None),
+    ],
+)
+def test_install_provenance_detects_engine_file_changes(
+    change: str,
+    initial: bytes | None,
+    replacement: bytes | None,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    identity, binary = _configured_alphamelts_identity(
+        tmp_path, monkeypatch, initial
+    )
+    before = install_provenance(identity)["runtime_artifacts"][
+        "alphamelts_binary_path"
+    ]
+    old_mtime_ns = binary.stat().st_mtime_ns if binary.exists() else None
+
+    if change == "appears":
+        binary.write_bytes(replacement or b"")
+    elif change == "deleted":
+        binary.unlink()
+    elif change == "replace_same_size_mtime":
+        candidate = tmp_path / "replacement.bin"
+        candidate.write_bytes(replacement or b"")
+        os.utime(candidate, ns=(candidate.stat().st_atime_ns, old_mtime_ns))
+        os.replace(candidate, binary)
+    else:
+        binary.write_bytes(replacement or b"")
+        if change == "same_size_mtime":
+            os.utime(binary, ns=(binary.stat().st_atime_ns, old_mtime_ns))
+
+    after = install_provenance(identity)["runtime_artifacts"][
+        "alphamelts_binary_path"
+    ]
+    assert after != before
+
+
+@pytest.mark.parametrize(
+    ("identity", "backend_attribute", "artifact_name"),
+    [
+        (
+            BindingIdentity("alphamelts", "MELTSv1.0.2", "alphamelts-r1", "subprocess"),
+            "_binary_path",
+            "alphamelts_selected_binary",
+        ),
+        (
+            BindingIdentity("alphamelts", "MELTSv1.0.2", "alphamelts-r1", "python_api"),
+            "_pet_module",
+            "alphamelts_python_api_module",
+        ),
+        (
+            BindingIdentity("thermoengine", "MELTSv1.0.2", "thermoengine-r1", "native"),
+            "_thermoengine",
+            "thermoengine_module",
+        ),
+        (
+            BindingIdentity("magemin", "ig", "magemin-ig-r1", "subprocess"),
+            "_binary_path",
+            "magemin_selected_binary",
+        ),
+    ],
+)
+def test_install_provenance_records_selected_producer_artifact(
+    identity: BindingIdentity,
+    backend_attribute: str,
+    artifact_name: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_local_config
+
+    config_path = tmp_path / "engines.local.toml"
+    config_path.write_text("[paths]\n", encoding="utf-8")
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: config_path,
+    )
+    artifact_path = tmp_path / artifact_name
+    artifact_bytes = b"selected producer artifact"
+    artifact_path.write_bytes(artifact_bytes)
+    selected = (
+        SimpleNamespace(__file__=str(artifact_path))
+        if backend_attribute in {"_pet_module", "_thermoengine"}
+        else artifact_path
+    )
+    backend = SimpleNamespace(**{backend_attribute: selected})
+
+    provenance = install_provenance(identity, runtime_backend=backend)
+
+    assert provenance["runtime_artifacts"][artifact_name]["sha256"] == (
+        hashlib.sha256(artifact_bytes).hexdigest()
+    )
+    assert admission._selected_producer_digest(identity, provenance) == (
+        hashlib.sha256(artifact_bytes).hexdigest()
+    )
+
+
+def test_install_provenance_distinguishes_selected_digest_from_optional_metadata(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_local_config
+
+    config_path = tmp_path / "engines.local.toml"
+    config_path.write_text("[paths]\n", encoding="utf-8")
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: config_path,
+    )
+    identity = BindingIdentity(
+        "alphamelts", "MELTSv1.0.2", "alphamelts-r1", "python_api"
+    )
+    selected_path = tmp_path / "petthermotools.py"
+    selected_bytes = b"selected Python API module"
+    selected_path.write_bytes(selected_bytes)
+    backend = SimpleNamespace(
+        _pet_module=SimpleNamespace(__file__=str(selected_path))
+    )
+    species_catalog = (
+        Path(admission.__file__).resolve().parent.parent
+        / "data"
+        / "species_catalog.yaml"
+    ).resolve()
+    original_is_file = Path.is_file
+
+    def missing_optional_catalog(path: Path) -> bool:
+        if path.resolve() == species_catalog:
+            return False
+        return original_is_file(path)
+
+    monkeypatch.setattr(Path, "is_file", missing_optional_catalog)
+    provenance = install_provenance(identity, runtime_backend=backend)
+
+    assert provenance["runtime_artifacts"]["alphamelts_python_api_module"][
+        "sha256"
+    ] == hashlib.sha256(selected_bytes).hexdigest()
+    assert provenance["selected_source_digests"]["species_catalog"][
+        "sha256"
+    ] is None
+    assert provenance["binding_provenance_verifiable"] is False
+    assert admission._selected_producer_digest(identity, provenance) == (
+        hashlib.sha256(selected_bytes).hexdigest()
+    )
+
+    backend._pet_module = SimpleNamespace(
+        __file__=str(tmp_path / "missing-petthermotools.py")
+    )
+    unavailable = install_provenance(identity, runtime_backend=backend)
+    assert unavailable["runtime_artifacts"]["alphamelts_python_api_module"][
+        "sha256"
+    ] is None
+    assert admission._selected_producer_digest(identity, unavailable) is None
+
+
+def test_gate_memo_origin_fingerprint_covers_transport_identity() -> None:
+    provenance = {
+        "binding_provenance_verifiable": True,
+        "runtime_artifacts": {
+            "alphamelts_selected_binary": {"sha256": "a" * 64},
+        },
+    }
+    subprocess_identity = BindingIdentity(
+        "alphamelts", "MELTSv1.0.2", "fixture-r1", "subprocess"
+    )
+    python_identity = BindingIdentity(
+        "alphamelts", "MELTSv1.0.2", "fixture-r1", "python_api"
+    )
+
+    assert admission.admission_fingerprint(
+        subprocess_identity,
+        provenance,
+    ) != admission.admission_fingerprint(python_identity, provenance)
 
 
 def test_openimcc_admission_records_production_default_pack() -> None:
@@ -620,6 +871,99 @@ def test_alpha_python_api_probe_refuses_resolved_transport_mismatch(
         )
 
 
+def test_magemin_binding_probe_forwards_redox_state_to_request(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import backends, config
+    from simulator.accounting.ledger import AtomLedger
+    from simulator.chemistry.kernel import (
+        CapabilityProfile,
+        ChemistryIntent,
+        IntentResult,
+    )
+    from simulator.fe_redox import RedoxState
+
+    identity = next(
+        identity
+        for identity, artifact in admission.known_binding_assessment_targets()
+        if identity.engine_id == 'magemin' and artifact == 'freeze_gate_curve'
+    )
+    state = RedoxState.absolute(-9.0)
+    captured = []
+
+    class RecordingProvider:
+        def capability_profile(self):
+            return CapabilityProfile(
+                provider_id='probe-magemin',
+                intents=frozenset({ChemistryIntent.GATE_LIQUID_FRACTION}),
+                is_authoritative_for=frozenset({
+                    ChemistryIntent.GATE_LIQUID_FRACTION
+                }),
+                declared_accounts=frozenset({'process.cleaned_melt'}),
+            )
+
+        def dispatch(self, request):
+            captured.append(request)
+            return IntentResult(
+                intent=request.intent,
+                status='ok',
+                transition=None,
+            )
+
+    class FakeSimulator:
+        melt = SimpleNamespace(temperature_C=1000.0, p_total_mbar=1000.0)
+        atom_ledger = AtomLedger()
+        species_formula_registry = {}
+
+        def load_batch(self, *_args, **_kwargs):
+            return None
+
+        def start_campaign(self, *_args, **_kwargs):
+            return None
+
+        def _dispatch_only(self, *_args, **_kwargs):
+            return None
+
+        def _freeze_gate_curve(self):
+            return self._dispatch_only(
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+                control_inputs={},
+                fO2_log=-9.0,
+                redox_state=state,
+            )
+
+    class FakeMAGEMinProvider(RecordingProvider):
+        def __init__(self):
+            self._backend = object()
+
+    monkeypatch.setattr(backends, 'resolve_backend', lambda *_a, **_k: object())
+    monkeypatch.setattr(backends, 'build_simulator', lambda _cfg: FakeSimulator())
+    monkeypatch.setattr(
+        config,
+        'load_config_bundle',
+        lambda: SimpleNamespace(
+            setpoints={}, feedstocks={}, vapor_pressures={}
+        ),
+    )
+    monkeypatch.setattr(
+        admission,
+        'selected_binding_provenance',
+        lambda *_args: {'binding_provenance_verifiable': True},
+    )
+    monkeypatch.setattr(
+        'engines.magemin.provider.MAGEMinShadowProvider',
+        FakeMAGEMinProvider,
+    )
+
+    admission._run_binding_probe(
+        identity,
+        'freeze_gate_curve',
+        {'active_backend': 'magemin'},
+    )
+
+    assert captured[0].redox_state is state
+
+
 def test_direct_replay_only_constructor_uses_receipt_authorizer(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -954,6 +1298,136 @@ def test_equilibrium_binding_producers_follow_input_selected_dependencies(
         sim,
         artifact="freeze_gate_curve",
     ) == ()
+
+
+def test_equilibrium_guard_does_not_borrow_gate_supplier_admission(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from engines.alphamelts import AlphaMELTSProvider
+    from simulator.chemistry.kernel import ChemistryIntent, ProviderRegistry
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+    )
+    equilibrium_backend = AlphaMELTSBackend()
+    gate_backend = AlphaMELTSBackend()
+    admission.publish_live_backend_admission(gate_backend)
+    assert getattr(
+        equilibrium_backend, "_engine_binding_admission_fingerprint", None
+    ) is None
+    assert gate_backend._engine_binding_admission_fingerprint is not None
+    registry = ProviderRegistry()
+    registry.register(
+        AlphaMELTSProvider(gate_backend),
+        [ChemistryIntent.GATE_LIQUID_FRACTION],
+    )
+    sim = SimpleNamespace(backend=equilibrium_backend, _chem_registry=registry)
+
+    assert not admission.live_binding_cache_eligibility(
+        sim,
+        artifact="equilibrium_post_record",
+    )
+
+
+def test_equilibrium_guard_keeps_own_admission_when_gate_supplier_unadmitted(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from engines.alphamelts import AlphaMELTSProvider
+    from simulator.chemistry.kernel import ChemistryIntent, ProviderRegistry
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+    )
+    equilibrium_backend = AlphaMELTSBackend()
+    gate_backend = AlphaMELTSBackend()
+    admission.publish_live_backend_admission(equilibrium_backend)
+    registry = ProviderRegistry()
+    registry.register(
+        AlphaMELTSProvider(gate_backend),
+        [ChemistryIntent.GATE_LIQUID_FRACTION],
+    )
+    sim = SimpleNamespace(backend=equilibrium_backend, _chem_registry=registry)
+
+    assert admission.live_binding_cache_eligibility(
+        sim,
+        artifact="equilibrium_post_record",
+    )
+
+
+def test_equilibrium_guard_does_not_use_gate_receipt_when_own_receipt_is_stale(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from engines.alphamelts import AlphaMELTSProvider
+    from simulator.chemistry.kernel import ChemistryIntent, ProviderRegistry
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+    )
+    equilibrium_backend = AlphaMELTSBackend()
+    gate_backend = AlphaMELTSBackend()
+    identity = admission.binding_identity_for_backend(equilibrium_backend)
+    receipt_path = admission.binding_receipt_path()
+    receipt = json.loads(receipt_path.read_text())
+    base = receipt["entries"][0]["provenance"]
+    equilibrium_provenance = {
+        **base,
+        "runtime_artifacts": {
+            "alphamelts_selected_binary": {"sha256": "a" * 64}
+        },
+    }
+    gate_provenance = {
+        **base,
+        "runtime_artifacts": {
+            "alphamelts_selected_binary": {"sha256": "b" * 64}
+        },
+    }
+    monkeypatch.setattr(
+        admission,
+        "current_backend_provenance",
+        lambda _identity, backend: (
+            equilibrium_provenance
+            if backend is equilibrium_backend
+            else gate_provenance
+        ),
+    )
+    receipt["entries"][0]["provenance"] = equilibrium_provenance
+    receipt_path.write_text(json.dumps(receipt))
+    admission.publish_live_backend_admission(equilibrium_backend)
+    assert equilibrium_backend._engine_binding_admission_fingerprint == (
+        admission.admission_fingerprint(identity, equilibrium_provenance)
+    )
+    receipt["entries"][0]["provenance"] = gate_provenance
+    receipt_path.write_text(json.dumps(receipt))
+    admission.publish_live_backend_admission(gate_backend)
+    assert gate_backend._engine_binding_admission_fingerprint == (
+        admission.admission_fingerprint(identity, gate_provenance)
+    )
+    registry = ProviderRegistry()
+    registry.register(
+        AlphaMELTSProvider(gate_backend),
+        [ChemistryIntent.GATE_LIQUID_FRACTION],
+    )
+    sim = SimpleNamespace(backend=equilibrium_backend, _chem_registry=registry)
+
+    assert not admission.live_binding_cache_eligibility(
+        sim,
+        artifact="equilibrium_post_record",
+    )
 
 
 def test_missing_selected_contributor_disables_live_cache_and_replay(

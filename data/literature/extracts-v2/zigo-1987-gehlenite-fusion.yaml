@@ -6,22 +6,67 @@ observations:
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_fusion'
+      tag: value
+      value: heat_of_fusion
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'gehlenite_C2AS_crystal_to_composition_matched_melt' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1863'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    kind: point
+    point: '172.1'
     approximate: false
   uncertainty:
     kind: printed
@@ -36,35 +81,94 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_enthalpy_at_1863K
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 179
     pdf_page_index: 9
     equation: '7'
   read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1863'
+      locator:
+        page: 179
+        pdf_page_index: 9
+        equation: '7'
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_fusion_entropy_at_1863K
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'entropy_of_fusion'
+      tag: value
+      value: entropy_of_fusion
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'gehlenite_C2AS_crystal_to_composition_matched_melt' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1863'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile entropy_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'entropy_of_fusion'; refusing to pick a number
+    kind: point
+    point: '92.4'
     approximate: false
   uncertainty:
     kind: printed
@@ -78,15 +182,29 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_entropy_at_1863K
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 179
     pdf_page_index: 9
     equation: '8'
   read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1863'
+      locator:
+        page: 179
+        pdf_page_index: 9
+        equation: '8'
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_selected
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:
@@ -104,6 +222,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1863'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'congruent_fusion_temperature'; refusing to pick
@@ -129,7 +250,16 @@ observations:
     pdf_page_index: 2
     paragraph: introduction
   read_from: pdf:zigo-1987-gehlenite-fusion
-- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_sensitivity::points:h=54bedae60b48
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1863'
+      locator:
+        page: 172
+        pdf_page_index: 2
+        paragraph: introduction
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_sensitivity::T=1857:h=54bedae60b48
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:
     quantity:
@@ -146,6 +276,12 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1857'
+    reference_state:
+      tag: unknown
+      reason: qualifier sensitivity_to_fusion_temperature does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -171,7 +307,16 @@ observations:
     pdf_page_index: 10
     paragraph: fusion temperature uncertainty
   read_from: pdf:zigo-1987-gehlenite-fusion
-- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_sensitivity::points:h=a6372be22745
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1857'
+      locator:
+        page: 180
+        pdf_page_index: 10
+        paragraph: fusion temperature uncertainty
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_sensitivity::T=1866:h=a6372be22745
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:
     quantity:
@@ -188,6 +333,12 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1866'
+    reference_state:
+      tag: unknown
+      reason: qualifier sensitivity_to_fusion_temperature does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -213,6 +364,15 @@ observations:
     pdf_page_index: 10
     paragraph: fusion temperature uncertainty
   read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1866'
+      locator:
+        page: 180
+        pdf_page_index: 10
+        paragraph: fusion temperature uncertainty
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:

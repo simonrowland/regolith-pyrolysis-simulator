@@ -9,7 +9,6 @@ from pathlib import Path
 
 import pytest
 import yaml
-import pytest
 
 from simulator.battery import migrate as migrate_module
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
@@ -57,9 +56,9 @@ _SWEPT_COMPOSITION_MAPS = (
     ("Hendrix", "hendrix-2024-reactivity-reduced-simulants", "composition_wt_pct", "SO3", 2),
     ("Flemetakis", "ta-flemetakis-2024", "composition_wt_pct", "B2O3", 1),
 )
-_MLS_BULK_IDS = {
-    "cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=1747.15:row=mls-1a:h=7bb710cb23de",
-    "kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::T=1747.15:row=mls-1a:h=23d3c0f9125e",
+_MLS_BULK_ID_PREFIXES = {
+    "cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=1747.15:row=mls-1a:",
+    "kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::T=1747.15:row=mls-1a:",
     "pomeroy_cardiff_2006_measurements:pomeroy_non_condensed_mass_loss_fraction",
 }
 
@@ -1809,13 +1808,17 @@ def test_mls_1a_case_duplicate_is_one_identity() -> None:
     found: list[str] = []
     for obs in _iter_store_observations():
         oid = str(obs.get("observation_id") or "")
-        if oid not in _MLS_BULK_IDS:
+        if not any(oid.startswith(prefix) for prefix in _MLS_BULK_ID_PREFIXES):
             continue
         if _quantity(obs) not in _BULK_QUANTITIES:
             continue
         found.append(oid)
         formulas.add(_formula(obs))
-    assert set(found) == _MLS_BULK_IDS, found
+    assert len(found) == len(_MLS_BULK_ID_PREFIXES), found
+    assert all(
+        any(oid.startswith(prefix) for oid in found)
+        for prefix in _MLS_BULK_ID_PREFIXES
+    ), found
     assert len(formulas) == 1, formulas
     formula = next(iter(formulas))
     assert formula, "MLS bulk rows have empty species.formula"

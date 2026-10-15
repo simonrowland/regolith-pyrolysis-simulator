@@ -46,9 +46,11 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     # the tick flux exactly; the residual Na roundoff dust is gone and the
     # audited overhead is now empty. HI-2 above remains <= 1e-12 %.
     # Restored flagged routing leaves only these identified roundoff parcels.
+    # 2026-10-13 b-850 round 2: parent-oxide alkali-dimer pressures no longer
+    # leave the prior 1.994e-20 kg Na roundoff parcel. The remaining SiO2_gas
+    # residual shifts from 9.409239450400745e-14 to 9.409239449650439e-14 kg.
     expected_overhead: dict[str, float] = {
-        "Na": 1.994044623865321e-20,
-        "SiO2_gas": 9.409239450400745e-14,
+        "SiO2_gas": 9.409239449650439e-14,
     }
     assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
         expected_overhead,

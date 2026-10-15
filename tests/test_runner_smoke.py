@@ -2240,22 +2240,24 @@ def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
     sim.melt.temperature_C = 1600.0
     sim.melt.target_temperature_C = 1600.0
     curve_calls = 0
+    from simulator.engine_binding_admission import write_gate_curve_memo_record
 
     def fail_to_floor_then_recover():
         nonlocal curve_calls
         curve_calls += 1
         if curve_calls == 1:
             raise ProviderUnavailableError("runner poison authority probe")
-        return {
+        curve = {
             "source": "test_recovered_real_curve",
             "solidus_T_C": 1000.0,
             "liquidus_T_C": 1700.0,
             "path": ((1000.0, 0.0), (1700.0, 1.0)),
         }
+        return write_gate_curve_memo_record(sim, curve)
 
     monkeypatch.setattr(
         sim,
-        "_freeze_gate_curve",
+        "_freeze_gate_curve_record",
         fail_to_floor_then_recover,
     )
     monkeypatch.setattr(sim, "_update_temperature", lambda: None)

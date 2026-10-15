@@ -12850,6 +12850,8 @@ families:
           stoichiometry_derivation: 'Premise: parent debit is 1.0 mol K2O per mol K2. Algebra gives 1.2045996884775
             kg parent/kg vapor and 0.204599688477504 kg O2/kg vapor. Unit check: kg/kg. Sanity: 1.2045996884775
             = 1 + 0.204599688477504.'
+          # This parent-oxide reaction uses a_parent = a_single^2; unit activity leaves the reference unchanged.
+          source_activity_basis: parent_oxide
           oxide_activity_exponent: 1.0
           pO2_exponent: -0.5
           pO2_reference_bar: 1
@@ -12992,6 +12994,8 @@ families:
           stoich_O2_per_vapor: 0
           stoichiometry_derivation: 'Premise: parent debit is 1.0 mol K2O per mol K2O. Algebra gives 1
             kg parent/kg vapor and 0 kg O2/kg vapor. Unit check: kg/kg. Sanity: 1 = 1 + 0.'
+          # This parent-oxide reaction uses a_parent = a_single^2; unit activity leaves the reference unchanged.
+          source_activity_basis: parent_oxide
           oxide_activity_exponent: 1.0
           pO2_exponent: 0.0
           pO2_reference_bar: 1
@@ -13482,6 +13486,8 @@ families:
           stoichiometry_derivation: 'Premise: parent debit is 1.0 mol Na2O per mol Na2. Algebra gives
             1.34795912488601 kg parent/kg vapor and 0.347959124886007 kg O2/kg vapor. Unit check: kg/kg.
             Sanity: 1.34795912488601 = 1 + 0.347959124886007.'
+          # This parent-oxide reaction uses a_parent = a_single^2; unit activity leaves the reference unchanged.
+          source_activity_basis: parent_oxide
           oxide_activity_exponent: 1.0
           pO2_exponent: -0.5
           pO2_reference_bar: 1
@@ -13683,6 +13689,8 @@ families:
           stoich_O2_per_vapor: 0
           stoichiometry_derivation: 'Premise: parent debit is 1.0 mol Na2O per mol Na2O. Algebra gives
             1 kg parent/kg vapor and 0 kg O2/kg vapor. Unit check: kg/kg. Sanity: 1 = 1 + 0.'
+          # This parent-oxide reaction uses a_parent = a_single^2; unit activity leaves the reference unchanged.
+          source_activity_basis: parent_oxide
           oxide_activity_exponent: 1.0
           pO2_exponent: 0.0
           pO2_reference_bar: 1

@@ -248,14 +248,18 @@ def test_classify_out_of_domain_and_no_liquid() -> None:
 @pytest.mark.parametrize(
     ("liquid_fraction", "expected"),
     [
+        (None, ("refusal", "liquid_fraction_missing")),
+        (math.nan, ("refusal", "liquid_fraction_invalid")),
+        (math.inf, ("refusal", "liquid_fraction_invalid")),
+        (-0.1, ("refusal", "liquid_fraction_invalid")),
+        (1.2, ("refusal", "liquid_fraction_invalid")),
         (0.0, ("refusal", "no_liquid")),
-        (-0.25, ("refusal", "no_liquid")),
-        (1.0e-15, ("ok", None)),
-        (1.1, ("ok", None)),
-        (math.nan, ("ok", None)),
+        (1.0, ("ok", None)),
+        (0.5, ("ok", None)),
     ],
 )
-def test_classify_legacy_no_liquid_boundary_values(liquid_fraction, expected):
+def test_classify_legacy_liquid_fraction_boundary_values(liquid_fraction, expected):
+    """b-870: missing/invalid fractions refuse; valid boundaries stay distinct."""
     result = SimpleNamespace(
         status="ok",
         diagnostics={},
@@ -267,6 +271,75 @@ def test_classify_legacy_no_liquid_boundary_values(liquid_fraction, expected):
     status, reason, _ = classify_equilibrate_outcome(result)
 
     assert (status, reason) == expected
+
+
+@pytest.mark.parametrize("liquid_fraction", [1.2, math.nan, -0.1])
+def test_classify_invalid_supplied_fraction_without_assemblage_refuses(
+    liquid_fraction,
+):
+    result = SimpleNamespace(
+        status="non_authoritative",
+        diagnostics={},
+        warnings=[],
+        liquid_fraction=liquid_fraction,
+        phase_assemblage_available=False,
+    )
+
+    assert classify_equilibrate_outcome(result)[:2] == (
+        "refusal",
+        "liquid_fraction_invalid",
+    )
+
+
+def test_classify_missing_fraction_without_assemblage_remains_permitted():
+    result = SimpleNamespace(
+        status="non_authoritative",
+        diagnostics={},
+        warnings=[],
+        liquid_fraction=None,
+        phase_assemblage_available=False,
+    )
+
+    assert classify_equilibrate_outcome(result) == ("ok", None, None)
+
+
+def test_equilibrate_cell_refuses_invalid_fraction_without_assemblage():
+    class _Backend:
+        def equilibrate(self, **_kwargs):
+            return SimpleNamespace(
+                status="non_authoritative",
+                diagnostics={},
+                warnings=[],
+                activity_coefficients={},
+                vapor_pressures_Pa={},
+                liquid_fraction=1.2,
+                phase_assemblage_available=False,
+            )
+
+    handle = EngineHandle(
+        name="vaporock",
+        backend=_Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = BinaryPot(
+        pot_id="invalid-fraction-no-assemblage",
+        kato_1993_table4_system=None,
+        why="invalid reported fraction",
+        composition_wt_pct={"Na2O": 100.0},
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1600.0,
+        po2=Po2Request(mode="commanded", po2_bar=1e-8),
+    )
+
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == "liquid_fraction_invalid"
 
 
 def test_classify_composition_projected_is_typed_refusal() -> None:
@@ -1338,6 +1411,42 @@ def test_equilibrate_cell_payload_round_trip_keeps_flags() -> None:
     ].startswith("antoine_fallback_from_vaporock")
 
 
+def test_equilibrate_cell_payload_shape_includes_activity_metadata() -> None:
+    payload = _ok_cell(engine="internal-analytical", gas={}).as_payload()
+    assert set(payload) == {
+        "pot_id",
+        "engine",
+        "temperature_K",
+        "po2",
+        "status",
+        "refusal_reason",
+        "engine_status",
+        "engine_reason",
+        "engine_annotation",
+        "melt_activities",
+        "melt_activity_coefficients",
+        "melt_activity_coefficient_details",
+        "activities_standard_state",
+        "gas_partial_pressures_Pa",
+        "invalid_gas_partial_pressure_components",
+        "liquid_fraction",
+        "wall_s",
+        "cpu_s",
+        "hostname",
+        "vapor_pressures_source",
+        "vapor_pressure_backend_status",
+        "vapor_pressure_backend_status_reason",
+        "authoritative_for_requested_vapor_pressure",
+        "arm",
+        "notices",
+        "authority",
+        "certified_band",
+        "exit_signal",
+        "exit_code",
+        "model_id",
+    }
+
+
 def test_openimcc_cell_round_trips_through_harness() -> None:
     pot = BinaryPot(
         pot_id="mgo_sio2_40_60",
@@ -1560,6 +1669,7 @@ for line in sys.stdin:
         )
         child = subprocess.Popen([sys.executable, "-c", child_code])
         marker.with_suffix(".pid").write_text(str(child.pid))
+    if mode == "hang":
         time.sleep(30)
     po2_raw = request["po2"]
     cell = EquilibrateCell(
@@ -1692,15 +1802,23 @@ def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
     battery = _install_fake_isolated_cell_worker(monkeypatch)
     marker = tmp_path / "grandchild.sentinel"
     try:
+        started = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-timeout-grandchild-ready",
+            simulate_crash="grandchild",
+            why=str(marker),
+        )
+        assert started.status == "ok"
+        assert marker.with_suffix(".pid").is_file()
+
         timed_out = _run_fake_isolated_cell(
             battery,
             pot_id="worker-timeout",
-            simulate_crash="grandchild",
+            simulate_crash="hang",
             why=str(marker),
             timeout_s=0.001,
         )
         assert timed_out.refusal_reason == REFUSAL_TIMEOUT
-        assert marker.with_suffix(".pid").is_file()
         time.sleep(1.0)
         assert not marker.exists(), "worker timeout left its sleeping grandchild alive"
         recovered = _run_fake_isolated_cell(battery, pot_id="worker-after-timeout")

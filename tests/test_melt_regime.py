@@ -5,27 +5,8 @@ import pytest
 from simulator.melt_regime import (
     MELT_REGIME_EPSILON,
     MeltRegime,
-    legacy_raw_liquid_fraction_is_nonpositive,
     melt_regime,
 )
-
-
-@pytest.mark.parametrize(
-    ("liquid_fraction", "expected"),
-    [
-        (0.0, True),
-        (-0.0, True),
-        (-0.25, True),
-        (-1.0e-15, True),
-        (1.0e-15, False),
-        (0.5, False),
-        (math.nan, False),
-        (math.inf, False),
-        (-math.inf, False),
-    ],
-)
-def test_legacy_raw_liquid_fraction_is_nonpositive(liquid_fraction, expected):
-    assert legacy_raw_liquid_fraction_is_nonpositive(liquid_fraction) is expected
 
 
 def test_melt_regime_liquid_fraction_uses_canonical_epsilon():

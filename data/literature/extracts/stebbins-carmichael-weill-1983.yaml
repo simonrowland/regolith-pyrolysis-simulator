@@ -407,10 +407,11 @@ species:
           composition: CaMgSi2O6
           system: diopside_glass_liquid_and_crystal
           method_class: measured_reduced
-          derived_from: [tables:stebbins-carmichael-weill-1983/t2.csv, tables:stebbins-carmichael-weill-1983/t3.csv]
+          derived_from: [stebbins_1983_diopside_calorimetry_measured_tables_1_3]
           derivation:
             relation: H(T)-H(300 K) heat-content functions fitted to measured heat-capacity and heat-content data
-            inputs: [Table 2 DSC Cp points, Table 3 drop-calorimetric heat contents]
+            inputs: [stebbins_1983_diopside_calorimetry_measured_tables_1_3]
+            locator: {table: '4', page: 'PDF p. 6 / printed p. 722'}
           table_4_heat_content_fit:
             evidence_class: measured_reduced
             method_class: measured_reduced
@@ -981,10 +982,11 @@ species:
           composition: NaAlSiO4
           system: nepheline_glass_liquid_and_crystal
           method_class: measured_reduced
-          derived_from: [tables:stebbins-carmichael-weill-1983/t3.csv]
+          derived_from: [stebbins_1983_nepheline_calorimetry_measured_table_3]
           derivation:
             relation: H(T)-H(300 K) functions fitted to Table 3 heat contents
-            inputs: [table_3_heat_content]
+            inputs: [stebbins_1983_nepheline_calorimetry_measured_table_3]
+            locator: {table: '4', page: 'PDF p. 6 / printed p. 722'}
           table_4_heat_content_fit:
             evidence_class: measured_reduced
             method_class: measured_reduced

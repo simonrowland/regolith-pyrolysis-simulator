@@ -15,7 +15,11 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from ..melt_regime import MeltRegime, melt_regime
+from ..melt_regime import (
+    MeltRegime,
+    liquid_fraction_invalidity,
+    melt_regime,
+)
 from ..scalar_boundary import is_declared_real_scalar
 
 LIQUIDUS_MATCH_TOLERANCE_C = 0.05
@@ -718,7 +722,7 @@ def _optional_fraction(value: Any) -> float | None:
         fraction = float(value)
     except (TypeError, ValueError):
         return None
-    if not math.isfinite(fraction) or not 0.0 <= fraction <= 1.0:
+    if liquid_fraction_invalidity(fraction) is not None:
         return None
     return fraction
 
@@ -734,7 +738,7 @@ def _caller_fraction(value: Any) -> float | None:
         raise InvalidLiquidFractionError(
             "scalar_liquid_fraction must be within [0, 1]"
         ) from exc
-    if not math.isfinite(fraction) or not 0.0 <= fraction <= 1.0:
+    if liquid_fraction_invalidity(fraction) is not None:
         raise InvalidLiquidFractionError(
             f"scalar_liquid_fraction must be within [0, 1]; got {value!r}"
         )

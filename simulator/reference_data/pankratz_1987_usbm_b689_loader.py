@@ -50,6 +50,11 @@ def load_manifest(root: Path = COMPILATION_ROOT, *, include_ocr_suspect: bool = 
     return manifest
 
 
+def load_published_curves(root: Path = COMPILATION_ROOT) -> tuple[dict, ...]:
+    """Load curated equation records kept separate from source cell records."""
+    return tuple(json.loads((root / "source/published-curves.json").read_text(encoding="utf-8")))
+
+
 def load_records(root: Path = COMPILATION_ROOT, *, include_ocr_suspect: bool = False):
     """Yield substances only; structural and unresolved identities stay in source artifacts."""
     for entry in _manifest(root)["entries"]:

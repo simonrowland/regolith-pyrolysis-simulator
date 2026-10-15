@@ -4,7 +4,13 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Engine, EvidenceClass, NoticeKind
+from simulator.battery.enums import (
+    Engine,
+    EvidenceClass,
+    MethodToken,
+    NoticeKind,
+    Phase,
+)
 from simulator.battery.migrate import Migrator
 from simulator.battery.score import ScoreContext, score_store
 
@@ -28,6 +34,16 @@ def test_ewing_figure_only_evidence_and_scoring_notice():
         o.evidence.class_.value is EvidenceClass.FIGURE_ONLY
         for o in observations
     )
+    assert len({o.experiment_id for o in observations}) == 1
+    experiment = result.experiments[observations[0].experiment_id]
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.STATIC_EQUILIBRIUM
+    assert all(
+        o.identity.reservoir.is_value
+        and o.identity.reservoir.value.formula == "Na"
+        and o.identity.reservoir.value.phase.value is Phase.L
+        for o in observations
+    )
 
     residuals, _ = score_store(
         ScoreContext(
@@ -43,6 +59,7 @@ def test_ewing_figure_only_evidence_and_scoring_notice():
         any(notice.kind is NoticeKind.FIGURE_ONLY for notice in residual.notices)
         for residual in residuals
     )
+    assert all(residual.numeric is not None for residual in residuals)
 
 
 def test_ewing_source_locators_and_table_1_readings():

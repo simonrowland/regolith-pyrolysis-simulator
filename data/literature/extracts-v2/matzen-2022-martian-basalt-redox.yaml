@@ -1,0 +1,2828 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/matzen-2022-martian-basalt-redox.yaml
+observations:
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_11_method_a
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-11
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1724.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.2345679012345679012345679012'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_11_method_a
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1724.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.88'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.19'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_11_method_b
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-11
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1724.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.08695652173913043478260869565'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_11_method_b
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1724.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.88'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.08'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_13_method_a
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-13
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.2345679012345679012345679012'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_13_method_a
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.85'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.19'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_13_method_b
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-13
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0989010989010989010989010989'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_13_method_b
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.85'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.09'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_15_method_a
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-15
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1724.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.2345679012345679012345679012'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_15_method_a
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1724.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.87'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.19'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_15_method_b
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-15
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1724.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0989010989010989010989010989'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_15_method_b
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1724.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.87'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.09'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_20_method_a
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-20
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1724.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.3333333333333333333333333333'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_20_method_a
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1724.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-4.76'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.25'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_20_method_b
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-20
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1724.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.1904761904761904761904761905'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_20_method_b
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1724.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-4.76'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.16'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_21_method_a
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-21
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1724.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.7857142857142857142857142857'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_21_method_a
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1724.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.48'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.44'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_21_method_b
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-21
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1724.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.6129032258064516129032258065'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_21_method_b
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1724.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.48'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.38'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_27_method_a
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-27
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0638297872340425531914893617'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_27_method_a
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-8'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.06'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_27_method_b
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-27
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0101010101010101010101010101'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_27_method_b
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-8'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.01'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_30_method_a
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-30
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1722.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0638297872340425531914893617'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_30_method_a
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1722.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-10'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.06'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_30_method_b
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-30
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1722.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: printed Fe3+/sum Fe Fe3_over_FeT='0.00' is not a fraction in (0, 1); fe3_fe2_ratio = r/(1 - r) is
+      undefined
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+    note: Method B fixes the ferrous endmember from run 30 (see the method definition, PDF p. 9); this 0.00 is a constraint
+      of the fit, not an independent measurement.
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1722.15'
+      locator:
+        page: 39
+        table: 2
+        note: Method B fixes the ferrous endmember from run 30 (see the method definition, PDF p. 9); this 0.00 is a constraint
+          of the fit, not an independent measurement.
+    fO2_log:
+      state:
+        tag: value
+        value: '-10'
+      locator:
+        page: 39
+        table: 2
+        note: Method B fixes the ferrous endmember from run 30 (see the method definition, PDF p. 9); this 0.00 is a constraint
+          of the fit, not an independent measurement.
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_31_method_a
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-31
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.2820512820512820512820512821'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_31_method_a
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-4.9'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.22'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_31_method_b
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-31
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.1494252873563218390804597701'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_31_method_b
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-4.9'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.13'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_57_method_a
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-57
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1724.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0752688172043010752688172043'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_57_method_a
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1724.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.03'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.07'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_57_method_b
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-57
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1724.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: printed Fe3+/sum Fe Fe3_over_FeT='0.00' is not a fraction in (0, 1); fe3_fe2_ratio = r/(1 - r) is
+      undefined
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1724.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.03'
+      locator:
+        page: 39
+        table: 2
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_60_method_a
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-60
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1725.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0638297872340425531914893617'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_60_method_a
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1725.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-8.2'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.06'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_60_method_b
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-60
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1725.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0101010101010101010101010101'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_60_method_b
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1725.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-8.2'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.01'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_61_method_a
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-61
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.2345679012345679012345679012'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_61_method_a
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-7.2'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.19'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_61_method_b
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-61
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0989010989010989010989010989'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_61_method_b
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-7.2'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.09'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_7_method_a
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-7
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1731.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '2.225806451612903225806451613'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_7_method_a
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1731.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.69'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless
+- observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_7_method_b
+  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-7
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched synthetic Martian basalt glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1731.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '1.941176470588235294117647059'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.03 (estimated error reported by the authors; Table 2 footnote f)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_7_method_b
+  source_id: matzen-2022-martian-basalt-redox
+  locator:
+    page: 39
+    table: 2
+  read_from: pdf:matzen-2022-martian-basalt-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1731.15'
+      locator:
+        page: 39
+        table: 2
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 39
+        table: 2
+  derived_from:
+  - pdf:matzen-2022-martian-basalt-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - pdf:matzen-2022-martian-basalt-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.66'
+        locator:
+          page: 39
+          table: 2
+    output_unit: dimensionless

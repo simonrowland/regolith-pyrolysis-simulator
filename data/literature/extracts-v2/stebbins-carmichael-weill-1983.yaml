@@ -48,8 +48,8 @@ observations:
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_fusion'
+      tag: value
+      value: heat_of_fusion
     species:
       formula: NaAlSi3O8
       phase:
@@ -61,12 +61,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
     temperature_K:
       tag: value
       value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, derived_from,
+      derivation, table_7_heat_of_fusion'
     approximate: false
   uncertainty:
     kind: printed
@@ -104,8 +147,8 @@ observations:
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_fusion'
+      tag: value
+      value: heat_of_fusion
     species:
       formula: NaAlSi3O8
       phase:
@@ -117,9 +160,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, estimate_from_glass_Cp_only,
+      locator, derivation'
     approximate: false
   uncertainty:
     kind: none
@@ -218,8 +307,8 @@ observations:
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_fusion'
+      tag: value
+      value: heat_of_fusion
     species:
       formula: NaAlSi3O8
       phase:
@@ -231,9 +320,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, estimate_from_liquid_glass_Cp_and_Tg,
+      locator, derivation'
     approximate: false
   uncertainty:
     kind: none
@@ -299,8 +434,8 @@ observations:
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_fusion'
+      tag: value
+      value: heat_of_fusion
     species:
       formula: CaAl2Si2O8
       phase:
@@ -312,9 +447,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, attribution,
+      derived_from, table_7_heat_of_fusion'
     approximate: false
   uncertainty:
     kind: printed
@@ -382,8 +563,8 @@ observations:
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_fusion'
+      tag: value
+      value: heat_of_fusion
     species:
       formula: CaMgSi2O6
       phase:
@@ -395,12 +576,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
     temperature_K:
       tag: value
       value: '1665'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, attribution,
+      value_kcal_per_mol, locator, derivation'
     approximate: false
   uncertainty:
     kind: none
@@ -431,8 +655,8 @@ observations:
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_fusion'
+      tag: value
+      value: heat_of_fusion
     species:
       formula: CaMgSi2O6
       phase:
@@ -444,12 +668,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
     temperature_K:
       tag: value
       value: '1665'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, derived_from,
+      derivation, table_7_heat_of_fusion'
     approximate: false
   uncertainty:
     kind: printed
@@ -487,8 +754,8 @@ observations:
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_fusion'
+      tag: value
+      value: heat_of_fusion
     species:
       formula: CaMgSi2O6
       phase:
@@ -500,9 +767,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, estimate_from_glass_Cp_only,
+      locator, derivation'
     approximate: false
   uncertainty:
     kind: none
@@ -558,6 +871,14 @@ observations:
     page: PDF p. 6 / printed p. 722
     table: '4'
   read_from: pdf:stebbins-carmichael-weill-1983
+  derived_from:
+  - stebbins-carmichael-weill-1983::stebbins_1983_diopside_calorimetry_measured_tables_1_3
+  derivation:
+    relation: H(T)-H(300 K) heat-content functions fitted to measured heat-capacity and heat-content data
+    inputs:
+    - stebbins-carmichael-weill-1983::stebbins_1983_diopside_calorimetry_measured_tables_1_3
+    parameters: []
+    output_unit: as_published
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_table_6_vitrification_quotes
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -600,8 +921,8 @@ observations:
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_fusion'
+      tag: value
+      value: heat_of_fusion
     species:
       formula: CaMgSi2O6
       phase:
@@ -613,9 +934,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, estimate_from_liquid_glass_Cp_and_Tg,
+      locator, derivation'
     approximate: false
   uncertainty:
     kind: none
@@ -681,8 +1048,8 @@ observations:
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_fusion'
+      tag: value
+      value: heat_of_fusion
     species:
       formula: NaAlSiO4
       phase:
@@ -694,12 +1061,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
     temperature_K:
       tag: value
       value: '1750'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, derived_from,
+      derivation, table_7_heat_of_fusion'
     approximate: false
   uncertainty:
     kind: printed
@@ -770,6 +1180,14 @@ observations:
     page: PDF p. 6 / printed p. 722
     table: '4'
   read_from: pdf:stebbins-carmichael-weill-1983
+  derived_from:
+  - stebbins-carmichael-weill-1983::stebbins_1983_nepheline_calorimetry_measured_table_3
+  derivation:
+    relation: H(T)-H(300 K) functions fitted to Table 3 heat contents
+    inputs:
+    - stebbins-carmichael-weill-1983::stebbins_1983_nepheline_calorimetry_measured_table_3
+    parameters: []
+    output_unit: as_published
 - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_table_6_vitrification_quotes
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
@@ -852,8 +1270,8 @@ observations:
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_fusion'
+      tag: value
+      value: heat_of_fusion
     species:
       formula: KAlSi3O8
       phase:
@@ -865,12 +1283,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
     temperature_K:
       tag: value
       value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, derived_from,
+      derivation, table_7_heat_of_fusion'
     approximate: false
   uncertainty:
     kind: printed
@@ -908,8 +1369,8 @@ observations:
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_fusion'
+      tag: value
+      value: heat_of_fusion
     species:
       formula: KAlSi3O8
       phase:
@@ -921,9 +1382,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: composition, quantity, method_class, estimate_from_glass_Cp_only,
+      locator, derivation'
     approximate: false
   uncertainty:
     kind: none

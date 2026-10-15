@@ -1,0 +1,170 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/oneill-2005-alkali-oxide-activities.yaml
+observations:
+- observation_id: oneill-2005-alkali-oxide-activities::oneill_2005_fig1_sodium_exchange_figure_only
+  experiment_id: 10.2138/am.2005.1792::experiment::B26/3/02
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: NaO0.5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: oneill-2005-alkali-oxide-activities
+  locator:
+    page: 2
+    published_page: 498
+    pdf_page_index: 1
+    figure: '1'
+  read_from: pdf:oneill-2005-alkali-oxide-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        published_page: 498
+        pdf_page_index: 1
+        figure: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-12'
+      locator:
+        page: 2
+        published_page: 498
+        pdf_page_index: 1
+        figure: '1'
+        note: quote=fO2 = 10^-12 bars
+- observation_id: oneill-2005-alkali-oxide-activities::oneill_2005_fig2_measured_solubility_figure_only
+  experiment_id: 10.2138/am.2005.1792::oneill-2005-alkali-oxide-activities
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: NaO0.5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: oneill-2005-alkali-oxide-activities
+  locator:
+    page: 3
+    published_page: 499
+    pdf_page_index: 2
+    figure: '2'
+  read_from: pdf:oneill-2005-alkali-oxide-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 3
+        published_page: 499
+        pdf_page_index: 2
+        figure: '2'
+- observation_id: oneill-2005-alkali-oxide-activities::oneill_2005_fig3_measured_solubility_figure_only
+  experiment_id: 10.2138/am.2005.1792::oneill-2005-alkali-oxide-activities
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: NaO0.5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: oneill-2005-alkali-oxide-activities
+  locator:
+    page: 4
+    published_page: 500
+    pdf_page_index: 3
+    figure: '3'
+  read_from: pdf:oneill-2005-alkali-oxide-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 4
+        published_page: 500
+        pdf_page_index: 3
+        figure: '3'

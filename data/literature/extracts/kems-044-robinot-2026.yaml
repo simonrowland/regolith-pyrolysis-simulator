@@ -409,7 +409,8 @@ species:
           the model is closed-system equilibrium
       values:
         quantity: equilibrium_molecular_oxygen_yield
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
         admission_status: model_output_not_measurement
         gas_species: O2
         mass_yield_percent_about: 1.37
@@ -437,7 +438,8 @@ species:
         note: figure-only model curves; MinerU numeric dump was all zeros and was rejected
       values:
         quantity: model_oxygen_mass_fraction_vs_T
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
         admission_status: figure_only
         semantics: bound_not_point_ordering
         pressures_bar_as_printed:
@@ -480,6 +482,10 @@ species:
         regolith_mass_kg_at_experimental_yield: 80
         note: 0.84 kg O2/day and 80 kg at the experimental yield are printed in the captioning prose.
           The Fig. 8 curve itself was not digitised.
+      derived_from: [kems-044-robinot-2026::robinot_2026_o2_yield_measured::field:mass_yield_percent]
+      derivation:
+        relation: Required regolith mass = daily O2 mass / measured oxygen mass yield; the paper reports 0.84 kg O2/day and 80 kg at the experimentally obtained 1.05% yield (Figure 8, p. 12).
+        inputs: [kems-044-robinot-2026::robinot_2026_o2_yield_measured::field:mass_yield_percent]
   Na:
     observations:
     - observation_id: robinot_2026_eac1_composition_quoted_sesko

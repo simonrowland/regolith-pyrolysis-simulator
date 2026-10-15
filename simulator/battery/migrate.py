@@ -48,7 +48,7 @@ from enum import Enum
 from fractions import Fraction
 from pathlib import Path
 from types import UnionType
-from typing import Any, Iterable, Iterator, Mapping, Sequence, Union, get_args, get_origin, get_type_hints
+from typing import Any, Callable, Iterable, Iterator, Mapping, Sequence, Union, get_args, get_origin, get_type_hints
 
 import yaml
 
@@ -65,6 +65,7 @@ from simulator.battery.enums import (
     Authority,
     EvidenceClass,
     ExperimentKind,
+    FUSION_QUANTITIES,
     FO2Channel,
     IdentityEqualKind,
     MEASURED_EVIDENCE,
@@ -74,6 +75,7 @@ from simulator.battery.enums import (
     Phase,
     Polymorph,
     Quantity,
+    RawInputStatus,
     Rail,
     ReferenceStateConvention,
     RefusalReason,
@@ -142,6 +144,7 @@ from simulator.battery.records import (
     Value,
     Work,
     _is_source_internally_inconsistent,
+    _value_has_numeric_value,
     as_decimal,
 )
 from simulator.battery.enums import BenchIdentityBasis, CellMaterial
@@ -881,6 +884,41 @@ def _state_from_plain(payload: object, cast) -> State:
     return State.unknown(reason)  # type: ignore[arg-type]
 
 
+class _InvalidDerivationAnnotation(ValueError):
+    """A malformed author annotation that should become an INVALID_SOURCE issue."""
+
+
+def _decode_author_annotation(
+    payload: object, decoder: Callable[[object], Any]
+) -> tuple[Any | None, str | None]:
+    try:
+        return decoder(payload), None
+    except (TypeError, ValueError) as exc:
+        return None, str(exc)
+
+
+def _raw_inputs_from_plain(payload: object) -> Located[RawInputStatus]:
+    if not isinstance(payload, Mapping) or "state" not in payload:
+        raise _InvalidDerivationAnnotation(
+            "raw_inputs declaration must contain a state"
+        )
+    state = payload["state"]
+    if not isinstance(state, (Mapping, State)):
+        raise _InvalidDerivationAnnotation("raw_inputs state must be an object")
+    if (
+        isinstance(state, Mapping)
+        and "tag" in state
+        and not isinstance(state["tag"], str)
+    ):
+        raise _InvalidDerivationAnnotation("raw_inputs state tag must be a string")
+    locator = payload.get("locator")
+    if "locator" in payload and not isinstance(locator, (Mapping, Locator)):
+        raise _InvalidDerivationAnnotation("raw_inputs locator must be an object")
+    return _located_from_plain(
+        payload, lambda value: _enum(RawInputStatus, value)
+    )
+
+
 def _locator_from_plain(payload: object) -> Locator | None:
     if payload is None:
         return None
@@ -894,25 +932,95 @@ def _locator_from_plain(payload: object) -> Locator | None:
     return Locator(**kwargs)
 
 
-def _derivation_from_plain(payload: object) -> Derivation | None:
+def _derivation_inputs_requirement_error(
+    derivation: Derivation, *, has_resolved_lineage: bool = False
+) -> str | None:
+    if (
+        not derivation.inputs
+        and derivation.declares_unprinted_raw_inputs
+        and not derivation.has_located_unprinted_raw_inputs
+    ):
+        return "raw_inputs not_printed declaration requires a locator"
+    if (
+        not derivation.inputs
+        and derivation.raw_inputs is None
+        and not has_resolved_lineage
+    ):
+        return "Derivation.inputs is required unless raw_inputs is located not_printed"
+    return None
+
+
+def _derivation_from_plain(
+    payload: object,
+    *,
+    require_sequence_inputs: bool = False,
+    require_relation: bool = False,
+    allow_mapping_inputs: bool = False,
+    require_inputs: bool = True,
+) -> Derivation | None:
     if not isinstance(payload, Mapping):
-        return None
-    params_raw = payload.get("parameters") or ()
+        raise _InvalidDerivationAnnotation("Derivation annotation must be a mapping")
+    params_raw = payload.get("parameters", ())
+    if not isinstance(params_raw, (list, tuple)):
+        raise _InvalidDerivationAnnotation(
+            "Derivation.parameters must be a sequence of name/value pairs"
+        )
     parameters: list[tuple[str, Located[Decimal]]] = []
     for item in params_raw:
-        if isinstance(item, (list, tuple)) and len(item) == 2:
-            parameters.append((str(item[0]), _located_from_plain(item[1], as_decimal)))
-    inputs = payload.get("inputs") or ()
-    if isinstance(inputs, str):
+        if not isinstance(item, (list, tuple)) or len(item) != 2:
+            raise _InvalidDerivationAnnotation(
+                "Derivation.parameters must contain name/value pairs"
+            )
+        if not isinstance(item[0], str):
+            raise _InvalidDerivationAnnotation(
+                "Derivation parameter names must be strings"
+            )
+        parameters.append((item[0], _located_from_plain(item[1], as_decimal)))
+    inputs = payload.get("inputs", ())
+    if isinstance(inputs, str) and not require_sequence_inputs:
         inputs = (inputs,)
+    if allow_mapping_inputs and isinstance(inputs, (list, tuple)):
+        if any(not isinstance(item, (str, Mapping)) for item in inputs):
+            raise _InvalidDerivationAnnotation(
+                "Derivation.inputs must contain only strings or mappings"
+            )
+        inputs = tuple(str(item) for item in inputs)
+    if not isinstance(inputs, (list, tuple)) or any(
+        not isinstance(item, str) for item in inputs
+    ):
+        raise _InvalidDerivationAnnotation(
+            "Derivation.inputs must contain only strings"
+        )
     raw_marker = payload.get("pure_substance_reference")
-    return Derivation(
-        relation=str(payload.get("relation") or "identity"),
-        inputs=tuple(str(x) for x in inputs),
-        parameters=tuple(parameters),
-        output_unit=str(payload.get("output_unit") or "as_published"),
-        pure_substance_reference=raw_marker if isinstance(raw_marker, bool) else None,
+    raw_inputs = payload.get("raw_inputs")
+    parsed_raw_inputs = (
+        _raw_inputs_from_plain(raw_inputs) if raw_inputs is not None else None
     )
+    relation = payload.get("relation", "identity")
+    if relation is None or relation == "":
+        if require_relation:
+            raise _InvalidDerivationAnnotation(
+                "Derivation.relation must be a nonempty string"
+            )
+        relation = "identity"
+    if not isinstance(relation, str):
+        raise _InvalidDerivationAnnotation("Derivation.relation must be a string")
+    output_unit = payload.get("output_unit", "as_published")
+    if not isinstance(output_unit, str):
+        raise _InvalidDerivationAnnotation("Derivation.output_unit must be a string")
+    derivation = Derivation(
+        relation=relation,
+        inputs=tuple(inputs),
+        parameters=tuple(parameters),
+        output_unit=output_unit,
+        pure_substance_reference=raw_marker,
+        raw_inputs=parsed_raw_inputs,
+    )
+    if require_inputs:
+        requirement_error = _derivation_inputs_requirement_error(derivation)
+        if requirement_error is not None:
+            raise ValueError(requirement_error)
+    return derivation
 
 
 def _mass_percent_pairs(payload: object) -> list[tuple[str, Decimal]] | None:
@@ -1124,7 +1232,9 @@ def _located_from_plain(payload: object, cast) -> Located:
     inference = None
     raw_inference = payload.get("inference")
     if isinstance(raw_inference, Mapping):
-        inference = _derivation_from_plain(raw_inference)
+        inference = _derivation_from_plain(
+            raw_inference, allow_mapping_inputs=True
+        )
     elif payload.get("inferred") is True:
         inference = _inferred_derivation_from_plain(payload)
     else:
@@ -1512,15 +1622,6 @@ _DEFAULTABLE_PENDING_REASONS = {
     "source admission_status=pending",
     "source admission_status=pending_validation is not a closed v2.1 token",
 }
-_NUMERIC_OBSERVATION_VALUE_KINDS = frozenset(
-    {
-        "point",
-        "series",
-        "bound",
-        "interval",
-        "relative_series",
-    }
-)
 
 
 def _defaulted_admission(source_reason: str) -> Admission:
@@ -1571,7 +1672,7 @@ def _admission_from_plain(payload: object, *, value: Value) -> Admission:
     raw_status = payload.get("status")
     reason = str(payload.get("reason") or _NO_ADMISSION_STATUS_REASON)
     status_text = str(raw_status or "pending")
-    has_numeric_value = value.kind.value in _NUMERIC_OBSERVATION_VALUE_KINDS
+    has_numeric_value = _value_has_numeric_value(value)
     if (
         not payload.get("superseded_by")
         and decided is None
@@ -1650,7 +1751,12 @@ def work_from_plain(payload: object) -> Work:
     )
 
 
-def _sample_from_plain(payload: object) -> Sample:
+def _sample_from_plain(
+    payload: object,
+    *,
+    experiment_id: str | None = None,
+    registry_issues: list[ValidationIssue] | None = None,
+) -> Sample:
     if not isinstance(payload, Mapping) or not payload:
         return Sample()
     mass = payload.get("mass_kg")
@@ -1663,14 +1769,61 @@ def _sample_from_plain(payload: object) -> Sample:
     characterization = payload.get("characterization")
     surface_area = payload.get("surface_area_m2")
     pretreatment = payload.get("pretreatment")
-    printed_located = (
-        None
-        if printed is None
-        else _mass_percent_printed_from_plain(printed)
-        or _located_from_plain(printed, lambda value: value)
-    )
+    issues = registry_issues if registry_issues is not None else []
+
+    def parse_registry_value(field: str, raw: object, parse):
+        try:
+            return parse(raw)
+        except (ArithmeticError, TypeError, ValueError) as exc:
+            issues.append(
+                ValidationIssue(
+                    path=f"experiment[{experiment_id}].sample.{field}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=f"invalid registry inference: {exc}",
+                )
+            )
+            raise
+
+    def parse_registry_located(field: str, raw: object, parse):
+        if not isinstance(raw, Mapping) or "inference" not in raw:
+            return parse_registry_value(field, raw, parse)
+        inference, error = _decode_author_annotation(
+            raw["inference"],
+            lambda value: _derivation_from_plain(
+                value, allow_mapping_inputs=True, require_relation=True
+            ),
+        )
+        if error is not None:
+            issues.append(
+                ValidationIssue(
+                    path=f"experiment[{experiment_id}].sample.{field}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=f"invalid registry inference: {error}",
+                )
+            )
+        value = parse_registry_value(
+            field,
+            {key: item for key, item in raw.items() if key != "inference"},
+            parse,
+        )
+        if value is not None and value.inference is None and inference is not None:
+            return replace(value, inference=inference)
+        return value
+
+    printed_located = None
+    if printed is not None:
+        printed_located = parse_registry_located(
+            "printed_composition",
+            printed,
+            lambda value: _mass_percent_printed_from_plain(value)
+            or _located_from_plain(value, lambda item: item),
+        )
     initial_located = (
-        None if initial is None else _composition_located_from_plain(initial)
+        None
+        if initial is None
+        else parse_registry_located(
+            "initial_composition", initial, _composition_located_from_plain
+        )
     )
     printed_from_initial = printed_located is None and initial is not None
     if printed_from_initial:
@@ -2037,6 +2190,12 @@ def _thermal_schedule_from_plain(payload: object) -> ThermalSchedule | None:
 
 
 def experiment_from_plain(payload: object) -> Experiment:
+    return _experiment_from_plain(payload, registry_issues=None)
+
+
+def _experiment_from_plain(
+    payload: object, *, registry_issues: list[ValidationIssue] | None
+) -> Experiment:
     assert isinstance(payload, Mapping)
     conditions = {}
     for key, value in (payload.get("conditions") or {}).items():
@@ -2074,7 +2233,11 @@ def experiment_from_plain(payload: object) -> Experiment:
         experiment_id=str(payload["experiment_id"]),
         kind=ExperimentKind(str(payload.get("kind") or "literature")),
         method=_state_from_plain(payload["method"], lambda v: MethodToken(str(v))),
-        sample=_sample_from_plain(payload.get("sample")),
+        sample=_sample_from_plain(
+            payload.get("sample"),
+            experiment_id=str(payload["experiment_id"]),
+            registry_issues=registry_issues,
+        ),
         conditions=conditions,
         pressure_environment=_pressure_env_from_plain(payload["pressure_environment"]),
         work_id=payload.get("work_id"),
@@ -5454,6 +5617,9 @@ class CompilationColumnSeries:
     value: Value
     temperature_K: State[Decimal]
     unit_trail: str | None = None
+    raw_tokens: tuple[str | None, ...] = ()
+    source_units: tuple[str | None, ...] = ()
+    cell_uncertainties: tuple[Decimal | None, ...] = ()
 
 
 def _normalize_compilation_column_label(label: str) -> str:
@@ -5531,6 +5697,46 @@ def _cell_numeric_amount(cell: object) -> Decimal | None:
     return _as_dec_or_none(cell)
 
 
+def _printed_cell_token(cell: object) -> str | None:
+    if isinstance(cell, Mapping):
+        token = cell.get("as_published")
+        return str(token) if token not in (None, "") else None
+    return str(cell) if isinstance(cell, str) and cell.strip() else None
+
+
+def _source_unit_for_cell(cell: object, default: str | None) -> str | None:
+    if isinstance(cell, Mapping):
+        unit = (
+            cell.get("units_as_published") or cell.get("units") or cell.get("unit")
+        )
+        if unit not in (None, ""):
+            return str(unit)
+    return default
+
+
+def _printed_rounding_allowance(token: str | None) -> Decimal | None:
+    if token is None:
+        return None
+    try:
+        printed = Decimal(token.strip())
+    except (InvalidOperation, ValueError):
+        return None
+    quantum = Decimal(1).scaleb(printed.as_tuple().exponent)
+    return abs(quantum) / Decimal(2)
+
+
+def _projected_cell_metadata(
+    cell: object, quantity: Quantity, default_unit: str | None
+) -> tuple[str | None, str | None, Decimal | None]:
+    token = _printed_cell_token(cell)
+    unit = _source_unit_for_cell(cell, default_unit)
+    allowance = _printed_rounding_allowance(token)
+    if allowance is None:
+        return token, unit, None
+    converted = _convert_compilation_amount(allowance, quantity, unit)
+    return token, unit, converted[0] if converted is not None else None
+
+
 def _compilation_rows(doc: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     rows = doc.get("rows")
     if not isinstance(rows, list):
@@ -5572,9 +5778,20 @@ def _emit_series_or_point(
     *,
     point_temperature: Decimal | None = None,
     unit_trail: str | None = None,
+    raw_tokens: Sequence[str | None] = (),
+    source_units: Sequence[str | None] = (),
+    cell_uncertainties: Sequence[Decimal | None] = (),
 ) -> CompilationColumnSeries | None:
     if not points:
         return None
+    count = len(points)
+    raw = tuple(raw_tokens) if raw_tokens else (None,) * count
+    units = tuple(source_units) if source_units else (None,) * count
+    uncertainties = (
+        tuple(cell_uncertainties) if cell_uncertainties else (None,) * count
+    )
+    if len(raw) != count or len(units) != count or len(uncertainties) != count:
+        raise ValueError(f"{series_key}: cell metadata must align with series values")
     if len(points) == 1 and point_temperature is not None:
         return CompilationColumnSeries(
             quantity=quantity,
@@ -5582,6 +5799,9 @@ def _emit_series_or_point(
             value=Value.point_of(points[0][1]),
             temperature_K=State.of(point_temperature),
             unit_trail=unit_trail,
+            raw_tokens=raw,
+            source_units=units,
+            cell_uncertainties=uncertainties,
         )
     return CompilationColumnSeries(
         quantity=quantity,
@@ -5589,6 +5809,9 @@ def _emit_series_or_point(
         value=Value(ValueKind.SERIES, series=tuple(points)),
         temperature_K=_series_temperature_state(series_key),
         unit_trail=unit_trail,
+        raw_tokens=raw,
+        source_units=units,
+        cell_uncertainties=uncertainties,
     )
 
 
@@ -5622,6 +5845,9 @@ def _column_series_from_list_cells(
         unit = next(item[3] for item in headings if item[0] == index)
         points: list[tuple[Decimal, Decimal]] = []
         trails: list[str] = []
+        raw_tokens: list[str | None] = []
+        source_units: list[str | None] = []
+        uncertainties: list[Decimal | None] = []
         for row in rows:
             cells = row.get("cells")
             if not isinstance(cells, list):
@@ -5632,18 +5858,28 @@ def _column_series_from_list_cells(
             v_amt = _cell_numeric_amount(cells[index])
             if t_amt is None or v_amt is None:
                 continue
-            converted = _convert_compilation_amount(v_amt, quantity, unit)
+            cell = cells[index]
+            token, source_unit, uncertainty = _projected_cell_metadata(
+                cell, quantity, unit
+            )
+            converted = _convert_compilation_amount(v_amt, quantity, source_unit)
             if converted is None:
                 points = []
                 break
             v_amt, trail = converted
             points.append((t_amt, v_amt))
             trails.append(trail)
+            raw_tokens.append(token)
+            source_units.append(source_unit)
+            uncertainties.append(uncertainty)
         series = _emit_series_or_point(
             quantity,
             heading,
             points,
             unit_trail=_consistent_series_trail(trails),
+            raw_tokens=raw_tokens,
+            source_units=source_units,
+            cell_uncertainties=uncertainties,
         )
         if series is not None:
             emitted.append(series)
@@ -5674,10 +5910,14 @@ def _column_series_from_named_cells(
     # Kelley-style: Cp at temperatures encoded in column keys + entropy columns.
     cp_points: list[tuple[Decimal, Decimal]] = []
     cp_trails: list[str] = []
+    cp_metadata: list[tuple[str | None, str | None, Decimal | None]] = []
     entropy_series: list[CompilationColumnSeries] = []
     grid_points: dict[Quantity, list[tuple[Decimal, Decimal]]] = {}
     grid_keys: dict[Quantity, str] = {}
     grid_trails: dict[Quantity, list[str]] = {}
+    grid_metadata: dict[
+        Quantity, list[tuple[str | None, str | None, Decimal | None]]
+    ] = {}
 
     for row in rows:
         cells = row_cells(row)
@@ -5700,19 +5940,31 @@ def _column_series_from_named_cells(
                 continue
             cp_t = _temperature_from_cp_column_key(key)
             if cp_t is not None:
+                source_unit = _source_unit_for_cell(
+                    cell, _printed_unit_for_field(doc, key)
+                )
                 converted = _convert_compilation_amount(
-                    amount, Quantity.CP, _printed_unit_for_field(doc, key)
+                    amount, Quantity.CP, source_unit
                 )
                 if converted is not None:
                     cp_points.append((cp_t, converted[0]))
                     cp_trails.append(converted[1])
+                    cp_metadata.append(
+                        _projected_cell_metadata(cell, Quantity.CP, source_unit)
+                    )
                 continue
             if key in _KELLEY_ENTROPY_COLUMNS:
+                source_unit = _source_unit_for_cell(
+                    cell, _printed_unit_for_field(doc, key)
+                )
                 converted = _convert_compilation_amount(
-                    amount, Quantity.S, _printed_unit_for_field(doc, key)
+                    amount, Quantity.S, source_unit
                 )
                 if converted is None:
                     continue
+                token, source_unit, uncertainty = _projected_cell_metadata(
+                    cell, Quantity.S, source_unit
+                )
                 series = _emit_series_or_point(
                     Quantity.S,
                     key,
@@ -5722,6 +5974,9 @@ def _column_series_from_named_cells(
                     if not converted[1].startswith("identity")
                     and converted[1] != "as_published"
                     else None,
+                    raw_tokens=(token,),
+                    source_units=(source_unit,),
+                    cell_uncertainties=(uncertainty,),
                 )
                 if series is not None:
                     entropy_series.append(series)
@@ -5731,33 +5986,46 @@ def _column_series_from_named_cells(
             )
             if quantity is None or t_amt is None:
                 continue
+            source_unit = _source_unit_for_cell(
+                cell, _printed_unit_for_field(doc, key)
+            )
             converted = _convert_compilation_amount(
-                amount, quantity, _printed_unit_for_field(doc, key)
+                amount, quantity, source_unit
             )
             if converted is not None:
                 grid_points.setdefault(quantity, []).append((t_amt, converted[0]))
                 grid_trails.setdefault(quantity, []).append(converted[1])
+                grid_metadata.setdefault(quantity, []).append(
+                    _projected_cell_metadata(cell, quantity, source_unit)
+                )
             grid_keys.setdefault(quantity, key)
 
     emitted: list[CompilationColumnSeries] = []
     if cp_points:
         # Stable order by printed temperature.
-        cp_points.sort(key=lambda item: item[0])
+        ordered_cp = sorted(zip(cp_points, cp_metadata), key=lambda item: item[0][0])
         series = _emit_series_or_point(
             Quantity.CP,
             "cp_temperature_grid",
-            cp_points,
+            [point for point, _metadata in ordered_cp],
             unit_trail=_consistent_series_trail(cp_trails),
+            raw_tokens=[metadata[0] for _point, metadata in ordered_cp],
+            source_units=[metadata[1] for _point, metadata in ordered_cp],
+            cell_uncertainties=[metadata[2] for _point, metadata in ordered_cp],
         )
         if series is not None:
             emitted.append(series)
     emitted.extend(entropy_series)
     for quantity, points in grid_points.items():
+        metadata = grid_metadata.get(quantity, [])
         series = _emit_series_or_point(
             quantity,
             grid_keys.get(quantity, quantity.value),
             points,
             unit_trail=_consistent_series_trail(grid_trails.get(quantity, ())),
+            raw_tokens=[cell[0] for cell in metadata],
+            source_units=[cell[1] for cell in metadata],
+            cell_uncertainties=[cell[2] for cell in metadata],
         )
         if series is not None:
             emitted.append(series)
@@ -5797,6 +6065,15 @@ def compilation_column_series_from_record(
     omitted; the caller falls back to the single-quantity refusal path when
     this returns empty.
     """
+
+    table = doc.get("table")
+    if isinstance(table, Mapping) and isinstance(table.get("values"), list):
+        projected = dict(doc)
+        projected["rows"] = [
+            {"cells": row} for row in table["values"] if isinstance(row, Mapping)
+        ]
+        projected["units_as_published"] = table.get("units_as_published")
+        return _column_series_from_named_cells(projected)
 
     kind = str(doc.get("record_kind") or "")
     table_kind = str(doc.get("table_kind") or "")
@@ -5924,21 +6201,60 @@ _CONDITIONAL_REDUCED_METHODS = frozenset({"calculated", "author_derived"})
 
 
 def source_derivation_from_source(
-    obs: Mapping[str, Any], values: Mapping[str, Any]
-) -> Derivation | None:
+    obs: Mapping[str, Any],
+    values: Mapping[str, Any],
+    *,
+    has_resolved_lineage: bool = False,
+) -> tuple[Derivation | None, tuple[tuple[str, str], ...]]:
     """Read an author-supplied derivation without inventing one."""
 
-    for payload in (values, obs):
-        raw = payload.get("derivation")
-        if not isinstance(raw, Mapping):
-            continue
-        if not raw.get("relation") or not raw.get("inputs"):
-            continue
-        try:
-            return _derivation_from_plain(raw)
-        except (TypeError, ValueError):
-            continue
-    return None
+    derivation: Derivation | None = None
+    invalid: list[tuple[str, str]] = []
+    if "derivation" in obs:
+        payload, field = obs, "derivation"
+    elif "derivation" in values:
+        payload, field = values, "values.derivation"
+    else:
+        return None, ()
+
+    raw = payload["derivation"]
+    # SCHEMA.md lines 187-209 place normalized lineage on the observation and
+    # allow inputs to be omitted when derived_from resolves. A nested
+    # values.derivation map is descriptive in that case, not a second record.
+    if (
+        field == "values.derivation"
+        and has_resolved_lineage
+        and isinstance(raw, Mapping)
+        and not ("inputs" in raw or "raw_inputs" in raw)
+    ):
+        return None, ()
+
+    relation = raw.get("relation") if isinstance(raw, Mapping) else None
+    relation_missing = isinstance(raw, Mapping) and (
+        not isinstance(relation, str) or not relation.strip()
+    )
+    parsed, error = _decode_author_annotation(
+        raw,
+        lambda value: _derivation_from_plain(value, require_inputs=False),
+    )
+    if error is not None:
+        invalid.append((field, error))
+    if relation_missing:
+        invalid.append((field, "derivation relation (author method) is required"))
+    if error is None and parsed is not None:
+        requirement_error = _derivation_inputs_requirement_error(
+            parsed, has_resolved_lineage=has_resolved_lineage
+        )
+        if requirement_error is not None:
+            invalid.append(
+                (
+                    field,
+                    requirement_error,
+                )
+            )
+        if not relation_missing:
+            derivation = parsed
+    return derivation, tuple(invalid)
 
 
 def conditional_reduced_lineage_is_measured(
@@ -7615,6 +7931,16 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "minus_delta_H_cool_kJ_mol-1",
         "value",
     ),
+    Quantity.ENTHALPY_OF_FUSION: (
+        "delta_H_fus_kJ_mol-1",
+        "delta_H_fusion_kJ_mol",
+        "value",
+    ),
+    Quantity.ENTROPY_OF_FUSION: (
+        "delta_S_fus_J_mol-1_K-1",
+        "delta_S_fusion_J_mol_K",
+        "value",
+    ),
     Quantity.DELTA_FH: (
         "delta_h",
         "delta_f_H",
@@ -7847,6 +8173,8 @@ def _convert_compilation_amount(
             Quantity.CP,
             Quantity.S,
             Quantity.H_MINUS_H298,
+            Quantity.ENTHALPY_OF_FUSION,
+            Quantity.ENTROPY_OF_FUSION,
             Quantity.DELTA_FH,
             Quantity.DELTA_FG,
         }:
@@ -7856,21 +8184,62 @@ def _convert_compilation_amount(
         return amount, "as_published"
     token = re.sub(r"\s+", "", str(unit).lower()).replace("·", "")
     token = token.replace(".", "").replace("deg-", "deg").replace("_", "")
-    energy = quantity in {Quantity.H_MINUS_H298, Quantity.DELTA_FH, Quantity.DELTA_FG}
-    heat = quantity in {Quantity.CP, Quantity.S}
+    if quantity in FUSION_QUANTITIES:
+        token = token.split(";", 1)[0]
+        token = token.replace("mol−1", "/mol").replace("mol-1", "/mol")
+        token = token.replace("k−1", "/k").replace("k-1", "/k")
+    energy = quantity in {
+        Quantity.H_MINUS_H298,
+        Quantity.DELTA_FH,
+        Quantity.DELTA_FG,
+        Quantity.ENTHALPY_OF_FUSION,
+    }
+    heat = quantity in {Quantity.CP, Quantity.S, Quantity.ENTROPY_OF_FUSION}
     if not energy and not heat:
         return amount, "as_published"
     with localcontext() as ctx:
         ctx.prec = 80
-        if heat and token in {"cal/mol/k", "cal/molk", "cal/deg-mole", "cal/degmole"}:
+        if heat and token in {
+            "cal/mol/k",
+            "cal/molk",
+            "cal/deg-mole",
+            "cal/degmole",
+            "calmol^-1k^-1",
+            "caldeg^-1gfw^-1",
+            "caldeg-1gfw-1",
+        }:
             return amount * Decimal("4.184"), "thermochemical_calorie_to_J_exact"
-        if heat and token in {"j/mol/k", "j/molk", "j/deg-mole", "j/degmole"}:
+        if heat and (
+            token
+            in {
+                "j/mol/k",
+                "j/molk",
+                "j/deg-mole",
+                "j/degmole",
+                "jk^-1mol^-1",
+                "jmol^-1k^-1",
+            }
+            or (
+                quantity is Quantity.ENTROPY_OF_FUSION
+                and token == "jpermolk"
+            )
+        ):
             return amount, "identity:J_per_mol_K"
-        if energy and token in {"kcal/mol", "kcal/mole"}:
+        if energy and token in {
+            "kcal/mol",
+            "kcal/mole",
+            "kcalgfw^-1",
+            "kcalgfw-1",
+        }:
             return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
         if energy and token in {"j/mol", "j/mole"}:
             return amount / Decimal("1000"), "J_to_kJ_exact"
-        if energy and token in {"kj/mol", "kj/mole", "kjpermol"}:
+        if energy and token in {
+            "kj/mol",
+            "kj/mole",
+            "kjpermol",
+            "kjmol^-1",
+        }:
             return amount, "identity:kJ_per_mol"
     return None
 
@@ -8125,7 +8494,11 @@ def _point_selection(
     condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
 ) -> SourceSelection:
     return SourceSelection(
-        value=Value.point_of(amount),
+        value=Value(
+            ValueKind.POINT,
+            point=amount,
+            approximate=bool(payload.get("approximate")),
+        ),
         field_name=field_name,
         unit_trail=unit_trail,
         amount=amount,
@@ -8168,9 +8541,12 @@ def _interval_selection(
 #
 # (1) Ferric fraction r = Fe3+/sum Fe = n3/(n2 + n3) (XANES, Moessbauer):
 #         n3 = r (n2 + n3)  =>  n3 (1 - r) = r n2  =>  R = r/(1 - r).
-#     Defined only for 0 < r < 1: r = 1 leaves no Fe2+ (R infinite) and r = 0
-#     gives R = 0, outside the log10 metric domain. Both are refused with a
-#     reason, never clipped.
+#     This ratio is dimensionless because both numerator and denominator are
+#     amounts of iron. Sanity checks: r = 0.5 gives R = 1; as r approaches 1,
+#     R approaches infinity. At r = 1 the denominator is zero and no Fe2+
+#     remains, so refuse the conversion instead of emitting infinity. The
+#     domain is 0 < r < 1; r = 0 also gives R = 0, outside the log10 metric
+#     domain, and is refused rather than clipped.
 # (2) Kress-style oxide wt % of ONE analysis, w3 = wt % Fe2O3, w2 = wt % FeO
 #     (Fe2O3 printed as such, not FeO* total iron). Per 100 g: n(Fe2O3) =
 #     w3/M(Fe2O3), n(FeO) = w2/M(FeO); each Fe2O3 carries two Fe3+ and each
@@ -8191,7 +8567,7 @@ FE3_FE2_RATIO_PRINTED_FIELDS: tuple[str, ...] = ("fe3_fe2_ratio", "Fe3_over_Fe2"
 FERRIC_FRACTION_FIELDS: tuple[str, ...] = ("Fe3_over_FeT", "Fe3_over_sum_Fe")
 KRESS_FE2O3_WT_PCT_FIELD = "Fe2O3_wt_pct"
 KRESS_FEO_WT_PCT_FIELD = "FeO_wt_pct"
-FERRIC_FRACTION_RELATION = "fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed"
+FERRIC_FRACTION_RELATION = "Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed"
 
 
 def kress_wt_pct_relation() -> str:
@@ -8337,6 +8713,27 @@ def fe3_fe2_ratio_reduction(
             or evidence.class_.value.value,
         )
     return evidence, derivation
+
+
+def fe3_fe2_ratio_parent_lineage(
+    selection: SourceSelection,
+    evidence: Evidence,
+    derived_from: tuple[str, ...] | None,
+    read_from: str,
+    source_derivation: Derivation | None,
+) -> tuple[str, ...] | None:
+    """Add source lineage only for a direct measured ferric-fraction reduction."""
+
+    if (
+        selection.reduction is not None
+        and selection.field_name in FERRIC_FRACTION_FIELDS
+        and evidence.class_.is_value
+        and evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        and not derived_from
+        and source_derivation is None
+    ):
+        return (read_from,)
+    return derived_from
 
 
 def _selection_from_named_field(
@@ -8609,7 +9006,9 @@ def select_declared_source(
         for key, unit in (
             ("T_K", "K"),
             ("T_K_as_published", "K"),
+            ("T_fus_K", "K"),
             ("temperature_K", "K"),
+            ("melting_temperature_K", "K"),
             ("Tmax_K", "K"),
             ("T_C", "C"),
             ("Tmax_C", "C"),
@@ -10494,16 +10893,18 @@ _AUTHOR_RATIO_REL_TOLERANCE = Decimal("1e-4")
 _CONGRUENT_VAPORIZATION_M_O2_G_MOL = Decimal("32.00")
 _CONGRUENT_VAPORIZATION_M_K_G_MOL = Decimal("39.10")
 _OXYGEN_TABLE_KEYS = frozenset({"series", "rows", "points"})
-_OXYGEN_LOG_UNITS = frozenset({
-    "",
-    "log10",
-    "log10(bar)",
-    "log10 bar",
-    "log10(atm)",
-    "log10 atm",
-    "log",
-    "dex",
-})
+_BAR_PA = Decimal("100000")
+# Bare and generic log labels retain their existing bar reference.
+_OXYGEN_LOG_REFERENCE_PA = {
+    "": _BAR_PA,
+    "log10": _BAR_PA,
+    "log10(bar)": _BAR_PA,
+    "log10 bar": _BAR_PA,
+    "log10(atm)": PA_PER_ATM_DEC,
+    "log10 atm": PA_PER_ATM_DEC,
+    "log": _BAR_PA,
+    "dex": _BAR_PA,
+}
 _POWER_OF_TEN = re.compile(r"^10\^([+-]?(?:\d+(?:\.\d+)?|\.\d+))$")
 _POINT_REJECT = re.compile(
     r"^\s*(?:[<>≤≥~≈]|10\s*\^\s*[+-]?\d.*\s+to\s+)",
@@ -10512,13 +10913,22 @@ _POINT_REJECT = re.compile(
 # Half a tenth of a dex: wide enough for the 0.0057 atm/bar offset and for
 # a one-decimal printed place, tight enough that -9.1 and -8 are not one fact.
 _OXYGEN_FRAME_TOLERANCE = Decimal("0.05")
-_BAR_PA = Decimal("100000")
 
 
 @dataclass(frozen=True)
 class PrintedOxygenFacts:
     log_fO2: Located[Decimal] | None = None
     oxygen_partial_pressure_Pa: Located[Value] | None = None
+    rejected_log_fO2: bool = False
+    log_fO2_reference_Pa: Decimal = _BAR_PA
+
+
+def _log_fO2_to_pa(
+    log10_fO2: Decimal, reference_pressure_pa: Decimal = _BAR_PA
+) -> Decimal:
+    # fO2_Pa = 10^L × P_ref, where P_ref is 1e5 Pa (bar) or 101325 Pa (atm).
+    # Unit check: 10^L is dimensionless, so multiplying by P_ref leaves Pa.
+    return reference_pressure_pa * (Decimal(10) ** log10_fO2)
 
 
 def _normalize_printed_token(raw: object) -> str:
@@ -10671,8 +11081,9 @@ def _frames_agree(log_value: Decimal, pressure_pa: Decimal) -> bool:
 def _walk_printed_oxygen(
     obj: object,
     fallback: Locator | None,
-    logs: list[tuple[Decimal, Located[Decimal]]],
+    logs: list[tuple[Decimal, Located[Decimal], Decimal]],
     pressures: list[tuple[Decimal, Located[Value], str]],
+    rejected_logs: list[bool],
     *,
     skip_tables: bool,
     depth: int = 0,
@@ -10682,25 +11093,78 @@ def _walk_printed_oxygen(
     if isinstance(obj, list):
         for item in obj:
             _walk_printed_oxygen(
-                item, fallback, logs, pressures, skip_tables=skip_tables, depth=depth + 1
+                item, fallback, logs, pressures, rejected_logs,
+                skip_tables=skip_tables, depth=depth + 1
             )
         return
     if not isinstance(obj, Mapping):
         return
     local = locator_from_mapping(obj.get("locator")) or fallback
+    buffer_relative = obj.get("oxygen_buffer_as_published") not in (None, "")
     for key, value in obj.items():
         name = str(key)
         if skip_tables and name in _OXYGEN_TABLE_KEYS:
             continue
+        if name == "point_conditions" and isinstance(value, Mapping):
+            condition = value.get("fO2_log")
+            if condition is not None:
+                try:
+                    located_condition = _point_condition_from_plain(
+                        condition, key="fO2_log"
+                    )
+                except (TypeError, ValueError, ArithmeticError):
+                    located_condition = None
+                condition_value = (
+                    located_condition.state.value
+                    if located_condition is not None
+                    and located_condition.state.is_value
+                    else None
+                )
+                if isinstance(condition_value, Value):
+                    condition_value = (
+                        condition_value.point
+                        if condition_value.kind is ValueKind.POINT
+                        else None
+                    )
+                if (
+                    buffer_relative
+                    or located_condition is None
+                    or not isinstance(condition_value, Decimal)
+                    or not condition_value.is_finite()
+                    or (
+                        isinstance(condition, Mapping)
+                        and _oxygen_node_rejected(condition, condition_value)
+                    )
+                ):
+                    rejected_logs.append(True)
+                else:
+                    logs.append((
+                        condition_value,
+                        Located(
+                            State.of(condition_value),
+                            locator=located_condition.locator or local,
+                            inference=located_condition.inference,
+                        ),
+                        _BAR_PA,
+                    ))
         if name in _PRINTED_LOG_FO2_KEYS or name in _PRINTED_PO2_KEYS:
+            if name in _PRINTED_LOG_FO2_KEYS and buffer_relative:
+                rejected_logs.append(True)
+                continue
             node = value if isinstance(value, Mapping) else {}
             raw = value.get("value") if isinstance(value, Mapping) else value
             if isinstance(value, Mapping) and _oxygen_node_rejected(value, raw):
+                if name in _PRINTED_LOG_FO2_KEYS:
+                    rejected_logs.append(True)
                 continue
             if not isinstance(value, Mapping) and isinstance(raw, str) and _POINT_REJECT.match(raw.strip()):
+                if name in _PRINTED_LOG_FO2_KEYS:
+                    rejected_logs.append(True)
                 continue
             amount = _printed_decimal(raw)
             if amount is None:
+                if name in _PRINTED_LOG_FO2_KEYS:
+                    rejected_logs.append(True)
                 continue
             locator = locator_from_mapping(node.get("locator")) or local
             if locator is None:
@@ -10712,9 +11176,12 @@ def _walk_printed_oxygen(
                 # log values. Feeding them through _printed_decimal would land
                 # ~1e-9 as fO2_log and stamp oxygen_condition near zero.
                 if isinstance(raw, str) and _power_of_ten(_normalize_printed_token(raw)) is not None:
+                    rejected_logs.append(True)
                     continue
                 units = str(node.get("units") or node.get("unit") or "").strip().lower()
-                if units not in _OXYGEN_LOG_UNITS:
+                reference_pressure_pa = _OXYGEN_LOG_REFERENCE_PA.get(units)
+                if reference_pressure_pa is None:
+                    rejected_logs.append(True)
                     continue
                 logs.append((
                     amount,
@@ -10725,6 +11192,7 @@ def _walk_printed_oxygen(
                         ),
                         inference=None,
                     ),
+                    reference_pressure_pa,
                 ))
             else:
                 units = str(node.get("units") or node.get("unit") or "").strip()
@@ -10748,7 +11216,8 @@ def _walk_printed_oxygen(
                 pressures.append((pa.point, located, units))
             continue
         _walk_printed_oxygen(
-            value, local, logs, pressures, skip_tables=skip_tables, depth=depth + 1
+            value, local, logs, pressures, rejected_logs,
+            skip_tables=skip_tables, depth=depth + 1
         )
 
 
@@ -10886,15 +11355,23 @@ def collect_printed_oxygen(
     is landed. Bounds, ranges, and ``inferred: true`` stay refusals.
     """
 
-    logs: list[tuple[Decimal, Located[Decimal]]] = []
+    logs: list[tuple[Decimal, Located[Decimal], Decimal]] = []
     pressures: list[tuple[Decimal, Located[Value], str]] = []
+    rejected_logs: list[bool] = []
     if fallback_locator is None:
         return PrintedOxygenFacts()
     for payload in payloads:
         _walk_printed_oxygen(
-            payload, fallback_locator, logs, pressures, skip_tables=skip_tables
+            payload, fallback_locator, logs, pressures, rejected_logs,
+            skip_tables=skip_tables
         )
-    log_located = _unique_oxygen([(value, located) for value, located in logs])
+    log_frames = {(value, reference_pa) for value, _, reference_pa in logs}
+    if len(log_frames) == 1:
+        log_located, log_reference_pa = logs[0][1], logs[0][2]
+    else:
+        log_located, log_reference_pa = None, _BAR_PA
+    if logs and log_located is None:
+        rejected_logs.append(True)
     pressure_located = _unique_oxygen(
         [(value, (located, units)) for value, located, units in pressures]
     )
@@ -10908,14 +11385,16 @@ def collect_printed_oxygen(
             and isinstance(log_point, Decimal)
             and not _frames_agree(log_point, point)
         ):
-            return PrintedOxygenFacts()
+            return PrintedOxygenFacts(rejected_log_fO2=True)
         if isinstance(point, Decimal) and isinstance(log_point, Decimal):
             log_located = _annotate_atm_bar_offset(log_located, point, units)
     return PrintedOxygenFacts(
         log_fO2=log_located if isinstance(log_located, Located) else None,
+        log_fO2_reference_Pa=log_reference_pa,
         oxygen_partial_pressure_Pa=(
             pressure_located[0] if isinstance(pressure_located, tuple) else None
         ),
+        rejected_log_fO2=bool(rejected_logs),
     )
 
 
@@ -11714,7 +12193,10 @@ class Migrator:
         if ratio_oxygen is not None:
             # The nested oxygen_partial_pressure is Plante's derived
             # congruent-vaporization condition, not a printed pO2 cell.
-            facts = PrintedOxygenFacts(log_fO2=facts.log_fO2)
+            facts = PrintedOxygenFacts(
+                log_fO2=facts.log_fO2,
+                log_fO2_reference_Pa=facts.log_fO2_reference_Pa,
+            )
         elif facts.log_fO2 is None and facts.oxygen_partial_pressure_Pa is None:
             return point_conditions
         merged = dict(point_conditions or {})
@@ -11742,15 +12224,18 @@ class Migrator:
         method: State[MethodToken] | None = None,
         quantity: Quantity | None = None,
         species_formula: str | None = None,
+        source_values: Mapping[str, Any] | None = None,
+        point_values: Mapping[str, Any] | None = None,
     ) -> tuple[dict[str, Any], tuple[str, ...]]:
         """Lift printed experiment conditions into an observation identity.
 
         An observation may omit conditions that its declared experiment records
         once. Pressure inherits only an exact experiment-scope value; a static
-        p_sat row also gets a pure reservoir when the sample's printed form and
-        single-component composition agree. The C–CO route is resolved through
-        the same guarded waypoint used by consumers, with derived pressure
-        provenance retained.
+        p_sat row gets a pure reservoir when the sample's printed form and
+        single-component composition agree. Point-scoped effusion phases are
+        resolved here from their own source rows. The C–CO route is resolved
+        through the same guarded waypoint used by consumers, with derived
+        pressure provenance retained.
         """
 
         experiment = self.result.experiments.get(experiment_id)
@@ -11758,6 +12243,14 @@ class Migrator:
             return {}, ()
         known: dict[str, Any] = {}
         provenance: list[str] = []
+
+        def has_pure_component_composition(state: State[Any] | None) -> bool:
+            return (
+                state is not None
+                and state.is_value
+                and isinstance(state.value, Composition)
+                and state.value.components == ((species_formula, Decimal("1")),)
+            )
 
         effective_method = (
             method
@@ -11768,8 +12261,17 @@ class Migrator:
             quantity is Quantity.P_SAT
             and species_formula is not None
             and effective_method.is_value
-            and effective_method.value is MethodToken.STATIC_EQUILIBRIUM
+            and effective_method.value
+            in {
+                MethodToken.STATIC_EQUILIBRIUM,
+                MethodToken.KNUDSEN_EFFUSION,
+            }
         ):
+            # Knudsen effusion qualifies only for a reported pressure: the
+            # orifice is sized so the cell remains near equilibrium with the
+            # condensed sample, and p_sat reports that equilibrium pressure.
+            # A flux/evaporation rate is kinetic, and an unstated condensed
+            # phase cannot supply a reservoir identity.
             sample = experiment.sample
             form = (
                 sample.form.state.value.strip().casefold()
@@ -11778,20 +12280,104 @@ class Migrator:
             )
             sample_phase = PHASE_MAP.get(form) if form is not None else None
             initial = sample.initial_composition
-            pure_sample = (
-                initial is not None
-                and initial.state.is_value
-                and isinstance(initial.state.value, Composition)
-                and initial.state.value.components
-                == ((species_formula, Decimal("1")),)
+            pure_sample = has_pure_component_composition(
+                initial.state if initial is not None else None
             )
             existing_reservoir = existing.get("reservoir")
             reservoir_can_fill = "reservoir" not in existing or (
                 isinstance(existing_reservoir, State)
                 and existing_reservoir.is_unknown
             )
-            if (
-                reservoir_can_fill
+            source_points = (
+                source_values.get("points")
+                if isinstance(source_values, Mapping)
+                else None
+            )
+            source_has_point_phases = isinstance(source_points, (list, tuple)) and any(
+                isinstance(point, Mapping) and "phase_as_published" in point
+                for point in source_points
+            )
+            source_uses_point_reservoirs = source_has_point_phases or (
+                isinstance(source_points, (list, tuple))
+                and str(source_values.get("method_class") or "")
+                .strip()
+                .casefold()
+                == "measured_tabulated"
+            )
+            if point_values is not None and isinstance(source_values, Mapping):
+                gas_formula = _extract_formula_token(
+                    source_values.get("gas_species")
+                )
+                point_conditions = point_values.get("point_conditions")
+                starting_composition = (
+                    point_conditions.get("starting_composition")
+                    if isinstance(point_conditions, Mapping)
+                    else None
+                )
+                if starting_composition is not None:
+                    point_composition = _point_condition_from_plain(
+                        starting_composition, key="starting_composition"
+                    )
+                    pure_sample = has_pure_component_composition(
+                        point_composition.state
+                    )
+
+                raw_phase = point_values.get("phase_as_published")
+                phase_options = (
+                    ("s", Phase.CR),
+                    ("l", Phase.L),
+                )
+                point_phases = []
+                for source_phase, reservoir_phase in phase_options:
+                    declared = _source_standard_state_phase(raw_phase, source_phase)
+                    if declared is not None:
+                        point_phases.append(
+                            (declared.split("(", 1)[0], reservoir_phase)
+                        )
+                method_class = str(
+                    source_values.get("method_class") or ""
+                ).strip().casefold()
+                point_effusion_psat = (
+                    effective_method.is_value
+                    and effective_method.value is MethodToken.KNUDSEN_EFFUSION
+                    and method_class == "measured_tabulated"
+                    and gas_formula == species_formula
+                )
+                if reservoir_can_fill and pure_sample and point_effusion_psat:
+                    # A Knudsen cell in equilibrium with a stated pure condensed
+                    # phase measures that phase's p_sat. If the source phase
+                    # assignment spans solid and liquid at the melting boundary,
+                    # neither phase's p_sat is uniquely identified; keep it unknown.
+                    phase_note = source_values.get("phase_assignment_note")
+                    note_provenance = (
+                        f"; source phase assignment: {phase_note}"
+                        if isinstance(phase_note, str) and phase_note.strip()
+                        else ""
+                    )
+                    if len(point_phases) == 1:
+                        condensed_formula, reservoir_phase = point_phases[0]
+                        if condensed_formula == gas_formula:
+                            known["reservoir"] = State.of(
+                                make_species(gas_formula, reservoir_phase)
+                            )
+                            provenance.append(
+                                "identity.reservoir=point phase_as_published "
+                                f"{raw_phase!r}; source phase assignment is inferred"
+                                f"{note_provenance}"
+                            )
+                    elif len(point_phases) > 1:
+                        known["reservoir"] = State.unknown(
+                            f"point phase_as_published {raw_phase!r} is ambiguous "
+                            "between condensed phases"
+                        )
+                        provenance.append(
+                            "identity.reservoir remains unknown because point "
+                            "phase_as_published is ambiguous"
+                            f"{note_provenance}"
+                        )
+            elif (
+                not source_uses_point_reservoirs
+                and reservoir_can_fill
                 and sample_phase
                 in {Phase.CR, Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}
                 and pure_sample
@@ -11870,7 +12456,7 @@ class Migrator:
                 ):
                     with localcontext() as ctx:
                         ctx.prec = 50
-                        f_o2 = Decimal("100000") * (Decimal(10) ** value.point)
+                        f_o2 = _log_fO2_to_pa(value.point, _BAR_PA)
                     known["fO2_Pa"] = State.of(f_o2)
                     provenance.append(
                         "identity.fO2_Pa=derived via oxygen_condition "
@@ -12136,7 +12722,9 @@ class Migrator:
                     "locator": to_plain(locator),
                 }
             )
-            experiment = experiment_from_plain(payload)
+            experiment = _experiment_from_plain(
+                payload, registry_issues=self.result.registry_issues
+            )
             existing_experiment = self.result.experiments.get(
                 experiment.experiment_id
             )
@@ -12431,6 +13019,7 @@ class Migrator:
             else None
         )
         rows = list(iter_extract_observations(doc))
+        fusion_transition_rows = self._fusion_transition_rows_by_table_row(rows)
         pressure_identity_context = _pressure_identity_context(doc, rows)
         records = phase_field_records(doc)
         self._phase_field_records[source_id] = records
@@ -12492,6 +13081,7 @@ class Migrator:
                 declared_experiment_id=declared_experiment_id,
                 source_context=pressure_identity_context,
                 provenance=extract_provenance,
+                fusion_transition_rows=fusion_transition_rows,
             )
         # b-555: do not leave a silent extract — absence is fine, silence is not.
         self._record_silent_extract_if_needed(
@@ -12592,6 +13182,37 @@ class Migrator:
             observation_id=f"{path_stem}::typed_absence",
         )
 
+    @staticmethod
+    def _fusion_transition_rows_by_table_row(
+        rows: Sequence[tuple[str, Mapping[str, Any]]],
+    ) -> dict[tuple[str, str, str], tuple[Mapping[str, Any], ...]]:
+        """Index transition rows for fusion observations to resolve."""
+
+        by_row: dict[tuple[str, str, str], list[Mapping[str, Any]]] = defaultdict(list)
+        for formula, observation in rows:
+            if observation.get("type") != "transition_point":
+                continue
+            values = observation.get("values")
+            raw_locator = observation.get("locator")
+            if not isinstance(values, Mapping) or not isinstance(raw_locator, Mapping):
+                continue
+            quantity, _reason = map_quantity(
+                "transition_point", values, units=observation.get("units"), row=observation
+            )
+            if not quantity.is_value or quantity.value is not Quantity.TRANSITION_TEMPERATURE:
+                continue
+            table, row = raw_locator.get("table"), raw_locator.get("row")
+            locator = locator_from_mapping(raw_locator)
+            if (
+                table in (None, "")
+                or row in (None, "")
+                or locator is None
+            ):
+                continue
+            key = (formula, str(table), str(row))
+            by_row[key].append(observation)
+        return {key: tuple(candidates) for key, candidates in by_row.items()}
+
     def _migrate_extract_observation(
         self,
         *,
@@ -12605,6 +13226,9 @@ class Migrator:
         declared_experiment_id: str | None = None,
         source_context: Mapping[str, Any] | None = None,
         provenance: Mapping[str, Any] | None = None,
+        fusion_transition_rows: Mapping[
+            tuple[str, str, str], tuple[Mapping[str, Any], ...]
+        ] | None = None,
     ) -> None:
         measured = self.result.measured
         raw_obs_id = str(obs.get("observation_id") or "")
@@ -12676,6 +13300,7 @@ class Migrator:
                         provenance,
                         quantity=child_quantity,
                     ),
+                    fusion_transition_rows=fusion_transition_rows,
                 )
             return
         locator = locator_from_mapping(
@@ -12702,8 +13327,21 @@ class Migrator:
         phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
         phase_provenance: str | None = None
         transition_reason = transition_phase_reason(obs_type, values)
+        method_class = str(values.get("method_class") or "").strip().casefold()
+        measured_tabulated_gas_formula = (
+            _extract_formula_token(values.get("gas_species"))
+            if q_token is Quantity.P_SAT and method_class == "measured_tabulated"
+            else None
+        )
         if (phase_raw is None or phase_raw == "") and transition_reason:
             phase, unmapped_phase = State.unknown(transition_reason), None
+        elif (
+            q_token in FUSION_QUANTITIES
+            and isinstance(phase_raw, str)
+            and "crystal" in phase_raw.casefold()
+            and "melt" in phase_raw.casefold()
+        ):
+            phase, unmapped_phase = State.of(Phase.CR), None
         else:
             phase, unmapped_phase = map_phase(phase_raw)
             if unmapped_phase and source_id == "janaf-4th":
@@ -12720,12 +13358,12 @@ class Migrator:
                 q_token, source_standard_state
             )
             # Derived/reduced pressure rows may identify a gas species even
-            # when the source phase names its condensed system; measured rows
-            # keep an explicit, missing, or unmapped source phase.
-            method_class = str(values.get("method_class") or "").strip().casefold()
+            # when the source phase names its condensed system. For a measured
+            # tabulated p_sat row, the explicit gas_species field identifies the
+            # pressure species; the per-point phase remains its condensed reservoir.
             source_declares_gas_phase = _source_standard_state_phase(
                 source_standard_state, "g"
-            ) is not None
+            ) is not None or measured_tabulated_gas_formula is not None
             inferred_pressure_phase = (
                 source_declares_gas_phase
                 or method_class
@@ -12741,9 +13379,17 @@ class Migrator:
             ):
                 phase = State.of(Phase.G)
                 unmapped_phase = None
+                if measured_tabulated_gas_formula is not None:
+                    phase_provenance = (
+                        "species.phase=gas declared by source values.gas_species "
+                        f"{values.get('gas_species')}"
+                    )
             if not (phase.is_value and phase.value is Phase.G):
                 phase_provenance = None
-        if phase_raw is None or phase_raw == "":
+        if (
+            (phase_raw is None or phase_raw == "")
+            and measured_tabulated_gas_formula is None
+        ):
             measured.missing_phases += 1
             self.result.add_queue(
                 work.work_id,
@@ -12763,11 +13409,18 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        species_formula = str(values.get("formula") or formula)
+        species_formula = measured_tabulated_gas_formula or str(
+            values.get("formula") or formula
+        )
         if values.get("formula"):
             measured.formulas += 1
+        species_polymorph = (
+            None
+            if measured_tabulated_gas_formula is not None
+            else polymorph_from_extract(obs)
+        )
         species = make_species(
-            species_formula, phase, polymorph=polymorph_from_extract(obs)
+            species_formula, phase, polymorph=species_polymorph
         )
         suffix_formula, suffix_derivation, suffix_reference = (None, None, None)
         raw_quantity = values.get("quantity") if isinstance(values, Mapping) else None
@@ -12776,9 +13429,9 @@ class Migrator:
             suffix_formula, suffix_derivation, suffix_reference = parse_quantity_suffix(
                 suffix
             )
-            if suffix_formula:
+            if suffix_formula and measured_tabulated_gas_formula is None:
                 species = make_species(
-                    suffix_formula, phase, polymorph=polymorph_from_extract(obs)
+                    suffix_formula, phase, polymorph=species_polymorph
                 )
         composition_refusal: list[str] = []
         initial_oxide_map = _initial_oxide_map_from_values(
@@ -12841,6 +13494,112 @@ class Migrator:
         if obs.get("T_range_K") is not None:
             t_payload.setdefault("T_range_K", obs.get("T_range_K"))
         t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, t_payload)
+        temperature_locator = locator
+        if (
+            q_token in FUSION_QUANTITIES
+            and t_sel.field_name is None
+            and not t_sel.condition_ranges
+        ):
+            raw_locator = obs.get("locator")
+            if isinstance(raw_locator, Mapping):
+                table, row = raw_locator.get("table"), raw_locator.get("row")
+                if table not in (None, "") and row not in (None, ""):
+                    transition_rows = (fusion_transition_rows or {}).get(
+                        (formula, str(table), str(row))
+                    )
+                    selected_transitions: list[tuple[Decimal, Locator]] = []
+                    for transition in transition_rows or ():
+                        transition_values = transition.get("values")
+                        transition_locator = locator_from_mapping(
+                            transition.get("locator")
+                        )
+                        if (
+                            not isinstance(transition_values, Mapping)
+                            or transition_locator is None
+                        ):
+                            continue
+                        selected_transition = select_declared_source(
+                            Quantity.TRANSITION_TEMPERATURE,
+                            transition.get("units"),
+                            transition_values,
+                        )
+                        if (
+                            not selected_transition.available
+                            or selected_transition.amount is None
+                        ):
+                            continue
+                        property_kind = _printed_field_text(
+                            transition_values.get("property_kind")
+                        )
+                        phase_from = _printed_field_text(
+                            transition_values.get("phase_from")
+                        )
+                        phase_to = _printed_field_text(
+                            transition_values.get("phase_to")
+                        )
+                        if property_kind is not None:
+                            property_kind = property_kind.casefold()
+                            if not (
+                                property_kind == "melting_point"
+                                or property_kind.startswith("melting_point_")
+                            ):
+                                continue
+                        elif not (
+                            phase_from is not None
+                            and phase_to is not None
+                            or selected_transition.field_name in {"T_m_K", "T_fus_K"}
+                        ):
+                            continue
+                        if phase_from is not None:
+                            source_phase = PHASE_MAP.get(phase_from) or PHASE_MAP.get(
+                                phase_from.casefold()
+                            )
+                            if source_phase in {Phase.L, Phase.G, Phase.AQ}:
+                                continue
+                        if phase_to is not None:
+                            target_phase = PHASE_MAP.get(phase_to) or PHASE_MAP.get(
+                                phase_to.casefold()
+                            )
+                            if (
+                                phase_to.casefold() not in {"liquid", "l", "condensed_liquid"}
+                                and target_phase is not Phase.L
+                            ):
+                                continue
+                        transition_polymorph = polymorph_from_extract(transition)
+                        fusion_polymorph = polymorph_from_extract(obs)
+                        if (
+                            transition_polymorph is None
+                            or fusion_polymorph is None
+                            or not transition_polymorph.is_value
+                            or not fusion_polymorph.is_value
+                        ):
+                            continue
+                        try:
+                            source_crystal = _polymorph_from_plain(
+                                transition_polymorph.value
+                            )
+                            fusion_crystal = _polymorph_from_plain(
+                                fusion_polymorph.value
+                            )
+                        except ValueError:
+                            source_crystal = " ".join(
+                                str(transition_polymorph.value).split()
+                            ).casefold()
+                            fusion_crystal = " ".join(
+                                str(fusion_polymorph.value).split()
+                            ).casefold()
+                        if source_crystal != fusion_crystal:
+                            continue
+                        selected_transitions.append(
+                            (selected_transition.amount, transition_locator)
+                        )
+                    if len(selected_transitions) == 1:
+                        fusion_temperature = selected_transitions[0]
+                        t_payload["T_fus_K"] = fusion_temperature[0]
+                        temperature_locator = fusion_temperature[1]
+                        t_sel = select_declared_source(
+                            AXIS_TEMPERATURE_K, None, t_payload
+                        )
         t_known = t_sel.amount if t_sel.available else None
         if t_sel.condition_ranges and t_known is None and q_token is not Quantity.ACTIVITY_COEFFICIENT:
             measured.range_only_T += 1
@@ -12886,7 +13645,17 @@ class Migrator:
                 detail=str(exc),
             ))
         derived_from = derived_parents or None
-        source_derivation = source_derivation_from_source(obs, values)
+        source_derivation, invalid_derivations = source_derivation_from_source(
+            obs, values, has_resolved_lineage=bool(derived_parents)
+        )
+        for field_path, detail in invalid_derivations:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observations.{obs_id}.{field_path}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=f"invalid derivation annotation: {detail}",
+                )
+            )
         if source_derivation is not None:
             derivation_parents, derivation_prose = lineage_parents_from_source(
                 {"derived_from": source_derivation.inputs},
@@ -12896,11 +13665,13 @@ class Migrator:
                 source_asset_ids,
             )
             derived_prose = tuple(dict.fromkeys((*derived_prose, *derivation_prose)))
-            source_derivation = (
-                replace(source_derivation, inputs=derivation_parents)
-                if derivation_parents
-                else None
-            )
+            if derivation_parents:
+                source_derivation = replace(
+                    source_derivation, inputs=derivation_parents
+                )
+            elif source_derivation.raw_inputs is None:
+                source_derivation = None
+            # Invalid declarations stay attached for validate_corpus to report.
             if not derived_prose:
                 if source_derivation is not None:
                     self._author_derivations[obs_id] = source_derivation
@@ -12935,11 +13706,25 @@ class Migrator:
         }:
             source_derivation = None
         for payload in (values, obs):
-            if not isinstance(payload.get("inference"), Mapping):
+            if "inference" not in payload:
                 continue
-            try:
-                extractor_derivation = _derivation_from_plain(payload["inference"])
-            except (TypeError, ValueError):
+            field_path = "values.inference" if payload is values else "inference"
+            extractor_derivation, error = _decode_author_annotation(
+                payload["inference"],
+                lambda value: _derivation_from_plain(
+                    value, require_sequence_inputs=True, require_relation=True
+                ),
+            )
+            if error is not None:
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=f"observations.{obs_id}.{field_path}",
+                        reason=RefusalReason.INVALID_SOURCE,
+                        detail=error,
+                    )
+                )
+                continue
+            if extractor_derivation is None:
                 continue
             if source_derivation is None:
                 source_derivation = _merge_source_conversion_derivation(
@@ -13033,7 +13818,7 @@ class Migrator:
         )
         if (
             admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX)
-            and value.kind.value not in _NUMERIC_OBSERVATION_VALUE_KINDS
+            and not _value_has_numeric_value(value)
         ):
             raw_source_admission = (
                 raw_adm
@@ -13080,11 +13865,15 @@ class Migrator:
                 choose_read_from(work, locator),
             )
         if value_sel.reduction is not None:
+            read_from = choose_read_from(work, locator)
+            derived_from = fe3_fe2_ratio_parent_lineage(
+                value_sel, evidence, derived_from, read_from, source_derivation
+            )
             evidence, value_derivation = fe3_fe2_ratio_reduction(
                 value_sel,
                 evidence,
                 locator,
-                choose_read_from(work, locator),
+                read_from,
                 source_derivation,
             )
         if malformed_composition_amount is not None:
@@ -13273,6 +14062,8 @@ class Migrator:
                             source=source_key,
                             observation_id=obs_id,
                         )
+        if q_token in FUSION_QUANTITIES:
+            ident_kwargs["subtype"] = State.of("solid_to_liquid")
         if q_token is Quantity.TRANSITION_TEMPERATURE and (
             value.kind in {ValueKind.UNAVAILABLE, ValueKind.INTERVAL}
         ):
@@ -13365,7 +14156,7 @@ class Migrator:
                     t_known,
                     t_sel.unit_trail,
                     _temperature_field_raw(t_payload, t_sel.field_name),
-                    locator,
+                    temperature_locator,
                 )
             }
         if composition_located is not None:
@@ -13506,6 +14297,7 @@ class Migrator:
             method=method,
             quantity=q_token,
             species_formula=species.formula,
+            source_values=values if isinstance(values, Mapping) else None,
         )
         identity_for_profile = (
             Identity(
@@ -14539,6 +15331,35 @@ class Migrator:
                 ident_kwargs["composition"] = State.unknown(
                     composition_unknown_reason(composition_refusal)
                 )
+        if (
+            q_token_point is Quantity.P_SAT
+            and isinstance(raw_item, Mapping)
+            and isinstance(parent_values, Mapping)
+            and str(parent_values.get("method_class") or "")
+            .strip()
+            .casefold()
+            == "measured_tabulated"
+        ):
+            experiment = self.result.experiments.get(experiment_id)
+            if experiment is not None:
+                point_identity, point_identity_provenance = (
+                    self._experiment_identity_fields(
+                        experiment_id,
+                        ident_kwargs,
+                        method=experiment.method,
+                        quantity=q_token_point,
+                        species_formula=species.formula,
+                        source_values=parent_values,
+                        point_values=raw_item,
+                    )
+                )
+                if "reservoir" in point_identity:
+                    ident_kwargs["reservoir"] = point_identity["reservoir"]
+                    identity_provenance += tuple(
+                        item
+                        for item in point_identity_provenance
+                        if item.startswith("identity.reservoir")
+                    )
         printed_phase_text = (
             _printed_point_phase_text(raw_item)
             if isinstance(raw_item, Mapping)
@@ -14583,6 +15404,31 @@ class Migrator:
                 charge=species.charge,
             )
         identity = fill_identity(quantity, species, **ident_kwargs)
+        if (
+            q_token_point is Quantity.FE3_FE2_RATIO
+            and isinstance(raw_item, Mapping)
+        ):
+            row_oxygen = collect_printed_oxygen((raw_item,), point_locator)
+            if row_oxygen.rejected_log_fO2:
+                # Bounds and buffer-relative logs cannot be point identities.
+                identity = replace(
+                    identity,
+                    fO2_Pa=State.unknown(
+                        "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
+                    ),
+                )
+            elif row_oxygen.log_fO2 is not None:
+                # A printed point overrides series fO2; absence leaves the
+                # inherited series value unchanged.
+                identity = replace(
+                    identity,
+                    fO2_Pa=State.of(
+                        _log_fO2_to_pa(
+                            row_oxygen.log_fO2.state.value,
+                            row_oxygen.log_fO2_reference_Pa,
+                        )
+                    ),
+                )
         converted: Derivation | None = None
         if value_sel is not None and value_sel.available:
             emitted = value_sel.value
@@ -14625,6 +15471,9 @@ class Migrator:
                 source_derivation, converted, read_from
             )
         if value_sel is not None and value_sel.reduction is not None:
+            derived_from = fe3_fe2_ratio_parent_lineage(
+                value_sel, evidence, derived_from, read_from, source_derivation
+            )
             evidence, derivation = fe3_fe2_ratio_reduction(
                 value_sel, evidence, point_locator, read_from, source_derivation
             )
@@ -14663,6 +15512,10 @@ class Migrator:
         unc = uncertainty
         if extra_unc is not None:
             verbatim = {"sigma": extra_unc, "parent": parent_id}
+            if isinstance(uncertainty.verbatim, Mapping):
+                confidence_level = uncertainty.verbatim.get("confidence_level")
+                if confidence_level is not None:
+                    verbatim["confidence_level"] = confidence_level
             if extra_unc_k is not None:
                 verbatim["k"] = extra_unc_k
                 numeric_extra_unc = _as_dec_or_none(extra_unc)
@@ -14905,9 +15758,7 @@ class Migrator:
                     )
                     log_fO2 = _as_dec_or_none(raw_item.get("log10_fO2"))
                     if log_fO2 is not None:
-                        oxygen = State.of(
-                            Decimal("100000") * (Decimal(10) ** log_fO2)
-                        )
+                        oxygen = State.of(_log_fO2_to_pa(log_fO2, _BAR_PA))
                     elif (
                         isinstance(parent_values, Mapping)
                         and isinstance(parent_values.get("fO2_control"), Mapping)
@@ -15420,7 +16271,7 @@ class Migrator:
             )
         admission = (
             _defaulted_admission(_NO_ADMISSION_STATUS_REASON)
-            if value.kind.value in _NUMERIC_OBSERVATION_VALUE_KINDS
+            if _value_has_numeric_value(value)
             else Admission(
                 status=AdmissionStatus.PENDING,
                 reason=_NO_ADMISSION_STATUS_REASON,

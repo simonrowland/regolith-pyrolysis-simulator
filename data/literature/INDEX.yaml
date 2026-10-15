@@ -9,14 +9,14 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 297
-  extracts: 295
+  sources: 313
+  extracts: 311
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 59
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 295
-  alias_groups_needing_resolution: 36
+  extracts_without_pdf: 311
+  alias_groups_needing_resolution: 37
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
@@ -31,11 +31,15 @@ gaps:
   - arxiv-1602-00658-fegley-rock-steam-solubility
   - arxiv-1902-05005
   - arxiv-2509-sio-flame-nucleation
+  - badjukov-petrova-1993-shock-vaporization
   - banchor-matsui-naito-1986
   - banya-watanabe-1977-feto-p2o5-solid-iron
+  - beckett-2002-silicate-melt-activities
   - behrens-rosenblatt-1972
   - bencze-yazhenskikh-2016
+  - bennour-1996-ternary-cs-na-silicate
   - berkowitz-chupka-inghram-1957
+  - borisov-2018-compilation
   - boulliung-2025-mercury-volatile-metals-magmatic
   - boulliung-wood-2022-so2-solubility-silicate-melts
   - britt-2019-asteroid-simulants
@@ -57,11 +61,13 @@ gaps:
   - fdm879
   - fegley-2016-rock-steam-solubility
   - fegley-2023-chemical-equilibrium-calculations-bu
+  - ferguson-2004-iron-vapor-pressure
   - filiberto-lpsc2011-2064-volatiles
   - fray-schmitt-2009-ch4-1
   - fray-schmitt-2009-co-1
   - fray-schmitt-2009-nh3
   - fujisawa-1990-cao-al2o3-activities
+  - gca-366-210-berry-2024
   - giauque-powell-1939-cl2
   - giauque-ruehrwein-1939-hcn-psat
   - gibbons-1963-thesis-cas-slags-cas
@@ -83,6 +89,7 @@ gaps:
   - jsc-a16-special-samples
   - jsc-lunar-catalog-12023
   - kang-2007-sio2-activity-cas-low-silica
+  - kassis-frischat-1981-silicate-glass-vapour
   - kems-001-homma-1966
   - kems-002-ohno-1967
   - kems-003-pound-1972
@@ -192,6 +199,7 @@ gaps:
   - lpsc-2024-bennu-pyrolysis-vandam
   - lunarsurface-2020-5029
   - mamiya-2000-sio-disproportionation
+  - matzen-2022-martian-basalt-redox
   - mendybaev-2017-fun-cai-lab-evaporation
   - mendybaev-2021-cai-low-pressure-h2-evap
   - metsoc-2019-6005
@@ -218,8 +226,10 @@ gaps:
   - ntrs-19730008085
   - ntrs-20250004626
   - ohta-1996-cao-mgo-al2o3-activities
+  - ohta-suito-1995-mno-activity-slags
   - okazaki-2022-ryugu-gas-treasure-box
   - oneill-2002-feo-activity-coefficients-cmas
+  - oneill-2005-alkali-oxide-activities
   - pahlevan-2026-protolunar-volatile-outflows
   - pending-as2o3-second-primary
   - pending-bi2o3-kems
@@ -250,10 +260,12 @@ gaps:
   - ref-052-k-o-gas
   - ref-052-na-o-gas
   - reiss-2019-thermal-extraction-nulht2m
+  - richet-bottinga-1986-silicate-thermochemistry
   - richter-et-al-2007
   - robie-hemingway-wilson-1980-usgs-of-80-908
   - robinot-2025-promes-review
   - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+  - sato-1976-lunar-fo2-apollo-17
   - sato-hickling-mclane-1973-lunar-fo2
   - schaefer-and-fegley-2007-icarus-outgassing-of-oc
   - schaefer-fegley-2011-vaporization-earth
@@ -278,6 +290,7 @@ gaps:
   - slag-003-hino-kitagawa-banya-1993
   - smales-1971-lpsc-12022
   - sossi-2020-cu-zn-isotope-evap-formalism
+  - sossi-2020-magma-ocean-redox
   - span-wagner-1996-co2-psat
   - stebbins-carmichael-weill-1983
   - steurer-1985-vapor-phase-pyrolysis
@@ -286,6 +299,7 @@ gaps:
   - stolyarova-1996-cao-alumina-silica-kems
   - street-2010-thermal-properties-simulants
   - sublimation-kinetics-2023-minerals
+  - sugawara-akaogi-2004-liquid-calorimetry
   - sutherland-2025-mare-simulant-volatile-loss
   - suzuki-2026-vacuum-oxygen-extraction
   - ta-badro-2021
@@ -309,6 +323,8 @@ gaps:
   - vanbuchem-2023-lavatmos
   - vanbuchem-2025-lavatmos2
   - visscher-fegley-2013-debris-disks
+  - volovetskii-2012-iron-redox
+  - wadhwa-2008-redox-small-bodies
   - wetzel-gail-2013-sio-arrhenius
   - wilkerson-2021-jsc1a-tga-ms-poster
   - wilkerson-2023-jsc1a-outgassing
@@ -701,6 +717,12 @@ gaps:
     source_ids:
     - kems-041-sossi-fegley-2018
     - kems-045-sossi-2018-pnas-cr
+    resolution: owner/controller
+  - type: source_id_alias
+    key: sossi-2020
+    source_ids:
+    - sossi-2020-cu-zn-isotope-evap-formalism
+    - sossi-2020-magma-ocean-redox
     resolution: owner/controller
   - type: source_id_alias
     key: yamada-1980
@@ -1344,13 +1366,71 @@ sources:
     extract:
       path: extracts/arxiv-2509-sio-flame-nucleation.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/arxiv-2509-sio-flame-nucleation.yaml
       present: true
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: badjukov-petrova-1993-shock-vaporization
+  aliases: []
+  citation: 'Badjukov D.D. and Petrova T.L. (1993). Vaporization by shock loading of albite, jadeite,
+    and pyrex glass: Experimental study. Lunar and Planetary Science XXIV, 51–52, abstract 1026.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/badjukov-petrova-1993-shock-vaporization.yaml
+    review_status: draft
+    rows: 3
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/badjukov-petrova-1993-shock-vaporization/badjukov-petrova-1993-shock-vaporization.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/badjukov-petrova-1993-shock-vaporization/sidecar.yaml
+      present: false
+    text:
+      path: text/badjukov-petrova-1993-shock-vaporization
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/badjukov-petrova-1993-shock-vaporization
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/badjukov-petrova-1993-shock-vaporization.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/badjukov-petrova-1993-shock-vaporization.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: banchor-matsui-naito-1986
   aliases: []
@@ -1462,6 +1542,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/banya-watanabe-1977-feto-p2o5-solid-iron.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: beckett-2002-silicate-melt-activities
+  aliases: []
+  citation: 'Beckett J.R. (2002). Role of basicity and tetrahedral speciation in controlling the thermodynamic
+    properties of silicate liquids, part1: The system CaO–MgO–Al2O3–SiO2. Geochimica et Cosmochimica Acta66(1):93–107.'
+  doi: 10.1016/S0016-7037(01)00751-7
+  report_number: null
+  identifier: 10.1016/S0016-7037(01)00751-7
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/beckett-2002-silicate-melt-activities.yaml
+    review_status: draft
+    rows: 14
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/beckett-2002-silicate-melt-activities/beckett-2002-silicate-melt-activities.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/beckett-2002-silicate-melt-activities/sidecar.yaml
+      present: false
+    text:
+      path: text/beckett-2002-silicate-melt-activities
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/beckett-2002-silicate-melt-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/beckett-2002-silicate-melt-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/beckett-2002-silicate-melt-activities.yaml
       present: false
       error: null
       last_stage: null
@@ -1584,6 +1722,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: bennour-1996-ternary-cs-na-silicate
+  aliases: []
+  citation: Bennour F., Chastel R., Mathieu J.-C., Coutures J.-P., and Bergman C. (1996). Determination
+    of the Excess Thermodynamic Functions in Ternary Cs2O–SiO2–Na2O Melts by Knudsen Effusion Mass Spectrometry.
+    Physics and Chemistry of Liquids33(4):229–248.
+  doi: 10.1080/00319109608039824
+  report_number: null
+  identifier: 10.1080/00319109608039824
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/bennour-1996-ternary-cs-na-silicate.yaml
+    review_status: draft
+    rows: 8
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/bennour-1996-ternary-cs-na-silicate/bennour-1996-ternary-cs-na-silicate.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/bennour-1996-ternary-cs-na-silicate/sidecar.yaml
+      present: false
+    text:
+      path: text/bennour-1996-ternary-cs-na-silicate
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/bennour-1996-ternary-cs-na-silicate
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/bennour-1996-ternary-cs-na-silicate.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/bennour-1996-ternary-cs-na-silicate.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: berkowitz-chupka-inghram-1957
   aliases: []
   citation: Berkowitz, Chupka & Inghram, J. Chem. Phys. 27 (1957) 87–90
@@ -1640,6 +1837,65 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: borisov-2018-compilation
+  aliases: []
+  citation: 'Borisov, A., Behrens, H. & Holtz, F. (2018), Ferric/ferrous ratio in silicate melts: a new
+    model for 1 atm data with special emphasis on the effects of melt composition, Contributions to Mineralogy
+    and Petrology 173, 98, Electronic Supplementary Material 1, Supplementary Table 2.'
+  doi: 10.1007/s00410-018-1524-8
+  report_number: null
+  identifier: 10.1007/s00410-018-1524-8
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/borisov-2018-compilation.yaml
+    review_status: draft
+    rows: 435
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/borisov-2018-compilation/borisov-2018-compilation.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/borisov-2018-compilation/sidecar.yaml
+      present: false
+    text:
+      path: text/borisov-2018-compilation
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/borisov-2018-compilation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/borisov-2018-compilation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/borisov-2018-compilation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: boulliung-2025-mercury-volatile-metals-magmatic
   aliases: []
@@ -2045,7 +2301,7 @@ sources:
     extract:
       path: extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/cardiff-2007-vacuum-pyrolysis-gsfc.yaml
       present: true
@@ -2870,6 +3126,64 @@ sources:
       last_stage: scored
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: ferguson-2004-iron-vapor-pressure
+  aliases: []
+  citation: Ferguson F.T., Nuth J.A. III, and Johnson N.M. (2004). Thermogravimetric Measurement of the
+    Vapor Pressure of Iron from1573K to1973K. Journal of Chemical and Engineering Data49:497–501.
+  doi: 10.1021/je034152w
+  report_number: null
+  identifier: 10.1021/je034152w
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/ferguson-2004-iron-vapor-pressure.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ferguson-2004-iron-vapor-pressure/ferguson-2004-iron-vapor-pressure.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/ferguson-2004-iron-vapor-pressure/sidecar.yaml
+      present: false
+    text:
+      path: text/ferguson-2004-iron-vapor-pressure
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/ferguson-2004-iron-vapor-pressure
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ferguson-2004-iron-vapor-pressure.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ferguson-2004-iron-vapor-pressure.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: filiberto-lpsc2011-2064-volatiles
   aliases: []
   citation: 'Filiberto, J., Treiman, A. H. & Dasgupta, R. (2011), "Comparing the effects of H2O, F, and
@@ -3161,6 +3475,65 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/fujisawa-1990-cao-al2o3-activities.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: gca-366-210-berry-2024
+  aliases: []
+  citation: Berry, A.J., Doyle, P.M., Schofield, P.F., Miller, L.A., Le Losq, C., Burnham, A.D., & Mosselmans,
+    J.F.W. (2024). The oxidation state of titanium in silicate melts. Geochimica et Cosmochimica Acta,
+    366, 210–220.
+  doi: 10.1016/j.gca.2023.11.014
+  report_number: null
+  identifier: 10.1016/j.gca.2023.11.014
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/gca-366-210-berry-2024.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/gca-366-210-berry-2024/gca-366-210-berry-2024.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/gca-366-210-berry-2024/sidecar.yaml
+      present: false
+    text:
+      path: text/gca-366-210-berry-2024
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/gca-366-210-berry-2024
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/gca-366-210-berry-2024.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/gca-366-210-berry-2024.yaml
       present: false
       error: null
       last_stage: null
@@ -3658,7 +4031,7 @@ sources:
   extracts:
   - path: data/literature/extracts/holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml
     review_status: draft
-    rows: 37
+    rows: 41
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -4092,7 +4465,7 @@ sources:
     extract:
       path: extracts/jaggi-2021-mercury-atmosphere.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/jaggi-2021-mercury-atmosphere.yaml
       present: true
@@ -4398,6 +4771,64 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: kassis-frischat-1981-silicate-glass-vapour
+  aliases: []
+  citation: Kassis N. and Frischat G.H. (1981). Vapor Pressures of Simple Silicate Glass Melts. Journal
+    of the American Ceramic Society 64:C28–C29.
+  doi: 10.1111/j.1151-2916.1981.tb09566.x
+  report_number: null
+  identifier: 10.1111/j.1151-2916.1981.tb09566.x
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml
+    review_status: draft
+    rows: 4
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kassis-frischat-1981-silicate-glass-vapour/kassis-frischat-1981-silicate-glass-vapour.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/kassis-frischat-1981-silicate-glass-vapour/sidecar.yaml
+      present: false
+    text:
+      path: text/kassis-frischat-1981-silicate-glass-vapour
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/kassis-frischat-1981-silicate-glass-vapour
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kassis-frischat-1981-silicate-glass-vapour.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kassis-frischat-1981-silicate-glass-vapour.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: kems-001-homma-1966
   aliases: []
   citation: Homma, M., Ohno, R. & Ishida, T. (1966), "Evaporation of Manganese, Copper and Tin from Molten
@@ -4616,7 +5047,7 @@ sources:
     extract:
       path: extracts/kems-005-fedkin-2006.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-005-fedkin-2006.yaml
       present: true
@@ -5072,7 +5503,7 @@ sources:
     extract:
       path: extracts/kems-014-drowart-2005.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-014-drowart-2005.yaml
       present: true
@@ -5238,7 +5669,7 @@ sources:
     extract:
       path: extracts/kems-017-stolyarova-2013.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-017-stolyarova-2013.yaml
       present: true
@@ -5954,7 +6385,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-031-halwax-2024.yaml
     review_status: draft
-    rows: 22
+    rows: 28
     locator_status: private_path
   battery_datasets:
   - data/literature/kems_measurements.yaml
@@ -6626,7 +7057,7 @@ sources:
     extract:
       path: extracts/kems-044-robinot-2026.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-044-robinot-2026.yaml
       present: true
@@ -6803,7 +7234,7 @@ sources:
     extract:
       path: extracts/kems-047-turkdogan-1984-isij.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-047-turkdogan-1984-isij.yaml
       present: true
@@ -6976,7 +7407,7 @@ sources:
     extract:
       path: extracts/kems-050-gorokhov-1977.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-050-gorokhov-1977.yaml
       present: true
@@ -7555,7 +7986,7 @@ sources:
     extract:
       path: extracts/kems-093-piacente-1975.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-093-piacente-1975.yaml
       present: true
@@ -7666,7 +8097,7 @@ sources:
     extract:
       path: extracts/kems-097-ikeda-1978.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-097-ikeda-1978.yaml
       present: true
@@ -10664,6 +11095,64 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: matzen-2022-martian-basalt-redox
+  aliases: []
+  citation: Matzen, A.K., Woodland, A., Beckett, J.R. & Wood, B.J. (2022) Oxidation state of iron and
+    Fe-Mg partitioning between olivine and basaltic Martian melts. American Mineralogist, in press.
+  doi: 10.2138/am-2021-7682
+  report_number: null
+  identifier: 10.2138/am-2021-7682
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/matzen-2022-martian-basalt-redox.yaml
+    review_status: draft
+    rows: 24
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/matzen-2022-martian-basalt-redox/matzen-2022-martian-basalt-redox.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/matzen-2022-martian-basalt-redox/sidecar.yaml
+      present: false
+    text:
+      path: text/matzen-2022-martian-basalt-redox
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/matzen-2022-martian-basalt-redox
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/matzen-2022-martian-basalt-redox.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/matzen-2022-martian-basalt-redox.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: mendybaev-2017-fun-cai-lab-evaporation
   aliases: []
   citation: 'Mendybaev, R. A., Williams, C. D., Spicuzza, M. J., Richter, F. M., Valley, J. W., Fedkin,
@@ -11948,7 +12437,7 @@ sources:
     extract:
       path: extracts/no27-fegley-cameron-1987-epsl.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/no27-fegley-cameron-1987-epsl.yaml
       present: true
@@ -12254,6 +12743,64 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: ohta-suito-1995-mno-activity-slags
+  aliases: []
+  citation: Ohta H. and Suito H. (1995). Activities of MnO in CaO–SiO2–Al2O3–MnO(<10Pct)–FetO(<3Pct) slags
+    saturated with liquid iron. Metallurgical and Materials Transactions B26:295–303.
+  doi: 10.1007/BF02660972
+  report_number: null
+  identifier: 10.1007/BF02660972
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/ohta-suito-1995-mno-activity-slags.yaml
+    review_status: draft
+    rows: 19
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ohta-suito-1995-mno-activity-slags/ohta-suito-1995-mno-activity-slags.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/ohta-suito-1995-mno-activity-slags/sidecar.yaml
+      present: false
+    text:
+      path: text/ohta-suito-1995-mno-activity-slags
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/ohta-suito-1995-mno-activity-slags
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ohta-suito-1995-mno-activity-slags.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ohta-suito-1995-mno-activity-slags.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: okazaki-2022-ryugu-gas-treasure-box
   aliases: []
   citation: 'Okazaki, R., Miura, Y. N., Takano, Y., Sawada, H., Sakamoto, K., Yada, T., Yamada, K., Kawagucci,
@@ -12367,6 +12914,65 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/oneill-2002-feo-activity-coefficients-cmas.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: oneill-2005-alkali-oxide-activities
+  aliases: []
+  citation: O’Neill H.St.C. (2005). A method for controlling alkali-metal oxide activities in one-atmosphere
+    experiments and its application to measuring the relative activity coefficients of NaO0.5 in silicate
+    melts. American Mineralogist90:497–501.
+  doi: 10.2138/am.2005.1792
+  report_number: null
+  identifier: 10.2138/am.2005.1792
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/oneill-2005-alkali-oxide-activities.yaml
+    review_status: draft
+    rows: 3
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/oneill-2005-alkali-oxide-activities/oneill-2005-alkali-oxide-activities.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/oneill-2005-alkali-oxide-activities/sidecar.yaml
+      present: false
+    text:
+      path: text/oneill-2005-alkali-oxide-activities
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/oneill-2005-alkali-oxide-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/oneill-2005-alkali-oxide-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/oneill-2005-alkali-oxide-activities.yaml
       present: false
       error: null
       last_stage: null
@@ -14118,6 +14724,64 @@ sources:
       last_stage: extracted
       date: '2026-09-12'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: richet-bottinga-1986-silicate-thermochemistry
+  aliases: []
+  citation: 'Richet, P. & Bottinga, Y. (1986), "Thermochemical properties of silicate glasses and liquids:
+    A review", Reviews of Geophysics, 24(1), 1-25.'
+  doi: 10.1029/rg024i001p00001
+  report_number: null
+  identifier: 10.1029/rg024i001p00001
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/richet-bottinga-1986-silicate-thermochemistry.yaml
+    review_status: draft
+    rows: 24
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/richet-bottinga-1986-silicate-thermochemistry/richet-bottinga-1986-silicate-thermochemistry.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/richet-bottinga-1986-silicate-thermochemistry/sidecar.yaml
+      present: false
+    text:
+      path: text/richet-bottinga-1986-silicate-thermochemistry
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/richet-bottinga-1986-silicate-thermochemistry
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/richet-bottinga-1986-silicate-thermochemistry.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/richet-bottinga-1986-silicate-thermochemistry.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: richter-et-al-2007
   aliases:
   - kems-010-richter-2007
@@ -14347,6 +15011,65 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: sato-1976-lunar-fo2-apollo-17
+  aliases: []
+  citation: Sato, M. (1976), Oxygen fugacity and other thermochemical parameters of Apollo 17 high-Ti
+    basalts and their implications on the reduction mechanism, Proceedings of the Lunar Science Conference,
+    7th, 1323-1344.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sato-1976-lunar-fo2-apollo-17.yaml
+    review_status: draft
+    rows: 21
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sato-1976-lunar-fo2-apollo-17/sato-1976-lunar-fo2-apollo-17.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/sato-1976-lunar-fo2-apollo-17/sidecar.yaml
+      present: false
+    text:
+      path: text/sato-1976-lunar-fo2-apollo-17
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/sato-1976-lunar-fo2-apollo-17
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sato-1976-lunar-fo2-apollo-17.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sato-1976-lunar-fo2-apollo-17.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: sato-hickling-mclane-1973-lunar-fo2
   aliases: []
@@ -15754,6 +16477,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: sossi-2020-magma-ocean-redox
+  aliases: []
+  citation: Sossi, P. A., Burnham, A. D., Badro, J., Lanzirotti, A., Newville, M., and O'Neill, H. St.C.
+    (2020). Redox state of Earth's magma ocean and its Venus-like early atmosphere. Science Advances 6,
+    eabd1387.
+  doi: 10.1126/sciadv.abd1387
+  report_number: null
+  identifier: 10.1126/sciadv.abd1387
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sossi-2020-magma-ocean-redox.yaml
+    review_status: draft
+    rows: 12
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sossi-2020-magma-ocean-redox/sossi-2020-magma-ocean-redox.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/sossi-2020-magma-ocean-redox/sidecar.yaml
+      present: false
+    text:
+      path: text/sossi-2020-magma-ocean-redox
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/sossi-2020-magma-ocean-redox
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sossi-2020-magma-ocean-redox.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sossi-2020-magma-ocean-redox.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: span-wagner-1996-co2-psat
   aliases: []
   citation: 'Span, R. & Wagner, W. (1996), "A New Equation of State for Carbon Dioxide Covering the Fluid
@@ -16221,6 +17003,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: sugawara-akaogi-2004-liquid-calorimetry
+  aliases: []
+  citation: Sugawara T. and Akaogi M. (2004). Calorimetry of liquids in the system Na2O–Fe2O3–SiO2. American
+    Mineralogist 89:1586–1596.
+  doi: 10.2138/am-2004-11-1202
+  report_number: null
+  identifier: 10.2138/am-2004-11-1202
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml
+    review_status: draft
+    rows: 7
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sugawara-akaogi-2004-liquid-calorimetry/sugawara-akaogi-2004-liquid-calorimetry.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/sugawara-akaogi-2004-liquid-calorimetry/sidecar.yaml
+      present: false
+    text:
+      path: text/sugawara-akaogi-2004-liquid-calorimetry
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/sugawara-akaogi-2004-liquid-calorimetry
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sugawara-akaogi-2004-liquid-calorimetry.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: sutherland-2025-mare-simulant-volatile-loss
   aliases: []
   citation: Sutherland J. et al. (2025) Volatile loss during heating of lunar mare simulants and related
@@ -16566,7 +17406,7 @@ sources:
     extract:
       path: extracts/ta-mendybaev-2002-lpsc.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ta-mendybaev-2002-lpsc.yaml
       present: true
@@ -16683,7 +17523,7 @@ sources:
     extract:
       path: extracts/ta-shirai-2000-lpsc.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ta-shirai-2000-lpsc.yaml
       present: true
@@ -16975,7 +17815,7 @@ sources:
     extract:
       path: extracts/thomas-wood-2021-chlorine-silicate-melts.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/thomas-wood-2021-chlorine-silicate-melts.yaml
       present: true
@@ -17559,13 +18399,130 @@ sources:
     extract:
       path: extracts/visscher-fegley-2013-debris-disks.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/visscher-fegley-2013-debris-disks.yaml
       present: true
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: volovetskii-2012-iron-redox
+  aliases: []
+  citation: Volovetskii M.V., Lukanin O.A., Rusakov V.S., and Kargal'tsev A.A. (2012). Influence of Oxygen
+    Fugacity and Temperature on the Redox State of Iron in Natural Silicic Aluminosilicate Melts. Geochemistry
+    International 50(4):330–343.
+  doi: 10.1134/S0016702912040088
+  report_number: null
+  identifier: 10.1134/S0016702912040088
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/volovetskii-2012-iron-redox.yaml
+    review_status: draft
+    rows: 3
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/volovetskii-2012-iron-redox/volovetskii-2012-iron-redox.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/volovetskii-2012-iron-redox/sidecar.yaml
+      present: false
+    text:
+      path: text/volovetskii-2012-iron-redox
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/volovetskii-2012-iron-redox
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/volovetskii-2012-iron-redox.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/volovetskii-2012-iron-redox.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: wadhwa-2008-redox-small-bodies
+  aliases: []
+  citation: Wadhwa M. (2008). Redox Conditions on Small Bodies, the Moon and Mars. Reviews in Mineralogy
+    and Geochemistry68:493–510, chapter17.
+  doi: 10.2138/rmg.2008.68.17
+  report_number: null
+  identifier: 10.2138/rmg.2008.68.17
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/wadhwa-2008-redox-small-bodies/wadhwa-2008-redox-small-bodies.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/wadhwa-2008-redox-small-bodies/sidecar.yaml
+      present: false
+    text:
+      path: text/wadhwa-2008-redox-small-bodies
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/wadhwa-2008-redox-small-bodies
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/wadhwa-2008-redox-small-bodies.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/wadhwa-2008-redox-small-bodies.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: wetzel-gail-2013-sio-arrhenius
   aliases:

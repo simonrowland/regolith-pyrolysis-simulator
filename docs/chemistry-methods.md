@@ -760,7 +760,7 @@ recorded warning.
   shadow for liquid fraction and phase context. It is quick and broad but returns stoichiometric phases
   only (no activity coefficients) and does not cover manganese, so it is a diagnostic companion rather
   than an authority. It is an optional install.
-<!-- impl: §9 -> engines/magemin/provider.py MAGEMinShadowProvider.capability_profile:132 — MAGEMin fallback scope -->
+<!-- impl: §9 -> engines/magemin/provider.py MAGEMinShadowProvider.capability_profile:200 — MAGEMin fallback scope -->
 
 - **VapoRock** computes silicate-vapor speciation over a melt composition and is run as a
   **diagnostic-only shadow** for vapor pressure. Its full gas speciation is reported for comparison and
