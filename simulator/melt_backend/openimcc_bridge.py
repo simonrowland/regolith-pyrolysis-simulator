@@ -56,7 +56,7 @@ OPENIMCC_INSTALL_HINT = (
 )
 OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
-    "@e256a69794390fda513ab7e7fe13972f3203f36b"
+    "@425efadf20985e508703fe55cc463a15283fe116"
 )
 DEFAULT_BACKEND_PACK_NAME = "default"
 
