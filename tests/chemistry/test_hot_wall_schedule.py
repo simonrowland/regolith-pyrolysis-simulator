@@ -66,6 +66,8 @@ def test_deliberately_colder_upstream_wall_is_flagged(setpoints_data):
     notices = model._upstream_wall_temperature_notices(MeltState(temperature_C=2100.0))
     risk = next(item for item in notices if item["type"] == "UpstreamWallCoatingRisk")
     assert risk["melt_temperature_C"] == 2100.0
+    assert risk["limit_C"] == 2100.0
+    assert risk["source"] == "MeltState.temperature_C"
     assert risk["wall_temperature_C"] == 1500.0
     assert risk["segment"] == NAMES[0]
 

@@ -2659,6 +2659,8 @@ class CondensationModel:
                     'segment': segment.name,
                     'wall_temperature_C': wall_C,
                     'melt_temperature_C': float(melt.temperature_C),
+                    'limit_C': float(melt.temperature_C),
+                    'source': 'MeltState.temperature_C',
                     'reason': 'explicit colder upstream wall; deliberate coating risk',
                 })
             # The mandate's Fe bake-off duty (~1775 C at 1 mbar) already
