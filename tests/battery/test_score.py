@@ -10215,22 +10215,47 @@ def test_score_store_refuses_synthetic_unknown_reference_activity_point() -> Non
     assert residual.refusal.detail["fields"] == ["reference_state"]
 
 
-def test_score_store_refuses_categorical_stolyarova_figure_only_row() -> None:
+def test_score_store_refuses_unavailable_stolyarova_figure_only_rows() -> None:
     source_id = "stolyarova-1996-cao-alumina-silica-kems"
     context = load_score_context(sources=(source_id,))
-    figure_row = next(
+    figure_row_keys = {
+        "stolyarova_1996_fig1_al2o3_activity_figure_only",
+        "stolyarova_1996_fig1_cao_activity_figure_only",
+        "stolyarova_1996_fig1_sio2_activity_figure_only",
+        "stolyarova_1996_fig2_al2o3_activity_figure_only",
+        "stolyarova_1996_fig2_cao_activity_figure_only",
+        "stolyarova_1996_fig2_sio2_activity_figure_only",
+    }
+    figure_rows = tuple(
         obs
         for obs in context.observations.values()
-        if obs.source_id == source_id and obs.value.kind is ValueKind.CATEGORICAL
+        if obs.source_id == source_id
+        and obs.observation_id.partition("::")[2] in figure_row_keys
+    )
+    assert {
+        obs.observation_id.partition("::")[2] for obs in figure_rows
+    } == figure_row_keys
+    assert all(
+        obs.locator.figure in {"1", "2"} for obs in figure_rows
+    )
+    assert all(
+        obs.evidence.class_.value is EvidenceClass.FIGURE_ONLY for obs in figure_rows
+    )
+    assert all(
+        obs.admission.status is AdmissionStatus.REJECTED for obs in figure_rows
+    )
+    assert all(obs.value.kind is ValueKind.UNAVAILABLE for obs in figure_rows)
+    assert all(
+        obs.value.unavailable_reason == "figure_not_digitized" for obs in figure_rows
     )
     figure_context = replace(
         context,
-        observations={figure_row.observation_id: figure_row},
+        observations={obs.observation_id: obs for obs in figure_rows},
         origins={
-            figure_row.observation_id: context.origins[figure_row.observation_id]
-        }
-        if figure_row.observation_id in context.origins
-        else {},
+            obs.observation_id: context.origins[obs.observation_id]
+            for obs in figure_rows
+            if obs.observation_id in context.origins
+        },
     )
     residuals, _ = score_store(
         figure_context,
@@ -10238,12 +10263,20 @@ def test_score_store_refuses_categorical_stolyarova_figure_only_row() -> None:
         include_diagnostics=True,
     )
 
-    assert len(residuals) == 1
-    refusal = residuals[0].refusal
-    assert refusal is not None
-    assert refusal.reason is RefusalReason.IDENTITY_UNKNOWN
-    assert "figure_only" in refusal.detail["quantity_reason"]
-    assert refusal.detail["value_kind"] == ValueKind.CATEGORICAL.value
+    assert {residual.reference for residual in residuals} == {
+        obs.observation_id for obs in figure_rows
+    }
+    for residual in residuals:
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.score_eligible is False
+        refusal = residual.refusal
+        assert refusal is not None
+        assert refusal.reason is RefusalReason.METRIC_DOMAIN
+        assert refusal.detail == {
+            "reason": "figure_not_digitized",
+            "value_kind": ValueKind.UNAVAILABLE.value,
+        }
 
 
 def test_score_store_records_each_in_scope_observation_in_small_fixture() -> None:
