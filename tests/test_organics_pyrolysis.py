@@ -58,6 +58,16 @@ def _build_sim(feedstock_key: str) -> PyrolysisSimulator:
     return sim
 
 
+def _tar_wall_floor_notices(sim: PyrolysisSimulator) -> list[dict]:
+    return [
+        notice
+        for notice in sim.condensation_model._upstream_wall_temperature_notices(
+            sim.melt
+        )
+        if notice["type"] == "UpstreamOrganicTarWallFloorApplied"
+    ]
+
+
 def _total_atoms(sim: PyrolysisSimulator, element: str) -> float:
     total = 0.0
     for _account, species_mol in sim.atom_ledger.mol_by_account().items():
@@ -243,11 +253,74 @@ def test_ci_c2b_cold_start_tar_uses_default_no_coat_wall() -> None:
     sim._configure_condensation_operating_conditions(EvaporationFlux())
     assert sim.condensation_model.pipe_segments[0].wall_temperature_C > 100.0
 
+    [notice] = _tar_wall_floor_notices(sim)
+    parameter = load_organics_pyrolysis_params()["tar"]["dewpoint_C"]
+    assert notice["floor_temperature_C"] == (
+        sim.condensation_model.pipe_segments[0].wall_temperature_C
+    )
+    assert notice["melt_temperature_C"] == 100.0
+    assert notice["parameter"]["path"] == "tar.dewpoint_C"
+    assert notice["parameter"]["status"] == parameter["status"]
+    assert notice["parameter"]["source"] == parameter["source"]
+    assert notice["parameter"]["uncertainty"] == parameter["uncertainty"]
+    assert notice["parameter"]["certified_point"] is None
+
     sim._apply_organic_tar_wall_deposit()
 
     assert sim.atom_ledger.kg_by_account("process.wall_deposit").get(
         "organic_tar", 0.0
     ) == pytest.approx(0.0)
+
+
+def test_tar_wall_floor_notice_is_absent_without_organics() -> None:
+    sim = _build_sim("lunar_mare_low_ti")
+    sim.melt.campaign = CampaignPhase.C2B
+    sim.melt.campaign_hour = 0.0
+    sim.melt.temperature_C = 100.0
+
+    sim._configure_condensation_operating_conditions(EvaporationFlux())
+
+    assert _tar_wall_floor_notices(sim) == []
+
+
+def test_tar_wall_floor_notice_is_absent_when_melt_is_above_floor() -> None:
+    sim = _build_sim("ci_carbonaceous_chondrite")
+    sim.melt.campaign = CampaignPhase.C2B
+    sim.melt.campaign_hour = 0.0
+    sim.melt.temperature_C = 500.0
+
+    sim._configure_condensation_operating_conditions(EvaporationFlux())
+
+    assert sim.condensation_model.pipe_segments[0].wall_temperature_C == 500.0
+    assert _tar_wall_floor_notices(sim) == []
+
+
+def test_explicit_tar_wall_schedule_wins_without_floor_notice() -> None:
+    sim = _build_sim("ci_carbonaceous_chondrite")
+    sim.melt.campaign = CampaignPhase.C2B
+    sim.melt.campaign_hour = 0.0
+    sim.melt.temperature_C = 100.0
+    sim.overhead_model._pipe_segment_temperature_config = {
+        "segments": {
+            "stage_0_to_stage_1": {
+                "default_C": 250.0,
+                "schedule": [
+                    {
+                        "campaign": "C2B",
+                        "from_campaign_hour": 0.0,
+                        "to_campaign_hour": 1.0,
+                        "start_C": 250.0,
+                        "end_C": 250.0,
+                    }
+                ],
+            }
+        }
+    }
+
+    sim._configure_condensation_operating_conditions(EvaporationFlux())
+
+    assert sim.condensation_model.pipe_segments[0].wall_temperature_C == 250.0
+    assert _tar_wall_floor_notices(sim) == []
 
 
 def test_lunar_organics_free_has_no_char_or_h2() -> None:
