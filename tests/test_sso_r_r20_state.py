@@ -792,6 +792,12 @@ def test_o2_bubbler_cannot_exceed_total_pressure_or_double_book_passthrough() ->
     diagnostic = sim._apply_o2_bubbler()
 
     assert sim._current_melt_redox_fO2_log() <= math.log10(2e-4) + 8*math.ulp(math.log10(2e-4))
+    notice, = diagnostic['pressure_ceiling_notices']
+    assert notice['flag'] == 'REDOX_PRESSURE_CEILING'
+    assert notice['site'] == 'o2_bubbler_target'
+    assert notice['unclamped_fO2_log'] == 0.0
+    assert notice['applied_fO2_log'] == math.log10(2e-4)
+    assert notice in sim._redox_source_breakdown_diagnostic()['pressure_ceiling_notices']
     assert diagnostic["injected_mol"] == pytest.approx(
         diagnostic["absorbed_mol"] + diagnostic["passthrough_mol"],
     )
@@ -2432,11 +2438,31 @@ def test_exchange_target_cannot_exceed_controlled_total_pressure() -> None:
     reservoir = sim._apply_oxygen_reservoir_exchange()
 
     assert reservoir.melt_intrinsic_fO2_log <= math.log10(2e-4) + 8*math.ulp(math.log10(2e-4))
+    notice, = sim._redox_source_breakdown_diagnostic()['pressure_ceiling_notices']
+    assert notice['flag'] == 'REDOX_PRESSURE_CEILING'
+    assert notice['site'] == 'headspace_exchange'
+    assert notice['unclamped_fO2_log'] == math.log10(reservoir.headspace_transport_pO2_bar)
+    assert notice['applied_fO2_log'] == math.log10(2e-4)
     transition = sim.atom_ledger.transitions[-1]
     assert transition.name == "fe_redox_respeciation"
     assert transition.debit_atom_moles(sim.species_formula_registry)["O"] == (
         transition.credit_atom_moles(sim.species_formula_registry)["O"]
     )
+
+
+def test_pressure_drop_and_reducing_source_label_do_not_restore_a_scalar_ceiling() -> None:
+    sim = _make_sim()
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-3.0)
+    sim.melt.p_total_mbar = 0.2
+    before = sim._current_melt_redox_fO2_log()
+    assert before > sim._melt_redox_fO2_upper_bound_log()
+    inventory = sim.atom_ledger.mol_by_account()
+    count = len(sim.atom_ledger.transitions)
+    sim._apply_oxygen_reservoir_redox_source_terms({'redox_source:test_reducing': -1e-10})
+    assert sim._current_melt_redox_fO2_log() == before
+    assert sim.atom_ledger.mol_by_account() == inventory
+    assert len(sim.atom_ledger.transitions) == count
+    assert not sim._redox_source_breakdown_diagnostic().get('pressure_ceiling_notices')
 
 
 @pytest.mark.parametrize("buffer_o2_mol", [0.0, 1.0e-6])

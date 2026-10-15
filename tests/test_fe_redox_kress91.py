@@ -177,6 +177,9 @@ def test_intrinsic_kress91_ends_follow_exchange(feo_mol, fe2o3_mol, exchange, ex
     assert state['fO2_log'] == expected
     assert state['exchange_bounded']
     assert 'EXCHANGE_BOUNDED' in state['flags']
+    assert state['unclamped_fO2_log'] == exchange
+    assert state['pressure_ceiling_fO2_log'] == -2.0
+    assert ('REDOX_PRESSURE_CEILING' in state['flags']) == (exchange > -2.0)
 
 
 @pytest.mark.parametrize('kind', ['absolute', 'buffer_offset'])
