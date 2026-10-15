@@ -49,12 +49,14 @@ simulator projects only these cleaned silicate melt oxides into
 `Na2O`, `K2O`, `Cr2O3`, `MnO`, `P2O5`, `NiO`, and `CoO`.
 
 Apollo-derived lunar bulk chemistry usually reports total iron as `FeO` or
-`FeO_T`, not as a separate `FeO`/`Fe2O3` assay. The simulator keeps lunar
-entries unflagged and uses their canonical `FeO` value as ferrous iron for
-process calculations by modelling choice; this does not claim the source
-measured that ferrous split. No ferric component or native/nanophase metal is
-inferred from the lunar reporting convention, and lunar data remains as
-reported.
+`FeO_T`, not as a separate `FeO`/`Fe2O3` assay. When a measured split is
+unavailable, the simulator predicts that split once at load using Kress91
+and the feedstock's intrinsic redox and formation-temperature anchors in
+`data/feedstocks.yaml`. It renormalizes the complete analysis to the batch
+mass without importing oxygen. The run reports the predicted split and any
+defaulted anchor as certification gaps. The ledger split then determines
+the melt's redox state. This fallback does not infer metallic iron or claim
+a measured ferric split; the source analysis remains unchanged.
 
 Other raw components are preserved in the batch inventory instead of being
 silently dropped. Examples include `H2O`, `C`, `S`, `SO3`, `Cl`, `ClO4`,
