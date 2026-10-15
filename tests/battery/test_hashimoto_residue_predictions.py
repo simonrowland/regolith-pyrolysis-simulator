@@ -182,6 +182,59 @@ def test_isolated_openimcc_worker_restarts_for_a_different_evaluator() -> None:
     ) == "second evaluator"
 
 
+def test_isolated_openimcc_worker_start_failure_is_typed_and_recoverable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import multiprocessing
+
+    import simulator.battery.residue as residue
+
+    spawn_context = multiprocessing.get_context("spawn")
+    connections = []
+    stopped_before_close = []
+
+    class ContextProxy:
+        def Pipe(self, **kwargs):
+            pair = spawn_context.Pipe(**kwargs)
+            connections.extend(pair)
+            return pair
+
+        def Process(self, **kwargs):
+            process = spawn_context.Process(**kwargs)
+            if not stopped_before_close:
+                original_start = process.start
+                original_close = process.close
+
+                def start_then_fail():
+                    original_start()
+                    raise OSError(24, "forced descriptor exhaustion")
+
+                def close_and_record():
+                    stopped_before_close.append(not process.is_alive())
+                    original_close()
+
+                process.start = start_then_fail
+                process.close = close_and_record
+            return process
+
+    monkeypatch.setattr(
+        residue.multiprocessing, "get_context", lambda _method: ContextProxy()
+    )
+
+    with pytest.raises(residue.ResidueEngineTransportError) as exc_info:
+        residue._evaluate_openimcc_isolated(_first_openimcc_engine, timeout_s=5.0)
+
+    assert exc_info.value.reason == "engine_transport_error:openimcc"
+    assert len(connections) == 2
+    assert all(connection.closed for connection in connections)
+    assert stopped_before_close == [True]
+    assert residue._OPENIMCC_EVALUATION_WORKER is None
+
+    assert residue._evaluate_openimcc_isolated(
+        _first_openimcc_engine, timeout_s=5.0
+    ) == "first evaluator"
+
+
 def _source_data():
     source = yaml.safe_load(SOURCE.read_text())
     store = yaml.safe_load(STORE.read_text())

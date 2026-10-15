@@ -1036,13 +1036,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     """
 
     real_backend_family = RealBackendFamily.MAGEMIN
+    _DEFAULT_DATABASE = 'ig'
 
     name = 'magemin'
 
     def __init__(self) -> None:
         self._available: bool = False
         self._config: Dict[str, Any] = {}
-        self._database: str = 'ig'
+        self._database: str = self._DEFAULT_DATABASE
         # 'subprocess' | 'pymagemin' | 'ctypes' | 'julia'
         self._bridge: Optional[str] = None
         self._magemin_module: Optional[Any] = None
@@ -1071,17 +1072,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         self._last_error = None
         self._config = dict(config or {})
 
-        self._database = str(self._config.get('database') or 'ig')
+        self._database = str(
+            self._config.get('database') or self._DEFAULT_DATABASE
+        )
 
-        explicit_path = self._config.get('binary_path')
-        if explicit_path:
-            binary_path = self._locate_binary(explicit_path)
-        else:
-            from simulator.engine_local_config import configured_magemin_binary_path
-
-            binary_path = configured_magemin_binary_path()
-            if binary_path is None:
-                binary_path = self._locate_binary(None)
+        binary_path = self._resolve_binary_path()
         if binary_path is None:
             self._warn(
                 'MAGEMin binary not found in engines/magemin or PATH; '
@@ -1809,6 +1804,18 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         return None
 
+    def _resolve_binary_path(self) -> Optional[Path]:
+        explicit_path = self._config.get('binary_path')
+        if explicit_path:
+            return self._locate_binary(explicit_path)
+
+        from simulator.engine_local_config import configured_magemin_binary_path
+
+        binary_path = configured_magemin_binary_path()
+        if binary_path is None:
+            binary_path = self._locate_binary(None)
+        return binary_path
+
     def get_engine_version(self) -> str:
         from simulator.engine_local_config import (
             cache_version_for,
@@ -1819,13 +1826,19 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if config_version is not None:
             return config_version
 
-        if self._binary_path is None:
+        binary_path = self._binary_path or self._resolve_binary_path()
+        if binary_path is None:
             return 'unavailable'
-        binary_path = self._binary_path.resolve()
+        resolved_binary_path = binary_path.resolve()
         try:
             with tempfile.TemporaryDirectory() as tmpdir:
                 result = subprocess.run(
-                    [str(binary_path), '--version', '--db', self._database],
+                    [
+                        str(resolved_binary_path),
+                        '--version',
+                        '--db',
+                        self._database,
+                    ],
                     cwd=tmpdir,
                     capture_output=True,
                     text=True,
@@ -1835,9 +1848,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             if result.returncode == 0 and lines:
                 legacy = lines[0].strip()
             else:
-                legacy = f'MAGEMin subprocess ({self._binary_path})'
+                legacy = f'MAGEMin subprocess ({resolved_binary_path})'
         except (OSError, subprocess.TimeoutExpired):
-            legacy = f'MAGEMin subprocess ({self._binary_path})'
+            legacy = f'MAGEMin subprocess ({resolved_binary_path})'
         warn_legacy_once(
             'magemin',
             'engines.local.toml absent; using legacy MAGEMin '

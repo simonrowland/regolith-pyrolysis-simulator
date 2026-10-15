@@ -21,6 +21,7 @@ from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     RedoxState,
+    _non_absolute_redox_state_kwargs,
     _kress91_gate_key_referenced_log_fO2,
     kress91_temperature_band_case,
     normalize_redox_state,
@@ -29,6 +30,7 @@ from simulator.melt_backend.base import MeltCompositionError
 from simulator.melt_regime import (
     MeltRegime,
     legacy_raw_liquid_fraction_is_zero,
+    liquid_fraction_invalidity,
     melt_regime,
 )
 from simulator.state import (
@@ -424,6 +426,18 @@ _FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
     'MnO',
     'P2O5',
 ))
+
+
+def _freeze_gate_notice_value(value: Any) -> float | str | None:
+    if value is None:
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return str(value)
+    return number if math.isfinite(number) else str(value)
+
+
 # Lower authority when a projected bulk has no usable solidus/liquidus.
 # The projection is not this source: the calibration floor is.
 _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE = (
@@ -1826,6 +1840,7 @@ class EvaporationMixin:
         source: str,
         reasons: list[str],
         path: tuple = (),
+        repair_notices: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any] | None:
         """Use the projected bulk's liquidus only when its bounds are usable.
 
@@ -1857,6 +1872,7 @@ class EvaporationMixin:
                     diagnostic.get('liquidus_T_C')
                 ),
                 source=projected_source,
+                repair_notices=repair_notices,
             )
         if curve is None:
             curve = self._freeze_gate_curve_from_bounds(
@@ -1875,9 +1891,35 @@ class EvaporationMixin:
                     'projected liquidus'
                 )
             return None
+        if curve.get('source') != source:
+            self._record_freeze_gate_curve_source_repair(
+                repair_notices,
+                failed_source=source,
+                replacement_source=str(curve.get('source') or ''),
+            )
         curve = dict(curve)
         curve['composition_projected_notice'] = notice
         return curve
+
+    def _record_freeze_gate_curve_source_repair(
+        self,
+        repair_notices: list[dict[str, Any]] | None,
+        *,
+        failed_source: str,
+        replacement_source: str,
+    ) -> None:
+        from simulator.reduced_real_determinism import record_repair_notice
+
+        notice = {
+            'type': 'typed_notice',
+            'kind': 'freeze_gate_curve_source_replaced',
+            'site': 'SR19',
+            'failed_source': str(failed_source),
+            'replacement_source': str(replacement_source),
+        }
+        record_repair_notice(self, notice)
+        if repair_notices is not None and notice not in repair_notices:
+            repair_notices.append(notice)
 
     def _stash_invalid_projected_liquidus_notice(
         self,
@@ -2015,44 +2057,101 @@ class EvaporationMixin:
             },
         )
 
-    def _freeze_gate_curve(self) -> dict[str, Any]:
+    def _freeze_gate_curve(
+        self,
+        *,
+        redox_state: RedoxState | None = None,
+    ) -> dict[str, Any]:
+        if redox_state is None:
+            return self._freeze_gate_curve_record()['curve']
+        return self._freeze_gate_curve_record(redox_state=redox_state)['curve']
+
+    def _freeze_gate_curve_record(
+        self,
+        *,
+        redox_state: RedoxState | None = None,
+    ) -> dict[str, Any]:
+        from simulator.reduced_real_determinism import (
+            gate_curve_memo_record,
+            _is_cacheable_gate_curve,
+            record_repair_notice,
+            uncacheable_replay_disposition,
+        )
+
+        self._reduced_real_uncacheable_reasons = []
+        self._last_reduced_real_replay_notices = None
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
         fO2_log = self._freeze_gate_liquidus_fO2_log(
             float(self._current_melt_redox_fO2_log())
         )
-        redox_state = RedoxState.absolute(fO2_log)
+        fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
+        redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
         key = self._freeze_gate_cache_key(
             pressure_bar=pressure_bar,
             fO2_log=redox_key_fO2_log,
+            **redox_state_kwargs,
         )
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
-        from simulator.engine_binding_admission import gate_curve_memo_eligibility
+        from simulator.engine_binding_admission import (
+            gate_curve_memo_origin_matches,
+        )
 
         if store is not None and getattr(store, 'replay_enabled', False):
-            curve = store.replay_gate_curve(self, fO2_log=fO2_log)
+            curve = store.replay_gate_curve(
+                self,
+                fO2_log=fO2_log,
+                **redox_state_kwargs,
+            )
             self._record_composition_projected_liquidus_notice_from_curve(curve)
-            return curve
+            replay_notices = getattr(
+                self, '_last_reduced_real_replay_notices', None
+            )
+            return gate_curve_memo_record(
+                curve,
+                None,
+                replay_notices if isinstance(replay_notices, list) else (),
+                'replay',
+            )
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
+        cached_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
         if (
             cache
             and cache.get('key') == key
+            and cache.get('disposition') in {'live', 'memo-hit'}
             and isinstance(cached_curve, Mapping)
-            and gate_curve_memo_eligibility(self, cached_curve)
+            and _is_cacheable_gate_curve(cached_curve)
+            and isinstance(cached_notices, list)
+            and gate_curve_memo_origin_matches(
+                self,
+                cached_curve,
+                cache.get('origin'),
+                fresh_evidence=True,
+                **redox_state_kwargs,
+            )
         ):
             curve = dict(cached_curve)
+            for notice in cached_notices:
+                record_repair_notice(self, notice)
             self._record_composition_projected_liquidus_notice_from_curve(curve)
             if store is not None and getattr(store, 'capture_enabled', False):
                 store.capture_gate_curve(
                     self,
                     fO2_log=fO2_log,
                     curve=curve,
+                    repair_notices=cached_notices,
+                    **redox_state_kwargs,
                 )
-            return curve
+            return gate_curve_memo_record(
+                curve,
+                cache.get('origin'),
+                cached_notices,
+                'memo-hit',
+            )
 
         # Opt-in caller-owned memo for workflows that build fresh simulator
         # instances for equivalent rows. Reuse is based on the quantized
@@ -2064,23 +2163,51 @@ class EvaporationMixin:
         )
         if isinstance(shared_curve_cache, dict):
             process_cached = shared_curve_cache.get(key)
+            if isinstance(process_cached, Mapping):
+                shared_value = process_cached.get('curve')
+                shared_origin = process_cached.get('origin')
+                shared_notices = process_cached.get('repair_notices')
+            else:
+                shared_value = {}
+                shared_origin = None
+                shared_notices = None
             if (
                 isinstance(process_cached, Mapping)
-                and gate_curve_memo_eligibility(self, process_cached)
+                and process_cached.get('disposition') in {'live', 'memo-hit'}
+                and isinstance(shared_value, Mapping)
+                and _is_cacheable_gate_curve(shared_value)
+                and isinstance(shared_notices, list)
+                and gate_curve_memo_origin_matches(
+                    self,
+                    shared_value,
+                    shared_origin,
+                    fresh_evidence=True,
+                    **redox_state_kwargs,
+                )
             ):
-                curve = dict(process_cached)
+                curve = shared_value
+                for notice in shared_notices:
+                    record_repair_notice(self, notice)
                 self._record_composition_projected_liquidus_notice_from_curve(curve)
+                record = gate_curve_memo_record(
+                    curve,
+                    shared_origin,
+                    shared_notices,
+                    'memo-hit',
+                )
                 self._freeze_gate_liquid_fraction_cache = {
+                    **record,
                     'key': key,
-                    'curve': dict(curve),
                 }
                 if store is not None and getattr(store, 'capture_enabled', False):
                     store.capture_gate_curve(
                         self,
                         fO2_log=fO2_log,
                         curve=curve,
+                        repair_notices=shared_notices,
+                        **redox_state_kwargs,
                     )
-                return curve
+                return record
 
         previous_in_progress = bool(
             getattr(self, '_freeze_gate_curve_in_progress', False)
@@ -2102,22 +2229,40 @@ class EvaporationMixin:
         self._invalid_projected_liquidus_notice = None
         try:
             reasons: list[str] = []
+            repair_notices: list[dict[str, Any]] = []
+            failed_curve_source: str | None = None
             curve = self._freeze_gate_curve_from_gate_dispatch(
                 reasons,
                 fO2_log=fO2_log,
+                repair_notices=repair_notices,
                 redox_state=redox_state,
             )
             if curve is None:
+                if not uncacheable_replay_disposition(self):
+                    failed_curve_source = 'gate_liquid_fraction'
+                backend_finder = getattr(
+                    self.backend,
+                    'find_liquidus_solidus',
+                    None,
+                )
                 curve = self._freeze_gate_curve_from_backend_liquidus(
                     reasons,
                     pressure_bar=pressure_bar,
                     fO2_log=fO2_log,
+                    repair_notices=repair_notices,
                     redox_state=redox_state,
                 )
+                if (
+                    curve is None
+                    and callable(backend_finder)
+                    and not uncacheable_replay_disposition(self)
+                ):
+                    failed_curve_source = 'liquidus_solidus:backend'
             if curve is None:
                 curve = self._freeze_gate_curve_from_kernel_liquidus(
                     reasons,
                     fO2_log=fO2_log,
+                    repair_notices=repair_notices,
                     redox_state=redox_state,
                 )
             # Invalid projected bounds are not a liquidus. A later ladder
@@ -2187,17 +2332,46 @@ class EvaporationMixin:
                     f'{detail}'
                 )
 
+            if (
+                failed_curve_source is not None
+                and not uncacheable_replay_disposition(self)
+            ):
+                self._record_freeze_gate_curve_source_repair(
+                    repair_notices,
+                    failed_source=failed_curve_source,
+                    replacement_source=str(curve.get('source') or ''),
+                )
+
             self._record_composition_projected_liquidus_notice_from_curve(curve)
-            cache_eligible = gate_curve_memo_eligibility(self, curve)
+            sticky = uncacheable_replay_disposition(self)
+            cache_eligible = not sticky and _is_cacheable_gate_curve(curve)
+            from simulator.engine_binding_admission import (
+                gate_curve_memo_evidence,
+                write_gate_curve_memo_record,
+            )
+
+            evidence = gate_curve_memo_evidence(
+                self,
+                curve,
+                include_selected_bindings=cache_eligible,
+            )
+            record = write_gate_curve_memo_record(
+                self,
+                curve,
+                repair_notices,
+                evidence=evidence,
+                **redox_state_kwargs,
+            )
+            origin = record['origin']
             if cache_eligible:
                 self._freeze_gate_liquid_fraction_cache = {
+                    **record,
                     'key': key,
-                    'curve': dict(curve),
                 }
                 if isinstance(shared_curve_cache, dict):
                     # Store a copy so later sim mutations of their local cache
                     # cannot corrupt the caller-owned memo used by sibling rows.
-                    shared_curve_cache[key] = dict(curve)
+                    shared_curve_cache[key] = record
                 cache_committed = True
             self._freeze_gate_cache_rebuild_count = (
                 int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
@@ -2211,13 +2385,19 @@ class EvaporationMixin:
             ):
                 self._freeze_gate_liquid_fraction_cache = previous_cache
             self._freeze_gate_curve_in_progress = previous_in_progress
-        if store is not None and getattr(store, 'capture_enabled', False):
+        if (
+            store is not None
+            and getattr(store, 'capture_enabled', False)
+            and not uncacheable_replay_disposition(self)
+        ):
             store.capture_gate_curve(
                 self,
                 fO2_log=fO2_log,
                 curve=curve,
+                repair_notices=repair_notices,
+                **redox_state_kwargs,
             )
-        return curve
+        return record
 
     @staticmethod
     def _freeze_gate_liquidus_fO2_log(fO2_log: float) -> float:
@@ -2260,6 +2440,7 @@ class EvaporationMixin:
         *,
         pressure_bar: float,
         fO2_log: float,
+        redox_state: RedoxState | None = None,
     ) -> tuple:
         cleaned_mol = self.atom_ledger.project_account_mol(
             _FREEZE_GATE_ACCOUNT
@@ -2307,20 +2488,31 @@ class EvaporationMixin:
         # components are omitted before this arithmetic. No physical-
         # equivalence error bound for these pressure/fO2 quanta is established
         # here.
-        return (
+        key = (
             'oxide_mol_fraction_p_fO2_v3',
             round(pressure_bucket, 6),
             round(fO2_bucket, 6),
             tuple(sorted(composition_key)),
         )
+        redox_identity = (
+            None if redox_state is None else redox_state.cache_identity()
+        )
+        if redox_identity is None:
+            return key
+        return (*key, tuple(sorted(redox_identity.items())))
 
     def _freeze_gate_curve_from_gate_dispatch(
         self,
         reasons: list[str],
         *,
         fO2_log: float,
+        repair_notices: list[dict[str, Any]] | None = None,
         redox_state: RedoxState | None = None,
     ) -> dict[str, Any] | None:
+        from simulator.reduced_real_determinism import (
+            mark_uncacheable_replay_disposition,
+        )
+
         fO2_log, redox_state = normalize_redox_state(
             fO2_log,
             redox_state,
@@ -2334,6 +2526,10 @@ class EvaporationMixin:
             try:
                 register_gate_providers()
             except Exception as exc:  # noqa: BLE001 - optional provider boundary
+                mark_uncacheable_replay_disposition(
+                    self,
+                    f'gate provider registration failed: {type(exc).__name__}',
+                )
                 reasons.append(f'gate provider registration failed: {exc}')
         try:
             result = self._dispatch_only(
@@ -2344,6 +2540,10 @@ class EvaporationMixin:
                 fe_redox_policy='intrinsic',
             )
         except ProviderUnavailableError as exc:
+            mark_uncacheable_replay_disposition(
+                self,
+                f'gate liquid fraction provider unavailable: {type(exc).__name__}',
+            )
             reasons.append(f'gate liquid fraction unavailable: {exc}')
             return None
 
@@ -2363,6 +2563,7 @@ class EvaporationMixin:
                 diagnostic,
                 source=source,
                 reasons=reasons,
+                repair_notices=repair_notices,
             )
             if projected is not None:
                 return projected
@@ -2385,6 +2586,7 @@ class EvaporationMixin:
                 solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
                 liquidus_T_C=self._optional_float(diagnostic.get('liquidus_T_C')),
                 source=source,
+                repair_notices=repair_notices,
             )
             if curve is not None:
                 return curve
@@ -2402,8 +2604,13 @@ class EvaporationMixin:
         *,
         pressure_bar: float,
         fO2_log: float,
+        repair_notices: list[dict[str, Any]] | None = None,
         redox_state: RedoxState | None = None,
     ) -> dict[str, Any] | None:
+        from simulator.reduced_real_determinism import (
+            mark_uncacheable_replay_disposition,
+        )
+
         fO2_log, redox_state = normalize_redox_state(
             fO2_log,
             redox_state,
@@ -2430,12 +2637,17 @@ class EvaporationMixin:
         except MeltCompositionError:
             raise
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            mark_uncacheable_replay_disposition(
+                self,
+                f'backend liquidus finder failed: {type(exc).__name__}',
+            )
             reasons.append(f'backend liquidus finder failed: {exc}')
             return None
         return self._freeze_gate_curve_from_liquidus_result(
             result,
             source='liquidus_solidus:backend',
             reasons=reasons,
+            repair_notices=repair_notices,
         )
 
     def _freeze_gate_curve_from_kernel_liquidus(
@@ -2448,7 +2660,12 @@ class EvaporationMixin:
         pressure_bar: float | None = None,
         composition_mol_by_account: Mapping[str, Mapping[str, float]] | None = None,
         allow_parametric: bool = False,
+        repair_notices: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any] | None:
+        from simulator.reduced_real_determinism import (
+            mark_uncacheable_replay_disposition,
+        )
+
         fO2_log, redox_state = normalize_redox_state(
             fO2_log,
             redox_state,
@@ -2485,6 +2702,10 @@ class EvaporationMixin:
                     fe_redox_policy='intrinsic',
                 )
         except ProviderUnavailableError as exc:
+            mark_uncacheable_replay_disposition(
+                self,
+                f'kernel liquidus provider unavailable: {type(exc).__name__}',
+            )
             reasons.append(f'kernel liquidus unavailable: {exc}')
             if allow_parametric:
                 return self._freeze_gate_curve_from_parametric_liquidus(reasons)
@@ -2542,6 +2763,7 @@ class EvaporationMixin:
         *,
         source: str,
         reasons: list[str],
+        repair_notices: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any] | None:
         status = str(getattr(result, 'status', 'unavailable'))
         if status != 'ok':
@@ -2579,6 +2801,7 @@ class EvaporationMixin:
                 source=source,
                 reasons=reasons,
                 path=tuple(sample_points),
+                repair_notices=repair_notices,
             )
             if projected is not None:
                 return projected
@@ -2611,6 +2834,7 @@ class EvaporationMixin:
                 solidus_T_C=solidus_T_C,
                 liquidus_T_C=liquidus_T_C,
                 source=source,
+                repair_notices=repair_notices,
             )
             if curve is not None:
                 return curve
@@ -2653,19 +2877,45 @@ class EvaporationMixin:
         solidus_T_C: float | None,
         liquidus_T_C: float | None,
         source: str,
+        repair_notices: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any] | None:
+        from simulator.reduced_real_determinism import record_repair_notice
+
         points: list[tuple[float, float]] = []
         for point in path:
             if isinstance(point, Mapping):
-                temperature_C = point.get('temperature_C', point.get('T_C'))
-                liquid_fraction = point.get('liquid_fraction')
+                raw_temperature_C = point.get('temperature_C', point.get('T_C'))
+                raw_liquid_fraction = point.get('liquid_fraction')
             else:
-                temperature_C = getattr(point, 'temperature_C', None)
-                liquid_fraction = getattr(point, 'liquid_fraction', None)
-            temperature_C = self._optional_float(temperature_C)
-            liquid_fraction = self._optional_float(liquid_fraction)
+                raw_temperature_C = getattr(point, 'temperature_C', None)
+                raw_liquid_fraction = getattr(point, 'liquid_fraction', None)
+            temperature_C = self._optional_float(raw_temperature_C)
+            liquid_fraction = self._optional_float(raw_liquid_fraction)
             if temperature_C is None or liquid_fraction is None:
+                notice = {
+                    'type': 'typed_notice',
+                    'kind': 'freeze_gate_curve_point_repaired',
+                    'site': 'SR18',
+                    'temperature_C': _freeze_gate_notice_value(raw_temperature_C),
+                    'raw_fraction': _freeze_gate_notice_value(raw_liquid_fraction),
+                    'action': 'drop_point',
+                }
+                record_repair_notice(self, notice)
+                if repair_notices is not None and notice not in repair_notices:
+                    repair_notices.append(notice)
                 continue
+            if liquid_fraction_invalidity(liquid_fraction) == 'out_of_range':
+                notice = {
+                    'type': 'typed_notice',
+                    'kind': 'freeze_gate_curve_point_repaired',
+                    'site': 'SR18',
+                    'temperature_C': temperature_C,
+                    'raw_fraction': liquid_fraction,
+                    'action': 'clamp_fraction',
+                }
+                record_repair_notice(self, notice)
+                if repair_notices is not None and notice not in repair_notices:
+                    repair_notices.append(notice)
             points.append(
                 (temperature_C, max(0.0, min(1.0, liquid_fraction)))
             )

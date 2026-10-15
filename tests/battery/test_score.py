@@ -5147,6 +5147,105 @@ def test_hashimoto_worker_infrastructure_failures_are_not_cohort_cached(
     assert prediction.refusal_detail["reason"] == reason
 
 
+@pytest.mark.parametrize(
+    ("failure_kind", "expected_reason", "expected_state", "expected_refusal"),
+    (
+        (
+            "timeout",
+            "engine_timeout:openimcc:hashimoto_residue_cohort",
+            "attempted_unavailable",
+            "attempted_unavailable",
+        ),
+        (
+            "transport",
+            "engine_transport_error:openimcc",
+            "attempted_unavailable",
+            "attempted_unavailable",
+        ),
+        (
+            "nonconvergence",
+            "engine_nonconvergence",
+            "not_probed",
+            "unsupported",
+        ),
+    ),
+)
+def test_hashimoto_integrator_preserves_failure_reason_for_scorer(
+    monkeypatch: pytest.MonkeyPatch,
+    failure_kind: str,
+    expected_reason: str,
+    expected_state: str,
+    expected_refusal: str,
+) -> None:
+    pytest.importorskip("openimcc")
+    from simulator.battery import residue, score
+    from simulator.battery.enums import Engine, Quantity
+    from simulator.battery.score import load_score_context, quantity_token
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+    context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    reference = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-015-hashimoto-1983"
+        and "::hashimoto_1983_table3_residue_composition_series::"
+        in row.observation_id
+        and quantity_token(row.identity)
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+
+    def fail_engine(*_args, **_kwargs):
+        if failure_kind == "timeout":
+            raise TimeoutError("forced Hashimoto call deadline")
+        raise residue.ResidueEngineTransportError("forced worker transport failure")
+
+    integration_calls = 0
+
+    def fail_inventory(
+        inventory,
+        _channels,
+        pressure_model,
+        **_kwargs,
+    ):
+        if failure_kind == "nonconvergence":
+            raise residue.ResidueEngineNonconvergence(
+                "openimcc", "forced solver nonconvergence"
+            )
+        pressure_model(inventory, -9.0)
+        raise AssertionError("injected engine failure unexpectedly returned")
+
+    original_integrate_geometry = residue._hashimoto_integrate_geometry
+
+    def track_integrate_geometry(*args, **kwargs):
+        nonlocal integration_calls
+        integration_calls += 1
+        return original_integrate_geometry(*args, **kwargs)
+
+    monkeypatch.setattr(residue, "_evaluate_openimcc_isolated", fail_engine)
+    monkeypatch.setattr(residue, "integrate_residue_inventory", fail_inventory)
+    monkeypatch.setattr(
+        residue, "_hashimoto_integrate_geometry", track_integrate_geometry
+    )
+    cache = {}
+    prediction = score._hashimoto_residue_prediction(
+        context, reference, Engine.OPENIMCC, cache
+    )
+
+    assert integration_calls > 0
+    assert prediction.value is None
+    assert prediction.refusal_detail["reason"] == expected_reason
+    assert prediction.execution.state.value == expected_state
+    assert prediction.refusal_reason.value == expected_refusal
+    if failure_kind in {"timeout", "transport"}:
+        assert ("kems-015-hashimoto-1983", Engine.OPENIMCC) in cache
+        assert "__cohort_error__" not in cache[
+            ("kems-015-hashimoto-1983", Engine.OPENIMCC)
+        ]
+
+
 def test_residue_area_is_not_identity_but_per_area_rate_still_requires_it() -> None:
     context = load_score_context(sources=("kems-015-hashimoto-1983",))
     residue_identity = next(
@@ -9516,7 +9615,17 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             if row.reference in stolyarova_1996_derived_pressures
             and row.key.rsplit("::", 1)[-1] == engine.value
         )
-        assert len(stolyarova_rows) == 235
+        unavailable_stolyarova_refs = {
+            obs.observation_id
+            for obs in score_module._refusal_diagnostic_references(filtered)
+            if obs.source_id
+            in {"kems-053-stolyarova-1991", "stolyarova-1995-cao-alumina-kems"}
+            and obs.value.kind is ValueKind.UNAVAILABLE
+        }
+        assert unavailable_stolyarova_refs <= {
+            row.reference for row in stolyarova_rows
+        }
+        assert len(stolyarova_rows) == 235 + len(unavailable_stolyarova_refs)
         activity_rows = [
             row for row in stolyarova_rows if row.reference in stolyarova_activities
         ]
@@ -10303,22 +10412,63 @@ def test_score_store_refuses_synthetic_unknown_reference_activity_point() -> Non
     assert residual.refusal.detail["fields"] == ["reference_state"]
 
 
-def test_score_store_refuses_categorical_stolyarova_figure_only_row() -> None:
+def _migrated_extract_context(*extract_names: str) -> ScoreContext:
+    from simulator.battery.migrate import Migrator
+
+    root = Path(__file__).resolve().parents[2]
+    migrator = Migrator(root)
+    for extract_name in extract_names:
+        migrator._migrate_extract(root / "data/literature/extracts" / extract_name)
+    return ScoreContext(
+        works=migrator.result.works,
+        experiments=migrator.result.experiments,
+        observations=migrator.result.observations,
+        benches=migrator.result.benches,
+        root=root,
+    )
+
+
+def test_score_store_refuses_unavailable_stolyarova_figure_only_rows() -> None:
     source_id = "stolyarova-1996-cao-alumina-silica-kems"
-    context = load_score_context(sources=(source_id,))
-    figure_row = next(
+    context = _migrated_extract_context(f"{source_id}.yaml")
+    figure_row_keys = {
+        "stolyarova_1996_fig1_al2o3_activity_figure_only",
+        "stolyarova_1996_fig1_cao_activity_figure_only",
+        "stolyarova_1996_fig1_sio2_activity_figure_only",
+        "stolyarova_1996_fig2_al2o3_activity_figure_only",
+        "stolyarova_1996_fig2_cao_activity_figure_only",
+        "stolyarova_1996_fig2_sio2_activity_figure_only",
+    }
+    figure_rows = tuple(
         obs
         for obs in context.observations.values()
-        if obs.source_id == source_id and obs.value.kind is ValueKind.CATEGORICAL
+        if obs.source_id == source_id
+        and obs.observation_id.partition("::")[2] in figure_row_keys
+    )
+    assert {
+        obs.observation_id.partition("::")[2] for obs in figure_rows
+    } == figure_row_keys
+    assert all(
+        obs.locator.figure in {"1", "2"} for obs in figure_rows
+    )
+    assert all(
+        obs.evidence.class_.value is EvidenceClass.FIGURE_ONLY for obs in figure_rows
+    )
+    assert all(
+        obs.admission.status is AdmissionStatus.REJECTED for obs in figure_rows
+    )
+    assert all(obs.value.kind is ValueKind.UNAVAILABLE for obs in figure_rows)
+    assert all(
+        obs.value.unavailable_reason == "figure_not_digitized" for obs in figure_rows
     )
     figure_context = replace(
         context,
-        observations={figure_row.observation_id: figure_row},
+        observations={obs.observation_id: obs for obs in figure_rows},
         origins={
-            figure_row.observation_id: context.origins[figure_row.observation_id]
-        }
-        if figure_row.observation_id in context.origins
-        else {},
+            obs.observation_id: context.origins[obs.observation_id]
+            for obs in figure_rows
+            if obs.observation_id in context.origins
+        },
     )
     residuals, _ = score_store(
         figure_context,
@@ -10326,12 +10476,84 @@ def test_score_store_refuses_categorical_stolyarova_figure_only_row() -> None:
         include_diagnostics=True,
     )
 
-    assert len(residuals) == 1
-    refusal = residuals[0].refusal
-    assert refusal is not None
-    assert refusal.reason is RefusalReason.IDENTITY_UNKNOWN
-    assert "figure_only" in refusal.detail["quantity_reason"]
-    assert refusal.detail["value_kind"] == ValueKind.CATEGORICAL.value
+    assert {residual.reference for residual in residuals} == {
+        obs.observation_id for obs in figure_rows
+    }
+    for residual in residuals:
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.score_eligible is False
+        refusal = residual.refusal
+        assert refusal is not None
+        assert refusal.reason is RefusalReason.METRIC_DOMAIN
+        assert refusal.detail == {
+            "reason": "figure_not_digitized",
+            "value_kind": ValueKind.UNAVAILABLE.value,
+        }
+
+
+def test_score_store_refuses_rejected_unavailable_stolyarova_rows_by_state() -> None:
+    from simulator.battery.score import comparison_candidates, rail_for_quantity
+
+    context = _migrated_extract_context(
+        "kems-053-stolyarova-1991.yaml",
+        "stolyarova-1995-cao-alumina-kems.yaml",
+    )
+
+    root = context.root
+    expected_row_keys = {
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=cd704583d7d4",
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=a5d8822cf03d",
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=cc225cf7fcf4",
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=90a9faf3168d",
+        "stolyarova_1991_gibbs_integral_energy_fig3::points:h=3f4c707e2ac9",
+        "stolyarova_1995_cao_activity_fig1_figure_only",
+        "stolyarova_1995_alumina_activity_fig1_figure_only",
+    }
+    observations = {
+        observation.observation_id: observation
+        for observation in context.observations.values()
+        if observation.observation_id.partition("::")[2] in expected_row_keys
+    }
+    assert {key.partition("::")[2] for key in observations} == expected_row_keys
+    context = replace(context, observations=observations)
+    assert not {
+        observation.observation_id
+        for observation in comparison_candidates(context)
+    } & observations.keys()
+
+    def prediction_must_not_run(*_args, **_kwargs):
+        pytest.fail("unavailable observations must refuse before prediction")
+
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=prediction_must_not_run,
+    )
+    assert {residual.reference for residual in residuals} == observations.keys()
+    for residual in residuals:
+        observation = observations[residual.reference]
+        expected_rail = (
+            Rail.MELT_ACTIVITY
+            if observation.source_id == "stolyarova-1995-cao-alumina-kems"
+            else Rail.THERMOCHEMISTRY
+        )
+        assert observation.admission.status is AdmissionStatus.REJECTED
+        assert observation.value.kind is ValueKind.UNAVAILABLE
+        assert rail_for_quantity(
+            quantity_token(observation.identity),
+            species_formula=observation.identity.species.formula,
+        ) is expected_rail
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.score_eligible is False
+        assert residual.rail is expected_rail
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
+        assert residual.refusal.detail == {
+            "reason": observation.value.unavailable_reason,
+            "value_kind": ValueKind.UNAVAILABLE.value,
+        }
 
 
 def test_score_store_records_each_in_scope_observation_in_small_fixture() -> None:

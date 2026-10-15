@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from simulator.fe_redox import _non_absolute_redox_state_kwargs
 from simulator.state_types import State
 
 
@@ -80,6 +81,16 @@ class EngineBindingAdmissionError(RuntimeError):
         super().__init__(
             f"engine binding {identity.producer_transport} is not admitted: {reason}"
         )
+
+
+@dataclass(frozen=True)
+class GateCurveEvidence:
+    """Primary producer evidence plus the unchanged public eligibility result."""
+
+    producer_evidence: str
+    eligible: bool
+    identity: BindingIdentity | None = None
+    provenance: Mapping[str, Any] | None = None
 
 
 _SELECTED_PRODUCER_IDENTITIES = {
@@ -196,10 +207,23 @@ def binding_identity_for_backend(backend: Any) -> BindingIdentity | None:
     return None
 
 
+def _magemin_version_owner(backend: Any) -> Any:
+    if callable(getattr(backend, "get_engine_version", None)):
+        return backend
+    live_backend = getattr(backend, "_backend", None)
+    if callable(getattr(live_backend, "get_engine_version", None)):
+        return live_backend
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    return MAGEMinBackend()
+
+
 def current_backend_provenance(
     identity: BindingIdentity,
     backend: Any,
 ) -> dict[str, Any]:
+    if identity.engine_id == "magemin":
+        backend = _magemin_version_owner(backend)
     provenance = install_provenance(identity, runtime_backend=backend)
     getter = getattr(backend, "get_engine_version", None)
     provenance["runtime_version"] = version_getter_provenance(getter)
@@ -260,10 +284,7 @@ def current_cached_real_provenance(
             else None
         )
         live_backend = getattr(provider, "_backend", None)
-        provenance = install_provenance(identity, runtime_backend=live_backend)
-        getter = getattr(live_backend, "get_engine_version", None)
-        provenance["runtime_version"] = version_getter_provenance(getter)
-        return provenance
+        return current_backend_provenance(identity, live_backend)
     if config is None:
         raise ValueError("cached-real binding configuration is unavailable")
     actual_identity = binding_identity_for_cached_real(config)
@@ -366,21 +387,6 @@ def _live_selected_binding_eligibility(
     return eligible
 
 
-def _live_with_selected_bindings(
-    sim: Any,
-    primary_eligible: bool,
-    *,
-    artifact: str,
-    provider_role: str | None,
-) -> bool:
-    selected_eligible = _live_selected_binding_eligibility(
-        sim,
-        artifact=artifact,
-        provider_role=provider_role,
-    )
-    return primary_eligible and selected_eligible
-
-
 def _authorize_selected_bindings(
     sim: Any,
     *,
@@ -410,139 +416,193 @@ def _authorize_selected_bindings(
         authorize_binding(identity, provenance)
 
 
-def cached_real_live_cache_eligibility(
+def _gate_curve_evidence(
+    sim: Any,
+    identity: BindingIdentity,
+    provenance: Mapping[str, Any],
+    *,
+    eligible: bool,
+) -> GateCurveEvidence:
+    if _selected_producer_digest(identity, provenance) is None:
+        return GateCurveEvidence(
+            "evidence-unavailable",
+            eligible,
+            identity,
+            provenance,
+        )
+    return GateCurveEvidence(
+        admission_fingerprint(identity, provenance),
+        eligible,
+        identity,
+        provenance,
+    )
+
+
+def _unresolved_gate_curve_evidence(
+    sim: Any,
+    provider_role: str | None,
+    *,
+    eligible: bool,
+) -> GateCurveEvidence:
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+    from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.reduced_real_determinism import (
+        _resolved_backend_for_cache_identity,
+    )
+
+    state = (
+        "no-external-install"
+        if isinstance(
+            _resolved_backend_for_cache_identity(
+                sim, ChemistryIntent.GATE_LIQUID_FRACTION, provider_role
+            ),
+            InternalAnalyticalBackend,
+        )
+        else "unproven"
+    )
+    return GateCurveEvidence(state, eligible)
+
+
+def _live_binding_cache_evidence(
     sim: Any,
     *,
-    provider_role: str | None = None,
-    artifact: str = "equilibrium_post_record",
-) -> bool:
+    provider_role: str | None,
+    artifact: str,
+    include_selected_bindings: bool,
+    cached_real: bool = False,
+) -> GateCurveEvidence:
     backend = getattr(sim, "backend", None)
-    config = getattr(backend, "config", None)
-    if config is None:
-        return _live_selected_binding_eligibility(
-            sim,
-            artifact=artifact,
-            provider_role=provider_role,
-        )
-    identity = (
-        binding_identity_for_gate_fallback()
-        if provider_role == "fallback"
-        else binding_identity_for_cached_real(config)
-    )
-    try:
-        provenance = current_cached_real_provenance(sim, identity)
-    except Exception:  # noqa: BLE001 - live compute stays fail-open
-        _record_live_cache_refusal(
-            sim,
-            identity,
-            "install provenance unverifiable",
-        )
-        _live_selected_binding_eligibility(
-            sim,
-            artifact=artifact,
-            provider_role=provider_role,
-        )
-        return False
-    published = getattr(backend, "_admitted_bindings", {}).get(
-        identity.producer_transport
-    )
-    if provider_role == "fallback":
-        from simulator.chemistry.kernel import ChemistryIntent
 
-        registry = getattr(sim, "_chem_registry", None)
-        provider = (
-            registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
-            if registry is not None
-            else None
-        )
-        provider_backend = getattr(provider, "_backend", None)
-        initialized = bool(getattr(provider, "_backend_initialised", False))
-        checker = getattr(provider_backend, "is_available", None)
-        initialized = initialized and callable(checker) and bool(checker())
-        if published is None and initialized:
-            published = admission_fingerprint(identity, provenance)
-            backend._admitted_bindings[identity.producer_transport] = published
-        if not initialized:
-            try:
-                authorize_binding(identity, provenance)
-            except EngineBindingAdmissionError:
-                eligible = live_cache_eligibility(
-                    sim,
-                    identity,
-                    provenance,
-                )
-                return _live_with_selected_bindings(
-                    sim,
-                    eligible,
-                    artifact=artifact,
-                    provider_role=provider_role,
-                )
-            return _live_with_selected_bindings(
+    def selected_bindings_eligible() -> bool:
+        return (
+            _live_selected_binding_eligibility(
                 sim,
-                False,
                 artifact=artifact,
                 provider_role=provider_role,
             )
-    eligible = live_cache_eligibility(
-        sim,
-        identity,
-        provenance,
-        published_fingerprint=published,
-        require_published_fingerprint=True,
-    )
-    return _live_with_selected_bindings(
-        sim,
-        eligible,
-        artifact=artifact,
-        provider_role=provider_role,
-    )
+            if include_selected_bindings
+            else True
+        )
 
-
-def live_binding_cache_eligibility(
-    sim: Any,
-    *,
-    provider_role: str | None = None,
-    artifact: str = "equilibrium_post_record",
-) -> bool:
-    backend = getattr(sim, "backend", None)
-    if getattr(backend, "config", None) is not None and hasattr(
-        backend,
-        "_admitted_bindings",
+    if cached_real or (
+        getattr(backend, "config", None) is not None
+        and hasattr(backend, "_admitted_bindings")
     ):
-        return cached_real_live_cache_eligibility(
+        config = getattr(backend, "config", None)
+        if config is None:
+            eligible = selected_bindings_eligible()
+            return _unresolved_gate_curve_evidence(
+                sim, provider_role, eligible=eligible
+            )
+        identity = (
+            binding_identity_for_gate_fallback()
+            if provider_role == "fallback"
+            else binding_identity_for_cached_real(config)
+        )
+        try:
+            provenance = current_cached_real_provenance(sim, identity)
+        except Exception:  # noqa: BLE001 - live compute stays fail-open
+            _record_live_cache_refusal(
+                sim,
+                identity,
+                "install provenance unverifiable",
+            )
+            selected_bindings_eligible()
+            return GateCurveEvidence(
+                "evidence-unavailable",
+                False,
+                identity,
+            )
+        primary_eligible = False
+        if include_selected_bindings:
+            published = getattr(backend, "_admitted_bindings", {}).get(
+                identity.producer_transport
+            )
+            if provider_role == "fallback":
+                from simulator.chemistry.kernel import ChemistryIntent
+
+                registry = getattr(sim, "_chem_registry", None)
+                provider = (
+                    registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+                    if registry is not None
+                    else None
+                )
+                provider_backend = getattr(provider, "_backend", None)
+                initialized = bool(
+                    getattr(provider, "_backend_initialised", False)
+                )
+                checker = getattr(provider_backend, "is_available", None)
+                initialized = (
+                    initialized and callable(checker) and bool(checker())
+                )
+                if published is None and initialized:
+                    published = admission_fingerprint(identity, provenance)
+                    backend._admitted_bindings[identity.producer_transport] = (
+                        published
+                    )
+                if not initialized:
+                    try:
+                        authorize_binding(identity, provenance)
+                    except EngineBindingAdmissionError:
+                        primary_eligible = live_cache_eligibility(
+                            sim, identity, provenance
+                        )
+                    selected = selected_bindings_eligible()
+                    return _gate_curve_evidence(
+                        sim,
+                        identity,
+                        provenance,
+                        eligible=primary_eligible and selected,
+                    )
+            primary_eligible = live_cache_eligibility(
+                sim,
+                identity,
+                provenance,
+                published_fingerprint=published,
+                require_published_fingerprint=True,
+            )
+        selected = selected_bindings_eligible()
+        return _gate_curve_evidence(
             sim,
-            provider_role=provider_role,
-            artifact=artifact,
+            identity,
+            provenance,
+            eligible=primary_eligible and selected,
+        )
+
+    from simulator.chemistry.kernel import ChemistryIntent
+
+    if artifact == "freeze_gate_curve":
+        from simulator.reduced_real_determinism import (
+            _resolved_backend_for_cache_identity,
+        )
+
+        backend = _resolved_backend_for_cache_identity(
+            sim, ChemistryIntent.GATE_LIQUID_FRACTION, provider_role
         )
     if provider_role == "fallback":
-        from simulator.chemistry.kernel import ChemistryIntent
-
         registry = getattr(sim, "_chem_registry", None)
         provider = (
             registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
             if registry is not None
             else None
         )
-        live_backend = getattr(provider, "_backend", None)
+        live_backend = backend
         if provider is None or live_backend is None:
-            return _live_selected_binding_eligibility(
-                sim,
-                artifact=artifact,
-                provider_role=provider_role,
+            eligible = selected_bindings_eligible()
+            return _unresolved_gate_curve_evidence(
+                sim, provider_role, eligible=eligible
             )
         try:
             identity = binding_identity_for_backend(live_backend)
         except Exception:  # noqa: BLE001 - an unknown identity cannot be cached
-            return _live_selected_binding_eligibility(
-                sim,
-                artifact=artifact,
-                provider_role=provider_role,
+            eligible = selected_bindings_eligible()
+            return _unresolved_gate_curve_evidence(
+                sim, provider_role, eligible=eligible
             )
         if identity is None:
-            return _live_selected_binding_eligibility(
-                sim,
-                artifact=artifact,
-                provider_role=provider_role,
+            eligible = selected_bindings_eligible()
+            return _unresolved_gate_curve_evidence(
+                sim, provider_role, eligible=eligible
             )
         try:
             provenance = current_backend_provenance(identity, live_backend)
@@ -552,64 +612,56 @@ def live_binding_cache_eligibility(
                 identity,
                 "install provenance unverifiable",
             )
-            _live_selected_binding_eligibility(
-                sim,
-                artifact=artifact,
-                provider_role=provider_role,
+            selected_bindings_eligible()
+            return GateCurveEvidence(
+                "evidence-unavailable",
+                False,
+                identity,
             )
-            return False
         initialized = bool(getattr(provider, "_backend_initialised", False))
         checker = getattr(live_backend, "is_available", None)
         initialized = initialized and callable(checker) and bool(checker())
-        if not initialized:
+        primary_eligible = False
+        if include_selected_bindings and not initialized:
             try:
                 authorize_binding(identity, provenance)
             except EngineBindingAdmissionError:
-                eligible = live_cache_eligibility(sim, identity, provenance)
-                return _live_with_selected_bindings(
-                    sim,
-                    eligible,
-                    artifact=artifact,
-                    provider_role=provider_role,
+                primary_eligible = live_cache_eligibility(
+                    sim, identity, provenance
                 )
-            return _live_with_selected_bindings(
-                sim,
-                False,
-                artifact=artifact,
-                provider_role=provider_role,
+        elif include_selected_bindings:
+            publish_live_backend_admission(live_backend)
+            published = getattr(
+                live_backend,
+                "_engine_binding_admission_fingerprint",
+                None,
             )
-        publish_live_backend_admission(live_backend)
-        published = getattr(
-            live_backend,
-            "_engine_binding_admission_fingerprint",
-            None,
-        )
-        eligible = live_cache_eligibility(
+            primary_eligible = live_cache_eligibility(
+                sim,
+                identity,
+                provenance,
+                published_fingerprint=published,
+                require_published_fingerprint=True,
+            )
+        selected = selected_bindings_eligible()
+        return _gate_curve_evidence(
             sim,
             identity,
             provenance,
-            published_fingerprint=published,
-            require_published_fingerprint=True,
+            eligible=primary_eligible and selected,
         )
-        return _live_with_selected_bindings(
-            sim,
-            eligible,
-            artifact=artifact,
-            provider_role=provider_role,
-        )
+
     try:
         identity = binding_identity_for_backend(backend)
     except Exception:  # noqa: BLE001 - an unknown identity cannot be cached
-        return _live_selected_binding_eligibility(
-            sim,
-            artifact=artifact,
-            provider_role=provider_role,
+        eligible = selected_bindings_eligible()
+        return _unresolved_gate_curve_evidence(
+            sim, provider_role, eligible=eligible
         )
     if identity is None:
-        return _live_selected_binding_eligibility(
-            sim,
-            artifact=artifact,
-            provider_role=provider_role,
+        eligible = selected_bindings_eligible()
+        return _unresolved_gate_curve_evidence(
+            sim, provider_role, eligible=eligible
         )
     try:
         provenance = current_backend_provenance(identity, backend)
@@ -619,44 +671,260 @@ def live_binding_cache_eligibility(
             identity,
             "install provenance unverifiable",
         )
-        _live_selected_binding_eligibility(
-            sim,
-            artifact=artifact,
-            provider_role=provider_role,
+        selected_bindings_eligible()
+        return GateCurveEvidence(
+            "evidence-unavailable",
+            False,
+            identity,
         )
-        return False
-    eligible = live_cache_eligibility(
+    primary_eligible = (
+        live_cache_eligibility(
+            sim,
+            identity,
+            provenance,
+            published_fingerprint=getattr(
+                backend,
+                "_engine_binding_admission_fingerprint",
+                None,
+            ),
+            require_published_fingerprint=True,
+        )
+        if include_selected_bindings
+        else False
+    )
+    selected = selected_bindings_eligible()
+    return _gate_curve_evidence(
         sim,
         identity,
         provenance,
-        published_fingerprint=getattr(
-            backend,
-            "_engine_binding_admission_fingerprint",
-            None,
-        ),
-        require_published_fingerprint=True,
+        eligible=primary_eligible and selected,
     )
-    return _live_with_selected_bindings(
+
+
+def cached_real_live_cache_eligibility(
+    sim: Any,
+    *,
+    provider_role: str | None = None,
+    artifact: str = "equilibrium_post_record",
+) -> bool:
+    return _live_binding_cache_evidence(
         sim,
-        eligible,
-        artifact=artifact,
         provider_role=provider_role,
+        artifact=artifact,
+        include_selected_bindings=True,
+        cached_real=True,
+    ).eligible
+
+
+def live_binding_cache_eligibility(
+    sim: Any,
+    *,
+    provider_role: str | None = None,
+    artifact: str = "equilibrium_post_record",
+) -> bool:
+    return _live_binding_cache_evidence(
+        sim,
+        provider_role=provider_role,
+        artifact=artifact,
+        include_selected_bindings=True,
+    ).eligible
+
+
+def gate_curve_memo_evidence(
+    sim: Any,
+    curve: Mapping[str, Any],
+    *,
+    include_selected_bindings: bool,
+) -> GateCurveEvidence:
+    from simulator.reduced_real_determinism import _gate_curve_provider_role
+
+    provider_role = _gate_curve_provider_role(curve)
+    return _live_binding_cache_evidence(
+        sim,
+        provider_role=provider_role,
+        artifact="freeze_gate_curve",
+        include_selected_bindings=include_selected_bindings,
     )
+
+
+def write_gate_curve_memo_origin(
+    sim: Any,
+    curve: Mapping[str, Any],
+    evidence: GateCurveEvidence,
+    *,
+    redox_state: Any | None = None,
+) -> dict[str, Any]:
+    import os
+
+    from simulator.reduced_real_determinism import (
+        gate_curve_memo_producer_configuration,
+    )
+
+    redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
+    return {
+        "producer_pid": os.getpid(),
+        "producer_configuration": gate_curve_memo_producer_configuration(
+            sim,
+            curve,
+            **redox_state_kwargs,
+        ),
+        "producer_evidence": evidence.producer_evidence,
+    }
+
+
+def write_gate_curve_memo_record(
+    sim: Any,
+    curve: Mapping[str, Any],
+    repair_notices: Sequence[Mapping[str, Any]] | None = None,
+    *,
+    evidence: GateCurveEvidence | None = None,
+    redox_state: Any | None = None,
+) -> dict[str, Any]:
+    """Write one origin-bearing runtime record for production or a fixture."""
+
+    from simulator.reduced_real_determinism import (
+        _is_cacheable_gate_curve,
+        gate_curve_memo_record,
+        uncacheable_replay_disposition,
+    )
+
+    if evidence is None:
+        evidence = gate_curve_memo_evidence(
+            sim,
+            curve,
+            include_selected_bindings=(
+                _is_cacheable_gate_curve(curve)
+                and not uncacheable_replay_disposition(sim)
+            ),
+        )
+    if evidence.producer_evidence == "unproven":
+        _record_live_cache_refusal(
+            sim,
+            BindingIdentity(
+                "unproven-gate-producer",
+                "unknown",
+                "unproven-r1",
+                "unknown",
+            ),
+            "unproven gate producer; register its adapter; in-process reuse "
+            "of this producer's gate curves is off",
+        )
+    redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
+    origin = write_gate_curve_memo_origin(
+        sim,
+        curve,
+        evidence,
+        **redox_state_kwargs,
+    )
+    return gate_curve_memo_record(
+        curve,
+        origin,
+        repair_notices,
+        "live",
+    )
+
+
+def gate_curve_memo_origin_matches(
+    sim: Any,
+    curve: Mapping[str, Any],
+    origin: Mapping[str, Any] | None,
+    *,
+    fresh_evidence: bool,
+    evidence: GateCurveEvidence | None = None,
+    redox_state: Any | None = None,
+) -> bool:
+    import os
+
+    from simulator.reduced_real_determinism import (
+        _gate_curve_provider_role,
+        gate_curve_memo_producer_configuration,
+    )
+
+    if not isinstance(origin, Mapping):
+        return False
+    producer_pid = origin.get("producer_pid")
+    if (
+        isinstance(producer_pid, bool)
+        or not isinstance(producer_pid, int)
+        or producer_pid != os.getpid()
+    ):
+        return False
+    redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
+    try:
+        configuration = gate_curve_memo_producer_configuration(
+            sim,
+            curve,
+            **redox_state_kwargs,
+        )
+    except Exception:  # noqa: BLE001 - malformed configuration is a miss
+        return False
+
+    def normalize_magemin_default(producer_configuration: Any) -> Any:
+        if not isinstance(producer_configuration, Mapping):
+            return producer_configuration
+        model = producer_configuration.get("model")
+        if (
+            not isinstance(model, Mapping)
+            or model.get("model") != "magemin-shadow"
+            or model.get("magemin_database") is not None
+        ):
+            return producer_configuration
+        from simulator.melt_backend.magemin import MAGEMinBackend
+
+        normalized = dict(producer_configuration)
+        normalized_model = dict(model)
+        normalized_model["magemin_database"] = MAGEMinBackend._DEFAULT_DATABASE
+        normalized["model"] = normalized_model
+        return normalized
+
+    if normalize_magemin_default(
+        origin.get("producer_configuration")
+    ) != normalize_magemin_default(configuration):
+        return False
+    producer_evidence = origin.get("producer_evidence")
+    if producer_evidence == "no-external-install":
+        from simulator.melt_backend.base import InternalAnalyticalBackend
+        from simulator.chemistry.kernel import ChemistryIntent
+        from simulator.reduced_real_determinism import (
+            _resolved_backend_for_cache_identity,
+        )
+
+        if not isinstance(
+            _resolved_backend_for_cache_identity(
+                sim,
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+                _gate_curve_provider_role(curve),
+            ),
+            InternalAnalyticalBackend,
+        ):
+            return False
+    elif (
+        not isinstance(producer_evidence, str)
+        or len(producer_evidence) != 64
+        or any(character not in "0123456789abcdef" for character in producer_evidence)
+    ):
+        return False
+    if not fresh_evidence:
+        return True
+    current = evidence or gate_curve_memo_evidence(
+        sim,
+        curve,
+        include_selected_bindings=True,
+    )
+    return current.producer_evidence == producer_evidence
 
 
 def gate_curve_memo_eligibility(sim: Any, curve: Mapping[str, Any]) -> bool:
     from simulator.reduced_real_determinism import (
-        _gate_curve_provider_role,
         _is_cacheable_gate_curve,
     )
 
     if not _is_cacheable_gate_curve(curve):
         return False
-    provider_role = _gate_curve_provider_role(curve)
-    live_binding_cache_eligibility(
+    gate_curve_memo_evidence(
         sim,
-        provider_role=provider_role,
-        artifact="freeze_gate_curve",
+        curve,
+        include_selected_bindings=True,
     )
     return True
 
@@ -1569,13 +1837,15 @@ def install_provenance(
         )
         binary = getattr(runtime_backend, "_binary_path", None)
         if binary is None:
-            from simulator.engine_local_config import configured_magemin_binary_path
-
-            binary = configured_magemin_binary_path()
-            if binary is None:
+            binary_resolver = getattr(
+                runtime_backend, "_resolve_binary_path", None
+            )
+            if callable(binary_resolver):
+                binary = binary_resolver()
+            else:
                 from simulator.melt_backend.magemin import MAGEMinBackend
 
-                binary = MAGEMinBackend()._locate_binary(None)
+                binary = MAGEMinBackend()._resolve_binary_path()
         binary_path = selected_path(binary)
         resolved_paths["magemin_selected_binary"] = (
             str(binary_path) if binary_path is not None else None
@@ -1596,19 +1866,7 @@ def install_provenance(
         "commissioning_snapshot": commissioning,
         "catalog_manifest": catalog,
     }
-    required_artifacts = {
-        "alphamelts": (
-            "alphamelts_adapter",
-            "alphamelts_selected_binary"
-            if identity.transport == "subprocess"
-            else "alphamelts_python_api_module",
-        ),
-        "thermoengine": ("thermoengine_adapter", "thermoengine_module"),
-        "magemin": ("magemin_adapter", "magemin_selected_binary"),
-        "builtin-vapor-pressure": ("builtin_vapor_pressure_module",),
-        "openimcc": ("openimcc_module",),
-        "sulfsat": ("pysulfsat_module",),
-    }.get(identity.engine_id, ())
+    required_artifacts = _required_runtime_artifacts(identity)
     required_sources = {
         "alphamelts": ("species_catalog",),
         "thermoengine": ("species_catalog",),
@@ -1638,6 +1896,54 @@ def install_provenance(
         and catalog.get("sha256") is not None
     )
     return provenance
+
+
+def _selected_producer_artifact_name(
+    identity: BindingIdentity,
+) -> str | None:
+    if identity.engine_id == "alphamelts":
+        return (
+            "alphamelts_selected_binary"
+            if identity.transport == "subprocess"
+            else "alphamelts_python_api_module"
+        )
+    return {
+        "thermoengine": "thermoengine_module",
+        "magemin": "magemin_selected_binary",
+    }.get(identity.engine_id)
+
+
+def _selected_producer_digest(
+    identity: BindingIdentity,
+    provenance: Mapping[str, Any],
+) -> str | None:
+    artifact_name = _selected_producer_artifact_name(identity)
+    runtime_artifacts = provenance.get("runtime_artifacts")
+    artifact = (
+        runtime_artifacts.get(artifact_name)
+        if artifact_name is not None and isinstance(runtime_artifacts, Mapping)
+        else None
+    )
+    digest = artifact.get("sha256") if isinstance(artifact, Mapping) else None
+    return digest if isinstance(digest, str) and digest else None
+
+
+def _required_runtime_artifacts(
+    identity: BindingIdentity,
+) -> tuple[str, ...]:
+    if identity.engine_id in {"alphamelts", "thermoengine", "magemin"}:
+        adapter = {
+            "alphamelts": "alphamelts_adapter",
+            "thermoengine": "thermoengine_adapter",
+            "magemin": "magemin_adapter",
+        }[identity.engine_id]
+        selected_artifact = _selected_producer_artifact_name(identity)
+        return (adapter, selected_artifact) if selected_artifact is not None else ()
+    return {
+        "builtin-vapor-pressure": ("builtin_vapor_pressure_module",),
+        "openimcc": ("openimcc_module",),
+        "sulfsat": ("pysulfsat_module",),
+    }.get(identity.engine_id, ())
 
 
 def _artifact_digest(path: Path) -> str | None:

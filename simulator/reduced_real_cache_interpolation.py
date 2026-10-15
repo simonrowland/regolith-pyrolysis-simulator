@@ -15,6 +15,7 @@ from simulator.reduced_real_determinism import (
     _replay_scope_hash,
     canonical_physics_bucket_key_from_replay_key,
     physics_control_rung_error_budget,
+    replay_dependency_vectors_match,
 )
 from simulator.interpolation_uncertainty import build_interpolation_uncertainty_vector
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -91,7 +92,10 @@ def greedy_nearest_neighbors(
     scored: list[tuple[float, float, float, str, Mapping[str, Any]]] = []
     for candidate in candidates:
         candidate_key = candidate.get("key")
-        if not isinstance(candidate_key, Mapping):
+        if not isinstance(candidate_key, Mapping) or not replay_dependency_vectors_match(
+            query_key,
+            candidate_key,
+        ):
             continue
         candidate_vector = interpolation_coordinate_vector(
             candidate_key,
