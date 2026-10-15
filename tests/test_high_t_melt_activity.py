@@ -675,6 +675,31 @@ def test_cap_crossing_over_screen_emits_typed_notice() -> None:
     )
 
 
+@pytest.mark.parametrize('temperature_K', [CAP_MINUS_T_K, CAP_PLUS_T_K])
+def test_closed_iw_bound_uses_existing_notice_container(temperature_K):
+    from dataclasses import replace
+
+    request = _request(BASE_MELT_MOL, temperature_K, high_t_melt_activity='openimcc')
+    request = replace(request, control_inputs={
+        **request.control_inputs,
+        'melt_redox_state': {'origin': 'closed_ledger', 'bound': 'lower',
+            'flags': ['FE_FEO_SATURATION_BOUND']},
+    })
+    result = _provider().dispatch(request)
+    payload = result.diagnostic['high_t_melt_activity']
+    # The existing run-output container can carry just a notice below the
+    # cap; it must not claim OpenIMCC evaluation where none was requested.
+    bound_notice, = (n for n in payload['notices']
+                    if n['code'] == 'FE_FEO_SATURATION_BOUND')
+    assert bound_notice['bound'] == 'lower'
+    assert bound_notice['fO2_log'] == request.control_inputs['intrinsic_fO2_log']
+    if temperature_K < VAPOROCK_T_MAX_K:
+        assert set(payload) == {'notices'}
+    else:
+        assert payload['provider'] == 'openimcc'
+        assert payload['fallback'] is False
+
+
 def test_recipe_default_and_constant_gamma_escape_are_threaded() -> None:
     default = PyrolysisRun(feedstock_id="lunar_mare_low_ti", hours=0)
     legacy = PyrolysisRun(

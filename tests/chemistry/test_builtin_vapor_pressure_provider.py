@@ -3145,6 +3145,14 @@ def test_closed_all_ferrous_vapor_activity_uses_ledger_split_at_iw_bound(
     assert sim._last_vapor_pressure_diagnostic['activities']['Fe'] == pytest.approx(expected)
     assert sim._last_vapor_pressure_diagnostic['a_FeO_calphad']['kress91_split'][
         'fe3_over_sigma_fe'] == 0.0
+    from simulator.runner import build_per_hour_summary
+
+    summary = build_per_hour_summary(sim, sim._make_snapshot())
+    notices = summary['high_t_melt_activity']['notices']
+    bound_notice, = (n for n in notices if n['code'] == 'FE_FEO_SATURATION_BOUND')
+    assert bound_notice['bound'] == 'lower'
+    assert bound_notice['fO2_log'] == potential
+    assert 'provider' not in summary['high_t_melt_activity']
 
 
 def test_closed_vapor_activity_uses_actual_ferric_inventory(vapor_pressure_data):
