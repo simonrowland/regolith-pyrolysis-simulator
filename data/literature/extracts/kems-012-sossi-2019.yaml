@@ -7061,8 +7061,9 @@ species:
             quote: around 25 mg of powder
           note: Around 25 mg per experiment; no individual charge weights reported.
         sample:
-          form: Powder mixed into a viscous slurry with 100,000 molecular weight polyethylene oxide; silicate melt during evaporation.
-          container: Metal wire loop; Re where possible below FMQ, Pt (and one Ir loop) above FMQ. Per-run loop is recorded in Table 2.
+          value:
+            form: Powder mixed into a viscous slurry with 100,000 molecular weight polyethylene oxide; silicate melt during evaporation.
+            container: Metal wire loop; Re where possible below FMQ, Pt (and one Ir loop) above FMQ. Per-run loop is recorded in Table 2.
           locator:
             <<: *sossi_2019_charge_locator
             quote: mixed into a viscous slurry with 100,000 molecular weight polyethylene oxide and loaded onto a metal wire loop
@@ -7087,83 +7088,11 @@ species:
           units: cm
           locator: *sossi_2019_furnace_locator
           note: Vocabulary key names the destination; payload retains the printed cm unit.
-        furnace_internal_diameter:
-          value: 42
-          units: mm
-          locator: *sossi_2019_furnace_locator
-        furnace_hotspot_length:
-          value: 3
-          units: cm
-          locator: *sossi_2019_furnace_locator
-        furnace_temperature_range:
-          value: 1300 < T (°C) < 1550
-          qualifier: printed_bounds
-          locator:
-            <<: *sossi_2019_furnace_locator
-            quote: between 1300 < T (°C) < 1550
-        run_duration:
-          range: [15, 930]
-          units: min
-          locator:
-            <<: *sossi_2019_furnace_locator
-            quote: run times between 15 min and 930 min
-          note: Protocol range only; existing series t_min values retain individual Table 2 durations.
-        gas_equilibration_time:
-          value: 10
-          units: min
-          qualifier: approximate
-          locator:
-            <<: *sossi_2019_furnace_locator
-            quote: Gases were allowed to run and equilibrate in the sealed furnace tube for ≈ 10 min prior to sample introduction.
-        exhaust_arrangement:
+        pumping:
           value: Continuous gas flow, evacuated by a line at the top of the furnace; evaporated material condensed in cold zones of the tube.
           locator:
             <<: *sossi_2019_furnace_locator
             quote: The gas continually flowed through the tube, and was evacuated by a line at the top of the furnace.
-        oxygen_fugacity_control:
-          value: CO-CO2 gas mixtures externally buffer fO2; air experiments are separate. Tylan mass flow controllers.
-          locator: &sossi_2019_gas_locator
-            source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-            page: 5
-            section: 2.1 Experimental Methods, lines 102-105
-            quote: Oxygen fugacity was externally buffered by CO–CO2 gas mixtures metered from Tylan mass flow controllers
-        gas_controller_ranges:
-          ranges: [[0, 200], [0, 20]]
-          units: sccm
-          locator:
-            <<: *sossi_2019_gas_locator
-            quote: range 0–200 and 0–20 standard cubic centimetres per minute, sccm
-          note: Controller ranges, not run flow rates; gas-to-controller assignment not specified here.
-        oxygen_sensor_calibration:
-          value: Yttria-stabilised zirconia SIRO2 oxygen sensor at 1000 °C; checked controllers in situ, not used during high-temperature experiments.
-          locator:
-            <<: *sossi_2019_gas_locator
-            section: 2.1 Experimental Methods, lines 104-106 (continues on PDF p. 6)
-            quote: performance was checked in-situ using a yttria-stabilised zirconia SIRO2 oxygen sensor at 1000 °C
-        oxygen_fugacity_range:
-          value: 10^-10 bar (≈IW) to 10^-0.68 bar (air)
-          qualifier: narrative_range
-          locator: &sossi_2019_flow_locator
-            source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-            page: 6
-            section: 2.1 Experimental Methods, lines 106-109
-            quote: Oxygen fugacities varied between 10-10 bar (≈IW) to 10-0.68 bar (air)
-          note: Rounded narrative range; existing series log10_fO2 retains Table 2 values, including -10.10.
-        oxygen_fugacity_accuracy:
-          value: ±0.05
-          units: log units
-          qualifier: estimated
-          locator:
-            <<: *sossi_2019_flow_locator
-            quote: at an estimated accuracy of ±0.05 log units
-        total_gas_flow:
-          value: 200
-          units: sccm
-          qualifier: approximate
-          locator:
-            <<: *sossi_2019_flow_locator
-            quote: Excepting experiments in air and at ANU, the total gas flow rate was kept constant at each oxygen fugacity, ≈ 200 sccm.
-          note: Not a universal setpoint; Table 2 gives individual CO and CO2 rates.
         temperature_measurement:
           value: Type B thermocouple bead <5 mm above sample; independently measured temperature and adjusted as necessary.
           locator: &sossi_2019_temperature_locator
@@ -7171,19 +7100,7 @@ species:
             page: 6
             section: 2.1 Experimental Methods, lines 120-128
             quote: Type B thermocouple bead (Klemme and O’Neill, 2000) located <5 mm above the sample
-        temperature_control:
-          value: External thermocouple outside alumina muffle tube, Eurotherm controller; fluctuations within ±1 °C.
-          locator:
-            <<: *sossi_2019_temperature_locator
-            quote: Eurotherm® controller, limiting fluctuations to within ±1 °C
-        thermal_equilibration_time:
-          range: [4, 7]
-          units: min
-          locator:
-            <<: *sossi_2019_temperature_locator
-            quote: time needed to reach 99% of the set temperature) was determined to be between 4 – 7 minutes
-          note: Run duration starts at insertion and includes equilibration; not a correction to subtract from Table 2.
-        sample_surface_area_as_printed:
+        sample_surface_area:
           value: 2.0e-05
           units: m
           qualifier: approximate_dimensional_ambiguity
@@ -7193,16 +7110,7 @@ species:
             section: 2.1 Experimental Methods, lines 131-133
             quote: surface areas (≈ 2×10-5 m)
           note: Visual PDF check confirms m, not m2. No measured-area determination procedure stated; do not lift this as an unambiguous SI area. Older rows interpreted the unit as m2.
-        sample_radius_model_assumption:
-          value: 0.001
-          units: m
-          qualifier: model_assumption_not_measured_geometry
-          locator:
-            source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
-            page: 9
-            section: 3.0 Theoretical Framework, lines 203-207
-            quote: 0.001 m was used for all experiments
-        analytical_calibration:
+        calibration:
           value: LA-ICP-MS standards bracket every 12-24 points (two samples), using three NIST-612 and two basaltic standards (BCR-2G, GSD-1G, GSE-1G or BIR-1G, session-dependent). NIST-612 (≈40 ppm trace elements) supplies counts-per-second versus concentration curves; internal 29Si (41 wt. % SiO2 in samples) and basaltic standards correct matrix effects.
           locator:
             source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
@@ -7237,6 +7145,100 @@ species:
             Mn | 992.4 | 690.2 | 3.8'
           note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
       values:
+        <<: &sossi_context_values
+          furnace_hotspot_length:
+            value: 3
+            units: cm
+            locator: *sossi_2019_furnace_locator
+          furnace_internal_diameter:
+            value: 42
+            units: mm
+            locator: *sossi_2019_furnace_locator
+          furnace_temperature_range:
+            value: 1300 < T (°C) < 1550
+            qualifier: printed_bounds
+            locator:
+              <<: *sossi_2019_furnace_locator
+              quote: between 1300 < T (°C) < 1550
+          run_duration:
+            value: run times between 15 min and 930 min
+            units: min
+            locator:
+              <<: *sossi_2019_furnace_locator
+              quote: run times between 15 min and 930 min
+            note: Protocol range only; existing series t_min values retain individual Table 2 durations.
+          gas_equilibration_time:
+            value: 10
+            units: min
+            qualifier: approximate
+            locator:
+              <<: *sossi_2019_furnace_locator
+              quote: Gases were allowed to run and equilibrate in the sealed furnace tube for ≈ 10 min prior to sample introduction.
+          oxygen_fugacity_control:
+            value: CO-CO2 gas mixtures externally buffer fO2; air experiments are separate. Tylan mass flow controllers.
+            locator: &sossi_2019_gas_locator
+              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+              page: 5
+              section: 2.1 Experimental Methods, lines 102-105
+              quote: Oxygen fugacity was externally buffered by CO–CO2 gas mixtures metered from Tylan mass flow controllers
+          gas_controller_ranges:
+            value: range 0–200 and 0–20 standard cubic centimetres per minute, sccm
+            units: sccm
+            locator:
+              <<: *sossi_2019_gas_locator
+              quote: range 0–200 and 0–20 standard cubic centimetres per minute, sccm
+            note: Controller ranges, not run flow rates; gas-to-controller assignment not specified here.
+          oxygen_sensor_calibration:
+            value: Yttria-stabilised zirconia SIRO2 oxygen sensor at 1000 °C; checked controllers in situ, not used during high-temperature experiments.
+            locator:
+              <<: *sossi_2019_gas_locator
+              section: 2.1 Experimental Methods, lines 104-106 (continues on PDF p. 6)
+              quote: performance was checked in-situ using a yttria-stabilised zirconia SIRO2 oxygen sensor at 1000 °C
+          oxygen_fugacity_range:
+            value: 10^-10 bar (≈IW) to 10^-0.68 bar (air)
+            qualifier: narrative_range
+            locator: &sossi_2019_flow_locator
+              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+              page: 6
+              section: 2.1 Experimental Methods, lines 106-109
+              quote: Oxygen fugacities varied between 10-10 bar (≈IW) to 10-0.68 bar (air)
+            note: Rounded narrative range; existing series log10_fO2 retains Table 2 values, including -10.10.
+          oxygen_fugacity_accuracy:
+            value: ±0.05
+            units: log units
+            qualifier: estimated
+            locator:
+              <<: *sossi_2019_flow_locator
+              quote: at an estimated accuracy of ±0.05 log units
+          total_gas_flow:
+            value: 200
+            units: sccm
+            qualifier: approximate
+            locator:
+              <<: *sossi_2019_flow_locator
+              quote: Excepting experiments in air and at ANU, the total gas flow rate was kept constant at each oxygen fugacity, ≈ 200 sccm.
+            note: Not a universal setpoint; Table 2 gives individual CO and CO2 rates.
+          temperature_control:
+            value: External thermocouple outside alumina muffle tube, Eurotherm controller; fluctuations within ±1 °C.
+            locator:
+              <<: *sossi_2019_temperature_locator
+              quote: Eurotherm® controller, limiting fluctuations to within ±1 °C
+          thermal_equilibration_time:
+            value: time needed to reach 99% of the set temperature) was determined to be between 4 – 7 minutes
+            units: min
+            locator:
+              <<: *sossi_2019_temperature_locator
+              quote: time needed to reach 99% of the set temperature) was determined to be between 4 – 7 minutes
+            note: Run duration starts at insertion and includes equilibration; not a correction to subtract from Table 2.
+          sample_radius_model_assumption:
+            value: 0.001
+            units: m
+            qualifier: model_assumption_not_measured_geometry
+            locator:
+              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+              page: 9
+              section: 3.0 Theoretical Framework, lines 203-207
+              quote: 0.001 m was used for all experiments
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
         method_class: measured_direct
@@ -10719,6 +10721,7 @@ species:
             Ti | 1008.0 | 1045.0 | 46.6'
           note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
       values:
+        <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
         method_class: measured_direct
@@ -13750,6 +13753,7 @@ species:
             Sc | 970.8 | 850.8 | 28.9'
           note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
       values:
+        <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
         method_class: measured_direct
@@ -14502,6 +14506,7 @@ species:
             V | 1019.7 | 1024.6 | 32.4'
           note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
       values:
+        <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
         method_class: measured_direct
@@ -15254,6 +15259,7 @@ species:
             Zr | 991.9 | 1118.1 | 34.8'
           note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
       values:
+        <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
         method_class: measured_direct
@@ -16006,6 +16012,7 @@ species:
             La | 1038.9 | 969.8 | 21.2'
           note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
       values:
+        <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
         method_class: measured_direct
@@ -16758,6 +16765,7 @@ species:
             Gd | 1063.3 | 1060.6 | 25.2'
           note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
       values:
+        <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
         method_class: measured_direct
@@ -17510,6 +17518,7 @@ species:
             Yb | 1036.2 | 1111.0 | 26.4'
           note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml
       values:
+        <<: *sossi_context_values
         quantity: open_furnace_residue_composition_vs_time
         evidence_class: measured
         method_class: measured_direct
