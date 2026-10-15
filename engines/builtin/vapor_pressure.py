@@ -3382,6 +3382,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
         if feo_activity_diagnostic is not None:
             diagnostic["a_FeO_calphad"] = feo_activity_diagnostic
+        redox_state = controls.get('melt_redox_state', {})
+        if (redox_state.get('origin') == 'closed_ledger'
+                and 'FE_FEO_SATURATION_BOUND' in redox_state.get('flags', ())):
+            # Reuse the existing run-notice channel after activity selection.
+            # Below the cap this carries only a notice, never a claim that
+            # OpenIMCC ran. The bound is a stability limit, not an imposed x.
+            diagnostic.setdefault('high_t_melt_activity', {}).setdefault(
+                'notices', []).append({
+                    'code': 'FE_FEO_SATURATION_BOUND',
+                    'type': 'typed_notice',
+                    'bound': redox_state['bound'],
+                    'fO2_log': intrinsic_fO2_log,
+                    'message': 'Ferric inventory exhausted; Fe/FeO saturation sets a lower bound on the melt potential.',
+                })
 
         return IntentResult(
             intent=ChemistryIntent.VAPOR_PRESSURE,
