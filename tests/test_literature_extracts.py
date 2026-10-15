@@ -3311,6 +3311,8 @@ def test_every_extract_has_fidelity_sample():
     """
     for path in vle.discover_extracts():
         doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+        if doc.get("schema_version") == vle.TABLE_SCHEMA_VERSION:
+            continue  # Companion tables rely on fidelity samples in their parent extract.
         n_obs = sum(
             len(b.get("observations") or [])
             for b in (doc.get("species") or {}).values()
