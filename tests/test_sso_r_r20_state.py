@@ -2127,7 +2127,7 @@ def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
     exchange_direction = exchange.exchange_direction
     exchange_o2_mol = exchange.exchange_o2_mol
     exchange_transition_name = exchange.exchange_transition_name
-    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_melt = dict(sim.atom_ledger.mol_by_account('process.cleaned_melt'))
     before_overhead_o2_mol = sim.atom_ledger.mol_by_account(
         "process.overhead_gas"
     ).get("O2", 0.0)
@@ -2160,7 +2160,27 @@ def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
     assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
         -o2_mol
     )
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < before_fO2
+    # SiO2 -> SiO + 1/2 O2 removes Si and oxygen, leaving the Fe split
+    # unchanged. The negative export label is not a second reducing command:
+    # the residual Kress composition, rather than that label, sets potential.
+    sio2_mol = _cleaned_melt_debit_mol(sim, transition, 'SiO2')
+    sio_mol = _transition_account_species_mol(sim, transition, side='credits',
+        account='process.overhead_gas', species='SiO')
+    assert sio2_mol > 0.0
+    assert sio_mol == pytest.approx(sio2_mol)
+    assert o2_mol == pytest.approx(0.5 * sio2_mol)
+    after_melt = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    assert after_melt['FeO'] == before_melt['FeO']
+    assert after_melt['Fe2O3'] == before_melt['Fe2O3']
+    transition.validate_conservation(sim.species_formula_registry)
+    from simulator.fe_redox import kress91_intrinsic_state
+    expected = kress91_intrinsic_state(
+        feo_mol=after_melt['FeO'], fe2o3_mol=after_melt['Fe2O3'],
+        mol_fractions=melt_mol_fractions_for_kress91(sim._melt_oxide_wt_pct()),
+        T_K=1873.15, pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        exchange_fO2_log=math.log10(sim.melt.p_total_mbar / 1000.0))['fO2_log']
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(expected, abs=2e-13)
+    assert sim.melt.oxygen_reservoir.redox_source_delta_ln_fO2 == 0.0
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
         "O2", 0.0
     ) == pytest.approx(before_overhead_o2_mol + o2_mol)
@@ -2304,7 +2324,10 @@ def test_selectivity_map_temperature_sweep_rides_kress91_curve(monkeypatch) -> N
     sim = _make_sim()
     sim.melt.p_total_mbar = 10.0  # Match the requested sweep's pressure below.
     sim._overhead_headspace_config["enabled"] = False
+    sim._sync_oxygen_reservoir_mirror()
     original_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    original_reference = sim.melt.oxygen_reservoir.reference_T_K
+    original_mol = sim.atom_ledger.mol_by_account()
     captured_fO2: list[float] = []
 
     def fake_get_equilibrium():
@@ -2334,7 +2357,8 @@ def test_selectivity_map_temperature_sweep_rides_kress91_curve(monkeypatch) -> N
     assert rows
     assert captured_fO2 == sorted(captured_fO2)
     assert len(set(captured_fO2)) == len(captured_fO2)
-    assert sim.melt.oxygen_reservoir.reference_T_K is None
+    assert sim.melt.oxygen_reservoir.reference_T_K == original_reference
+    assert sim.atom_ledger.mol_by_account() == original_mol
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
         original_fO2,
     )
@@ -2888,12 +2912,9 @@ def test_c2a_staged_po2_hold_uses_managed_exchange_not_direct_refresh(
     assert snapshot.oxygen_reservoir["headspace_control_floor_pO2_bar"] == (
         pytest.approx(0.0015)
     )
-    assert snapshot.oxygen_reservoir["exchange_direction"].split("|")[0] in {
-        "managed_headspace_to_melt",
-        "headspace_to_melt",
-        "melt_to_headspace",
-        "none:below_threshold",
-    }
+    assert snapshot.oxygen_reservoir["exchange_direction"].split("|")[0] == (
+        'none:no_melt_redox_capacity')
+    assert snapshot.oxygen_reservoir['exchange_o2_mol'] == 0.0
 
 
 def test_live_paths_do_not_call_intrinsic_heuristic(
@@ -2990,17 +3011,27 @@ def test_native_fe_split_updates_fO2_to_saturation_boundary() -> None:
     sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     before_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
+    transition_count = len(sim.atom_ledger.transitions)
 
     sim._apply_native_fe_saturation_split()
 
     after = sim._compute_fe_redox_split_diagnostic()
     assert before_native > 0.0
     assert (
-        "redox_source:native_fe_saturation_split"
+        "redox_source:native_fe_saturation_split:skipped:below_threshold"
         in sim.melt.oxygen_reservoir.exchange_direction.split("|")
     )
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log > before_fO2
     assert after["native_fe_frac"] <= 2.0e-12
+    transition = next(t for t in sim.atom_ledger.transitions[transition_count:]
+                      if t.name == 'native_fe_saturation_split')
+    feo = _cleaned_melt_debit_mol(sim, transition, 'FeO')
+    assert feo > 0.0
+    oxygen = sum(_transition_account_species_mol(sim, transition, side='credits',
+        account=account, species='O2') for account in
+        ('process.overhead_gas', 'reservoir.fo2_buffer'))
+    assert oxygen == pytest.approx(0.5 * feo)
+    assert sim.melt.oxygen_reservoir.redox_source_delta_ln_fO2 == 0.0
 
 
 def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> None:

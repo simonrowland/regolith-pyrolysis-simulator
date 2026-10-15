@@ -6925,7 +6925,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if not math.isfinite(T_K) or T_K <= 0.0:
             raise ValueError('temperature_K must be finite and greater than zero')
-        return self._current_melt_redox_fO2_log(T_K)
+        # No explicit prediction temperature means the current intrinsic
+        # state, including its last authorized liquid/quench reference.
+        return self._current_melt_redox_fO2_log(
+            T_K if temperature_K is not None else None)
 
     def _compute_fe_redox_split_diagnostic(
         self,

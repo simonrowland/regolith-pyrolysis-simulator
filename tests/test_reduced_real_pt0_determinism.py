@@ -1826,8 +1826,6 @@ def test_pt0_gate_curve_rekeys_from_live_fo2_after_first_liquid_seed(
     capture_sim = _build_pt0_sim(capture)
     capture_sim.start_campaign(CampaignPhase.C2A_STAGED)
     capture_sim.melt.temperature_C = 1450.0
-    capture_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
-    capture_sim.melt.oxygen_reservoir.reference_T_K = None
     capture_sim._sync_oxygen_reservoir_mirror()
     preseed_redox_key_fO2_log = capture_sim._freeze_gate_redox_key_fO2_log()
     preseed_local_key = capture_sim._freeze_gate_cache_key(
@@ -1838,7 +1836,7 @@ def test_pt0_gate_curve_rekeys_from_live_fo2_after_first_liquid_seed(
 
     assert capture_sim._freeze_gate_curve() == curve
     preseed_controls = capture.capture_sequence[-1]["key"]["controls"]
-    assert preseed_controls["log_fO2"] == pytest.approx(-9.0)
+    assert capture_sim.melt.oxygen_reservoir.reference_T_K is not None
     assert preseed_controls["T_K"] == pytest.approx(298.15)
     assert preseed_redox_key_fO2_log == pytest.approx(
         preseed_controls["log_fO2"],
@@ -1851,13 +1849,17 @@ def test_pt0_gate_curve_rekeys_from_live_fo2_after_first_liquid_seed(
     replay_sim = _build_pt0_sim(replay)
     replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
     replay_sim.melt.temperature_C = 1450.0
-    replay_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
-    replay_sim.melt.oxygen_reservoir.reference_T_K = None
     replay_sim._sync_oxygen_reservoir_mirror()
     assert replay_sim._freeze_gate_curve() == curve
     assert replay.replay_sequence[-1]["key"]["controls"] == preseed_controls
 
     replay_sim._re_reference_melt_fO2_to_temperature(1723.15)
+    # The formation reference already exists at load. Merely re-expressing
+    # the same split at its first liquid T must preserve cache identity.
+    assert replay_sim._freeze_gate_redox_key_fO2_log() == pytest.approx(
+        preseed_redox_key_fO2_log)
+    # A real change of the iron split must still invalidate the replay key.
+    _seed_melt_redox(replay_sim, replay_sim._current_melt_redox_fO2_log() + 0.25)
     postseed_redox_key_fO2_log = replay_sim._freeze_gate_redox_key_fO2_log()
     postseed_local_key = replay_sim._freeze_gate_cache_key(
         pressure_bar=replay_sim.melt.p_total_mbar / 1000.0,
@@ -1871,7 +1873,7 @@ def test_pt0_gate_curve_rekeys_from_live_fo2_after_first_liquid_seed(
 
     postseed_controls = replay.replay_sequence[-1]["key"]["controls"]
     expected_postseed_fO2 = kress91_referenced_log_fO2(
-        -9.0,
+        replay_sim._current_melt_redox_fO2_log(),
         reference_T_K=1723.15,
         target_T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
     )
@@ -2498,7 +2500,9 @@ def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
         db_path=db_path,
         control_quantization=ControlQuantization.from_name("coarse"),
     )
-    capture_sim = _build_pt0_sim(capture_store)
+    capture_sim = _build_pt0_sim(None)
+    _seed_melt_redox(capture_sim, -10.0)
+    capture_sim.configure_pt0_determinism_store(capture_store)
     capture_sim.backend = AlphaMELTSBackend()
     capture_sim._chem_registry.register(
         provider,
@@ -2524,7 +2528,9 @@ def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
         db_path=db_path,
         control_quantization=ControlQuantization.from_name("fine"),
     )
-    replay_sim = _build_pt0_sim(replay_store)
+    replay_sim = _build_pt0_sim(None)
+    _seed_melt_redox(replay_sim, -10.0)
+    replay_sim.configure_pt0_determinism_store(replay_store)
     replay_sim.backend = AlphaMELTSBackend()
     replay_sim._chem_registry.register(
         provider,

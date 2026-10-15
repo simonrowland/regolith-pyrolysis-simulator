@@ -249,9 +249,12 @@ def test_engine_result_attaches_unknown_split_notice(monkeypatch) -> None:
 
     assert returned is result
     assert result.diagnostics["feedstock_iron_notice"]["code"] == (
-        "fe_redox_split_unknown"
+        "feedstock_iron_initialization"
     )
-    assert "all-ferrous" in result.diagnostics["feedstock_iron_notice"]["message"]
+    notice = result.diagnostics['feedstock_iron_notice']
+    assert notice['method'] == 'predicted_kress91_split'
+    assert 'measured_feedstock_iron_split' in notice['certification_gaps']
+    assert sim.atom_ledger.mol_by_account('process.cleaned_melt')['Fe2O3'] > 0.0
 
 
 @pytest.mark.parametrize(

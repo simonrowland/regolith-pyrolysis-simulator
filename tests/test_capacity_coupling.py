@@ -676,6 +676,7 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     sim = _real_capacity_sim()
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 1600.0
+    sim._re_reference_melt_fO2_to_temperature(1873.15)
     equilibrium = sim._get_equilibrium()
     effective_source = _pre_rg_effective_pressure_source(
         sim.vapor_pressures, equilibrium
