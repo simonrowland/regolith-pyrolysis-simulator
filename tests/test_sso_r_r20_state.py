@@ -2625,6 +2625,21 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
     assert sim.melt.melt_fO2_log == pytest.approx(-6.5)
 
 
+def test_cleanup_leaves_injected_gate_fallback_backend_alone() -> None:
+    from tests.binding_admission_fixtures import register_synthetic_gate_curve_producer
+
+    sim = _make_sim()
+    register_synthetic_gate_curve_producer(sim)
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    backend = provider._backend
+
+    close_test_owned_magemin_backend(sim)
+
+    assert provider._backend is backend
+
+
 def test_step_does_not_reseed_live_fO2_from_heuristic() -> None:
     sim = _make_sim()
     sim.start_campaign(CampaignPhase.C0)
