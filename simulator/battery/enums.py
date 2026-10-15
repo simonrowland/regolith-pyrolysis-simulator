@@ -38,6 +38,12 @@ class Engine(StrEnum):
     OPENIMCC = "openimcc"
 
 
+class PolymorphRejectionKind(StrEnum):
+    OMITTED = "omitted"
+    UNRECOGNISED = "unrecognised"
+    CONTRADICTS_FORMULA = "contradicts_formula"
+
+
 class Rail(StrEnum):
     """Owner-bound residual reporting rails."""
 

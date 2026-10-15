@@ -35,6 +35,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Polymorph,
+    PolymorphRejectionKind,
     Quantity,
     Rail,
     ResidualStatus,
@@ -2169,6 +2170,41 @@ def test_to_plain_state_serialization_omits_absent_keys() -> None:
 
     assert unknown_bytes == b'{"reason":"not recorded","tag":"unknown"}'
     assert value_bytes == b'{"tag":"value","value":"fixture"}'
+
+
+def test_polymorph_rejection_kind_round_trips_and_loads_legacy_states() -> None:
+    from simulator.battery.migrate import _species_from_plain
+    from simulator.battery.records import Species, State
+
+    rejected = Species(
+        "MgO",
+        State.of(Phase.CR),
+        State.unknown(
+            "unrecognised polymorph 'not-a-form' is not a closed Polymorph token",
+            rejection_kind=PolymorphRejectionKind.UNRECOGNISED,
+        ),
+    )
+    payload = to_plain(rejected)
+    assert payload["polymorph"]["rejection_kind"] == "unrecognised"
+    assert _species_from_plain(payload) == rejected
+
+    for reason, expected in (
+        ("source does not state polymorph", PolymorphRejectionKind.OMITTED),
+        (
+            "unrecognised polymorph 'not-a-form' is not a closed Polymorph token",
+            PolymorphRejectionKind.UNRECOGNISED,
+        ),
+        (
+            "polymorph clinoenstatite does not denote formula MgO",
+            PolymorphRejectionKind.CONTRADICTS_FORMULA,
+        ),
+    ):
+        legacy = {
+            "formula": "MgO",
+            "phase": {"tag": "value", "value": "cr"},
+            "polymorph": {"tag": "unknown", "reason": reason},
+        }
+        assert _species_from_plain(legacy).polymorph.rejection_kind is expected
 
 
 @pytest.mark.parametrize(

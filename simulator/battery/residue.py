@@ -174,6 +174,7 @@ def _evaluate_openimcc_isolated(
             daemon=True,
         )
         try:
+            # Spawn re-imports __main__; score_store scripts need an __main__ guard.
             process.start()
         except Exception as exc:
             try:

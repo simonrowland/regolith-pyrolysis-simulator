@@ -51,6 +51,7 @@ from simulator.battery.enums import (
     PerBasis,
     Phase,
     Polymorph,
+    PolymorphRejectionKind,
     PURE_STANDARD_THERMO,
     Quantity,
     ReferenceStateConvention,
@@ -1239,18 +1240,18 @@ def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
         return True
     if not source_polymorph.is_unknown:
         return False
-    reason = source_polymorph.reason or ""
-    rejected = reason.startswith("unrecognised polymorph ") or (
-        reason.startswith("polymorph ") and " does not denote formula " in reason
-    )
-    return not rejected
+    return source_polymorph.rejection_kind is PolymorphRejectionKind.OMITTED
 
 
 def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
     return (
         source_polymorph is not None
         and source_polymorph.is_unknown
-        and not _source_polymorph_is_unspecified(source_polymorph)
+        and source_polymorph.rejection_kind
+        in (
+            PolymorphRejectionKind.UNRECOGNISED,
+            PolymorphRejectionKind.CONTRADICTS_FORMULA,
+        )
     )
 
 
@@ -9492,6 +9493,67 @@ def render_score_report(
         studio_hostname=studio_hostname,
         store_stamp=derive_store_stamp(root or REPO_ROOT),
     )
+
+
+def _append_nasa9_fit_comparison_stratum(
+    report: str, comparisons: Iterable[Mapping[str, object]]
+) -> str:
+    counts: dict[tuple[str, str], list[int]] = defaultdict(lambda: [0, 0, 0])
+    refusals: dict[tuple[str, str, str, str], int] = defaultdict(int)
+    for row in comparisons:
+        channel = row.get("comparison_channel")
+        if not isinstance(channel, str) or not channel.startswith("nasa9_fit:"):
+            continue
+        engine = channel.partition(":")[2]
+        quantity = str(row.get("quantity") or "unknown")
+        numeric = row.get("value") is not None and row.get("status") != "refused"
+        group = counts[(engine, quantity)]
+        group[0] += 1
+        group[1 if numeric else 2] += 1
+        if numeric:
+            continue
+        reason = str(row.get("refusal_reason") or "untyped")
+        detail = row.get("refusal_detail")
+        detail_text = json.dumps(
+            dict(detail) if isinstance(detail, Mapping) else {},
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        refusals[(engine, quantity, reason, detail_text)] += 1
+
+    if not counts:
+        return report
+
+    lines = [
+        "## NASA-9 fit comparison stratum",
+        "",
+        "Fit comparisons are separate from printed-cell comparisons and measured-tier counts.",
+        "",
+        "| engine | quantity | n comparisons | n numeric | n refused |",
+        "|---|---|---:|---:|---:|",
+    ]
+    for (engine, quantity), (total, numeric, refused) in sorted(counts.items()):
+        lines.append(
+            f"| {engine} | {quantity} | {total} | {numeric} | {refused} |"
+        )
+    lines.extend(["", "### Typed refusal diagnostics", ""])
+    if not refusals:
+        lines.append("None.")
+    else:
+        lines.extend(
+            [
+                "| engine | quantity | reason | count | detail |",
+                "|---|---|---|---:|---|",
+            ]
+        )
+        for (engine, quantity, reason, detail), count in sorted(refusals.items()):
+            safe_detail = detail.replace("|", "\\|").replace("`", "\\`")
+            lines.append(
+                f"| {engine} | {quantity} | `{reason}` | {count} | `{safe_detail}` |"
+            )
+    section = "\n".join(lines)
+    return f"{report.rstrip()}\n\n{section}\n"
 
 
 def _render_score_report_from_payloads_legacy(
