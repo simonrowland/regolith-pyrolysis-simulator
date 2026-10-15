@@ -90,7 +90,7 @@ observations:
     section: Results
     note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual reads
       at 30, 60 and 90 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -159,7 +159,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:
@@ -274,7 +274,7 @@ observations:
     section: Results
     note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual reads
       at 30, 60 and 90 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -343,7 +343,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:
@@ -458,7 +458,7 @@ observations:
     section: Results
     note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual reads
       at 30, 60 and 90 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -527,7 +527,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:
@@ -643,7 +643,7 @@ observations:
     pdf_page_index: 3
     figure: '2'
     section: Results
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -769,7 +769,7 @@ observations:
     figure: '2'
     section: Results
     note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -834,7 +834,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:
@@ -946,7 +946,7 @@ observations:
     figure: '2'
     section: Results
     note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -1011,7 +1011,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:
@@ -1123,7 +1123,7 @@ observations:
     figure: '2'
     section: Results
     note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -1188,7 +1188,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:
@@ -1300,7 +1300,7 @@ observations:
     figure: '2'
     section: Results
     note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -1365,7 +1365,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:
@@ -1485,7 +1485,7 @@ observations:
     published_page: Article in Press; no printed page number
     pdf_page_index: 0
     section: Abstract
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -1524,7 +1524,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters: []
     output_unit: Pa
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_mass_loss_1200C
@@ -1622,7 +1622,7 @@ observations:
     figure: '2'
     section: Results
     equation: '1'
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -1667,7 +1667,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters: []
     output_unit: Pa
 - observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run01_figure2::point:0
@@ -1757,7 +1757,7 @@ observations:
     figure: '2'
     section: Results
     note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -1822,7 +1822,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:
@@ -1934,7 +1934,7 @@ observations:
     figure: '2'
     section: Results
     note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -1999,7 +1999,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:
@@ -2111,7 +2111,7 @@ observations:
     figure: '2'
     section: Results
     note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -2176,7 +2176,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:
@@ -2288,7 +2288,7 @@ observations:
     figure: '2'
     section: Results
     note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -2353,7 +2353,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:
@@ -2465,7 +2465,7 @@ observations:
     figure: '2'
     section: Results
     note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -2530,7 +2530,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:
@@ -2642,7 +2642,7 @@ observations:
     figure: '2'
     section: Results
     note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
-  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
     temperature_K:
       state:
@@ -2707,7 +2707,7 @@ observations:
   derivation:
     relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    - unknown:suzuki-2026-vacuum-oxygen-extraction
     parameters:
     - - original
       - state:

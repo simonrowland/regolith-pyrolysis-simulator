@@ -916,7 +916,12 @@ def _charge_state(species: Species) -> State[int]:
     return State.of(0)
 
 
-def _species_equal(a: Species, b: Species) -> IdentityEqualOutcome:
+def _species_equal(
+    a: Species,
+    b: Species,
+    *,
+    allow_unknown_phase: bool = False,
+) -> IdentityEqualOutcome:
     fields: list[str] = []
     unknown: list[str] = []
     if a.formula != b.formula:
@@ -924,7 +929,10 @@ def _species_equal(a: Species, b: Species) -> IdentityEqualOutcome:
     phase_cmp = _state_compare(
         "species.phase", _phase_state(a), _phase_state(b), required=True
     )
-    if phase_cmp.kind is IdentityEqualKind.IDENTITY_UNKNOWN:
+    if (
+        phase_cmp.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+        and not allow_unknown_phase
+    ):
         unknown.append("species.phase")
     elif phase_cmp.kind is IdentityEqualKind.IDENTITY_MISMATCH:
         fields.append("species.phase")
@@ -1331,8 +1339,13 @@ def _reservoir_rule(identity: Identity) -> IdentityEqualOutcome | None:
     return None
 
 
-def identity_equal(left: Identity, right: Identity) -> IdentityEqualOutcome:
-    """Exact equality on the quantity-class compared axes."""
+def _identity_equal(
+    left: Identity,
+    right: Identity,
+    *,
+    allow_unknown_species_phase: bool = False,
+) -> IdentityEqualOutcome:
+    """Compare identities, optionally omitting only an unknown species phase."""
 
     left_q_state = _quantity_state(left)
     right_q_state = _quantity_state(right)
@@ -1360,7 +1373,11 @@ def identity_equal(left: Identity, right: Identity) -> IdentityEqualOutcome:
         return IdentityEqualOutcome(
             IdentityEqualKind.IDENTITY_MISMATCH, ("quantity",)
         )
-    species_outcome = _species_equal(left.species, right.species)
+    species_outcome = _species_equal(
+        left.species,
+        right.species,
+        allow_unknown_phase=allow_unknown_species_phase,
+    )
     if species_outcome.kind is not IdentityEqualKind.EQUAL:
         return species_outcome
 
@@ -1426,3 +1443,22 @@ def identity_equal(left: Identity, right: Identity) -> IdentityEqualOutcome:
     if unknown:
         return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_UNKNOWN, tuple(unknown))
     return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+
+
+def identity_equal(left: Identity, right: Identity) -> IdentityEqualOutcome:
+    """Exact equality on the quantity-class compared axes."""
+
+    return _identity_equal(left, right)
+
+
+def _same_row_redox_identity_equal(
+    left: Identity, right: Identity
+) -> IdentityEqualOutcome:
+    """Compare same-row Fe redox identities, where unknown phase is unused."""
+
+    if (
+        quantity_token(left) is not Quantity.FE3_FE2_RATIO
+        or quantity_token(right) is not Quantity.FE3_FE2_RATIO
+    ):
+        return identity_equal(left, right)
+    return _identity_equal(left, right, allow_unknown_species_phase=True)

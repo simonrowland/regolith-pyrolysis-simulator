@@ -153,10 +153,10 @@ species:
         evidence_class: model_derived
         admission_status: admitted
         measurement_status: author_reported_calculated_from_Ca_O_and_interaction_parameters
-        derived_from: [tables:seki-2011-ca-o-solubility-fe-cao-al2o3]
+        derived_from: [unknown:seki-2011-ca-o-solubility-fe-cao-al2o3]
         derivation:
           relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
-          inputs: [tables:seki-2011-ca-o-solubility-fe-cao-al2o3]
+          inputs: [unknown:seki-2011-ca-o-solubility-fe-cao-al2o3]
           note: The numeric context row seki_2011_table2_solubilities gives the printed Ca/O concentrations and slag compositions (Table 2, p. 1372); context row seki_2011_method gives the §4.2 fitted interaction parameters (p. 1373).
           parameters:
           - [log_K, {state: {tag: value, value: '-4.38'}, locator: {published_page: 1373, pdf_page_index: 5, section: 4.2}}]

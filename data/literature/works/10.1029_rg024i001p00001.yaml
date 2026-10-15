@@ -11,24 +11,6 @@ work:
       tag: value
       value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
-    - asset_id: pdf:richet-bottinga-1986-silicate-thermochemistry
-      role: pdf
-      path: raw/richet-bottinga-1986-silicate-thermochemistry/richet-bottinga-1986-silicate-thermochemistry.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:richet-bottinga-1986-silicate-thermochemistry
-      role: pdftotext
-      path: text/richet-bottinga-1986-silicate-thermochemistry
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:richet-bottinga-1986-silicate-thermochemistry
-      role: table_csv
-      path: tables/richet-bottinga-1986-silicate-thermochemistry
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:richet-bottinga-1986-silicate-thermochemistry
       role: pdftotext
       path: unknown
@@ -162,6 +144,12 @@ context:
     published_page: 16
     table: '5'
     row: Cristobalite
+  condensed_form:
+    state: crystalline
+    polymorph: cristobalite_high
+    basis: explicit_author
+    note: 'Labelled interpretation: the only cristobalite stable at 1999 K is high (beta) cristobalite; the alpha-beta inversion
+      is near 500 K.'
   units: J per mol K
   values:
     method_class: model_derived

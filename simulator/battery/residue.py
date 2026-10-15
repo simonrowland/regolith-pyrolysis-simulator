@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import atexit
 import math
+import multiprocessing
 import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
@@ -65,8 +67,10 @@ class ResidueEngineNonconvergence(RuntimeError):
         step: int | None = None,
         time_reached_s: float | None = None,
         retry: str | None = None,
+        reason: str = "engine_nonconvergence",
     ) -> None:
         super().__init__(detail)
+        self.reason = reason
         self.engine = engine
         self.detail = detail
         self.composition_mol = (
@@ -86,6 +90,173 @@ class ResidueEngineNonconvergence(RuntimeError):
             "message": self.detail,
             "retry": self.retry,
         }
+
+
+class ResidueEngineTransportError(ResidueEngineNonconvergence):
+    """Infrastructure failure moving an engine result across its worker pipe."""
+
+    def __init__(self, detail: str) -> None:
+        super().__init__("openimcc", detail, reason="engine_transport_error:openimcc")
+
+
+_OPENIMCC_EVALUATION_WORKER_STARTUP_TIMEOUT_S = 120.0
+
+
+def _openimcc_evaluation_worker(connection, evaluate) -> None:
+    try:
+        from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
+
+        connection.send(("ready",))
+    except BaseException as exc:  # noqa: BLE001 - report startup failures to parent
+        try:
+            connection.send(("startup_error", type(exc).__name__, str(exc)))
+        except (BrokenPipeError, EOFError, OSError):
+            pass
+        connection.close()
+        return
+    while True:
+        kwargs = connection.recv()
+        if kwargs is None:
+            break
+        try:
+            result = evaluate(**kwargs)
+            if isinstance(result, OpenImccBridgeResult):
+                connection.send((True, "openimcc_bridge_result", result.to_transport()))
+            else:
+                connection.send((True, "value", result))
+        except BaseException as exc:  # noqa: BLE001 - report worker failures to parent
+            connection.send((False, type(exc).__name__, str(exc)))
+    connection.close()
+
+
+_OPENIMCC_EVALUATION_WORKER = None
+
+
+def _close_openimcc_evaluation_worker() -> None:
+    global _OPENIMCC_EVALUATION_WORKER
+    worker = _OPENIMCC_EVALUATION_WORKER
+    _OPENIMCC_EVALUATION_WORKER = None
+    if worker is None:
+        return
+    process, connection, _evaluate = worker
+    if process.is_alive():
+        try:
+            connection.send(None)
+            process.join(timeout=1.0)
+        except (BrokenPipeError, EOFError, OSError):
+            pass
+    if process.is_alive():
+        process.terminate()
+        process.join()
+    connection.close()
+
+
+atexit.register(_close_openimcc_evaluation_worker)
+
+
+def _evaluate_openimcc_isolated(
+    evaluate: Callable[..., Any], *, timeout_s: float, **kwargs: Any
+) -> Any:
+    """Run one residue-engine call in a killable process with a hard deadline."""
+    global _OPENIMCC_EVALUATION_WORKER
+    worker = _OPENIMCC_EVALUATION_WORKER
+    if worker is not None and (
+        not worker[0].is_alive() or worker[2] is not evaluate
+    ):
+        _close_openimcc_evaluation_worker()
+        worker = None
+    if worker is None:
+        context = multiprocessing.get_context("spawn")
+        parent, child = context.Pipe(duplex=True)
+        process = context.Process(
+            target=_openimcc_evaluation_worker,
+            args=(child, evaluate),
+            daemon=True,
+        )
+        try:
+            process.start()
+        except Exception as exc:
+            try:
+                if process.pid is not None:
+                    if process.is_alive():
+                        process.terminate()
+                    process.join()
+            except (AssertionError, OSError, ValueError):
+                pass
+            try:
+                process.close()
+            except (AssertionError, OSError, ValueError):
+                pass
+            finally:
+                parent.close()
+                child.close()
+                _OPENIMCC_EVALUATION_WORKER = None
+            raise ResidueEngineTransportError(
+                f"OpenIMCC worker failed to start: {exc}"
+            ) from exc
+        child.close()
+        worker = (process, parent, evaluate)
+        _OPENIMCC_EVALUATION_WORKER = worker
+        if not parent.poll(_OPENIMCC_EVALUATION_WORKER_STARTUP_TIMEOUT_S):
+            _close_openimcc_evaluation_worker()
+            raise ResidueEngineTransportError(
+                "OpenIMCC worker readiness timed out after "
+                f"{_OPENIMCC_EVALUATION_WORKER_STARTUP_TIMEOUT_S:g}s"
+            )
+        try:
+            startup = parent.recv()
+        except (EOFError, OSError) as exc:
+            _close_openimcc_evaluation_worker()
+            raise ResidueEngineTransportError(
+                f"OpenIMCC worker exited before readiness: {exc}"
+            ) from exc
+        if startup != ("ready",):
+            _close_openimcc_evaluation_worker()
+            if (
+                isinstance(startup, tuple)
+                and len(startup) == 3
+                and startup[0] == "startup_error"
+            ):
+                raise ResidueEngineTransportError(
+                    f"OpenIMCC worker startup failed: {startup[1]}: {startup[2]}"
+                )
+            raise ResidueEngineTransportError(
+                f"unexpected OpenIMCC worker startup response: {startup!r}"
+            )
+    process, parent, _evaluate = worker
+    try:
+        try:
+            parent.send(kwargs)
+        except (OSError, TypeError, ValueError) as exc:
+            raise ResidueEngineTransportError(str(exc)) from exc
+        if not parent.poll(timeout_s):
+            _close_openimcc_evaluation_worker()
+            raise TimeoutError(f"OpenIMCC call timed out after {timeout_s:g}s")
+        try:
+            response = parent.recv()
+        except (EOFError, OSError) as exc:
+            raise ResidueEngineTransportError(str(exc)) from exc
+        if response[0]:
+            result_kind, payload = response[1:]
+            if result_kind == "openimcc_bridge_result":
+                from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
+
+                try:
+                    return OpenImccBridgeResult.from_transport(payload)
+                except (KeyError, TypeError, ValueError) as exc:
+                    raise ResidueEngineTransportError(str(exc)) from exc
+            return payload
+        error_name, detail = response[1:]
+        if error_name in {"PicklingError", "TypeError", "AttributeError"} and (
+            "pickl" in str(detail).lower() or "serializ" in str(detail).lower()
+        ):
+            raise ResidueEngineTransportError(str(detail))
+        if error_name == "ImccNonconvergenceError":
+            raise ResidueEngineNonconvergence("openimcc", str(detail))
+        raise RuntimeError(f"isolated OpenIMCC {error_name}: {detail}")
+    finally:
+        if not process.is_alive():
+            _close_openimcc_evaluation_worker()
 
 
 def _component_exhaustion_floor_mol(sample_total_mol: float) -> float:
@@ -850,6 +1021,7 @@ def _hashimoto_integrate_geometry(
                     step=step_number,
                     time_reached_s=elapsed_s,
                     retry="one interval halving; refined substep still failed",
+                    reason=exc.reason,
                 )
                 break
 
@@ -1166,6 +1338,10 @@ def _predict_hashimoto_residue_cohort(
         ] = {}
 
         if engine == "openimcc":
+            from simulator.diagnostic_helpers.binary_pot_battery import (
+                _ENGINE_OUTER_TIMEOUT_S,
+            )
+
             def pressure_model(
                 inventory: Mapping[str, float], log10_pO2_bar: float
             ) -> Mapping[str, float]:
@@ -1178,7 +1354,9 @@ def _predict_hashimoto_residue_cohort(
                         oxide: amount for oxide, amount in key if amount > 0.0
                     }
                     try:
-                        state = openimcc_bridge.evaluate(
+                        state = _evaluate_openimcc_isolated(
+                            openimcc_bridge.evaluate,
+                            timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
                             composition_mol=current_composition,
                             temperature_K=temperature_K,
                             allow_extrapolation=True,
@@ -1187,6 +1365,12 @@ def _predict_hashimoto_residue_cohort(
                     except ImccNonconvergenceError as exc:
                         raise ResidueEngineNonconvergence(
                             "openimcc", str(exc)
+                        ) from exc
+                    except TimeoutError as exc:
+                        raise ResidueEngineNonconvergence(
+                            "openimcc",
+                            f"Hashimoto residue cohort OpenIMCC timeout: {exc}",
+                            reason="engine_timeout:openimcc:hashimoto_residue_cohort",
                         ) from exc
                     base_pressure_bar = evaluate_gas(
                         state.parent_oxide_activities,
@@ -1761,6 +1945,10 @@ def _predict_sossi_residue_cohort(
         melt_activity_input_policy: dict[str, Any] = {}
         melt_activity_extensions: dict[str, dict[str, Any]] = {}
         if engine == "openimcc":
+            from simulator.diagnostic_helpers.binary_pot_battery import (
+                _ENGINE_OUTER_TIMEOUT_S,
+            )
+
             pO2_exponents = {
                 species: (1.0 if species == "O2" else -reaction_o2 / reaction_parent)
                 for species, _parent, reaction_parent, reaction_o2 in gas_channels
@@ -1781,7 +1969,9 @@ def _predict_sossi_residue_cohort(
                             openimcc_bridge._cleaned_melt_policy(composition)
                         )
                         melt_activity_input_policy.update(activity_input_policy)
-                        state = openimcc_bridge.evaluate(
+                        state = _evaluate_openimcc_isolated(
+                            openimcc_bridge.evaluate,
+                            timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
                             composition_mol=activity_composition,
                             temperature_K=temperature_K,
                             allow_extrapolation=True,
@@ -1789,6 +1979,12 @@ def _predict_sossi_residue_cohort(
                         )
                     except ImccNonconvergenceError as exc:
                         raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
+                    except TimeoutError as exc:
+                        raise ResidueEngineNonconvergence(
+                            "openimcc",
+                            f"Sossi residue cohort OpenIMCC timeout: {exc}",
+                            reason="engine_timeout:openimcc:sossi_residue_cohort",
+                        ) from exc
                     gas_parent_oxide_activities = dict(
                         state.parent_oxide_activities
                     )
@@ -1886,7 +2082,28 @@ def _predict_sossi_residue_cohort(
                 )
                 return response.vapor_pressures_Pa
 
-        initial_pressures = pressure_model(inventory, buffered_logp)
+        try:
+            initial_pressures = pressure_model(inventory, buffered_logp)
+        except ResidueEngineNonconvergence as exc:
+            prediction_rows.append(
+                _SossiResiduePrediction(
+                    experiment_id=experiment_id,
+                    primary_element_ppm={},
+                    geometry_element_ppm={},
+                    sensitivity_band_ppm={},
+                    channel_missing_elements=tuple(missing_elements),
+                    provenance={
+                        "source_id": _SOSSI_SOURCE_ID,
+                        "experiment_id": experiment_id,
+                        "engine": engine,
+                        "run_refusal": {
+                            **exc.as_record(),
+                            "cohort": "sossi_residue_cohort",
+                        },
+                    },
+                )
+            )
+            continue
         pressure_species = {
             species
             for species, pressure in initial_pressures.items()
@@ -1933,6 +2150,7 @@ def _predict_sossi_residue_cohort(
         geometry_predictions: dict[str, dict[str, float]] = {}
         geometry_buffer_exchange: dict[str, float] = {}
         geometry_refinement: dict[str, dict[str, Any]] = {}
+        run_refusal: ResidueEngineNonconvergence | None = None
         for geometry in _SOSSI_GEOMETRIES:
             steps = min(_HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0)))
             previous: dict[str, float] | None = None
@@ -1956,17 +2174,23 @@ def _predict_sossi_residue_cohort(
                         ) ** (2.0 / 3.0)
                     else:
                         area = areas[geometry]
-                    step_result = integrate_residue_inventory(
-                        current_inventory,
-                        channels,
-                        pressure_model,
-                        temperature_K=temperature_K,
-                        duration_s=dt,
-                        area_evolution_m2=(area,),
-                        buffered_fO2_log=buffered_logp,
-                    )
+                    try:
+                        step_result = integrate_residue_inventory(
+                            current_inventory,
+                            channels,
+                            pressure_model,
+                            temperature_K=temperature_K,
+                            duration_s=dt,
+                            area_evolution_m2=(area,),
+                            buffered_fO2_log=buffered_logp,
+                        )
+                    except ResidueEngineNonconvergence as exc:
+                        run_refusal = exc
+                        break
                     current_inventory = dict(step_result.residue_mol)
                     buffer_exchange += step_result.buffer_oxygen_exchange_mol
+                if run_refusal is not None:
+                    break
                 accepted = _sossi_project_element_ppm(
                     current_inventory, buffer_exchange, supported_elements
                 )
@@ -1984,6 +2208,8 @@ def _predict_sossi_residue_cohort(
                     break
                 previous = accepted
                 steps = min(_HASHIMOTO_N_CAP, steps * 2)
+            if run_refusal is not None:
+                break
             geometry_predictions[geometry] = accepted
             geometry_buffer_exchange[geometry] = buffer_exchange
             geometry_refinement[geometry] = {
@@ -1995,6 +2221,27 @@ def _predict_sossi_residue_cohort(
                     else "unconverged_at_cap"
                 ),
             }
+
+        if run_refusal is not None:
+            prediction_rows.append(
+                _SossiResiduePrediction(
+                    experiment_id=experiment_id,
+                    primary_element_ppm={},
+                    geometry_element_ppm=geometry_predictions,
+                    sensitivity_band_ppm={},
+                    channel_missing_elements=tuple(missing_elements),
+                    provenance={
+                        "source_id": _SOSSI_SOURCE_ID,
+                        "experiment_id": experiment_id,
+                        "engine": engine,
+                        "run_refusal": {
+                            **run_refusal.as_record(),
+                            "cohort": "sossi_residue_cohort",
+                        },
+                    },
+                )
+            )
+            continue
 
         bands = {
             element: (

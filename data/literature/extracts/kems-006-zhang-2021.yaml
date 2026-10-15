@@ -1675,7 +1675,7 @@ species:
     - observation_id: zhang_2021_table4_this_study_evaporation_coefficients
       type: alpha
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
         table: '4'
         page: 74
       T_range_K:
@@ -1695,11 +1695,11 @@ species:
         admission_status: admitted
         method_class: directly_reduced_measurement
         derived_from:
-        - tables:kems-006-zhang-2021
+        - pdf:kems-006-zhang-2021
         inference:
           relation: table4_evaporation_coefficient_alpha_fit
           inputs:
-          - tables:kems-006-zhang-2021
+          - pdf:kems-006-zhang-2021
           output_unit: dimensionless
         provenance:
           scoring:
@@ -1809,7 +1809,7 @@ species:
     - observation_id: zhang_2021_table4_K_evaporation_coefficients
       type: alpha
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
         table: '4'
         page: 74
       T_range_K:
@@ -1827,11 +1827,11 @@ species:
         admission_status: admitted
         method_class: directly_reduced_measurement
         derived_from:
-        - tables:kems-006-zhang-2021
+        - pdf:kems-006-zhang-2021
         inference:
           relation: table4_evaporation_coefficient_alpha_fit
           inputs:
-          - tables:kems-006-zhang-2021
+          - pdf:kems-006-zhang-2021
           output_unit: dimensionless
         provenance:
           scoring:

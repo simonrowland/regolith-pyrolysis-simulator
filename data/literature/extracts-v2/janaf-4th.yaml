@@ -89,7 +89,7 @@ observations:
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Cr-001: CRYSTAL LIQUID 2130.000 K'', ''url'': ''https://janaf.nist.gov/tables/Cr-001.html''}'
     record: melting_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Cr_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -177,7 +177,7 @@ observations:
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Cr-001: LIQUID IDEAL GAS 2952.078 K'', ''url'': ''https://janaf.nist.gov/tables/Cr-001.html''}'
     record: normal_boiling_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Fe_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -267,7 +267,7 @@ observations:
       domain starts at 1809 K'', ''webbook'': ''NIST-WB Iron condensed Shomate: liquid T range 1809–3133.345 K (Chase 1998)'',
       ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439896&Mask=2''}'
     record: melting_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Fe_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -357,7 +357,7 @@ observations:
       domain ends 3133.345 K on WebBook Shomate'', ''catalog_crosscheck'': ''catalog boiling_point_C=2862 → 3135.15 K (within
       ~1 K of 3134 K handbook value)''}'
     record: normal_boiling_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::JANAF1998_P2_formation_tabulation
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -457,7 +457,7 @@ observations:
     note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
     source_path: https://janaf.nist.gov/tables/P-012.html
     record: JANAF1998_P2_formation_tabulation
-  read_from: tables:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -559,7 +559,7 @@ observations:
   locator:
     note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
     record: JANAF1998_P4O10_gas_formation_tabulation
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::JANAF1998_P4O10_pure_solid_sublimation_screening
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -599,7 +599,7 @@ observations:
   locator:
     note: Chase (1998) NIST-JANAF tables O-094 and O-095; screening arithmetic this work
     record: JANAF1998_P4O10_pure_solid_sublimation_screening
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -701,7 +701,7 @@ observations:
     note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
     source_path: https://janaf.nist.gov/tables/O-087.html
     record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
-  read_from: tables:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::JANAF1998_P4_formation_tabulation
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -805,7 +805,7 @@ observations:
     note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
     source_path: https://janaf.nist.gov/tables/P-013.html
     record: JANAF1998_P4_formation_tabulation
-  read_from: tables:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -917,7 +917,7 @@ observations:
     note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
     source_path: https://janaf.nist.gov/tables/O-032.html
     record: JANAF1998_PO2_formation_tabulation
-  read_from: tables:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::JANAF1998_PO_formation_tabulation
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -1030,7 +1030,7 @@ observations:
       (Phosphorus Oxide, PO, g), pp. ~1642
     source_path: https://janaf.nist.gov/tables/O-004.html
     record: JANAF1998_PO_formation_tabulation
-  read_from: tables:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::KCl_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -1118,7 +1118,7 @@ observations:
   locator:
     note: '{''primary'': ''CRC / JANAF KCl(cr,l) conventional melt ~1045 K''}'
     record: melting_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::KCl_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -1207,7 +1207,7 @@ observations:
     note: '{''primary'': ''Stull (1947) via NIST-WB KCl Antoine (CAS 7447-40-7); CRC bp 1420 C as in vapor_pressures.yaml'',
       ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7447407&Units=SI&Mask=4''}'
     record: normal_boiling_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::MgCl2_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -1295,7 +1295,7 @@ observations:
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF MgCl2 table Cl-083: CRYSTAL LIQUID 950.000 K'', ''url'': ''https://janaf.nist.gov/tables/Cl-083.html''}'
     record: melting_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Mn_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -1383,7 +1383,7 @@ observations:
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Mn-001: DELTA LIQUID 1519.000 K'', ''url'': ''https://janaf.nist.gov/tables/Mn-001.html''}'
     record: melting_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Mn_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -1471,7 +1471,7 @@ observations:
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Mn-001: LIQUID IDEAL GAS 2334.526 K'', ''url'': ''https://janaf.nist.gov/tables/Mn-001.html''}'
     record: normal_boiling_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::NaCl_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -1561,7 +1561,7 @@ observations:
       ''note'': ''WebBook phase page empty; value is standard JANAF/CRC halide melt — CONFIRM against open JANAF NaCl table
       text before promote (table Cl-067 fetched; explicit CRYSTAL LIQUID labe'
     record: melting_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::NaCl_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -1652,7 +1652,7 @@ observations:
       (NaCl entry as compiled on NIST-WB Antoine page for CAS 7647-14-5)'', ''secondary'': ''CRC Handbook normal boiling point
       1465 C (as cited in vapor_pressures.yaml pure_component_antoine sour'
     record: normal_boiling_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::NaF_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -1741,7 +1741,7 @@ observations:
     note: '{''primary'': ''Chase (1998) NIST-JANAF NaF(cr,l) table F-033: CRYSTAL LIQUID at 1269.000 K (row immediately before
       liquid domain)'', ''url'': ''https://janaf.nist.gov/tables/F-033.html''}'
     record: melting_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::NaF_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -1830,7 +1830,7 @@ observations:
     note: '{''primary'': ''CRC normal boiling point 1704 C as retained in vapor_pressures.yaml NaF notes (interval-only identity
       row)''}'
     record: normal_boiling_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Na_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -1920,7 +1920,7 @@ observations:
       Blackwell Sci. Pub., Oxford'', ''webbook'': ''NIST Chemistry WebBook SRD 69, Sodium (CAS 7440-23-5), phase change: Tfus=370.96
       K; TRC u=0.01 K; recommended fixed point for thermometry'', ''ur'
     record: melting_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Na_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2009,7 +2009,7 @@ observations:
     note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69 Sodium: Tboil=1156 K; TRC
       u=1 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440235&Units=SI&Mask=4''}'
     record: normal_boiling_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Na_triple_point_temperature
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2098,7 +2098,7 @@ observations:
     note: '{''primary'': ''Honig, R.E. & Kramer, D.A. (1969) Vapor pressure data for the solid and liquid elements, RCA Rev.
       30, 285'', ''webbook'': ''NIST-WB SRD 69 Sodium: Ttriple=370.98 K; TRC u=0.03 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440235&Units=SI&Mask=4''}'
     record: triple_point_temperature
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Si_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2187,7 +2187,7 @@ observations:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Si(cr,l) table Si-001: CRYSTAL LIQUID transition at 1685.000 K'', ''url'':
       ''https://janaf.nist.gov/tables/Si-001.html''}'
     record: melting_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Si_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2275,7 +2275,7 @@ observations:
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Si-001: LIQUID IDEAL GAS 3504.616 K'', ''url'': ''https://janaf.nist.gov/tables/Si-001.html''}'
     record: normal_boiling_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Ti_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2363,7 +2363,7 @@ observations:
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Ti-001: BETA LIQUID 1939.000 K'', ''url'': ''https://janaf.nist.gov/tables/Ti-001.html''}'
     record: melting_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Ti_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2451,7 +2451,7 @@ observations:
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Ti-001: LIQUID IDEAL GAS 3630.956 K'', ''url'': ''https://janaf.nist.gov/tables/Ti-001.html''}'
     record: normal_boiling_point
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::Ti_solid_solid_transition
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2539,7 +2539,7 @@ observations:
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Ti-001: ALPHA BETA 1166.000 K'', ''url'': ''https://janaf.nist.gov/tables/Ti-001.html''}'
     record: solid_solid_transition
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_BaO_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2621,7 +2621,7 @@ observations:
     note: 'NIST-JANAF BaO(g) Chase 1998 (REF-020) — independent evaluation path from LH87 JPCRD review (shared literature
       pool caveat: still the best available second table; true lab independence would be raw KEMS of Farber/other).'
     record: JANAF-4th#BaO_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_Cr2O3_gas_melt_partial
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2663,7 +2663,7 @@ observations:
       and later Cr–O gas KEMS reviews; JANAF CrO/CrO2/CrO3(g) Chase 1998. Live numeric CrO2 family fit is JANAF minimax —
       for CrO2 see P1 independence via measured KEMS, not JANAF self-check.'
     record: JANAF-4th#CrO2_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_FeO_gas_melt_partial_or_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2705,7 +2705,7 @@ observations:
       volatility entry (review — use only to locate primaries). (B) Primary preferred: Kazenas, E.K. & Tsvetkov, Yu.V., Thermodynamics
       of Evaporation of Oxides (book; Russian academy series) '
     record: JANAF-4th#FeO_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_K2Cl2_dimer_partial
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2745,7 +2745,7 @@ observations:
   locator:
     note: Analogous KCl dimer KEMS literature + JANAF K2Cl2(g)
     record: JANAF-4th#K2Cl2_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_MnO_gas_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2826,7 +2826,7 @@ observations:
   locator:
     note: JANAF MnO(g) Chase 1998 (REF-020); Sossi & Fegley 2018 Table 1 MnO(g) entry as literature pointer only.
     record: JANAF-4th#MnO_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_NaF_pure_Psat
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2907,7 +2907,7 @@ observations:
   locator:
     note: JANAF NaF(l/g); molten NaF vapor-pressure / KEMS (not Stull-only)
     record: JANAF-4th#NaF
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_NiO_gas_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -2988,7 +2988,7 @@ observations:
   locator:
     note: JANAF NiO(g) Chase 1998 (REF-020); oxide vaporization reviews (Kazenas & Tsvetkov) for Ni–O gas.
     record: JANAF-4th#NiO_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_O_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3071,7 +3071,7 @@ observations:
       anchor (spectroscopic + thermal). Not a pure-component Psat. Independence: acquisition row did not fit an Antoine to
       JANAF; it declares pO2 exponent 0.5 from stoichiometry.'
     record: JANAF-4th#O_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_P2_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3152,7 +3152,7 @@ observations:
   locator:
     note: JANAF P2(g) Chase 1998; gas-phase P4 ⇌ 2 P2 equilibrium data
     record: JANAF-4th#P2_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_PO2_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3233,7 +3233,7 @@ observations:
   locator:
     note: JANAF PO2(g) Chase 1998
     record: JANAF-4th#PO2_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_PO_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3314,7 +3314,7 @@ observations:
   locator:
     note: JANAF PO(g) Chase 1998 (REF-020); Sossi & Fegley 2018 Table 5 carrier role
     record: JANAF-4th#PO_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_S2_pure_Psat_or_speciation
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3357,7 +3357,7 @@ observations:
   locator:
     note: JANAF S2(g); Rau / sulfur allotrope vapor-pressure ladder (analogous to Se); Stull total-S if not already the fit
     record: JANAF-4th#S2_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_SO3_pure_Psat
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3440,7 +3440,7 @@ observations:
       earlier: Miles et al. oleum Psat compilations). Prefer: Liler, M. (1971) Reaction Mechanisms in Sulphuric Acid chapter
       data, or primary Abercromby alternative — Giauque-class SO3 vaporizati'
     record: JANAF-4th#SO3_l_g_deltafG_crosscheck
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_SiO2_gas_melt_partial
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3482,7 +3482,7 @@ observations:
       for minority channel. Plant-relevant independent evidence is SiO(g) melt partials — see SiO P1 row (Costa & Jacobson
       2015; Schaefer & Fegley 2004 Table 9).'
     record: JANAF-4th#SiO2_g_minority
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_TiO2_gas_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3564,7 +3564,7 @@ observations:
     note: JANAF TiO(g)/TiO2(g) Chase 1998 (REF-020); LH87 Ti–O gas if tabulated; melt-context Ti volatility reviews in Sossi
       & Fegley 2018 Table 1.
     record: JANAF-4th#TiO_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::anchor_Ti_pure_Psat
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3647,7 +3647,7 @@ observations:
       J.W., Johnston, H.L. & Ditmars, W.E. historical Ti vapor-pressure work as cited by Alcock (use primary pages, not Alcock
       coefficients).'
     record: JANAF-4th#Ti_g
-  read_from: pdf:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::extreme_reduction_from_phosphate
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3686,7 +3686,7 @@ observations:
     note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
     source_path: https://janaf.nist.gov/tables/P-012.html
     record: extreme_reduction_from_phosphate
-  read_from: tables:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::extreme_reduction_from_phosphate_P4
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3725,7 +3725,7 @@ observations:
     note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
     source_path: https://janaf.nist.gov/tables/P-013.html
     record: extreme_reduction_from_phosphate_P4
-  read_from: tables:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::janaf_P2_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3810,7 +3810,7 @@ observations:
     note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
     source_path: https://janaf.nist.gov/tables/P-012.html
     record: JANAF P-012
-  read_from: tables:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::janaf_P4O6_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3895,7 +3895,7 @@ observations:
     note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
     source_path: https://janaf.nist.gov/tables/O-087.html
     record: JANAF O-087
-  read_from: tables:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::janaf_P4_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3980,7 +3980,7 @@ observations:
     note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
     source_path: https://janaf.nist.gov/tables/P-013.html
     record: JANAF P-013
-  read_from: tables:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::janaf_PO2_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -4063,7 +4063,7 @@ observations:
     note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
     source_path: https://janaf.nist.gov/tables/O-032.html
     record: JANAF O-032
-  read_from: tables:janaf-4th
+  read_from: unknown:janaf-4th
 - observation_id: janaf-4th::janaf_PO_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -4147,4 +4147,4 @@ observations:
       (Phosphorus Oxide, PO, g), pp. ~1642
     source_path: https://janaf.nist.gov/tables/O-004.html
     record: JANAF O-004
-  read_from: tables:janaf-4th
+  read_from: unknown:janaf-4th

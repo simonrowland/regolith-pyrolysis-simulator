@@ -110,6 +110,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for AgO0.5(l) = Ag(g) + 1/4 O2
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_ag_logKstar_table3_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -337,12 +346,16 @@ observations:
         line_range: 1112-1118
         note: Table 4 γ_i (this work) for AgO0.5; authors set α_e=1 and compute γ from K*/K
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_ag_logKstar_table3
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_ag_logKstar_table3
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_ag_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -566,6 +579,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for CdO(l) = Cd(g) + 1/2 O2
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_cd_logKstar_table3_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -793,12 +815,16 @@ observations:
         line_range: 1112-1118
         note: Table 4 γ_i (this work) for CdO; authors set α_e=1 and compute γ from K*/K
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_cd_logKstar_table3
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_cd_logKstar_table3
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_cd_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -1022,6 +1048,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for CrO(l) + 1/2 O2 = CrO2(g)
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -1196,12 +1231,17 @@ observations:
         line_range: 1121-1127
         note: Table 5 experimental columns
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_cr_logKstar_table3_CrO_ox
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: '* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi
+      remains constant over all temperatures.'
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_cr_logKstar_table3_CrO_ox
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_cr_table5_experimental_CrO_ox_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -1373,6 +1413,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for CuO0.5(l) = Cu(g) + 1/4 O2
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_cu_logKstar_table3_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -1609,12 +1658,16 @@ observations:
     note: Table 4 γ_i (this work) for CuO0.5; authors set α_e=1 and compute γ from K*/K
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
   read_from: unknown:kems-012-sossi-2019
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_cu_logKstar_table3
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_cu_logKstar_table3
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_cu_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -1822,12 +1875,17 @@ observations:
         line_range: 1121-1127
         note: Table 5 experimental columns
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_cu_logKstar_table3
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors derive ΔH* and ΔS* from the temperature dependence of experimental log K* using the second law (Table
+      5; §4.7, Eqs. 17–18).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_cu_logKstar_table3
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_cu_table5_experimental_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -1999,6 +2057,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for GaO1.5(l) = GaO(g) + 1/4 O2
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -2224,6 +2291,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for GaO1.5(l) = Ga(g) + 3/4 O2
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -2407,12 +2483,17 @@ observations:
         line_range: 1121-1127
         note: Table 5 experimental columns
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_Ga_g
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors derive ΔH* and ΔS* from the temperature dependence of experimental log K* using the second law (Table
+      5; §4.7, Eqs. 17–18).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_Ga_g
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_ga_table5_experimental_Ga_g_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -11609,6 +11690,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for GeO2(l) = GeO(g) + 1/2 O2
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_ge_logKstar_table3_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -11845,12 +11935,16 @@ observations:
     note: Table 4 γ_i (this work) for GeO2; authors set α_e=1 and compute γ from K*/K
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
   read_from: unknown:kems-012-sossi-2019
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_ge_logKstar_table3
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_ge_logKstar_table3
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_ge_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -12058,12 +12152,17 @@ observations:
         line_range: 1121-1127
         note: Table 5 experimental columns
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_ge_logKstar_table3
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors derive ΔH* and ΔS* from the temperature dependence of experimental log K* using the second law (Table
+      5; §4.7, Eqs. 17–18).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_ge_logKstar_table3
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_ge_table5_experimental_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -13045,12 +13144,17 @@ observations:
         line_range: 1121-1127
         note: Table 5 experimental columns
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_k_logKstar_table3
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: '* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi
+      remains constant over all temperatures.'
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_k_logKstar_table3
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_k_table5_experimental_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -22245,6 +22349,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for LiO0.5(l) + 1/4 O2 = LiO(g)
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_li_logKstar_table3_LiO_g_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -22469,6 +22582,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for LiO0.5(l) = Li(g) + 1/4 O2
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_li_logKstar_table3_Li_g_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -22706,12 +22828,16 @@ observations:
         line_range: 1112-1118
         note: Table 4 γ_i (this work) for LiO0.5; authors set α_e=1 and compute γ from K*/K
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_li_logKstar_table3_Li_g
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_li_logKstar_table3_Li_g
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_li_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -22903,12 +23029,17 @@ observations:
         line_range: 1121-1127
         note: Table 5 experimental columns
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_li_logKstar_table3_Li_g
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: '* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi
+      remains constant over all temperatures.'
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_li_logKstar_table3_Li_g
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_li_table5_experimental_Li_g_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -49180,12 +49311,15 @@ observations:
         line_range: 1121-1127
         note: Table 5 pure-system columns (not this experiment)
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: Table 5 reprints pure-system ΔH° and ΔS° from cited literature, with γi = 1; these are not experimental values
+      (Table 5; §4.7).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_mn_table5_pure_system_not_experimental_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -49295,12 +49429,16 @@ observations:
       experiments'
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_mn_table5_pure_system_not_experimental
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors calculate Te1 from pure-system thermodynamic data at stated oxygen fugacity (Table 6; §5.1).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_mn_table5_pure_system_not_experimental
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_mn_table6_te1_pure_system_derived_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -49457,6 +49595,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for MoO2(l) + 1/2 O2 = MoO3(g)
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -49682,6 +49829,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for MoO3(l) = MoO3(g)
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -49865,12 +50021,17 @@ observations:
         line_range: 1121-1127
         note: Table 5 experimental columns
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO3_congruent
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: '* denotes elements for which logK* was measured at only 1 temperature, ∆S* and ∆H* determined by assuming γi
+      remains constant over all temperatures.'
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO3_congruent
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_mo_table5_experimental_MoO3_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -51177,6 +51338,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for PbO(l) = PbO(g)
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_PbO_g_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -51386,6 +51556,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for PbO(l) = Pb(g) + 1/2 O2
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_Pb_g_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -51598,12 +51777,16 @@ observations:
     note: Table 4 γ_i (this work) for PbO; authors set α_e=1 and compute γ from K*/K
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
   read_from: unknown:kems-012-sossi-2019
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_Pb_g
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_Pb_g
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_pb_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -51805,12 +51988,17 @@ observations:
         line_range: 1121-1127
         note: Table 5 experimental columns
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_PbO_g
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors derive ΔH* and ΔS* from the temperature dependence of experimental log K* using the second law (Table
+      5; §4.7, Eqs. 17–18).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_PbO_g
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_pb_table5_experimental_PbO_g_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -51982,6 +52170,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for RbO0.5(l) = Rb(g) + 1/4 O2
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_rb_logKstar_table3_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -52209,12 +52406,16 @@ observations:
     note: Table 4 γ_i (this work) for RbO0.5; authors set α_e=1 and compute γ from K*/K
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
   read_from: unknown:kems-012-sossi-2019
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_rb_logKstar_table3
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_rb_logKstar_table3
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_rb_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -52414,12 +52615,17 @@ observations:
         line_range: 1121-1127
         note: Table 5 experimental columns
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_rb_logKstar_table3
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors derive ΔH* and ΔS* from the temperature dependence of experimental log K* using the second law (Table
+      5; §4.7, Eqs. 17–18).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_rb_logKstar_table3
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_rb_table5_experimental_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -105810,6 +106016,15 @@ observations:
         line_range: 1108-1112
         note: Table 3 fitted logK* for ZnO(l) = Zn(g) + 1/2 O2
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_zn_logKstar_table3_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -106046,12 +106261,16 @@ observations:
     note: Table 4 γ_i (this work) for ZnO; authors set α_e=1 and compute γ from K*/K
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-012-sossi-2019/tables.md
   read_from: unknown:kems-012-sossi-2019
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_zn_logKstar_table3
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors calculated activity coefficients with αe = 1 from Eq. 6 (Table 4; §4.6).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_zn_logKstar_table3
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_zn_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -106259,12 +106478,17 @@ observations:
         line_range: 1121-1127
         note: Table 5 experimental columns
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  derived_from:
+  - tables:kems-012-sossi-2019
+  - kems-012-sossi-2019::sossi_2019_zn_logKstar_table3
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: The authors derive ΔH* and ΔS* from the temperature dependence of experimental log K* using the second law (Table
+      5; §4.7, Eqs. 17–18).
     inputs:
-    - unknown:kems-012-sossi-2019
+    - tables:kems-012-sossi-2019
+    - kems-012-sossi-2019::sossi_2019_zn_logKstar_table3
     parameters: []
-    output_unit: Pa
+    output_unit: as_published
 - observation_id: kems-012-sossi-2019::sossi_2019_zn_table5_experimental_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:

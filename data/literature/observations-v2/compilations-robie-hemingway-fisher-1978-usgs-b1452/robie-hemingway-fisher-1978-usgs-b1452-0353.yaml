@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
 observations:
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1000:col=entropy:v=9040ebe14c
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1000:col=entropy:v=9040ebe14c:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -14,8 +14,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -77,8 +77,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='401.71'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -97,7 +108,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1100:col=entropy:v=9457f54d42
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1100:col=entropy:v=9457f54d42:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -109,8 +120,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -172,8 +183,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='425.65'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -192,7 +214,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1200:col=entropy:v=03d7c6967e
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1200:col=entropy:v=03d7c6967e:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -204,8 +226,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -267,8 +289,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='447.87'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -287,7 +320,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1300:col=entropy:v=dbb8b6a0e9
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1300:col=entropy:v=dbb8b6a0e9:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -299,8 +332,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -362,8 +395,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='468.59'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -382,7 +426,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1400:col=entropy:v=12b182653b
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1400:col=entropy:v=12b182653b:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -394,8 +438,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -457,8 +501,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='488.01'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -477,7 +532,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1500:col=entropy:v=7f61993dc4
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1500:col=entropy:v=7f61993dc4:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -489,8 +544,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -552,8 +607,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='506.26'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -572,7 +638,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1600:col=entropy:v=068b707a37
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=1600:col=entropy:v=068b707a37:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -584,8 +650,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -647,8 +713,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='523.47'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -667,7 +744,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=298.15:col=entropy:v=a3e64ace3b
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=298.15:col=entropy:v=a3e64ace3b:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -679,8 +756,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -742,8 +819,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='143.09'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -762,7 +850,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=400:col=entropy:v=32a143e854
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=400:col=entropy:v=32a143e854:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -774,8 +862,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -837,8 +925,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='196.45'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -857,7 +956,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=600:col=entropy:v=abfdf6e161
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=600:col=entropy:v=abfdf6e161:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -869,8 +968,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -932,8 +1031,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='281.24'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -952,7 +1062,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=700:col=entropy:v=4eaa0d2f35
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=700:col=entropy:v=4eaa0d2f35:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -964,8 +1074,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -1027,8 +1137,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='316.13'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1047,7 +1168,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=800:col=entropy:v=f5959a3db3
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=800:col=entropy:v=f5959a3db3:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -1059,8 +1180,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -1122,8 +1243,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='347.40'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1142,7 +1274,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=900:col=entropy:v=5d267aaeff
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:S:shared:T=900:col=entropy:v=5d267aaeff:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -1154,8 +1286,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -1217,8 +1349,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='375.76'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1237,7 +1380,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1000:col=heat_capacity:v=70c97faa83
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1000:col=heat_capacity:v=70c97faa83:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -1249,8 +1392,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -1312,8 +1455,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='248.90'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1332,7 +1486,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1100:col=heat_capacity:v=d687c8504e
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1100:col=heat_capacity:v=d687c8504e:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -1344,8 +1498,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -1407,8 +1561,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='253.39'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1427,7 +1592,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1200:col=heat_capacity:v=4a28103bd1
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1200:col=heat_capacity:v=4a28103bd1:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -1439,8 +1604,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -1502,8 +1667,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='257.27'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1522,7 +1698,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1300:col=heat_capacity:v=fd3890e950
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1300:col=heat_capacity:v=fd3890e950:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -1534,8 +1710,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -1597,8 +1773,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='260.59'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1617,7 +1804,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1400:col=heat_capacity:v=1e76cdc727
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1400:col=heat_capacity:v=1e76cdc727:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -1629,8 +1816,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -1692,8 +1879,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='263.38'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1712,7 +1910,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1500:col=heat_capacity:v=c4f54f38e1
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1500:col=heat_capacity:v=c4f54f38e1:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -1724,8 +1922,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -1787,8 +1985,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='265.67'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1807,7 +2016,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1600:col=heat_capacity:v=3e98e7dd6f
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=1600:col=heat_capacity:v=3e98e7dd6f:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -1819,8 +2028,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -1882,8 +2091,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='267.48'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1902,7 +2122,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=298.15:col=heat_capacity:v=49b756003e
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=298.15:col=heat_capacity:v=49b756003e:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -1914,8 +2134,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -1977,8 +2197,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='166.52'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1997,7 +2228,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=400:col=heat_capacity:v=5ebb5371d7
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=400:col=heat_capacity:v=5ebb5371d7:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -2009,8 +2240,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -2072,8 +2303,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='194.83'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2092,7 +2334,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=600:col=heat_capacity:v=52700f2dd8
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=600:col=heat_capacity:v=52700f2dd8:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -2104,8 +2346,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -2167,8 +2409,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='221.96'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2187,7 +2440,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=700:col=heat_capacity:v=a2fdb726ab
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=700:col=heat_capacity:v=a2fdb726ab:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -2199,8 +2452,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -2262,8 +2515,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='230.60'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2282,7 +2546,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=800:col=heat_capacity:v=a63aa5c50e
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=800:col=heat_capacity:v=a63aa5c50e:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -2294,8 +2558,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -2357,8 +2621,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='237.70'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2377,7 +2652,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=900:col=heat_capacity:v=0f485028ab
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:cp:shared:T=900:col=heat_capacity:v=0f485028ab:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -2389,8 +2664,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -2452,8 +2727,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='243.72'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2472,7 +2758,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fG:from_the_elements:T=1300:col=formation_gibbs_energy:v=16e6046767
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fG:from_the_elements:T=1300:col=formation_gibbs_energy:v=16e6046767:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -2484,8 +2770,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -2511,8 +2797,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -2652,8 +2938,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-2455.994'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2682,7 +2979,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fG:from_the_elements:T=1500:col=formation_gibbs_energy:v=3743b75fe9
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fG:from_the_elements:T=1500:col=formation_gibbs_energy:v=3743b75fe9:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -2694,8 +2991,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -2721,8 +3018,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -2862,8 +3159,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-2327.674'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -2892,7 +3200,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=1000:col=formation_enthalpy:v=039301baf6
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=1000:col=formation_enthalpy:v=039301baf6:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -2904,8 +3212,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -2931,8 +3239,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -3072,8 +3380,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-3209.601'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -3102,7 +3421,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=1100:col=formation_enthalpy:v=e69d3959f9
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=1100:col=formation_enthalpy:v=e69d3959f9:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -3114,8 +3433,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -3141,8 +3460,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -3282,8 +3601,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-3207.899'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -3312,7 +3642,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=1200:col=formation_enthalpy:v=3c907ac3a8
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=1200:col=formation_enthalpy:v=3c907ac3a8:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -3324,8 +3654,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -3351,8 +3681,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -3492,8 +3822,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-3213.333'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -3522,7 +3863,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=1300:col=formation_enthalpy:v=9b0706ec5f
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=1300:col=formation_enthalpy:v=9b0706ec5f:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -3534,8 +3875,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -3561,8 +3902,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -3702,8 +4043,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-3209.850'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -3732,7 +4084,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=1400:col=formation_enthalpy:v=c9a8e15f8f
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=1400:col=formation_enthalpy:v=c9a8e15f8f:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -3744,8 +4096,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -3771,8 +4123,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -3912,8 +4264,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-3333.180'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -3942,7 +4305,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=1600:col=formation_enthalpy:v=a8e72fb86f
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=1600:col=formation_enthalpy:v=a8e72fb86f:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -3954,8 +4317,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -3981,8 +4344,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -4122,8 +4485,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-3323.214'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -4152,7 +4526,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:v=53ea6a8fba
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:v=53ea6a8fba:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -4164,8 +4538,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -4191,8 +4565,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -4332,8 +4706,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-3210.760'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -4362,7 +4747,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=400:col=formation_enthalpy:v=0b32f3b39d
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=400:col=formation_enthalpy:v=0b32f3b39d:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -4374,8 +4759,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -4401,8 +4786,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -4542,8 +4927,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-3210.800'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -4572,7 +4968,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=600:col=formation_enthalpy:v=f356659b3f
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=600:col=formation_enthalpy:v=f356659b3f:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -4584,8 +4980,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -4611,8 +5007,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -4752,8 +5148,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-3207.850'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -4782,7 +5189,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=700:col=formation_enthalpy:v=fb616ef3b7
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=700:col=formation_enthalpy:v=fb616ef3b7:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -4794,8 +5201,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -4821,8 +5228,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -4962,8 +5369,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-3205.893'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -4992,7 +5410,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=800:col=formation_enthalpy:v=825832eedf
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=800:col=formation_enthalpy:v=825832eedf:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -5004,8 +5422,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -5031,8 +5449,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -5172,8 +5590,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-3204.605'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -5202,7 +5631,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=900:col=formation_enthalpy:v=18473b9c34
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:delta_fH:from_the_elements:T=900:col=formation_enthalpy:v=18473b9c34:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -5214,8 +5643,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -5241,8 +5670,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -5382,8 +5811,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='-3202.512'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -5412,7 +5852,7 @@ observations:
           pdf_page_index: 36
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:log10_Kf:from_the_elements:T=1300:col=log_kf:v=bf0f2c0454
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:log10_Kf:from_the_elements:T=1300:col=log_kf:v=bf0f2c0454:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -5424,8 +5864,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -5451,8 +5891,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -5592,8 +6032,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='98.683'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -5614,7 +6065,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:log10_Kf:from_the_elements:T=1500:col=log_kf:v=12b061f795
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:log10_Kf:from_the_elements:T=1500:col=log_kf:v=12b061f795:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -5626,8 +6077,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -5653,8 +6104,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -5794,8 +6245,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='81.057'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -5816,7 +6278,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:log10_Kf:from_the_elements:T=700:col=log_kf:v=df94745ded
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:log10_Kf:from_the_elements:T=700:col=log_kf:v=df94745ded:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0353:tabulation
   identity:
     quantity:
@@ -5828,8 +6290,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -5855,8 +6317,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Crystals 298.15 to aeltiuq point 1664 K.' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -5996,8 +6458,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 379
+        pdf_page_index: 385
+        table: robie-hemingway-fisher-1978-usgs-b1452-0353
+        note: as_published='209.157'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0353.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0353
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:

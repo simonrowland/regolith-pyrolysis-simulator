@@ -2531,7 +2531,7 @@ def test_report_rebuilt_from_payloads_keeps_the_tier_split() -> None:
     )
     assert "## Measured tier" in report
     assert "## Compilation tier" in report
-    assert "| thermochemistry | internal-analytical | 0 | 0 | 0 |" in report
+    assert "| thermochemistry | internal-analytical | — | 0 | 0 | 0 |" in report
     assert "| internal-analytical | 1 |" in report
     census = report.split("## Refusal census", 1)[1]
     assert "internal-analytical" not in census or "0 |" in report

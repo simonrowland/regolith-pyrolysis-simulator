@@ -220,6 +220,23 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "reference": Polymorph.REFERENCE,
 }
 
+# Named phases whose tokens are valid only beside their mineral formula.
+# Diopside's two formulas are equivalent ways the cited compilations print
+# CaMgSi2O6; the other labels have one formula here.
+POLYMORPH_FORMULAS: dict[Polymorph, frozenset[str]] = {
+    Polymorph.CLINOENSTATITE: frozenset({"MgSiO3"}),
+    Polymorph.DIOPSIDE: frozenset({"CaMgSi2O6", "CaMg(SiO3)2"}),
+    Polymorph.ALBITE_HIGH: frozenset({"NaAlSi3O8"}),
+    Polymorph.SANIDINE_HIGH: frozenset({"KAlSi3O8"}),
+}
+
+
+def polymorph_matches_formula(formula: str, token: Polymorph) -> bool:
+    """Whether a formula supports a formula-scoped named phase token."""
+
+    allowed = POLYMORPH_FORMULAS.get(token)
+    return allowed is None or formula in allowed
+
 CROSS_SOURCE_EQUIVALENCES: tuple[tuple[str, str, str, Polymorph], ...] = (
     ("Al2O3", "Alpha", "Corundum", Polymorph.CORUNDUM),
     ("Al2SiO5", "Andalusite", "Andalusite", Polymorph.ANDALUSITE),

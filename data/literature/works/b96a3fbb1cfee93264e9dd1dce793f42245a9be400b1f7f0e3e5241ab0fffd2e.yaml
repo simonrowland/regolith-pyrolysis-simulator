@@ -17,18 +17,6 @@ work:
       sha256:
         tag: value
         value: 0ab4154b0fdeac29581f8d047a4cb6836c138c0b41da8f28990ef7d3e2756765
-    - asset_id: pdftotext:nasa-cea-thermo
-      role: pdftotext
-      path: text/nasa-cea-thermo
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:nasa-cea-thermo
-      role: table_csv
-      path: tables/nasa-cea-thermo
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:nasa-cea-thermo
       role: pdftotext
       path: unknown

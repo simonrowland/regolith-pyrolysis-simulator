@@ -1,4 +1,4 @@
-"""Shared classification of engine source metadata versus ancestry ids."""
+"""Shared helpers for source assets, engine metadata, and ancestry ids."""
 
 from __future__ import annotations
 
@@ -20,6 +20,12 @@ _OPENIMCC_ENGINE_IDENTITY_FIELDS: tuple[tuple[str, str], ...] = (
     ("openimcc-condensate-table", "condensate_table_digest"),
     ("openimcc-gas-table", "gas_table_digest"),
 )
+
+
+def _is_unknown_source_asset(asset_id: str) -> bool:
+    """Identify the generated fallback asset for an unmatched INDEX layer."""
+
+    return asset_id.startswith("unknown:")
 
 
 def openimcc_engine_identity_sources(

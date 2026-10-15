@@ -150,6 +150,7 @@ def test_positive_sub_tolerance_lot_retains_consistent_kg_and_mol(oxygen_kg) -> 
         meta={"amount_basis": "mol", "species_mol": {"O2": oxygen_mol}},
     )
     for retained in (lot, lot.without_empty()):
+        assert retained.meta["amount_basis"] == "mol"
         assert retained.species_kg == {"O2": oxygen_kg}
         assert retained.species_moles_for()["O2"] == oxygen_mol
         assert retained.meta["species_mol"]["O2"] == oxygen_mol
@@ -176,6 +177,11 @@ def test_h190_fe_reduction_retains_tiny_oxygen_credit_and_closes() -> None:
     ))
     transition = ledger.transitions[-1]
     oxygen_lot = next(lot for lot in transition.credits if lot.account == "process.overhead_gas")
+    assert oxygen_lot.meta["amount_basis"] == "mol"
+    assert oxygen_lot.meta["species_mol"] == {"O2": oxygen_mol}
+    assert oxygen_lot.species_kg["O2"] == (
+        oxygen_mol * resolve_species_formula("O2").molar_mass_kg_per_mol()
+    )
     assert oxygen_lot.species_moles_for()["O2"] == oxygen_mol
     assert oxygen_lot.species_moles_for() == dict(oxygen_lot.meta["species_mol"])
     after_mass = math.fsum(ledger.total_kg_by_account().values())

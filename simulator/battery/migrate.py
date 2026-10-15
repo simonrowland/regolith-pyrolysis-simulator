@@ -55,9 +55,11 @@ import yaml
 from simulator.battery.polymorph_dictionary import (
     POLYMORPH_ALIASES,
     is_generic_polymorph_name,
+    polymorph_matches_formula,
     resolve_formula_polymorph,
 )
 from simulator.battery.extract_context import iter_extract_context_containers
+from simulator.battery.source_lineage import _is_unknown_source_asset
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -3640,10 +3642,19 @@ def _mole_fraction_composition_from_values(
             for token, amount in _composition_mol_items(raw):
                 # Declared amounts have one owner; malformed → ValueError (hard issue).
                 parsed = parse_declared_amount(amount)
-                if parse_species_formula(token) is None:
+                component = token
+                if token == "FeO+FeO1.5":
+                    # Premise: Borisov's composition_mol values are mole fractions
+                    # of oxide formula units, and FeO and FeO1.5 each contain one Fe.
+                    # Algebra: X_FeOT = X_FeO + X_FeO1.5, the total Fe fraction;
+                    # no Fe2+/Fe3+ split (or measured ratio) is used. Unit check:
+                    # both sides are mole fractions. Sanity check: row 438 closes at
+                    # 1.000000 before and after this name-only mapping.
+                    component = "FeO"
+                if parse_species_formula(component) is None:
                     omitted.append(token)
                     continue
-                components.append((token, parsed))
+                components.append((component, parsed))
     if len(components) < 2:
         for key in ("X_Na2O_as_published", "X_Na2O"):
             fraction = _as_dec_or_none(values.get(key))
@@ -6151,13 +6162,11 @@ def lineage_parents_from_source(
     local_ids: set[str],
     asset_ids: set[str] | frozenset[str] = frozenset(),
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
-    """Source-stated lineage as (parents, prose). Never invents a pointer.
+    """Source-stated lineage as (parents, prose), without inventing pointers.
 
-    A stated parent resolves only against a local observation id or an
-    already-qualified ``source::id`` reference. Bare text that names no
-    resolvable id is prose about how the value was obtained; it is returned
-    in the second tuple so the caller can route it to the queue rather than
-    minting a ``source::prose`` pointer that cannot resolve by construction.
+    Unqualified prose is returned separately for queueing. Namespaced
+    references are kept for store validation, which checks them against the
+    observation's Work assets and observation ids.
     """
 
     raw = values.get("derived_from")
@@ -6182,15 +6191,11 @@ def lineage_parents_from_source(
         local = item[len(prefix):] if item.startswith(prefix) else item
         if local in local_ids:
             parents.append(f"{prefix}{local}")
-        elif item == f"tables:{source_id}":
-            # The source's root table asset is a stable lineage link. More
-            # specific table filenames resolve only when registered.
+        elif item in asset_ids:
             parents.append(item)
-        elif item.startswith("tables:") and item in asset_ids:
-            parents.append(item)
-        elif "::" in item:
-            # Source-stated qualified pointer; kept as written. If it
-            # dangles, the store validator flags the extract, not us.
+        elif "::" in item or (":" in item and not any(char.isspace() for char in item)):
+            # Keep source-stated qualified references for store validation;
+            # the store validator checks them against registered assets.
             parents.append(item)
         else:
             prose.append(item)
@@ -7779,7 +7784,32 @@ def _identity_provenance_for_value_derivation(
     )
 
 
-def polymorph_from_extract(obs: Mapping[str, Any]) -> State[Polymorph] | State[str] | None:
+_EXTRACT_POLYMORPH_ALIASES: dict[str, Polymorph] = {
+    "clinoenstatite": Polymorph.CLINOENSTATITE,
+    "diopside": Polymorph.DIOPSIDE,
+    "high albite": Polymorph.ALBITE_HIGH,
+    "high sanidine": Polymorph.SANIDINE_HIGH,
+}
+
+
+def _extract_polymorph_alias(
+    value: object, formula: str
+) -> State[Polymorph] | None:
+    spelling = " ".join(str(value).casefold().split())
+    alias = _EXTRACT_POLYMORPH_ALIASES.get(spelling)
+    if alias is None:
+        return None
+    token = alias
+    if not polymorph_matches_formula(formula, token):
+        return State.unknown(
+            f"polymorph {value!r} does not denote formula {formula}"
+        )
+    return State.of(token)
+
+
+def polymorph_from_extract(
+    obs: Mapping[str, Any], formula: str
+) -> State[Polymorph] | State[str] | None:
     """Read condensed_form.polymorph from an extract observation.
 
     Plain closed tokens stay ``State.of(str(...))`` for Species coercion.
@@ -7795,6 +7825,10 @@ def polymorph_from_extract(obs: Mapping[str, Any]) -> State[Polymorph] | State[s
     if not raw:
         return None
     if isinstance(raw, Mapping):
+        if str(raw.get("tag") or "") == "value":
+            alias = _extract_polymorph_alias(raw.get("value"), formula)
+            if alias is not None:
+                return alias
         try:
             return _state_from_plain(raw, _polymorph_from_plain)
         except ValueError:
@@ -7802,6 +7836,9 @@ def polymorph_from_extract(obs: Mapping[str, Any]) -> State[Polymorph] | State[s
 
             spelling = raw.get("value") if str(raw.get("tag") or "") == "value" else raw
             return State.unknown(unrecognised_polymorph_reason(spelling))
+    alias = _extract_polymorph_alias(raw, formula)
+    if alias is not None:
+        return alias
     return State.of(str(raw))
 
 
@@ -8742,6 +8779,12 @@ def _selection_from_named_field(
     units: str | None,
     condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
 ) -> SourceSelection | None:
+    if q_token is Quantity.ACTIVITY and payload.get("unavailable_reason"):
+        return _unavailable_selection(
+            str(payload["unavailable_reason"]),
+            condition_ranges=condition_ranges,
+            field_name="activity",
+        )
     if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
         for key, unit in _PRESSURE_SERIES_KEYS:
             if key not in payload:
@@ -11571,14 +11614,16 @@ def choose_read_from(work: Work, locator: Locator | None) -> str:
 
 def _unknown_asset_id(files: tuple[SourceFile, ...] | list[SourceFile]) -> str:
     for asset in files:
-        if asset.asset_id.startswith("unknown:"):
+        if _is_unknown_source_asset(asset.asset_id):
             return asset.asset_id
     return "unknown"
 
 
 def unmatched_read_from_reason(locator: Locator | None, read_from: str) -> str | None:
     loc_path = locator.source_path if locator is not None else None
-    if loc_path and (read_from == "unknown" or str(read_from).startswith("unknown:")):
+    if loc_path and (
+        read_from == "unknown" or _is_unknown_source_asset(str(read_from))
+    ):
         return f"locator source_path {loc_path!r} has no matching INDEX asset"
     return None
 
@@ -11598,7 +11643,7 @@ def source_files_for(
     raw = corpus.get("raw") or {}
     pdf_path = raw.get("path") or (index_row or {}).get("pdf_path")
     sha = raw.get("sha256") or (index_row or {}).get("pdf_sha256")
-    if pdf_path:
+    if pdf_path and raw.get("present") is not False:
         files.append(
             SourceFile(
                 asset_id=f"pdf:{source_id}",
@@ -11608,7 +11653,11 @@ def source_files_for(
             )
         )
     text = corpus.get("text") or {}
-    if text.get("exists") or text.get("path"):
+    if (
+        text.get("exists") is not False
+        and text.get("present") is not False
+        and (text.get("exists") or text.get("path"))
+    ):
         files.append(
             SourceFile(
                 asset_id=f"pdftotext:{source_id}",
@@ -11618,7 +11667,11 @@ def source_files_for(
             )
         )
     tables = corpus.get("tables") or {}
-    if tables.get("exists") or tables.get("path"):
+    if (
+        tables.get("exists") is not False
+        and tables.get("present") is not False
+        and (tables.get("exists") or tables.get("path"))
+    ):
         files.append(
             SourceFile(
                 asset_id=f"tables:{source_id}",
@@ -11628,7 +11681,12 @@ def source_files_for(
             )
         )
     ocr = corpus.get("ocr") or corpus.get("mineru") or corpus.get("vlm")
-    if isinstance(ocr, Mapping) and (ocr.get("exists") or ocr.get("path")):
+    if (
+        isinstance(ocr, Mapping)
+        and ocr.get("exists") is not False
+        and ocr.get("present") is not False
+        and (ocr.get("exists") or ocr.get("path"))
+    ):
         files.append(
             SourceFile(
                 asset_id=f"mineru_md:{source_id}",
@@ -13417,7 +13475,7 @@ class Migrator:
         species_polymorph = (
             None
             if measured_tabulated_gas_formula is not None
-            else polymorph_from_extract(obs)
+            else polymorph_from_extract(obs, species_formula)
         )
         species = make_species(
             species_formula, phase, polymorph=species_polymorph
@@ -13480,7 +13538,9 @@ class Migrator:
                 oxide_map=initial_oxide_map,
             )
             species = make_species(
-                species_formula, phase, polymorph=polymorph_from_extract(obs)
+                species_formula,
+                phase,
+                polymorph=polymorph_from_extract(obs, species_formula),
             )
 
         t_payload = dict(values)
@@ -13565,8 +13625,10 @@ class Migrator:
                                 and target_phase is not Phase.L
                             ):
                                 continue
-                        transition_polymorph = polymorph_from_extract(transition)
-                        fusion_polymorph = polymorph_from_extract(obs)
+                        transition_polymorph = polymorph_from_extract(
+                            transition, formula
+                        )
+                        fusion_polymorph = polymorph_from_extract(obs, formula)
                         if (
                             transition_polymorph is None
                             or fusion_polymorph is None
@@ -13645,8 +13707,12 @@ class Migrator:
                 detail=str(exc),
             ))
         derived_from = derived_parents or None
+        has_resolved_lineage = any(
+            "::" in parent or parent in source_asset_ids
+            for parent in derived_parents
+        )
         source_derivation, invalid_derivations = source_derivation_from_source(
-            obs, values, has_resolved_lineage=bool(derived_parents)
+            obs, values, has_resolved_lineage=has_resolved_lineage
         )
         for field_path, detail in invalid_derivations:
             self.result.registry_issues.append(
@@ -13959,6 +14025,22 @@ class Migrator:
                 species_formula=species.formula,
                 values=values,
             )
+        elif obs.get("per") is not None:
+            raw_per = obs["per"]
+            try:
+                ident_kwargs["per"] = _state_from_plain(
+                    raw_per, lambda value: PerBasis(str(value))
+                )
+            except (TypeError, ValueError):
+                reason = f"unrecognised per basis {raw_per!r}"
+                ident_kwargs["per"] = State.unknown(reason)
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=f"observations.{obs_id}.identity.per",
+                        reason=RefusalReason.INVALID_IDENTITY,
+                        detail=reason,
+                    )
+                )
         if source_reference_state is not None:
             ident_kwargs["reference_state"] = source_reference_state
             if source_reference_state.is_unknown:

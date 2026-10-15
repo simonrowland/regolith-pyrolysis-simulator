@@ -25742,7 +25742,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:S:shared:T=298.15:col=entropy_s298:name=clinoenstatite-$mgsio_{3}$:v=8d41b298ac
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:S:shared:T=298.15:col=entropy_s298:name=clinoenstatite-$mgsio_{3}$:v=8d41b298ac:poly=clinoenstatite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -25754,8 +25754,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'CLINOENSTATITE $MgSiO_{3}$' is not a closed Polymorph token
+        tag: value
+        value: clinoenstatite
       charge:
         tag: value
         value: 0
@@ -25817,8 +25817,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='67.86'; unit='J/mol·K' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -28857,7 +28868,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:S:shared:T=298.15:col=entropy_s298:name=diopside-$camg(sio_{3})_{2}$:v=a3e64ace3b
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:S:shared:T=298.15:col=entropy_s298:name=diopside-$camg(sio_{3})_{2}$:v=a3e64ace3b:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -28869,8 +28880,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'DIOPSIDE $CaMg(SiO_{3})_{2}$' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -28932,8 +28943,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='143.09'; unit='J/mol·K' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -84986,7 +85008,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in J·mol-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:from_the_elements:T=298.15:col=formation_gibbs_energy:name=clinoenstatite-$mgsio_{3}$:v=edb0b9d197
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:from_the_elements:T=298.15:col=formation_gibbs_energy:name=clinoenstatite-$mgsio_{3}$:v=edb0b9d197:poly=clinoenstatite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -84998,8 +85020,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'CLINOENSTATITE $MgSiO_{3}$' is not a closed Polymorph token
+        tag: value
+        value: clinoenstatite
       charge:
         tag: value
         value: 0
@@ -85025,8 +85047,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'CLINOENSTATITE $MgSiO_{3}$' is not a closed Polymorph token
+              tag: value
+              value: clinoenstatite
             charge:
               tag: value
               value: 0
@@ -85143,8 +85165,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-1460883'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -89520,7 +89553,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in J·mol-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:from_the_elements:T=298.15:col=formation_gibbs_energy:name=diopside-$camg(sio_{3})_{2}$:v=9e28294063
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:from_the_elements:T=298.15:col=formation_gibbs_energy:name=diopside-$camg(sio_{3})_{2}$:v=9e28294063:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -89532,8 +89565,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'DIOPSIDE $CaMg(SiO_{3})_{2}$' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -89559,8 +89592,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'DIOPSIDE $CaMg(SiO_{3})_{2}$' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -89700,8 +89733,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-3036554'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -154419,7 +154463,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in J·mol-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:name=clinoenstatite-$mgsio_{3}$:v=95a5873f7a
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:name=clinoenstatite-$mgsio_{3}$:v=95a5873f7a:poly=clinoenstatite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -154431,8 +154475,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'CLINOENSTATITE $MgSiO_{3}$' is not a closed Polymorph token
+        tag: value
+        value: clinoenstatite
       charge:
         tag: value
         value: 0
@@ -154458,8 +154502,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'CLINOENSTATITE $MgSiO_{3}$' is not a closed Polymorph token
+              tag: value
+              value: clinoenstatite
             charge:
               tag: value
               value: 0
@@ -154576,8 +154620,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-1547750'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -157401,7 +157456,7 @@ observations:
           pdf_page_index: 9
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in J·mol-1'
     output_unit: kJ_per_declared_mol_basis
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:name=diopside-$camg(sio_{3})_{2}$:v=858d4085d1
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fH:from_the_elements:T=298.15:col=formation_enthalpy:name=diopside-$camg(sio_{3})_{2}$:v=858d4085d1:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -157413,8 +157468,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'DIOPSIDE $CaMg(SiO_{3})_{2}$' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -157440,8 +157495,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'DIOPSIDE $CaMg(SiO_{3})_{2}$' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -157581,8 +157636,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-3210760'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -217593,7 +217659,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:log10_Kf:from_the_elements:T=298.15:col=log_kf:name=clinoenstatite-$mgsio_{3}$:v=545c23ecaf
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:log10_Kf:from_the_elements:T=298.15:col=log_kf:name=clinoenstatite-$mgsio_{3}$:v=545c23ecaf:poly=clinoenstatite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -217605,8 +217671,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'CLINOENSTATITE $MgSiO_{3}$' is not a closed Polymorph token
+        tag: value
+        value: clinoenstatite
       charge:
         tag: value
         value: 0
@@ -217632,8 +217698,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'CLINOENSTATITE $MgSiO_{3}$' is not a closed Polymorph token
+              tag: value
+              value: clinoenstatite
             charge:
               tag: value
               value: 0
@@ -217750,8 +217816,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='255.942'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -221919,7 +221996,7 @@ observations:
     - compilation_record:data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
     parameters: []
     output_unit: dimensionless
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:log10_Kf:from_the_elements:T=298.15:col=log_kf:name=diopside-$camg(sio_{3})_{2}$:v=f32ed84405
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:log10_Kf:from_the_elements:T=298.15:col=log_kf:name=diopside-$camg(sio_{3})_{2}$:v=f32ed84405:poly=diopside
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -221931,8 +222008,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'DIOPSIDE $CaMg(SiO_{3})_{2}$' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -221958,8 +222035,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'DIOPSIDE $CaMg(SiO_{3})_{2}$' is not a closed Polymorph token
+              tag: value
+              value: diopside
             charge:
               tag: value
               value: 0
@@ -222099,8 +222176,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='531.994'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:

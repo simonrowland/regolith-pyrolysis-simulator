@@ -11,24 +11,6 @@ work:
       tag: value
       value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
-    - asset_id: pdf:pending-as2o3-second-primary
-      role: pdf
-      path: raw/pending-as2o3-second-primary/pending-as2o3-second-primary.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:pending-as2o3-second-primary
-      role: pdftotext
-      path: text/pending-as2o3-second-primary
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:pending-as2o3-second-primary
-      role: table_csv
-      path: tables/pending-as2o3-second-primary
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:pending-as2o3-second-primary
       role: pdftotext
       path: unknown
