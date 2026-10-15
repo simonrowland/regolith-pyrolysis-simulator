@@ -14577,6 +14577,37 @@ def test_stolyarova_1991_printed_compositions_reach_migrated_observations(
     assert all(obs.identity.total_pressure_Pa.is_unknown for obs in pressure_rows)
 
 
+def test_stolyarova_1991_atomic_oxygen_derivation_keeps_equilibrium_relation(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kems-053-stolyarova-1991.yaml", write=False
+    )
+    rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-053-stolyarova-1991"
+        and "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium"
+        in obs.observation_id
+    ]
+
+    assert len(rows) == 9
+    work_id = next(
+        work_id
+        for work_id, work in result.works.items()
+        if "kems-053-stolyarova-1991" in work.source_ids
+    )
+    assert any(
+        row.get("observation_id") == "stolyarova_1991_printed_equilibrium_1"
+        for row in result.context_by_work[work_id]
+    )
+    for obs in rows:
+        assert obs.derivation is not None
+        assert "(WO3) = (WO2) + (O), Eq. [1]" in obs.derivation.relation
+        assert obs.derived_from == ("unknown:kems-053-stolyarova-1991",)
+        assert obs.derivation.inputs == ("unknown:kems-053-stolyarova-1991",)
+
+
 def test_stolyarova_1991_composition_map_mutation_removes_identity(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
