@@ -87,6 +87,44 @@ def test_fe_redox_respeciation_intent_authority_is_registered(
     ] == "builtin-fe-redox-respeciation"
 
 
+def test_respeciation_at_intrinsic_potential_keeps_spent_oxide_equilibrium(
+    formula_registry,
+):
+    from simulator.accounting.ledger import AtomLedger
+    from simulator.chemistry.kernel.account_filters import build_provider_account_view
+    from simulator.core import PyrolysisSimulator
+    from simulator.fe_redox import kress91_intrinsic_state, melt_mol_fractions_for_kress91
+
+    accounts = {
+        'process.cleaned_melt': {'SiO2': 200.0, 'FeO': 100.0, 'Fe2O3': 1.0},
+        'process.spent_reductant_residue': {'Na2O': 50.0},
+    }
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.atom_ledger = AtomLedger(formula_registry, initial_balances=accounts)
+    composition = sim._melt_oxide_wt_pct()
+    intrinsic = kress91_intrinsic_state(
+        feo_mol=100.0, fe2o3_mol=1.0,
+        mol_fractions=melt_mol_fractions_for_kress91(composition),
+        T_K=2423.15, pressure_bar=1e-9, exchange_fO2_log=-9.0,
+    )['fO2_log']
+    provider = BuiltinFeRedoxRespeciationProvider()
+    view = build_provider_account_view(
+        sim.atom_ledger, provider.capability_profile().declared_accounts,
+        formula_registry)
+    request = IntentRequest(
+        intent=ChemistryIntent.FE_REDOX_RESPECIATION,
+        account_view=view, temperature_C=2150.0, pressure_bar=1e-9,
+        fO2_log=intrinsic,
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == 'ok'
+    assert result.transition is None
+    assert result.diagnostic['delta_fe2o3_mol'] == pytest.approx(0.0, abs=1e-12)
+    assert sim.atom_ledger.mol_by_account() == accounts
+
+
 def test_oxidizing_respeciation_consumes_explicit_o2_and_matches_kress91(
     formula_registry,
 ):
