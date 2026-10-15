@@ -387,6 +387,187 @@ def _mgo_janaf_observation():
     )
 
 
+def _nasa9_fit_test_case():
+    from simulator.battery.compilation_tier import _nasa9_fit_phase_label
+    from simulator.battery.generators.compilation_thermo_fits import load_sidecar
+    from simulator.battery.generators.janaf import generate_table
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    table_id = "O-037"
+    record = next(
+        row
+        for row in load_sidecar()
+        if row["source_record_id"] == table_id
+        and row["status"] == "accepted"
+        and row["phase"] == "cr:beta"
+        and row["residual_summary"][Quantity.CP.value]["max_abs"]
+        <= row["residual_summary"][Quantity.CP.value]["gate_tolerance"]
+    )
+    table_path = TABLES_DIR / f"{table_id}.yaml"
+    accepted_owner = generate_table(
+        load_table_document(table_path), source_path=str(table_path)
+    )
+    observation = next(
+        observation
+        for observation in accepted_owner.observations
+        if observation.locator is not None
+        and observation.locator.record == table_id
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.CP
+        and _nasa9_fit_phase_label(observation.identity) == record["phase"]
+    )
+    experiment = replace(
+        F.tabulation_experiment(), experiment_id=observation.experiment_id
+    )
+    context = _context(
+        observation,
+        experiments={experiment.experiment_id: experiment},
+    )
+    point = next(
+        point
+        for point in _iter_compilation_series_cells(observation)
+        if point.identity.temperature_K.is_value
+        and record["validity"]["T_min_K"]
+        <= float(point.identity.temperature_K.value)
+        <= record["validity"]["T_max_K"]
+    )
+    return record, context, point
+
+
+def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
+    tmp_path, monkeypatch
+) -> None:
+    import simulator.battery.compilation_tier as compilation_tier
+    import simulator.battery.generators.compilation_thermo_fits as fit_generator
+    import simulator.battery.score as score
+    from simulator.battery.compilation_tier import (
+        ThermoAttempt,
+        _nasa9_fit_comparisons,
+        iter_compilation_comparisons_jsonl,
+        write_compilation_comparisons_jsonl,
+    )
+    from simulator.battery.enums import QUANTITY_UNITS
+    from simulator.battery.generators.compilation_thermo_fits import (
+        sidecar_element_reference_curves,
+    )
+
+    record, context, printed_cell = _nasa9_fit_test_case()
+    temperature = printed_cell.identity.temperature_K.value
+    fit_value, reason = fit_generator.evaluate_sidecar_fit(
+        record,
+        Quantity.CP,
+        float(temperature),
+        reference_curves=sidecar_element_reference_curves([record]),
+    )
+    assert reason is None and fit_value is not None
+    gate_tolerance = record["residual_summary"][Quantity.CP.value]["gate_tolerance"]
+    assert abs(fit_value - float(printed_cell.value.point)) <= gate_tolerance
+
+    def echo_fit(engine, observation, **_kwargs):
+        return ThermoAttempt(
+            value=observation.value.point,
+            unit=QUANTITY_UNITS[Quantity.CP],
+            authority=Authority.BRIDGE,
+            notices=(),
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence="pinned-fit-test",
+            coefficient_sources=(),
+        )
+
+    monkeypatch.setattr(compilation_tier, "predict_thermo_attempt", echo_fit)
+    comparisons = _nasa9_fit_comparisons(
+        context,
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=False,
+        fit_records=(record,),
+    )
+    scored = next(
+        item
+        for item in comparisons
+        if item.quantity is Quantity.CP and item.temperature_K == temperature
+    )
+    assert scored.residual.numeric is not None
+    assert scored.residual.numeric.value == 0
+
+    monkeypatch.setattr(fit_generator, "load_sidecar", lambda: [record])
+    monkeypatch.setattr(score, "SCORE_ENGINE_SET", (Engine.THERMOENGINE,))
+    output_path = tmp_path / "compilation-comparisons.jsonl"
+    assert write_compilation_comparisons_jsonl(context, output_path) == len(comparisons)
+    written = tuple(iter_compilation_comparisons_jsonl(output_path))
+    fit_row = next(
+        row
+        for row in written
+        if str(row["comparison_channel"]).startswith("nasa9_fit:")
+    )
+    assert fit_row["comparison_channel"] == (
+        f"nasa9_fit:{Engine.THERMOENGINE.value}"
+    )
+    assert fit_row["reference_id"].startswith("nasa9-fit::")
+    assert set(fit_row) == {
+        "reference_id",
+        "quantity",
+        "comparison_channel",
+        "comparison_key",
+        "comparison_quantity",
+        "status",
+        "value",
+        "band",
+    }
+
+
+@pytest.mark.parametrize("mutation", ("outside_validity", "rejected"))
+def test_nasa9_fit_mutations_produce_no_comparison(mutation, monkeypatch) -> None:
+    from copy import deepcopy
+
+    import simulator.battery.compilation_tier as compilation_tier
+
+    record, context, _printed_cell = _nasa9_fit_test_case()
+    mutated = deepcopy(record)
+    if mutation == "outside_validity":
+        mutated["validity"] = {"T_min_K": 10000.0, "T_max_K": 11000.0}
+    else:
+        mutated["status"] = "rejected"
+
+    def no_engine_call(*_args, **_kwargs):
+        pytest.fail("a fit mutation outside the accepted domain reached scoring")
+
+    monkeypatch.setattr(compilation_tier, "predict_thermo_attempt", no_engine_call)
+    assert (
+        compilation_tier._nasa9_fit_comparisons(
+            context,
+            engines=(Engine.THERMOENGINE,),
+            invoke_pure_phase=False,
+            fit_records=(mutated,),
+        )
+        == []
+    )
+
+
+def test_nasa9_fit_census_is_separate_and_lists_regolith_species() -> None:
+    from simulator.battery.compilation_tier import compilation_tier_census
+
+    record, context, _printed_cell = _nasa9_fit_test_case()
+    census = compilation_tier_census(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        invoke_pure_phase=False,
+        audit_compile_residual=False,
+    )
+    fit_row = next(
+        row
+        for row in census["fit_rows"]
+        if row["formula"] == record["formula"]
+        and row["phase"] == record["phase"]
+        and row["quantity"] == Quantity.CP.value
+        and row["engine"] == Engine.INTERNAL_ANALYTICAL.value
+    )
+    assert fit_row["reachable"] > 0
+    assert fit_row["numeric"] == 0
+    assert fit_row["refused"]
+    assert fit_row in census["regolith_species_table"]["rows"]
+
+
 def test_compilation_comparison_sidecar_is_additive_and_streamed(tmp_path) -> None:
     import hashlib
     from pathlib import Path
