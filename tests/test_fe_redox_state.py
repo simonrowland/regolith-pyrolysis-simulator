@@ -26,6 +26,14 @@ def test_redox_state_equality_and_hash_use_normalized_values() -> None:
         integer.log_fO2 = -8.0
 
 
+def test_cache_identity_omits_absolute_state_and_projects_buffer_offset() -> None:
+    absolute = RedoxState.absolute(-9.0)
+    offset = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.25)
+
+    assert absolute.cache_identity() is None
+    assert offset.cache_identity() == offset.to_descriptor()
+
+
 @pytest.mark.parametrize('value', [True, False, None, object(), 'not numeric'])
 def test_absolute_rejects_non_numeric_or_boolean_values(value: object) -> None:
     with pytest.raises(TypeError):

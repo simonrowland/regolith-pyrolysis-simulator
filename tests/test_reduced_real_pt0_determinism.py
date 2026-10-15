@@ -62,6 +62,9 @@ from simulator.reduced_real_determinism import (
 from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
+from tests.chemistry.test_evaporation_freeze_gate import (
+    _freeze_gate_redox_state_pair,
+)
 from tests.binding_admission_fixtures import (
     register_synthetic_gate_curve_producer,
     seed_gate_curve_memo_record,
@@ -1524,7 +1527,7 @@ def test_pt1_physics_ladder_reemits_source_notices_and_approximation_notice(
 
 def _real_magemin_available() -> bool:
     backend = MAGEMinBackend()
-    backend.initialize({"python_bridge": "subprocess"})
+    backend.initialize({"python_bridge": "subprocess", "warm_worker": False})
     return backend.is_available()
 
 
@@ -1555,6 +1558,125 @@ def test_pt0_canonical_key_contains_required_identity_fields() -> None:
     assert "engine_version" not in key
     assert "source_module_digest" not in key
     assert "data_digests" not in key
+
+
+def test_pt0_gate_replay_separates_buffers_at_same_scalar_fO2(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.engine_binding_admission import write_gate_curve_memo_record
+
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
+    scalar_fO2_log = -9.0
+    state_a, state_b = _freeze_gate_redox_state_pair(
+        distinct_buffers=True,
+        monkeypatch=monkeypatch,
+    )
+    assert state_a.log_fO2_at(REDOX_STATE_REFERENCE_T_K) == pytest.approx(
+        scalar_fO2_log
+    )
+    assert state_b.log_fO2_at(REDOX_STATE_REFERENCE_T_K) == pytest.approx(
+        scalar_fO2_log
+    )
+
+    db_path = tmp_path / "pt1-redox-state.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture_sim = _build_pt0_sim(capture)
+    capture_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(capture_sim)
+    capture_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = scalar_fO2_log
+    capture_sim.melt.oxygen_reservoir.reference_T_K = (
+        REDOX_STATE_REFERENCE_T_K
+    )
+    capture_sim._sync_oxygen_reservoir_mirror()
+    curve = {
+        "source": "gate_liquid_fraction:fallback:magemin-shadow",
+        "status": "ok",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+    }
+    record = write_gate_curve_memo_record(
+        capture_sim,
+        curve,
+        redox_state=state_a,
+    )
+    local_key = capture_sim._freeze_gate_cache_key(
+        pressure_bar=float(capture_sim.melt.p_total_mbar) / 1000.0,
+        fO2_log=capture_sim._freeze_gate_redox_key_fO2_log(
+            fO2_log=scalar_fO2_log,
+        ),
+        redox_state=state_a,
+    )
+    capture_sim._freeze_gate_liquid_fraction_cache = {
+        **record,
+        "key": local_key,
+    }
+    capture.capture_gate_curve(
+        capture_sim,
+        fO2_log=scalar_fO2_log,
+        curve=curve,
+        redox_state=state_a,
+    )
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(replay_sim)
+    replay_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = scalar_fO2_log
+    replay_sim.melt.oxygen_reservoir.reference_T_K = (
+        REDOX_STATE_REFERENCE_T_K
+    )
+    replay_sim._sync_oxygen_reservoir_mirror()
+
+    same_state_curve = replay.replay_gate_curve(
+        replay_sim,
+        fO2_log=scalar_fO2_log,
+        redox_state=state_a,
+    )
+    assert same_state_curve["source"] == curve["source"]
+    assert same_state_curve["solidus_T_C"] == curve["solidus_T_C"]
+    assert same_state_curve["liquidus_T_C"] == curve["liquidus_T_C"]
+
+    with pytest.raises(PT0CacheMiss):
+        replay.replay_gate_curve(
+            replay_sim,
+            fO2_log=scalar_fO2_log,
+            redox_state=state_b,
+        )
+
+
+def test_physics_bucket_replay_scope_keeps_nonabsolute_redox_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    scalar_fO2_log = -9.0
+    state_a, state_b = _freeze_gate_redox_state_pair(
+        distinct_buffers=True,
+        monkeypatch=monkeypatch,
+    )
+    sim = _build_pt0_sim(None)
+    keys = [
+        canonical_replay_key(
+            sim,
+            artifact="freeze_gate_curve",
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            fO2_log=scalar_fO2_log,
+            fe_redox_policy="intrinsic",
+            redox_state=state,
+        )
+        for state in (state_a, state_b)
+    ]
+    buckets = [
+        canonical_physics_bucket_key_from_replay_key(key) for key in keys
+    ]
+
+    assert buckets[0]["physics_bucket"] == buckets[1]["physics_bucket"]
+    assert buckets[0]["replay_scope"]["redox_state_identity"] == (
+        state_a.cache_identity()
+    )
+    assert buckets[1]["replay_scope"]["redox_state_identity"] == (
+        state_b.cache_identity()
+    )
+    assert buckets[0]["replay_scope"] != buckets[1]["replay_scope"]
 
 
 def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(

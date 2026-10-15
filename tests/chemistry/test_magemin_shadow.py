@@ -1286,7 +1286,7 @@ def test_shadow_diagnostic_shape_serialisable():
 # ---------------------------------------------------------------------------
 
 
-def test_provider_with_real_adapter_smoke():
+def test_provider_with_real_adapter_smoke(request):
     """When the MAGEMin binary is present, the provider returns OK or
     a clean unavailable status without raising.
 
@@ -1297,6 +1297,7 @@ def test_provider_with_real_adapter_smoke():
     from simulator.melt_backend.magemin import MAGEMinBackend
 
     backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
     initialised = backend.initialize({})
     if not initialised:
         pytest.skip(
@@ -1304,13 +1305,13 @@ def test_provider_with_real_adapter_smoke():
         )
 
     shadow = MAGEMinShadowProvider(backend=backend)
-    request = _make_request(
+    chemistry_request = _make_request(
         ChemistryIntent.SILICATE_LIQUIDUS,
         temperature_C=1400.0,
         pressure_bar=1000.0,  # 1 kbar; MAGEMin's CLI expects kbar via the
                               # adapter's pressure_kbar conversion.
     )
-    result = shadow.dispatch(request)
+    result = shadow.dispatch(chemistry_request)
     assert result.transition is None
     assert result.status in (
         'ok', 'not_converged', 'out_of_domain', 'unavailable',
