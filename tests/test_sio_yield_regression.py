@@ -1130,6 +1130,18 @@ def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
     )
     setpoints_data = yaml.safe_load((data_dir / "setpoints.yaml").read_text())
 
+    # Isolate the SiO transport law: real iron redox at startup can release
+    # enough O2 that its headspace pressure dominates both commanded floors.
+    # These declared zero-iron controls are a test composition, not a lunar assay.
+    feedstock = feedstocks_data['lunar_mare_low_ti']
+    feedstock['fe_redox_split_unknown'] = False
+    for oxide in ('FeO', 'Fe2O3'):
+        feedstock['composition_wt_pct'][oxide] = 0.0
+        feedstock.setdefault('composition_basis', {})[oxide] = {
+            'method': 'defined iron-free SiO transport fixture',
+            'source': 'test_po2_wall_sweep_mode_suppresses_first_tick_sio_release',
+        }
+
     def _evolved_sio_kg_one_tick(*, pO2_mbar: float) -> float:
         sim = _build_sim(
             "lunar_mare_low_ti",
@@ -1160,6 +1172,9 @@ def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
 
         initial_sio_mol = _sio_mol_total()
         sim.step()
+        assert sim._last_vapor_pressure_diagnostic['pO2_bar'] == pytest.approx(
+            pO2_mbar / 1000.0,
+        )
         sio_mol = max(0.0, _sio_mol_total() - initial_sio_mol)
         from simulator.state import MOLAR_MASS
         sio_molar_mass_kg_mol = MOLAR_MASS["SiO"] / 1000.0
