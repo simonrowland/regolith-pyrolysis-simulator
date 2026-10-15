@@ -8658,6 +8658,103 @@ def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> No
         assert polymorph.reason == "source does not state polymorph"
 
 
+def test_demaria_partial_alkalis_do_not_become_a_complete_composition(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
+    rows = {
+        obs.observation_id.split("::", 1)[1]: obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-022-demaria-1971"
+    }
+    for prefix in (
+        "demaria_1971_na_psat_figure1_sample_12022_digitized",
+        "demaria_1971_na_psat_figure1_sample_12065_digitized",
+    ):
+        related = [obs for key, obs in rows.items() if key.startswith(prefix)]
+        assert related
+        assert all(obs.identity.composition is not None for obs in related)
+        assert all(obs.identity.composition.is_unknown for obs in related)
+        assert all(
+            obs.identity.composition.reason == "no composition mapped from source"
+            for obs in related
+        )
+
+    extract_rows = _extract_observations("kems-022-demaria-1971.yaml")
+    sample_12022 = next(
+        row
+        for row in extract_rows
+        if row.get("observation_id")
+        == "demaria_1971_na_psat_figure1_sample_12022_digitized"
+    )
+    values = sample_12022["values"]
+    assert values["sample_alkali_content_wt_pct"] == {
+        "Na2O": 0.36,
+        "K2O": 0.068,
+    }
+    assert "reported elsewhere (SMALES, 1971)" in values["composition_source_gap"]
+    assert "composition_from_sample_catalog" not in values
+    assert "sample_oxide_composition_wt_pct" not in values
+    assert "printed_composition" not in values
+    sample_12065 = next(
+        row
+        for row in extract_rows
+        if row.get("observation_id")
+        == "demaria_1971_na_psat_figure1_sample_12065_digitized"
+    )
+    assert "does not print a bulk composition" in sample_12065["values"][
+        "composition_source_gap"
+    ]
+
+
+def test_demaria_undigitized_pressure_figures_are_unavailable_not_points(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import ScoreContext, comparison_candidates
+
+    result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
+    expected = {
+        "demaria_1971_ca_figure_only_and_measurement_difficulty",
+        "demaria_1971_tio_tio2_figure6_comparable_pressures",
+        "demaria_1971_tio2_figure6_comparable_to_tio",
+        "demaria_1971_al_monatomic_figure7",
+    }
+    rows = {
+        obs.observation_id.split("::", 1)[1]: obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-022-demaria-1971"
+    }
+    assert expected <= rows.keys()
+    extract_rows = {
+        row["observation_id"]: row
+        for row in _extract_observations("kems-022-demaria-1971.yaml")
+    }
+    for observation_id in expected:
+        obs = rows[observation_id]
+        source_values = extract_rows[observation_id]["values"]
+        assert "points" not in source_values
+        assert source_values["pressure_atm"] is None
+        assert quantity_token(obs.identity) is Quantity.P_PARTIAL
+        assert obs.identity.species.phase.is_value
+        assert obs.identity.species.phase.value is Phase.G
+        assert obs.evidence.class_.is_value
+        assert obs.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        assert obs.value.kind is ValueKind.UNAVAILABLE
+        assert obs.value.unavailable_reason
+        assert obs.admission.status is AdmissionStatus.REJECTED
+
+    candidates = comparison_candidates(
+        ScoreContext(
+            works=result.works,
+            experiments=result.experiments,
+            observations=result.observations,
+        )
+    )
+    assert expected.isdisjoint(
+        obs.observation_id.split("::", 1)[1] for obs in candidates
+    )
+
+
 def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None:
     from simulator.battery.score import (
         ScoreContext,
