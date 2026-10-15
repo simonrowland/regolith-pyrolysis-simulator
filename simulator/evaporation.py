@@ -67,6 +67,19 @@ PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID = (
 PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C = 1050.0
 
 
+def reaction_oxygen_destination(oxygen_amount: float, vapor_oxygen_atoms: float,
+                                explicit_destination: str) -> str:
+    """Ledger destination for signed coproduct oxygen (negative means debit)."""
+    if explicit_destination not in {'', 'process.overhead_gas', 'reservoir.fo2_buffer'}:
+        raise AccountingError(f'unsupported oxygen_destination {explicit_destination!r}')
+    if oxygen_amount < 0.0:
+        return 'process.overhead_gas'
+    if explicit_destination:
+        return explicit_destination
+    return ('process.overhead_gas' if vapor_oxygen_atoms > 0.0
+            else 'reservoir.fo2_buffer')
+
+
 class EvaporationFluxRefusal(ProviderUnavailableError):
     """Typed terminal refusal for unavailable authoritative flux inputs."""
 
