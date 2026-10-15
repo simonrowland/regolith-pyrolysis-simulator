@@ -469,6 +469,13 @@ def test_compilation_comparison_sidecar_is_additive_and_streamed(tmp_path) -> No
         note="JANAF compilation point",
     )
     expected_scores = (score_cea_point(point), score_ellingham_point(point))
+    assert [
+        (row["comparison_channel"], row["value"], row["status"], row["band"])
+        for row in rows
+    ] == [
+        ("nasa_cea_9", "-0.5409627066909479", "match", "0.05"),
+        ("ellingham", "0.0006669999999076026", "match", "0.05"),
+    ]
     assert [row["reference_id"] for row in rows] == [observation.observation_id] * 2
     assert [row["comparison_channel"] for row in rows] == [
         score.engine_channel for score in expected_scores if score is not None
