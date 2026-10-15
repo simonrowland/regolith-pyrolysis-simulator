@@ -115,6 +115,18 @@ def test_exhausted_ferric_inventory_without_activity_is_a_typed_refusal():
             pressure_bar=0.01, exchange_fO2_log=-9.0)
 
 
+def test_closed_all_ferric_activity_keeps_zero_ferrous_inventory():
+    from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
+
+    result = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt={'SiO2': 80.0, 'FeO': 0.0, 'Fe2O3': 20.0},
+        fO2_log=-2.0, T_K=1873.15, pressure_bar=0.01, closed_ledger=True,
+    )
+    assert result['a_FeO_authoritative'] == 0.0
+    assert result['kress91_split']['fe3_over_sigma_fe'] == 1.0
+    assert result['kress91_split']['fe2o3_over_feo_molar'] is None
+
+
 def test_lab_feot_split_collapse_round_trip_and_stated_iw_condition():
     from simulator.fe_redox import (split_feot_composition, collapse_feot_composition,
                                     RedoxState, FE_FEO_BUFFER_STANDARD)
