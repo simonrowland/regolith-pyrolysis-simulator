@@ -8,7 +8,13 @@ from __future__ import annotations
 
 import ast
 import re
-from simulator.battery.enums import Polymorph, PrintedQualifierKind, StateTag
+from simulator.battery.enums import (
+    Polymorph,
+    PolymorphRejectionKind,
+    PrintedQualifierKind,
+    StateTag,
+)
+from simulator.state_types import State
 
 _TRAILING_FORMULA_RE = re.compile(r"\s*\([^()]*(?:\([^()]*\)[^()]*)*\)\s*$")
 _PRESSURE_QUALIFIER_RE = re.compile(r"^\d+ Bar$")
@@ -313,6 +319,23 @@ def unrecognised_polymorph_reason(spelling: object) -> str:
     """Reason that preserves the original spelling for a later census."""
 
     return f"unrecognised polymorph {str(spelling)!r} is not a closed Polymorph token"
+
+
+def unrecognised_polymorph_state(spelling: object) -> State[Polymorph]:
+    return State.unknown(
+        unrecognised_polymorph_reason(spelling),
+        rejection_kind=PolymorphRejectionKind.UNRECOGNISED,
+    )
+
+
+def contradicting_polymorph_state(
+    value: object, formula: str, *, quoted: bool = False
+) -> State[Polymorph]:
+    printed = repr(value) if quoted else str(value)
+    return State.unknown(
+        f"polymorph {printed} does not denote formula {formula}",
+        rejection_kind=PolymorphRejectionKind.CONTRADICTS_FORMULA,
+    )
 
 
 def unrecognised_polymorph_spelling(reason: str | None) -> str | None:

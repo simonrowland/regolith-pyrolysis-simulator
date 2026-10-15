@@ -18,6 +18,7 @@ import os
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 from collections.abc import Mapping
 from pathlib import Path
@@ -32,7 +33,7 @@ from simulator.battery.migrate import (  # noqa: E402
 )
 from simulator.battery.compilation_tier import (  # noqa: E402
     iter_compilation_comparisons_jsonl,
-    write_compilation_comparisons_jsonl,
+    _write_compilation_comparisons_jsonl,
 )
 from simulator.battery.pins import (  # noqa: E402
     load_pins,
@@ -42,6 +43,7 @@ from simulator.battery.pins import (  # noqa: E402
 )
 from simulator.battery.score import (  # noqa: E402
     SCORE_ENGINE_SET,
+    _append_nasa9_fit_comparison_stratum,
     _render_score_report_from_payloads_legacy,
     _ResidualJsonlRows,
     _count_residuals_jsonl,
@@ -271,7 +273,9 @@ def _progress_wait(proc: subprocess.Popen[str], *, label: str) -> int:
             print(f"studio wait {elapsed}s {label}", flush=True)
 
 
-def _run_studio(engines: list[str], extra: list[str]) -> str | None:
+def _run_studio(
+    engines: list[str], extra: list[str]
+) -> tuple[str | None, Path | None]:
     """Dispatch MELTS engines to Studio 1. Prints a progress line every 60 s."""
 
     remote_root = "/tmp/battery-score-impl-chunk2"
@@ -294,7 +298,7 @@ def _run_studio(engines: list[str], extra: list[str]) -> str | None:
     )
     if rsync.returncode != 0:
         print(f"studio rsync failed: {rsync.returncode}", flush=True)
-        return None
+        return None, None
     remote_py = "~/repos/regolith-pyrolysis-simulator/.venv/bin/python"
     engine_csv = ",".join(engines)
     extra_args = " ".join(extra)
@@ -330,7 +334,7 @@ def _run_studio(engines: list[str], extra: list[str]) -> str | None:
     code = proc.wait()
     if code != 0:
         print(f"studio score failed: {code}", flush=True)
-        return hostname
+        return hostname, None
     subprocess.run(
         [
             "rsync",
@@ -349,7 +353,25 @@ def _run_studio(engines: list[str], extra: list[str]) -> str | None:
         ],
         check=False,
     )
-    return hostname
+    with tempfile.NamedTemporaryFile(
+        prefix="regolith-studio-compilation-comparisons-",
+        suffix=".jsonl",
+        delete=False,
+    ) as stream:
+        studio_comparisons_path = Path(stream.name)
+    copied = subprocess.run(
+        [
+            "rsync",
+            "-a",
+            f"{STUDIO_HOST}:{remote_root}/data/battery/compilation-comparisons.jsonl",
+            str(studio_comparisons_path),
+        ],
+        check=False,
+    )
+    if copied.returncode != 0 or studio_comparisons_path.stat().st_size == 0:
+        studio_comparisons_path.unlink(missing_ok=True)
+        studio_comparisons_path = None
+    return hostname, studio_comparisons_path
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -453,6 +475,10 @@ def main(argv: list[str] | None = None) -> int:
             observations=context.observations,
             origins=context.origins,
         )
+        report = _append_nasa9_fit_comparison_stratum(
+            report,
+            iter_compilation_comparisons_jsonl(compilation_comparisons_path),
+        )
         summary_path = args.root / "data" / "battery" / "score-summary.json"
         summary_partial_path = summary_path.with_name(summary_path.name + ".partial")
         report_partial_path = report_path.with_name(report_path.name + ".partial")
@@ -476,8 +502,11 @@ def main(argv: list[str] | None = None) -> int:
     melts = [e.value for e in engines if e.value in {"alphamelts", "thermoengine", "magemin"}]
     laptop = [e for e in engines if e.value not in {"alphamelts", "thermoengine", "magemin"}]
     studio_hostname = None
+    studio_comparisons_path = None
+    studio_routed = False
     host = socket.gethostname()
     if args.studio and melts and STUDIO_HOST not in host and "studio" not in host.lower():
+        studio_routed = True
         extra = []
         if args.rail:
             extra.extend(["--rail", args.rail])
@@ -485,7 +514,7 @@ def main(argv: list[str] | None = None) -> int:
             extra.extend(["--work", args.work])
         if args.limit is not None:
             extra.extend(["--limit", str(args.limit)])
-        studio_hostname = _run_studio(melts, extra)
+        studio_hostname, studio_comparisons_path = _run_studio(melts, extra)
         engines = tuple(laptop)
 
     context = load_score_context(args.root)
@@ -522,10 +551,36 @@ def main(argv: list[str] | None = None) -> int:
     key_map: dict[str, str] = {}
     scored = report_aggregate.scored_count
     try:
-        write_compilation_comparisons_jsonl(
+        _write_compilation_comparisons_jsonl(
             context,
             compilation_comparisons_partial_path,
+            engines=engines,
+            invoke_pure_phase=not studio_routed,
         )
+        if studio_comparisons_path is not None:
+            try:
+                with compilation_comparisons_partial_path.open(
+                    "a", encoding="utf-8"
+                ) as stream:
+                    for row in iter_compilation_comparisons_jsonl(
+                        studio_comparisons_path
+                    ):
+                        channel = row.get("comparison_channel")
+                        if not isinstance(channel, str) or not channel.startswith(
+                            "nasa9_fit:"
+                        ):
+                            continue
+                        stream.write(
+                            json.dumps(
+                                row,
+                                sort_keys=True,
+                                ensure_ascii=False,
+                                separators=(",", ":"),
+                            )
+                            + "\n"
+                        )
+            finally:
+                studio_comparisons_path.unlink(missing_ok=True)
         if pins_file.is_file():
             loaded = load_pins(pins_file)
             key_map = loaded["key_map"]
@@ -551,6 +606,10 @@ def main(argv: list[str] | None = None) -> int:
             studio_hostname=studio_hostname,
             store_stamp=recorded,
             _aggregate=report_aggregate,
+        )
+        report = _append_nasa9_fit_comparison_stratum(
+            report,
+            iter_compilation_comparisons_jsonl(compilation_comparisons_partial_path),
         )
         _write_headline_summary_from_accumulator_json(
             report_aggregate,
