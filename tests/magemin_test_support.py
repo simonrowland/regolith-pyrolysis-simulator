@@ -11,10 +11,11 @@ def close_test_owned_magemin_backend(sim: PyrolysisSimulator) -> None:
     )
     if provider is None:
         return
+    finalizer = getattr(provider, "_backend_finalizer", None)
+    if finalizer is None:
+        return
     backend = getattr(provider, "_backend", None)
     if backend is None:
         return
-    finalizer = getattr(provider, "_backend_finalizer", None)
-    if finalizer is not None:
-        finalizer.detach()
+    finalizer.detach()
     backend.close()
