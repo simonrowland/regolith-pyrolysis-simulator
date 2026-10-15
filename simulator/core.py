@@ -3595,6 +3595,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if species_formula_registry
             else (evap_flux, transport['vapor_pressure_mbar'])
         )
+        pipe_segment_temperatures_C = (
+            self.overhead_model.resolve_pipe_segment_temperatures_C(
+                [
+                    segment.name
+                    for segment in self.condensation_model.pipe_segments
+                ],
+                self.melt,
+            )
+        )
         self.condensation_model.configure_operating_conditions(
             wall_temperature_C=transport['pipe_temperature_C'],
             overhead_pressure_mbar=transport['pressure_mbar'],
@@ -3609,15 +3618,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             stage_area_m2_by_stage=transport['stage_area_m2_by_stage'],
             stage_area_geometry_provenance_notice=transport.get(
                 'stage_area_geometry_provenance_notice', {}),
-            pipe_segment_temperatures_C=(
-                self.overhead_model.resolve_pipe_segment_temperatures_C(
-                    [
-                        segment.name
-                        for segment in self.condensation_model.pipe_segments
-                    ],
-                    self.melt,
-                )
-            ),
+            pipe_segment_temperatures_C=pipe_segment_temperatures_C,
             # 0.5.2 Phase B (series-resistance + stir-Sherwood): the
             # induction-stirring knob lives on the melt state, set by
             # campaign overrides (``simulator/campaigns.py:152``) and
@@ -3659,6 +3660,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             carrier_gas=self._resolve_condensation_carrier_gas(),
             campaign_name=getattr(self.melt.campaign, 'name', ''),
             campaign_hour=float(self.melt.campaign_hour),
+        )
+        self.condensation_model._upstream_wall_floor_notice = copy.deepcopy(
+            self.overhead_model._upstream_wall_floor_notice
         )
         self.condensation_model._source_saturation_pressures_pa = dict(
             (getattr(self, '_last_vapour_batch_flux_overlay', {}) or {})

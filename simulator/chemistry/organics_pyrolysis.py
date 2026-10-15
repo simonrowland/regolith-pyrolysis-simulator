@@ -886,20 +886,31 @@ class TarFateResult:
         }
 
 
-def _tar_dewpoint_C(params: Mapping[str, Any] | None = None) -> float:
+def _tar_dewpoint_parameter(
+    params: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     payload = params or load_organics_pyrolysis_params()
     cfg = dict(payload.get("tar") or {})
-    return _finite(dict(cfg.get("dewpoint_C") or {}).get("value"), 400.0)
+    return dict(cfg.get("dewpoint_C") or {})
+
+
+def _tar_dewpoint_C(params: Mapping[str, Any] | None = None) -> float:
+    return _finite(_tar_dewpoint_parameter(params).get("value"), 400.0)
 
 
 def tar_no_coat_wall_floor_C(
     params: Mapping[str, Any] | None = None,
-) -> float:
-    """Return the first representable wall temperature with zero tar coat."""
+) -> tuple[float, dict[str, Any]]:
+    """Return the no-coat floor and its source parameter record."""
+    parameter = _tar_dewpoint_parameter(params)
+    dewpoint_C = _finite(parameter.get("value"), 400.0)
     # The existing parameter is a dewpoint in °C, and tar_fate coats at or
     # below it. The next representable value above that same parameter is
     # therefore the smallest wall value that makes tar_fate's coat fraction 0.
-    return math.nextafter(_tar_dewpoint_C(params), math.inf)
+    return math.nextafter(dewpoint_C, math.inf), {
+        **parameter,
+        "path": "tar.dewpoint_C",
+    }
 
 
 def tar_fate(

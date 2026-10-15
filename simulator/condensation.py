@@ -2154,6 +2154,7 @@ class CondensationModel:
         self.last_knudsen_pressure_adjustment: dict[str, Any] = {}
         self.last_sticking_alpha_provenance_notice: dict[str, Any] = {}
         self.wall_temperature_input_refusals: dict[str, str] = {}
+        self._upstream_wall_floor_notice: dict[str, Any] | None = None
         self.last_transport_parameter_notice: dict[str, Any] = {}
         self.last_capture_budget_regularizer_notice: dict[str, Any] = {}
         # VR-11 / B2: consumer-facing condensation refusal channel.
@@ -2316,6 +2317,7 @@ class CondensationModel:
                         'and above absolute zero'
                     )
 
+        self._upstream_wall_floor_notice = None
         if wall_temperature_C is not None:
             wall_temperature = float(wall_temperature_C)
             if not math.isfinite(wall_temperature) or wall_temperature <= -273.15:
@@ -2684,6 +2686,24 @@ class CondensationModel:
                         'material': material.get('material', material.get('liner_material')),
                         'source': source,
                     })
+        floor_notice = self._upstream_wall_floor_notice
+        upstream_segment = next(
+            (
+                segment
+                for segment in self.pipe_segments
+                if segment.name == UPSTREAM_PIPE_SEGMENT_NAME
+            ),
+            None,
+        )
+        if (
+            floor_notice is not None
+            and UPSTREAM_PIPE_SEGMENT_NAME not in self.wall_temperature_input_refusals
+            and upstream_segment is not None
+            and float(upstream_segment.wall_temperature_C)
+            == floor_notice['floor_temperature_C']
+            and float(melt.temperature_C) == floor_notice['melt_temperature_C']
+        ):
+            notices.append(copy.deepcopy(floor_notice))
         return notices
 
     def _build_default_pipe_segments(

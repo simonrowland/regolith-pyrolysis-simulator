@@ -642,15 +642,18 @@ class OverheadGasModel:
             'pipe_segment_temperatures_C',
             self._liner_temperature_config,
         )
+        self._pipe_temperature_floor_notice: dict[str, Any] | None = None
+        self._upstream_wall_floor_notice: dict[str, Any] | None = None
         self._pipe_temperature_C = self.resolve_pipe_temperature_C()  # °C — resolved active pipe/liner wall temperature
 
     def resolve_pipe_temperature_C(self, melt: Optional[MeltState] = None) -> float:
         """Resolve scalar or scheduled liner temperature for the current tick."""
 
-        value = self._resolve_liner_temperature_value(  # °C — resolved liner wall temperature
+        value, floor_notice = self._resolve_liner_temperature_value(  # °C — resolved liner wall temperature
             self._liner_temperature_config,
             melt,
         )
+        self._pipe_temperature_floor_notice = floor_notice
         self._pipe_temperature_C = max(0.0, float(value))  # °C — clamped pipe/liner wall temperature
         return self._pipe_temperature_C
 
@@ -661,9 +664,13 @@ class OverheadGasModel:
     ) -> dict[str, float]:
         """Resolve per-segment wall temperatures for the active recipe."""
 
+        self._upstream_wall_floor_notice = None
         base_C = self.resolve_pipe_temperature_C(melt)  # °C — scalar fallback pipe/liner wall temperature
+        base_floor_notice = self._pipe_temperature_floor_notice
         config = self._pipe_segment_temperature_config  # °C or mapping — segment temperature config
         if config in (None, ''):
+            if UPSTREAM_PIPE_SEGMENT_NAME in segment_names:
+                self._upstream_wall_floor_notice = base_floor_notice
             return {
                 str(name): (
                     base_C if name == UPSTREAM_PIPE_SEGMENT_NAME
@@ -673,30 +680,45 @@ class OverheadGasModel:
                 for name in segment_names
             }
         if isinstance(config, (int, float)) or not isinstance(config, Mapping):
-            value = self._resolve_liner_temperature_value(config, melt)  # °C — scalar segment wall temperature
+            value, floor_notice = self._resolve_liner_temperature_value(config, melt)  # °C — scalar segment wall temperature
+            if UPSTREAM_PIPE_SEGMENT_NAME in segment_names:
+                self._upstream_wall_floor_notice = floor_notice
             return {str(name): max(0.0, float(value)) for name in segment_names}
         if 'segments' not in config:
-            value = self._resolve_liner_temperature_value(config, melt)  # °C — mapping-derived wall temperature
+            value, floor_notice = self._resolve_liner_temperature_value(config, melt)  # °C — mapping-derived wall temperature
+            if UPSTREAM_PIPE_SEGMENT_NAME in segment_names:
+                self._upstream_wall_floor_notice = floor_notice
             return {str(name): max(0.0, float(value)) for name in segment_names}
 
         default_config = config.get('default_C', base_C)  # °C or schedule — default segment temperature source
-        default_C = self._resolve_liner_temperature_value(default_config, melt)  # °C — default segment wall temperature
+        if 'default_C' in config:
+            default_C, default_floor_notice = self._resolve_liner_temperature_value(
+                default_config, melt)
+        else:
+            default_C, default_floor_notice = base_C, base_floor_notice
         segments = config.get('segments', {}) or {}  # °C mapping — per-segment wall temperature configs
         if not isinstance(segments, Mapping):
             segments = {}  # °C mapping — empty per-segment wall temperature configs
 
         resolved: dict[str, float] = {}  # °C by segment — resolved wall temperatures
+        upstream_floor_notice = None
         for raw_name in segment_names:
             name = str(raw_name)
             segment_config = segments.get(name)  # °C or schedule — segment wall temperature source
             if segment_config is None:
                 resolved[name] = max(0.0, float(default_C))  # °C — default segment wall temperature
+                if name == UPSTREAM_PIPE_SEGMENT_NAME:
+                    upstream_floor_notice = default_floor_notice
             else:
+                segment_C, segment_floor_notice = self._resolve_liner_temperature_value(
+                    segment_config, melt)
                 resolved[name] = max(  # °C — resolved segment wall temperature
                     0.0,
-                    float(self._resolve_liner_temperature_value(
-                        segment_config, melt)),
+                    float(segment_C),
                 )
+                if name == UPSTREAM_PIPE_SEGMENT_NAME:
+                    upstream_floor_notice = segment_floor_notice
+        self._upstream_wall_floor_notice = upstream_floor_notice
         return resolved
 
     def estimate_transport_state(
@@ -880,7 +902,7 @@ class OverheadGasModel:
         self,
         config: Any,
         melt: Optional[MeltState],
-    ) -> float:
+    ) -> tuple[float, dict[str, Any] | None]:
         if config is None and melt is not None:
             # d-148: p_i <= a_i*Psat_i(T_melt), a_i<=1. Monotone Psat gives
             # Psat_i(T_wall)>=Psat_i(T_melt)>=p_i when T_wall>=T_melt.
@@ -892,20 +914,26 @@ class OverheadGasModel:
             temperature_C = _required_finite_float(melt.temperature_C, 'melt.temperature_C')
             if temperature_C <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise OverheadConfigurationError('melt.temperature_C must be above absolute zero')
+            floor_notice = None
             if self._organic_tar_kg_for_schedule > 0.0:
                 from simulator.chemistry.organics_pyrolysis import (
                     tar_no_coat_wall_floor_C,
                 )
 
-                temperature_C = max(
-                    temperature_C,
-                    tar_no_coat_wall_floor_C(),
-                )
-            return temperature_C
+                floor_C, parameter = tar_no_coat_wall_floor_C()
+                if temperature_C < floor_C:
+                    floor_notice = {
+                        'type': 'UpstreamOrganicTarWallFloorApplied',
+                        'floor_temperature_C': floor_C,
+                        'melt_temperature_C': temperature_C,
+                        'parameter': parameter,
+                    }
+                    temperature_C = floor_C
+            return temperature_C, floor_notice
         if is_declared_real_scalar(config) and isinstance(config, (int, float)):
-            return float(config)
+            return float(config), None
         if not isinstance(config, Mapping):
-            return DEFAULT_PIPE_TEMPERATURE_C
+            return DEFAULT_PIPE_TEMPERATURE_C, None
 
         default_C = self._optional_float(  # °C — default liner wall temperature
             config.get('default_C'),
@@ -915,7 +943,7 @@ class OverheadGasModel:
         if isinstance(schedule, Mapping):
             schedule = schedule.get('segments', ())  # unitless sequence — segment schedule entries
         if not isinstance(schedule, (list, tuple)):
-            return default_C
+            return default_C, None
 
         campaign_name = ''
         campaign_hour = 0.0  # hr — campaign-relative time
@@ -946,14 +974,15 @@ class OverheadGasModel:
             if end_hour is not None and hour > end_hour:
                 selected = segment
                 continue
-            return self._interpolate_liner_segment(segment, hour, start_hour, end_hour)
+            return self._interpolate_liner_segment(
+                segment, hour, start_hour, end_hour), None
 
         if isinstance(selected, Mapping):
             return self._optional_float(
                 selected.get('end_C', selected.get('start_C')),
                 default_C,
-            )
-        return default_C
+            ), None
+        return default_C, None
 
     @staticmethod
     def _optional_float(value: Any, default: float) -> float:
