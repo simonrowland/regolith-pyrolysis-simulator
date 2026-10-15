@@ -38,6 +38,56 @@ KRESS91_MOL_FRACTIONS = {
 }
 
 
+def test_initial_feot_split_conserves_iron_and_normalizes_without_oxygen_import():
+    from simulator.fe_redox import initialize_feedstock_iron
+    from simulator.state import MOLAR_MASS
+
+    feedstock = {
+        'composition_wt_pct': {'SiO2': 80.0, 'FeO': 20.0},
+        'intrinsic_redox': {
+            'delta_iw': -1.0, 'formation_temperature_K': 1673.15,
+            'source': 'test fixture', 'locator': {'page': 1},
+            'estimated': True,
+        },
+    }
+    initialized, diagnostic = initialize_feedstock_iron(feedstock)
+    comp = initialized['composition_wt_pct']
+    factor = diagnostic['renormalization_factor']
+    assert sum(comp.values()) == pytest.approx(100.0, abs=1e-12)
+    assert comp['Fe2O3'] > 0.0
+    assert comp['SiO2'] == 80.0 * factor
+    iron = comp['FeO'] / MOLAR_MASS['FeO'] + 2 * comp['Fe2O3'] / MOLAR_MASS['Fe2O3']
+    assert iron == pytest.approx(factor * 20.0 / MOLAR_MASS['FeO'], rel=2e-15)
+    recovered = intrinsic_from_composition(comp, 1673.15)
+    assert recovered == pytest.approx(feo_iw_log10_fO2_bar(1673.15) - 1.0, abs=2e-14)
+    assert diagnostic['certification_gaps']
+    assert feedstock['composition_wt_pct'] == {'SiO2': 80.0, 'FeO': 20.0}
+
+
+def intrinsic_from_composition(comp, T_K):
+    from simulator.fe_redox import intrinsic_melt_fO2
+    return intrinsic_melt_fO2(comp, T_K)
+
+
+def test_measured_initial_split_is_preserved_without_kress_reanchoring():
+    from simulator.fe_redox import initialize_feedstock_iron
+
+    feedstock = {'composition_wt_pct': {'SiO2': 80.0, 'FeO': 18.0, 'Fe2O3': 2.0},
+                 'elemental_composition_wt_pct': {'Fe': 0.5}}
+    initialized, diagnostic = initialize_feedstock_iron(feedstock)
+    assert initialized == feedstock
+    assert diagnostic['method'] == 'declared_split'
+
+
+def test_missing_initial_anchor_is_predicted_and_explicitly_flagged():
+    from simulator.fe_redox import initialize_feedstock_iron
+
+    initialized, diagnostic = initialize_feedstock_iron(
+        {'composition_wt_pct': {'SiO2': 80.0, 'FeO': 20.0}})
+    assert initialized['composition_wt_pct']['Fe2O3'] > 0.0
+    assert set(diagnostic['certification_gaps']) >= {'intrinsic_delta_iw', 'formation_temperature_K'}
+
+
 @pytest.mark.parametrize('T_K', [1473.15, 1673.15, 1873.15, 2373.15])
 @pytest.mark.parametrize('pressure_bar', [1e-9, 0.01, 1.0])
 @pytest.mark.parametrize('fO2_log', [-18.0, -9.0, -3.0])
