@@ -804,6 +804,9 @@ def test_o2_bubbler_cannot_exceed_total_pressure_or_double_book_passthrough() ->
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0) == pytest.approx(
         before_o2 + diagnostic["passthrough_mol"],
     )
+    assert notice in sim._make_snapshot().redox_source_breakdown['pressure_ceiling_notices']
+    sim._reset_redox_source_diagnostics_for_hour()
+    assert not sim._redox_source_breakdown_diagnostic().get('pressure_ceiling_notices')
 
 
 def test_o2_bubbler_reoxidizes_by_kress91_capacity_math() -> None:
@@ -973,6 +976,7 @@ def test_o2_bubbler_cap_prevents_overoxidation_and_overhead_transition() -> None
 
     assert diagnostic["reason"] == "at_or_above_target"
     assert diagnostic["injected_mol"] == pytest.approx(0.0)
+    assert diagnostic['pressure_ceiling_notices'] == []
     assert sim._current_melt_redox_fO2_log() == pytest.approx(-8.0)
     assert len(sim.atom_ledger.transitions) == before_transitions
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(

@@ -5348,6 +5348,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             floor_bar=self._vacuum_floor_bar(),
         ))
 
+    def _record_redox_pressure_ceiling_hit(
+        self, *, site: str, unclamped_fO2_log: float, applied_fO2_log: float,
+    ) -> dict[str, Any] | None:
+        if unclamped_fO2_log <= applied_fO2_log:
+            return None
+        notice = {
+            'flag': 'REDOX_PRESSURE_CEILING',
+            'site': site,
+            'unclamped_fO2_log': unclamped_fO2_log,
+            'applied_fO2_log': applied_fO2_log,
+        }
+        # Keep actual selected boundary hits in the existing hourly diagnostic;
+        # intermediate root-solver trials are not physical exchange events.
+        self._redox_pressure_ceiling_notices_this_hr = [
+            *getattr(self, '_redox_pressure_ceiling_notices_this_hr', []), notice,
+        ]
+        return notice
+
     def _melt_fO2_reference_state_at_temperature(
         self,
         temperature_K: Optional[float] = None,
@@ -5766,7 +5784,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_authority=gate_authority,
         )
         current_fO2_log = self._current_melt_redox_fO2_log()
+        unclamped_target_fO2_log = target_fO2_log
         target_fO2_log = min(target_fO2_log, self._melt_redox_fO2_upper_bound_log())
+        target_ceiling_notice = self._record_redox_pressure_ceiling_hit(
+            site='o2_bubbler_target', unclamped_fO2_log=unclamped_target_fO2_log,
+            applied_fO2_log=target_fO2_log,
+        )
         inventory = self.atom_ledger.mol_by_account('process.cleaned_melt')
         finite_need = kress91_oxygen_demand_mol(
             feo_mol=float(inventory.get('FeO', 0.0)),
@@ -5981,6 +6004,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'eta_absorb': eta_absorb,
             'target_fO2_log': target_fO2_log,
             'target_source': target_source,
+            'pressure_ceiling_notices': ([target_ceiling_notice]
+                                         if target_ceiling_notice else []),
             'current_fO2_log_before': current_fO2_log,
             'melt_redox_capacity_mol_per_ln_fO2': self._melt_redox_source_capacity_mol_per_ln_fO2(
                 fO2_log=current_fO2_log, T_K=T_K, gate_authority=gate_authority,
@@ -6039,6 +6064,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
     def _reset_redox_source_diagnostics_for_hour(self) -> None:
+        self._redox_pressure_ceiling_notices_this_hr = []
         self._redox_source_terms_this_hr = {}
         self._redox_source_applied_terms_this_hr = {}
         self._redox_source_skipped_terms_this_hr = {}
@@ -6344,7 +6370,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self, '_fe_redox_respeciation_diagnostics_this_hr', []) or []
             )
         ]
-        if not terms and not respeciation_attempts:
+        ceiling_notices = list(getattr(
+            self, '_redox_pressure_ceiling_notices_this_hr', []))
+        if not terms and not respeciation_attempts and not ceiling_notices:
             return {}
         applied_terms = _filtered_terms('_redox_source_applied_terms_this_hr')
         skipped_terms = _filtered_terms('_redox_source_skipped_terms_this_hr')
@@ -6388,6 +6416,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self, '_last_fe_redox_respeciation_diagnostic', {}) or {}
             ),
             'fe_redox_respeciation_attempts': respeciation_attempts,
+            'pressure_ceiling_notices': ceiling_notices,
             'source_context': source_context,
             'redox_source_refusal_context': refusal_context,
             'source_campaign': str(source_context.get('campaign', '')),
@@ -6455,6 +6484,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             available_o2_mol=available, gas_log_fO2=gas_log_fO2,
         )
         gas_log = gas_log_fO2(head_o2 - uptake)
+        selected_head_o2 = head_o2 - uptake
+        selected_transport = self._headspace_transport_pO2_bar_from_ledger(
+            self._headspace_ledger_pO2_bar_from_o2_mol(selected_head_o2),
+            head_o2_mol=selected_head_o2,
+        )
+        self._record_redox_pressure_ceiling_hit(
+            site='headspace_exchange',
+            unclamped_fO2_log=math.log10(max(selected_transport, self._vacuum_floor_bar())),
+            applied_fO2_log=gas_log,
+        )
         if abs(uptake) > OXYGEN_RESERVOIR_NOOP_MOL:
             target = kress91_intrinsic_state(
                 feo_mol=max(0.0, feo - 4.0 * uptake),

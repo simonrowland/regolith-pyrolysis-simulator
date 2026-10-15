@@ -972,6 +972,8 @@ def kress91_intrinsic_state(
         value = min(exchange_fO2_log, math.log10(pressure_bar))
         bounded = True
         flags.append('EXCHANGE_BOUNDED')
+        if exchange_fO2_log > value:
+            flags.append('REDOX_PRESSURE_CEILING')
     else:
         # Premise (Kress & Carmichael 1991): ln(n_Fe2O3/n_FeO) = a ln fO2 + B,
         # B containing composition and the full T/P terms. Evaluate B through
@@ -988,7 +990,11 @@ def kress91_intrinsic_state(
         value = (math.log(fe2o3_mol) - math.log(feo_mol) - math.log(baseline)) / (
             KRESS91_LN_FO2_COEFFICIENT * math.log(10.0)
         )
-    return {'fO2_log': value, 'exchange_bounded': bounded, 'bound': bound, 'flags': flags}
+    state = {'fO2_log': value, 'exchange_bounded': bounded, 'bound': bound, 'flags': flags}
+    if bounded:
+        state.update(unclamped_fO2_log=exchange_fO2_log,
+                     pressure_ceiling_fO2_log=math.log10(pressure_bar))
+    return state
 
 
 def kress91_oxygen_demand_mol(
