@@ -129,7 +129,7 @@ def test_quenched_redox_reference_survives_pressure_cycle() -> None:
 def test_passive_exchange_respeciation_settles_same_buffer_once(absorbing) -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
-    sim.melt.p_total_mbar = 10.0
+    sim.melt.p_total_mbar = 0.2
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas", {"O2": 1000.0},
         source="test funded initial redox split", material_origin="feedstock",
