@@ -7851,9 +7851,7 @@ def test_source_polymorph_classification_pin() -> None:
     )
 
     omitted = State.unknown("source does not state polymorph")
-    unrecognised = State.unknown(
-        "unrecognised polymorph 'beta' is not a closed Polymorph token"
-    )
+    unrecognised = Species("MgO", Phase.CR, State.of("unknown-form")).polymorph
     contradictory_mgo = Species(
         "MgO", Phase.CR, State.of(Polymorph.CLINOENSTATITE)
     ).polymorph
