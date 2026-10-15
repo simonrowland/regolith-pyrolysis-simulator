@@ -62,3 +62,23 @@ def test_shults_1994_migrates_printed_pressure_and_activity_cells() -> None:
         and observation.point_conditions["temperature_K"].locator is not None
         for observation in result.observations.values()
     )
+
+
+def test_ostrovski_2000_migrates_printed_activity_cells() -> None:
+    result = _migrate("ostrovski-2000-cao-tio2-sio2.yaml")
+    assert len(result.observations) == 40
+    assert _point(result, "ostrovski_2000_table4_s7_activity") == Decimal("0.84")
+    assert _point(result, "ostrovski_2000_table4_s7_activity_coefficient") == Decimal(
+        "1.615"
+    )
+    located = [
+        observation
+        for observation in result.observations.values()
+        if observation.point_conditions
+    ]
+    assert len(located) == 38
+    assert all(
+        observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].locator is not None
+        for observation in located
+    )
