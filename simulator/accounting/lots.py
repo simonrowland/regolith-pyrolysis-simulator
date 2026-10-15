@@ -208,10 +208,10 @@ class MaterialLot:
             value = float(kg)
             if not math.isfinite(value):
                 raise AccountingError(f"mass for species {name!r} must be finite")
-            if value < -EMPTY_KG_TOLERANCE:
+            if value < 0.0:
                 raise AccountingError(f"lot mass for species {name!r} must be non-negative")
-            if abs(value) <= EMPTY_KG_TOLERANCE:
-                value = 0.0
+            # A fresh positive parcel is real mass, even below the balance
+            # tolerance. Debit cancellation residues belong to the ledger.
             normalized[name] = normalized.get(name, 0.0) + value
 
         object.__setattr__(self, "account", account)
@@ -268,7 +268,7 @@ class MaterialLot:
             _freeze_meta(dict(sorted(methods.items()))),
         )
 
-    def without_empty(self, tolerance_kg: float = EMPTY_KG_TOLERANCE) -> "MaterialLot":
+    def without_empty(self, tolerance_kg: float = 0.0) -> "MaterialLot":
         kept = {species: kg for species, kg in self.species_kg.items() if abs(kg) > tolerance_kg}
         return MaterialLot(
             self.account,
