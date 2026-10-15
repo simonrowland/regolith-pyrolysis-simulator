@@ -163,7 +163,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
-from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.account_ids import MELT_RESIDENT_ACCOUNTS, SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
@@ -326,20 +326,15 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 SPENT_REDUCTANT_RESIDUE_ACCOUNT,
             )
         )
-        for species, kg in spent_residue_kg.items():
-            composition_kg[species] = composition_kg.get(species, 0.0) + kg
+        from simulator.accounting.ledger import _merge_species_amounts_from_accounts
+
+        composition_kg = _merge_species_amounts_from_accounts(
+            {MELT_RESIDENT_ACCOUNTS[0]: composition_kg,
+             SPENT_REDUCTANT_RESIDUE_ACCOUNT: spent_residue_kg},
+            MELT_RESIDENT_ACCOUNTS)
         total_kg += spent_residue_total_kg
-        composition_mol = dict(
-            request.account_view.accounts.get("process.cleaned_melt", {}) or {}
-        )
-        for species, mol in (
-            request.account_view.accounts.get(
-                SPENT_REDUCTANT_RESIDUE_ACCOUNT,
-                {},
-            )
-            or {}
-        ).items():
-            composition_mol[species] = composition_mol.get(species, 0.0) + mol
+        composition_mol = _merge_species_amounts_from_accounts(
+            request.account_view.accounts, MELT_RESIDENT_ACCOUNTS)
         composition_wt_pct = self._wt_pct_from_kg(composition_kg, total_kg)
         true_available_mol = self._true_available_mol_by_species(controls)
 

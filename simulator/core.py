@@ -370,6 +370,7 @@ def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
         ) from exc
 
 from simulator.account_ids import (
+    MELT_RESIDENT_ACCOUNTS,
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
@@ -402,6 +403,7 @@ from simulator.accounting import (
     resolve_species_formula,
 )
 from simulator.accounting.ledger import (
+    _merge_species_amounts_from_accounts,
     KNOWN_LEDGER_ACCOUNTS,
     KNOWN_LEDGER_ACCOUNT_PREFIXES,
     snapshot_atom_ledger,
@@ -831,8 +833,7 @@ FLOW_MASS_EXCLUDED_ACCOUNTS = (
     'process.stage0_foulant',
 )
 BACKEND_REACTIVE_ACCOUNTS = (
-    'process.cleaned_melt',
-    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+    *MELT_RESIDENT_ACCOUNTS,
     'process.metal_phase',
     'process.overhead_gas',
 )
@@ -8930,16 +8931,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _melt_resident_composition_kg_from_atom_ledger(self) -> Dict[str, float]:
         """Project both melt-resident accounts without changing cached outputs."""
-        ledger_melt = self.atom_ledger.project_account_kg('process.cleaned_melt')
-        spent_reductant_residue = self.atom_ledger.project_account_kg(
-            SPENT_REDUCTANT_RESIDUE_ACCOUNT)
-        projected_melt = {
-            species: float(kg)
-            for species, kg in ledger_melt.items()
-        }
-        for species, kg in spent_reductant_residue.items():
-            projected_melt[species] = projected_melt.get(species, 0.0) + float(kg)
-        return projected_melt
+        return _merge_species_amounts_from_accounts(
+            {account: self.atom_ledger.project_account_kg(account)
+             for account in MELT_RESIDENT_ACCOUNTS},
+            MELT_RESIDENT_ACCOUNTS)
 
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
         projected_melt = self._melt_resident_composition_kg_from_atom_ledger()

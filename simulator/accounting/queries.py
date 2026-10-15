@@ -2639,19 +2639,6 @@ def _oxygen_atom_mol_for_balances(
     )
 
 
-def _merge_species_mol_from_accounts(
-    balances: Mapping[str, Mapping[str, float]],
-    accounts: tuple[str, ...] | list[str],
-) -> dict[str, float]:
-    merged: dict[str, float] = {}
-    for account in accounts:
-        for species, mol in (balances.get(str(account), {}) or {}).items():
-            amount = float(mol)
-            if amount:
-                merged[str(species)] = merged.get(str(species), 0.0) + amount
-    return dict(sorted(merged.items()))
-
-
 def _plume_position_reading(
     species_mol: Mapping[str, float],
     registry: Mapping[str, Any],

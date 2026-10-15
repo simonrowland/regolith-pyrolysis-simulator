@@ -47,6 +47,8 @@ DEFAULT_BALANCE_TOLERANCE_KG = 1e-12
 DEFAULT_BALANCE_RELATIVE_TOLERANCE = 1e-12
 DEFAULT_BALANCE_ABSOLUTE_FLOOR_KG = 1e-15
 DEFAULT_SCOPE = "batch"
+
+
 POLICY_SCOPES = {"batch", "campaign", "external"}
 TERMINAL_DEBIT_EXCEPTIONS = {
     (
@@ -113,6 +115,20 @@ KNOWN_LEDGER_ACCOUNT_PREFIXES: tuple[str, ...] = (
     "process.wall_deposit_segment_",
     "reservoir.reagent.",
 )
+
+
+def _merge_species_amounts_from_accounts(
+    balances: Mapping[str, Mapping[str, float]],
+    accounts: tuple[str, ...],
+) -> dict[str, float]:
+    """Sum selected accounts in order; all inputs must use the same unit."""
+    merged: dict[str, float] = {}
+    for account in accounts:
+        for species, value in (balances.get(account, {}) or {}).items():
+            amount = float(value)
+            if amount:
+                merged[species] = merged.get(species, 0.0) + amount
+    return merged
 
 
 @dataclass(frozen=True)
