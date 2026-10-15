@@ -518,6 +518,10 @@ species:
           method_class: authors_estimate
           quantity: heat_of_fusion
           delta_H_fus_kJ_mol-1: 37.7
+          T_fus_K:
+            value: 1147
+            units: K
+            locator: {page: 15, published_page: 15, pdf_page_index: 14, table: '4', row: Na2Si2O5, column: T_f (K)}
           model: In this appendix we use the model of Richet and Bottinga [1982] for Cpg and that of Richet and Bottinga [1985] for Cpl to calculate with equation (23) the enthalpies of fusion of some silicates of geological or theoretical interest.
         uncertainty: {reported_status: printed, value: 4.4, units: kJ/mol}
       - observation_id: rb86_1986_na2si2o5_entropy_of_fusion_table4
@@ -581,6 +585,10 @@ species:
           method_class: authors_estimate
           quantity: heat_of_fusion
           delta_H_fus_kJ_mol-1: 32.0
+          T_fus_K:
+            value: 1318
+            units: K
+            locator: {page: 15, published_page: 15, pdf_page_index: 14, table: '4', row: K2Si2O5, column: T_f (K)}
           model: In this appendix we use the model of Richet and Bottinga [1982] for Cpg and that of Richet and Bottinga [1985] for Cpl to calculate with equation (23) the enthalpies of fusion of some silicates of geological or theoretical interest.
         uncertainty: {reported_status: printed, value: 4.0, units: kJ/mol}
       - observation_id: rb86_1986_k2si2o5_entropy_of_fusion_table4
@@ -644,6 +652,10 @@ species:
           method_class: authors_estimate
           quantity: heat_of_fusion
           delta_H_fus_kJ_mol-1: 19.6
+          T_fus_K:
+            value: 1249
+            units: K
+            locator: {page: 15, published_page: 15, pdf_page_index: 14, table: '4', row: K2SiO3, column: T_f (K)}
           model: In this appendix we use the model of Richet and Bottinga [1982] for Cpg and that of Richet and Bottinga [1985] for Cpl to calculate with equation (23) the enthalpies of fusion of some silicates of geological or theoretical interest.
         uncertainty: {reported_status: printed, value: 4.0, units: kJ/mol}
       - observation_id: rb86_1986_k2sio3_entropy_of_fusion_table4
@@ -724,6 +736,11 @@ species:
           method_class: authors_estimate
           quantity: heat_of_fusion
           delta_H_fus_kJ_mol-1: 73.2
+          T_fus_K:
+            value: null
+            units: K
+            reason: Table 4 does not print Tf for the second MgSiO3 row (This work, appendix)
+            locator: {page: 15, published_page: 15, pdf_page_index: 14, table: '4', row: MgSiO3, column: T_f (K)}
           model: In this appendix we use the model of Richet and Bottinga [1982] for Cpg and that of Richet and Bottinga [1985] for Cpl to calculate with equation (23) the enthalpies of fusion of some silicates of geological or theoretical interest.
         uncertainty: {reported_status: printed, value: 6.0, units: kJ/mol}
       - observation_id: rb86_1986_mgsio3_entropy_of_fusion_table4
@@ -754,7 +771,7 @@ species:
           T_fus_K:
             value: null
             units: K
-            reason: Table 4 does not print Tf for the second MgSiO3 row (This work, appendix).
+            reason: Table 4 does not print Tf for the second MgSiO3 row (This work, appendix)
             locator: {page: 15, published_page: 15, pdf_page_index: 14, table: '4', row: MgSiO3, column: T_f (K)}
           delta_S_fus_J_mol-1_K-1: 39.9
         uncertainty: {reported_status: printed, value: 3.3, units: J/mol K}
