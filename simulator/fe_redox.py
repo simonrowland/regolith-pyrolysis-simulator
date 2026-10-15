@@ -1078,7 +1078,7 @@ def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, di
     comp = dict(feedstock.get('composition_wt_pct', {}))
     anchor = dict(feedstock.get('intrinsic_redox', {}) or {})
     T_K = float(anchor.get('formation_temperature_K', KRESS91_FO2_KEY_REFERENCE_T_K))
-    if 'Fe2O3' in comp or not comp.get('FeO'):
+    if 'Fe2O3' in comp or not iron_oxide_values(comp)[0]:
         return prepared, {
             'method': 'declared_split', 'formation_temperature_K': T_K,
             'certification_gaps': (['formation_temperature_K']
