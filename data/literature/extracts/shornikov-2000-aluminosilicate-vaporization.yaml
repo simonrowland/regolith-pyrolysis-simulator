@@ -1,0 +1,1856 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2000-aluminosilicate-vaporization
+source:
+  citation: "Shornikov, S. I., Archakov, I. Yu., and Chemekova, T. Yu. (2000). A Mass-Spectrometric Study of Vaporization and Phase Equilibria in the Al2O3–SiO2 System. Russian Journal of Physical Chemistry, 74(5), 677–683."
+  year: 2000
+  corpus_asset: raw/shornikov-2000-aluminosilicate-vaporization/shornikov-2000-aluminosilicate-vaporization.pdf
+  corpus_sha256: dbd1fcb5d9d98b5b56a5b5c09651514d105c69a0a392bd5b684c7ed131766437
+extraction:
+  method: "manual transcription from 250 dpi page images; values checked against page images"
+  date: "2026-10-05"
+  worker: x-2000-as-vap
+review_status: draft
+fidelity_samples:
+  - species: Al2O3
+    observable: transition_point
+    observation_id: shornikov_2000_table1_mullite_congruent_melting
+    field: T_K
+    value: 2180
+    locator:
+      published_page: 681
+      table: "Nonvariant points"
+      note: "M + L, congruent melting; 60.00 mol% Al2O3; this work"
+  - species: Al2O3
+    observable: transition_point
+    observation_id: shornikov_2000_table1_mullite_corundum_liquid_eutectic
+    field: T_K
+    value: 2160
+    locator:
+      published_page: 681
+      table: "Nonvariant points"
+      note: "M + A + L, eutectic; 67.63 mol% Al2O3; this work"
+benches:
+  - id: shornikov-2000-mi1201-mo-cell
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: MI-1201 high-temperature mass spectrometer}
+      locator: {published_page: 677, pdf_page_index: 0, section: Experimental}
+    method:
+      state: {tag: value, value: Knudsen effusion mass spectrometry}
+      locator: {published_page: 677, pdf_page_index: 0, section: Experimental}
+    detector:
+      state: {tag: value, value: MI-1201 commercial mass spectrometer}
+      locator: {published_page: 677, pdf_page_index: 0, section: Experimental}
+    cell_material_and_liner:
+      state: {tag: value, value: Molybdenum effusion cells; liner material not stated}
+      locator: {published_page: 677, pdf_page_index: 0, section: Experimental}
+    cell_materials:
+      - state: {tag: value, value: Mo}
+        locator: {published_page: 677, pdf_page_index: 0, section: Experimental}
+    heating_method:
+      state: {tag: value, value: Alternating current through a tantalum holder of the effusion cell}
+      locator: {published_page: 677, pdf_page_index: 0, section: Experimental}
+    temperature_measurement:
+      sensor:
+        state: {tag: value, value: EOP-66 optical pyrometer}
+        locator: {published_page: 677, pdf_page_index: 0, section: Experimental}
+    temperature_calibration:
+      method:
+        state: {tag: value, value: Calibrated against reference temperature points}
+        locator: {published_page: 677, pdf_page_index: 0, section: Experimental}
+      blackbody_simulation:
+        state: {tag: value, value: Blackbody radiation imitated with a channel from the effusion chamber body}
+        locator: {published_page: 677, pdf_page_index: 0, section: Experimental}
+    ionization:
+      energy_eV:
+        state: {tag: value, value: {kind: point, point: '20.0'}}
+        locator: {published_page: 678, pdf_page_index: 1, section: Results and Discussion}
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 677, pdf_page_index: 0, section: Experimental, note: 'Orifice stated; diameter not printed'}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 677, pdf_page_index: 0, section: Experimental, note: 'No channel length printed'}
+    other_facts:
+      - name: liner_material
+        unit: "as printed"
+        value:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 677, pdf_page_index: 0, section: Experimental, note: Liner material is not stated}
+      - name: stated_temperature_measurement_accuracy
+        unit: K
+        value:
+          state: {tag: value, value: {kind: point, point: '10'}}
+          locator: {published_page: 677, pdf_page_index: 0, section: Experimental, note: 'EOP-66 accuracy includes light absorption by pyrometric window'}
+      - name: ion_optical_system_copper_lead_diameter
+        unit: mm
+        value:
+          state: {tag: value, value: {kind: point, point: '1.0'}}
+          locator: {published_page: 677, pdf_page_index: 0, section: Introduction}
+      - name: orifice_laser_cut_weld_width
+        unit: mm
+        value:
+          state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '0.02'}}
+          locator: {published_page: 677, pdf_page_index: 0, section: Experimental, note: 'Weld width is not orifice diameter'}
+      - name: sample_vaporization_surface_area_to_effusion_orifice_area_ratio
+        unit: dimensionless
+        value:
+          state: {tag: value, value: {kind: bound, bound_operator: '>=', bound_value: '250'}}
+          locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+      - name: ion_source_residual_gas_pressure_upper_bound_at_3000_K
+        unit: atm
+        value:
+          state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '1e-10'}}
+          locator: {published_page: 677, pdf_page_index: 0, section: Introduction, note: 'Ion source high-rate heating capability; not a sample-run chamber background'}
+      - name: ionizing_energy_uncertainty
+        unit: eV
+        value:
+          state: {tag: value, value: {kind: point, point: '0.1'}}
+          locator: {published_page: 678, pdf_page_index: 1, section: Results and Discussion}
+      - name: ionization_cross_sections_and_source
+        unit: "as printed"
+        value:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 678, pdf_page_index: 1, section: Results and Discussion, note: "No cross-sections or their source reported"}
+      - name: multiplier_correction
+        unit: "as printed"
+        value:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 678, pdf_page_index: 1, section: Results and Discussion, note: "No multiplier correction reported"}
+      - name: isotope_correction
+        unit: "as printed"
+        value:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 678, pdf_page_index: 1, section: Results and Discussion, note: "No isotope correction reported"}
+  - id: quench-furnace-described
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: Furnace used for quenching experiments; type not stated}
+      locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+    cell_material_and_liner:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: No effusion cell or liner described for the quench furnace}
+    geometry:
+      orifice_diameter_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: No effusion orifice in the quench furnace method}
+      orifice_channel_length_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: No effusion channel in the quench furnace method}
+    temperature_measurement:
+      sensor:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: No temperature sensor or calibration is stated for quench runs}
+    temperature_calibration:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: No temperature sensor or calibration is stated for quench runs}
+    ionization:
+      energy_eV:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: Quench phase-diagram work is described without mass spectrometric ionization}
+    other_facts:
+      - name: sample_support
+        unit: as printed
+        value:
+          state: {tag: value, value: {kind: categorical, categorical: tungsten wire}}
+          locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+      - name: ionization_cross_sections_and_source
+        unit: "as printed"
+        value:
+          state: {tag: not_applicable, reason: not_applicable}
+          locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: Quench phase-diagram work is described without mass spectrometry}
+      - name: multiplier_correction
+        unit: "as printed"
+        value:
+          state: {tag: not_applicable, reason: not_applicable}
+          locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: Quench phase-diagram work is described without mass spectrometry}
+      - name: isotope_correction
+        unit: "as printed"
+        value:
+          state: {tag: not_applicable, reason: not_applicable}
+          locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: Quench phase-diagram work is described without mass spectrometry}
+experiments:
+  - experiment_id: kems-vaporization-series
+    bench_id: shornikov-2000-mi1201-mo-cell
+    method: knudsen_effusion
+    locator: {published_page: 677, pdf_page_index: 0, section: Experimental}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 677, pdf_page_index: 0, section: Experimental, note: 'The source does not state a diameter'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 677, pdf_page_index: 0, section: Experimental, note: 'The source does not state a channel length'}
+      calibration:
+        method:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 678, pdf_page_index: 1, section: Results and Discussion, note: 'No intensity-to-partial-pressure conversion is reported'}
+        reference_substance:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 678, pdf_page_index: 1, section: Results and Discussion, note: 'No pressure-calibration reference substance is reported'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 677, pdf_page_index: 0, section: Introduction, note: 'The <=1e-10 atm upper bound applies to source heating capability, not an assigned sample-run background'}
+      sweep_gas:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 677, pdf_page_index: 0, section: Experimental, note: 'No sweep gas stated for vaporization runs'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    sample:
+      mass_kg:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: 'No vaporization charge mass stated'}
+      form:
+        state: {tag: value, value: Al2O3-SiO2 samples vaporized as melts}
+        locator: {published_page: 677, pdf_page_index: 0, section: Experimental}
+      printed_composition:
+        state: {tag: unknown, reason: would_invent}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: 'Eight distinct sample compositions are listed; no single composition applies to this series'}
+      initial_composition:
+        state: {tag: unknown, reason: would_invent}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: 'Per-sample compositions are retained in source-context and observation rows'}
+      characterization:
+        state:
+          tag: value
+          value: "Samples synthesized by solid-state reaction and analyzed by X-ray and chemical analysis; alumina prepared from ammonium alum of os. ch. special-purity grade with only traces of impurities detected spectroscopically; rock-crystal powder contained 99.90 wt% SiO2. No numerical post-vaporization assay is stated; text reports partial SiO2 volatilization on unprotected surfaces."
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+      pretreatment:
+        state:
+          tag: value
+          value: "Starting oxides mixed in a jasper ball mill in acetone; solid-state synthesis in air in Silit furnaces up to 1600 K for 24 h; high-frequency annealing in argon on a Donets-1 unit at 1800-2000 K for 1 h, stated to prevent transition to liquid."
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+    conditions:
+      temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1720', interval_high: '2520'}}
+        locator: {published_page: 677, pdf_page_index: 0, section: Abstract and Experimental}
+    thermal_schedule:
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: 'No duration is stated for the vaporization run series'}
+  - experiment_id: quench-phase-diagram-study
+    bench_id: quench-furnace-described
+    method: quench_equilibration
+    locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: 'Additional phase-diagram study by quenching; apparatus and run assignments are only partly described'}
+    apparatus:
+      calibration:
+        method:
+          state: {tag: not_applicable, reason: not_applicable}
+          locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: Quench runs have no intensity-to-pressure measurement}
+        reference_substance:
+          state: {tag: not_applicable, reason: not_applicable}
+          locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: Quench runs have no intensity-to-pressure measurement}
+    sample:
+      form:
+        state: {tag: value, value: Al2O3-SiO2 samples suspended on tungsten wire}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+      initial_composition:
+        state: {tag: unknown, reason: would_invent}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: 'No single quenching charge composition assigned'}
+      mass_kg:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+    conditions:
+      temperature_K:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: 'Heated to complete melting; no temperature values stated for quench runs'}
+    thermal_schedule:
+      method:
+        state:
+          tag: value
+          value: "Heated to complete melting, held molten for some time, then rapidly crystallized by quenching"
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental, note: 'Only qualitative duration, held molten for some time'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+      sweep_gas:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+  - experiment_id: table-1-literature-comparison
+    method: tabulation
+    locator: {published_page: 681, pdf_page_index: 4, section: Nonvariant points table}
+species:
+  Al2O3:
+    observations:
+      - observation_id: shornikov_2000_table1_row_01
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r01; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [1986.0, 1986.0]
+        uncertainty: "Temperature uncertainty printed as ± 5 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r01"
+          phase_region_as_printed: "S + L, congruent melting"
+          Al2O3_mol_percent: 0
+          composition_mol:
+            Al2O3: 0
+            SiO2: 1
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "0"
+          T_K: 1986
+          T_K_as_printed: "1986 ± 5"
+          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
+          reference_as_printed: "[11]"
+          attribution: "Reference [11] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_02
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r02; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [1996.0, 1996.0]
+        uncertainty: "Temperature uncertainty printed as ± 5 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r02"
+          phase_region_as_printed: "S + L, congruent melting"
+          Al2O3_mol_percent: 0
+          composition_mol:
+            Al2O3: 0
+            SiO2: 1
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "0"
+          T_K: 1996
+          T_K_as_printed: "1996 ± 5"
+          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
+          reference_as_printed: "[22]"
+          attribution: "Reference [22] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_03
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r03; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [1998.0, 1998.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r03"
+          phase_region_as_printed: "S + L, congruent melting"
+          Al2O3_mol_percent: 0
+          composition_mol:
+            Al2O3: 0
+            SiO2: 1
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "0"
+          T_K: 1998
+          T_K_as_printed: "1998 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[40]"
+          attribution: "Reference [40] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_04
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r04; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [1999.0, 1999.0]
+        uncertainty: "Temperature uncertainty printed as ± 5 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r04"
+          phase_region_as_printed: "S + L, congruent melting"
+          Al2O3_mol_percent: 0
+          composition_mol:
+            Al2O3: 0
+            SiO2: 1
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "0"
+          T_K: 1999
+          T_K_as_printed: "1999 ± 5"
+          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
+          reference_as_printed: "[26]"
+          attribution: "Reference [26] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_05
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r05; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2007.0, 2007.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r05"
+          phase_region_as_printed: "S + L, congruent melting"
+          Al2O3_mol_percent: 0
+          composition_mol:
+            Al2O3: 0
+            SiO2: 1
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "0"
+          T_K: 2007
+          T_K_as_printed: "2007"
+          reference_as_printed: "[37]"
+          attribution: "Reference [37] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_06
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r06; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [1819.0, 1819.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r06"
+          phase_region_as_printed: "M + S + L, eutectic"
+          Al2O3_mol_percent: 5.51
+          composition_mol:
+            Al2O3: 0.0551
+            SiO2: 0.9449
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "5.51"
+          T_K: 1819
+          T_K_as_printed: "1819"
+          reference_as_printed: "[37]"
+          attribution: "Reference [37] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_07
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r07; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [1822.0, 1822.0]
+        uncertainty: "Temperature uncertainty printed as ± 5 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r07"
+          phase_region_as_printed: "M + S + L, eutectic"
+          Al2O3_mol_percent: 3.5
+          composition_mol:
+            Al2O3: 0.035
+            SiO2: 0.965
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "3.50"
+          T_K: 1822
+          T_K_as_printed: "1822 ± 5"
+          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
+          reference_as_printed: "[28]"
+          attribution: "Reference [28] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_08
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r08; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [1823.0, 1823.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r08"
+          phase_region_as_printed: "M + S + L, eutectic"
+          Al2O3_mol_percent:
+            state: {tag: unknown, reason: not_published}
+            locator: {table: "Nonvariant points", published_page: 681, pdf_page_index: 4, note: "Composition cell is blank; no carry-forward inferred"}
+          Al2O3_mol_percent_as_printed: ""
+          T_K: 1823
+          T_K_as_printed: "1823"
+          reference_as_printed: "[25]"
+          attribution: "Reference [25] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_09
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r09; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [1857.0, 1857.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r09"
+          phase_region_as_printed: "M + S + L, eutectic"
+          Al2O3_mol_percent: 3.32
+          composition_mol:
+            Al2O3: 0.0332
+            SiO2: 0.9668
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "3.32"
+          T_K: 1857
+          T_K_as_printed: "1857"
+          reference_as_printed: "[11]"
+          attribution: "Reference [11] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_10
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r10; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [1860.0, 1860.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r10"
+          phase_region_as_printed: "M + S + L, eutectic"
+          Al2O3_mol_percent: 4.43
+          composition_mol:
+            Al2O3: 0.0443
+            SiO2: 0.9557
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "4.43"
+          T_K: 1860
+          T_K_as_printed: "1860 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[24]"
+          attribution: "Reference [24] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_11
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r11; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [1860.0, 1860.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r11"
+          phase_region_as_printed: "M + S + L, eutectic"
+          Al2O3_mol_percent:
+            state: {tag: unknown, reason: not_published}
+            locator: {table: "Nonvariant points", published_page: 681, pdf_page_index: 4, note: "Composition cell is blank; no carry-forward inferred"}
+          Al2O3_mol_percent_as_printed: ""
+          T_K: 1860
+          T_K_as_printed: "1860 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[26, 41]"
+          attribution: "Reference [26, 41] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_12
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r12; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [1868.0, 1868.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r12"
+          phase_region_as_printed: "M + S + L, eutectic"
+          Al2O3_mol_percent:
+            state: {tag: unknown, reason: not_published}
+            locator: {table: "Nonvariant points", published_page: 681, pdf_page_index: 4, note: "Composition cell is blank; no carry-forward inferred"}
+          Al2O3_mol_percent_as_printed: ""
+          T_K: 1868
+          T_K_as_printed: "1868 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[42]"
+          attribution: "Reference [42] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_13
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r13; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [1883.0, 1883.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r13"
+          phase_region_as_printed: "M + S + L, eutectic"
+          Al2O3_mol_percent: 8.09
+          composition_mol:
+            Al2O3: 0.0809
+            SiO2: 0.9191
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "8.09"
+          T_K: 1883
+          T_K_as_printed: "1883"
+          reference_as_printed: "[40]"
+          attribution: "Reference [40] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_15
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r15; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2089.0, 2089.0]
+        uncertainty: "Temperature uncertainty printed as ± 20 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r15"
+          phase_region_as_printed: "M + L, congruent melting"
+          Al2O3_mol_percent: 50.08
+          composition_mol:
+            Al2O3: 0.5008
+            SiO2: 0.4992
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "50.08"
+          T_K: 2089
+          T_K_as_printed: "2089 ± 20"
+          temperature_uncertainty_K: 20
+          T_m_uncertainty_K: 20
+          reference_as_printed: "[40]"
+          attribution: "Reference [40] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_16
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r16; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2123.0, 2123.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r16"
+          phase_region_as_printed: "M + L, congruent melting"
+          Al2O3_mol_percent_low: 60.00
+          Al2O3_mol_percent_high: 63.01
+          Al2O3_mol_percent_as_printed: "60.00–63.01"
+          T_K: 2123
+          T_K_as_printed: "2123 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[42]"
+          attribution: "Reference [42] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_17
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r17; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2173.0, 2173.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r17"
+          phase_region_as_printed: "M + L, congruent melting"
+          Al2O3_mol_percent: 66.74
+          composition_mol:
+            Al2O3: 0.6674
+            SiO2: 0.3326
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "66.74"
+          T_K: 2173
+          T_K_as_printed: "2173 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[38]"
+          attribution: "Reference [38] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_18
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r18; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2173.0, 2173.0]
+        uncertainty: "Temperature uncertainty printed as ± 20 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r18"
+          phase_region_as_printed: "M + L, congruent melting"
+          Al2O3_mol_percent: 60.24
+          composition_mol:
+            Al2O3: 0.6024
+            SiO2: 0.3976
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "60.24"
+          T_K: 2173
+          T_K_as_printed: "2173 ± 20"
+          temperature_uncertainty_K: 20
+          T_m_uncertainty_K: 20
+          reference_as_printed: "[12]"
+          attribution: "Reference [12] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_mullite_congruent_melting
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r19; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2180.0, 2180.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: measured_tabulated
+          admission_status: admitted
+          source_row: "t1-r19"
+          phase_region_as_printed: "M + L, congruent melting"
+          Al2O3_mol_percent: 60
+          composition_mol:
+            Al2O3: 0.6
+            SiO2: 0.4
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "60.00"
+          T_K: 2180
+          T_K_as_printed: "2180 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "*"
+          attribution: "Shornikov et al. (2000), this work"
+      - observation_id: shornikov_2000_table1_row_20
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r20; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2183.0, 2183.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r20"
+          phase_region_as_printed: "M + L, congruent melting"
+          Al2O3_mol_percent: 60
+          composition_mol:
+            Al2O3: 0.6
+            SiO2: 0.4
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "60.00"
+          T_K: 2183
+          T_K_as_printed: "2183"
+          reference_as_printed: "[11]"
+          attribution: "Reference [11] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_21
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r21; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2207.0, 2207.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r21"
+          phase_region_as_printed: "M + L, congruent melting"
+          Al2O3_mol_percent: 60.24
+          composition_mol:
+            Al2O3: 0.6024
+            SiO2: 0.3976
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "60.24"
+          T_K: 2207
+          T_K_as_printed: "2207"
+          reference_as_printed: "[37]"
+          attribution: "Reference [37] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_22
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r22; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2083.0, 2083.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r22"
+          phase_region_as_printed: "M + A + L, incongruent melting"
+          Al2O3_mol_percent: 60
+          composition_mol:
+            Al2O3: 0.6
+            SiO2: 0.4
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "60.00"
+          T_K: 2083
+          T_K_as_printed: "2083 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[28]"
+          attribution: "Reference [28] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_23
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r23; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2083.0, 2083.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r23"
+          phase_region_as_printed: "M + A + L, incongruent melting"
+          Al2O3_mol_percent_low: 60.00
+          Al2O3_mol_percent_high: 66.74
+          Al2O3_mol_percent_as_printed: "60.00–66.74"
+          T_K: 2083
+          T_K_as_printed: "2083"
+          reference_as_printed: "[35]"
+          attribution: "Reference [35] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_24
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r24; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2098.0, 2098.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r24"
+          phase_region_as_printed: "M + A + L, incongruent melting"
+          Al2O3_mol_percent:
+            state: {tag: unknown, reason: not_published}
+            locator: {table: "Nonvariant points", published_page: 681, pdf_page_index: 4, note: "Composition cell is blank; no carry-forward inferred"}
+          Al2O3_mol_percent_as_printed: ""
+          T_K: 2098
+          T_K_as_printed: "2098 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[43]"
+          attribution: "Reference [43] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_25
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r25; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2101.0, 2101.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r25"
+          phase_region_as_printed: "M + A + L, incongruent melting"
+          Al2O3_mol_percent_low: 58.48
+          Al2O3_mol_percent_high: 62.65
+          Al2O3_mol_percent_as_printed: "58.48–62.65"
+          T_K: 2101
+          T_K_as_printed: "2101 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[26, 41]"
+          attribution: "Reference [26, 41] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_26
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r26; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2103.0, 2103.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r26"
+          phase_region_as_printed: "M + A + L, incongruent melting"
+          Al2O3_mol_percent: 74.21
+          composition_mol:
+            Al2O3: 0.7421
+            SiO2: 0.2579
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "74.21"
+          T_K: 2103
+          T_K_as_printed: "2103"
+          reference_as_printed: "[30]"
+          attribution: "Reference [30] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_27
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r27; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2160.0, 2160.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r27"
+          phase_region_as_printed: "M + A + L, incongruent melting"
+          Al2O3_mol_percent:
+            state: {tag: unknown, reason: not_published}
+            locator: {table: "Nonvariant points", published_page: 681, pdf_page_index: 4, note: "Composition cell is blank; no carry-forward inferred"}
+          Al2O3_mol_percent_as_printed: ""
+          T_K: 2160
+          T_K_as_printed: "2160"
+          reference_as_printed: "[25]"
+          attribution: "Reference [25] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_28
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r28; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2163.0, 2163.0]
+        uncertainty: "Temperature uncertainty printed as ± 2 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r28"
+          phase_region_as_printed: "M + A + L, incongruent melting"
+          Al2O3_mol_percent: 66.55
+          composition_mol:
+            Al2O3: 0.6655
+            SiO2: 0.3345
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "66.55"
+          T_K: 2163
+          T_K_as_printed: "2163 ± 2"
+          temperature_uncertainty_K: 2
+          T_m_uncertainty_K: 2
+          reference_as_printed: "[24]"
+          attribution: "Reference [24] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_29
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r29; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2163.0, 2163.0]
+        uncertainty: "Temperature uncertainty printed as ± 5 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r29"
+          phase_region_as_printed: "M + A + L, incongruent melting"
+          Al2O3_mol_percent: 66.74
+          composition_mol:
+            Al2O3: 0.6674
+            SiO2: 0.3326
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "66.74"
+          T_K: 2163
+          T_K_as_printed: "2163 ± 5"
+          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
+          reference_as_printed: "[44]"
+          attribution: "Reference [44] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_30
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r30; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2101.0, 2101.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r30"
+          phase_region_as_printed: "M + A + L, peritectic"
+          Al2O3_mol_percent: 40.89
+          composition_mol:
+            Al2O3: 0.4089
+            SiO2: 0.5911
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "40.89"
+          T_K: 2101
+          T_K_as_printed: "2101 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[26]"
+          attribution: "Reference [26] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_31
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r31; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2101.0, 2101.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r31"
+          phase_region_as_printed: "M + A + L, peritectic"
+          Al2O3_mol_percent: 37.08
+          composition_mol:
+            Al2O3: 0.3708
+            SiO2: 0.6292
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "37.08"
+          T_K: 2101
+          T_K_as_printed: "2101 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[27]"
+          attribution: "Reference [27] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_32
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r32; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2113.0, 2113.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r32"
+          phase_region_as_printed: "M + A + L, peritectic"
+          Al2O3_mol_percent: 47.96
+          composition_mol:
+            Al2O3: 0.4796
+            SiO2: 0.5204
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "47.96"
+          T_K: 2113
+          T_K_as_printed: "2113"
+          reference_as_printed: "[45]"
+          attribution: "Reference [45] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_33
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r33; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2160.0, 2160.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r33"
+          phase_region_as_printed: "M + A + L, peritectic"
+          Al2O3_mol_percent:
+            state: {tag: unknown, reason: not_published}
+            locator: {table: "Nonvariant points", published_page: 681, pdf_page_index: 4, note: "Composition cell is blank; no carry-forward inferred"}
+          Al2O3_mol_percent_as_printed: ""
+          T_K: 2160
+          T_K_as_printed: "2160"
+          reference_as_printed: "[25]"
+          attribution: "Reference [25] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_34
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r34; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2163.0, 2163.0]
+        uncertainty: "Temperature uncertainty printed as ± 5 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r34"
+          phase_region_as_printed: "M + A + L, peritectic"
+          Al2O3_mol_percent: 66.36
+          composition_mol:
+            Al2O3: 0.6636
+            SiO2: 0.3364
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "66.36"
+          T_K: 2163
+          T_K_as_printed: "2163 ± 5"
+          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
+          reference_as_printed: "[44]"
+          attribution: "Reference [44] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_35
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r35; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2163.0, 2163.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r35"
+          phase_region_as_printed: "M + A + L, peritectic"
+          Al2O3_mol_percent_low: 65.73
+          Al2O3_mol_percent_high: 66.36
+          Al2O3_mol_percent_as_printed: "65.73–66.36"
+          T_K: 2163
+          T_K_as_printed: "2163 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[24]"
+          attribution: "Reference [24] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_36
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r36; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2083.0, 2083.0]
+        uncertainty: "Temperature uncertainty printed as ± 20 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r36"
+          phase_region_as_printed: "M + A + L, eutectic"
+          Al2O3_mol_percent: 51.16
+          composition_mol:
+            Al2O3: 0.5116
+            SiO2: 0.4884
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "51.16"
+          T_K: 2083
+          T_K_as_printed: "2083 ± 20"
+          temperature_uncertainty_K: 20
+          T_m_uncertainty_K: 20
+          reference_as_printed: "[40]"
+          attribution: "Reference [40] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_37
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r37; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2113.0, 2113.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r37"
+          phase_region_as_printed: "M + A + L, eutectic"
+          Al2O3_mol_percent: 67.12
+          composition_mol:
+            Al2O3: 0.6712
+            SiO2: 0.3288
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "67.12"
+          T_K: 2113
+          T_K_as_printed: "2113 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[42]"
+          attribution: "Reference [42] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_38
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r38; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2123.0, 2123.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r38"
+          phase_region_as_printed: "M + A + L, eutectic"
+          Al2O3_mol_percent: 68.91
+          composition_mol:
+            Al2O3: 0.6891
+            SiO2: 0.3109
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "68.91"
+          T_K: 2123
+          T_K_as_printed: "2123"
+          reference_as_printed: "[11]"
+          attribution: "Reference [11] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_39
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r39; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2143.0, 2143.0]
+        uncertainty: "Temperature uncertainty printed as ± 20 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r39"
+          phase_region_as_printed: "M + A + L, eutectic"
+          Al2O3_mol_percent: 66.74
+          composition_mol:
+            Al2O3: 0.6674
+            SiO2: 0.3326
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "66.74"
+          T_K: 2143
+          T_K_as_printed: "2143 ± 20"
+          temperature_uncertainty_K: 20
+          T_m_uncertainty_K: 20
+          reference_as_printed: "[12]"
+          attribution: "Reference [12] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_mullite_corundum_liquid_eutectic
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r40; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2160.0, 2160.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: measured_tabulated
+          admission_status: admitted
+          source_row: "t1-r40"
+          phase_region_as_printed: "M + A + L, eutectic"
+          Al2O3_mol_percent: 67.63
+          composition_mol:
+            Al2O3: 0.6763
+            SiO2: 0.3237
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "67.63"
+          T_K: 2160
+          T_K_as_printed: "2160 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "*"
+          attribution: "Shornikov et al. (2000), this work"
+      - observation_id: shornikov_2000_table1_row_41
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r41; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2161.0, 2161.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r41"
+          phase_region_as_printed: "M + A + L, eutectic"
+          Al2O3_mol_percent: 66.99
+          composition_mol:
+            Al2O3: 0.6699
+            SiO2: 0.3301
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "66.99"
+          T_K: 2161
+          T_K_as_printed: "2161"
+          reference_as_printed: "[38]"
+          attribution: "Reference [38] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_42
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r42; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2185.0, 2185.0]
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r42"
+          phase_region_as_printed: "M + A + L, eutectic"
+          Al2O3_mol_percent: 67.63
+          composition_mol:
+            Al2O3: 0.6763
+            SiO2: 0.3237
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "67.63"
+          T_K: 2185
+          T_K_as_printed: "2185"
+          reference_as_printed: "[37]"
+          attribution: "Reference [37] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_43
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r43; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2311.0, 2311.0]
+        uncertainty: "Temperature uncertainty printed as ± 5 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r43"
+          phase_region_as_printed: "A + L, congruent melting"
+          Al2O3_mol_percent: 100
+          composition_mol:
+            Al2O3: 1
+            SiO2: 0
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "100.0"
+          T_K: 2311
+          T_K_as_printed: "2311 ± 5"
+          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
+          reference_as_printed: "[44]"
+          attribution: "Reference [44] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_44
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r44; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2323.0, 2323.0]
+        uncertainty: "Temperature uncertainty printed as ± 10 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r44"
+          phase_region_as_printed: "A + L, congruent melting"
+          Al2O3_mol_percent: 100
+          composition_mol:
+            Al2O3: 1
+            SiO2: 0
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "100.0"
+          T_K: 2323
+          T_K_as_printed: "2323 ± 10"
+          temperature_uncertainty_K: 10
+          T_m_uncertainty_K: 10
+          reference_as_printed: "[37]"
+          attribution: "Reference [37] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_45
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r45; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2323.0, 2323.0]
+        uncertainty: "Temperature uncertainty printed as ± 20 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r45"
+          phase_region_as_printed: "A + L, congruent melting"
+          Al2O3_mol_percent: 100
+          composition_mol:
+            Al2O3: 1
+            SiO2: 0
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "100.0"
+          T_K: 2323
+          T_K_as_printed: "2323 ± 20"
+          temperature_uncertainty_K: 20
+          T_m_uncertainty_K: 20
+          reference_as_printed: "[12]"
+          attribution: "Reference [12] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_46
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r46; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2327.0, 2327.0]
+        uncertainty: "Temperature uncertainty printed as ± 6 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r46"
+          phase_region_as_printed: "A + L, congruent melting"
+          Al2O3_mol_percent: 100
+          composition_mol:
+            Al2O3: 1
+            SiO2: 0
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "100.0"
+          T_K: 2327
+          T_K_as_printed: "2327 ± 6"
+          temperature_uncertainty_K: 6
+          T_m_uncertainty_K: 6
+          reference_as_printed: "[26, 41]"
+          attribution: "Reference [26, 41] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_table1_row_47
+        experiment: table-1-literature-comparison
+        type: transition_point
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r47; title printed without table number"
+        units: "K and mol% Al2O3"
+        T_range_K: [2327.0, 2327.0]
+        uncertainty: "Temperature uncertainty printed as ± 3 K"
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          admission_status: admitted
+          source_row: "t1-r47"
+          phase_region_as_printed: "A + L, congruent melting"
+          Al2O3_mol_percent: 100
+          composition_mol:
+            Al2O3: 1
+            SiO2: 0
+          composition_conversion_as_printed: "Al2O3 mole fraction is the printed mol% divided by 100; SiO2 is the binary remainder"
+          Al2O3_mol_percent_as_printed: "100.0"
+          T_K: 2327
+          T_K_as_printed: "2327 ± 3"
+          temperature_uncertainty_K: 3
+          T_m_uncertainty_K: 3
+          reference_as_printed: "[39]"
+          attribution: "Reference [39] as cited by Shornikov et al. (2000)"
+    context:
+      - observation_id: shornikov_2000_sample_composition_series
+        type: characterization
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+        units: "mol% Al2O3 and wt% Al2O3"
+        values:
+          quantity: prepared_sample_composition_series
+          method_class: measured_direct
+          analysis_methods_as_printed: X-ray and chemical analysis
+          samples:
+            - sample_order: 1
+              Al2O3_mol_percent: 1.19
+              Al2O3_wt_percent: 2.00
+            - sample_order: 2
+              Al2O3_mol_percent: 3.31
+              Al2O3_wt_percent: 5.50
+            - sample_order: 3
+              Al2O3_mol_percent: 12.84
+              Al2O3_wt_percent: 20.00
+            - sample_order: 4
+              Al2O3_mol_percent: 28.20
+              Al2O3_wt_percent: 40.00
+            - sample_order: 5
+              Al2O3_mol_percent: 60.00
+              Al2O3_wt_percent: 71.80
+            - sample_order: 6
+              Al2O3_mol_percent: 67.63
+              Al2O3_wt_percent: 78.00
+            - sample_order: 7
+              Al2O3_mol_percent: 70.21
+              Al2O3_wt_percent: 80.00
+            - sample_order: 8
+              Al2O3_mol_percent: 84.14
+              Al2O3_wt_percent: 90.00
+      - observation_id: shornikov_2000_vaporization_composition_drift_qualifier
+        type: experiment_series
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+        units: as printed
+        values:
+          quantity: composition_change_and_protection
+          method_class: quoted_unattributed
+          statement_as_printed: "A characteristic feature of this method is the formation of tungsten metal films preventing vaporization of aluminum and silicon oxides on the surface of samples, because partial volatilization of system components (largely silicon dioxide) in vacuum at high temperatures and normal pressure changes the initial composition of samples during measurements. If the surface remained unprotected, partial vaporization of silicon dioxide was indeed observed according to chemical and mineralogical analyses."
+          additional_statements_as_printed:
+            - "The very high rate of crystallization required short times for the formation of crystalline phases."
+            - "The initial compositions were selected based on consideration of possible high-temperature heterogeneous reactions that changed the composition of condensed phases during vaporization under given temperature conditions."
+      - observation_id: shornikov_2000_equation1_integrated_current_composition_method
+        type: method
+        locator: {published_page: 679, pdf_page_index: 2, equation: '1'}
+        units: as printed
+        values:
+          quantity: composition_change_calculation
+          method_class: model_derived
+          relation_as_printed: "m_t(j)=m_0(j) multiplied by the time integral of I_j(i)+ from 0 to t divided by the integral from 0 to t_0"
+          definition_as_printed: "t_0 is the time of complete vaporization of component j from an Al2O3-SiO2 melt"
+      - observation_id: shornikov_2000_fig3_current_and_composition_trajectories
+        type: experiment_series
+        locator: {figure: '3', published_page: 680, pdf_page_index: 3}
+        units: "as printed in figure; curves not digitized"
+        values:
+          quantity: ion_current_and_composition_time_series
+          method_class: figure_only
+          temperature_K: 2220
+          time_axis_tick_labels_min: [25, 75, 125]
+          ion_current_log_axis_tick_labels: [0, 1, 2, 3]
+          composition_axis_tick_labels_mol_percent: [10, 30, 50, 70]
+          caption_as_printed: "Fig. 3. Evolution of ion current intensities for (1) (SiO)+ and (2) (Al)+ and (3) changes in the content of Al2O3 in the condensed phase during vaporization of an Al2O3-SiO2 melt at 2220 K."
+          note: Curve values not digitized.
+      - observation_id: shornikov_2000_fig4_liquidus_points
+        type: thermodynamic_example
+        locator: {figure: '4', published_page: 680, pdf_page_index: 3}
+        units: "as printed in figure; curve values not digitized"
+        values:
+          quantity: liquidus_diagram_and_sample_labels
+          method_class: figure_only
+          caption_sample_compositions_Al2O3_mol_percent: [1.19, 3.31, 4.38, 12.84, 18.32, 28.20, 60.00, 67.63, 70.21, 84.14]
+          temperature_axis_scale: T times 10^-3 K
+          temperature_axis_tick_labels_times_1e3_K: [1.9, 2.1, 2.3]
+          composition_axis_tick_labels_mol_percent: [20, 40, 60, 80, 100]
+          phase_regions_as_printed: "(I) SiO2 + liquid; (II, III) Al6Si2O13 + liquid; (IV) Al6Si2O13 + SiO2; (V) Al6Si2O13 solid solutions; (VI) Al6Si2O13 + Al2O3; (VII) Al2O3 + liquid; (VIII) liquid."
+          note: The plotted liquidus curves and points were not digitized.
+      - observation_id: shornikov_2000_published_directional_claims_page679
+        type: thermodynamic_example
+        locator: {published_page: 679, pdf_page_index: 2, section: Results and Discussion}
+        units: as printed
+        values:
+          quantity: vaporization_and_composition_qualifiers
+          method_class: quoted_unattributed
+          statements_as_printed:
+            - "It follows that vaporization of aluminosilicate melts largely follows the heterogeneous reactions characteristic of vaporization of pure oxides constituting the Al2O3-SiO2 system."
+            - "As follows from the mass spectrum of vapor over Al2O3-SiO2 melts given above and the mass spectrum of vapor over mullite [8, 15, 16], an increase in temperature decreases the amount of polyatomic molecules corresponding to the (AlO)+, (Al2O)+, (AlO2)+, (Al2O2)+, (SiO2)+, and (AlSiO)+ ions in the gas phase over Al2O3-SiO2 melts in comparison with the simpler molecular species corresponding to the (SiO)+ and (Al)+ molecular ions."
+            - "Note that the polyatomic molecules mentioned above such as (AlO), (Al2O), (AlO2), and (Al2O2) detected in the gas phase over aluminosilicate melts and over dialuminum trioxide [5, 8, 13-16] are formed as a result of vaporization of Al2O3 present in the Al2O3-SiO2 system rather than in reduction reactions between melts and the effusion cell material, as was erroneously stated in [20]."
+            - "According to [21, 22], the compositions of the condensed phase and the gas phase over it are different."
+            - "Vaporization of Al2O3-SiO2 melts causes substantial changes in the concentration ratio between the components in the condensed phase."
+            - "This makes it possible to obtain virtually the whole set of ion currents from the initial to the final composition, which corresponds to the component with the higher melting point, under given temperature conditions."
+            - "Such changes in the intensities of ion currents corresponding to molecular forms in the vapor phase over melts are evidence of a rapid increase in the concentration of aluminum oxide x(Al2O3) in the condensed phase during vaporization (Fig. 3)."
+            - "The ratio between the (SiO)+ and (Al)+ ion current intensities remained constant starting with a 73.67 ± 0.15 mol% Al2O3 concentration."
+            - "The observed changes in x(Al2O3) were determined from the ratio between the masses of condensed phase components calculated from a decrease in mass mt(j) of the jth component during time t by the equation (1)."
+            - "This means that, during vaporization of an Al2O3-SiO2 melt, the ratio between the concentrations of the oxides constituting this melt changed to that corresponding to a liquidus line point."
+            - "These experiments enabled us to determine the positions of liquidus points by selecting different temperature conditions of measurements. Some of these points are shown in Fig. 4."
+      - observation_id: shornikov_2000_phase_diagram_comparisons_page680
+        type: thermodynamic_example
+        locator: {published_page: 679, pdf_page_index: 2, section: Results and Discussion, note: 'Comparisons printed on p. 679; the final preference sentence continues at the top left of p. 680.'}
+        units: as printed
+        values:
+          quantity: liquidus_and_phase_diagram_comparisons
+          method_class: quoted_attributed
+          point_at_2220_K_other_data_Al2O3_mol_percent: [69.4, 78.4]
+          Al2O3_plus_liquid_field_begins_mol_percent_as_reported_elsewhere: 60.0
+          claimed_peritectic_composition_Al2O3_mol_percent: 36.9
+          statements_as_printed:
+            - "According to the other data [24, 25], the point at 2220 K occurs between 69.4 [24] and 78.4 mol% Al2O3 [25]."
+            - "It was found in [26, 27] that the Al2O3 + liquid field began at 60.0 mol% Al2O3. This result differs substantially from those of this work and [11, 23-25]."
+            - "The position of the liquidus point at 2220 K determined in this work is also evidence against the occurrence of a peritectic compound in the Al2O3-SiO2 system containing 36.9 mol % Al2O3; this compound was claimed to exist in [26, 27] and in several other works [28-36]."
+            - "The positions of liquidus points were verified by studying the characteristic behavior of ion currents at the temperatures of fusion of the aluminosilicate system compositions studied in this work."
+            - "The positions of liquidus points determined in this work as described above substantiate the data on the Al2O3 + liquid field in the Al2O3-SiO2 system obtained in [11, 23]."
+            - "It follows from Fig. 4 that the liquidus points in region II (Al6Si2O13 + liquid) obtained in this work almost coincide with those reported in [11] at the end portions of crystallization curves and lie somewhat higher (by ~25 K) than the latter in the concentration range 20-40 mol % Al2O3."
+            - "These deviations are within the errors of this work and [11]. Note that they do not introduce fundamental differences in the phase diagram of the Al2O3-SiO2 system."
+            - "We nevertheless give preference to the crystallization line with a slope steeper than that obtained in [11]."
+          attribution: References [11, 23-36] as cited by Shornikov et al. (2000)
+      - observation_id: shornikov_2000_region_ii_and_mullite_fusion_comparisons
+        type: thermodynamic_example
+        locator: {published_page: 680, pdf_page_index: 3, section: Results and Discussion}
+        units: as printed
+        values:
+          quantity: eutectic_and_congruent_melting_comparisons
+          method_class: quoted_unattributed
+          measured_sample_composition_Al2O3_mol_percent: 67.63
+          sample_fusion_temperature_K: 2157
+          comparison_eutectic_temperature_K: 2123
+          comparison_eutectic_composition_Al2O3_mol_percent: 68.9
+          mass_spectral_mullite_fusion_temperature_K: 2180
+          statements_as_printed:
+            - "Interesting conclusions can be drawn from the data on vaporization of the Al2O3-SiO2 melt with a 67.63 mol % Al2O3 initial composition."
+            - "We studied this sample because of its closeness to the eutectic composition at 2123 K reported in [11] (68.9 mol % Al2O3, table) and found that the temperature of its fusion equaled 2157 K."
+            - "This temperature is closest to the values cited in [11, 12, 37, 38]."
+            - "The temperature of fusion of mullite found in this work from the mass spectral measurements, 2180 K, is fairly close to the temperature of fusion of the sample specified above but somewhat exceeds the latter."
+            - "This allows us to suggest the existence of a eutectic composition in the phase diagram of the aluminosilicate system between the mullite and corundum fields and leads us to conclude that mullite undergoes congruent melting."
+            - "Similar conclusions were drawn from the data obtained in quenching experiments."
+            - "When a sample initially having the composition of mullite loses an insignificant amount of silicon dioxide, excess aluminum oxide crystallizes as corundum, which is the reason why melting of mullite is thought to be accompanied by decomposition."
+            - "In reality, the initial composition of the sample changes during heating."
+            - "We detected corundum only in samples with free film surfaces unprotected by tungsten."
+            - "Samples completely covered by tungsten metal films, which looked like black band edging samples in polished sections for microscopic examination, only contained mullite."
+            - "If silicon dioxide volatilized from the surface, samples contained well-defined layers of Al2O3 grains."
+            - "The chemical analysis and microscopic examination data show that mullite melts congruently in vacuum at 2183 K."
+      - observation_id: shornikov_2000_melting_disagreement_qualifiers_page680
+        type: thermodynamic_example
+        locator: {published_page: 680, pdf_page_index: 3, section: Results and Discussion, note: 'The final comparison continues onto page 681'}
+        units: as printed
+        values:
+          quantity: melting_interpretation_comparisons
+          method_class: quoted_unattributed
+          numerical_comparisons_as_printed:
+            congruent_melting_composition_discrepancy_wt_percent: 7.5
+            congruent_melting_temperature_discrepancy_K: 100
+            incongruent_melting_composition_discrepancy_wt_percent: 23
+            incongruent_melting_temperature_discrepancy_K: 60
+            pure_oxide_temperature_measurement_error_upper_bound_K: 20
+          statements_as_printed:
+            - "A detailed analysis of the data on nonvariant points in the Al2O3-SiO2 system shows that melting of mullite is considered congruent in some works and incongruent in others (table)."
+            - "Data on the concentrations and temperatures corresponding to the nonvariant points of the Al2O3-SiO2 system for the M + S + L, M + L, and M + A + L phases (A = Al2O3, S = SiO2, M = mullite, and L = liquid) are discrepant."
+            - "According to the table, these discrepancies equal 7.5 wt % and 100 K in the works in which mullite is assumed to melt congruently and 23 wt % and 60 K in the works claiming incongruent melting of mullite."
+            - "These deviations far exceed the deviations obtained in the same works for the temperatures of fusion of pure Al2O3 and SiO2 oxides, which coincide within the errors of measurements not exceeding 20 K and correspond to the generally accepted values [22, 39] (table)."
+            - "We believe that the difference in opinions concerning the character and temperature of fusion of mullite (table) is to a great degree determined by different conditions of measurements, first and foremost temperature conditions (heating and cooling rates) and the composition of the gas phase, and also other factors influencing melting of this compound [12, 23, 46-50]."
+            - "The dual character of melting of mullite gives grounds to believe that mullite melts incongruently under equilibrium conditions and congruently under metastable conditions [26, 29, 41, 51, 52]."
+            - "However, according to Galakhov [53], a detailed consideration of these works (in particular, [26]) does not allow an equilibrium phase diagram to be constructed with incongruent melting of mullite."
+            - "The point of view expressed in [26, 29, 41, 51, 52] is opposite to that [23, 42, 54-57], where the conclusion is drawn that the stable variant of the Al2O3-SiO2 phase diagram is characterized by congruent melting of mullite, whereas the metastable variant includes incongruent mullite melting."
+      - observation_id: shornikov_2000_impurity_drift_and_heating_qualifiers_page681
+        type: thermodynamic_example
+        locator: {published_page: 681, pdf_page_index: 4, section: Results and Discussion, note: 'The phase-characterization sentence continues on p. 682; the final polymorph sentence is printed on p. 682.'}
+        units: as printed
+        values:
+          quantity: factors_qualifying_mullite_melting_interpretation
+          method_class: quoted_unattributed
+          statements_as_printed:
+            - "The question of the reliability of determining the phase relations in the region of mullite melting is complicated by insignificance of the temperature difference between the melting point and the eutectic horizontal and by closeness of the eutectic point to the stoichiometric composition of mullite."
+            - "According to [50], the character of mullite melting is intermediate between congruent and incongruent."
+            - "As a consequence, we come across opposite views on the matter in works of the same authors, for instance, melting of mullite is claimed to be incongruent in [24] and congruent in [38]."
+            - "The presence of a third component such as manganese oxide [58] in the Al2O3-SiO2 system facilitates mullite formation, whereas sodium oxide [43], silicon monoxide [29, 31, 32], and nickel and iron oxides [46] hinder the reaction, which can create the impression that mullite melts incongruently."
+            - "Similar conclusions can be drawn when stoichiometric mullite samples are held for a long time in open containers and heated in vacuum, because their initial composition then shifts to the side of aluminum oxide."
+            - "This process is difficult to take into account because of different temperature dependences of the integral vaporization coefficients of silicon dioxide and aluminum oxide."
+            - "Note that when mullite is heated at a high rate in a microfurnace, samples can be overheated, which favors the congruent interpretation [50]."
+            - "Special attention should be given to the determination of the phase composition of Al2O3-SiO2 samples, because X-ray diffractograms or microscopic examination of separate probe regions may give a distorted idea of equilibrium phase relations [11, 65-67]."
+            - "The effects of aluminum oxide polymorphs on the attainment of equilibria in the Al2O3-SiO2 system should also be taken into account [68-70]."
+      - observation_id: shornikov_2000_conclusion_page682
+        type: thermodynamic_example
+        locator: {published_page: 682, pdf_page_index: 5, section: Conclusion}
+        units: as printed
+        values:
+          quantity: author_conclusion
+          method_class: quoted_unattributed
+          statements_as_printed:
+            - "The data of one of the earliest works [40] concerned with the phase diagram of the Al2O3-SiO2 system appear to be fairly approximate."
+            - "It follows from the table that the data obtained in this work provide unambiguous evidence of the existence of a eutectic composition in the M + A + L region and are in agreement with the results of [11, 12, 37, 38, 42]."
+            - "This proves the congruent character of mullite melting observed in the same works in the temperature range 2123-2207 K."
+            - "The conclusion that mullite melts incongruently [24-26, 28, 30, 35, 41, 43, 44] cannot be considered convincing for the reasons given above; this conclusion is influenced by such factors as experimental procedure, the presence of impurities, and changes in the initial concentration of samples during measurements."
+            - "Our data do not confirm the occurrence of a peritectic compound in the concentration range 37-66 mol % Al2O3 [24-27, 44]."
+            - "The calculations of this peritectic composition performed in [45] are based on the thermodynamic data obtained in mass spectrometric experiments with the use of the Knudsen effusion method for the Al6Si2O13-Al2O3 and CaAlSi2O8-Al6Si2O13-Al2O3 equilibria in the temperature range 1472-1761 K; these temperatures are too low for obtaining reliable data."
+            - "In our view, the results of [45] cannot be considered sufficiently correct and require a detailed examination."
+            - "The reliability of the results of this work is substantiated by thermodynamic data, which unambiguously favor the congruent character of mullite melting."
+            - "It should be noted that the point of view expressed and substantiated by Toropov and Galakhov in [11, 23, 47, 65-67] is often (for instance, in [25, 52, 71-73]) unjustly ignored in considering the properties of the Al2O3-SiO2 system."
+            - "To summarize, we performed a mass spectrometric study with the use of the Knudsen effusion method of vaporization of Al2O3-SiO2 melts. The mass spectrometric data and the results obtained in studying the phase diagram of the Al2O3-SiO2 system in the mullite region by the method of quenching allowed us to refine the position of the liquidus line in this system and prove the congruent character of mullite melting at 2180 K."
+            - "Mainly, our data are in agreement with the phase diagram of the Al2O3-SiO2 system constructed by Toropov and Galakhov and provide a basis for thermodynamic calculations of the properties of this system."
+      - observation_id: shornikov_2000_mullite_vapor_relative_ion_currents_2220k
+        experiment: kems-vaporization-series
+        type: thermodynamic_example
+        locator: {published_page: 678, pdf_page_index: 1, section: Results and Discussion}
+        T_range_K: [2220.0, 2220.0]
+        phase: Al2O3-SiO2 vapor over melt of composition close to mullite
+        units: relative ion-current ratio, as printed
+        values:
+          quantity: relative_molecular_ion_currents
+          method_class: measured_direct
+          temperature_K: 2220
+          composition_Al2O3_mol_percent:
+            state: {tag: unknown, reason: would_invent}
+            locator: {published_page: 678, pdf_page_index: 1, section: Results and Discussion, note: 'The ratio passage says compositions close to that of mullite; no exact numerical composition is specified for this measurement.'}
+          ions_in_order_as_printed: ['(SiO)+', '(SiO2)+', '(Al)+', '(AlO)+', '(Al2O)+', '(AlO2)+', '(Al2O2)+', '(O)+', '(O2)+']
+          ion_current_ratio_as_printed: "600 : 0.5 : 1.0 : 0.05 : 0.2 : 0.001 : 0.002 : 0.005 : 0.001"
+          relative_ion_current_values: [600, 0.5, 1.0, 0.05, 0.2, 0.001, 0.002, 0.005, 0.001]
+      - observation_id: shornikov_2000_ion_current_interference_limits
+        type: thermodynamic_example
+        locator: {published_page: 678, pdf_page_index: 1, section: Results and Discussion, note: 'The Mo+ limit begins on p. 678; the Si+ and AlSiO+ interference limits are printed on p. 679.'}
+        units: relative ion-current percent
+        values:
+          quantity: fragment_and_cell_reaction_interference_limits
+          method_class: measured_direct
+          cell_ion_Mo_plus_percent_of_SiO_plus: 0.1
+          Si_plus_fragment_percent_of_SiO_plus: 3
+          AlSiO_plus_percent_of_SiO_plus: 0.01
+          statements_as_printed:
+            - "The ratio between the ion currents corresponding to the molecular ions formed in interaction between the gas phase over Al2O3-SiO2 and the material of the effusion cell [(MoO)+, (MoO2)+, and (MoO3)+] was close to that observed for vaporization of mullite [8, 15, 16] and melts in this system in the concentration range 0-20 mol % Al2O3 [17] and silicon dioxide [13]."
+            - "The intensity of the ion current of the (Mo)+ molecular ion formed in the vaporization of the effusion cell itself did not exceed 0.1% of the intensity of the (SiO)+ ion current."
+            - "The intensity of the ion current corresponding to the (Si)+ fragment ion formed from the (SiO)+ and (SiO2)+ molecular ions did not exceed 3% of the intensity of the (SiO)+ ion current, as with silicon dioxide [13]."
+            - "The relative content of the (AlSiO)+ molecular ion studied in detail in [8, 15, 16, 18, 19] was insignificant in the mass spectra of vapor over Al2O3-SiO2 melts and did not exceed 0.01% of the (SiO)+ ion current intensity."
+      - observation_id: shornikov_2000_table1_row_t1_r14_temperature_absent
+        type: thermodynamic_example
+        locator:
+          table: "Nonvariant points"
+          published_page: 681
+          pdf_page_index: 4
+          note: "Table row t1-r14; the temperature cell is blank"
+        units: "mol% Al2O3 and K"
+        values:
+          quantity: table_row_without_temperature
+          method_class: quoted_attributed
+          source_row: "t1-r14"
+          phase_region_as_printed: "M + L, congruent melting"
+          Al2O3_mol_percent: 58.24
+          Al2O3_mol_percent_as_printed: "58.24"
+          composition_mol: {Al2O3: 0.5824, SiO2: 0.4176}
+          temperature_K:
+            state: {tag: unknown, reason: not_published}
+            locator: {table: "Nonvariant points", published_page: 681, pdf_page_index: 4, note: "Temperature cell is blank in this printed row"}
+          reference_as_printed: "[1]"
+          attribution: "Reference [1] as cited by Shornikov et al. (2000)"
+      - observation_id: shornikov_2000_sample_preparation_numeric_facts
+        type: characterization
+        locator: {published_page: 678, pdf_page_index: 1, section: Experimental}
+        units: "K, h, wt%"
+        values:
+          quantity: sample_preparation_protocol
+          method_class: measured_direct
+          starting_materials:
+            alumina_precursor: ammonium alum
+            alumina_grade_as_printed: "os. ch. (special purity)"
+            alumina_impurities_as_printed: "only traces detected spectroscopically"
+            silica_material: rock crystal powder
+            silica_SiO2_wt_percent: 99.90
+          mixing:
+            mill: jasper ball mill
+            solvent: acetone
+          solid_state_synthesis:
+            furnace: Silit
+            atmosphere: air
+            maximum_temperature_K: 1600
+            duration_h: 24
+          high_temperature_annealing:
+            unit: Donets-1
+            heating: high-frequency
+            atmosphere: argon
+            temperature_range_K: [1800, 2000]
+            duration_h: 1
+            stated_purpose: prevent transition to liquid
+          post_run_composition_as_analyzed:
+            state: {tag: unknown, reason: not_published}
+            note: No numerical post-vaporization composition is reported; unprotected surfaces showed partial SiO2 volatilization.
+      - observation_id: shornikov_2000_shutter_measurement_qualification
+        type: method
+        locator: {published_page: 677, pdf_page_index: 0, section: Experimental}
+        units: as printed
+        values:
+          quantity: molecular_beam_shutter_qualification
+          method_class: quoted_unattributed
+          statement_as_printed: "The flow of molecules from the effusion cell to the region of ionization of the ion source through channel 5 could be rapidly stopped by the introduction of molybdenum shutter 6 with the use of electromagnetic armature. Note that without a shutter, measurement results may be distorted, as, for instance, in work [9]."
+      - observation_id: shornikov_2000_introductory_phase_relations_background
+        type: thermodynamic_example
+        locator: {published_page: 677, pdf_page_index: 0, section: Introduction}
+        units: "K and as printed"
+        values:
+          quantity: introductory_phase_relations_background
+          method_class: quoted_unattributed
+          mullite_stability_threshold_K: 1000
+          abstract_temperature_range_K: [1720, 2520]
+          abstract_mullite_congruent_melting_temperature_K: 2180
+          statements_as_printed:
+            - "Vaporization of Al2O3–SiO2 melts from a Knudsen effusion cell was studied mass-spectrometrically in the temperature range 1720–2520 K. The liquidus line in the aluminosilicate system was refined, and the Al6Si2O13 compound was shown to melt congruently at 2180 K."
+            - "Of special importance for the production of modern high-quality refractories are the properties of mullite Al6Si2O13, which occurs in the Al2O3–SiO2 system and is stable at high (above 1000 K) temperatures; this is a highly refractory and chemically stable component for firing refractories from kaolins and clays, high-alumina articles, porcelain, and other aluminosilicate ceramic masses."
+            - "These low-temperature (in comparison with mullite) compounds are stable only at certain temperatures and pressures."
+            - "The data on the physicochemical properties of these compounds are, however, not unambiguous, and those on the phase relations and the thermodynamic properties of the Al2O3–SiO2 system are even controversial."

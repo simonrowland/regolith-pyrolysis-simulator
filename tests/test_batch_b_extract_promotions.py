@@ -156,3 +156,15 @@ def test_adamkovicova_1980_ingested_count_and_pdf_cells() -> None:
     # independently from Table I, p. 195 and Table II, p. 196.
     assert table1["values"]["points"][0]["delta_Hcool_kJ_mol-1_as_printed"] == 139.6
     assert table2["values"]["points"][0]["delta_Hsol_kJ_mol-1_as_printed"] == 311.1
+
+
+def test_shornikov_2000_migrates_printed_transition_temperatures() -> None:
+    result = _migrate("shornikov-2000-aluminosilicate-vaporization.yaml")
+    assert len(result.observations) == 46
+    assert _point(result, "shornikov_2000_table1_row_01") == Decimal("1986")
+    assert _point(result, "shornikov_2000_table1_row_02") == Decimal("1996")
+    assert all(
+        observation.point_conditions["temperature_K"].state.is_value
+        and observation.point_conditions["temperature_K"].locator is not None
+        for observation in result.observations.values()
+    )
