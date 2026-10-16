@@ -815,21 +815,24 @@ def test_o2_bubbler_cannot_exceed_total_pressure_or_double_book_passthrough() ->
     diagnostic = sim._apply_o2_bubbler()
 
     assert sim._current_melt_redox_fO2_log() <= math.log10(2e-4) + 8*math.ulp(math.log10(2e-4))
-    notice, = diagnostic['pressure_ceiling_notices']
+    notice = next(
+        item for item in diagnostic['redox_bound_notices']
+        if item['flag'] == 'REDOX_PRESSURE_CEILING'
+    )
     assert notice['flag'] == 'REDOX_PRESSURE_CEILING'
     assert notice['site'] == 'o2_bubbler_target'
     assert notice['unclamped_fO2_log'] == 0.0
     assert notice['applied_fO2_log'] == math.log10(2e-4)
-    assert notice in sim._redox_source_breakdown_diagnostic()['pressure_ceiling_notices']
+    assert notice in sim._redox_source_breakdown_diagnostic()['redox_bound_notices']
     assert diagnostic["injected_mol"] == pytest.approx(
         diagnostic["absorbed_mol"] + diagnostic["passthrough_mol"],
     )
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0) == pytest.approx(
         before_o2 + diagnostic["passthrough_mol"],
     )
-    assert notice in sim._make_snapshot().redox_source_breakdown['pressure_ceiling_notices']
+    assert notice in sim._make_snapshot().redox_source_breakdown['redox_bound_notices']
     sim._reset_redox_source_diagnostics_for_hour()
-    assert not sim._redox_source_breakdown_diagnostic().get('pressure_ceiling_notices')
+    assert not sim._redox_source_breakdown_diagnostic().get('redox_bound_notices')
 
 
 def test_o2_bubbler_reoxidizes_by_kress91_capacity_math() -> None:
@@ -999,7 +1002,7 @@ def test_o2_bubbler_cap_prevents_overoxidation_and_overhead_transition() -> None
 
     assert diagnostic["reason"] == "at_or_above_target"
     assert diagnostic["injected_mol"] == pytest.approx(0.0)
-    assert 'pressure_ceiling_notices' not in diagnostic
+    assert 'redox_bound_notices' not in diagnostic
     assert sim._current_melt_redox_fO2_log() == pytest.approx(-8.0)
     assert len(sim.atom_ledger.transitions) == before_transitions
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
@@ -2471,7 +2474,10 @@ def test_exchange_target_cannot_exceed_controlled_total_pressure() -> None:
     reservoir = sim._apply_oxygen_reservoir_exchange()
 
     assert reservoir.melt_intrinsic_fO2_log <= math.log10(2e-4) + 8*math.ulp(math.log10(2e-4))
-    notice, = sim._redox_source_breakdown_diagnostic()['pressure_ceiling_notices']
+    notice = next(
+        item for item in sim._redox_source_breakdown_diagnostic()['redox_bound_notices']
+        if item['flag'] == 'REDOX_PRESSURE_CEILING'
+    )
     assert notice['flag'] == 'REDOX_PRESSURE_CEILING'
     assert notice['site'] == 'headspace_exchange'
     assert notice['unclamped_fO2_log'] == math.log10(reservoir.headspace_transport_pO2_bar)
@@ -2495,7 +2501,7 @@ def test_interior_potential_above_gas_ceiling_emits_degassing_notice() -> None:
     assert sim._current_melt_redox_fO2_log() == before
     assert sim.atom_ledger.mol_by_account() == inventory
     assert len(sim.atom_ledger.transitions) == count
-    notices = sim._redox_source_breakdown_diagnostic()['pressure_ceiling_notices']
+    notices = sim._redox_source_breakdown_diagnostic()['redox_bound_notices']
     ceiling = sim._melt_redox_fO2_upper_bound_log()
     notice = next(
         item for item in notices

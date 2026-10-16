@@ -185,7 +185,7 @@ def test_intrinsic_melt_fo2_inverse_reports_below_feo_saturation(
     notice = next(
         item
         for item in sim._redox_source_breakdown_diagnostic()[
-            "pressure_ceiling_notices"
+            "redox_bound_notices"
         ]
         if item["flag"] == "REDOX_BELOW_FE_FEO_SATURATION"
         and item["melt_potential"] == pytest.approx(default_inverse)

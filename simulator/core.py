@@ -4388,13 +4388,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 })
         if pending_notices:
             notices = list(
-                getattr(self, '_redox_pressure_ceiling_notices_this_hr', [])
+                getattr(self, '_redox_bound_notices_this_hr', [])
                 or []
             )
             for notice in pending_notices:
                 if notice not in notices:
                     notices.append(notice)
-            self._redox_pressure_ceiling_notices_this_hr = notices
+            self._redox_bound_notices_this_hr = notices
         return melt_potential
 
     def _current_melt_redox_reference_T_K(self) -> Optional[float]:
@@ -5408,8 +5408,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         # Keep actual selected boundary hits in the existing hourly diagnostic;
         # intermediate root-solver trials are not physical exchange events.
-        self._redox_pressure_ceiling_notices_this_hr = [
-            *getattr(self, '_redox_pressure_ceiling_notices_this_hr', []), notice,
+        self._redox_bound_notices_this_hr = [
+            *getattr(self, '_redox_bound_notices_this_hr', []), notice,
         ]
         return notice
 
@@ -6054,7 +6054,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'eta_absorb': eta_absorb,
             'target_fO2_log': target_fO2_log,
             'target_source': target_source,
-            **({'pressure_ceiling_notices': [target_ceiling_notice]}
+            **({'redox_bound_notices': [target_ceiling_notice]}
                if target_ceiling_notice else {}),
             'current_fO2_log_before': current_fO2_log,
             'melt_redox_capacity_mol_per_ln_fO2': self._melt_redox_source_capacity_mol_per_ln_fO2(
@@ -6114,7 +6114,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
     def _reset_redox_source_diagnostics_for_hour(self) -> None:
-        self._redox_pressure_ceiling_notices_this_hr = []
+        self._redox_bound_notices_this_hr = []
         self._redox_source_terms_this_hr = {}
         self._redox_source_applied_terms_this_hr = {}
         self._redox_source_skipped_terms_this_hr = {}
@@ -6420,9 +6420,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self, '_fe_redox_respeciation_diagnostics_this_hr', []) or []
             )
         ]
-        ceiling_notices = list(getattr(
-            self, '_redox_pressure_ceiling_notices_this_hr', []))
-        if not terms and not respeciation_attempts and not ceiling_notices:
+        bound_notices = list(getattr(
+            self, '_redox_bound_notices_this_hr', []))
+        if not terms and not respeciation_attempts and not bound_notices:
             return {}
         applied_terms = _filtered_terms('_redox_source_applied_terms_this_hr')
         skipped_terms = _filtered_terms('_redox_source_skipped_terms_this_hr')
@@ -6466,7 +6466,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self, '_last_fe_redox_respeciation_diagnostic', {}) or {}
             ),
             'fe_redox_respeciation_attempts': respeciation_attempts,
-            **({'pressure_ceiling_notices': ceiling_notices} if ceiling_notices else {}),
+            **({'redox_bound_notices': bound_notices} if bound_notices else {}),
             'source_context': source_context,
             'redox_source_refusal_context': refusal_context,
             'source_campaign': str(source_context.get('campaign', '')),
