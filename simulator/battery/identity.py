@@ -93,6 +93,7 @@ from simulator.battery.enums import (
     IdentityEqualKind,
     PerBasis,
     Phase,
+    PolymorphRejectionKind,
     Quantity,
     StateTag,
 )
@@ -959,6 +960,14 @@ def _species_equal(
         b.polymorph,
         required=a_token is Phase.CR,
     )
+    both_polymorphs_unspecified = all(
+        polymorph is None
+        or (
+            polymorph.is_unknown
+            and polymorph.rejection_kind is PolymorphRejectionKind.OMITTED
+        )
+        for polymorph in (a.polymorph, b.polymorph)
+    )
     if (
         a.polymorph is not None
         and b.polymorph is not None
@@ -971,13 +980,14 @@ def _species_equal(
         if poly.kind is not IdentityEqualKind.EQUAL:
             if not (
                 allow_unknown_polymorph
+                and both_polymorphs_unspecified
                 and poly.kind is IdentityEqualKind.IDENTITY_UNKNOWN
             ):
                 return poly
         # Crystal phase requires a physically resolved polymorph value.
         if (
             (a.polymorph is None or not a.polymorph.is_value)
-            and not allow_unknown_polymorph
+            and not (allow_unknown_polymorph and both_polymorphs_unspecified)
         ):
             return IdentityEqualOutcome(
                 IdentityEqualKind.IDENTITY_UNKNOWN,

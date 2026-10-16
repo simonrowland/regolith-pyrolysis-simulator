@@ -7793,6 +7793,20 @@ def test_unprinted_source_phase_is_typed_and_cannot_be_scored() -> None:
         for notice in residual.notices
     )
 
+    quartz_identity = _with_activity_reference_polymorph(identity, "quartz")
+    mismatched, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=_predict(Decimal("0.3"), quartz_identity),
+    )
+    assert mismatched.status is ResidualStatus.REFUSED
+    assert mismatched.refusal is not None
+    assert mismatched.refusal.reason in {
+        RefusalReason.IDENTITY_UNKNOWN,
+        RefusalReason.IDENTITY_MISMATCH,
+    }
+
 
 @pytest.mark.parametrize(
     ("formula", "temperature_K", "crossing_K"),

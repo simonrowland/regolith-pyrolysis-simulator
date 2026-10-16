@@ -6808,6 +6808,7 @@ def compile_residual(
     candidate = candidate_observation(reference, prediction)
     compared_reference = reference.identity
     compared_candidate = candidate.identity
+    source_identity = source_reference.identity
     if isinstance(compared_reference, Identity) and isinstance(compared_candidate, Identity):
         compared_reference = _comparison_identity(
             compared_reference, reference, prediction
@@ -6817,12 +6818,12 @@ def compile_residual(
         )
     source_phase_missing = (
         quantity is Quantity.ACTIVITY
-        and isinstance(identity, Identity)
-        and identity.reference_state is not None
-        and identity.reference_state.is_value
-        and isinstance(identity.reference_state.value, StandardState)
+        and isinstance(source_identity, Identity)
+        and source_identity.reference_state is not None
+        and source_identity.reference_state.is_value
+        and isinstance(source_identity.reference_state.value, StandardState)
         and _source_polymorph_is_unspecified(
-            identity.reference_state.value.endmember.polymorph
+            source_identity.reference_state.value.endmember.polymorph
         )
     )
     if quantity is Quantity.FE3_FE2_RATIO:
