@@ -173,6 +173,9 @@ KNUDSEN_TRANSITION_REASON = 'knudsen_transitional_flow'
 INVALID_PIPE_DIAMETER_REASON = 'invalid_pipe_diameter'
 COLD_SPOT_MARGIN_C = 25.0
 DEFAULT_UPSTREAM_HOT_WALL_MIN_C = 1400.0
+STABLE_CONDENSATION_PRODUCT_BACKSTOP_STATUS = (
+    "stable_condensation_product_backstop"
+)
 LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 
 # Viscous-regime wall mass-transfer model (post-F3 follow-on, 2026-05-27).
@@ -2145,6 +2148,7 @@ class CondensationModel:
             'has_cold_spot': False,
             'warnings': [],
             'findings': [],
+            'dew_point_unavailable': [],
             'has_upstream_hot_wall_violation': False,
             'upstream_hot_wall_warnings': [],
             'upstream_hot_wall_findings': [],
@@ -6800,7 +6804,7 @@ def _wall_deposition_driving_pressure_pa(
             diagnostic_out["wall_saturation_pressure_pa"] = 0.0
             diagnostic_out["wall_saturation_pressure_refused"] = False
             diagnostic_out["wall_saturation_pressure_status"] = (
-                "stable_condensation_product_backstop"
+                STABLE_CONDENSATION_PRODUCT_BACKSTOP_STATUS
             )
         return max(0.0, local_pressure_pa)
     reactivity_class = declared_reactivity_class
@@ -7860,6 +7864,7 @@ def cold_spot_diagnostic(
 
     margin_C = _finite_nonnegative_value(margin_C, label='margin_C')
     findings: list[dict[str, Any]] = []
+    dew_point_unavailable: list[dict[str, Any]] = []
     upstream_hot_wall_findings: list[dict[str, Any]] = []
     hot_wall_threshold_C = (
         None
@@ -7998,6 +8003,22 @@ def cold_spot_diagnostic(
                     # formation; do not turn the routing target into a wall
                     # saturation test here.
                     upstream_threshold_replaced = True
+                    dew_point_unavailable.append({
+                        'status': 'dew_point_unavailable',
+                        'reason': 'no_accepted_pure_wall_psat',
+                        'species': str(species),
+                        'segment': segment.name,
+                        'wall_temperature_C': wall_T_C,
+                        'accepted_product_policy': (
+                            STABLE_CONDENSATION_PRODUCT_BACKSTOP_STATUS
+                        ),
+                        'warning': (
+                            f'dew-point unavailable for {species} at '
+                            f'{segment.name}: no accepted pure-wall P_sat; '
+                            f'accepted product policy '
+                            f'{STABLE_CONDENSATION_PRODUCT_BACKSTOP_STATUS}'
+                        ),
+                    })
             if upstream_threshold_replaced:
                 continue
             if wall_T_C >= threshold_C:
@@ -8028,6 +8049,7 @@ def cold_spot_diagnostic(
         'margin_C': margin_C,
         'warnings': warnings,
         'findings': findings,
+        'dew_point_unavailable': dew_point_unavailable,
         'has_upstream_hot_wall_violation': bool(upstream_hot_wall_findings),
         'upstream_hot_wall_min_C': hot_wall_threshold_C,
         'upstream_hot_wall_warnings': upstream_hot_wall_warnings,

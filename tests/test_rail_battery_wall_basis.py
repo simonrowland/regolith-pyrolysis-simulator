@@ -194,6 +194,15 @@ def test_cro2_routing_target_is_not_a_wall_dew_point():
     # Antoine entry cannot provide a wall P_sat for a dew-point comparison.
     assert diagnostic["has_cold_spot"] is False
     assert diagnostic["findings"] == []
+    unavailable = diagnostic["dew_point_unavailable"]
+    assert len(unavailable) == 1
+    assert unavailable[0]["status"] == "dew_point_unavailable"
+    assert unavailable[0]["reason"] == "no_accepted_pure_wall_psat"
+    assert unavailable[0]["species"] == "CrO2"
+    assert unavailable[0]["accepted_product_policy"] == (
+        "stable_condensation_product_backstop"
+    )
+    assert "wall_saturation_pressure_pa" not in unavailable[0]
 
 
 def test_wall_below_sio_landing_temperature_still_has_cold_spot():
