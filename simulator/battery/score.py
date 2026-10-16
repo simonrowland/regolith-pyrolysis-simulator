@@ -5684,6 +5684,32 @@ def _is_residue_worker_infrastructure_failure(reason: object) -> bool:
     return str(reason).startswith(("engine_timeout:", "engine_transport_error:"))
 
 
+def _hashimoto_engine_floor_inversion_notices(
+    engine: Engine, diagnostics: object
+) -> tuple[Notice, ...]:
+    if not isinstance(diagnostics, Sequence) or isinstance(diagnostics, (str, bytes)):
+        return ()
+    notices: list[Notice] = []
+    for row in diagnostics:
+        if not isinstance(row, Mapping) or row.get("kind") != "floor_inversion":
+            continue
+        original = row.get("original")
+        band = row.get("band")
+        if original is None or band is None:
+            continue
+        notices.append(
+            Notice(
+                kind=NoticeKind.FLOOR_INVERSION,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=f"{row.get('reason') or 'floor_inversion'}:{row.get('species')}",
+                origin=f"engine:{engine.value}",
+                original=as_decimal(original),
+                band=json.dumps(band, sort_keys=True, default=str),
+            )
+        )
+    return tuple(notices)
+
+
 def _hashimoto_residue_prediction(
     context: ScoreContext,
     reference: Observation,
@@ -5835,6 +5861,37 @@ def _hashimoto_residue_prediction(
                 band="1973-2273 K; engine tip 191960ce8",
             )
         ]
+        notices.extend(
+            _hashimoto_engine_floor_inversion_notices(
+                engine,
+                primary_provenance.get("engine_floor_inversion_diagnostics"),
+            )
+        )
+        surface_floor = primary_provenance.get("surface_pO2_balance_floor")
+        if isinstance(surface_floor, Mapping):
+            floor_steps = int(surface_floor.get("steps_at_floor") or 0)
+            floor_pO2 = surface_floor.get("pO2_bar")
+            if floor_steps > 0 and floor_pO2 is not None:
+                floor_first_step = surface_floor.get("first_step")
+                floor_fraction = float(
+                    surface_floor.get("fraction_of_time_at_floor") or 0.0
+                )
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.FLOOR_INVERSION,
+                        affected_quantities=(
+                            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                        ),
+                        reason="surface_pO2_at_balance_floor",
+                        origin="residue-oxygen-balance",
+                        original=as_decimal(floor_pO2),
+                        band=(
+                            f"steps_at_floor={floor_steps}; "
+                            f"first_step={floor_first_step}; "
+                            f"fraction_of_time_at_floor={floor_fraction:.17g}"
+                        ),
+                    )
+                )
         integration = primary.provenance.get("integration") or {}
         if integration.get("refinement_status") == "unconverged_at_cap":
             notices.append(
@@ -5887,6 +5944,19 @@ def _hashimoto_residue_prediction(
         }
         if getattr(exc, "detail", None):
             detail["detail"] = str(exc.detail)
+        engine_floor_diagnostics: object = ()
+        if getattr(exc, "reason", None) == "hashimoto_internal_analytical_channels_missing":
+            try:
+                refusal_detail = json.loads(str(exc.detail))
+            except (TypeError, ValueError):
+                refusal_detail = {}
+            if isinstance(refusal_detail, Mapping):
+                engine_floor_diagnostics = refusal_detail.get(
+                    "engine_floor_inversion_diagnostics", ()
+                )
+        notices = _hashimoto_engine_floor_inversion_notices(
+            engine, engine_floor_diagnostics
+        )
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -5898,6 +5968,7 @@ def _hashimoto_residue_prediction(
                 )
             ),
             coefficient_sources=sources,
+            notices=notices,
             refusal_reason=(
                 RefusalReason.ATTEMPTED_UNAVAILABLE
                 if infrastructure_failure

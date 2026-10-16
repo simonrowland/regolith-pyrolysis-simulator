@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from typing import Literal
 
 from scipy.optimize import brentq
 
@@ -17,6 +18,7 @@ OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
     {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
 )
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
+OxygenBalanceBracketBoundary = Literal["lower", "upper"]
 _OXYGEN_GAS_ALPHA = 1.0
 _OXYGEN_GAS_ALPHA_SOURCE = (
     "declared common-unity sensitivity alpha=1.0 for O/O2 free-molecular gas escape; "
@@ -41,6 +43,7 @@ class _VacuumOxygenChannel:
 @dataclass(frozen=True)
 class _VacuumOxygenBalance:
     pO2_bar: float
+    bracket_boundary: OxygenBalanceBracketBoundary | None
     pressures_Pa: Mapping[str, float]
     channel_fluxes_mol_m2_s: Mapping[str, float]
     oxygen_atom_flux_mol_m2_s: float
@@ -155,10 +158,13 @@ def _solve_vacuum_oxygen_balance(
 
     f_low = evaluate(low)[0]
     f_high = evaluate(high)[0]
+    bracket_boundary: OxygenBalanceBracketBoundary | None = None
     if f_low == 0.0:
         root = low
+        bracket_boundary = "lower"
     elif f_high == 0.0:
         root = high
+        bracket_boundary = "upper"
     elif f_low * f_high > 0.0:
         raise ValueError(
             "vacuum oxygen balance has no root in the declared pO2 bracket"
@@ -205,6 +211,7 @@ def _solve_vacuum_oxygen_balance(
     }
     return _VacuumOxygenBalance(
         pO2_bar=10.0**root,
+        bracket_boundary=bracket_boundary,
         pressures_Pa=pressures,
         channel_fluxes_mol_m2_s=fluxes,
         oxygen_atom_flux_mol_m2_s=oxygen_flux,

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import atexit
+import json
 import math
 import multiprocessing
 import time
@@ -15,6 +16,7 @@ from typing import Any
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting.formulas import parse_formula
 from simulator.battery.oxygen_balance import (
+    OxygenBalanceBracketBoundary,
     _VacuumOxygenChannel,
     _solve_vacuum_oxygen_balance,
 )
@@ -284,6 +286,14 @@ class ResidueInventoryResult:
     residue_mol: Mapping[str, float]
     evaporated_mol: Mapping[str, float]
     pO2_bar_by_step: tuple[float | None, ...]
+    pO2_balance_bracket_boundary_by_step: tuple[
+        OxygenBalanceBracketBoundary | None, ...
+    ]
+    pO2_balance_floor_steps: int
+    pO2_balance_floor_first_step: int | None
+    pO2_balance_floor_time_fraction: float
+    pO2_balance_floor_time_s: float
+    pO2_balance_floor_pO2_bar: float | None
     atom_closure_mol: Mapping[str, float]
     buffer_oxygen_exchange_mol: float = 0.0
 
@@ -596,6 +606,7 @@ def integrate_residue_inventory(
     dt_s = duration / len(areas)
     evaporated: defaultdict[str, float] = defaultdict(float)
     pO2_steps: list[float | None] = []
+    bracket_boundary_steps: list[OxygenBalanceBracketBoundary | None] = []
     buffer_oxygen_exchange_mol = 0.0
 
     # Supplied channels define the supported pressure bundle. Root metadata
@@ -610,6 +621,7 @@ def integrate_residue_inventory(
         ]
         if not active_parent_terms:
             pO2_steps.append(None)
+            bracket_boundary_steps.append(None)
             continue
 
         def pressure_at(log10_pO2_bar: float) -> Mapping[str, float]:
@@ -656,11 +668,13 @@ def integrate_residue_inventory(
                     for term in active_parent_terms
                 ):
                     pO2_steps.append(None)
+                    bracket_boundary_steps.append(None)
                     continue
                 raise ResidueInventoryRefusal(
                     "residue_oxygen_balance_failed", str(exc)
                 ) from exc
             pO2_steps.append(balance.pO2_bar)
+            bracket_boundary_steps.append(balance.bracket_boundary)
             pressures = balance.pressures_Pa
         else:
             pressures = pressure_at(buffered_logp)
@@ -676,6 +690,7 @@ def integrate_residue_inventory(
                         f"invalid pressure for {term.source.species!r}",
                     )
             pO2_steps.append(10.0**buffered_logp)
+            bracket_boundary_steps.append(None)
 
         requested_rates_kg_s = _finite_step_fluxes(
             terms,
@@ -780,10 +795,28 @@ def integrate_residue_inventory(
                 "residue_atom_balance_failed",
                 f"{element} atom residual {residual:.17g} mol exceeds scale-aware tolerance",
             )
+    floor_step_indices = [
+        index
+        for index, boundary in enumerate(bracket_boundary_steps, start=1)
+        if boundary == "lower"
+    ]
+    floor_steps = len(floor_step_indices)
+    floor_time_s = duration * floor_steps / len(areas)
+    first_floor_step = floor_step_indices[0] if floor_step_indices else None
     return ResidueInventoryResult(
         residue_mol=dict(inventory),
         evaporated_mol=dict(evaporated),
         pO2_bar_by_step=tuple(pO2_steps),
+        pO2_balance_bracket_boundary_by_step=tuple(bracket_boundary_steps),
+        pO2_balance_floor_steps=floor_steps,
+        pO2_balance_floor_first_step=first_floor_step,
+        pO2_balance_floor_time_fraction=floor_time_s / duration,
+        pO2_balance_floor_time_s=floor_time_s,
+        pO2_balance_floor_pO2_bar=(
+            pO2_steps[first_floor_step - 1]
+            if first_floor_step is not None
+            else None
+        ),
         atom_closure_mol=closure,
         buffer_oxygen_exchange_mol=buffer_oxygen_exchange_mol,
     )
@@ -922,6 +955,7 @@ def _hashimoto_integrate_geometry(
     tuple[dict[str, float | int | str], ...],
     ResidueEngineNonconvergence | None,
     dict[str, float],
+    dict[str, float | int | None],
 ]:
     inventory = {str(oxide): float(amount) for oxide, amount in initial_inventory_mol.items()}
     sample_total_mol = math.fsum(inventory.values())
@@ -936,6 +970,10 @@ def _hashimoto_integrate_geometry(
     exhaustion_notices: list[dict[str, float | int | str]] = []
     refusal: ResidueEngineNonconvergence | None = None
     elapsed_s = 0.0
+    pO2_balance_floor_steps = 0
+    pO2_balance_floor_first_step: int | None = None
+    pO2_balance_floor_time_s = 0.0
+    pO2_balance_floor_pO2_bar: float | None = None
 
     def remove_exhausted(*, step_number: int, time_s: float, substep: int) -> None:
         for oxide, amount in tuple(inventory.items()):
@@ -971,6 +1009,10 @@ def _hashimoto_integrate_geometry(
 
     def advance(duration: float, *, step_number: int, substep: int) -> None:
         nonlocal inventory
+        nonlocal pO2_balance_floor_steps
+        nonlocal pO2_balance_floor_first_step
+        nonlocal pO2_balance_floor_time_s
+        nonlocal pO2_balance_floor_pO2_bar
         remove_exhausted(
             step_number=step_number,
             time_s=elapsed_s,
@@ -996,6 +1038,17 @@ def _hashimoto_integrate_geometry(
         pO2_steps.extend(
             float(value) for value in step.pO2_bar_by_step if value is not None
         )
+        substep_duration_s = duration / len(step.pO2_balance_bracket_boundary_by_step)
+        for index, boundary in enumerate(
+            step.pO2_balance_bracket_boundary_by_step
+        ):
+            if boundary != "lower":
+                continue
+            pO2_balance_floor_steps += 1
+            pO2_balance_floor_time_s += substep_duration_s
+            if pO2_balance_floor_first_step is None:
+                pO2_balance_floor_first_step = step_number
+                pO2_balance_floor_pO2_bar = step.pO2_bar_by_step[index]
 
     for step_number in range(1, steps + 1):
         try:
@@ -1052,12 +1105,22 @@ def _hashimoto_integrate_geometry(
                 "residue_atom_balance_failed",
                 f"{element} atom residual {residual:.17g} mol after exhaustion projection",
             )
+    pO2_balance_floor = {
+        "steps_at_floor": pO2_balance_floor_steps,
+        "first_step": pO2_balance_floor_first_step,
+        "fraction_of_time_at_floor": (
+            pO2_balance_floor_time_s / elapsed_s if elapsed_s > 0.0 else 0.0
+        ),
+        "time_at_floor_s": pO2_balance_floor_time_s,
+        "pO2_bar": pO2_balance_floor_pO2_bar,
+    }
     return (
         _hashimoto_project_oxide_wt_pct(inventory),
         tuple(pO2_steps),
         tuple(exhaustion_notices),
         refusal,
         closure,
+        pO2_balance_floor,
     )
 
 
@@ -1337,6 +1400,7 @@ def _predict_hashimoto_residue_cohort(
         pressure_state_cache: dict[
             tuple[tuple[str, float], ...], Mapping[str, float]
         ] = {}
+        engine_floor_inversion_diagnostics: dict[str, dict[str, object]] = {}
 
         if engine == "openimcc":
             from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -1425,6 +1489,29 @@ def _predict_hashimoto_residue_cohort(
                     ),
                     include_diagnostic_shadows=False,
                 )
+                vapor_diagnostic = response.diagnostics.get("vapor_pressure_diagnostic")
+                floor_notices = (
+                    vapor_diagnostic.get("pO2_floor_inversion_notices_by_species")
+                    if isinstance(vapor_diagnostic, Mapping)
+                    else None
+                )
+                if isinstance(floor_notices, Mapping):
+                    for species, detail in floor_notices.items():
+                        if not isinstance(detail, Mapping):
+                            continue
+                        diagnostic = {
+                            "kind": "floor_inversion",
+                            "species": str(species),
+                            "reason": str(
+                                detail.get("reason") or "floor_inversion"
+                            ),
+                            "original": detail.get("pO2_bar_used"),
+                            "band": detail.get("certified_band"),
+                            "detail": dict(detail),
+                        }
+                        engine_floor_inversion_diagnostics.setdefault(
+                            str(species), diagnostic
+                        )
                 pressures = response.vapor_pressures_Pa
                 missing = [
                     str(species)
@@ -1434,7 +1521,19 @@ def _predict_hashimoto_residue_cohort(
                 if missing:
                     raise ResidueInventoryRefusal(
                         "hashimoto_internal_analytical_channels_missing",
-                        ", ".join(missing),
+                        json.dumps(
+                            {
+                                "missing_channels": missing,
+                                "engine_floor_inversion_diagnostics": (
+                                    tuple(
+                                        engine_floor_inversion_diagnostics.values()
+                                    )
+                                ),
+                            },
+                            sort_keys=True,
+                            default=str,
+                            separators=(",", ":"),
+                        ),
                     )
                 return {
                     str(species): float(pressures[str(species)])
@@ -1448,6 +1547,9 @@ def _predict_hashimoto_residue_cohort(
         for alpha_arm, channels, alpha_records, row_key in arm_channels:
             geometry_predictions: dict[str, dict[str, float]] = {}
             pO2_ranges: dict[str, list[float] | None] = {}
+            pO2_balance_floor_by_geometry: dict[
+                str, dict[str, float | int | None]
+            ] = {}
             geometry_exhaustions: dict[str, tuple[dict[str, float | int | str], ...]] = {}
             geometry_refusals: dict[str, dict[str, object] | None] = {}
             geometry_atom_closure: dict[str, dict[str, float]] = {}
@@ -1468,10 +1570,18 @@ def _predict_hashimoto_residue_cohort(
                 exhaustions: tuple[dict[str, float | int | str], ...] = ()
                 refusal: ResidueEngineNonconvergence | None = None
                 atom_closure: dict[str, float] = {}
+                pO2_balance_floor: dict[str, float | int | None] = {}
                 refinement_status = "unconverged_at_cap"
                 while True:
                     started_cpu = time.process_time()
-                    values, pO2_steps, exhaustions, refusal, atom_closure = (
+                    (
+                        values,
+                        pO2_steps,
+                        exhaustions,
+                        refusal,
+                        atom_closure,
+                        pO2_balance_floor,
+                    ) = (
                         _hashimoto_integrate_geometry(
                             run_initial_mol,
                             channels,
@@ -1521,6 +1631,7 @@ def _predict_hashimoto_residue_cohort(
                 refinement_accepted_steps_by_geometry[geometry] = tried_steps[-1]
                 geometry_predictions[geometry] = values
                 geometry_exhaustions[geometry] = exhaustions
+                pO2_balance_floor_by_geometry[geometry] = pO2_balance_floor
                 geometry_refusals[geometry] = (
                     {
                         **refusal.as_record(),
@@ -1631,6 +1742,15 @@ def _predict_hashimoto_residue_cohort(
                 "oxygen_boundary": "unbuffered vacuum; fO2 control none",
                 "total_pressure_Pa": total_pressure_Pa,
                 "surface_pO2_bar_range_by_geometry": pO2_ranges,
+                "surface_pO2_balance_floor": pO2_balance_floor_by_geometry[
+                    primary_geometry
+                ],
+                "surface_pO2_balance_floor_by_geometry": (
+                    pO2_balance_floor_by_geometry
+                ),
+                "engine_floor_inversion_diagnostics": tuple(
+                    engine_floor_inversion_diagnostics.values()
+                ),
                 "liquid_rows_used": tuple(active_liquid_rows[row_key]),
                 "d060_pending": True,
                 "openimcc_version": str(getattr(openimcc, "__version__", "unknown")),
