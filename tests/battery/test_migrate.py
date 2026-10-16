@@ -1224,6 +1224,7 @@ def test_darken_gurry_equilibrium_compositions_migrate_with_conditions() -> None
     ] == [Decimal("2.824"), Decimal("2.850")]
 
     for row_id, temperature, value, starting_material in (
+        ("dg46_t1_l_1596_fe2o3", "1596", "4.067", "Fe2O3"),
         ("dg46_t1_l_1615_fe2o3", "1615", "3.881", "Fe2O3"),
         ("dg46_t1_l_1632_fe2o3", "1632", "4.033", "Fe2O3"),
         ("dg46_t1_l_1632_wustite", "1632", "3.958", "Wustite"),
@@ -1242,10 +1243,21 @@ def test_darken_gurry_equilibrium_compositions_migrate_with_conditions() -> None
     condensed_rows = [
         observation
         for observation in observations.values()
-        if observation.identity.species.formula == "FeO"
+        if observation.identity.species.formula == "Fe(1-x)O"
     ]
     assert len(condensed_rows) == 89
-    assert all(row.identity.species.phase.value is Phase.L for row in condensed_rows)
+    assert Counter(
+        (
+            row.identity.species.formula,
+            row.identity.species.phase.value.value,
+            row.identity.species.charge.value,
+        )
+        for row in condensed_rows
+    ) == {("Fe(1-x)O", "l", 0): 89}
+    assert all(
+        row.identity.subtype.value == "r=(Fe++ + Fe+++)/Fe++ as printed"
+        for row in condensed_rows
+    )
 
     table_iii_b = observations["dg46_t3b_1436"]
     assert (
