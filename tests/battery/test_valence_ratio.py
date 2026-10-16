@@ -31,6 +31,7 @@ from simulator.battery.migrate import (
     _identity_from_plain,
     map_quantity,
     to_plain,
+    wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import Species, State
 from simulator.battery.score import (
@@ -217,6 +218,33 @@ def test_sulfur_valence_forms_are_recognized_and_migrated_as_printed(tmp_path: P
 
 
 def test_jugo_2010_table4_values_and_conditions_match_render():
+    extract = yaml.safe_load(JUGO_S.read_text(encoding="utf-8"))
+    table4 = next(
+        observation
+        for observation in extract["species"]["S"]["observations"]
+        if observation["observation_id"] == "jugo_2010_table4_xanes_s6_fraction"
+    )
+    assert table4["units"] == "percent"
+    assert (
+        Decimal(str(table4["values"]["points"][0]["value"]))
+        == Decimal("100.83")
+    )
+    assert table4["locator"]["pdf_page_index"] == 7
+    raw_inputs_note = table4["derivation"]["raw_inputs"]["locator"][
+        "note"
+    ]
+    assert raw_inputs_note.startswith(
+        "Only the underlying spectra are not digitised"
+    )
+    eq10 = next(
+        observation
+        for observation in extract["species"]["S"]["observations"]
+        if observation["observation_id"]
+        == "jugo_2010_eq10_sulfate_fraction_vs_delta_fmq_fit"
+    )
+    assert eq10["units"] == "fraction; ΔFMQ"
+    assert eq10["derivation"]["output_unit"] == "fraction"
+
     migrator = Migrator(ROOT)
     migrator._migrate_extract(JUGO_S)
     migrator.finalize()
@@ -227,30 +255,54 @@ def test_jugo_2010_table4_values_and_conditions_match_render():
     ]
 
     expected = {
-        "SB-5": Decimal("100.83"),
-        "SB-15": Decimal("94.44"),
-        "SB-19": Decimal("91.33"),
-        "SB-35": Decimal("71.87"),
-        "SB-6": Decimal("40.41"),
-        "SB-36": Decimal("0.19"),
-        "SB-41": Decimal("-0.24"),
+        "SB-5": Decimal("1.0083"),
+        "SB-15": Decimal("0.9444"),
+        "SB-19": Decimal("0.9133"),
+        "SB-35": Decimal("0.7187"),
+        "SB-6": Decimal("0.4041"),
+        "SB-36": Decimal("0.0019"),
+        "SB-41": Decimal("-0.0024"),
     }
-    assert len(rows) == 7  # Table 4, PDF page 9 (published page 5933)
+    assert len(rows) == 7  # Table 4, PDF index 7 (published page 5933)
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in rows) == 0
     assert {row.value.point for row in rows} == set(expected.values())
     assert migrator.result.validation is not None
     assert not migrator.result.validation.hard_issues
-    sb5 = next(row for row in rows if row.value.point == Decimal("100.83"))
-    sb41 = next(row for row in rows if row.value.point == Decimal("-0.24"))
+    sb5 = next(
+        row
+        for row in rows
+        if row.point_conditions["composition"].state.value["SiO2"]
+        == Decimal("47.48")
+    )
+    sb41 = next(
+        row
+        for row in rows
+        if row.point_conditions["composition"].state.value["S"]
+        == Decimal("0.07")
+    )
+    assert sb5.value.point == expected["SB-5"]
     assert sb5.point_conditions["fO2_control"].state.value == "FMQ+2.7"
     assert sb5.point_conditions["pressure_MPa"].state.value == Decimal("200")
     assert sb5.point_conditions["composition"].state.value["SiO2"] == Decimal("47.48")
-    assert sb41.point_conditions["composition"].state.value["S"] == Decimal("0.07")
+    assert sb41.value.point == expected["SB-41"]
     assert all(
         row.identity.quantity.value is Quantity.VALENCE_RATIO
         and row.admission.status is AdmissionStatus.ADMITTED
         and row.identity.temperature_K.value == Decimal("1323.15")
+        and row.identity.composition is not None
+        and row.identity.composition.is_value
+        and row.identity.composition.value
+        == wt_pct_to_mole_fraction(
+            row.point_conditions["composition"].state.value
+        )
+        and row.identity.total_pressure_Pa is not None
+        and row.identity.total_pressure_Pa.is_value
+        and row.identity.total_pressure_Pa.value == Decimal("200000000")
+        and row.identity.fO2_Pa is not None
+        and row.identity.fO2_Pa.is_unknown
+        and row.identity.fO2_Pa.reason.startswith("buffer-relative fO2 (")
         and row.point_conditions["temperature_K"].state.value == Decimal("1323.15")
+        and row.point_conditions["temperature_K"].locator.pdf_page_index == 7
         and row.point_conditions["pressure_MPa"].state.value == Decimal("200")
         and row.point_conditions["fO2_control"].locator.published_page == 5928
         and row.point_conditions["composition"].locator.published_page == 5928

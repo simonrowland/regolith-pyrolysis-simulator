@@ -6,7 +6,7 @@ source:
   year: 2010
   corpus_asset: raw/jugo-2010-sulfur-xanes/jugo-2010-sulfur-xanes.pdf
 extraction:
-  method: Values transcribed from page renders. Table 4 ratios are measured_reduced from the authors' XANES calibration in Eq. 3; Table 2 provides conditions and Table 3 provides per-sample EPMA compositions. Natural-glass Table 5 values lack printed run temperature, pressure, and fO2 in this paper and are not assigned those conditions. Figure-only points are not digitised.
+  method: Values transcribed from page renders. Table 4 ratios are measured_reduced from the authors' XANES calibration in Eq. 3 and remain in the printed percent unit; Table 4 prints the peak-integral values and Eq. 3 prints the calibration coefficients, while the underlying spectra and figure-only points are not digitised. SB-5's printed 100.83% and SB-41's printed -0.24% are retained without clipping. Table 2 provides conditions and Table 3 provides per-sample EPMA compositions. Natural-glass Table 5 values lack printed run temperature, pressure, and fO2 in this paper and are not assigned those conditions.
   date: '2026-10-16'
   worker: rdxw2-s10
 review_status: draft
@@ -27,7 +27,7 @@ species:
       type: concentration_series
       locator:
         published_page: 5933
-        pdf_page_index: 8
+        pdf_page_index: 7
         table: '4'
       phase: L
       standard_state: S6+/ΣS as printed in percent
@@ -39,7 +39,7 @@ species:
         output_unit: percent
         raw_inputs:
           state: {tag: value, value: not_printed}
-          locator: {published_page: 5933, pdf_page_index: 7, figure: '8'}
+          locator: {published_page: 5933, pdf_page_index: 7, figure: '8', note: "Only the underlying spectra are not digitised; Table 4 integrals and Eq. 3 coefficients are printed."}
       values:
         quantity: S6plus_over_sum_S
         method_class: measured_reduced
@@ -103,7 +103,7 @@ species:
         equation: '10'
       phase: L
       standard_state: S6+/ΣS fraction as a function of ΔFMQ
-      units: percent as printed; ΔFMQ
+      units: fraction; ΔFMQ
       derived_from:
       - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=b77ab6c54253
       - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=7a57577814c0
@@ -114,7 +114,7 @@ species:
       - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=2d2636f52b02
       derivation:
         relation: "Equation 10 fit to the seven stored synthetic S6+/ΣS rows against ΔFMQ: S6+/ΣS = 1 / (1 + 10^(A - BΔFMQ)); slope B is fixed at 2 and A is fitted."
-        output_unit: percent
+        output_unit: fraction
         inputs:
         - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=b77ab6c54253
         - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=7a57577814c0
