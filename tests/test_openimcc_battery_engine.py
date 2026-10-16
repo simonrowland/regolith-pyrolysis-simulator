@@ -984,6 +984,33 @@ def test_vapor_engine_lists_guards_when_every_start_grid_point_is_refused() -> N
     assert "out_of_basis: temperature_range: 6" in detail
 
 
+def test_feo_association_channel_uses_catalog_parent_for_oxygen_balance() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _engine_gas_pressures_bar_for_oxygen_balance,
+        _vapor_engine_oxygen_balance_species_metadata,
+    )
+    from simulator.melt_backend.vaporock import _parent_oxide_for_vaporock_gas
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    channel = "FeO_association_gas"
+    vapor_data = load_cached_safe_yaml(
+        (Path(__file__).resolve().parents[1] / "data" / "vapor_pressures.yaml")
+        .read_text(encoding="utf-8")
+    )
+    expected_parent = vapor_data["families"][
+        "oxide_vapors_feo_association_family"
+    ]["physical_properties"]["species"][channel]["parent_oxide"]
+    assert _parent_oxide_for_vaporock_gas(channel) == expected_parent
+    metadata = _vapor_engine_oxygen_balance_species_metadata((channel,))
+
+    pressures_bar = _engine_gas_pressures_bar_for_oxygen_balance(
+        {channel: 1.0e5}, metadata
+    )
+
+    assert set(metadata) == {expected_parent}
+    assert pressures_bar == {expected_parent: pytest.approx(1.0)}
+
+
 @pytest.mark.parametrize("gas_species", ("NaOH(g)", "KOH(g)"))
 def test_positive_hydroxide_pressure_refuses_dry_cell_oxygen_balance(
     gas_species: str,
