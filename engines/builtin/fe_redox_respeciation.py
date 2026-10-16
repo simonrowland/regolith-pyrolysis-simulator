@@ -8,7 +8,6 @@ from engines.builtin._common import (
     build_atom_balance_proof,
     composition_wt_pct_from_account_view,
     diagnostic_control_audit,
-    merge_species_amounts_from_accounts,
     reject_wrong_intent,
     unpack_controls,
 )
@@ -170,6 +169,8 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                     "oxygen_source": oxygen_source,
                 },
             )
+
+        from simulator.accounting.account_views import merge_species_amounts_from_accounts
 
         # Provenance-isolated spent oxide is physically in the same melt.
         # Only this thermodynamic basis is combined; Fe/O2 funding and

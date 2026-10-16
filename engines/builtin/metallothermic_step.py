@@ -133,7 +133,6 @@ from engines.builtin._common import (
     composition_kg_from_account_view,
     diagnostic_control_audit,
     dispatch_reaction_family,
-    merge_species_amounts_from_accounts,
     reject_wrong_intent,
     unpack_controls,
 )
@@ -270,6 +269,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         # package init -- see engines/builtin/__init__.py for the cycle
         # description.
         from simulator.accounting.formulas import resolve_species_formula
+        from simulator.accounting.account_views import merge_species_amounts_from_accounts
         from simulator.state import MOLAR_MASS
 
         wrong_intent = reject_wrong_intent(

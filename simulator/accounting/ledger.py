@@ -11,6 +11,9 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any
 
+from simulator.accounting.account_views import (
+    merge_species_amounts_from_accounts as _merge_species_amounts_from_accounts,
+)
 from simulator.accounting.exceptions import (
     AccountCreditPolicyError,
     AccountingError,
@@ -115,20 +118,6 @@ KNOWN_LEDGER_ACCOUNT_PREFIXES: tuple[str, ...] = (
     "process.wall_deposit_segment_",
     "reservoir.reagent.",
 )
-
-
-def _merge_species_amounts_from_accounts(
-    balances: Mapping[str, Mapping[str, float]],
-    accounts: tuple[str, ...],
-) -> dict[str, float]:
-    """Sum selected accounts in order; all inputs must use the same unit."""
-    merged: dict[str, float] = {}
-    for account in accounts:
-        for species, value in (balances.get(account, {}) or {}).items():
-            amount = float(value)
-            if amount:
-                merged[species] = merged.get(species, 0.0) + amount
-    return merged
 
 
 @dataclass(frozen=True)
