@@ -1473,7 +1473,7 @@ def test_openimcc_pack_domain_flags_even_without_active_complex(
     assert notice["authority"] == "extrapolated"
     assert notice["certified_band"]["temperature_K"] == [floor, ceiling]
     assert f"[{floor:g}, {ceiling:g}] K" in notice["reason"]
-    assert "extrapolated: Delta_r Cp = 0 continuation" in notice["reason"]
+    assert "extrapolated: Delta_r Cp = 0 continuation" not in notice["reason"]
 
 
 def test_openimcc_below_floor_real_melt_activity_has_extrapolation_flag(

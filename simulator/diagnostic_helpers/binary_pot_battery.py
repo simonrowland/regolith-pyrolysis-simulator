@@ -1932,8 +1932,13 @@ class _OpenImccBatteryBackend:
                 "reason": (
                     "T outside openimcc datapack domain at "
                     f"{temperature_K:g} K; certified band "
-                    f"{certified_band_text}; extrapolated: Delta_r Cp = 0 "
-                    "continuation; uncertainty band unavailable."
+                    f"{certified_band_text}; "
+                    + (
+                        "extrapolated: Delta_r Cp = 0 continuation; "
+                        if result.extrapolated
+                        else ""
+                    )
+                    + "uncertainty band unavailable."
                 ),
             }
             if certified_domain is not None:
