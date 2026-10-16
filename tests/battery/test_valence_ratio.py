@@ -42,6 +42,7 @@ from simulator.battery.score import (
 
 ROOT = Path(__file__).resolve().parents[2]
 SOSSI_CR = ROOT / "data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml"
+JAYASURIYA_FE = ROOT / "data/literature/extracts/jayasuriya-2004-iron-mossbauer.yaml"
 
 
 def _identity(basis: ValenceBasis) -> Identity:
@@ -368,6 +369,51 @@ def test_sossi_2018_quoted_cr_rows_migrate_as_numeric_valence_fractions():
         assert control.state.value in {"near FMQ", "~1 log unit below IW"}
         assert control.locator is not None
         assert control.locator.published_page == 10921
+
+
+def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
+    doc = yaml.safe_load(JAYASURIYA_FE.read_text(encoding="utf-8"))
+    observations = doc["species"]["Fe"]["observations"]
+    assert sum(len(obs["values"]["points"]) for obs in observations) == 38
+    rt_fractions = [
+        observations[0]["values"]["points"][i]["Fe3_over_sum_Fe"] for i in (1, 15)
+    ]
+    assert rt_fractions == [
+        0.025,
+        0.851,
+    ]
+    high_fe_fractions = [
+        observations[2]["values"]["points"][i]["Fe3_over_sum_Fe"] for i in (0, 14)
+    ]
+    assert high_fe_fractions == [
+        0.846,
+        0.218,
+    ]
+    assert [
+        observations[0]["locator"]["published_page"],
+        observations[2]["locator"]["published_page"],
+    ] == [1602, 1603]
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(JAYASURIYA_FE)
+    migrator.finalize()
+    rows = [
+        row
+        for row in migrator.result.observations.values()
+        if "jayasuriya_2004" in row.observation_id
+    ]
+    assert len(rows) == 38
+    assert migrator.result.registry_issues == []
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in rows) == 3
+    assert all(
+        row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.FE3_FE2_RATIO
+        and row.identity.temperature_K.is_value
+        and row.identity.fO2_Pa.is_value
+        and row.point_conditions["temperature_K"].state.is_value
+        and row.point_conditions["fO2_log"].state.is_value
+        for row in rows
+    )
 
 
 def test_valence_ratio_scores_redox_and_counts_each_engine_refusal():
