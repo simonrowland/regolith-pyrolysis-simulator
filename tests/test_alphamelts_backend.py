@@ -5103,6 +5103,24 @@ def test_backend_health_timeout_config_reaches_transport(monkeypatch):
     assert backend._thermoengine_transport.equilibrate_timeout_s == 7.0
 
 
+def test_thermoengine_backend_forwards_per_call_timeout():
+    backend = ThermoEngineBackend()
+    backend._composition_kg_to_wt_pct = lambda _composition: {'SiO2': 100.0}
+    backend._domain_gate = lambda *_args, **_kwargs: None
+    backend._apply_engine_commissioning = lambda *_args, **_kwargs: {}
+    backend._normalize_composition_to_melts_basis = lambda composition: composition
+    backend._last_normalization_warnings = []
+    backend._equilibrate_prepared = lambda **kwargs: kwargs
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg={'SiO2': 1.0},
+        call_timeout_s=17.0,
+    )
+
+    assert result['call_timeout_s'] == 17.0
+
+
 def test_thermoengine_transport_rejects_unknown_model_name():
     with pytest.raises(ValueError, match='unknown ThermoEngine MELTS model'):
         ThermoEngineTransport(
@@ -6531,6 +6549,30 @@ def test_thermoengine_transport_remaps_nonfinite_field_remote_error():
             pressure_bar=1.0,
             comp_wt=_melts_domain_composition(),
         )
+
+
+def test_thermoengine_transport_forwards_per_call_timeout():
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+    seen = {}
+
+    def _record_worker_call(_request, *, timeout_s=None):
+        seen['timeout_s'] = timeout_s
+        return object()
+
+    transport._worker.call = _record_worker_call
+    result = transport.equilibrate(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        comp_wt=_melts_domain_composition(),
+        call_timeout_s=27.0,
+    )
+
+    assert seen['timeout_s'] == 27.0
+    assert result is not None
 
 
 def test_thermoengine_transport_remaps_fo2_undefined_remote_error():

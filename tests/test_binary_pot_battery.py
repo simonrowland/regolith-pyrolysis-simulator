@@ -298,6 +298,24 @@ def test_classify_out_of_domain_and_no_liquid() -> None:
     assert reason == "no_liquid"
 
 
+def test_classify_thermoengine_nonfinite_keeps_field_detail() -> None:
+    class NonFiniteField(ValueError):
+        backend_status_reason = "thermoengine_nonfinite_field"
+
+    status, reason, engine_reason = classify_equilibrate_outcome(
+        error=NonFiniteField(
+            "ThermoEngine Liquid GibbsFreeEnergy is not finite: nan"
+        )
+    )
+
+    assert status == "refusal"
+    assert reason == REFUSAL_UNAVAILABLE
+    assert engine_reason == (
+        "thermoengine_nonfinite_field: "
+        "ThermoEngine Liquid GibbsFreeEnergy is not finite: nan"
+    )
+
+
 @pytest.mark.parametrize(
     ("liquid_fraction", "expected"),
     [
@@ -1742,6 +1760,63 @@ def _fake_isolated_cell_handler(_resource, request, _diagnostic_log):
     return cell.as_payload()
 
 
+def _nested_warm_hang_handler(_resource, _request, _diagnostic_log):
+    time.sleep(30.0)
+
+
+def _nested_warm_worker_bootstrap():
+    return None, "nested-warm-ready"
+
+
+class _NestedWarmHangBackend:
+    def __init__(self, budget_path: str, pid_path: str, call_started_path: str) -> None:
+        from simulator.engine_pool import WarmEngineWorker
+
+        self.budget_path = Path(budget_path)
+        self.worker = WarmEngineWorker(
+            name="nested test warm engine",
+            bootstrap=_nested_warm_worker_bootstrap,
+            handler=_nested_warm_hang_handler,
+            startup_timeout_s=5.0,
+            call_timeout_s=5.0,
+            diagnostic_signal=signal.SIGCONT,
+            watchdog_grace_s=0.05,
+            daemon=False,
+        )
+        self.worker.start()
+        Path(pid_path).write_text(str(self.worker.process.pid), encoding="utf-8")
+        self.call_started_path = Path(call_started_path)
+
+    def equilibrate(self, *, call_timeout_s: float, **_kwargs):
+        self.budget_path.write_text(repr(call_timeout_s), encoding="utf-8")
+        self.call_started_path.write_text(repr(time.monotonic()), encoding="utf-8")
+        return self.worker.call({}, timeout_s=call_timeout_s)
+
+    def close(self) -> None:
+        self.worker.close()
+
+
+def _nested_warm_hang_bootstrap(
+    engine: str,
+    *,
+    budget_path: str,
+    pid_path: str,
+    call_started_path: str,
+):
+    import simulator.diagnostic_helpers.binary_pot_battery as binary_pot_battery
+
+    backend = _NestedWarmHangBackend(budget_path, pid_path, call_started_path)
+    handle = EngineHandle(
+        name=engine,
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    return binary_pot_battery._IsolatedCellEngine(handle), "nested-warm-ready"
+
+
 def _install_fake_isolated_cell_worker(
     monkeypatch: pytest.MonkeyPatch,
     *,
@@ -1928,6 +2003,59 @@ def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
         recovered = _run_fake_isolated_cell(battery, pot_id="worker-after-timeout")
         assert recovered.status == "ok"
         assert battery._ISOLATED_CELL_WORKERS["alphamelts"].start_count == 2
+    finally:
+        battery._close_isolated_cell_workers()
+
+
+def test_thermoengine_nested_warm_hang_uses_cell_budget_and_times_out(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    battery._close_isolated_cell_workers()
+    budget_path = tmp_path / "nested-budget.txt"
+    pid_path = tmp_path / "nested-worker.pid"
+    call_started_path = tmp_path / "nested-call-started.txt"
+    monkeypatch.setattr(
+        battery,
+        "_bootstrap_isolated_cell_engine",
+        partial(
+            _nested_warm_hang_bootstrap,
+            budget_path=str(budget_path),
+            pid_path=str(pid_path),
+            call_started_path=str(call_started_path),
+        ),
+    )
+    timeout_s = 0.8
+    try:
+        cell = _run_fake_isolated_cell(
+            battery,
+            pot_id="nested-warm-timeout",
+            engine="thermoengine",
+            why="nested-warm-timeout",
+            timeout_s=timeout_s,
+        )
+
+        assert cell.refusal_reason == REFUSAL_TIMEOUT
+        assert float(budget_path.read_text(encoding="utf-8")) == pytest.approx(
+            timeout_s
+        )
+        assert time.monotonic() - float(
+            call_started_path.read_text(encoding="utf-8")
+        ) <= timeout_s + 0.5
+        nested_pid = int(pid_path.read_text(encoding="utf-8"))
+        deadline = time.monotonic() + 1.0
+        while True:
+            try:
+                os.kill(nested_pid, 0)
+            except ProcessLookupError:
+                break
+            if time.monotonic() >= deadline:
+                pytest.fail(
+                    f"nested warm timeout left engine pid {nested_pid} alive"
+                )
+            time.sleep(0.05)
     finally:
         battery._close_isolated_cell_workers()
 

@@ -171,14 +171,13 @@ _DEFAULT_PRESSURE_BAR = 1.0e-6
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9
 
-# Outer wall around equilibrate(). Engine workers already have their own
-# call timeouts; this is the battery's hard stop so a wedged call becomes
-# engine_timeout instead of a hang. Values sit a few seconds above the
-# engine's own warm-call wall.
+# Per-cell wall around equilibrate(). ThermoEngine forwards this same budget
+# to its nested warm worker; its 60 s limit covers the measured 54.75 s D3
+# SiO2 maximum. The isolated-cell worker gets a separate 2 s response margin.
 _ENGINE_OUTER_TIMEOUT_S: dict[str, float] = {
     "internal-analytical": 5.0,
     "alphamelts": 30.0,
-    "thermoengine": 10.0,
+    "thermoengine": 60.0,
     "vaporock": 70.0,
     "magemin": 20.0,
     "cached-real": 30.0,
@@ -1333,7 +1332,9 @@ def classify_equilibrate_outcome(
         status_reason = str(getattr(error, "backend_status_reason", "") or "")
         category = str(getattr(error, "backend_failure_category", "") or "")
         message = str(error)
-        if status_reason:
+        if reason_code == "thermoengine_nonfinite_field":
+            engine_reason = f"{reason_code}: {message}"
+        elif status_reason:
             engine_reason = status_reason
         elif reason_code.startswith("imcc_gas_"):
             engine_reason = f"{reason_code}: {message}"

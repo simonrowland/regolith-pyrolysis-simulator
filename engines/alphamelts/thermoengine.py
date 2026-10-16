@@ -1255,6 +1255,7 @@ print('ok')
         comp_wt: Mapping[str, float],
         fO2_log: Optional[float] = None,
         warnings: tuple[str, ...] = (),
+        call_timeout_s: Optional[float] = None,
     ) -> ThermoEnginePayload:
         """Equilibrate with a hard deadline around all native solve calls."""
         if self._worker.process is None and self._worker.start_count == 0:
@@ -1270,7 +1271,11 @@ print('ok')
             'warnings': tuple(warnings),
         }
         try:
-            return self._worker.call(kwargs)
+            if call_timeout_s is None:
+                return self._worker.call(kwargs)
+            return self._worker.call(
+                kwargs, timeout_s=max(0.001, float(call_timeout_s))
+            )
         except EngineWorkerRemoteError as exc:
             exc_name = exc.exc_name
             detail = exc.detail
