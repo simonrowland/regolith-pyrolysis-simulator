@@ -880,6 +880,110 @@ def test_vapor_engine_reports_domain_when_no_admitted_bracket_exists() -> None:
     assert "sum_pressure_sanity" in str(exc_info.value)
 
 
+def test_vapor_engine_finds_admitted_start_away_from_seed() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    trials: list[tuple[float, str]] = []
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        logp = math.log10(po2_bar)
+        if not -14.0 <= logp <= -9.0:
+            trials.append((po2_bar, "domain"))
+            return SimpleNamespace(
+                status="refusal",
+                refusal_reason="outside_test_domain",
+                engine_reason=f"outside admitted window at log10(pO2)={logp:g}",
+                gas_partial_pressures_Pa={},
+                invalid_gas_partial_pressure_components=(),
+            )
+
+        trials.append((po2_bar, "ok"))
+        return SimpleNamespace(
+            status="ok",
+            gas_partial_pressures_Pa={
+                "K": 1e-16 * po2_bar**-0.25 * 1e5,
+                "O2": 0.02264 * po2_bar * 1e5,
+            },
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    solved_po2_bar, pressures_bar, balance, _fraction, _info = (
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+    )
+
+    assert trials[0][0] == pytest.approx(1e-6)
+    assert trials[0][1] == "domain"
+    assert [round(math.log10(po2)) for po2, _status in trials[:7]] == [
+        -6,
+        -5,
+        -7,
+        -4,
+        -8,
+        -3,
+        -9,
+    ]
+    first_admitted = next(po2 for po2, status in trials if status == "ok")
+    assert first_admitted == pytest.approx(1e-9)
+    assert 1e-14 <= solved_po2_bar <= 1e-9
+    assert balance["residual"] < 1e-12
+
+    direct_cell = engine_call_at_po2(solved_po2_bar)
+    assert direct_cell.status == "ok"
+    for species, pressure_pa in direct_cell.gas_partial_pressures_Pa.items():
+        assert pressures_bar[species] == pytest.approx(
+            pressure_pa / 1e5, rel=1e-9
+        )
+
+
+def test_vapor_engine_lists_guards_when_every_start_grid_point_is_refused() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    trials: list[float] = []
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        logp = round(math.log10(po2_bar))
+        trials.append(logp)
+        if logp < -15:
+            reason, engine_reason = "engine_crash", "subprocess_died"
+        elif logp < -5:
+            reason, engine_reason = (
+                "engine_crash",
+                "subprocess_fe_free_absolute_fo2_crash",
+            )
+        else:
+            reason, engine_reason = "out_of_basis", "temperature_range"
+        return SimpleNamespace(
+            status="refusal",
+            refusal_reason=reason,
+            engine_reason=engine_reason,
+            gas_partial_pressures_Pa={},
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    detail = str(exc_info.value)
+    assert exc_info.value.reason_code == "oxygen_balance_no_admitted_bracket"
+    assert sorted(trials) == list(range(-30, 1))
+    assert "engine_crash: subprocess_died: 15" in detail
+    assert "engine_crash: subprocess_fe_free_absolute_fo2_crash: 10" in detail
+    assert "out_of_basis: temperature_range: 6" in detail
+
+
 @pytest.mark.parametrize("gas_species", ("NaOH(g)", "KOH(g)"))
 def test_positive_hydroxide_pressure_refuses_dry_cell_oxygen_balance(
     gas_species: str,
