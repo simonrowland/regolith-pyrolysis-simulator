@@ -1740,11 +1740,20 @@ class CampaignManager:
                     ovr = self._campaign_overrides(campaign)
                     target = self._float(
                         ovr.get('hold_temp_C'),
-                        self._float(cfg.get('default_hold_T_C'), 1750.0),
+                        self._required_float(
+                            cfg.get('default_hold_T_C'),
+                            'C2A_staged.default_hold_T_C',
+                        ),
                     )
                 else:
-                    target = self._float(selected.get('target_C'), 1750.0)
-                ramp = self._float(selected.get('ramp_rate_C_per_hr'), 150.0)
+                    target = self._required_float(
+                        selected.get('target_C'),
+                        f"C2A_staged.stages.{selected.get('name')}.target_C",
+                    )
+                ramp = self._required_float(
+                    selected.get('ramp_rate_C_per_hr'),
+                    f"C2A_staged.stages.{selected.get('name')}.ramp_rate_C_per_hr",
+                )
                 return (target, ramp)
 
             cfg = self._campaign_config(campaign)
@@ -1755,11 +1764,20 @@ class CampaignManager:
                 ovr = self._campaign_overrides(campaign)
                 target = self._float(
                     ovr.get('hold_temp_C'),
-                    self._float(cfg.get('default_hold_T_C'), 1750.0),
+                    self._required_float(
+                        cfg.get('default_hold_T_C'),
+                        'C2A_staged.default_hold_T_C',
+                    ),
                 )
             else:
-                target = self._float(selected.get('target_C'), 1750.0)
-            ramp = self._float(selected.get('ramp_rate_C_per_hr'), 150.0)
+                target = self._required_float(
+                    selected.get('target_C'),
+                    f"C2A_staged.stages.{selected.get('name')}.target_C",
+                )
+            ramp = self._required_float(
+                selected.get('ramp_rate_C_per_hr'),
+                f"C2A_staged.stages.{selected.get('name')}.ramp_rate_C_per_hr",
+            )
             return (target, ramp)
 
         elif campaign == CampaignPhase.C2B:
