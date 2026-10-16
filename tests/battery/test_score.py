@@ -7778,10 +7778,13 @@ def test_unprinted_source_phase_is_typed_and_cannot_be_scored() -> None:
         prediction=_predict(Decimal("0.3"), identity),
     )
 
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.numeric is None
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
     assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert residual.refusal.detail["reason"] == (
+        "fusion_source_reference_phase_unprinted"
+    )
     assert candidate is not None
     assert any(
         notice.reason == "fusion_source_reference_phase_unprinted"

@@ -70,6 +70,7 @@ from simulator.battery.identity import (
     PA_PER_BAR_DEC,
     THERMOCHEMICAL_CALORIE_J,
     identity_equal,
+    _identity_equal,
     _same_row_redox_identity_equal,
     log10K_from_delta_fG_kJ_mol,
     profile_for,
@@ -6812,11 +6813,28 @@ def compile_residual(
         compared_candidate = _comparison_identity(
             compared_candidate, reference, prediction
         )
-    equal = (
-        _same_row_redox_identity_equal(compared_reference, compared_candidate)
-        if quantity is Quantity.FE3_FE2_RATIO
-        else identity_equal(compared_reference, compared_candidate)
+    source_phase_missing = (
+        quantity is Quantity.ACTIVITY
+        and isinstance(identity, Identity)
+        and identity.reference_state is not None
+        and identity.reference_state.is_value
+        and isinstance(identity.reference_state.value, StandardState)
+        and _source_polymorph_is_unspecified(
+            identity.reference_state.value.endmember.polymorph
+        )
     )
+    if quantity is Quantity.FE3_FE2_RATIO:
+        equal = _same_row_redox_identity_equal(
+            compared_reference, compared_candidate
+        )
+    elif source_phase_missing:
+        equal = _identity_equal(
+            compared_reference,
+            compared_candidate,
+            allow_unknown_species_polymorph=True,
+        )
+    else:
+        equal = identity_equal(compared_reference, compared_candidate)
     if equal.kind is not IdentityEqualKind.EQUAL:
         reason = (
             RefusalReason.IDENTITY_MISMATCH
