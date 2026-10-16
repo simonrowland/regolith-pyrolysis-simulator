@@ -406,6 +406,8 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     assert payload["equilibrium_result"]["liquid_fraction"] == pytest.approx(0.705)
     assert payload["equilibrium_result"]["vapor_pressures_Pa"]["SiO"] == pytest.approx(7.025)
     assert "cached_interpolated_linear_estimate" in payload["equilibrium_result"]["warnings"]
+    assert "requested_fO2_log" not in payload["equilibrium_result"]
+    assert "printed_fO2_echo_log" not in payload["equilibrium_result"]
 
 
 def test_cached_interpolation_uses_query_fo2_and_drops_neighbor_echo(
@@ -422,11 +424,19 @@ def test_cached_interpolation_uses_query_fo2_and_drops_neighbor_echo(
     low_payload["equilibrium_result"].update(
         requested_fO2_log=-9.0001,
         printed_fO2_echo_log=-9.0,
+        diagnostics={
+            "requested_fO2_log": -9.0001,
+            "printed_fO2_echo_log": -9.0,
+        },
     )
     high_payload = _interpolation_payload(liquid_fraction=0.71, sio_pa=7.05)
     high_payload["equilibrium_result"].update(
         requested_fO2_log=-8.9999,
         printed_fO2_echo_log=-9.0,
+        diagnostics={
+            "requested_fO2_log": -8.9999,
+            "printed_fO2_echo_log": -9.0,
+        },
     )
 
     attempt = rci.attempt_cached_interpolation(
@@ -440,6 +450,8 @@ def test_cached_interpolation_uses_query_fo2_and_drops_neighbor_echo(
     assert interpolated_result["fO2_log"] == pytest.approx(-9.0)
     assert interpolated_result["requested_fO2_log"] == pytest.approx(-9.0)
     assert interpolated_result["printed_fO2_echo_log"] is None
+    assert interpolated_result["diagnostics"]["requested_fO2_log"] == pytest.approx(-9.0)
+    assert interpolated_result["diagnostics"]["printed_fO2_echo_log"] is None
 
     store = PT0DeterminismStore(
         "capture",
@@ -457,6 +469,8 @@ def test_cached_interpolation_uses_query_fo2_and_drops_neighbor_echo(
     assert replayed.fO2_log == pytest.approx(-9.0)
     assert replayed.requested_fO2_log == pytest.approx(-9.0)
     assert replayed.printed_fO2_echo_log is None
+    assert replayed.diagnostics["requested_fO2_log"] == pytest.approx(-9.0)
+    assert replayed.diagnostics["printed_fO2_echo_log"] is None
     assert sim.melt.fO2_log == pytest.approx(-9.0)
     assert sim.melt.melt_fO2_log == pytest.approx(-9.0)
 
