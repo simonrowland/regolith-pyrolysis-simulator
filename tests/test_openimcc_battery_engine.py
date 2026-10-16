@@ -727,6 +727,49 @@ def test_reactive_cell_buffer_pins_at_selected_buffer(monkeypatch) -> None:
     assert info["buffer_pO2_bar"] == pytest.approx(solved)
 
 
+def test_openimcc_cell_balance_pre_generalization_golden(monkeypatch) -> None:
+    import openimcc
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "_cell_oxide_thermodynamics",
+        lambda _material, _temperature: (
+            {"WO3": (-250_000.0, 3.0)},
+            -15.0,
+            {"WO3": {"table_id": "O-068", "source_sha256": "test"}},
+        ),
+    )
+    species = openimcc.oxygen_balance_species_metadata({"Si": "SiO2"})
+
+    def pressure_model(logp: float) -> dict[str, float]:
+        return {"Si": 1e-12 * 10.0 ** (-logp)}
+
+    solved, pressures, balance, fraction, info = battery._solve_cell_oxygen_balance(
+        pressure_model,
+        species,
+        temperature_K=1933.0,
+        cell_material="W",
+        oxygen_balance_from_pressure_model=openimcc.oxygen_balance_from_pressure_model,
+    )
+
+    assert (
+        solved.hex(),
+        pressures["Si"].hex(),
+        pressures["WO3"].hex(),
+        balance["residual"].hex(),
+        fraction.hex(),
+        info["buffer_pO2_bar"].hex(),
+    ) == (
+        "0x1.203af9ee75616p-50",
+        "0x1.f400000000000p+9",
+        "0x1.9f47e60278c26p-53",
+        "0x1.0000000000000p+0",
+        "0x1.0000000000000p+0",
+        "0x1.203af9ee75616p-50",
+    )
+
+
 def test_unknown_cell_material_is_a_typed_refusal() -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
 
