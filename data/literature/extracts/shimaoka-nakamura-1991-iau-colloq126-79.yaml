@@ -655,7 +655,7 @@ fidelity_samples:
     table: '1'
     row: 89A
     column: Na (ppm)
-- path: species.Na.observations[shimaoka_1991_na_run_89a_vaporization_rate].values.evaporation_rate
+- path: species.Na.observations[shimaoka_1991_na_run_89a_vaporization_rate].values.k_cm3_min_cm2_as_printed
   value: 0.000107
   locator:
     published_page: 81
@@ -858,11 +858,13 @@ species:
         inputs:
         - shimaoka_1991_na_run_89a_concentration
       values:
-        quantity: evaporation_rate
+        quantity: per_area_volumetric_rate
+        status: typed_refusal
+        reason: 'The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.'
         method_class: model_derived
         attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
         analyte: Na
-        evaporation_rate: 0.000107
+        k_cm3_min_cm2_as_printed: 0.000107
         temperature_C_as_printed: 1300
         temperature_K: 1573.15
         temperature_conversion: 1300 °C + 273.15 = 1573.15 K
