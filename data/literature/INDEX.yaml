@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 315
-  extracts: 313
+  sources: 316
+  extracts: 314
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 61
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 313
+  extracts_without_pdf: 314
   alias_groups_needing_resolution: 38
 gaps:
   pdfs_without_extract: []
@@ -39,6 +39,7 @@ gaps:
   - bencze-yazhenskikh-2016
   - bennour-1996-ternary-cs-na-silicate
   - berkowitz-chupka-inghram-1957
+  - berry-oneill-2004-chromium-xanes
   - borisov-2018-compilation
   - boulliung-2025-mercury-volatile-metals-magmatic
   - boulliung-wood-2022-so2-solubility-silicate-melts
@@ -1848,6 +1849,64 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: berry-oneill-2004-chromium-xanes
+  aliases: []
+  citation: Berry, A. J. and O’Neill, H. St. C. (2004), “A XANES determination of the oxidation state
+    of chromium in silicate glasses”, American Mineralogist 89:790-798.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/berry-oneill-2004-chromium-xanes.yaml
+    review_status: draft
+    rows: 145
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/berry-oneill-2004-chromium-xanes/berry-oneill-2004-chromium-xanes.pdf
+      present: true
+      sha256: a05f33cc7ec1375ab390444d04aee6fe8a21098849c18c8fe6ebe0d9efe743f4
+      matches_simulator: null
+    sidecar:
+      path: raw/berry-oneill-2004-chromium-xanes/sidecar.yaml
+      present: true
+    text:
+      path: text/berry-oneill-2004-chromium-xanes
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/berry-oneill-2004-chromium-xanes
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/berry-oneill-2004-chromium-xanes.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/berry-oneill-2004-chromium-xanes.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: bd11a6f918ea900cb0cbe1529cc9018f72a82767
 - source_id: borisov-2018-compilation
   aliases: []
   citation: 'Borisov, A., Behrens, H. & Holtz, F. (2018), Ferric/ferrous ratio in silicate melts: a new
