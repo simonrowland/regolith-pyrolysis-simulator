@@ -1922,7 +1922,11 @@ class _OpenImccBatteryBackend:
             extrapolation_notice: dict[str, Any] = {
                 "kind": "openimcc_temperature_extrapolated",
                 "authority": AUTHORITY_EXTRAPOLATED,
-                "reason": "; ".join(package_notices),
+                "reason": "; ".join(package_notices)
+                or (
+                    "T outside openimcc datapack domain; "
+                    "evaluate(allow_extrapolation=True)"
+                ),
             }
             if certified_domain is not None:
                 extrapolation_notice["certified_band"] = {
