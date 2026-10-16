@@ -503,29 +503,35 @@ def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):
     assertions = {a["name"]: a for a in smoke_payload["assertions"]}
 
     assert owner["native_fe_pool_mol"] == pytest.approx(
-        1576.0114767733974, rel=0.0, abs=1.0e-9
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        771.7846000093335, rel=0.0, abs=1.0e-9
     )
     assert owner["native_fe_tap_mol"] == pytest.approx(
-        1573.8956138175351, rel=0.0, abs=1.0e-9
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        769.6892089309141, rel=0.0, abs=1.0e-9
     )
     assert owner["native_fe_vapor_mol"] == pytest.approx(
-        2.1158629558621413, rel=0.0, abs=1.0e-12
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        2.095391078419451, rel=0.0, abs=1.0e-12
     )
     assert owner["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.00134254286028043, rel=0.0, abs=1.0e-15
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        0.002714994673894906, rel=0.0, abs=1.0e-15
     )
     # t-523 restores nonzero OOD inventory debits while retaining the
     # equilibrium-backend pressure seam. That changes the downstream stage-3
     # composition denominator; the native Fe pool/tap/vapour pins above remain
     # unchanged, so this is not a redox-authority or value-source cutover.
     assert owner["stage_3_Fe_wt_pct"] == pytest.approx(
-        0.0121860033141556, rel=0.0, abs=1.0e-15
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        34.45293490952912, rel=0.0, abs=1.0e-15
     )
     assert owner["ferric_divergence_material"] is False
     assert abs(owner["mass_balance_error_pct"]) <= 5e-12
     assert owner["SiO_provider_pO2_bar"] == pytest.approx(1.0e-9)
     assert owner["SiO_flux_kg_hr"] == pytest.approx(
-        0.02824157889055116, rel=0.0, abs=1.0e-15
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        0.023123885242454335, rel=0.0, abs=1.0e-15
     )
     requested_pO2_assertion = assertions[
         "owner_pN2_recipe_point_requested_pO2_semantics"
