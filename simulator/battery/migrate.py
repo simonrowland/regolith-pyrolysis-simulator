@@ -13534,7 +13534,11 @@ class Migrator:
             suffix_formula, suffix_derivation, suffix_reference = parse_quantity_suffix(
                 suffix
             )
-            if suffix_formula and measured_tabulated_gas_formula is None:
+            if (
+                suffix_formula
+                and raw_quantity not in QUANTITY_ALIASES
+                and measured_tabulated_gas_formula is None
+            ):
                 species = make_species(
                     suffix_formula, phase, polymorph=species_polymorph
                 )

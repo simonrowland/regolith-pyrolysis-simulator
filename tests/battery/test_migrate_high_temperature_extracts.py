@@ -150,6 +150,13 @@ def test_demaria_table4_points_keep_printed_values_and_temperatures(migrated_tar
         temperature = observation.point_conditions["temperature_K"]
         assert temperature.state.is_value
         assert temperature.locator is not None
+    alo_points = [
+        observation
+        for observation in table4
+        if "demaria_1971_alo_psat_table4" in observation.observation_id
+    ]
+    assert len(alo_points) == 6
+    assert {point.identity.species.formula for point in alo_points} == {"AlO"}
     _assert_printed_point(
         migrated_targets,
         source_id="kems-022-demaria-1971",
