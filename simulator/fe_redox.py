@@ -937,6 +937,27 @@ def kress91_fe3_over_sigma_fe(
     return 2.0 * ratio / (2.0 * ratio + 1.0)
 
 
+def _all_ferrous_feo_activity(
+    *,
+    comp_wt: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+) -> float:
+    activity = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=comp_wt,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+        fO2_log=feo_iw_log10_fO2_bar(T_K),
+        fe3_over_sigma_fe=0.0,
+    )
+    a_feo = float(activity['a_FeO_authoritative'])
+    if not math.isfinite(a_feo) or a_feo <= 0.0:
+        raise Kress91InvalidControls(
+            'all-ferrous state has no established FeO activity bound'
+        )
+    return a_feo
+
+
 def kress91_intrinsic_state(
     *,
     feo_mol: float,
@@ -968,14 +989,11 @@ def kress91_intrinsic_state(
     if feo_mol > 0.0 and fe2o3_mol == 0.0:
         if composition_wt_pct is None:
             raise Kress91InvalidControls('all-ferrous state requires grounded FeO activity')
-        activity = calphad_ferrous_feo_activity_diagnostic(
-            comp_wt=composition_wt_pct, T_K=T_K, pressure_bar=pressure_bar,
-            fO2_log=feo_iw_log10_fO2_bar(T_K),
-            fe3_over_sigma_fe=0.0,
+        a_feo = _all_ferrous_feo_activity(
+            comp_wt=composition_wt_pct,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
         )
-        a_feo = float(activity['a_FeO_authoritative'])
-        if not math.isfinite(a_feo) or a_feo <= 0.0:
-            raise Kress91InvalidControls('all-ferrous state has no established FeO activity bound')
         # FeO(l)=Fe+1/2 O2: the existing activity owner sets saturation.
         # Below this lower bound metallic Fe can form; zero ferric inventory
         # cannot specify a finite Kress potential. This is a stability bound,
@@ -1011,6 +1029,25 @@ def kress91_intrinsic_state(
     if bounded:
         state.update(unclamped_fO2_log=exchange_fO2_log,
                      pressure_ceiling_fO2_log=math.log10(pressure_bar))
+    elif bound is None and feo_mol > 0.0 and fe2o3_mol > 0.0:
+        if composition_wt_pct is not None:
+            a_feo = _all_ferrous_feo_activity(
+                comp_wt=composition_wt_pct,
+                T_K=T_K,
+                pressure_bar=pressure_bar,
+            )
+            # Premise: Kress91's ferric/ferrous ratio is a fit, not an
+            # Fe/FeO equilibrium, so a finite low-ferric inverse can undercut
+            # the separate Fe/FeO stability bound.
+            # Algebra: FeO(l) = Fe + 1/2 O2 gives IW(a_FeO) =
+            # IW + 2 log10(a_FeO).
+            # Units: fO2 is relative to 1 bar and a_FeO is dimensionless, so
+            # the logarithm arguments and result in dex are dimensionless.
+            # Sanity: a_FeO=1 recovers IW; a_FeO<1 lowers the bound.
+            state.update(
+                a_feo=a_feo,
+                iw_bound=feo_iw_log10_fO2_bar(T_K, a_feo=a_feo),
+            )
     return state
 
 

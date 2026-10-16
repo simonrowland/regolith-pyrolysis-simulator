@@ -4363,20 +4363,38 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._last_intrinsic_redox_state = state
         melt_potential = float(state['fO2_log'])
+        pending_notices = []
         if not state.get('exchange_bounded') and state.get('bound') is None:
             ceiling = self._melt_redox_fO2_upper_bound_log()
             if melt_potential > ceiling:
-                notice = {
+                pending_notices.append({
                     'flag': 'REDOX_ABOVE_GAS_CEILING',
                     'melt_potential': melt_potential,
                     'ceiling': ceiling,
                     'reason': 'degassing_pending',
-                }
-                notices = getattr(self, '_redox_pressure_ceiling_notices_this_hr', [])
+                })
+            a_feo = state.get('a_feo')
+            iw_bound = state.get('iw_bound')
+            if (
+                a_feo is not None
+                and iw_bound is not None
+                and melt_potential < float(iw_bound)
+            ):
+                pending_notices.append({
+                    'flag': 'REDOX_BELOW_FE_FEO_SATURATION',
+                    'melt_potential': melt_potential,
+                    'iw_bound': float(iw_bound),
+                    'a_feo': float(a_feo),
+                })
+        if pending_notices:
+            notices = list(
+                getattr(self, '_redox_pressure_ceiling_notices_this_hr', [])
+                or []
+            )
+            for notice in pending_notices:
                 if notice not in notices:
-                    self._redox_pressure_ceiling_notices_this_hr = [
-                        *notices, notice,
-                    ]
+                    notices.append(notice)
+            self._redox_pressure_ceiling_notices_this_hr = notices
         return melt_potential
 
     def _current_melt_redox_reference_T_K(self) -> Optional[float]:
