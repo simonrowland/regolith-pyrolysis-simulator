@@ -22,6 +22,19 @@ extraction:
   figure_only_candidates: Figures 3, 5, and 6 contain plotted XANES/redox points; no values visible only in figures
     were digitized. They remain figure-read candidates.
 review_status: draft
+experiments:
+- experiment_id: berry_2004_table3_one_bar
+  method: {tag: unknown, reason: not_mapped}
+  locator: {table: '3', published_page: 794, pdf_page_index: 5, record: Table 3 log fO2 -16.13 CO cells}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '100000'}}
+      locator: {published_page: 791, pdf_page_index: 2, section: Experimental methods, record: "Cr3C2/CO experiments at 1 bar"}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 791, pdf_page_index: 2, section: Experimental methods}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
 corrections: []
 species:
   Cr:
@@ -36,10 +49,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.005'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -0.68*; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -152,10 +167,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.009'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -0.68*; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -268,10 +285,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.008'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -0.68*; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -384,10 +403,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.008'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -0.68*; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -500,10 +521,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.007'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -0.68*; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -616,10 +639,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.014'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -0.68*; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -737,10 +762,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.029'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.0†; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -841,10 +868,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.024'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.0†; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -945,10 +974,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.016'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.0†; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -1049,10 +1080,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.026'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.0†; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -1153,10 +1186,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.031'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.0†; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -1257,10 +1292,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.020'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.0†; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -1378,10 +1415,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.034'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.5†; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -1482,10 +1521,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.033'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.5†; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -1586,10 +1627,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.024'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.5†; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -1690,10 +1733,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.034'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.5†; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -1794,10 +1839,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.028'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.5†; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -1898,10 +1945,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.029'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.5†; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -2004,10 +2053,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.024'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -2.0†; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -2108,10 +2159,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.020'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -2.0†; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -2212,10 +2265,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.020'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -2.0†; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -2316,10 +2371,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.021'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -2.0†; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -2420,10 +2477,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.022'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -2.0†; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -2524,10 +2583,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.023'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -2.0†; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -2630,10 +2691,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.028'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃† (second measurement); AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -2736,10 +2799,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.017'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -3.0‡; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -2838,10 +2903,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.026'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -3.0‡; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -2942,10 +3009,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.018'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -3.0‡; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -3044,10 +3113,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.024'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -3.0‡; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -3146,10 +3217,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.029'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -3.0‡; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -3248,10 +3321,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.031'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -3.0‡; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -3352,10 +3427,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.039'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -4.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -3456,10 +3533,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.034'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -4.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -3560,10 +3639,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.026'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -4.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -3662,10 +3743,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.050'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -4.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -3764,10 +3847,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.065'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -4.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -3866,10 +3951,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.049'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -4.0; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -3970,10 +4057,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.060'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -5.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -4074,10 +4163,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.044'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -5.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -4176,10 +4267,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.063'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -5.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -4280,10 +4373,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.058'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -5.0; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -4384,10 +4479,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.118'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -4486,10 +4583,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.089'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -4590,10 +4689,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.085'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -4692,10 +4793,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.138'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -4794,10 +4897,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.173'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -4896,10 +5001,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.080'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.0; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -5000,10 +5107,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.140'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.5; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -5102,10 +5211,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.116'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.5; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -5206,10 +5317,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.099'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.5; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -5308,10 +5421,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.163'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.5; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -5410,10 +5525,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.199'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.5; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -5512,10 +5629,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.098'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.5; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -5616,10 +5735,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.244'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -5719,10 +5840,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.151'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -5821,10 +5944,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.123'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -5923,10 +6048,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.190'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -6025,10 +6152,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.081'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -6129,10 +6258,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.114'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.0; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -6233,10 +6364,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.207'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.5; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -6335,10 +6468,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.196'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.5; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -6437,10 +6572,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.156'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.5; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -6539,10 +6676,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.232'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.5; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -6641,10 +6780,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.263'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.5; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -6743,10 +6884,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.127'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.5; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -6847,10 +6990,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.231'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -6949,10 +7094,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.233'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -7051,10 +7198,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.174'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -7153,10 +7302,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.249'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -7255,10 +7406,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.294'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -7357,10 +7510,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.271'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.5; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -7459,10 +7614,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.264'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.5; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -7561,10 +7718,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.209'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.5; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -7663,10 +7822,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.293'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.5; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -7765,10 +7926,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.333'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.5; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -7867,10 +8030,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.174'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.5; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -7971,10 +8136,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.296'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -9.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -8073,10 +8240,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.297'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -9.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -8175,10 +8344,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.234'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -9.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -8277,10 +8448,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.328'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -9.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -8379,10 +8552,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.348'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -9.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -8481,10 +8656,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.210'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -9.0; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -8585,10 +8762,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.347'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -10.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -8687,10 +8866,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.293'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -10.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -8789,10 +8970,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.374'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -10.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -8891,10 +9074,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.390'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -10.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -8993,10 +9178,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.235'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -10.0; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -9097,10 +9284,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.382'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -11.0 (replicate 1); AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -9199,10 +9388,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.385'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -11.0 (replicate 1); AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -9301,10 +9492,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.325'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -11.0 (replicate 1); AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -9403,10 +9596,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.391'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -11.0 (replicate 1); AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -9505,10 +9700,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.411'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -11.0 (replicate 1); AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -9607,10 +9804,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.315'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -11.0 (replicate 1); AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -9711,10 +9910,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.386'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 2); AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -9813,10 +10014,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.381'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 2); AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -9915,10 +10118,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.329'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 2); AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -10017,10 +10222,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.394'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 2); AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -10119,10 +10326,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.412'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 2); AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -10221,10 +10430,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.304'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 2); AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -10325,10 +10536,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.379'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 3); AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -10427,10 +10640,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.387'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 3); AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -10529,10 +10744,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.329'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 3); AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -10631,10 +10848,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.392'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 3); AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -10733,10 +10952,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.412'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 3); AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -10835,10 +11056,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.384'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -10937,10 +11160,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.388'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -11039,10 +11264,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.333'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -11141,10 +11368,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.408'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -11243,10 +11472,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.388'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -11346,10 +11577,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.331'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.0; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -11450,10 +11683,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.396'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.7#; intermediate between AD and AD + 15% Mg2SiO4; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -11539,10 +11774,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.396'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.7#; intermediate between AD and AD + 15% Mg2SiO4; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -11628,10 +11865,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.357'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.7#; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -11730,10 +11969,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.440'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.7#; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -11832,10 +12073,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.415'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.7#; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -11934,10 +12177,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.369'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.7#; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -12038,10 +12283,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.417'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃#; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -12140,10 +12387,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.368'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃#; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -12244,10 +12493,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.417'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -13.75#; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -12346,10 +12597,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.420'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -13.75#; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -12448,10 +12701,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.382'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -13.75#; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -12550,10 +12805,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.445'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -13.75#; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -12652,10 +12909,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.437'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -13.75#; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -12754,10 +13013,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.375'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -13.75#; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -12858,10 +13119,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.394'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -14.5§; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -12962,10 +13225,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.357'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -14.5§; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -13066,10 +13331,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.411'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -14.5§; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -13170,10 +13437,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.382'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -14.5§; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -13267,6 +13536,7 @@ species:
         composition_wt_pct_as_printed: *id042
         composition_uncertainty_wt_pct: *id043
     - observation_id: berry_2004_table3_ad_r25
+      experiment: berry_2004_table3_one_bar
       type: activity_coefficient
       locator: &id278
         table: '3'
@@ -13276,10 +13546,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.423'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -16.13||; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -13377,6 +13649,7 @@ species:
         total_pressure_Pa: '100000'
         total_pressure_units: Pa; source prints 1 bar
     - observation_id: berry_2004_table3_ad_fo_r25
+      experiment: berry_2004_table3_one_bar
       type: activity_coefficient
       locator: &id280
         table: '3'
@@ -13386,10 +13659,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_fo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.431'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -16.13||; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -13487,6 +13762,7 @@ species:
         total_pressure_Pa: '100000'
         total_pressure_units: Pa; source prints 1 bar
     - observation_id: berry_2004_table3_ad_wo_r25
+      experiment: berry_2004_table3_one_bar
       type: activity_coefficient
       locator: &id282
         table: '3'
@@ -13496,10 +13772,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_wo]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.385'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -16.13||; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -13597,6 +13875,7 @@ species:
         total_pressure_Pa: '100000'
         total_pressure_units: Pa; source prints 1 bar
     - observation_id: berry_2004_table3_ad_en_r25
+      experiment: berry_2004_table3_one_bar
       type: activity_coefficient
       locator: &id284
         table: '3'
@@ -13606,10 +13885,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_en]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.446'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -16.13||; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -13707,6 +13988,7 @@ species:
         total_pressure_Pa: '100000'
         total_pressure_units: Pa; source prints 1 bar
     - observation_id: berry_2004_table3_ad_qz_r25
+      experiment: berry_2004_table3_one_bar
       type: activity_coefficient
       locator: &id286
         table: '3'
@@ -13716,10 +13998,12 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: ["pdf:berry-oneill-2004-chromium-xanes"]
+      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
-        relation: "Eq. 6 converts the calibrated derivative 1s-to-4s shoulder area to Cr2+/SumCr using Table 4 a0 and a1; Table 2 powdered end-member glass mixtures are the standards."
-        inputs: ["pdf:berry-oneill-2004-chromium-xanes"]
+        relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
+        inputs: [berry_2004_table4_logkprime_ad_qz]
+        parameters:
+        - [A(1s/4s), {state: {tag: value, value: '0.441'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -16.13||; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
@@ -13831,7 +14115,8 @@ species:
         confidence_level: not stated
       values:
         quantity: log10_Cr3plus_over_Cr2plus
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Berry and O'Neill (2004), Table 4"
         admission_status: admitted
         T_C: '1400'
         log_fO2: '0'
@@ -13843,33 +14128,6 @@ species:
         table4_a0_as_printed: 0.039(10)
         table4_a1_as_printed: 2.265(24)
         table4_chi_squared_as_printed: '1.44'
-        derived_from: &id288
-        - berry_2004_table3_ad_r01
-        - berry_2004_table3_ad_r02
-        - berry_2004_table3_ad_r03
-        - berry_2004_table3_ad_r04
-        - berry_2004_table3_ad_r06
-        - berry_2004_table3_ad_r07
-        - berry_2004_table3_ad_r08
-        - berry_2004_table3_ad_r09
-        - berry_2004_table3_ad_r10
-        - berry_2004_table3_ad_r11
-        - berry_2004_table3_ad_r12
-        - berry_2004_table3_ad_r13
-        - berry_2004_table3_ad_r14
-        - berry_2004_table3_ad_r15
-        - berry_2004_table3_ad_r17
-        - berry_2004_table3_ad_r18_rep2
-        - berry_2004_table3_ad_r19_rep3
-        - berry_2004_table3_ad_r20
-        - berry_2004_table3_ad_r23
-        - berry_2004_table3_ad_r24
-        - berry_2004_table3_ad_r25
-        derivation:
-          relation: Table 4 fixed-exponent Eq. 7 fit; log K-prime is the log10(Cr3+/Cr2+) intercept at log fO2=0
-            from Eqs. 3-4
-          inputs: *id288
-          output_unit: log10(Cr3+/Cr2+) as printed
         uncertainty_as_printed: 1.871(17)
         method_note: The paper fits the Table 3 Cr2+/SumCr rows to Eq. 7. The fitted log K-prime is the intercept
           in the printed log(Cr3+/Cr2+) equation; value retained as printed.
@@ -13898,7 +14156,7 @@ species:
                 pdf_page_index: 6
                 record: Table 4 AD log K-prime is the Eq. 3-4 intercept at log fO2=0
               as_printed: log fO2=0 intercept
-            fO2_control: &id291
+            fO2_control:
               state:
                 tag: value
                 value: log fO2=0 intercept of Eq. 3-4 fit
@@ -13907,7 +14165,7 @@ species:
                 published_page: 795
                 pdf_page_index: 6
                 record: Table 4 row AD log K-prime fit
-            total_pressure_Pa: &id292
+            total_pressure_Pa:
               state:
                 tag: unknown
                 reason: Fit combines Table 3 points and does not report one total pressure for the fitted composition.
@@ -13946,7 +14204,7 @@ species:
               as_printed: 0.5 wt%
     - observation_id: berry_2004_table4_slope_ad
       type: activity_coefficient
-      locator:
+      locator: &berry_t4_slope_ad
         table: '4'
         published_page: 795
         pdf_page_index: 6
@@ -13959,7 +14217,8 @@ species:
         confidence_level: not stated
       values:
         quantity: cr_redox_logfO2_slope_n_over_4
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Berry and O'Neill (2004), Table 4"
         admission_status: typed_refusal
         status: typed_refusal
         reason: The reviewed valence-ratio schema has no quantity for a fitted log fO2 slope/exponent n/4; retain
@@ -13973,28 +14232,27 @@ species:
         value_as_printed: 0.257(12)
         uncertainty_as_printed: n/4 = 0.257(12)
         fit_n_points: '14'
-        derived_from: *id288
-        derivation:
-          relation: Table 4 variable-exponent fit of Eq. 7 to Table 3 redox rows
-          inputs: *id288
-          output_unit: n/4 per log fO2
         points:
         - value: '0.257'
           T_C: '1400'
-          locator:
-            table: '4'
-            published_page: 795
-            pdf_page_index: 6
-            record: Table 4 row AD n/4 slope
+          locator: *berry_t4_slope_ad
           point_conditions:
             temperature_C: *id290
             fO2_log:
               state:
                 tag: unknown
                 reason: Slope is fitted across Table 3 fO2 values; it has no single-fO2 condition.
-              locator: *id289
-            fO2_control: *id291
-            total_pressure_Pa: *id292
+              locator: *berry_t4_slope_ad
+            fO2_control:
+              state:
+                tag: unknown
+                reason: Slope fit spans experimental fO2 values and has no single fO2 control.
+              locator: *berry_t4_slope_ad
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Fit combines Table 3 points and does not report one total pressure for the fitted composition.
+              locator: *berry_t4_slope_ad
             composition: *id293
             Cr2O3_added_wt_percent: *id294
     - observation_id: berry_2004_table4_logkprime_ad_fo
@@ -14012,7 +14270,8 @@ species:
         confidence_level: not stated
       values:
         quantity: log10_Cr3plus_over_Cr2plus
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Berry and O'Neill (2004), Table 4"
         admission_status: admitted
         T_C: '1400'
         log_fO2: '0'
@@ -14024,32 +14283,6 @@ species:
         table4_a0_as_printed: 0.029 fixed
         table4_a1_as_printed: 2.247(14)
         table4_chi_squared_as_printed: '2.91'
-        derived_from: &id295
-        - berry_2004_table3_ad_fo_r01
-        - berry_2004_table3_ad_fo_r02
-        - berry_2004_table3_ad_fo_r03
-        - berry_2004_table3_ad_fo_r04
-        - berry_2004_table3_ad_fo_r06
-        - berry_2004_table3_ad_fo_r07
-        - berry_2004_table3_ad_fo_r09
-        - berry_2004_table3_ad_fo_r10
-        - berry_2004_table3_ad_fo_r11
-        - berry_2004_table3_ad_fo_r12
-        - berry_2004_table3_ad_fo_r13
-        - berry_2004_table3_ad_fo_r14
-        - berry_2004_table3_ad_fo_r15
-        - berry_2004_table3_ad_fo_r16
-        - berry_2004_table3_ad_fo_r17
-        - berry_2004_table3_ad_fo_r18_rep2
-        - berry_2004_table3_ad_fo_r19_rep3
-        - berry_2004_table3_ad_fo_r20
-        - berry_2004_table3_ad_fo_r23
-        - berry_2004_table3_ad_fo_r25
-        derivation:
-          relation: Table 4 fixed-exponent Eq. 7 fit; log K-prime is the log10(Cr3+/Cr2+) intercept at log fO2=0
-            from Eqs. 3-4
-          inputs: *id295
-          output_unit: log10(Cr3+/Cr2+) as printed
         uncertainty_as_printed: 1.921(12)
         method_note: The paper fits the Table 3 Cr2+/SumCr rows to Eq. 7. The fitted log K-prime is the intercept
           in the printed log(Cr3+/Cr2+) equation; value retained as printed.
@@ -14078,7 +14311,7 @@ species:
                 pdf_page_index: 6
                 record: Table 4 AD + Fo log K-prime is the Eq. 3-4 intercept at log fO2=0
               as_printed: log fO2=0 intercept
-            fO2_control: &id298
+            fO2_control:
               state:
                 tag: value
                 value: log fO2=0 intercept of Eq. 3-4 fit
@@ -14087,7 +14320,7 @@ species:
                 published_page: 795
                 pdf_page_index: 6
                 record: Table 4 row AD + Fo log K-prime fit
-            total_pressure_Pa: &id299
+            total_pressure_Pa:
               state:
                 tag: unknown
                 reason: Fit combines Table 3 points and does not report one total pressure for the fitted composition.
@@ -14126,7 +14359,7 @@ species:
               as_printed: 0.5 wt%
     - observation_id: berry_2004_table4_slope_ad_fo
       type: activity_coefficient
-      locator:
+      locator: &berry_t4_slope_ad_fo
         table: '4'
         published_page: 795
         pdf_page_index: 6
@@ -14139,7 +14372,8 @@ species:
         confidence_level: not stated
       values:
         quantity: cr_redox_logfO2_slope_n_over_4
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Berry and O'Neill (2004), Table 4"
         admission_status: typed_refusal
         status: typed_refusal
         reason: The reviewed valence-ratio schema has no quantity for a fitted log fO2 slope/exponent n/4; retain
@@ -14153,28 +14387,27 @@ species:
         value_as_printed: 0.284(12)
         uncertainty_as_printed: n/4 = 0.284(12)
         fit_n_points: '11'
-        derived_from: *id295
-        derivation:
-          relation: Table 4 variable-exponent fit of Eq. 7 to Table 3 redox rows
-          inputs: *id295
-          output_unit: n/4 per log fO2
         points:
         - value: '0.284'
           T_C: '1400'
-          locator:
-            table: '4'
-            published_page: 795
-            pdf_page_index: 6
-            record: Table 4 row AD + Fo n/4 slope
+          locator: *berry_t4_slope_ad_fo
           point_conditions:
             temperature_C: *id297
             fO2_log:
               state:
                 tag: unknown
                 reason: Slope is fitted across Table 3 fO2 values; it has no single-fO2 condition.
-              locator: *id296
-            fO2_control: *id298
-            total_pressure_Pa: *id299
+              locator: *berry_t4_slope_ad_fo
+            fO2_control:
+              state:
+                tag: unknown
+                reason: Slope fit spans experimental fO2 values and has no single fO2 control.
+              locator: *berry_t4_slope_ad_fo
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Fit combines Table 3 points and does not report one total pressure for the fitted composition.
+              locator: *berry_t4_slope_ad_fo
             composition: *id300
             Cr2O3_added_wt_percent: *id301
     - observation_id: berry_2004_table4_logkprime_ad_wo
@@ -14192,7 +14425,8 @@ species:
         confidence_level: not stated
       values:
         quantity: log10_Cr3plus_over_Cr2plus
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Berry and O'Neill (2004), Table 4"
         admission_status: admitted
         T_C: '1400'
         log_fO2: '0'
@@ -14204,35 +14438,6 @@ species:
         table4_a0_as_printed: 0.013(10)
         table4_a1_as_printed: 2.534(26)
         table4_chi_squared_as_printed: '1.55'
-        derived_from: &id302
-        - berry_2004_table3_ad_wo_r01
-        - berry_2004_table3_ad_wo_r02
-        - berry_2004_table3_ad_wo_r03
-        - berry_2004_table3_ad_wo_r04
-        - berry_2004_table3_ad_wo_r06
-        - berry_2004_table3_ad_wo_r07
-        - berry_2004_table3_ad_wo_r08
-        - berry_2004_table3_ad_wo_r09
-        - berry_2004_table3_ad_wo_r10
-        - berry_2004_table3_ad_wo_r11
-        - berry_2004_table3_ad_wo_r12
-        - berry_2004_table3_ad_wo_r13
-        - berry_2004_table3_ad_wo_r14
-        - berry_2004_table3_ad_wo_r15
-        - berry_2004_table3_ad_wo_r16
-        - berry_2004_table3_ad_wo_r17
-        - berry_2004_table3_ad_wo_r18_rep2
-        - berry_2004_table3_ad_wo_r19_rep3
-        - berry_2004_table3_ad_wo_r20
-        - berry_2004_table3_ad_wo_r21
-        - berry_2004_table3_ad_wo_r23
-        - berry_2004_table3_ad_wo_r24
-        - berry_2004_table3_ad_wo_r25
-        derivation:
-          relation: Table 4 fixed-exponent Eq. 7 fit; log K-prime is the log10(Cr3+/Cr2+) intercept at log fO2=0
-            from Eqs. 3-4
-          inputs: *id302
-          output_unit: log10(Cr3+/Cr2+) as printed
         uncertainty_as_printed: 2.056(18)
         method_note: The paper fits the Table 3 Cr2+/SumCr rows to Eq. 7. The fitted log K-prime is the intercept
           in the printed log(Cr3+/Cr2+) equation; value retained as printed.
@@ -14261,7 +14466,7 @@ species:
                 pdf_page_index: 6
                 record: Table 4 AD + Wo log K-prime is the Eq. 3-4 intercept at log fO2=0
               as_printed: log fO2=0 intercept
-            fO2_control: &id305
+            fO2_control:
               state:
                 tag: value
                 value: log fO2=0 intercept of Eq. 3-4 fit
@@ -14270,7 +14475,7 @@ species:
                 published_page: 795
                 pdf_page_index: 6
                 record: Table 4 row AD + Wo log K-prime fit
-            total_pressure_Pa: &id306
+            total_pressure_Pa:
               state:
                 tag: unknown
                 reason: Fit combines Table 3 points and does not report one total pressure for the fitted composition.
@@ -14309,7 +14514,7 @@ species:
               as_printed: 0.5 wt%
     - observation_id: berry_2004_table4_slope_ad_wo
       type: activity_coefficient
-      locator:
+      locator: &berry_t4_slope_ad_wo
         table: '4'
         published_page: 795
         pdf_page_index: 6
@@ -14322,7 +14527,8 @@ species:
         confidence_level: not stated
       values:
         quantity: cr_redox_logfO2_slope_n_over_4
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Berry and O'Neill (2004), Table 4"
         admission_status: typed_refusal
         status: typed_refusal
         reason: The reviewed valence-ratio schema has no quantity for a fitted log fO2 slope/exponent n/4; retain
@@ -14336,28 +14542,27 @@ species:
         value_as_printed: 0.250(12)
         uncertainty_as_printed: n/4 = 0.250(12)
         fit_n_points: '16'
-        derived_from: *id302
-        derivation:
-          relation: Table 4 variable-exponent fit of Eq. 7 to Table 3 redox rows
-          inputs: *id302
-          output_unit: n/4 per log fO2
         points:
         - value: '0.250'
           T_C: '1400'
-          locator:
-            table: '4'
-            published_page: 795
-            pdf_page_index: 6
-            record: Table 4 row AD + Wo n/4 slope
+          locator: *berry_t4_slope_ad_wo
           point_conditions:
             temperature_C: *id304
             fO2_log:
               state:
                 tag: unknown
                 reason: Slope is fitted across Table 3 fO2 values; it has no single-fO2 condition.
-              locator: *id303
-            fO2_control: *id305
-            total_pressure_Pa: *id306
+              locator: *berry_t4_slope_ad_wo
+            fO2_control:
+              state:
+                tag: unknown
+                reason: Slope fit spans experimental fO2 values and has no single fO2 control.
+              locator: *berry_t4_slope_ad_wo
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Fit combines Table 3 points and does not report one total pressure for the fitted composition.
+              locator: *berry_t4_slope_ad_wo
             composition: *id307
             Cr2O3_added_wt_percent: *id308
     - observation_id: berry_2004_table4_logkprime_ad_en
@@ -14375,7 +14580,8 @@ species:
         confidence_level: not stated
       values:
         quantity: log10_Cr3plus_over_Cr2plus
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Berry and O'Neill (2004), Table 4"
         admission_status: admitted
         T_C: '1400'
         log_fO2: '0'
@@ -14387,35 +14593,6 @@ species:
         table4_a0_as_printed: 0.020(10)
         table4_a1_as_printed: 2.181(23)
         table4_chi_squared_as_printed: '1.68'
-        derived_from: &id309
-        - berry_2004_table3_ad_en_r01
-        - berry_2004_table3_ad_en_r02
-        - berry_2004_table3_ad_en_r03
-        - berry_2004_table3_ad_en_r04
-        - berry_2004_table3_ad_en_r06
-        - berry_2004_table3_ad_en_r07
-        - berry_2004_table3_ad_en_r08
-        - berry_2004_table3_ad_en_r09
-        - berry_2004_table3_ad_en_r10
-        - berry_2004_table3_ad_en_r11
-        - berry_2004_table3_ad_en_r12
-        - berry_2004_table3_ad_en_r13
-        - berry_2004_table3_ad_en_r14
-        - berry_2004_table3_ad_en_r15
-        - berry_2004_table3_ad_en_r16
-        - berry_2004_table3_ad_en_r17
-        - berry_2004_table3_ad_en_r18_rep2
-        - berry_2004_table3_ad_en_r19_rep3
-        - berry_2004_table3_ad_en_r20
-        - berry_2004_table3_ad_en_r21
-        - berry_2004_table3_ad_en_r22_rep2
-        - berry_2004_table3_ad_en_r23
-        - berry_2004_table3_ad_en_r25
-        derivation:
-          relation: Table 4 fixed-exponent Eq. 7 fit; log K-prime is the log10(Cr3+/Cr2+) intercept at log fO2=0
-            from Eqs. 3-4
-          inputs: *id309
-          output_unit: log10(Cr3+/Cr2+) as printed
         uncertainty_as_printed: 1.844(16)
         method_note: The paper fits the Table 3 Cr2+/SumCr rows to Eq. 7. The fitted log K-prime is the intercept
           in the printed log(Cr3+/Cr2+) equation; value retained as printed.
@@ -14444,7 +14621,7 @@ species:
                 pdf_page_index: 6
                 record: Table 4 AD + En log K-prime is the Eq. 3-4 intercept at log fO2=0
               as_printed: log fO2=0 intercept
-            fO2_control: &id312
+            fO2_control:
               state:
                 tag: value
                 value: log fO2=0 intercept of Eq. 3-4 fit
@@ -14453,7 +14630,7 @@ species:
                 published_page: 795
                 pdf_page_index: 6
                 record: Table 4 row AD + En log K-prime fit
-            total_pressure_Pa: &id313
+            total_pressure_Pa:
               state:
                 tag: unknown
                 reason: Fit combines Table 3 points and does not report one total pressure for the fitted composition.
@@ -14492,7 +14669,7 @@ species:
               as_printed: 0.5 wt%
     - observation_id: berry_2004_table4_slope_ad_en
       type: activity_coefficient
-      locator:
+      locator: &berry_t4_slope_ad_en
         table: '4'
         published_page: 795
         pdf_page_index: 6
@@ -14505,7 +14682,8 @@ species:
         confidence_level: not stated
       values:
         quantity: cr_redox_logfO2_slope_n_over_4
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Berry and O'Neill (2004), Table 4"
         admission_status: typed_refusal
         status: typed_refusal
         reason: The reviewed valence-ratio schema has no quantity for a fitted log fO2 slope/exponent n/4; retain
@@ -14519,28 +14697,27 @@ species:
         value_as_printed: 0.244(11)
         uncertainty_as_printed: n/4 = 0.244(11)
         fit_n_points: '15'
-        derived_from: *id309
-        derivation:
-          relation: Table 4 variable-exponent fit of Eq. 7 to Table 3 redox rows
-          inputs: *id309
-          output_unit: n/4 per log fO2
         points:
         - value: '0.244'
           T_C: '1400'
-          locator:
-            table: '4'
-            published_page: 795
-            pdf_page_index: 6
-            record: Table 4 row AD + En n/4 slope
+          locator: *berry_t4_slope_ad_en
           point_conditions:
             temperature_C: *id311
             fO2_log:
               state:
                 tag: unknown
                 reason: Slope is fitted across Table 3 fO2 values; it has no single-fO2 condition.
-              locator: *id310
-            fO2_control: *id312
-            total_pressure_Pa: *id313
+              locator: *berry_t4_slope_ad_en
+            fO2_control:
+              state:
+                tag: unknown
+                reason: Slope fit spans experimental fO2 values and has no single fO2 control.
+              locator: *berry_t4_slope_ad_en
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Fit combines Table 3 points and does not report one total pressure for the fitted composition.
+              locator: *berry_t4_slope_ad_en
             composition: *id314
             Cr2O3_added_wt_percent: *id315
     - observation_id: berry_2004_table4_logkprime_ad_qz
@@ -14558,7 +14735,8 @@ species:
         confidence_level: not stated
       values:
         quantity: log10_Cr3plus_over_Cr2plus
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Berry and O'Neill (2004), Table 4"
         admission_status: admitted
         T_C: '1400'
         log_fO2: '0'
@@ -14570,34 +14748,6 @@ species:
         table4_a0_as_printed: 0.048(12)
         table4_a1_as_printed: 2.154(27)
         table4_chi_squared_as_printed: '1.44'
-        derived_from: &id316
-        - berry_2004_table3_ad_qz_r01
-        - berry_2004_table3_ad_qz_r02
-        - berry_2004_table3_ad_qz_r03
-        - berry_2004_table3_ad_qz_r04
-        - berry_2004_table3_ad_qz_r06
-        - berry_2004_table3_ad_qz_r07
-        - berry_2004_table3_ad_qz_r09
-        - berry_2004_table3_ad_qz_r10
-        - berry_2004_table3_ad_qz_r11
-        - berry_2004_table3_ad_qz_r12
-        - berry_2004_table3_ad_qz_r13
-        - berry_2004_table3_ad_qz_r14
-        - berry_2004_table3_ad_qz_r15
-        - berry_2004_table3_ad_qz_r16
-        - berry_2004_table3_ad_qz_r17
-        - berry_2004_table3_ad_qz_r18_rep2
-        - berry_2004_table3_ad_qz_r19_rep3
-        - berry_2004_table3_ad_qz_r20
-        - berry_2004_table3_ad_qz_r21
-        - berry_2004_table3_ad_qz_r23
-        - berry_2004_table3_ad_qz_r24
-        - berry_2004_table3_ad_qz_r25
-        derivation:
-          relation: Table 4 fixed-exponent Eq. 7 fit; log K-prime is the log10(Cr3+/Cr2+) intercept at log fO2=0
-            from Eqs. 3-4
-          inputs: *id316
-          output_unit: log10(Cr3+/Cr2+) as printed
         uncertainty_as_printed: 1.650(19)
         method_note: The paper fits the Table 3 Cr2+/SumCr rows to Eq. 7. The fitted log K-prime is the intercept
           in the printed log(Cr3+/Cr2+) equation; value retained as printed.
@@ -14626,7 +14776,7 @@ species:
                 pdf_page_index: 6
                 record: Table 4 AD + Qz log K-prime is the Eq. 3-4 intercept at log fO2=0
               as_printed: log fO2=0 intercept
-            fO2_control: &id319
+            fO2_control:
               state:
                 tag: value
                 value: log fO2=0 intercept of Eq. 3-4 fit
@@ -14635,7 +14785,7 @@ species:
                 published_page: 795
                 pdf_page_index: 6
                 record: Table 4 row AD + Qz log K-prime fit
-            total_pressure_Pa: &id320
+            total_pressure_Pa:
               state:
                 tag: unknown
                 reason: Fit combines Table 3 points and does not report one total pressure for the fitted composition.
@@ -14674,7 +14824,7 @@ species:
               as_printed: 0.5 wt%
     - observation_id: berry_2004_table4_slope_ad_qz
       type: activity_coefficient
-      locator:
+      locator: &berry_t4_slope_ad_qz
         table: '4'
         published_page: 795
         pdf_page_index: 6
@@ -14687,7 +14837,8 @@ species:
         confidence_level: not stated
       values:
         quantity: cr_redox_logfO2_slope_n_over_4
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Berry and O'Neill (2004), Table 4"
         admission_status: typed_refusal
         status: typed_refusal
         reason: The reviewed valence-ratio schema has no quantity for a fitted log fO2 slope/exponent n/4; retain
@@ -14701,28 +14852,27 @@ species:
         value_as_printed: 0.254(13)
         uncertainty_as_printed: n/4 = 0.254(13)
         fit_n_points: '13'
-        derived_from: *id316
-        derivation:
-          relation: Table 4 variable-exponent fit of Eq. 7 to Table 3 redox rows
-          inputs: *id316
-          output_unit: n/4 per log fO2
         points:
         - value: '0.254'
           T_C: '1400'
-          locator:
-            table: '4'
-            published_page: 795
-            pdf_page_index: 6
-            record: Table 4 row AD + Qz n/4 slope
+          locator: *berry_t4_slope_ad_qz
           point_conditions:
             temperature_C: *id318
             fO2_log:
               state:
                 tag: unknown
                 reason: Slope is fitted across Table 3 fO2 values; it has no single-fO2 condition.
-              locator: *id317
-            fO2_control: *id319
-            total_pressure_Pa: *id320
+              locator: *berry_t4_slope_ad_qz
+            fO2_control:
+              state:
+                tag: unknown
+                reason: Slope fit spans experimental fO2 values and has no single fO2 control.
+              locator: *berry_t4_slope_ad_qz
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Fit combines Table 3 points and does not report one total pressure for the fitted composition.
+              locator: *berry_t4_slope_ad_qz
             composition: *id321
             Cr2O3_added_wt_percent: *id322
     - observation_id: berry_2004_table4_logkprime_ad_rt10
@@ -14740,7 +14890,8 @@ species:
         confidence_level: not stated
       values:
         quantity: log10_Cr3plus_over_Cr2plus
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Berry and O'Neill (2004), Table 4"
         admission_status: admitted
         T_C: '1400'
         log_fO2: '0'
@@ -14752,21 +14903,6 @@ species:
         table4_a0_as_printed: -0.069(19)
         table4_a1_as_printed: 2.650(49)
         table4_chi_squared_as_printed: '2.31'
-        derived_from: &id323
-        - berry_2004_table3_ad_rt10_r01
-        - berry_2004_table3_ad_rt10_r08
-        - berry_2004_table3_ad_rt10_r11
-        - berry_2004_table3_ad_rt10_r15
-        - berry_2004_table3_ad_rt10_r17
-        - berry_2004_table3_ad_rt10_r18_rep2
-        - berry_2004_table3_ad_rt10_r20
-        - berry_2004_table3_ad_rt10_r21
-        - berry_2004_table3_ad_rt10_r22_rep2
-        derivation:
-          relation: Table 4 fixed-exponent Eq. 7 fit; log K-prime is the log10(Cr3+/Cr2+) intercept at log fO2=0
-            from Eqs. 3-4
-          inputs: *id323
-          output_unit: log10(Cr3+/Cr2+) as printed
         uncertainty_as_printed: 2.274(43)
         method_note: The paper fits the Table 3 Cr2+/SumCr rows to Eq. 7. The fitted log K-prime is the intercept
           in the printed log(Cr3+/Cr2+) equation; value retained as printed.
@@ -14858,7 +14994,8 @@ species:
         confidence_level: not stated
       values:
         quantity: log10_Cr3plus_over_Cr2plus
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: "Berry and O'Neill (2004), Table 4"
         admission_status: admitted
         T_C: '1400'
         log_fO2: '0'
@@ -14870,25 +15007,6 @@ species:
         table4_a0_as_printed: -0.086(10)
         table4_a1_as_printed: 2.711(37)
         table4_chi_squared_as_printed: '2.28'
-        derived_from: &id325
-        - berry_2004_table3_ad_rt20_r02
-        - berry_2004_table3_ad_rt20_r03
-        - berry_2004_table3_ad_rt20_r04
-        - berry_2004_table3_ad_rt20_r05_rep2
-        - berry_2004_table3_ad_rt20_r06
-        - berry_2004_table3_ad_rt20_r07
-        - berry_2004_table3_ad_rt20_r09
-        - berry_2004_table3_ad_rt20_r10
-        - berry_2004_table3_ad_rt20_r12
-        - berry_2004_table3_ad_rt20_r14
-        - berry_2004_table3_ad_rt20_r16
-        - berry_2004_table3_ad_rt20_r23
-        - berry_2004_table3_ad_rt20_r24
-        derivation:
-          relation: Table 4 fixed-exponent Eq. 7 fit; log K-prime is the log10(Cr3+/Cr2+) intercept at log fO2=0
-            from Eqs. 3-4
-          inputs: *id325
-          output_unit: log10(Cr3+/Cr2+) as printed
         uncertainty_as_printed: 2.371(26)
         method_note: The paper fits the Table 3 Cr2+/SumCr rows to Eq. 7. The fitted log K-prime is the intercept
           in the printed log(Cr3+/Cr2+) equation; value retained as printed.

@@ -205,29 +205,92 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
     assert all(
         all(
             key in row.point_conditions
+            and row.point_conditions[key].state is not None
             and row.point_conditions[key].locator is not None
             for key in required_conditions
         )
         for row in rows
     )
-    assert all(
-        "pdf:berry-oneill-2004-chromium-xanes" in row.derived_from
-        and row.derivation is not None
-        for row in fractions
-    )
 
-    assert all(row.evidence.class_.value is EvidenceClass.MODEL_DERIVED for row in log_ratios)
+    pressure_cells = {
+        "berry_2004_table3_ad_r25",
+        "berry_2004_table3_ad_fo_r25",
+        "berry_2004_table3_ad_wo_r25",
+        "berry_2004_table3_ad_en_r25",
+        "berry_2004_table3_ad_qz_r25",
+    }
+    assert {
+        local_id
+        for local_id, row in by_local_id.items()
+        if row.identity.total_pressure_Pa is not None
+        and row.identity.total_pressure_Pa.is_value
+    } == pressure_cells
+    for local_id in pressure_cells:
+        row = by_local_id[local_id]
+        pressure = row.identity.total_pressure_Pa
+        point_pressure = row.point_conditions["total_pressure_Pa"]
+        assert pressure is not None and pressure.is_value
+        assert pressure.value == Decimal("100000")
+        assert point_pressure.state.is_value
+        assert point_pressure.state.value == Decimal("100000")
+
+    intermediate_calibration = {
+        Decimal("0.936"): "berry_2004_table4_logkprime_ad",
+        Decimal("0.919"): "berry_2004_table4_logkprime_ad_fo",
+    }
+    for row in fractions:
+        assert row.derivation is not None
+        assert len(row.derivation.parameters) == 1
+        name, area = row.derivation.parameters[0]
+        assert name == "A(1s/4s)"
+        assert area.state.is_value
+        assert area.locator is not None
+        assert area.locator.published_page == 794
+        assert "A(1s/4s)" in area.locator.record
+        assert len(row.derived_from) == 1
+        assert row.derivation.inputs == row.derived_from
+        assert all(not parent.startswith("pdf:") for parent in row.derived_from)
+        parent = result.observations[row.derived_from[0]]
+        assert parent in log_ratios
+        local_parent = parent.observation_id.split("::", 1)[1].split("::", 1)[0]
+        row_composition = row.point_conditions["composition"].state
+        if row_composition.is_value:
+            assert (
+                parent.point_conditions["composition"].state.value
+                == row_composition.value
+            )
+        else:
+            assert local_parent == intermediate_calibration[row.value.point]
+
+    area_pins = {
+        "berry_2004_table3_ad_r01": Decimal("0.005"),
+        "berry_2004_table3_ad_wo_r13": Decimal("0.174"),
+        "berry_2004_table3_ad_rt20_r24": Decimal("0.382"),
+    }
+    for local_id, expected in area_pins.items():
+        assert by_local_id[local_id].derivation.parameters[0][1].state.value == expected
+
     slope_rows = [row for row in rows if "slope" in row.observation_id]
     assert len(slope_rows) == 5
-    for row in [*log_ratios, *slope_rows]:
-        assert row.derivation is not None
-        parents = [result.observations[parent] for parent in row.derived_from]
-        assert parents
-        fitted_composition = row.point_conditions["composition"].state.value
-        assert all(
-            parent.point_conditions["composition"].state.value == fitted_composition
-            for parent in parents
-        )
+    table4_rows = [*log_ratios, *slope_rows]
+    assert len(table4_rows) == 12
+    for row in table4_rows:
+        assert row.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert row.evidence.attribution == "Berry and O'Neill (2004), Table 4"
+        assert not row.derived_from
+        pressure = row.identity.total_pressure_Pa
+        point_pressure = row.point_conditions["total_pressure_Pa"]
+        if row in log_ratios:
+            assert pressure is not None and pressure.is_unknown
+        else:
+            assert pressure is None or pressure.is_unknown
+        assert point_pressure.state.is_unknown
+    for row in slope_rows:
+        control = row.point_conditions["fO2_control"]
+        assert control.state.is_unknown
+        assert control.locator == row.locator
+        assert row.point_conditions["fO2_log"].locator == row.locator
+        assert row.point_conditions["total_pressure_Pa"].locator == row.locator
     assert {
         row.value.point for row in log_ratios
     } == {
