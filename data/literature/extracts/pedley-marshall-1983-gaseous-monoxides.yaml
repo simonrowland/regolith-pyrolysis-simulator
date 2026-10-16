@@ -846,8 +846,8 @@ species:
         values:
           method_class: compilation_assessed
           evidence_class: compilation_assessed
-          admission_status: typed_refusal
-          reason: The printed kcal/mol unit is incompatible with the delta_fH quantity unit; no conversion is made.
+          reason: >-
+            Table 4 is printed in kcal/mol; migration stores delta_fH in kJ/mol through the exact thermochemical ×4.184 conversion. Table 5 is the printed kJ/mol assessment.
           quantity: delta_fH
           rows:
             - {"sample": "AgO", "delta_fH": 75.0}
