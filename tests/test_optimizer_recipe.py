@@ -2068,6 +2068,7 @@ def test_forbidden_floor_cannot_be_neutered_by_custom_schema() -> None:
 def test_knob_bounds_source_provenance_is_honest() -> None:
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
     range_sourced = 0
+    converted_setpoint_ranges = 0
     engineering_envelopes = 0
     grounded_sources = 0
 
@@ -2082,8 +2083,16 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
             assert len(yaml_value) == 2
             assert spec.low is not None
             assert spec.high is not None
-            assert yaml_value[0] <= spec.low <= spec.high <= yaml_value[1]
+            assert (spec.low, spec.high) == tuple(yaml_value)
             range_sourced += 1
+        elif spec.bounds_source.startswith(
+            "engineering_envelope converted from setpoints:"
+        ):
+            yaml_value = _lookup_setpoint(setpoints, "campaigns.C5.pO2_bar")
+            assert (spec.low, spec.high) == tuple(
+                value * 1000 for value in yaml_value
+            )
+            converted_setpoint_ranges += 1
         elif spec.bounds_source.startswith(
             ("hot_wall_invariant:", "condensation_train ")
         ):
@@ -2099,9 +2108,14 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
             engineering_envelopes += 1
 
     assert (
-        range_sourced + engineering_envelopes + grounded_sources
+        range_sourced
+        + converted_setpoint_ranges
+        + engineering_envelopes
+        + grounded_sources
         == len(RecipeSchema().allowlist)
     )
+    assert range_sourced == 41
+    assert converted_setpoint_ranges == 2
     assert engineering_envelopes > 0
     assert grounded_sources > 0
 
@@ -2158,12 +2172,33 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
         for spec in schema.allowlist
         if spec.bounds_source.startswith("setpoints:")
         or spec.bounds_source.startswith(
-            "engineering_envelope converted from setpoints.yaml range "
+            "engineering_envelope converted from setpoints:"
         )
     }
 
     assert len(actual) == 43
     assert actual == expected
+
+
+def test_recipe_schema_uses_supplied_setpoints_for_derived_bounds() -> None:
+    setpoints = copy.deepcopy(yaml.safe_load(SETPOINTS_PATH.read_text()))
+    setpoints["campaigns"]["C2A_staged"]["temp_range_C"] = [1250, 1700]
+    setpoints["campaigns"]["C5"]["pO2_bar"] = [0.02, 0.08]
+
+    schema = RecipeSchema(setpoints=setpoints)
+    c2a_hold = schema.spec_for(("campaigns", "C2A_staged", "default_hold_T_C"))
+    c5_po2 = schema.spec_for(("campaigns", "C5", "pO2_bar"))
+    c5_po2_mbar = schema.spec_for(
+        ("campaigns", "C5", "pO2_mbar_default")
+    )
+    c5_total_mbar = schema.spec_for(
+        ("campaigns", "C5", "p_total_mbar_default")
+    )
+
+    assert (c2a_hold.low, c2a_hold.high) == (1250, 1700)
+    assert (c5_po2.low, c5_po2.high) == (0.02, 0.08)
+    assert (c5_po2_mbar.low, c5_po2_mbar.high) == (20, 80)
+    assert (c5_total_mbar.low, c5_total_mbar.high) == (20, 80)
 
 
 def test_pressure_default_pair_map_covers_allowlisted_siblings() -> None:

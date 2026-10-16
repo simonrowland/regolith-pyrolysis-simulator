@@ -12,7 +12,7 @@ from types import MappingProxyType
 from typing import Any, Literal, Mapping, Sequence
 import warnings
 
-from simulator.config import DEFAULT_DATA_DIR
+from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.chemistry.kernel.config import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
@@ -476,8 +476,6 @@ def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
         ),
         _knob(
             f"{prefix}.p_total_mbar",
-            low=5.0,
-            high=15.0,
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
             scale="log",
@@ -601,8 +599,6 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C0.temp_range_C",
-            low=20,
-            high=950,
             units="C",
             bounds_source="setpoints:campaigns.C0.temp_range_C",
             search_enabled=False,
@@ -671,72 +667,54 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C0b_p_cleanup.temp_range_C",
-            low=1180,
-            high=1320,
             units="C",
             bounds_source="setpoints:campaigns.C0b_p_cleanup.temp_range_C",
             search_enabled=False,
         ),
         _knob(
             "campaigns.C0b_p_cleanup.pO2_mbar",
-            low=3.0,
-            high=15.0,
             units="mbar",
             bounds_source="setpoints:campaigns.C0b_p_cleanup.pO2_mbar",
             scale="log",
         ),
         _knob(
             "campaigns.C0b_p_cleanup.pO2_mbar_default",
-            low=3.0,
-            high=15.0,
             units="mbar",
             bounds_source="setpoints:campaigns.C0b_p_cleanup.pO2_mbar",
             scale="log",
         ),
         _knob(
             "campaigns.C0b_p_cleanup.p_total_mbar_default",
-            low=3.0,
-            high=15.0,
             units="mbar",
             bounds_source="setpoints:campaigns.C0b_p_cleanup.pO2_mbar",
             scale="log",
         ),
         _knob(
             "campaigns.C0b_p_cleanup.duration_hr",
-            low=0.5,
-            high=2.5,
             units="hr",
             bounds_source="setpoints:campaigns.C0b_p_cleanup.duration_h",
             search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_continuous.temp_range_C",
-            low=1050,
-            high=1843,
             units="C",
             bounds_source="setpoints:campaigns.C2A_continuous.temp_range_C",
             search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
-            low=10,
-            high=20,
             units="C/hr",
             bounds_source="setpoints:campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
             search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_continuous.p_total_mbar",
-            low=5,
-            high=15,
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_continuous.p_total_mbar",
             scale="log",
         ),
         _knob(
             "campaigns.C2A_continuous.p_total_mbar_default",
-            low=5,
-            high=15,
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_continuous.p_total_mbar",
             scale="log",
@@ -766,31 +744,23 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C2A_staged.temp_range_C",
-            low=1250,
-            high=1750,
             units="C",
             bounds_source="setpoints:campaigns.C2A_staged.temp_range_C",
             search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_staged.default_hold_T_C",
-            low=1250,
-            high=1750,
             units="C",
             bounds_source="setpoints:campaigns.C2A_staged.temp_range_C",
         ),
         _knob(
             "campaigns.C2A_staged.p_total_mbar",
-            low=5,
-            high=15,
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
             scale="log",
         ),
         _knob(
             "campaigns.C2A_staged.p_total_mbar_default",
-            low=5,
-            high=15,
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
             scale="log",
@@ -962,8 +932,6 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C2B.temp_range_C",
-            low=1320,
-            high=1480,
             units="C",
             bounds_source="setpoints:campaigns.C2B.temp_range_C",
             search_enabled=False,
@@ -986,24 +954,18 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C2B.pO2_mbar",
-            low=0.8,
-            high=2.3,
             units="mbar",
             bounds_source="setpoints:campaigns.C2B.pO2_mbar",
             scale="log",
         ),
         _knob(
             "campaigns.C2B.pO2_mbar_default",
-            low=0.8,
-            high=2.3,
             units="mbar",
             bounds_source="setpoints:campaigns.C2B.pO2_mbar",
             scale="log",
         ),
         _knob(
             "campaigns.C2B.p_total_mbar_default",
-            low=0.8,
-            high=2.3,
             units="mbar",
             bounds_source="setpoints:campaigns.C2B.pO2_mbar",
             scale="log",
@@ -1017,24 +979,18 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C3.pO2_mbar_default",
-            low=0.5,
-            high=1.5,
             units="mbar",
             bounds_source="setpoints:campaigns.C3.K_phase.pO2_bakeout_mbar",
             scale="log",
         ),
         _knob(
             "campaigns.C3.p_total_mbar_default",
-            low=0.5,
-            high=1.5,
             units="mbar",
             bounds_source="setpoints:campaigns.C3.K_phase.pO2_bakeout_mbar",
             scale="log",
         ),
         _knob(
             "campaigns.C3.K_phase.pO2_bakeout_mbar",
-            low=0.5,
-            high=1.5,
             units="mbar",
             bounds_source="setpoints:campaigns.C3.K_phase.pO2_bakeout_mbar",
             search_enabled=False,
@@ -1042,8 +998,6 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C3.Na_phase.pO2_bakeout_mbar",
-            low=0.5,
-            high=1.5,
             units="mbar",
             bounds_source="setpoints:campaigns.C3.Na_phase.pO2_bakeout_mbar",
             search_enabled=False,
@@ -1072,16 +1026,12 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C3.duration_after_pathA_hr",
-            low=10,
-            high=18,
             units="hr",
             bounds_source="setpoints:campaigns.C3.duration_after_pathA_h",
             search_enabled=False,
         ),
         _knob(
             "campaigns.C3.duration_after_pathB_hr_per_phase",
-            low=20,
-            high=35,
             units="hr",
             bounds_source="setpoints:campaigns.C3.duration_after_pathB_h_per_phase",
             search_enabled=False,
@@ -1095,16 +1045,12 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C4.temp_range_C",
-            low=1580,
-            high=1670,
             units="C",
             bounds_source="setpoints:campaigns.C4.temp_range_C",
             search_enabled=False,
         ),
         _knob(
             "campaigns.C4.default_hold_T_C",
-            low=1580,
-            high=1670,
             units="C",
             bounds_source="setpoints:campaigns.C4.temp_range_C",
             runtime_enabled=False,
@@ -1120,8 +1066,6 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C4.pO2_mbar",
-            low=0.08,
-            high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C4.pO2_mbar",
             search_enabled=False,
@@ -1129,8 +1073,6 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C4.pO2_mbar_default",
-            low=0.08,
-            high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C4.pO2_mbar",
             search_enabled=False,
@@ -1138,8 +1080,6 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C4.p_total_mbar_default",
-            low=0.08,
-            high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C4.pO2_mbar",
             search_enabled=False,
@@ -1147,8 +1087,6 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C4.optional_Ca_harvest.pO2_mbar",
-            low=0.03,
-            high=0.12,
             units="mbar",
             bounds_source="setpoints:campaigns.C4.optional_Ca_harvest.pO2_mbar",
             search_enabled=False,
@@ -1163,42 +1101,34 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C5.temp_range_C",
-            low=1500,
-            high=1650,
             units="C",
             bounds_source="setpoints:campaigns.C5.temp_range_C",
             search_enabled=False,
         ),
         _knob(
             "campaigns.C5.pO2_bar",
-            low=0.01,
-            high=0.1,
             units="bar",
             bounds_source="setpoints:campaigns.C5.pO2_bar",
             search_enabled=False,
         ),
         _knob(
             "campaigns.C5.pO2_mbar_default",
-            low=10,
-            high=100,
             units="mbar",
             # Default mbar sweep is the C5 bar range converted for runner setpoints.
             bounds_source=(
-                "engineering_envelope converted from setpoints.yaml range "
-                "campaigns.C5.pO2_bar=[0.01, 0.1] bar to mbar default"
+                "engineering_envelope converted from setpoints:"
+                "campaigns.C5.pO2_bar bar to mbar default"
             ),
             scale="log",
             guard=C5_GUARD,
         ),
         _knob(
             "campaigns.C5.p_total_mbar_default",
-            low=10,
-            high=100,
             units="mbar",
             # Total-pressure default follows the converted C5 pO2 bar sweep.
             bounds_source=(
-                "engineering_envelope converted from setpoints.yaml range "
-                "campaigns.C5.pO2_bar=[0.01, 0.1] bar to total mbar default"
+                "engineering_envelope converted from setpoints:"
+                "campaigns.C5.pO2_bar bar to total mbar default"
             ),
             scale="log",
             guard=C5_GUARD,
@@ -1271,16 +1201,12 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C6.temp_range_C",
-            low=1380,
-            high=1450,
             units="C",
             bounds_source="setpoints:campaigns.C6.temp_range_C",
             search_enabled=False,
         ),
         _knob(
             "campaigns.C6.default_hold_T_C",
-            low=1380,
-            high=1450,
             units="C",
             bounds_source="setpoints:campaigns.C6.temp_range_C",
         ),
@@ -1295,8 +1221,6 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C6.pO2_mbar",
-            low=0.08,
-            high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C6.pO2_mbar",
             search_enabled=False,
@@ -1304,8 +1228,6 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C6.pO2_mbar_default",
-            low=0.08,
-            high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C6.pO2_mbar",
             search_enabled=False,
@@ -1313,8 +1235,6 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C6.p_total_mbar_default",
-            low=0.08,
-            high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C6.pO2_mbar",
             search_enabled=False,
@@ -1444,17 +1364,25 @@ class RecipeSchema:
         self,
         allowlist: tuple[KnobSpec, ...] | None = None,
         *,
+        setpoints: Mapping[str, Any] | None = None,
         forbidden_prefixes: tuple[str, ...] | None = None,
         recipe_schema_version: str | None = None,
         allowlist_version: str | None = None,
         pinned_paths: Sequence[str | KeyPath] | None = None,
     ) -> None:
+        self.setpoints = (
+            _shipped_recipe_setpoints() if setpoints is None else setpoints
+        )
         # Treat the class allowlist as a template even when passed explicitly, so
         # source-fingerprinted bounds (notably C5 MRE cap) refresh on use.
-        self.allowlist = (
+        template_allowlist = (
             allowlist
             if allowlist is not None and allowlist != type(self).ALLOWLIST
             else _default_allowlist_for_source(type(self).ALLOWLIST)
+        )
+        self.allowlist = _setpoint_sourced_allowlist(
+            template_allowlist,
+            self.setpoints,
         )
         # FORBIDDEN_PREFIXES is an INVIOLABLE floor: a caller may ADD deny
         # prefixes but can never remove the class-level set. Otherwise a custom
@@ -1503,6 +1431,7 @@ class RecipeSchema:
             return self
         return type(self)(
             allowlist=self.allowlist,
+            setpoints=self.setpoints,
             forbidden_prefixes=self.forbidden_prefixes,
             recipe_schema_version=self.recipe_schema_version,
             allowlist_version=self.allowlist_version,
@@ -2096,6 +2025,52 @@ def _default_allowlist_for_source(
         _setpoints_source_fingerprint(),
         template_allowlist,
     )
+
+
+@lru_cache(maxsize=1)
+def _shipped_recipe_setpoints() -> Mapping[str, Any]:
+    return load_config_bundle().setpoints
+
+
+def _setpoint_sourced_allowlist(
+    template_allowlist: tuple[KnobSpec, ...],
+    setpoints: Mapping[str, Any],
+) -> tuple[KnobSpec, ...]:
+    converted_source_prefix = "engineering_envelope converted from setpoints:"
+    resolved: list[KnobSpec] = []
+    for spec in template_allowlist:
+        if spec.bounds_source.startswith("setpoints:"):
+            source_path = spec.bounds_source.removeprefix("setpoints:")
+            scale = 1
+        elif spec.bounds_source.startswith(converted_source_prefix):
+            source_path = spec.bounds_source.removeprefix(
+                converted_source_prefix
+            ).split(" ", 1)[0]
+            scale = 1000
+        else:
+            resolved.append(spec)
+            continue
+
+        value: Any = setpoints
+        for segment in source_path.split("."):
+            if not isinstance(value, Mapping) or segment not in value:
+                raise ValueError(
+                    f"setpoints bounds source {source_path!r} is missing"
+                )
+            value = value[segment]
+        if not isinstance(value, (list, tuple)) or len(value) != 2:
+            raise ValueError(
+                f"setpoints bounds source {source_path!r} must contain two values"
+            )
+        low, high = value
+        if scale != 1:
+            low, high = (bound * scale for bound in (low, high))
+            low, high = (
+                int(bound) if float(bound).is_integer() else bound
+                for bound in (low, high)
+            )
+        resolved.append(replace(spec, low=low, high=high))
+    return tuple(resolved)
 
 
 @lru_cache(maxsize=8)

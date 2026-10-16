@@ -228,7 +228,8 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
     # YAML default total requires patching the pair, so sample the pair here.
     pair_map = dict(RecipeSchema.PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT)
     spec_by_path = {spec.path: spec for spec in schema.allowlist}
-    for spec in MANDATE_LEVER_ALLOWLIST:
+    for path in MANDATE_LEVER_PATHS:
+        spec = spec_by_path[path]
         if spec.path not in (
             C4_RUNTIME_ONLY_PATHS
             | C2A_STAGED_STAGE_GAS_PATHS
