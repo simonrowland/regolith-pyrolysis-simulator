@@ -271,9 +271,9 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
         ensure_ascii=False,
     ).encode()
 
-    # Canonical full-file pin from 7af736a2a, before the OpenIMCC wiring.
+    # New-base pin includes t-1279's six joined-Aithala FeOT notices.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "04901817bd62d1781e144ccbb898a3d4d04b7bb6d925b4840a4998f24d1231cd"
+        "e96668c29b434c4c477afa11cf6e3510c8e2ebc29791f4631420feeb259aaf2d"
     )
 
 
