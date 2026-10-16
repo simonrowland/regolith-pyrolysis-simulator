@@ -267,7 +267,6 @@ class _Sim:
         temperature_C: float | None = None,
         pressure_bar: float | None = None,
         composition_mol_by_account: dict[str, dict[str, float]] | None = None,
-        allow_parametric: bool = False,
     ) -> dict[str, object] | None:
         self.kernel_curve_requests.append(
             {
@@ -275,7 +274,6 @@ class _Sim:
                 "temperature_C": temperature_C,
                 "pressure_bar": pressure_bar,
                 "composition_mol_by_account": composition_mol_by_account,
-                "allow_parametric": allow_parametric,
             }
         )
         if self._freeze_curve is None:
@@ -4360,7 +4358,6 @@ def test_real_backend_out_of_domain_subsolidus_rump_terminal_is_scored_success()
     requests = execution.simulator.kernel_curve_requests
     assert requests, "rump earning must request a kernel curve"
     earned_request = requests[-1]
-    assert earned_request["allow_parametric"] is False
     assert earned_request["temperature_C"] == pytest.approx(1100.0)
     assert earned_request["pressure_bar"] == pytest.approx(1.0e-6)
     assert earned_request["fO2_log"] == pytest.approx(-9.0)

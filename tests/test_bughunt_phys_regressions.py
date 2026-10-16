@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import gc
+import inspect
 import math
 import pickle
 from collections import deque
@@ -1252,6 +1253,13 @@ def test_in_loop_mol_consumers_use_canonical_raw() -> None:
     Projection remains an outward/provider boundary only. These sites must not
     raise AccountingError via project_account_mol, because they no longer call it.
     """
+    assert not hasattr(
+        EvaporationMixin, "_freeze_gate_curve_from_parametric_liquidus"
+    )
+    assert "allow_parametric" not in inspect.signature(
+        EvaporationMixin._freeze_gate_curve_from_kernel_liquidus
+    ).parameters
+
     consumers = (
         (
             "extraction_availability",
@@ -1260,14 +1268,6 @@ def test_in_loop_mol_consumers_use_canonical_raw() -> None:
                 sim, ("FeO",)
             ),
             lambda result: result == {"FeO": 0.0},
-        ),
-        (
-            "parametric_liquidus",
-            "process.cleaned_melt",
-            lambda sim: EvaporationMixin._freeze_gate_curve_from_parametric_liquidus(
-                sim, []
-            ),
-            lambda result: result is None,
         ),
         (
             "headspace_holdup",

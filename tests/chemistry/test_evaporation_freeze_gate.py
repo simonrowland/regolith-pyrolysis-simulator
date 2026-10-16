@@ -1061,8 +1061,7 @@ def test_kernel_liquidus_aggregate_budget_exhaustion_production_default_no_autho
     feedstocks_data,
     setpoints_data,
 ):
-    """allow_parametric=False is the production default: budget exhaustion
-    must not earn a curve, cache entry, or ledger-authority path.
+    """Budget exhaustion must not earn a curve, cache entry, or ledger path.
     """
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
@@ -1094,7 +1093,6 @@ def test_kernel_liquidus_aggregate_budget_exhaustion_production_default_no_autho
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
     reasons: list[str] = []
 
-    # Production call site omits allow_parametric (default False).
     curve = sim._freeze_gate_curve_from_kernel_liquidus(
         reasons,
         fO2_log=-9.0,

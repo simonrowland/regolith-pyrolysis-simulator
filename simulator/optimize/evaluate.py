@@ -4985,7 +4985,6 @@ def _assess_rump_terminal(run_execution: Any) -> RumpTerminalAssessment:
             temperature_C=T_crash_C,
             pressure_bar=pressure_bar,
             composition_mol_by_account=composition_mol_by_account,
-            allow_parametric=False,
         )
     except Exception as exc:  # noqa: BLE001 - proof source unavailable, not earned
         return _rump_terminal_not_earned(
