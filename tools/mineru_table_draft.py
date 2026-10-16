@@ -5,11 +5,11 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import math
 import re
 import sys
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+from decimal import Decimal, InvalidOperation
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Mapping
@@ -22,7 +22,11 @@ _NUMBER = re.compile(
     r"^[+\-−–—]?(?:\d+(?:\.\d+)?|\.\d+)(?:\(\d+\))?(?:[eE][+\-]?\d+)?$"
 )
 _COMMA_DECIMAL = re.compile(r"(?<![\d.])\d{2,3}\.\d{3}(?!\d)")
-_FOOTNOTE_MARK = re.compile(r"([A-Za-z*†‡§¶¹²³⁴⁵⁶⁷⁸⁹⁰])$")
+_FOOTNOTE_MARK = re.compile(r"([*†‡§¶|]+)$")
+_NUMERIC_SUPERSCRIPT = re.compile(
+    r"[+\-−–—]?\d+|[⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+"
+)
+_UNICODE_SUPERSCRIPT_SUFFIX = re.compile(r"[⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+$")
 _NEGATIVE_HEADER = re.compile(
     r"\b(?:negative|minus)\b|below\s+zero|less\s+than\s+zero|[<≤]\s*0",
     re.IGNORECASE,
@@ -130,30 +134,63 @@ def _is_number(text: str) -> bool:
     return bool(_NUMBER.fullmatch(text.strip()))
 
 
-def _number_value(text: str) -> float | None:
+def _number_decimal(text: str) -> Decimal | None:
     token = text.strip()
     if not _is_number(token):
         return None
     token = re.sub(r"\(\d+\)", "", token)
     token = token.translate(str.maketrans({"−": "-", "–": "-", "—": "-"}))
     try:
-        return float(token)
-    except ValueError:
+        return Decimal(token)
+    except InvalidOperation:
         return None
+
+
+def _number_value(text: str) -> float | None:
+    value = _number_decimal(text)
+    return float(value) if value is not None else None
 
 
 def _split_mark(text: str, superscript_text: str = "") -> tuple[str, str]:
     token = text.strip()
     superscript = superscript_text.strip()
-    if superscript and token.endswith(superscript):
-        candidate = token[: -len(superscript)].rstrip()
-        if _is_number(candidate):
-            return candidate, superscript
+    mark = ""
     mark_match = _FOOTNOTE_MARK.search(token)
     if mark_match:
         candidate = token[: mark_match.start()].rstrip()
+        suffix = mark_match.group(1)
+        numeric_superscript = bool(
+            superscript
+            and _NUMERIC_SUPERSCRIPT.fullmatch(superscript)
+            and candidate.endswith(superscript)
+            and _is_number(candidate[: -len(superscript)].rstrip())
+        )
+        unicode_superscript = _UNICODE_SUPERSCRIPT_SUFFIX.search(candidate)
+        raw_numeric_superscript = bool(
+            unicode_superscript
+            and _is_number(candidate[: unicode_superscript.start()].rstrip())
+        )
+        if _is_number(candidate) or numeric_superscript or raw_numeric_superscript:
+            token = candidate
+            mark = suffix
+    if superscript and token.endswith(superscript):
+        candidate = token[: -len(superscript)].rstrip()
+        if _is_number(candidate) and _NUMERIC_SUPERSCRIPT.fullmatch(superscript):
+            numeric_superscript = re.fullmatch(r"[+\-−–—]?\d+", superscript)
+            return f"{candidate}^{superscript}", mark or (
+                "" if numeric_superscript else superscript
+            )
         if _is_number(candidate):
-            return candidate, mark_match.group(1)
+            return candidate, mark or superscript
+    unicode_superscript = _UNICODE_SUPERSCRIPT_SUFFIX.search(token)
+    if unicode_superscript:
+        candidate = token[: unicode_superscript.start()].rstrip()
+        if _is_number(candidate):
+            return f"{candidate}^{unicode_superscript.group()}", mark or (
+                unicode_superscript.group()
+            )
+    if mark:
+        return token, mark
     return token, ""
 
 
@@ -212,15 +249,18 @@ def _header_row_count(grid: list[list[Cell]]) -> int:
     if tagged_count:
         return tagged_count
 
-    for row_index, row in enumerate(grid):
-        if (
-            sum(
-                _number_value(_split_mark(cell.text, cell.superscript_text)[0])
-                is not None
-                for cell in row
-            )
-            >= 2
-        ):
+    numeric_rows = [
+        [
+            _number_value(_split_mark(cell.text, cell.superscript_text)[0])
+            for cell in row
+        ]
+        for row in grid
+    ]
+    for row_index, row_values in enumerate(numeric_rows):
+        if sum(value is not None for value in row_values) >= 2:
+            return row_index
+    for row_index, row_values in enumerate(numeric_rows):
+        if any(value is not None for value in row_values):
             return row_index
     return len(grid)
 
@@ -266,9 +306,14 @@ def _add_cell_flags(
                 flags.append("empty_cell")
             if cell.merged:
                 flags.append("merged_cell")
-            if "−" in cell.text:
-                flags.append("unicode_minus")
-            if cell.mark and cell.numeric_value is not None:
+            for sign, flag in (
+                ("−", "unicode_minus"),
+                ("–", "en_dash_minus"),
+                ("—", "em_dash_minus"),
+            ):
+                if sign in cell.text:
+                    flags.append(flag)
+            if cell.mark:
                 flags.append("superscript_or_footnote_mark")
             if (
                 row_index >= header_count
@@ -497,7 +542,7 @@ def compare_extract_to_draft(
 ) -> list[dict[str, Any]]:
     index_path = Path(draft_index_path)
     index = yaml.safe_load(index_path.read_text(encoding="utf-8")) or {}
-    draft_by_page: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    draft_by_page: dict[int, list[tuple[dict[str, Any], Decimal]]] = defaultdict(list)
     for table in index.get("tables") or []:
         page = int(table["pdf_page"])
         csv_path = index_path.parent / table["csv"]
@@ -512,49 +557,49 @@ def compare_extract_to_draft(
                     or int(cell["column"]) != int(cell["origin_column"])
                 ):
                     continue
-                number = _number_value(cell["value_text"])
+                number = _number_decimal(cell["value_text"])
                 if number is not None:
-                    draft_by_page[page].append(
-                        {
-                            "value": number,
-                            "text": cell["text"],
-                            "table_key": table["table_key"],
-                            "row": int(cell["row"]),
-                            "column": int(cell["column"]),
-                        }
-                    )
+                    candidate = {
+                        "value": float(number),
+                        "text": cell["text"],
+                        "table_key": table["table_key"],
+                        "row": int(cell["row"]),
+                        "column": int(cell["column"]),
+                        "flags": json.loads(cell["flags"] or "[]"),
+                    }
+                    draft_by_page[page].append((candidate, number))
 
     consumed: dict[int, set[int]] = defaultdict(set)
     results: list[dict[str, Any]] = []
     for point in _numeric_points(extract):
         page = point["pdf_page"]
-        candidates = draft_by_page.get(page, []) if page is not None else []
+        indexed_candidates = draft_by_page.get(page, []) if page is not None else []
+        point_value = Decimal(str(point["value"]))
         match_index = next(
             (
                 index
-                for index, candidate in enumerate(candidates)
+                for index, (_, candidate_value) in enumerate(indexed_candidates)
                 if index not in consumed[page]
-                and math.isclose(
-                    float(point["value"]),
-                    candidate["value"],
-                    rel_tol=1e-12,
-                    abs_tol=1e-12,
-                )
+                and point_value == candidate_value
             ),
             None,
         )
         if match_index is not None:
             consumed[page].add(match_index)
             status = "matched"
-        elif candidates:
+        elif indexed_candidates:
             status = "mismatch"
         else:
             status = "no-match"
+        candidates = [candidate for candidate, _ in indexed_candidates]
         results.append(
             {
                 **point,
                 "status": status,
                 "draft_cells": candidates,
+                "matched_cell": (
+                    candidates[match_index] if match_index is not None else None
+                ),
             }
         )
     return results
@@ -578,6 +623,7 @@ def _compare_command(args: argparse.Namespace) -> int:
         "value",
         "status",
         "draft_cells",
+        "matched_cell",
         "path",
     )
     writer = csv.DictWriter(sys.stdout, fieldnames=fields, lineterminator="\n")
@@ -586,7 +632,7 @@ def _compare_command(args: argparse.Namespace) -> int:
         {
             key: (
                 json.dumps(row[key], ensure_ascii=False)
-                if key == "draft_cells"
+                if key in {"draft_cells", "matched_cell"}
                 else row[key]
             )
             for key in fields
