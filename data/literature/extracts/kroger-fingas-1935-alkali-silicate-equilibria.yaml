@@ -459,10 +459,10 @@ species:
             - kroger_fingas_1935_na2si2o5_na2co3_table3
         values:
           method_class: model_derived
-          quantity: deltafH
-          delta_f_H: -67.0
-          formation_heat_evolved_kcal_as_printed: 67.0
-          reaction: Na2O(s) + 2SiO2(quartz) = Na2Si2O5(s) + 67.0 kcal
+          quantity: reaction_enthalpy
+          reaction: Na2O(s) + 2SiO2(quartz) = Na2Si2O5(s)
+          delta_H_kcal_mol: -67.0
+          heat_evolved_kcal_as_printed: 67.0
   Na2SiO3:
     observations:
       - observation_id: kroger_fingas_1935_sodium_metasilicate_formation_enthalpy
@@ -492,9 +492,10 @@ species:
             - kroger_fingas_1935_na2si3o7_naco3_table4
         values:
           method_class: model_derived
-          quantity: deltafH
-          delta_f_H: -54.6
-          formation_heat_evolved_kcal_as_printed: 54.6
+          quantity: reaction_enthalpy
+          reaction: Na2O(s) + SiO2(quartz) = Na2SiO3(s)
+          delta_H_kcal_mol: -54.6
+          heat_evolved_kcal_as_printed: 54.6
           reaction_heats_kcal_as_printed:
             - {reaction: 'Na2CO3 + SiO2(quartz) = Na2SiO3 + CO2', heat_kcal: -22.3}
             - {reaction: 'Na2O + SiO2(quartz) = Na2SiO3', heat_kcal: 54.6}
@@ -510,13 +511,13 @@ species:
             - {reaction_label: b2 as in Fig. 1, mean_kcal: -42.5, uncertainty_kcal: 0.2, n: 4}
           method: Derived from slopes of log pressure versus 1/T and reaction cycles; approximate Nernst values are reported alongside.
           reported_temperature_ranges_C: ['788-908', '914-948', '1090-1223']
-  Na2Si3O7:
+  Na6Si2O7:
     observations:
-      - observation_id: kroger_fingas_1935_na2si3o7_congruent_melting_temperature
+      - observation_id: kroger_fingas_1935_na6si2o7_congruent_melting_temperature
         type: transition_point
-        locator: {page: 7, published_page: 7, pdf_page_index: 6, section: Na2O-SiO2 binary phase discussion}
+        locator: {page: 11, published_page: 11, pdf_page_index: 10, section: Na2O-SiO2 binary phase discussion}
         phase: condensed_solid
-        standard_state: Congruent melting point of Na2Si3O7 as cited by the authors.
+        standard_state: Congruent melting point of Na6Si2O7 as cited by the authors.
         units: °C
         uncertainty: {reported_status: not_reported}
         values:
