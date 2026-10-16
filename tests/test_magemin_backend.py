@@ -3388,3 +3388,20 @@ def test_magemin_resolve_buffer_qfm_calibration_at_1450C():
     expected = 8.58 - 25050.0 / (1450.0 + 273.15)
     assert qfm_at_1450C == pytest.approx(expected, abs=1e-9)
     assert -7.0 < qfm_at_1450C < -5.0, qfm_at_1450C
+
+
+def test_magemin_qfm_buffer_offsets_are_bit_pinned():
+    backend = MAGEMinBackend()
+    expected_hex = {
+        1000.0: "-0x1.cf0c806fa67b0p-1",
+        1200.0: "-0x1.c9adf82faff0cp+1",
+        1450.0: "-0x1.82bb1b69b673ep+2",
+        1600.0: "-0x1.cd3c4b84b9f52p+2",
+    }
+
+    for temperature_C, pinned_hex in expected_hex.items():
+        _, offset, _ = backend._resolve_buffer(
+            temperature_C=temperature_C,
+            fO2_log=-12.0,
+        )
+        assert offset.hex() == pinned_hex
