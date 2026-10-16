@@ -1,12 +1,18 @@
 from __future__ import annotations
 
 import os
+import math
 import time
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 from engines.alphamelts.subprocess_runner import equilibrate_via_subprocess
+from simulator.diagnostic_helpers.binary_pot_battery import (
+    _solve_vapor_engine_cell_oxygen_balance,
+)
+from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
     ALPHAMELTS_REASON_SUBPROCESS_DIED,
@@ -168,3 +174,38 @@ def test_known_crashing_alkali_silica_binary_refuses_before_launch(tmp_path):
         'composition_mol_by_account'
     ] == composition
     assert not marker.exists()
+
+
+def test_real_subprocess_projection_closes_dry_alkali_silica_oxygen_balance():
+    backend = AlphaMELTSBackend()
+    solved_liquid_wt_pct = {'Na2O': 20.0, 'K2O': 20.0, 'SiO2': 60.0}
+
+    def cell_at_po2(pO2_bar: float):
+        eq = EquilibriumResult(
+            temperature_C=1800.0 - 273.15,
+            pressure_bar=1.0,
+            fO2_log=math.log10(pO2_bar),
+            liquid_fraction=1.0,
+            liquid_composition_wt_pct=solved_liquid_wt_pct,
+        )
+        pressures_pa, _sources, _diagnostic = (
+            backend._builtin_vapor_projection_for_subprocess(eq)
+        )
+        return SimpleNamespace(
+            status='ok',
+            gas_partial_pressures_Pa=pressures_pa,
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    pO2_bar, pressures_bar, balance, _cell_fraction, _cell_info = (
+        _solve_vapor_engine_cell_oxygen_balance(
+            cell_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+    )
+
+    assert 0.0 < pO2_bar < 1.0
+    assert pressures_bar['O2'] == pytest.approx(pO2_bar, rel=1e-6)
+    assert pressures_bar['O'] > 0.0
+    assert balance['residual'] < 1e-8
