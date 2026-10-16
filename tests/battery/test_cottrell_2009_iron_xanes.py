@@ -148,10 +148,18 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
     assert not set(basalt_fit.derived_from or ()) & {
         oid for oid in ratios if any(tag in oid for tag in ("row=aii_-35", "row=lw_-30", "row=aii_-25"))
     }
-    assert not set(rhyolite_fit.derived_from or ()) & {
-        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:0",
-        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:1",
+    rhyolite_parents = {
+        f"{prefix}cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725",
+        f"{prefix}cottrell_2009_rhyolite_mossbauer::point:1",
+        f"{prefix}cottrell_2009_rhyolite_mossbauer::point:2",
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:2",
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:3",
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:4",
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:5",
     }
+    assert len(rhyolite_fit.derived_from or ()) == 7
+    assert set(rhyolite_fit.derived_from or ()) == rhyolite_parents
+    assert rhyolite_parents.issubset(result.observations)
     moore_dt39_observation = result.observations[
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:1"
     ]
@@ -178,8 +186,8 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
         "b.d. (below detection)" in (obs.value.unavailable_reason or "")
         for obs in below_detection
     )
-    assert rhyolite_fit.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-    assert not rhyolite_fit.derived_from
+    assert rhyolite_fit.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert set(rhyolite_fit.derivation.inputs) == rhyolite_parents
 
     assert not result.validation.hard_issues
     assert sum(
