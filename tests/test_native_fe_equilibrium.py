@@ -45,6 +45,20 @@ def test_b899_extent_is_reduced_from_historical_frozen_potential_pin(probe):
     assert _solve(probe)['native_fe_mol'] < probe[2]
 
 
+def test_inverse_notice_bound_uses_actual_ferric_inventory(probe):
+    sim, controls, _ = probe
+    inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    state = fe_redox.kress91_intrinsic_state(
+        feo_mol=inventory['FeO'], fe2o3_mol=inventory['Fe2O3'],
+        mol_fractions=fe_redox.melt_mol_fractions_for_kress91(controls['comp']),
+        T_K=controls['T_K'], pressure_bar=controls['pressure_bar'],
+        exchange_fO2_log=-20., composition_wt_pct=controls['comp'])
+    comparison = fe_redox._native_fe_saturation_comparison(
+        **{**controls, 'fO2_log': state['fO2_log']})
+    assert state['iw_bound'] == comparison['iw_bound_log']
+    assert state['a_feo'] == comparison['native_fe_activity']
+
+
 def _post_removal(probe, n):
     sim, controls, _ = probe
     inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')

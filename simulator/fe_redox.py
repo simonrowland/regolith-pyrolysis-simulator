@@ -1222,10 +1222,10 @@ def kress91_intrinsic_state(
                      pressure_ceiling_fO2_log=math.log10(pressure_bar))
     elif bound is None and feo_mol > 0.0 and fe2o3_mol > 0.0:
         if composition_wt_pct is not None:
-            a_feo = _all_ferrous_feo_activity(
-                comp_wt=composition_wt_pct,
-                T_K=T_K,
-                pressure_bar=pressure_bar,
+            comparison = _native_fe_saturation_comparison(
+                composition_wt_pct,
+                fe3_over_sigma_fe=2.0 * fe2o3_mol / (feo_mol + 2.0 * fe2o3_mol),
+                T_K=T_K, pressure_bar=pressure_bar, fO2_log=value,
             )
             # Premise: Kress91's ferric/ferrous ratio is a fit, not an
             # Fe/FeO equilibrium, so a finite low-ferric inverse can undercut
@@ -1236,8 +1236,8 @@ def kress91_intrinsic_state(
             # the logarithm arguments and result in dex are dimensionless.
             # Sanity: a_FeO=1 recovers IW; a_FeO<1 lowers the bound.
             state.update(
-                a_feo=a_feo,
-                iw_bound=_feo_activity_saturation_log10_fO2_bar(T_K, a_feo=a_feo),
+                a_feo=comparison['native_fe_activity'],
+                iw_bound=comparison['iw_bound_log'],
             )
     return state
 
