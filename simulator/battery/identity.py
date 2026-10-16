@@ -394,12 +394,10 @@ class ValenceBasis:
     value_form: ValenceValueForm
 
     def __post_init__(self) -> None:
-        if (
-            not isinstance(self.numerator_oxidation_states, tuple)
-            or not self.numerator_oxidation_states
-            or any(type(state) is not int for state in self.numerator_oxidation_states)
-            or len(set(self.numerator_oxidation_states))
-            != len(self.numerator_oxidation_states)
+        if not isinstance(self.numerator_oxidation_states, tuple) or any(
+            type(state) is not int for state in self.numerator_oxidation_states
+        ) or len(set(self.numerator_oxidation_states)) != len(
+            self.numerator_oxidation_states
         ):
             raise IdentityRefusal(
                 RefusalReason.INVALID_IDENTITY,
@@ -418,6 +416,24 @@ class ValenceBasis:
                 "valence_basis.value_form",
                 "must be a closed printed value form",
             )
+        if (
+            not self.numerator_oxidation_states
+            and self.value_form is not ValenceValueForm.AVERAGE_OXIDATION_STATE
+        ):
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.numerator_oxidation_states",
+                "must name oxidation states unless the value is an average oxidation state",
+            )
+        if (
+            self.value_form is ValenceValueForm.FRACTION
+            and len(self.numerator_oxidation_states) > 1
+        ):
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.numerator_oxidation_states",
+                "a fraction must name exactly one numerator oxidation state",
+            )
         if self.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT:
             if self.denominator_oxidation_state is not None:
                 raise IdentityRefusal(
@@ -425,11 +441,24 @@ class ValenceBasis:
                     "valence_basis.denominator_oxidation_state",
                     "must be absent for a total-element denominator",
                 )
-            if self.value_form is not ValenceValueForm.FRACTION:
+            if self.value_form not in {
+                ValenceValueForm.FRACTION,
+                ValenceValueForm.AVERAGE_OXIDATION_STATE,
+            }:
                 raise IdentityRefusal(
                     RefusalReason.INVALID_IDENTITY,
                     "valence_basis.value_form",
-                    "a total-element denominator must use the fraction form",
+                    "a total-element denominator must use the fraction or average "
+                    "oxidation-state form",
+                )
+            if (
+                self.value_form is ValenceValueForm.AVERAGE_OXIDATION_STATE
+                and self.numerator_oxidation_states
+            ):
+                raise IdentityRefusal(
+                    RefusalReason.INVALID_IDENTITY,
+                    "valence_basis.numerator_oxidation_states",
+                    "an average oxidation state has no numerator oxidation states",
                 )
         elif type(self.denominator_oxidation_state) is not int:
             raise IdentityRefusal(
@@ -443,6 +472,12 @@ class ValenceBasis:
                 "valence_basis.value_form",
                 "a fraction must use a total-element denominator",
             )
+        elif self.value_form is ValenceValueForm.AVERAGE_OXIDATION_STATE:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.denominator_kind",
+                "an average oxidation state must use a total-element denominator",
+            )
         if (
             self.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
             and self.denominator_oxidation_state in self.numerator_oxidation_states
@@ -455,10 +490,17 @@ class ValenceBasis:
 
 
 _PRINTED_VALENCE_QUANTITY = re.compile(
-    r"(?P<log10>log10_)?(?P<element>[A-Z][a-z]?)(?P<numerator>\d+)plus_over_"
+    r"(?P<log10>log10_)?(?P<element>[A-Z][a-z]?)(?P<numerator>\d+)"
+    r"(?P<numerator_sign>plus|minus)_over_"
     r"(?:(?P<total_kind>total|sum)_(?P<total_element>[A-Z][a-z]?)|"
-    r"(?P<denominator_element>[A-Z][a-z]?)(?P<denominator>\d+)plus)"
+    r"(?P<denominator_element>[A-Z][a-z]?)(?P<denominator>\d+)"
+    r"(?P<denominator_sign>plus|minus))"
 )
+
+
+def _signed_oxidation_state(magnitude: str, sign: str) -> int:
+    value = int(magnitude)
+    return -value if sign == "minus" else value
 
 
 def parse_valence_basis(
@@ -466,6 +508,19 @@ def parse_valence_basis(
 ) -> ValenceBasis:
     """Parse printed oxidation-state forms without changing their value basis."""
 
+    if raw == ValenceValueForm.AVERAGE_OXIDATION_STATE.value:
+        if not species_formula:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_SOURCE,
+                "quantity",
+                "average oxidation state requires the identity species formula",
+            )
+        return ValenceBasis(
+            numerator_oxidation_states=(),
+            denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+            denominator_oxidation_state=None,
+            value_form=ValenceValueForm.AVERAGE_OXIDATION_STATE,
+        )
     match = _PRINTED_VALENCE_QUANTITY.fullmatch(raw)
     if match is None:
         raise IdentityRefusal(
@@ -499,14 +554,19 @@ def parse_valence_basis(
         value_form = ValenceValueForm.FRACTION
     else:
         denominator_kind = ValenceDenominatorKind.OXIDATION_STATE
-        denominator_state = int(match.group("denominator"))
+        denominator_state = _signed_oxidation_state(
+            match.group("denominator"), match.group("denominator_sign")
+        )
         value_form = (
             ValenceValueForm.LOG10_RATIO
             if match.group("log10")
             else ValenceValueForm.RATIO
         )
+    numerator_state = _signed_oxidation_state(
+        match.group("numerator"), match.group("numerator_sign")
+    )
     return ValenceBasis(
-        numerator_oxidation_states=(int(match.group("numerator")),),
+        numerator_oxidation_states=(numerator_state,),
         denominator_kind=denominator_kind,
         denominator_oxidation_state=denominator_state,
         value_form=value_form,

@@ -403,6 +403,8 @@ UNIT_DECLARED_QUANTITY = {
 }
 
 QUANTITY_ALIASES = {
+    "Fe3plus_over_Fe2plus": Quantity.FE3_FE2_RATIO,
+    ValenceValueForm.AVERAGE_OXIDATION_STATE.value: Quantity.VALENCE_RATIO,
     "pure_Psat": Quantity.P_SAT,
     "vapor_pressure": Quantity.P_SAT,
     "pure_vapor_pressure": Quantity.P_SAT,
@@ -5536,11 +5538,6 @@ def map_quantity(
                 return State.unknown(contradiction), contradiction
             return State.of(inferred), None
         if isinstance(raw, str) and "plus_over_" in raw:
-            try:
-                parse_valence_basis(raw)
-            except IdentityRefusal as refusal:
-                detail = f"{refusal.reason.value}: {refusal.detail}"
-                return State.unknown(detail), detail
             return State.of(Quantity.VALENCE_RATIO), None
         if isinstance(raw, str) and raw:
             qualified, _suffix = split_qualified_quantity(raw)
@@ -14017,7 +14014,11 @@ class Migrator:
         if q_token is Quantity.VALENCE_RATIO:
             raw_valence_quantity = values.get("quantity")
             try:
-                if isinstance(raw_valence_quantity, str) and "plus_over_" in raw_valence_quantity:
+                if isinstance(raw_valence_quantity, str) and (
+                    "plus_over_" in raw_valence_quantity
+                    or raw_valence_quantity
+                    == ValenceValueForm.AVERAGE_OXIDATION_STATE.value
+                ):
                     valence_basis = parse_valence_basis(
                         raw_valence_quantity, species_formula=formula
                     )

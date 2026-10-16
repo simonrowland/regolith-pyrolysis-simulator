@@ -24,7 +24,12 @@ from simulator.battery.identity import (
     parse_valence_basis,
     profile_for,
 )
-from simulator.battery.migrate import Migrator, _identity_from_plain, to_plain
+from simulator.battery.migrate import (
+    Migrator,
+    _identity_from_plain,
+    map_quantity,
+    to_plain,
+)
 from simulator.battery.records import Species, State
 from simulator.battery.score import (
     SCORE_ENGINE_SET,
@@ -81,11 +86,78 @@ def test_printed_valence_forms_parse_into_typed_identity(
     assert "valence_basis" in profile_for(identity).required
 
 
+def test_average_oxidation_state_has_total_element_basis_and_round_trips():
+    basis = parse_valence_basis(
+        "average_oxidation_state", species_formula="V"
+    )
+    quantity, reason = map_quantity(
+        "concentration_series", {"quantity": "average_oxidation_state"}
+    )
+    identity = Identity(
+        quantity=Quantity.VALENCE_RATIO,
+        species=Species("V", Phase.L),
+        valence_basis=State.of(basis),
+    )
+
+    assert basis.numerator_oxidation_states == ()
+    assert basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+    assert basis.denominator_oxidation_state is None
+    assert basis.value_form is ValenceValueForm.AVERAGE_OXIDATION_STATE
+    assert quantity.is_value and quantity.value is Quantity.VALENCE_RATIO
+    assert reason is None
+    payload = to_plain(identity)
+    assert isinstance(payload, dict)
+    decoded = _identity_from_plain(payload)
+    assert decoded.species.formula == "V"
+    assert decoded.valence_basis == identity.valence_basis
+
+
 def test_malformed_valence_form_has_typed_refusal():
     with pytest.raises(IdentityRefusal) as refused:
         parse_valence_basis("Cr2plus_over_total_Fe", species_formula="Cr")
 
     assert refused.value.reason is RefusalReason.INVALID_SOURCE
+
+
+def test_multi_state_fraction_numerator_has_typed_refusal():
+    with pytest.raises(IdentityRefusal) as refused:
+        ValenceBasis(
+            numerator_oxidation_states=(3, 4, 5),
+            denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+            denominator_oxidation_state=None,
+            value_form=ValenceValueForm.FRACTION,
+        )
+
+    assert refused.value.reason is RefusalReason.INVALID_IDENTITY
+    assert refused.value.field == "valence_basis.numerator_oxidation_states"
+
+
+def test_sulfide_to_sulfate_printed_ratio_accepts_negative_state():
+    sulfide_to_sulfate = parse_valence_basis(
+        "S2minus_over_S6plus", species_formula="S"
+    )
+    sulfate_fraction = parse_valence_basis(
+        "S6plus_over_sum_S", species_formula="S"
+    )
+
+    assert sulfide_to_sulfate.numerator_oxidation_states == (-2,)
+    assert sulfide_to_sulfate.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
+    assert sulfide_to_sulfate.denominator_oxidation_state == 6
+    assert sulfide_to_sulfate.value_form is ValenceValueForm.RATIO
+    assert sulfate_fraction.numerator_oxidation_states == (6,)
+    assert sulfate_fraction.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+    assert sulfate_fraction.denominator_oxidation_state is None
+    assert sulfate_fraction.value_form is ValenceValueForm.FRACTION
+
+
+def test_fe_plus_spelling_stays_on_existing_fe_ratio_quantity():
+    quantity, reason = map_quantity(
+        "ratio", {"quantity": "Fe3plus_over_Fe2plus"}
+    )
+
+    assert quantity.is_value
+    assert quantity.value is Quantity.FE3_FE2_RATIO
+    assert reason is None
 
 
 def test_identity_requires_valence_basis_only_for_valence_ratio():

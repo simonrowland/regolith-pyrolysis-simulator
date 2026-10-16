@@ -283,6 +283,7 @@ DECISION_BAND_RATCHET_RELATIVE_PATH = Path("data/battery/decision-band-ratchet.y
 # Minimum n for a descriptive residual bias/scatter ratio; it does not gate bands.
 MIN_RESIDUAL_SUMMARY_N = 10
 _ALIGNMENT_AXES = (
+    "valence_basis",
     "subtype",
     "per",
     "temperature_K",
