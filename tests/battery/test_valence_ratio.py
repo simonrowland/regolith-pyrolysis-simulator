@@ -1,7 +1,9 @@
+import copy
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.battery.enums import (
     AdmissionStatus,
@@ -24,7 +26,12 @@ from simulator.battery.identity import (
     parse_valence_basis,
     profile_for,
 )
-from simulator.battery.migrate import Migrator, _identity_from_plain, to_plain
+from simulator.battery.migrate import (
+    Migrator,
+    _identity_from_plain,
+    map_quantity,
+    to_plain,
+)
 from simulator.battery.records import Species, State
 from simulator.battery.score import (
     SCORE_ENGINE_SET,
@@ -82,11 +89,141 @@ def test_printed_valence_forms_parse_into_typed_identity(
     assert "valence_basis" in profile_for(identity).required
 
 
+def test_average_oxidation_state_has_total_element_basis_and_round_trips():
+    basis = parse_valence_basis(
+        "average_oxidation_state", species_formula="V"
+    )
+    quantity, reason = map_quantity(
+        "concentration_series", {"quantity": "average_oxidation_state"}
+    )
+    identity = Identity(
+        quantity=Quantity.VALENCE_RATIO,
+        species=Species("V", Phase.L),
+        valence_basis=State.of(basis),
+    )
+
+    assert basis.numerator_oxidation_states == ()
+    assert basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+    assert basis.denominator_oxidation_state is None
+    assert basis.value_form is ValenceValueForm.AVERAGE_OXIDATION_STATE
+    assert quantity.is_value and quantity.value is Quantity.VALENCE_RATIO
+    assert reason is None
+    payload = to_plain(identity)
+    assert isinstance(payload, dict)
+    decoded = _identity_from_plain(payload)
+    assert decoded.species.formula == "V"
+    assert decoded.valence_basis == identity.valence_basis
+
+
 def test_malformed_valence_form_has_typed_refusal():
     with pytest.raises(IdentityRefusal) as refused:
         parse_valence_basis("Cr2plus_over_total_Fe", species_formula="Cr")
 
     assert refused.value.reason is RefusalReason.INVALID_SOURCE
+
+
+def test_multi_state_fraction_numerator_has_typed_refusal():
+    with pytest.raises(IdentityRefusal) as refused:
+        ValenceBasis(
+            numerator_oxidation_states=(3, 4, 5),
+            denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+            denominator_oxidation_state=None,
+            value_form=ValenceValueForm.FRACTION,
+        )
+
+    assert refused.value.reason is RefusalReason.INVALID_IDENTITY
+    assert refused.value.field == "valence_basis.numerator_oxidation_states"
+
+
+def test_sulfide_to_sulfate_printed_ratio_accepts_negative_state():
+    sulfide_to_sulfate = parse_valence_basis(
+        "S2minus_over_S6plus", species_formula="S"
+    )
+    sulfate_fraction = parse_valence_basis(
+        "S6plus_over_sum_S", species_formula="S"
+    )
+
+    assert sulfide_to_sulfate.numerator_oxidation_states == (-2,)
+    assert sulfide_to_sulfate.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
+    assert sulfide_to_sulfate.denominator_oxidation_state == 6
+    assert sulfide_to_sulfate.value_form is ValenceValueForm.RATIO
+    assert sulfate_fraction.numerator_oxidation_states == (6,)
+    assert sulfate_fraction.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+    assert sulfate_fraction.denominator_oxidation_state is None
+    assert sulfate_fraction.value_form is ValenceValueForm.FRACTION
+
+
+def test_sulfur_valence_forms_are_recognized_and_migrated_as_printed(tmp_path: Path):
+    printed_values = (
+        ("S2minus_over_S6plus", "0.32"),
+        ("S2minus_over_total_S", "0.50"),
+        ("log10_S2minus_over_S6plus", "-2.0"),
+    )
+    for printed, _value in printed_values:
+        quantity, reason = map_quantity(
+            "concentration_series", {"quantity": printed}
+        )
+        assert quantity.is_value and quantity.value is Quantity.VALENCE_RATIO
+        assert reason is None
+
+    doc = yaml.safe_load(SOSSI_CR.read_text(encoding="utf-8"))
+    observations = []
+    for index, (printed, value) in enumerate(printed_values):
+        observations.append(
+            {
+                "observation_id": f"fixture_sulfur_valence_{index}",
+                "type": "concentration_series",
+                "locator": {"page": 1, "table": "1"},
+                "phase": "liquid",
+                "units": "fraction",
+                "values": {
+                    "method_class": "measured_direct",
+                    "quantity": printed,
+                    "admission_status": "admitted",
+                    "value": value,
+                },
+            }
+        )
+    doc["species"] = {"S": {"observations": observations}}
+    extract = tmp_path / SOSSI_CR.name
+    extract.write_text(
+        yaml.safe_dump(doc, sort_keys=False, allow_unicode=True), encoding="utf-8"
+    )
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    rows = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrator.result.observations.values()
+        if "fixture_sulfur_valence_" in row.observation_id
+    }
+
+    assert set(rows) == {
+        "fixture_sulfur_valence_0",
+        "fixture_sulfur_valence_1",
+        "fixture_sulfur_valence_2",
+    }
+    assert [rows[f"fixture_sulfur_valence_{i}"].value.point for i in range(3)] == [
+        Decimal("0.32"),
+        Decimal("0.50"),
+        Decimal("-2.0"),
+    ]
+    assert all(
+        rows[f"fixture_sulfur_valence_{i}"].identity.quantity.value
+        is Quantity.VALENCE_RATIO
+        for i in range(3)
+    )
+
+
+def test_fe_plus_spelling_stays_on_existing_fe_ratio_quantity():
+    quantity, reason = map_quantity(
+        "ratio", {"quantity": "Fe3plus_over_Fe2plus"}
+    )
+
+    assert quantity.is_value
+    assert quantity.value is Quantity.FE3_FE2_RATIO
+    assert reason is None
 
 
 def test_identity_requires_valence_basis_only_for_valence_ratio():
@@ -308,6 +445,50 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
         row.observation_id for row in slope_rows
     }
 
+
+def test_refused_printed_valence_forms_do_not_select_scalar(tmp_path: Path):
+    doc = yaml.safe_load(SOSSI_CR.read_text(encoding="utf-8"))
+    template = doc["species"]["Cr"]["observations"][0]
+    printed_forms = (
+        "log10_Cr2plus_over_total_Cr",
+        "not_a_plus_over_real",
+    )
+    observations = []
+    for index, printed in enumerate(printed_forms):
+        row = copy.deepcopy(template)
+        row.update(
+            {
+                "observation_id": f"fixture_refused_valence_{index}",
+                "phase": "liquid",
+                "values": {
+                    "method_class": "measured_direct",
+                    "quantity": printed,
+                    "admission_status": "admitted",
+                    "value": "0.32",
+                },
+            }
+        )
+        observations.append(row)
+    doc["species"]["Cr"]["observations"] = observations
+    extract = tmp_path / SOSSI_CR.name
+    extract.write_text(
+        yaml.safe_dump(doc, sort_keys=False, allow_unicode=True), encoding="utf-8"
+    )
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    rows = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrator.result.observations.values()
+        if "fixture_refused_valence_" in row.observation_id
+    }
+
+    assert set(rows) == {
+        "fixture_refused_valence_0",
+        "fixture_refused_valence_1",
+    }
+    assert all(row.value.kind is ValueKind.UNAVAILABLE for row in rows.values())
 
 def test_sossi_2018_quoted_cr_rows_migrate_as_numeric_valence_fractions():
     result = _migrate_sossi_cr()

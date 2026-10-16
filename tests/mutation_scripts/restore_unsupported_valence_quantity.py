@@ -1,23 +1,17 @@
-"""Prove the Sossi valence rows fail when printed valence parsing is removed."""
+"""Prove the Sossi rows fail when valence quantity classification is removed."""
 
 from __future__ import annotations
 
 import os
 from pathlib import Path
 import subprocess
+import sys
+import tempfile
 
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "simulator/battery/migrate.py"
-PYTHON = Path(
-    "/Users/simonrowland/Repos/regolith-pyrolysis-simulator/.venv/bin/python"
-)
 TARGET = '''        if isinstance(raw, str) and "plus_over_" in raw:
-            try:
-                parse_valence_basis(raw)
-            except IdentityRefusal as refusal:
-                detail = f"{refusal.reason.value}: {refusal.detail}"
-                return State.unknown(detail), detail
             return State.of(Quantity.VALENCE_RATIO), None
 '''
 TEST = (
@@ -33,11 +27,14 @@ def main() -> int:
     try:
         SOURCE.write_text(original.replace(TARGET, "", 1), encoding="utf-8")
         env = dict(os.environ)
-        env["MPLCONFIGDIR"] = "/private/tmp/claude-501/main-review/mplcache"
+        env.setdefault(
+            "MPLCONFIGDIR",
+            str(Path(tempfile.gettempdir()) / "matplotlib"),
+        )
         env["PYTHONPATH"] = str(ROOT) + os.pathsep + env.get("PYTHONPATH", "")
         result = subprocess.run(
             [
-                str(PYTHON),
+                sys.executable,
                 "-m",
                 "pytest",
                 "-vv",
