@@ -1165,8 +1165,8 @@ class EvaporationMixin:
             }
             if overhead_partials_override_Pa is not None
             else {
-                species: max(0.0, float(pressure)) * 100.0
-                for species, pressure in self._melt_headspace_composition_mbar.items()
+                species: max(0.0, EvaporationMixin._evaporation_bulk_partial_pressure_pa(self, species))
+                for species in self._melt_headspace_composition_mbar
             }
         )
         for species in vapor_pressures:
