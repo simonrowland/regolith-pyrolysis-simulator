@@ -175,11 +175,29 @@ def test_known_crashing_alkali_silica_binary_refuses_before_launch(tmp_path):
     assert not marker.exists()
 
 
-def test_real_subprocess_projection_closes_dry_alkali_silica_oxygen_balance():
-    from simulator.diagnostic_helpers.binary_pot_battery import (
-        _engine_gas_pressures_bar_for_oxygen_balance,
-        _solve_cell_oxygen_balance,
-        _vapor_engine_oxygen_balance_species_metadata,
+def test_real_subprocess_projection_closes_dry_alkali_silica_oxygen_balance(
+    monkeypatch,
+):
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    _solve_cell_oxygen_balance = battery._solve_cell_oxygen_balance
+    owner_calls = []
+
+    def capture_owner_call(pressure_model, species_metadata, **kwargs):
+        result = _solve_cell_oxygen_balance(
+            pressure_model,
+            species_metadata,
+            **kwargs,
+        )
+        owner_calls.append(
+            (pressure_model, species_metadata, dict(kwargs), result)
+        )
+        return result
+
+    monkeypatch.setattr(
+        battery,
+        '_solve_cell_oxygen_balance',
+        capture_owner_call,
     )
 
     backend = AlphaMELTSBackend()
@@ -292,24 +310,15 @@ def test_real_subprocess_projection_closes_dry_alkali_silica_oxygen_balance():
         printed_echo_po2_bar,
         rel=1e-10,
     )
-    fresh_metadata = _vapor_engine_oxygen_balance_species_metadata(
-        tuple(fresh_cell.gas_partial_pressures_Pa)
+    assert owner_calls
+    fresh_pressure_model, fresh_metadata, fresh_kwargs, _last_owner_result = (
+        owner_calls[-1]
     )
-
-    def fresh_pressure_model(trial_po2_bar: float) -> dict[str, float]:
-        trial_cell = cell_at_po2(trial_po2_bar)
-        return _engine_gas_pressures_bar_for_oxygen_balance(
-            trial_cell.gas_partial_pressures_Pa,
-            fresh_metadata,
-        )
-
     fresh_po2, fresh_pressures, fresh_balance, fresh_wall_fraction, _fresh_info = (
         _solve_cell_oxygen_balance(
             fresh_pressure_model,
             fresh_metadata,
-            temperature_K=temperature_K,
-            cell_material=None,
-            bracket=tuple(balance['bracket']),
+            **fresh_kwargs,
         )
     )
 
