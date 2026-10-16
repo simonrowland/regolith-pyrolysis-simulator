@@ -29,11 +29,16 @@ from simulator.melt_backend.openimcc_bridge import (
 )
 import simulator.melt_backend.openimcc_bridge as openimcc_bridge_module
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
-from simulator.runner import PyrolysisRun
-from simulator.state import MOLAR_MASS
+from simulator.run_executor import RunExecutor
+from simulator.runner import (
+    PyrolysisRun,
+    _high_t_melt_activity_fallback_sentence,
+)
+from simulator.state import CampaignPhase, MOLAR_MASS
 
 
-pytest.importorskip("openimcc")
+_openimcc = pytest.importorskip("openimcc")
+ImccNonconvergenceError = _openimcc.ImccNonconvergenceError
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 REPO_ROOT = DATA_DIR.parent
@@ -74,6 +79,7 @@ def _request(
     high_t_melt_activity: str | None = None,
     previous_temperature_K: float | None = None,
     crossing: bool = False,
+    pressure_bar: float = 1.0e-6,
     pO2_bar: float = 1.0e-9,
     intrinsic_fO2_log: float | None = -10.0,
 ) -> IntentRequest:
@@ -96,7 +102,7 @@ def _request(
             species_formula_registry={},
         ),
         temperature_C=temperature_K - 273.15,
-        pressure_bar=1.0e-6,
+        pressure_bar=pressure_bar,
         control_inputs=controls,
     )
 
@@ -454,6 +460,70 @@ def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
     ]["Na2O"]
 
 
+def test_ae95_depleted_melt_continuation_root_is_selected_by_provider() -> None:
+    # Captured ae95 hot-train melt at campaign hour 66; pressure and fO2
+    # controls match the provider comparison in golden-shift.md.
+    composition_mol = {
+        "SiO2": 0.011138886562497141,
+        "MgO": 2288.8042997487846,
+        "FeO": 87.38220230346212,
+        "CaO": 2014.8644234379233,
+        "Al2O3": 1360.0091131723866,
+        "TiO2": 192.82496476933426,
+        "Na2O": 5.3731722769972105e-09,
+        "K2O": 8.844980280923895,
+    }
+    result = _provider().dispatch(
+        _request(
+            composition_mol,
+            2445.65,
+            high_t_melt_activity="openimcc",
+            pressure_bar=0.01,
+            pO2_bar=1.0e-9,
+            intrinsic_fO2_log=-2.0727607447837726,
+        )
+    )
+    high_t = result.diagnostic["high_t_melt_activity"]
+    sio_provenance = result.diagnostic["vapor_pressure_numerator_provenance"][
+        "SiO"
+    ]
+
+    assert result.status == "ok"
+    assert high_t["provider"] == "openimcc"
+    assert high_t["fallback"] is False
+    assert "fallback_reason" not in high_t
+    assert high_t["activities_by_oxide"]["SiO2"] == pytest.approx(
+        3.4859611072197934e-9,
+        rel=1e-9,
+        abs=0.0,
+    )
+    assert sio_provenance["melt_activity_authority"] == "openimcc"
+    assert not sio_provenance.get("melt_activity_fallback", False)
+    assert not any(
+        "high_t_melt_activity_fallback" in warning
+        or "openimcc_refused_constant_gamma_fallback" in warning
+        for warning in result.warnings
+    )
+    assert not any(
+        "openimcc_refused_constant_gamma_fallback" in source
+        for source in result.diagnostic["vapor_pressures_source"].values()
+    )
+
+    # The recovered root does not change the standing K2O authority ruling.
+    k2o_exclusion = high_t["authority_exclusions"]["K2O"]
+    k2o_constant_gamma = melt_oxide_activity(
+        "K2O",
+        composition_mol,
+        temperature_K=2445.65,
+    )
+    assert k2o_exclusion["tracking_id"] == "t-999"
+    assert high_t["seam"]["K2O"]["selected_activity_basis"] == "constant_gamma"
+    assert high_t["activities_by_oxide"]["K2O"] == k2o_constant_gamma.activity
+    assert high_t["openimcc_activities_by_oxide"]["K2O"] != (
+        k2o_constant_gamma.activity
+    )
+
+
 def test_k2o_pack_evaluation_table_matches_zhang_gamma_from_bridge() -> None:
     evaluations = vapor_pressure_module._K2O_PACK_EVALUATIONS_BY_DIGEST
     loaded_digests = set()
@@ -584,9 +654,12 @@ def test_missing_present_parent_refuses_and_labels_provider_fallback(
         _request(composition, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
     )
     high_t = result.diagnostic["high_t_melt_activity"]
+    # Keep this typed result-shape refusal as a prediction, with its reason
+    # made explicit on the extrapolated authority ladder.
     assert result.status == "ok"
     assert high_t["provider"] == "constant_gamma"
     assert high_t["fallback"] is True
+    assert high_t["authority"] == "extrapolated"
     assert high_t["fallback_reason"]["code"] == "openimcc_result_shape"
     provenance = result.diagnostic["vapor_pressure_numerator_provenance"]
     for species in ("Na", "Na2", "Na2O_gas"):
@@ -594,6 +667,184 @@ def test_missing_present_parent_refuses_and_labels_provider_fallback(
         assert provenance[species]["openimcc_refusal"]["code"] == (
             "openimcc_result_shape"
         )
+
+
+def test_unexpected_openimcc_activity_error_propagates(monkeypatch) -> None:
+    def fail(**kwargs):
+        raise RuntimeError("unexpected evaluator bug")
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", fail)
+
+    with pytest.raises(RuntimeError, match="unexpected evaluator bug"):
+        _provider().dispatch(
+            _request(
+                BASE_MELT_MOL,
+                CAP_PLUS_T_K,
+                high_t_melt_activity="openimcc",
+            )
+        )
+
+
+def test_envelope_refusal_keeps_flagged_constant_gamma_prediction() -> None:
+    composition = {"Na2O": 2.0, "SiO2": 1.0}
+    provider = _provider()
+    predicted = provider.dispatch(
+        _request(
+            composition,
+            2400.0,
+            high_t_melt_activity="openimcc",
+        )
+    )
+    constant_gamma = provider.dispatch(
+        _request(
+            composition,
+            2400.0,
+            high_t_melt_activity="constant_gamma",
+        )
+    )
+
+    assert predicted.status == "ok"
+    assert predicted.diagnostic["vapor_pressures_Pa"] == constant_gamma.diagnostic[
+        "vapor_pressures_Pa"
+    ]
+    authority = predicted.diagnostic["high_t_melt_activity"]
+    assert authority["provider"] == "constant_gamma"
+    assert authority["fallback"] is True
+    assert authority["authority"] == "extrapolated"
+    assert authority["fallback_reason"]["code"] == (
+        "imcc_composition_outside_validated_envelope"
+    )
+
+
+def test_fallback_status_remains_on_warning_without_authority_status_fields(
+    monkeypatch,
+) -> None:
+    def nonconverge(**kwargs):
+        raise ImccNonconvergenceError(
+            "IMCC-SF04 parent-balance solve did not converge",
+            {"residual_inf": 0.25},
+        )
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
+    result = _provider().dispatch(
+        _request(BASE_MELT_MOL, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
+    )
+    authority = result.diagnostic["high_t_melt_activity"]
+    fallback_activity = vapor_pressure_module._high_t_activity_for_parent(
+        "Na2O",
+        BASE_MELT_MOL,
+        temperature_K=CAP_PLUS_T_K,
+        authority=authority,
+    )
+
+    assert fallback_activity.evidence_tier == "PREDICT_AND_FLAG"
+    assert "openimcc_refused_constant_gamma_fallback" in fallback_activity.warning
+    assert fallback_activity.authority_status != "extrapolated"
+    fallback_provenance = result.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]
+    assert all(
+        "melt_oxide_activity_authority_status" not in item
+        for item in fallback_provenance.values()
+        if item.get("melt_activity_fallback")
+    )
+
+
+def test_nonconvergence_keeps_prediction_and_emits_run_notice(monkeypatch) -> None:
+    diagnostics = {"iterations": 8, "residual_inf": 0.25}
+    real_evaluate = openimcc_bridge_module.evaluate
+
+    def nonconverge(**kwargs):
+        raise ImccNonconvergenceError(
+            "IMCC-SF04 parent-balance solve did not converge",
+            diagnostics,
+        )
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
+    request = _request(
+        BASE_MELT_MOL,
+        CAP_PLUS_T_K,
+        high_t_melt_activity="openimcc",
+    )
+    predicted = _provider().dispatch(request)
+    constant_gamma = _provider().dispatch(
+        _request(
+            BASE_MELT_MOL,
+            CAP_PLUS_T_K,
+            high_t_melt_activity="constant_gamma",
+        )
+    )
+
+    assert predicted.status == "ok"
+    assert predicted.diagnostic["vapor_pressures_Pa"] == constant_gamma.diagnostic[
+        "vapor_pressures_Pa"
+    ]
+    high_t = predicted.diagnostic["high_t_melt_activity"]
+    assert high_t["provider"] == "constant_gamma"
+    assert high_t["authority"] == "extrapolated"
+    assert high_t["fallback_reason"]["code"] == "imcc_nonconvergence"
+    assert high_t["fallback_reason"]["residual_inf"] == 0.25
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", real_evaluate)
+    execution = RunExecutor().execute_session(session, hours=1)
+    sim = session.simulator
+    completed_hour = int(sim.melt.hour)
+    assert completed_hour > 0
+    sim._high_t_melt_activity_fallback_steps = []
+    sim.melt.hour = completed_hour - 1
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.temperature_C = CAP_PLUS_T_K - 273.15
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
+    sim._refresh_vapor_pressures_from_kernel(
+        SimpleNamespace(
+            vapor_pressures_Pa={},
+            vapor_pressures_source={},
+            liquid_fraction=1.0,
+            fO2_log=sim.melt.fO2_log,
+            activity_coefficients={},
+        )
+    )
+    sim.melt.hour = completed_hour
+
+    output = run._build_output(execution)
+    notice = output["run_metadata"]["high_t_melt_activity_fallback_notice"]
+    assert notice["authority"] == "extrapolated"
+    assert notice["reason"] == "imcc_nonconvergence"
+    assert notice["notices"][0]["residual_inf"] == 0.25
+    assert notice["affected_tick_count"] == 1
+    assert notice["affected_parent_count"] == 7
+    assert notice["affected_parent_count"] == len(notice["affected_parent_oxides"])
+    assert "K2O" not in notice["affected_parent_oxides"]
+    assert notice["first_hour"] == notice["last_hour"] == 1
+    assert notice["campaign"] == "C2A"
+    assert output["product_classification"][
+        "high_t_melt_activity_fallback_notice"
+    ] == notice
+    assert "IMCC" in output["product_classification"]["markdown"]
+
+
+def test_fallback_sentence_renders_all_campaigns() -> None:
+    sentence = _high_t_melt_activity_fallback_sentence(
+        {
+            "reason": "imcc_nonconvergence",
+            "campaigns": ["C2A", "C4"],
+            "affected_tick_count": 2,
+            "affected_parent_count": 7,
+            "first_hour": 1,
+            "last_hour": 3,
+        }
+    )
+
+    assert "campaigns `C2A, C4`" in sentence
+    assert "campaign `unspecified`" not in sentence
 
 
 def test_absent_parent_stays_out_of_openimcc_authority() -> None:
@@ -816,6 +1067,7 @@ def test_projection_over_one_percent_refuses_and_provider_flags_fallback() -> No
     assert result.status == "ok"
     assert high_t["provider"] == "constant_gamma"
     assert high_t["fallback"] is True
+    assert high_t["authority"] == "extrapolated"
     assert high_t["fallback_reason"]["code"] == "openimcc_projection_over_threshold"
     assert any(
         "openimcc_refused_constant_gamma_fallback" in source
@@ -1039,6 +1291,7 @@ print(json.dumps({
     "provider": high_t["provider"],
     "fallback": high_t["fallback"],
     "code": high_t["fallback_reason"]["code"],
+    "authority": high_t["authority"],
 }))
 '''
     environment = dict(os.environ)
@@ -1058,6 +1311,7 @@ print(json.dumps({
         "provider": "constant_gamma",
         "fallback": True,
         "code": "openimcc_not_importable",
+        "authority": "extrapolated",
     }
 
 
