@@ -1295,6 +1295,45 @@ def test_equilibrium_payload_hash_ignores_melt_regime_divergence_diagnostics():
     assert "future_melt_regime_divergences" in live_diagnostic
 
 
+def test_equilibrium_replay_restores_requested_fo2_not_printed_echo(
+    tmp_path: Path,
+):
+    requested_fO2_log = -4.05594164298
+    printed_echo_fO2_log = -4.056
+    payload = {
+        "equilibrium_result": {
+            "temperature_C": 1526.85,
+            "pressure_bar": 1.0,
+            "fO2_log": printed_echo_fO2_log,
+            "requested_fO2_log": requested_fO2_log,
+            "printed_fO2_echo_log": printed_echo_fO2_log,
+            "liquid_fraction": 1.0,
+            "status": "ok",
+        },
+        "last_vapor_pressures_source": {},
+        "last_vapor_pressure_diagnostic": {},
+    }
+    store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / "requested-fo2-replay.sqlite",
+    )
+    store.last_cache_state = "cached_exact"
+    sim = SimpleNamespace(
+        melt=SimpleNamespace(
+            fO2_log=-9.0,
+            melt_fO2_log=-9.0,
+        ),
+    )
+
+    replayed = store._equilibrium_from_payload(sim, payload)
+
+    assert replayed.fO2_log == printed_echo_fO2_log
+    assert replayed.requested_fO2_log == requested_fO2_log
+    assert replayed.printed_fO2_echo_log == printed_echo_fO2_log
+    assert sim.melt.fO2_log == requested_fO2_log
+    assert sim.melt.melt_fO2_log == requested_fO2_log
+
+
 def test_equilibrium_envelope_is_cache_inert_and_attached_on_legacy_replay(
     tmp_path: Path,
 ):
