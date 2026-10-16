@@ -269,6 +269,49 @@ def test_printed_uncertainty_converts_units_before_setting_ticket() -> None:
     assert _decision_band_kind(pressure.band) == "printed_2sigma"
 
 
+def test_log_activity_envelope_selects_the_row_temperature_without_interpolation() -> None:
+    from simulator.battery.records import State
+
+    def resolve(temperature_K: str, envelope: dict[str, str]):
+        observation = SimpleNamespace(
+            identity=SimpleNamespace(temperature_K=State.of(Decimal(temperature_K))),
+            locator=None,
+            derivation=None,
+        )
+        return _printed_uncertainty_band(
+            Quantity.ACTIVITY,
+            Uncertainty(
+                kind=UncertaintyKind.PRINTED,
+                verbatim={"log10_a_envelope": envelope},
+            ),
+            Decimal("0.1"),
+            source_observation=observation,
+        )
+
+    envelope = {"1100_C": "0.16", "1200_C": "0.15", "1300_C": "0.14"}
+    for temperature_K, expected in (
+        ("1373.15", Decimal("0.16")),
+        ("1473.15", Decimal("0.15")),
+        ("1573.15", Decimal("0.14")),
+    ):
+        resolved = resolve(temperature_K, envelope)
+        assert resolved.band is not None
+        assert resolved.band.value == expected
+        assert resolved.band.unit == "dimensionless"
+
+    kelvin_key = resolve("1373.15", {"1373.15_K": "0.16"})
+    assert kelvin_key.band is not None
+    assert kelvin_key.band.value == Decimal("0.16")
+
+    mismatch = resolve("1423.15", envelope)
+    assert mismatch.band is None
+    assert mismatch.refusal == {
+        "reason": "printed_uncertainty_temperature_unavailable",
+        "temperature_K": "1423.15",
+        "available_temperatures": ["1100_C", "1200_C", "1300_C"],
+    }
+
+
 def test_incompatible_borrowed_band_is_rejected_without_losing_numeric_residual() -> None:
     numeric, reason, detail = populate_numeric(
         quantity=Quantity.CP,

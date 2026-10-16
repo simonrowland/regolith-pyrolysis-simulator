@@ -2717,6 +2717,60 @@ def _printed_uncertainty_source(
     return parsed, shape, unit
 
 
+def _temperature_envelope_value(
+    uncertainty: Uncertainty,
+    observation: Observation | None,
+) -> tuple[Decimal | None, dict[str, object] | None, bool]:
+    raw = uncertainty.verbatim
+    if not isinstance(raw, Mapping) or not isinstance(
+        raw.get("log10_a_envelope"), Mapping
+    ):
+        return None, None, False
+    envelope = raw["log10_a_envelope"]
+    temperature = None
+    if observation is not None:
+        state = observation.identity.temperature_K
+        if isinstance(state, State) and state.is_value:
+            try:
+                temperature = as_decimal(state.value)
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                pass
+    available = [str(key) for key in envelope]
+    if temperature is None:
+        return None, {
+            "reason": "printed_uncertainty_temperature_missing",
+            "available_temperatures": available,
+        }, True
+    for key, value in envelope.items():
+        match = re.fullmatch(
+            r"\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))_([CK])\s*", str(key)
+        )
+        if match is None:
+            continue
+        try:
+            keyed_temperature = Decimal(match.group(1))
+            if match.group(2) == "C":
+                keyed_temperature += Decimal("273.15")
+            if keyed_temperature == temperature:
+                try:
+                    parsed = abs(as_decimal(value))
+                except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                    return None, {
+                        "reason": "unparseable_printed_uncertainty",
+                        "temperature_K": str(temperature),
+                        "available_temperatures": available,
+                    }, True
+                if parsed.is_finite():
+                    return parsed, None, True
+        except InvalidOperation:
+            continue
+    return None, {
+        "reason": "printed_uncertainty_temperature_unavailable",
+        "temperature_K": str(temperature),
+        "available_temperatures": available,
+    }, True
+
+
 def _uncertainty_unit(
     quantity: Quantity,
     uncertainty: Uncertainty,
@@ -2929,6 +2983,15 @@ def _printed_uncertainty_band(
         else "not_stated"
     )
     source_value, shape, mapped_unit = _printed_uncertainty_source(uncertainty)
+    envelope_value, envelope_refusal, is_temperature_envelope = (
+        _temperature_envelope_value(uncertainty, source_observation)
+    )
+    if envelope_refusal is not None:
+        return _PrintedBandResolution(refusal=envelope_refusal)
+    if is_temperature_envelope:
+        source_value = envelope_value
+        shape = "scalar"
+        mapped_unit = "dex"
     if source_value is None:
         return _PrintedBandResolution(
             refusal={
