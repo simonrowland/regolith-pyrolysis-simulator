@@ -31,8 +31,9 @@ from simulator.battery.migrate import (
     _identity_from_plain,
     map_quantity,
     to_plain,
+    wt_pct_to_mole_fraction,
 )
-from simulator.battery.records import Species, State
+from simulator.battery.records import Composition, Species, State
 from simulator.battery.score import (
     SCORE_ENGINE_SET,
     ScoreContext,
@@ -375,6 +376,12 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
     doc = yaml.safe_load(JAYASURIYA_FE.read_text(encoding="utf-8"))
     observations = doc["species"]["Fe"]["observations"]
     assert sum(len(obs["values"]["points"]) for obs in observations) == 38
+    assert [
+        point["gas_mix_as_printed"]
+        for obs in observations[:2]
+        for point in obs["values"]["points"]
+        if point["sample_as_published"] == "FeV9"
+    ] == ["O2 100.0 × 200 SCCM", "O2 100.0 × 200 SCCM"]
     rt_fractions = [
         observations[0]["values"]["points"][i]["Fe3_over_sum_Fe"] for i in (1, 15)
     ]
@@ -410,9 +417,53 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
         and row.identity.quantity.value is Quantity.FE3_FE2_RATIO
         and row.identity.temperature_K.is_value
         and row.identity.fO2_Pa.is_value
+        and row.identity.composition.is_value
+        and isinstance(row.identity.composition.value, Composition)
         and row.point_conditions["temperature_K"].state.is_value
         and row.point_conditions["fO2_log"].state.is_value
         for row in rows
+    )
+    high_fe = next(
+        row
+        for row in rows
+        if "jayasuriya_2004_rt_high_fe" in row.observation_id
+        and row.point_conditions["FeOT_wt_percent"].state.value
+        == Decimal("1.75")
+    )
+    assert high_fe.identity.composition.value == wt_pct_to_mole_fraction(
+        {
+            "SiO2": Decimal("50.47"),
+            "Al2O3": Decimal("15.12"),
+            "MgO": Decimal("10.46"),
+            "CaO": Decimal("23.94"),
+            "FeO": Decimal("1.75"),
+        }
+    )
+    low_fe = next(
+        row
+        for row in rows
+        if "jayasuriya_2004_rt_1pct" in row.observation_id
+    )
+    assert low_fe.identity.composition.value == wt_pct_to_mole_fraction(
+        {
+            "SiO2": Decimal("50.47"),
+            "Al2O3": Decimal("15.12"),
+            "MgO": Decimal("10.46"),
+            "CaO": Decimal("23.94"),
+            "Fe2O3": Decimal("1.0"),
+        }
+    )
+    d60 = [
+        row
+        for row in rows
+        if row.point_conditions.get("total_pressure_Pa") is not None
+    ]
+    assert len(d60) == 2
+    assert all(
+        row.identity.total_pressure_Pa.is_unknown
+        and row.point_conditions["total_pressure_Pa"].state.value.point
+        == Decimal("1100000000")
+        for row in d60
     )
 
 
