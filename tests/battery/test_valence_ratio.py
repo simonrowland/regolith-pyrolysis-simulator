@@ -316,12 +316,34 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
         "berry_2004_table3_ad_r01": Decimal("0.050"),
         "berry_2004_table3_ad_wo_r13": Decimal("0.453"),
         "berry_2004_table3_ad_rt20_r24": Decimal("0.951"),
+        "berry_2004_table3_ad_r21": Decimal("0.936"),
+        "berry_2004_table3_ad_fo_r21": Decimal("0.919"),
     }
     for local_id, expected in render_pins.items():
         row = by_local_id[local_id]
         assert row.value.kind is ValueKind.POINT
         assert row.value.point == expected
         assert row.locator.published_page == 794
+
+    duplicate_author_row = {
+        local_id: by_local_id[local_id]
+        for local_id in (
+            "berry_2004_table3_ad_r21",
+            "berry_2004_table3_ad_fo_r21",
+        )
+    }
+    assert {
+        local_id: row.value.point for local_id, row in duplicate_author_row.items()
+    } == {
+        "berry_2004_table3_ad_r21": Decimal("0.936"),
+        "berry_2004_table3_ad_fo_r21": Decimal("0.919"),
+    }
+    assert duplicate_author_row["berry_2004_table3_ad_r21"].locator.record.endswith(
+        "AD column; Cr2+/SumCr cell"
+    )
+    assert duplicate_author_row[
+        "berry_2004_table3_ad_fo_r21"
+    ].locator.record.endswith("AD + Fo column; Cr2+/SumCr cell")
 
     assert all(row.identity.species.formula == "Cr" for row in fractions)
     assert all(row.identity.species.phase.value is Phase.L for row in fractions)
@@ -384,10 +406,11 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
         assert not row.derived_from
         assert not row.derivation.inputs
         assert row.derivation.raw_inputs is not None
-        assert row.derivation.raw_inputs.state.is_value
         assert row.derivation.raw_inputs.state.value == "not_printed"
         assert row.derivation.raw_inputs.locator is not None
-        assert row.derivation.raw_inputs.locator.table == "4"
+        assert row.derivation.raw_inputs.locator.table is None
+        assert row.derivation.raw_inputs.locator.section == "Experimental methods"
+        assert "Raw XANES spectra" in row.derivation.raw_inputs.locator.record
         assert selected_lineage_level(row, set(result.observations))
 
     area_pins = {
