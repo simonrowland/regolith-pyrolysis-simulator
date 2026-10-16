@@ -1450,6 +1450,27 @@ def test_below_solidus_with_routed_flow_is_honest_infeasible() -> None:
         assert "not-attempted-no-volatilization" not in margin.detail
 
 
+@pytest.mark.parametrize(
+    ("knudsen_number", "expected_regime"),
+    [
+        (0.0, "viscous"),
+        (math.nextafter(0.01, 0.0), "viscous"),
+        (0.01, "transitional"),
+        (1.0, "transitional"),
+        (math.nextafter(10.0, 0.0), "transitional"),
+        (10.0, "free_molecular"),
+        (1e6, "free_molecular"),
+    ],
+)
+def test_optimizer_knudsen_regime_boundary_pin(
+    knudsen_number: float,
+    expected_regime: str,
+) -> None:
+    assert evaluate_module._knudsen_summary_regime(
+        {}, knudsen_number
+    ) == expected_regime
+
+
 def test_flow_present_missing_knudsen_summary_fails_closed() -> None:
     trace = _trace(snapshots=(_flow_present_missing_knudsen_snapshot(),))
 
