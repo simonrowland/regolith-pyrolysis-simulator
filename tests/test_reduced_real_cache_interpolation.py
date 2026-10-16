@@ -475,6 +475,102 @@ def test_cached_interpolation_uses_query_fo2_and_drops_neighbor_echo(
     assert sim.melt.melt_fO2_log == pytest.approx(-9.0)
 
 
+@pytest.mark.parametrize(
+    ("backend_family", "backend_name", "backend_class", "evidence_class", "backend_diagnostics"),
+    [
+        (
+            "thermoengine",
+            "ThermoEngineBackend",
+            "simulator.melt_backend.thermoengine.ThermoEngineBackend",
+            "melts",
+            {"fO2_transport": "thermoengine_oxygen_root"},
+        ),
+        (
+            "magemin",
+            "MAGEMinBackend",
+            "simulator.melt_backend.magemin.MAGEMinBackend",
+            "magemin",
+            {
+                "applied_fO2_buffer": "mw",
+                "applied_fO2_buffer_n": 0.0,
+                "fO2_clamped": False,
+                "authoritative_for_requested_conditions": True,
+                "authoritative_for_solved_conditions": True,
+            },
+        ),
+    ],
+)
+def test_cached_interpolation_preserves_legacy_engine_fo2_diagnostics(
+    tmp_path: Path,
+    backend_family: str,
+    backend_name: str,
+    backend_class: str,
+    evidence_class: str,
+    backend_diagnostics: dict[str, object],
+) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    query["controls"]["log_fO2"] = -9.0
+    low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1499.0)
+    low["controls"]["log_fO2"] = -9.0001
+    high = _interpolation_key("high", feo_fraction=0.20, temperature_K=1501.0)
+    high["controls"]["log_fO2"] = -8.9999
+    backend = {
+        "backend_name": backend_name,
+        "backend_class": backend_class,
+        "backend_version": "test-v1",
+    }
+    for key in (query, low, high):
+        key["backend"] = copy.deepcopy(backend)
+
+    candidates = []
+    for key, requested_fO2_log in ((low, -9.0001), (high, -8.9999)):
+        payload = _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0)
+        payload["authority"]["backend_family"] = backend_family
+        payload["authority"]["backend"] = copy.deepcopy(backend)
+        payload["authority"]["evidence_class"] = evidence_class
+        result = payload["equilibrium_result"]
+        result["temperature_C"] = key["controls"]["T_K"] - 273.15
+        result["fO2_log"] = -9.0000000005
+        result["diagnostics"] = {
+            **backend_diagnostics,
+            "requested_fO2_log": requested_fO2_log,
+            "solved_fO2_log": -9.0000000005,
+        }
+        candidates.append(_candidate(key, payload))
+
+    attempt = rci.attempt_cached_interpolation(query, candidates)
+
+    assert attempt is not None
+    assert attempt["weight_info"]["mode"] == "along_trajectory_T"
+    assert attempt["weight_info"]["weights"] == pytest.approx([0.5, 0.5])
+    interpolated_result = attempt["payload"]["equilibrium_result"]
+    assert interpolated_result["fO2_log"] == -9.0000000005
+    assert "requested_fO2_log" not in interpolated_result
+    assert "printed_fO2_echo_log" not in interpolated_result
+    assert interpolated_result["diagnostics"] == attempt["neighbors"][0]["payload"][
+        "equilibrium_result"
+    ]["diagnostics"]
+
+    store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / f"interpolated-{backend_family}-fo2.sqlite",
+    )
+    store.last_cache_state = "cached_interpolated"
+    sim = SimpleNamespace(
+        melt=SimpleNamespace(
+            fO2_log=-8.0,
+            melt_fO2_log=-8.0,
+        ),
+    )
+    replayed = store._equilibrium_from_payload(sim, attempt["payload"])
+
+    assert replayed.requested_fO2_log is None
+    assert replayed.fO2_log == interpolated_result["fO2_log"]
+    assert sim.melt.fO2_log == interpolated_result["fO2_log"]
+    assert sim.melt.melt_fO2_log == interpolated_result["fO2_log"]
+    assert sim.melt.fO2_log != query["controls"]["log_fO2"]
+
+
 def test_interpolation_reemits_union_from_every_used_neighbor(tmp_path: Path) -> None:
     query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
     low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1490.0)
