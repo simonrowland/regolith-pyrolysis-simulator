@@ -150,3 +150,22 @@ def test_aithala_row_printed_f_o2_overrides_experiment_value(tmp_path: Path) -> 
     ]
     f_o2 = observation.point_conditions["fO2_log"]
     assert f_o2.state.is_value and f_o2.state.value == Decimal("-5.0")
+
+
+def test_aithala_rejected_row_f_o2_refuses_experiment_fallback(tmp_path: Path) -> None:
+    extract = AITHALA.read_text(encoding="utf-8")
+    extract = extract.replace(
+        "        quantity: fe3_fe2_ratio\n        sample_id: 1800-30\n",
+        "        quantity: fe3_fe2_ratio\n        sample_id: 1800-30\n        log_fO2: '< -5'\n",
+        1,
+    )
+    path = tmp_path / AITHALA.name
+    path.write_text(extract, encoding="utf-8")
+
+    result = _migrate(path)
+    observation = result.observations[
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes"
+    ]
+    f_o2 = observation.point_conditions["fO2_log"]
+    assert f_o2.state.is_unknown
+    assert "bounded or not absolute" in f_o2.state.reason

@@ -11041,6 +11041,12 @@ class PrintedOxygenFacts:
     log_fO2_reference_Pa: Decimal = _BAR_PA
 
 
+def _rejected_log_fO2_reason(facts: PrintedOxygenFacts) -> str | None:
+    if not facts.rejected_log_fO2:
+        return None
+    return "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
+
+
 def _log_fO2_to_pa(
     log10_fO2: Decimal, reference_pressure_pa: Decimal = _BAR_PA
 ) -> Decimal:
@@ -12318,6 +12324,7 @@ class Migrator:
             ratio_oxygen is None
             and facts.log_fO2 is None
             and facts.oxygen_partial_pressure_Pa is None
+            and _rejected_log_fO2_reason(facts) is None
             and fallback
         ):
             ratio_oxygen = collect_author_ratio_oxygen(fallback, locator)
@@ -12331,6 +12338,14 @@ class Migrator:
                 log_fO2_reference_Pa=facts.log_fO2_reference_Pa,
             )
         elif facts.log_fO2 is None and facts.oxygen_partial_pressure_Pa is None:
+            refusal = _rejected_log_fO2_reason(facts)
+            if refusal is not None:
+                merged = dict(point_conditions or {})
+                merged.setdefault(
+                    "fO2_log",
+                    Located(State.unknown(refusal), locator=locator),
+                )
+                return merged
             return point_conditions
         merged = dict(point_conditions or {})
         if facts.log_fO2 is not None and "fO2_log" not in merged:
@@ -15691,18 +15706,13 @@ class Migrator:
                 charge=species.charge,
             )
         identity = fill_identity(quantity, species, **ident_kwargs)
-        if (
-            q_token_point is Quantity.FE3_FE2_RATIO
-            and isinstance(raw_item, Mapping)
-        ):
+        if q_token_point is Quantity.FE3_FE2_RATIO and isinstance(raw_item, Mapping):
             row_oxygen = collect_printed_oxygen((raw_item,), point_locator)
-            if row_oxygen.rejected_log_fO2:
-                # Bounds and buffer-relative logs cannot be point identities.
+            refusal = _rejected_log_fO2_reason(row_oxygen)
+            if refusal is not None:
                 identity = replace(
                     identity,
-                    fO2_Pa=State.unknown(
-                        "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
-                    ),
+                    fO2_Pa=State.unknown(refusal),
                 )
             elif row_oxygen.log_fO2 is not None:
                 # A printed point overrides series fO2; absence leaves the
