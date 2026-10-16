@@ -3021,6 +3021,7 @@ class _IsolatedCellWorker:
                 60.0 if self.engine == "thermoengine" else 30.0
             ),
             call_timeout_s=_ENGINE_OUTER_TIMEOUT_S.get(self.engine, 30.0) + 2.0,
+            diagnostic_signal=signal.SIGCONT,
             # ThermoEngine cold start measured 43.99s here; only it needs this
             # separate READY budget and child-capable worker.
             daemon=self.engine != "thermoengine",

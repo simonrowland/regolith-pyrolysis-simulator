@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import signal
 import resource
 import subprocess
 import sys
@@ -1699,9 +1700,18 @@ def _fake_isolated_cell_handler(_resource, request, _diagnostic_log):
         os._exit(73)
     if mode == "grandchild":
         marker = Path(request["why"])
-        child_code = (
-            "import time; from pathlib import Path; "
-            f"time.sleep(10.0); Path({str(marker)!r}).write_text('survived')"
+        release_file = marker.with_suffix(".release")
+        child_code = "\n".join(
+            (
+                "import time",
+                "from pathlib import Path",
+                f"release = Path({str(release_file)!r})",
+                f"marker = Path({str(marker)!r})",
+                "while not release.exists():",
+                "    time.sleep(0.01)",
+                "time.sleep(2.5)",
+                "marker.write_text('survived')",
+            )
         )
         child = subprocess.Popen([sys.executable, "-c", child_code])
         marker.with_suffix(".pid").write_text(str(child.pid))
@@ -1868,7 +1878,20 @@ def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
     tmp_path: Path,
 ) -> None:
     battery = _install_fake_isolated_cell_worker(monkeypatch)
+    original_worker = battery.WarmEngineWorker
+
+    def fatal_diagnostic_signal_worker(**kwargs):
+        kwargs["diagnostic_signal"] = signal.SIGUSR1
+        return original_worker(**kwargs)
+
+    # Exercise the shared reaper against the fatal signal that exposed the
+    # leak, even though isolated cells now use a non-fatal diagnostic signal.
+    monkeypatch.setattr(
+        battery, "WarmEngineWorker", fatal_diagnostic_signal_worker
+    )
     marker = tmp_path / "grandchild.sentinel"
+    pid_file = marker.with_suffix(".pid")
+    release_file = marker.with_suffix(".release")
     try:
         started = _run_fake_isolated_cell(
             battery,
@@ -1877,7 +1900,9 @@ def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
             why=str(marker),
         )
         assert started.status == "ok"
-        assert marker.with_suffix(".pid").is_file()
+        assert pid_file.is_file()
+        grandchild_pid = int(pid_file.read_text(encoding="utf-8"))
+        release_file.touch()
 
         timed_out = _run_fake_isolated_cell(
             battery,
@@ -1887,7 +1912,18 @@ def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
             timeout_s=0.001,
         )
         assert timed_out.refusal_reason == REFUSAL_TIMEOUT
-        time.sleep(1.0)
+        deadline = time.monotonic() + 0.1
+        while True:
+            try:
+                os.kill(grandchild_pid, 0)
+            except ProcessLookupError:
+                break
+            if time.monotonic() >= deadline:
+                pytest.fail(
+                    f"worker timeout left grandchild pid {grandchild_pid} alive"
+                )
+            time.sleep(0.05)
+        time.sleep(0.5)
         assert not marker.exists(), "worker timeout left its sleeping grandchild alive"
         recovered = _run_fake_isolated_cell(battery, pot_id="worker-after-timeout")
         assert recovered.status == "ok"

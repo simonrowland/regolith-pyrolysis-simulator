@@ -700,30 +700,32 @@ class WarmEngineWorker:
             pid = _process_pid(process)
             if pid is None:
                 pass
-            elif cleanup_group and process is not None and not process.is_alive():
-                try:
-                    os.killpg(pid, signal.SIGKILL)
-                except (AttributeError, OSError):
-                    pass
-            elif process is not None and process.is_alive():
-                if diagnostic:
+            else:
+                if process is not None and process.is_alive() and diagnostic:
                     try:
                         os.kill(pid, self.diagnostic_signal)
                     except OSError:
                         pass
                     time.sleep(self.watchdog_grace_s)
-                if process.is_alive():
+
+                # The diagnostic signal may have killed the leader while its
+                # descendants remain in the session. Reap the group regardless
+                # of the leader's liveness before falling back to Process.kill.
+                if cleanup_group or (
+                    process is not None and process.is_alive()
+                ):
                     try:
                         os.killpg(pid, signal.SIGKILL)
                         process.join(timeout=0.1)
                     except (AttributeError, OSError):
                         pass
-                if process.is_alive():
+                if process is not None and process.is_alive():
                     try:
                         process.kill()
                     except OSError:
                         pass
-                process.join(timeout=1.0)
+                if process is not None:
+                    process.join(timeout=1.0)
         finally:
             if connection is not None:
                 try:
