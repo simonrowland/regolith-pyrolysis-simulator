@@ -3,30 +3,14 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
-import yaml
-
-from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
+from simulator.battery.enums import EvidenceClass
+from tests.battery.test_migrate import _migrate_real_extract
 
 
 def test_fe_neutral_table2_pressure_is_explicitly_model_derived(
     tmp_path: Path,
 ) -> None:
     source_id = "shornikov-2008-redox-oxide-evaporation"
-    source = yaml.safe_load(
-        (REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml")
-        .read_text(encoding="utf-8")
-    )
-    fe = next(
-        observation
-        for observation in source["species"]["Fe_table2"]["observations"]
-        if observation["observation_id"] == "shornikov_2008_t2_fe_neutral"
-    )
-    assert fe["values"]["method_class"] == "model_derived"
-    assert fe["values"]["evidence_class"] == "model_derived"
-    assert fe["values"]["model"] == (
-        "Gibbs energy minimization using the activity data [15] and thermodynamic data [18, 19]."
-    )
-
     result = _migrate_real_extract(tmp_path, f"{source_id}.yaml", write=False)
     rows = [
         observation
@@ -41,3 +25,13 @@ def test_fe_neutral_table2_pressure_is_explicitly_model_derived(
         Decimal("0.014793450"),
         Decimal("0.043265775"),
     ]
+    assert all(row.evidence.class_.is_value for row in rows)
+    assert all(
+        row.evidence.class_.value is EvidenceClass.MODEL_DERIVED for row in rows
+    )
+    parent_prefix = f"{source_id}::shornikov_2008_t2_feo_activity::T=2000.0:"
+    assert all(row.derived_from for row in rows)
+    assert all(
+        all(parent.startswith(parent_prefix) for parent in row.derived_from)
+        for row in rows
+    )
