@@ -1007,29 +1007,7 @@ species:
         admission_status: admitted
         sample: '10017'
         p_Pa_arithmetic: p_Pa = p_atm x 101325
-        composition_basis: same_sample_catalog_first_complete_whole_sample_bulk_analysis
-        composition_from_sample_catalog: true
-        composition_source_kind: published_same_sample_bulk_analysis
-        composition_source: >-
-          Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk
-          analysis. Selection rule: use the first complete named whole-sample bulk-analysis column after
-          the reference summary, excluding component and clast analyses; do not average analyses. This
-          composition is a cross-source same-sample proxy, not a composition printed by DeMaria 1973.
-        composition_source_locator:
-          source_id: lpi-compendium-10017
-          published_pages: 'PDF p. 7, Table 1a'
-          quote: Maxwell70 GSC complete bulk analysis for Apollo 10017
-        sample_oxide_composition_wt_pct:
-          SiO2: 40.78
-          TiO2: 11.71
-          Al2O3: 8.12
-          FeO: 19.82
-          MnO: 0.22
-          MgO: 7.65
-          CaO: 10.55
-          Na2O: 0.51
-          K2O: 0.30
-          P2O5: 0.13
+        caveat: bulk composition not printed; requested on fetch list
         fO2_pairing:
           status: unavailable_no_printed_oxygen_column
           measured_at_same_T: false
@@ -1079,29 +1057,7 @@ species:
         admission_status: admitted
         sample: '12073'
         p_Pa_arithmetic: p_Pa = p_atm x 101325
-        composition_basis: same_sample_catalog_first_complete_whole_sample_bulk_analysis
-        composition_from_sample_catalog: true
-        composition_source_kind: published_same_sample_bulk_analysis
-        composition_source: >-
-          Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample
-          bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column
-          after partial/component columns, excluding basalt-clast analyses; do not average analyses. Sample
-          12073 is a heterogeneous regolith breccia, so this is a cross-source same-sample bulk proxy,
-          not a composition printed by DeMaria 1973.
-        composition_source_locator:
-          source_id: lpi-compendium-12073
-          published_pages: 'PDF p. 5, Table 1'
-          quote: LSPET70 complete whole-sample bulk analysis for Apollo 12073
-        sample_oxide_composition_wt_pct:
-          SiO2: 41.0
-          TiO2: 3.1
-          Al2O3: 15.0
-          FeO: 17.0
-          MnO: 0.13
-          MgO: 11.0
-          CaO: 11.5
-          Na2O: 0.5
-          K2O: 0.25
+        caveat: bulk composition not printed; requested on fetch list
         fO2_pairing:
           status: unavailable_no_printed_oxygen_column
           measured_at_same_T: false
