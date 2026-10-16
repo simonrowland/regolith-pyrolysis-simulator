@@ -80,6 +80,24 @@ from simulator.transport_regime import TransportRegimeRefusal
 from optimizer_fixtures import StubSmokeConstraintSet
 
 
+def test_optimizer_trace_preserves_high_t_melt_activity_notice() -> None:
+    notice = {
+        "kind": "high_t_melt_activity_fallback",
+        "authority": "extrapolated",
+        "reason": "imcc_nonconvergence",
+        "campaigns": ["C2A", "C4"],
+    }
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            high_t_melt_activity_run_notice=lambda: notice
+        )
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert payload["high_t_melt_activity_fallback_notice"] == notice
+
+
 PO2_DEFAULT = ("campaigns", "C0b_p_cleanup", "pO2_mbar_default")
 C6_WINDOW_REFUSAL = "c6_joint_thermodynamic_liquid_fraction_window_empty"
 

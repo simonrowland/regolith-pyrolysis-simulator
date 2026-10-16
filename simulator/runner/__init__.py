@@ -78,6 +78,7 @@ from simulator.core import (
     CampaignPhase,
     DEGRADED_PATH_ENGAGEMENT_KEYS,
     PyrolysisSimulator,
+    read_high_t_melt_activity_fallback_notice,
 )
 from simulator.condensation import (
     KNUDSEN_REFUSAL_REASON,
@@ -1447,6 +1448,7 @@ class PyrolysisRun:
         _attach_sulfur_saturation_notice(run_metadata, sim)
         _attach_rump_expectation_notice(run_metadata, sim)
         _attach_composition_projected_liquidus_notice(run_metadata, sim)
+        _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
         run_metadata.update(
             canonicalize_fidelity_emission(
                 backend_name=self.backend_name,
@@ -3542,6 +3544,17 @@ def _attach_composition_projected_liquidus_notice(
         )
 
 
+def _attach_high_t_melt_activity_fallback_notice(
+    run_metadata: dict[str, Any],
+    sim: Any,
+) -> None:
+    notice = read_high_t_melt_activity_fallback_notice(sim)
+    if notice:
+        run_metadata["high_t_melt_activity_fallback_notice"] = _json_safe(
+            notice
+        )
+
+
 def _engine_commissioning_sentence(notice: Mapping[str, Any]) -> str:
     authority = str(notice.get("authority") or "unspecified")
     pieces: list[str] = []
@@ -3576,6 +3589,26 @@ def _diagnostic_gate_authority_sentence(notice: Mapping[str, Any]) -> str:
         f"**Diagnostic freeze-gate authority**: provider `{provider_id}` is "
         f"authoritative for `{intent}` dispatch but has no ledger-transition "
         "authority. Reported numbers are unchanged."
+    )
+
+
+def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
+    reason = str(notice.get("reason") or "openimcc_evaluation_refused")
+    campaign = notice.get("campaign")
+    campaigns = notice.get("campaigns")
+    if campaign:
+        campaign_text = f"campaign `{campaign}`"
+    elif isinstance(campaigns, (list, tuple)) and campaigns:
+        campaign_text = f"campaigns `{', '.join(map(str, campaigns))}`"
+    else:
+        campaign_text = "campaign `unspecified`"
+    return (
+        f"**High-temperature melt activity**: OpenIMCC refusal `{reason}` "
+        "used a constant-gamma extrapolated prediction for "
+        f"{notice.get('affected_tick_count', 0)} tick(s) and "
+        f"{notice.get('affected_parent_count', 0)} parent oxide(s), "
+        f"{campaign_text}, hours {notice.get('first_hour')}-"
+        f"{notice.get('last_hour')}."
     )
 
 
@@ -3625,6 +3658,14 @@ def _product_classification_report(
     if notice:
         report["engine_commissioning_notice"] = _json_safe(notice)
         sentences.append(_engine_commissioning_sentence(notice))
+    high_t_activity_notice = read_high_t_melt_activity_fallback_notice(sim)
+    if high_t_activity_notice:
+        report["high_t_melt_activity_fallback_notice"] = _json_safe(
+            high_t_activity_notice
+        )
+        sentences.append(
+            _high_t_melt_activity_fallback_sentence(high_t_activity_notice)
+        )
     diagnostic_notice = _diagnostic_gate_authority_notice(sim)
     if diagnostic_notice:
         report["diagnostic_gate_authority_notice"] = _json_safe(
@@ -5250,6 +5291,7 @@ def _runner_failure_result(
     _attach_sulfur_saturation_notice(run_metadata, sim)
     _attach_rump_expectation_notice(run_metadata, sim)
     _attach_composition_projected_liquidus_notice(run_metadata, sim)
+    _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
     final_state = (
         _safe_failure_value(lambda: _final_state_from_ledger(sim), {})
         if sim is not None
