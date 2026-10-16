@@ -3253,17 +3253,15 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
     buffer_n_args = [a for a in buffer_args if a.startswith("--buffer_n=")]
     assert len(buffer_n_args) == 1, buffer_args
     buffer_n = float(buffer_n_args[0].split("=", 1)[1])
-    # O'Neill 1987: logfo2_QFM = 8.58 - 25050 / T_K. At T_C = 1450,
-    # T_K = 1723.15, QFM ~ 8.58 - 14.537 = -5.957. So delta should be
-    # ~-12 - (-5.957) = -6.043. Allow generous tolerance for the
-    # calibration fit.
-    expected_offset = -12.0 - (8.58 - 25050.0 / (1450.0 + 273.15))
+    # The owner supplies the QFM reference for this absolute-to-offset path.
+    qfm_at_1450C = MAGEMinBackend._qfm_logfo2_oneill(1450.0)
+    expected_offset = -12.0 - qfm_at_1450C
     assert buffer_n == pytest.approx(expected_offset, abs=0.05), (
         f"buffer_n={buffer_n} should approximate {expected_offset}"
     )
     # Once the offset round-trips through QFM(T) we recover the
     # requested absolute fO2_log within calibration accuracy.
-    recovered_fo2_log = buffer_n + (8.58 - 25050.0 / (1450.0 + 273.15))
+    recovered_fo2_log = buffer_n + qfm_at_1450C
     assert recovered_fo2_log == pytest.approx(-12.0, abs=0.05)
     # The warning chain must explicitly name the substitution so the
     # caller knows their absolute fO2 was translated, not ignored.
@@ -3385,8 +3383,7 @@ def test_magemin_resolve_buffer_qfm_calibration_at_1450C():
     # A5 honest-substitution path; a wrong constant would silently shift
     # every Mars reducing fO2 by ~6 decades.
     qfm_at_1450C = MAGEMinBackend._qfm_logfo2_oneill(1450.0)
-    expected = 8.58 - 25050.0 / (1450.0 + 273.15)
-    assert qfm_at_1450C == pytest.approx(expected, abs=1e-9)
+    assert qfm_at_1450C == -5.957329890026985
     assert -7.0 < qfm_at_1450C < -5.0, qfm_at_1450C
 
 
@@ -3405,3 +3402,26 @@ def test_magemin_qfm_buffer_offsets_are_bit_pinned():
             fO2_log=-12.0,
         )
         assert offset.hex() == pinned_hex
+
+
+def test_oneill_qfm_coefficient_has_one_production_owner():
+    repo_root = Path(__file__).resolve().parents[1]
+    tracked = subprocess.run(
+        ["git", "ls-files", "--", "simulator", "engines"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.splitlines()
+    coefficient = re.compile(r"(?<!\d)25_?050(?:\.0)?(?!\d)")
+    occurrences = []
+
+    for relative_path in tracked:
+        if not relative_path.endswith(".py"):
+            continue
+        source_path = repo_root / relative_path
+        for line in source_path.read_text(encoding="utf-8").splitlines():
+            if coefficient.search(line):
+                occurrences.append(relative_path)
+
+    assert occurrences == ["engines/builtin/cco_redox_buffer.py"]

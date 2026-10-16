@@ -2666,17 +2666,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
     @staticmethod
     def _qfm_logfo2_oneill(temperature_C: float) -> float:
-        """
-        Absolute log10(fO2) of the QFM buffer at ``temperature_C``.
+        """Convert Celsius to Kelvin and delegate to the shared QFM owner."""
+        from engines.builtin.cco_redox_buffer import qfm_log10_fO2_bar
 
-        O'Neill (1987) formulation: ``logfO2_QFM = 8.58 - 25050 / T_K``.
-        Kept in sync with ``sulfsat.py::_qfm_logfo2_oneill`` for engine-aligned
-        buffer reporting only. NOTE (b-094): the Jugo-2010 S6+/ST path no
-        longer uses this fit — Jugo deltaQFM is referenced to Frost (1991)
-        per PySulfSat's own requirement.
-        """
         T_K = float(temperature_C) + 273.15
-        return 8.58 - 25050.0 / T_K
+        return qfm_log10_fO2_bar(T_K)
 
     def _resolve_buffer(
         self, *, temperature_C: float, fO2_log: float,

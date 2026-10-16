@@ -88,12 +88,15 @@ def test_reference_delta_uses_absolute_log10_minus_qfm() -> None:
     result = cco_buffered_fO2(temperature_K, 1.0, reference_buffer="QFM")
     qfm = qfm_log10_fO2_bar(temperature_K)
 
-    assert qfm == pytest.approx(8.58 - 25050.0 / temperature_K)
     assert result.reference_log10_fO2_bar == pytest.approx(qfm)
     assert result.delta_log10_fO2_from_reference == pytest.approx(
         result.log10_fO2_bar - qfm
     )
     assert result.delta_log10_fO2_from_reference < 0.0
+
+
+def test_oneill_qfm_reference_anchor() -> None:
+    assert qfm_log10_fO2_bar(1473.15) == -8.424378372874452
 
 
 def test_cco_log10_fO2_increases_with_temperature() -> None:
