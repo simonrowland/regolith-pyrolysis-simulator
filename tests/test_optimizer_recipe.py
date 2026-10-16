@@ -2086,11 +2086,21 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
             assert (spec.low, spec.high) == tuple(yaml_value)
             range_sourced += 1
         elif spec.bounds_source.startswith(
-            "engineering_envelope converted from setpoints:"
+            "engineering_envelope converted from setpoints.yaml range "
         ):
             yaml_value = _lookup_setpoint(setpoints, "campaigns.C5.pO2_bar")
             assert (spec.low, spec.high) == tuple(
                 value * 1000 for value in yaml_value
+            )
+            mbar_target = (
+                "mbar default"
+                if spec.path[-1] == "pO2_mbar_default"
+                else "total mbar default"
+            )
+            assert spec.bounds_source == (
+                "engineering_envelope converted from setpoints.yaml range "
+                f"campaigns.C5.pO2_bar=[{yaml_value[0]!r}, {yaml_value[1]!r}] "
+                f"bar to {mbar_target}"
             )
             converted_setpoint_ranges += 1
         elif spec.bounds_source.startswith(
@@ -2177,7 +2187,7 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
         for spec in schema.allowlist
         if spec.bounds_source.startswith("setpoints:")
         or spec.bounds_source.startswith(
-            "engineering_envelope converted from setpoints:"
+            "engineering_envelope converted from setpoints.yaml range "
         )
     }
 

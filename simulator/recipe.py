@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import copy
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from functools import lru_cache
 import hashlib
 import math
@@ -429,6 +429,7 @@ class KnobSpec:
     runtime_enabled: bool = True
     scale: Literal["linear", "log", "log10", "ordinal", "zero-inflated"] = "linear"
     guard: GuardSpec | None = None
+    _bound_types: tuple[type, type] | None = field(default=None, repr=False)
 
 
 def _knob(
@@ -444,6 +445,7 @@ def _knob(
     runtime_enabled: bool = True,
     scale: Literal["linear", "log", "log10", "ordinal", "zero-inflated"] = "linear",
     guard: GuardSpec | None = None,
+    _bound_types: tuple[type, type] | None = None,
 ) -> KnobSpec:
     return KnobSpec(
         path=tuple(path.split(".")),
@@ -457,6 +459,7 @@ def _knob(
         runtime_enabled=runtime_enabled,
         scale=scale,
         guard=guard,
+        _bound_types=_bound_types,
     )
 
 
@@ -479,6 +482,7 @@ def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
             scale="log",
+            _bound_types=(float, float),
         ),
         _knob(
             f"{prefix}.gas_cover_mode",
@@ -2058,13 +2062,27 @@ def _setpoint_sourced_allowlist(
                 f"setpoints bounds source {source_path!r} must contain two values"
             )
         low, high = value
+        bounds_source = spec.bounds_source
         if scale != 1:
+            source_range = f"[{low!r}, {high!r}]"
+            source_suffix = spec.bounds_source.removeprefix(
+                f"{converted_source_prefix}{source_path}"
+            )
+            bounds_source = (
+                "engineering_envelope converted from setpoints.yaml range "
+                f"{source_path}={source_range}{source_suffix}"
+            )
             low, high = (bound * scale for bound in (low, high))
             low, high = (
                 int(bound) if float(bound).is_integer() else bound
                 for bound in (low, high)
             )
-        resolved.append(replace(spec, low=low, high=high))
+        if spec._bound_types is not None:
+            low = spec._bound_types[0](low)
+            high = spec._bound_types[1](high)
+        resolved.append(
+            replace(spec, low=low, high=high, bounds_source=bounds_source)
+        )
     return tuple(resolved)
 
 
