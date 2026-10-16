@@ -60,18 +60,20 @@ def test_inverse_notice_bound_uses_actual_ferric_inventory(probe):
 
 
 @pytest.mark.parametrize('q, lower, upper', [
-    (0.039, 0.679, 0.529), (0.02, 1.558, 0.921),
-    (0.01, math.inf, 1.558),
+    (0.039, 1.142, 1.059), (0.02, 2.346, 1.981),
+    (0.01, math.inf, 3.806),
 ])
-def test_saturation_band_matches_jayasuriya_method_precision(q, lower, upper):
-    # Jayasuriya et al. 2004 method precision propagated in t-1293 Table 1.
+def test_saturation_band_combines_jayasuriya_precision_and_held_out_residual(q, lower, upper):
+    # Independent propagation in d160-seed: Jayasuriya method precision plus
+    # RMS(.0046,.0235,.0122) validation residual, without subtracting a bias.
     band = fe_redox._native_fe_saturation_band(q)
     assert band[0] == pytest.approx(lower, abs=0.001)
     assert band[1] == pytest.approx(upper, abs=0.001)
 
 
 @pytest.mark.parametrize('margin, status', [
-    (-0.8, 'BELOW'), (-0.031, 'INDETERMINATE'), (0.6, 'ABOVE'),
+    (-1.2, 'BELOW'), (-0.8, 'INDETERMINATE'), (-0.031, 'INDETERMINATE'),
+    (0.2, 'INDETERMINATE'), (0.6, 'INDETERMINATE'), (1.1, 'ABOVE'),
 ])
 def test_three_way_saturation_uses_propagated_band(monkeypatch, margin, status):
     monkeypatch.setattr(fe_redox, 'calphad_ferrous_feo_activity_diagnostic',
@@ -372,6 +374,7 @@ def _reducing_sim():
     from tests.chemistry.conftest import _build_sim, _load_yaml
 
     feeds = _load_yaml('feedstocks.yaml')
+    feeds['lunar_mare_low_ti'].pop('iron_speciation', None)
     feeds['lunar_mare_low_ti']['composition_wt_pct'] = {
         'FeO': 60., 'K2O': 80., 'SiO2': 40.,
         'Fe2O3': 60. / MOLAR_MASS['FeO'] * 0.039 / (2 * (1 - 0.039)) * MOLAR_MASS['Fe2O3'],

@@ -22,6 +22,7 @@ DECLARED_ACCOUNTS = frozenset({
     "process.spent_reductant_residue",
     "process.overhead_gas",
     "reservoir.fo2_buffer",
+    "process.metal_phase",
 })
 
 
@@ -68,6 +69,25 @@ def test_provider_declares_fe_redox_respeciation_authority_and_accounts():
         ChemistryIntent.FE_REDOX_RESPECIATION,
     })
     assert profile.declared_accounts == DECLARED_ACCOUNTS
+
+
+@pytest.mark.parametrize('metal,ferric', [(2., 5.), (5., 2.), (0., 5.)])
+def test_comproportionation_funds_both_reactants_and_closes_atoms(metal, ferric):
+    provider = BuiltinFeRedoxRespeciationProvider()
+    result = provider.dispatch(_request({}, {
+        'process.cleaned_melt': {'FeO': 10., 'Fe2O3': ferric},
+        'process.metal_phase': {'Fe': metal},
+    }, fO2_log=-10., control_inputs={'reaction': 'fe0_comproportionation'}))
+    assert result.status == 'ok'
+    if not metal:
+        assert result.transition is None
+        return
+    proposal = result.transition
+    validate_atom_balance(proposal, {})
+    validate_proposal_accounts(proposal, provider.DECLARED_ACCOUNTS)
+    assert proposal.debits['process.metal_phase']['Fe'] == min(metal, ferric)
+    assert proposal.credits['process.cleaned_melt']['FeO'] == 3*min(metal, ferric)
+    assert 'O2' not in proposal.credits.get('process.overhead_gas', {})
 
 
 def test_fe_redox_respeciation_intent_authority_is_registered(

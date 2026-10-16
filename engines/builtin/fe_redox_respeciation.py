@@ -21,10 +21,11 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
     ProviderAccountView,
 )
-from simulator.account_ids import MELT_RESIDENT_ACCOUNTS
+from simulator.account_ids import MELT_RESIDENT_ACCOUNTS, METAL_PHASE_ACCOUNT
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
+    fe0_comproportionation_extent,
     kress91_fe3_over_sigma_fe,
     kress91_temperature_band_case,
     melt_mol_fractions_for_kress91,
@@ -54,6 +55,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
     name = "builtin-fe-redox-respeciation"
     DECLARED_ACCOUNTS = frozenset({
         *MELT_RESIDENT_ACCOUNTS,
+        METAL_PHASE_ACCOUNT,
         OXYGEN_ACCOUNT,
         FO2_BUFFER_ACCOUNT,
     })
@@ -152,6 +154,25 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         cleaned_melt = dict(accounts.get(CLEANED_MELT_ACCOUNT, {}) or {})
         feo_mol = max(0.0, float(cleaned_melt.get("FeO", 0.0) or 0.0))
         fe2o3_mol = max(0.0, float(cleaned_melt.get("Fe2O3", 0.0) or 0.0))
+        if controls.get('reaction') == 'fe0_comproportionation':
+            metal = max(0.0, float(accounts.get(METAL_PHASE_ACCOUNT, {}).get('Fe', 0.0)))
+            extent = fe0_comproportionation_extent(metal, fe2o3_mol)
+            n = extent['extent_mol']
+            proposal = None
+            if n > NOOP_MOL:
+                debits = {METAL_PHASE_ACCOUNT: {'Fe': n}, CLEANED_MELT_ACCOUNT: {'Fe2O3': n}}
+                credits = {CLEANED_MELT_ACCOUNT: {'FeO': extent['feo_credit_mol']}}
+                proposal = LedgerTransitionProposal(
+                    debits=debits, credits=credits, reason='fe0_comproportionation',
+                    atom_balance_proof=build_atom_balance_proof(
+                        debits, credits, request.account_view.species_formula_registry,
+                        resolve_species_formula),
+                )
+            return IntentResult(
+                intent=ChemistryIntent.FE_REDOX_RESPECIATION, status='ok',
+                transition=proposal, control_audit=control_audit,
+                diagnostic={**band_diagnostic, **extent, 'reaction': 'fe0_comproportionation'},
+            )
         total_fe_mol = feo_mol + 2.0 * fe2o3_mol
         if total_fe_mol <= NOOP_MOL:
             return IntentResult(

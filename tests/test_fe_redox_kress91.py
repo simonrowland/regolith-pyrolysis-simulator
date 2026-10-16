@@ -76,13 +76,11 @@ def test_measured_initial_split_is_preserved_without_kress_reanchoring():
     assert diagnostic['method'] == 'declared_split'
 
 
-def test_missing_initial_anchor_is_predicted_and_explicitly_flagged():
+def test_missing_initial_anchor_is_a_typed_refusal():
     from simulator.fe_redox import initialize_feedstock_iron
 
-    initialized, diagnostic = initialize_feedstock_iron(
-        {'composition_wt_pct': {'SiO2': 80.0, 'FeO': 20.0}})
-    assert initialized['composition_wt_pct']['Fe2O3'] > 0.0
-    assert set(diagnostic['certification_gaps']) >= {'intrinsic_delta_iw', 'formation_temperature_K'}
+    with pytest.raises(Kress91InvalidControls, match='cited intrinsic_redox'):
+        initialize_feedstock_iron({'composition_wt_pct': {'SiO2': 80.0, 'FeO': 20.0}})
 
 
 def test_exhausted_ferric_inventory_has_an_activity_corrected_iw_lower_bound():

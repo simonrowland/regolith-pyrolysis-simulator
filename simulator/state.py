@@ -20,6 +20,7 @@ from simulator.condensation_routing import target_species_for_stage_number
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe_errors import MalformedRecipeError
+from simulator.feedstock_composition import IronSeedAuthority
 
 # ============================================================================
 # SECTION 1: CONSTANTS
@@ -1043,6 +1044,8 @@ class HourSnapshot:
     temperature_C: float = 25.0
     melt_mass_kg: float = 0.0
     composition_wt_pct: Dict[str, float] = field(default_factory=dict)
+    seed_authority: IronSeedAuthority | None = None
+    iron_comproportionation: Dict[str, Any] = field(default_factory=dict)
     inventory: ProcessInventory = field(default_factory=ProcessInventory)
     # Historical C6 hold accounting must use the dispatch decision made on
     # that tick. Re-evaluating an old temperature against a later ramp target
@@ -1296,6 +1299,7 @@ class BatchRecord:
     batch_id: str = ''
     feedstock_key: str = ''
     feedstock_label: str = ''
+    seed_authority: IronSeedAuthority | None = None
     batch_mass_kg: float = 0.0
     additives_kg: Dict[str, float] = field(default_factory=dict)
     initial_inventory: ProcessInventory = field(default_factory=ProcessInventory)

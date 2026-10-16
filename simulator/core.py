@@ -432,6 +432,8 @@ from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
     kress91_intrinsic_state,
     initialize_feedstock_iron,
+    conventional_iw_log10_fO2_bar,
+    CONVENTIONAL_IW_SOURCE,
     kress91_oxygen_demand_mol,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_split,
@@ -1526,6 +1528,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             resolve_feedstock_composition(fs).fe_redox_split_unknown
         )
         fs, self._feedstock_iron_initialization = initialize_feedstock_iron(fs)
+        self._feedstock_iron_comproportionation_pending = bool(
+            self._feedstock_iron_initialization.get('metal_phase_species'))
+        self._feedstock_iron_comproportionation = {}
         ledger_additives = dict(additives)
 
         previous_registry = self.species_formula_registry
@@ -1653,6 +1658,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.record = BatchRecord(
             feedstock_key=feedstock_key,
             feedstock_label=fs.get('label', feedstock_key),
+            seed_authority=self._feedstock_iron_initialization['seed_authority'],
             batch_mass_kg=mass_kg,
             additives_kg=additives,
             initial_inventory=self.inventory.copy(),
@@ -6231,6 +6237,39 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             > OXYGEN_RESERVOIR_NOOP_MOL
         )
 
+    def _apply_feedstock_iron_comproportionation(
+        self, *, gate_authority=_RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+    ) -> Dict[str, Any]:
+        if not getattr(self, '_feedstock_iron_comproportionation_pending', False):
+            return dict(getattr(self, '_feedstock_iron_comproportionation', {}))
+        gate_authority = self._resolved_melt_redox_gate_authority(gate_authority)
+        T_K = float(self.melt.temperature_C) + 273.15
+        if not self._melt_redox_temperature_shift_is_liquid(T_K, gate_authority=gate_authority):
+            return {'reaction': 'fe0_comproportionation', 'status': 'deferred_not_liquid'}
+        controls = {'reaction': 'fe0_comproportionation'}
+        result = self._dispatch_only(
+            ChemistryIntent.FE_REDOX_RESPECIATION, control_inputs=controls,
+            fO2_log=float(self.melt.melt_fO2_log),
+        )
+        diagnostic = dict(result.diagnostic or {}, status=result.status)
+        if result.status != 'ok':
+            self._feedstock_iron_comproportionation = diagnostic
+            raise AccountingError(f'first-liquid iron comproportionation refused: {diagnostic}')
+        if result.transition is not None:
+            transition_source, transition_meta = self._melt_redox_transition_provenance(gate_authority)
+            transition = self._commit_proposal(
+                ChemistryIntent.FE_REDOX_RESPECIATION, result.transition,
+                diagnostic=diagnostic, control_inputs=controls,
+                transition_source=transition_source, transition_meta=transition_meta,
+            )
+            diagnostic['transition_name'] = transition.name
+            self._project_cleaned_melt_from_atom_ledger()
+        self._feedstock_iron_comproportionation_pending = False
+        self._re_reference_melt_fO2_to_temperature(T_K, gate_authority=gate_authority)
+        diagnostic['intrinsic_state_after'] = dict(self._last_intrinsic_redox_state)
+        self._feedstock_iron_comproportionation = diagnostic
+        return diagnostic
+
     def _apply_fe_redox_respeciation(
         self,
         *,
@@ -6298,6 +6337,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._fe_redox_respeciation_diagnostics_this_hr.append(dict(diagnostic))
             self.melt.oxygen_reservoir.ferric_divergence = dict(divergence)
             return diagnostic
+        self._apply_feedstock_iron_comproportionation(gate_authority=gate_authority)
         fO2_log, reference_T_K = self._melt_fO2_reference_state_at_temperature(
             T_K,
             gate_authority=gate_authority,
@@ -7039,7 +7079,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             floor_bar=self._vacuum_floor_bar(),
         )
         log_iw = (
-            -27215.0 / T_K + 6.57
+            conventional_iw_log10_fO2_bar(T_K)
             if T_K > 0.0
             else math.log10(self._vacuum_floor_bar())
         )
@@ -7048,8 +7088,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'temperature_K': float(T_K),
             'pressure_bar': float(pressure_bar),
             'iw_log': float(log_iw),
-            'native_fe_saturation': bool(fO2_log <= log_iw),
-            'native_fe_threshold': 'IW',
+            'iw_reference': CONVENTIONAL_IW_SOURCE,
+            'native_fe_saturation': False,
+            'native_fe_threshold': 'unavailable:no_iron',
             'reference': KRESS_CARMICHAEL_1991_REFERENCE,
             'diagnostic_only': True,
             'intrinsic_state': dict(getattr(self, '_last_intrinsic_redox_state', {})),
@@ -7577,6 +7618,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._last_native_fe_saturation_event = dict(event)
             return {**split, **event}
 
+        self._apply_feedstock_iron_comproportionation(gate_authority=gate_authority)
         self._re_reference_melt_fO2_to_temperature(
             T_K,
             gate_authority=gate_authority,
@@ -8210,8 +8252,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._load_ledger_account(
             'terminal.drain_tap_material',
-            self.inventory.metal_alloy_kg,
+            {species: kg for species, kg in self.inventory.metal_alloy_kg.items()
+             if species not in self._feedstock_iron_initialization.get('metal_phase_species', ())},
             source=f'{label} Stage 0 metal alloy',
+        )
+        self._load_ledger_account(
+            'process.metal_phase',
+            {species: kg for species, kg in self.inventory.metal_alloy_kg.items()
+             if species in self._feedstock_iron_initialization.get('metal_phase_species', ())},
+            source=f'{label} initial speciated metal',
         )
         self._load_ledger_account(
             'terminal.slag',
@@ -13563,6 +13612,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._update_temperature()
         self._apply_c2a_knudsen_pressure_adjustment()
         self._establish_melt_redox_gate_authority_for_current_hour()
+        self._apply_feedstock_iron_comproportionation()
         self._apply_oxygen_reservoir_exchange()
         self._apply_o2_bubbler()
         # t-325: un-lanced solid char reduces melt FeO at T >= 700 C
@@ -14563,6 +14613,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             temperature_C=self.melt.temperature_C,
             melt_mass_kg=self.melt.total_mass_kg,
             composition_wt_pct=self.melt.composition_wt_pct(),
+            seed_authority=getattr(self.record, 'seed_authority', None),
+            iron_comproportionation=dict(getattr(self, '_feedstock_iron_comproportionation', {})),
             inventory=self.inventory.copy(),
             c6_at_hold_target=(
                 self.melt.campaign == CampaignPhase.C6

@@ -14,6 +14,11 @@
 lunar_mare_low_ti:
   intrinsic_redox:
     delta_iw: -1.0
+    buffer: solid_iron_wustite_sato1973
+    buffer_source: {reference: "Sato, Hickling & McLane 1973 Eq.5", page: 1067}
+    interval: [-2.0, -0.5]
+    authority: model_assumed
+    range_source: {reference: "Wadhwa 2008 lunar proxies, not a family confidence interval", page: 497}
     source: wadhwa-2008-redox-small-bodies
     observation_id: wadh08_lunar_karner_glasses
     locator: {published_page: 497, pdf_page_index: 4, note: very-low-Ti glasses; family proxy}
@@ -21,6 +26,23 @@ lunar_mare_low_ti:
     formation_temperature_K: 1673.15
     formation_temperature_estimated: true
     formation_temperature_source: predicted liquid reference; no family quench temperature captured
+  iron_speciation:
+    # Family proxy, not a measurement of this modeled charge. Index interval
+    # is the observed Apollo 12/15 soil spread, not analytical precision.
+    is_over_feo:
+      value: 70.0
+      interval: [12.0, 70.0]
+      source: {reference: "lpi-lunar-soils: soils 15020 and 12032", page: "PDF indices 367 and 84"}
+      method: fmr_is_feo
+      authority: literature_typical
+      note: "Apollo 15 soil 15020 proxy; measures 4-33 nm npFe0 only, not coarse metal"
+    feo_wt_pct:
+      value: 15.21
+      interval: [15.21, 15.21]
+      source: {reference: "lpi-lunar-soils: soil 15020 chemistry", page: "PDF index 368"}
+      method: literature_typical
+      authority: literature_typical
+      note: "Printed source-sample FeO; precision unreported, point interval is not zero analytical error"
   label: "Lunar Mare Basalt (Low-Ti)"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 12/15 low-Ti basaltic soils"
   confidence: "High"
@@ -451,6 +473,33 @@ lunar_mare_high_ti:
       source: "Gibson & Johnson 1971; corroborates matchett-2006 Table 1 (in-house OCR capture)"
 
 lunar_highland:
+  intrinsic_redox:
+    delta_iw: -1.0
+    interval: [-2.0, -0.5]
+    authority: model_assumed
+    buffer: solid_iron_wustite_sato1973
+    buffer_source: {reference: "Sato, Hickling & McLane 1973 Eq.5", page: 1067}
+    source: wadhwa-2008-redox-small-bodies
+    locator: {published_page: 497, note: "lunar family proxy, not a highlands measurement"}
+    range_source: {reference: "Wadhwa 2008 separate lunar proxies", page: 497}
+    estimated: true
+    formation_temperature_K: 1673.15
+    formation_temperature_estimated: true
+  iron_speciation:
+    is_over_feo:
+      value: 57.0
+      interval: [57.0, 106.0]
+      source: {reference: "lpi-lunar-soils: soil 60050; lpi-compendium-65701", page: "PDF index 584; compendium p.1"}
+      method: fmr_is_feo
+      authority: literature_typical
+      note: "Apollo 16 soil 60050 proxy; interval is observed soil spread, not batch precision; coarse metal unconstrained"
+    feo_wt_pct:
+      value: 4.5
+      interval: [4.5, 4.5]
+      source: {reference: "lpi-lunar-soils: soil 60050", page: "PDF index 584"}
+      method: literature_typical
+      authority: literature_typical
+      note: "Printed source-sample FeO; analytical precision unreported"
   label: "Lunar Highland Anorthosite"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 16 anorthositic soils"
   confidence: "High"
@@ -658,6 +707,33 @@ lunar_highland:
       source: "Gibson & Johnson 1971; corroborates matchett-2006 Table 1 (in-house OCR capture)"
 
 lunar_pkt_kreep_average:
+  intrinsic_redox:
+    delta_iw: -1.0
+    interval: [-2.0, -0.5]
+    authority: model_assumed
+    buffer: solid_iron_wustite_sato1973
+    buffer_source: {reference: "Sato, Hickling & McLane 1973 Eq.5", page: 1067}
+    source: wadhwa-2008-redox-small-bodies
+    locator: {published_page: 497, note: "lunar family proxy, not a KREEP measurement"}
+    range_source: {reference: "Wadhwa 2008 separate lunar proxies", page: 497}
+    estimated: true
+    formation_temperature_K: 1673.15
+    formation_temperature_estimated: true
+  iron_speciation:
+    is_over_feo:
+      value: 74.0
+      interval: [46.0, 74.0]
+      source: {reference: "lpi-lunar-soils: soil 14148; lpi-compendium-14240", page: "PDF index 244; compendium p.2"}
+      method: fmr_is_feo
+      authority: literature_typical
+      note: "Apollo 14 soil 14148 proxy; interval is observed soil spread, not batch precision; coarse metal unconstrained"
+    feo_wt_pct:
+      value: 10.55
+      interval: [10.55, 10.55]
+      source: {reference: "lpi-lunar-soils: soil 14148 chemistry", page: "PDF index 245"}
+      method: literature_typical
+      authority: literature_typical
+      note: "Printed source-sample FeO; analytical precision unreported"
   label: "Procellarum KREEP Terrane (PKT) Average"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Fra Mauro / Imbrium ejecta average (Apollo 14 soils + 15386 analogs)"
   confidence: "High"
@@ -1943,6 +2019,11 @@ e_type_enstatite_aubrite:
 ci_carbonaceous_chondrite:
   intrinsic_redox:
     delta_iw: 2.0  # Predicted midpoint of carbonaceous-class IW+1 to IW+3.
+    buffer: solid_iron_wustite_sato1973
+    buffer_source: {reference: "Sato, Hickling & McLane 1973 Eq.5", page: 1067}
+    interval: [1.0, 3.0]
+    authority: model_assumed
+    range_source: {reference: "Wadhwa 2008 carbonaceous class; not CI-specific", page: 494}
     source: wadhwa-2008-redox-small-bodies
     observation_id: wadh08_carbonaceous_chondrite_redox
     locator: {published_page: 494, pdf_page_index: 1, note: class proxy; not CI-specific}
@@ -2507,6 +2588,11 @@ mars_global_mgs1:
 mars_basalt:
   intrinsic_redox:
     delta_iw: 1.5  # Predicted midpoint of shergottite IW+0.5 to IW+2.5.
+    buffer: solid_iron_wustite_sato1973
+    buffer_source: {reference: "Sato, Hickling & McLane 1973 Eq.5", page: 1067}
+    interval: [0.5, 2.5]
+    authority: model_assumed
+    range_source: {reference: "Wadhwa 2008 shergottites; not APXS soil", page: 502}
     source: wadhwa-2008-redox-small-bodies
     observation_id: wadh08_mars_herd_fe_ti_range
     locator: {published_page: 502, pdf_page_index: 9, note: shergottite proxy; not APXS soil}

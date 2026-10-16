@@ -3490,6 +3490,9 @@ def _attach_feedstock_iron_notice(run_metadata: dict[str, Any], sim: Any) -> Non
     notice = getattr(sim, '_feedstock_iron_initialization', None)
     if isinstance(notice, Mapping) and notice:
         run_metadata['feedstock_iron_notice'] = _json_safe(notice)
+        run_metadata['seed_authority'] = _json_safe(notice.get('seed_authority'))
+        run_metadata['iron_comproportionation'] = _json_safe(
+            getattr(sim, '_feedstock_iron_comproportionation', {}))
 
 
 def _sulfur_saturation_notice(sim: Any) -> dict[str, Any] | None:

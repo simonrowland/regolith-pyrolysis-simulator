@@ -8,10 +8,13 @@ from typing import Literal
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.feedstock_composition import (
+    _representative_number,
+    IronSeedAuthority,
     feot_equivalent_wt_pct,
     iron_oxide_values,
     normalize_component_masses_kg,
     normalized_feedstock_component_masses_kg,
+    validate_iron_speciation,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -507,6 +510,21 @@ def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
     return ln_fO2 / math.log(10.0)
 
 
+CONVENTIONAL_IW_BUFFER = 'solid_iron_wustite_sato1973'
+CONVENTIONAL_IW_SOURCE = 'Sato, Hickling & McLane 1973, p.1067 Eq.5 (850-1300 C)'
+
+
+def conventional_iw_log10_fO2_bar(T_K: float) -> float:
+    """Conventional solid Fe/wustite IW; extrapolation is reported by the seed."""
+    if not math.isfinite(T_K) or T_K <= 0:
+        raise Kress91InvalidControls('conventional IW requires finite positive T_K')
+    # Sato et al. 1973 p.1067 Eq.5: log10(fO2/atm)=6.824-27470/T[K].
+    # 1 atm=1.01325 bar exactly; converting the dimensionless fugacity
+    # ratio adds log10(1.01325). The inverse-T coefficient has units K.
+    # At 1673.15 K this is -9.5884168484 bar-dex; delta=0 recovers IW.
+    return 6.824 - 27470.0 / T_K + math.log10(1.01325)
+
+
 def _feo_activity_saturation_log10_fO2_bar(T_K: float, *, a_feo: float) -> float:
     """Fe saturation for the activity owner's stoichiometric-FeO standard."""
     multiplier = float(holzheid_stoich_feo_gamma_band(T_K)['conversion_multiplier'])
@@ -953,10 +971,15 @@ def kress91_fe3_over_sigma_fe(
 def _native_fe_saturation_band(q: float) -> tuple[float, float]:
     # Jayasuriya et al. (2004), Am Mineral 89, 1597, abstract:
     # doi:10.2138/am-2004-11-1203, Mossbauer q=Fe3+/SumFe precision
-    # +/-0.01 (1 sigma). This is method precision, not a lunar calibration.
+    # +/-0.01 (1 sigma). Held-out near-IW Jayasuriya forward residuals
+    # (b917-r2, "Jayasuriya forward comparison") are +.0046, +.0235, +.0122
+    # in q. Their RMS is a model-error magnitude, NOT a fitted bias correction.
     # R=q/(1-q); log10 R=a*log10 fO2+const, a=0.196 (Kress91).
     # Thus each finite interval endpoint shifts log fO2 by log(R_end/R)/a.
-    # Ratios are dimensionless, output is dex; q=.039 gives -0.679/+0.529.
+    # d(log10 R)/dq = 1/[ln(10)*q*(1-q)], hence model sigma in dex is
+    # RMS(residuals)/[a*ln(10)*q*(1-q)]. Combine it in quadrature with EACH
+    # finite method-interval endpoint. All inputs are dimensionless, output
+    # is dex. Zero residuals recover the method-only band; no bias is removed.
     # q-.01<=0 leaves the reducing end unbounded, rather than clipping it.
     if q <= 0.0 or q >= 1.0:
         return math.inf, math.inf
@@ -966,7 +989,9 @@ def _native_fe_saturation_band(q: float) -> tuple[float, float]:
              (log_r - math.log10(low / (1.0 - low))) / KRESS91_LN_FO2_COEFFICIENT)
     upper = (math.inf if high >= 1.0 else
              (math.log10(high / (1.0 - high)) - log_r) / KRESS91_LN_FO2_COEFFICIENT)
-    return lower, upper
+    residual_rms = math.sqrt(math.fsum(r*r for r in (.0046, .0235, .0122)) / 3.0)
+    model_sigma = residual_rms / (KRESS91_LN_FO2_COEFFICIENT * math.log(10.0) * q * (1.0-q))
+    return math.hypot(lower, model_sigma), math.hypot(upper, model_sigma)
 
 
 @dataclass(frozen=True)
@@ -1154,7 +1179,7 @@ def native_fe_equilibrium_extent(
         # n/F is dimensionless; at zero extent the composition is unchanged,
         # and n -> F removes all FeO. No kg inventory is introduced.
         comp = dict(comp_wt)
-        comp['FeO'] = float(comp['FeO']) * ((feo_mol - n) / feo_mol)
+        comp.update(FeO=iron_oxide_values(comp)[0] * ((feo_mol - n) / feo_mol))
         total = sum(comp.values())
         comp = {s: 100.0*w/total for s, w in comp.items()}
         potential = float(kress91_intrinsic_state(
@@ -1357,7 +1382,7 @@ def kress91_intrinsic_state(
     if bounded:
         state.update(unclamped_fO2_log=exchange_fO2_log,
                      pressure_ceiling_fO2_log=math.log10(pressure_bar))
-    elif bound is None and feo_mol > 0.0 and fe2o3_mol > 0.0:
+    elif feo_mol > 0.0 and fe2o3_mol >= 0.0:
         if composition_wt_pct is not None:
             comparison = _native_fe_saturation_comparison(
                 composition_wt_pct,
@@ -1376,6 +1401,10 @@ def kress91_intrinsic_state(
                 a_feo=comparison['native_fe_activity'],
                 iw_bound=comparison['iw_bound_log'],
                 saturation_notice=comparison['saturation_notice'],
+                saturation_status=comparison['saturation_status'],
+                band_lower_dex=comparison['band_lower_dex'],
+                band_upper_dex=comparison['band_upper_dex'],
+                saturation_gap_dex=comparison['saturation_gap_dex'],
             )
     return state
 
@@ -1440,8 +1469,8 @@ def _split_feot_at_ferric_fraction(
     # Lunar sanity (1673.15 K, IW-1): x=0.01817376108; the complete
     # feedstock scale is 1.02680810709 and Fe2O3 is 0.34218983917 wt%.
     n = feot / MOLAR_MASS['FeO']
-    comp['FeO'] = (1.0 - x) * n * MOLAR_MASS['FeO']
-    comp['Fe2O3'] = x * n * MOLAR_MASS['Fe2O3'] / 2.0
+    comp.update(FeO=(1.0 - x) * n * MOLAR_MASS['FeO'],
+                Fe2O3=x * n * MOLAR_MASS['Fe2O3'] / 2.0)
     factor = 100.0 / sum(comp.values())
     normalize_component_masses_kg(comp, 100.0)
     return comp, factor
@@ -1454,31 +1483,133 @@ def collapse_feot_composition(
     from simulator.state import MOLAR_MASS
 
     comp = dict(composition_wt_pct)
-    comp['FeO'] = feot_equivalent_wt_pct(comp)
+    feot = feot_equivalent_wt_pct(comp)
     comp.pop('Fe2O3', None)
     if include_metal:
         # One Fe atom in FeO: metal mass * M_FeO/M_Fe is FeOt mass.
-        comp['FeO'] += comp.pop('Fe', 0.0) * MOLAR_MASS['FeO'] / MOLAR_MASS['Fe']
+        feot += comp.pop('Fe', 0.0) * MOLAR_MASS['FeO'] / MOLAR_MASS['Fe']
+    comp.update(FeO=feot)
     normalize_component_masses_kg(comp, 100.0)
     return comp
 
 
 def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, dict]:
     """Preserve declared iron splits; predict missing splits once, before seeding."""
+    from simulator.state import MOLAR_MASS
+
+    validate_iron_speciation(feedstock)
     prepared = dict(feedstock)
+    basis = dict(feedstock.get('composition_basis', {}) or {})
+    if 'iron_initialization' in basis:
+        return prepared, dict(basis['iron_initialization'])
     comp = dict(feedstock.get('composition_wt_pct', {}))
+    spec = dict(feedstock.get('iron_speciation', {}) or {})
     anchor = dict(feedstock.get('intrinsic_redox', {}) or {})
     T_K = float(anchor.get('formation_temperature_K', KRESS91_FO2_KEY_REFERENCE_T_K))
-    if 'Fe2O3' in comp or not iron_oxide_values(comp)[0]:
+    ferric_observation = spec.get('fe3_over_sum_fe') or spec.get('fe2o3_wt_pct')
+    authority = (IronSeedAuthority(ferric_observation['authority']) if ferric_observation
+                 else IronSeedAuthority.MODEL_ASSUMED)
+    declared_authority = IronSeedAuthority(basis.get('FeO', {}).get(
+        'authority', 'measured' if all(basis.get(s, {}).get('source')
+                                     for s in ('FeO', 'Fe2O3')) else 'model_assumed'))
+    declared_split = 'Fe2O3' in comp
+    if not spec and (declared_split or not iron_oxide_values(comp)[0]):
+        authority = declared_authority
         return prepared, {
             'method': 'declared_split', 'formation_temperature_K': T_K,
+            'seed_authority': authority,
             'certification_gaps': (['formation_temperature_K']
                 if anchor.get('formation_temperature_estimated', True) else []),
         }
+    metal_diagnostic = {}
+    metal_wt_pct = 0.0
+    metal_observation = spec.get('fe0_metal_wt_pct') or spec.get('is_over_feo')
+    if metal_observation:
+        if 'fe0_metal_wt_pct' in spec:
+            metal_wt_pct = float(metal_observation['value'])
+        else:
+            metal_diagnostic['metal_conversion'] = nanophase_iron_from_fmr(
+                float(spec['is_over_feo']['value']), float(spec['feo_wt_pct']['value']))
+            metal_wt_pct = metal_diagnostic['metal_conversion']['fe0_metal_wt_pct']
+        elemental = dict(prepared.get('elemental_composition_wt_pct', {}) or {})
+        if 'Fe' in elemental:
+            raise Kress91InvalidControls('iron_speciation Fe0 duplicates elemental Fe inventory')
+        elemental['Fe'] = metal_wt_pct
+        prepared['elemental_composition_wt_pct'] = elemental
+        metal_diagnostic.update(
+            metal_seed_authority=IronSeedAuthority(metal_observation['authority']),
+            metal_phase_species=['Fe'], fe0_metal_wt_pct=metal_wt_pct,
+        )
+        alloy = metal_observation.get('metal_composition_wt_pct', {})
+        additions = dict(prepared.get('bulk_additions', {}) or {})
+        # Fe0 is elemental Fe mass. If Ni/Co mass shares y are measured in
+        # that metal, M_alloy=M_Fe/(1-sum(y)); M_i=M_alloy*y_i. All are on
+        # the same wt% basis. Transfer any declared elemental trace inventory
+        # instead of counting it twice; absent trace rows are supplied by the
+        # alloy assay. At y=0 the metal contains only Fe.
+        total_metal = metal_wt_pct / (1.0-sum(alloy.values())/100.0)
+        metal_diagnostic['metal_alloy_wt_pct'] = total_metal
+        for species, pct in alloy.items():
+            amount = total_metal * pct / 100.0
+            if species in additions:
+                raise Kress91InvalidControls(f'iron_speciation duplicates bulk {species}')
+            if species in comp:
+                available = _representative_number(comp[species], species)
+                if available is None or amount > available:
+                    raise Kress91InvalidControls(f'iron_speciation alloy exceeds bulk {species}')
+                comp[species] = available - amount
+            additions[species] = amount
+            metal_diagnostic['metal_phase_species'].append(species)
+        if alloy:
+            prepared['bulk_additions'] = additions
+        # The unsplit assay is TOTAL Fe as FeO, including measured metal.
+        # n_Fe,oxide = FeOt/M_FeO - Fe0/M_Fe; replace that FeO-equivalent
+        # mass before splitting, so adding the metal never invents Fe atoms.
+        # wt%/g mol^-1 is mol/100g; M_FeO/M_Fe is dimensionless. At Fe0=0
+        # the original assay is recovered. Full-feed normalization follows.
+        if not declared_split and feot_equivalent_wt_pct(comp) > 0:
+            feot = feot_equivalent_wt_pct(comp) - metal_wt_pct * MOLAR_MASS['FeO']/MOLAR_MASS['Fe']
+            if feot <= 0:
+                raise Kress91InvalidControls('iron_speciation Fe0 exhausts the total-Fe assay')
+            comp.update(FeO=feot)
     stated = 'delta_iw' in anchor
-    state = (RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, anchor['delta_iw'])
-             if stated else None)
-    result = split_feot_composition(comp, T_K, redox_state=state)
+    conversion = {}
+    if ferric_observation:
+        if 'fe3_over_sum_fe' in spec:
+            measured_q = float(ferric_observation['value'])
+            oxide_fe = feot_equivalent_wt_pct(comp) / MOLAR_MASS['FeO']
+            # The measured denominator is ALL Fe, including declared Fe0.
+            # Kress uses oxide Fe only: q_oxide=q_measured*(n_oxide+n_0)/n_oxide.
+            # Mol/mol cancels; n_0=0 recovers the measured fraction unchanged.
+            if oxide_fe <= 0:
+                raise Kress91InvalidControls('ferric iron_speciation requires oxide iron')
+            q = measured_q * (oxide_fe + metal_wt_pct/MOLAR_MASS['Fe']) / oxide_fe
+            if q > 1:
+                raise Kress91InvalidControls('ferric iron_speciation plus Fe0 exceeds total Fe')
+        else:
+            feo = float(spec['feo_wt_pct']['value']) / MOLAR_MASS['FeO']
+            ferric = 2 * float(spec['fe2o3_wt_pct']['value']) / MOLAR_MASS['Fe2O3']
+            if feo + ferric <= 0:
+                raise Kress91InvalidControls('printed iron_speciation pair has no iron')
+            q = ferric / (feo + ferric)
+        split, factor = _split_feot_at_ferric_fraction(comp, q)
+        result = {'composition_wt_pct': split, 'renormalization_factor': factor,
+                  'fe3_over_sigma_fe': q, 'condition': 'condition_stated',
+                  'certification_gaps': []}
+        state = None
+    elif declared_split or feot_equivalent_wt_pct(comp) == 0:
+        feo, ferric = iron_oxide_values(comp)
+        n3 = 2*ferric/MOLAR_MASS['Fe2O3']
+        total = feo/MOLAR_MASS['FeO'] + n3
+        result = {'composition_wt_pct': comp, 'renormalization_factor': 1.0,
+                  'fe3_over_sigma_fe': n3/total if total else 0.0,
+                  'condition': 'condition_stated', 'certification_gaps': []}
+        authority = declared_authority
+        state = None
+    else:
+        state, conversion = _feedstock_anchor_state(anchor, T_K)
+        result = split_feot_composition(comp, T_K, redox_state=state)
+        authority = IronSeedAuthority(anchor.get('authority', 'model_assumed'))
     # Preserve the original raw-analysis basis including nonoxide constituents;
     # the existing complete-feedstock normalizer scales every mass bucket once.
     prepared['composition_wt_pct'] = {
@@ -1488,35 +1619,62 @@ def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, di
     # This internal prepared analysis is predicted, never exposed as a measured
     # assay: retain the original metadata on the simulator and in the diagnostic.
     prepared['fe_redox_split_unknown'] = False
-    basis = dict(feedstock.get('composition_basis', {}) or {})
     for oxide in ('FeO', 'Fe2O3'):
-        basis[oxide] = {'method': 'predicted Kress91 initialization',
-                        'source': str(anchor.get('source', 'predicted IW default'))}
+        if declared_split and not ferric_observation:
+            continue
+        basis[oxide] = {
+            'method': ('iron_speciation initialization' if ferric_observation or declared_split
+                       else 'predicted Kress91 initialization'),
+            'source': str(ferric_observation['source'] if ferric_observation
+                          else anchor.get('source', 'predicted IW default')),
+            'authority': authority.value,
+        }
     prepared['composition_basis'] = basis
     stage0 = dict(feedstock.get('anhydrous_silicate_after_degassing', {}) or {})
     if stage0:
         stage0_comp = stage0.get('composition_wt_pct', {})
         if 'Fe2O3' not in stage0_comp and iron_oxide_values(stage0_comp)[0]:
-            stage0['composition_wt_pct'] = split_feot_composition(
-                stage0_comp, T_K, redox_state=state)['composition_wt_pct']
+            stage0['composition_wt_pct'] = (
+                _split_feot_at_ferric_fraction(stage0_comp, result['fe3_over_sigma_fe'])[0]
+                if ferric_observation or declared_split else split_feot_composition(
+                    stage0_comp, T_K, redox_state=state)['composition_wt_pct'])
         prepared['anhydrous_silicate_after_degassing'] = stage0
     gaps = list(result['certification_gaps'])
-    if stated and anchor.get('estimated', True):
+    if not ferric_observation and stated and anchor.get('estimated', True):
         gaps.append('intrinsic_delta_iw')
     if 'formation_temperature_K' not in anchor or anchor.get('formation_temperature_estimated', True):
         gaps.append('formation_temperature_K')
-    gaps.append('measured_feedstock_iron_split')
+    if authority is not IronSeedAuthority.MEASURED:
+        gaps.append('measured_feedstock_iron_split')
+    # Retain computed provenance on this private prepared analysis. Re-loading
+    # it must not repeat a total-Fe subtraction or lose its metal account route.
+    diagnostic = {
+        **result, **conversion, **metal_diagnostic,
+        **({'iron_speciation': spec} if spec else {}),
+        'method': ('iron_speciation_split' if ferric_observation else
+                   'declared_split' if declared_split else 'predicted_kress91_split'),
+        'seed_authority': authority,
+        'condition': ('condition_defaulted' if not ferric_observation and not declared_split
+                      and anchor.get('estimated', True) else result['condition']),
+        'formation_temperature_K': T_K, 'anchor': anchor, 'certification_gaps': gaps,
+    }
+    basis['iron_initialization'] = diagnostic
     complete = normalized_feedstock_component_masses_kg(prepared, 100.0)
     # The normalized Si/Fe proportions carry the whole-assay scale, including
     # native metal and nonoxide masses; use a nonzero corrected oxide as probe.
-    probe = next(k for k, v in prepared['composition_wt_pct'].items() if v > 0.0)
-    factor = complete[probe] / prepared['composition_wt_pct'][probe]
+    analysis = dict(prepared['composition_wt_pct'])
+    if metal_observation:
+        analysis['Fe'] = metal_wt_pct
+    probe = next(k for k, v in analysis.items() if v > 0.0)
+    factor = complete[probe] / analysis[probe]
     # The cleanup dose is per tonne of the original complete analysis. If its
     # mass is A and ferric oxygen adds dA, sulfate and its stoichiometric C dose
     # both scale by A/(A+dA). Since factor=100/(A+dA), this is 1-factor*dA/100.
     # All masses use the same 100 g analysis basis; the ratio is dimensionless
     # and becomes one when no oxygen is added, even when A is not 100 g.
-    added_oxygen = sum(prepared['composition_wt_pct'].values()) - sum(comp.values())
+    added_oxygen = (sum(prepared['composition_wt_pct'].values()) - sum(
+        feedstock.get('composition_wt_pct', {}).values())
+        + float(metal_diagnostic.get('metal_alloy_wt_pct', 0.0)))
     dose_scale = 1.0 - factor * added_oxygen / 100.0
     cleanup = prepared.get('stage0_carbon_cleanup')
     if isinstance(cleanup, Mapping):
@@ -1534,14 +1692,67 @@ def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, di
             is_declared_real_scalar(v, allow_numeric_str=True) for v in value
         ):
             declaration[key] = [float(v) * dose_scale for v in value]
-    return prepared, {
-        **result, 'method': 'predicted_kress91_split',
-        'condition': ('condition_defaulted' if anchor.get('estimated', True)
-                      else result['condition']),
-        'renormalization_factor': factor,
-        'formation_temperature_K': T_K, 'anchor': anchor,
-        'certification_gaps': gaps,
-    }
+    diagnostic['renormalization_factor'] = factor
+    return prepared, diagnostic
+
+
+def _feedstock_anchor_state(anchor: Mapping, T_K: float) -> tuple[RedoxState | None, dict]:
+    if 'delta_iw' not in anchor:
+        raise Kress91InvalidControls(
+            'unsplit feedstock iron requires cited intrinsic_redox delta_iw, buffer and interval')
+    delta = _redox_state_finite_float(anchor['delta_iw'], 'intrinsic delta_iw')
+    buffer = anchor.get('buffer')
+    if buffer is None:
+        raise Kress91InvalidControls('intrinsic_redox requires an explicit cited buffer')
+    if buffer not in {'pure_liquid_wustite', FE_FEO_BUFFER_STANDARD, CONVENTIONAL_IW_BUFFER}:
+        raise Kress91InvalidControls(f'unsupported intrinsic_redox buffer {buffer!r}')
+    interval = anchor.get('interval')
+    if (not isinstance(interval, (list, tuple)) or len(interval) != 2
+            or not all(is_declared_real_scalar(v) and isinstance(v, (float, int))
+                       and math.isfinite(v) for v in interval)
+            or not interval[0] <= delta <= interval[1]):
+        raise Kress91InvalidControls('intrinsic_redox requires delta_iw within a cited interval')
+    source = anchor.get('buffer_source', {})
+    locator = anchor.get('locator', {})
+    if (not isinstance(source, Mapping) or not source.get('reference') or not source.get('page')
+            or not anchor.get('source') or not isinstance(locator, Mapping)
+            or not any(locator.get(k) is not None for k in ('published_page', 'page', 'pdf_page_index'))):
+        raise Kress91InvalidControls('intrinsic_redox buffer and delta_iw require sources with page')
+    if buffer in {'pure_liquid_wustite', FE_FEO_BUFFER_STANDARD}:
+        return RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, delta), {}
+    iw = conventional_iw_log10_fO2_bar(T_K)
+    # Convert the absolute potential ONCE; no T-dependent offset is retained
+    # in the initialized inventory. delta_liquid=(IW_s+delta_s)-IW_l, dex.
+    # Both references use bar, so delta=0 on the literature scale recovers
+    # conventional IW, not the different pure-liquid reference.
+    value = iw + delta
+    return RedoxState.absolute(value), {'buffer_conversion': {
+        'buffer': buffer, 'source': CONVENTIONAL_IW_SOURCE,
+        'literature_iw_log': iw, 'liquid_iw_log': feo_iw_log10_fO2_bar(T_K),
+        'delta_iw_liquid': value - feo_iw_log10_fO2_bar(T_K),
+        'fO2_interval_log': [iw + interval[0], iw + interval[1]],
+        'extrapolated': not 1123.15 <= T_K <= 1573.15,
+    }}
+
+
+def nanophase_iron_from_fmr(is_over_feo: float, feo_wt_pct: float) -> dict:
+    # Escobar-Cerezo et al. 2018 ApJ 853:71 p.5 Eq.6 (Morris1980):
+    # npFe0/FeO=(3.20+/-0.08)e-4*(Is/FeO)+(1+/-5)e-4, a mass ratio.
+    # Multiplying by source-sample FeO wt% gives Fe0 wt%, NOT a fraction
+    # needing another /100. Is=12, FeO=17.6 wt% gives .069344 wt%.
+    # This calibration counts 4-33nm metal; coarser metal is unmeasured.
+    return {'fe0_metal_wt_pct': feo_wt_pct * (.000320 * is_over_feo + .0001),
+            'source': 'Escobar-Cerezo et al. 2018, doi:10.3847/1538-4357/aaa24d, p.5 Eq.6',
+            'scope': '4-33 nm npFe0 only; coarser native/meteoritic metal unconstrained'}
+
+
+def fe0_comproportionation_extent(fe_mol: float, fe2o3_mol: float) -> dict:
+    # Fe0 + Fe2O3 -> 3 FeO: one mol metal and one mol ferric oxide
+    # supply three Fe atoms and three O atoms. Extent=min(available mol).
+    # mol coefficients are dimensionless; either absent reactant gives zero.
+    n = min(fe_mol, fe2o3_mol)
+    return {'extent_mol': n, 'feo_credit_mol': 3.0*n,
+            'metal_remaining_mol': fe_mol-n, 'fe2o3_remaining_mol': fe2o3_mol-n}
 
 
 def _kress91_exchange_uptake_mol(

@@ -2,6 +2,39 @@
 
 The simulator is intended to compare feedstock families, not optimize one idealized lunar composition. Different bodies offer different product streams, pressure environments, volatile hazards, and energy tradeoffs.
 
+## Initial iron speciation
+
+Optional `iron_speciation` observations carry `value`, an ordered `interval`,
+`source: {reference: ..., page: ...}`, `method`, and `authority` (`measured`,
+`literature_typical`, or `model_assumed`). Methods are `mossbauer`, `xanes`,
+`wet_chemistry_titration`, `fmr_is_feo`, `vsm_saturation_magnetization`,
+`sato_zirconia_cell`, and `literature_typical`.
+
+Use `fe3_over_sum_fe` for ferric atoms divided by **all** iron atoms, including
+declared metal, or a printed `feo_wt_pct` / `fe2o3_wt_pct` pair. These take
+precedence over the formation-buffer prediction. `fe0_metal_wt_pct` is elemental
+metallic Fe mass, with `form: nanophase | meteoritic_fe_ni | native`; optional
+`metal_composition_wt_pct: {Ni: ..., Co: ...}` gives mass percentages within
+that alloy. Existing elemental trace inventories fund those Ni/Co shares when
+present. FeOt includes the metallic iron on an unsplit total-Fe assay; an
+explicit FeO/Fe2O3 analysis already describes the separate oxides.
+
+Alternatively store raw `is_over_feo` and the source sample's `feo_wt_pct`.
+The redox owner converts these to 4–33 nm npFe⁰ using the cited Morris relation;
+coarser native or meteoritic metal remains unconstrained. Lunar family proxies
+are labelled `literature_typical`; their maturity intervals describe sample
+spread, not batch measurement precision. Carbon, sulfur, and perchlorates
+continue to use their existing composition inventory fields.
+
+`intrinsic_redox` carries `delta_iw`, `interval`, `buffer`, the buffer's
+`buffer_source`, and the offset's `source` / `locator`. The conventional
+`solid_iron_wustite_sato1973` buffer is evaluated from Sato et al. (1973), p.1067
+Eq.5, then converted once to the code's liquid-wüstite reference. Its
+850–1300 °C range is explicit; extrapolated formation temperatures are flagged.
+Results and hourly snapshots expose the ferric seed's typed `seed_authority`;
+metal authority is recorded separately. First liquid contact reacts
+Fe⁰ + Fe₂O₃ → 3 FeO through the existing redox reaction provider and atom ledger.
+
 ## Lunar Feedstocks
 
 Lunar mare and highland materials are the baseline cases. They are useful for studying oxygen, Fe extraction, SiO suppression, glass preservation, Mg recovery, refractory residues, and MRE pretreatment.
