@@ -8111,6 +8111,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "MgO_wt_pct",
         "CaO_wt_pct",
     ),
+    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: ("r_as_printed", "value"),
 }
 
 _CONDITION_RANGE_KEYS = ("T_range_K", "temperature_range_k", "temperature_range_K")
@@ -14198,6 +14199,14 @@ class Migrator:
                             source=source_key,
                             observation_id=obs_id,
                         )
+        if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+            basis = values.get("basis_as_published")
+            if isinstance(basis, str) and basis.strip():
+                ident_kwargs["subtype"] = State.of(basis)
+            else:
+                ident_kwargs["subtype"] = State.unknown(
+                    "source does not state equilibrium composition basis"
+                )
         if q_token in FUSION_QUANTITIES:
             ident_kwargs["subtype"] = State.of("solid_to_liquid")
         if q_token is Quantity.TRANSITION_TEMPERATURE and (
