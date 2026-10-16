@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass, replace
+import inspect
 import math
 from types import SimpleNamespace
 
@@ -1469,6 +1470,21 @@ def test_optimizer_knudsen_regime_boundary_pin(
     assert evaluate_module._knudsen_summary_regime(
         {}, knudsen_number
     ) == expected_regime
+
+
+def test_optimizer_knudsen_summary_uses_owner_and_refuses_negative() -> None:
+    regime_source = inspect.getsource(evaluate_module._knudsen_summary_regime)
+    assert "0.01" not in regime_source
+    assert "10.0" not in regime_source
+
+    prepared, missing_reason = evaluate_module._knudsen_summary_with_segment(
+        {"knudsen_number": -1.0}, 7
+    )
+
+    assert prepared is None
+    assert missing_reason == (
+        "snapshot 7 missing overhead flow state: knudsen regime unavailable"
+    )
 
 
 def test_flow_present_missing_knudsen_summary_fails_closed() -> None:
