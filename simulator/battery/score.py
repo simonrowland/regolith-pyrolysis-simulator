@@ -6879,32 +6879,20 @@ def compile_residual(
                 if method_uncertainties is None or source_reference.source_id is None
                 else method_uncertainties.get(source_reference.source_id)
             )
-            if source_method_uncertainty is not None and quantity is not None:
-                quantity_basis = source_method_uncertainty.quantity_basis
-                basis_lower = quantity_basis.casefold()
-                basis_words = re.sub(r"[\W_]+", " ", basis_lower).strip()
-                quantity_words = re.sub(
-                    r"[\W_]+", " ", quantity.value.casefold()
-                ).strip()
-                quantity_names = (quantity_words,)
-                if quantity is Quantity.P_PARTIAL:
-                    quantity_names += ("partial pressure",)
-                if not any(
-                    re.search(rf"(?<!\w){re.escape(name)}(?!\w)", basis_words)
-                    for name in quantity_names
-                ):
-                    source_method_uncertainty = None
-            if source_method_uncertainty is not None:
-                quantity_basis = source_method_uncertainty.quantity_basis
-                printed_unit = (
-                    "dex"
-                    if "dex" in basis_lower
-                    else "%"
-                    if "%" in basis_lower or "percent" in basis_lower
-                    else "fraction"
-                    if "relative" in basis_lower or "fraction" in basis_lower
-                    else quantity_basis
+            if (
+                source_method_uncertainty is not None
+                and (
+                    quantity is None
+                    or source_method_uncertainty.quantity is not quantity
                 )
+            ):
+                source_method_uncertainty = None
+            if source_method_uncertainty is not None:
+                printed_unit = {
+                    "log10_dex": "dex",
+                    "absolute": QUANTITY_UNITS[quantity],
+                    "relative_percent": "%",
+                }[source_method_uncertainty.basis]
                 band_uncertainty = Uncertainty(
                     kind=UncertaintyKind.PRINTED,
                     verbatim={
@@ -6914,7 +6902,7 @@ def compile_residual(
                         "note": source_method_uncertainty.locator.note,
                     },
                     value=source_method_uncertainty.value,
-                    basis=quantity_basis,
+                    basis=printed_unit,
                 )
                 band_basis = "source_method"
         printed = _printed_uncertainty_band(
