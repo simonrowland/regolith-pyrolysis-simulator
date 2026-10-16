@@ -2118,11 +2118,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 [ChemistryIntent.VAPOR_PRESSURE],
             )
 
-        # VapoRockProvider receives the same vapor_pressures.yaml payload
-        # so its diagnostic output is filtered onto the simulator species
-        # universe. It is shadow-only: the builtin result remains the
-        # authoritative pressure dict even when VapoRock reports
-        # non_authoritative or empty diagnostics.
+        # VapoRockProvider accepts the same payload for wiring
+        # compatibility. Its full-speciation diagnostic is not filtered;
+        # the builtin result remains the authoritative pressure dict
+        # even when VapoRock reports non_authoritative or empty diagnostics.
         if not any(
             isinstance(provider, VapoRockProvider)
             for provider in self._chem_registry.shadows_for(

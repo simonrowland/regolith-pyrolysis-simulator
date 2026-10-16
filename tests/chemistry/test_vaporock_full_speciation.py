@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 from dataclasses import asdict
 import importlib
 import json
@@ -134,7 +133,6 @@ def test_provider_keeps_authoritative_pressure_dict_empty():
         pO2_bar=1e-9,
         mode="system_eval_gas_abundances",
         engine_version="test",
-        allowed_species=frozenset(filtered_before),
         melt_envelope=in_calibration,
     )
     extrapolated = VapoRockProvider._project_equilibrium(
@@ -142,7 +140,6 @@ def test_provider_keeps_authoritative_pressure_dict_empty():
         pO2_bar=1e-9,
         mode="system_eval_gas_abundances",
         engine_version="test",
-        allowed_species=frozenset(filtered_before),
         melt_envelope=melt_extrapolation_envelope(1800.0, _MELT_MODEL_ID),
     )
 
@@ -228,63 +225,6 @@ def test_provider_dispatch_emits_status_bearing_h2_envelope_without_authority():
     assert result.warnings == ()
     assert result.diagnostic["backend_warnings"] == ()
     assert {key: result.diagnostic[key] for key in expected} == expected
-
-
-def test_provider_allowed_species_honors_inactive_consumer_status(
-    vapor_pressure_data,
-):
-    # 2026-08-05 MC-4 wave 1B: Si is now an ACTIVE composed carrier, so the
-    # inactive-consumer-status contract is exercised against a deepcopy with
-    # Si forced inactive (the same pattern as
-    # test_inactive_metal_consumer_status_suppresses_builtin_fallback).
-    data = copy.deepcopy(vapor_pressure_data)
-    assert (
-        data["metals"]["Si"]["consumer_status"].lower() == "active"
-    )
-    data["metals"]["Si"]["consumer_status"] = "inactive"
-
-    allowed_species = VapoRockProvider._build_allowed_species(
-        data
-    )
-
-    assert "Si" not in allowed_species
-    assert {"SiO", "Na", "Fe"} <= allowed_species
-
-    equilibrium = types.SimpleNamespace(
-        vapor_pressures_Pa={
-            "Si": 1000.0,
-            "SiO": 100.0,
-            "Na": 10.0,
-            "Fe": 1.0,
-        },
-        vaporock_full_speciation_Pa={
-            "Si": 1000.0,
-            "SiO": 100.0,
-            "Na": 10.0,
-            "Fe": 1.0,
-        },
-        warnings=(),
-        status="ok",
-    )
-
-    diagnostics = VapoRockProvider._project_equilibrium(
-        equilibrium,
-        pO2_bar=1e-9,
-        mode="system_eval_gas_abundances",
-        engine_version="test",
-        allowed_species=allowed_species,
-        melt_envelope=melt_extrapolation_envelope(1800.0, _MELT_MODEL_ID),
-    )
-
-    assert diagnostics.vapor_pressures_Pa == {}
-    assert diagnostics.vaporock_full_speciation_Pa["Si"] == pytest.approx(
-        1000.0
-    )
-    assert diagnostics.vaporock_full_speciation_Pa["SiO"] == pytest.approx(
-        100.0
-    )
-    assert diagnostics.vaporock_full_speciation_Pa["Na"] == pytest.approx(10.0)
-    assert diagnostics.vaporock_full_speciation_Pa["Fe"] == pytest.approx(1.0)
 
 
 def test_vaporock_diagnostic_payload_round_trips_full_speciation():

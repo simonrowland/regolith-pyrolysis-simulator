@@ -3165,7 +3165,6 @@ def test_provider_keeps_proven_empty_zero_pressure():
         pO2_bar=1e-9,
         mode="system_eval_gas_abundances",
         engine_version="test",
-        allowed_species=frozenset({"Na", "Cr"}),
         melt_envelope=melt_extrapolation_envelope(1600.0, "MELTS-v1.0"),
     )
     assert diagnostics.vaporock_full_speciation_Pa["Na"] == 1000.0
