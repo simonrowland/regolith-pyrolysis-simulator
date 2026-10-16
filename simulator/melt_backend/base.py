@@ -530,6 +530,12 @@ class EquilibriumResult:
     # the ABI-safe tail so legacy positional constructors retain their shape.
     phase_instances: List[Dict[str, Any]] = field(default_factory=list)
 
+    # AlphaMELTS subprocess distinguishes the absolute fO2 serialized into the
+    # melts file from System_main_tbl.txt's 3-decimal printed confirmation.
+    # Other backends leave these fields unset.
+    requested_fO2_log: Optional[float] = None
+    printed_fO2_echo_log: Optional[float] = None
+
     def __post_init__(self) -> None:
         if self.status != 'ok':
             return
