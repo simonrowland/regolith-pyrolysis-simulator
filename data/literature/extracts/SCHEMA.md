@@ -40,7 +40,9 @@ source:
   method_uncertainty:                     # optional source-level method uncertainty
     value: 0.10
     meaning: one_sigma                    # one_sigma | two_sigma | range_half_width
-    quantity_basis: "log10 activity in dex"
+    quantity: activity                    # Quantity enum value
+    basis: log10_dex                      # log10_dex | absolute | relative_percent
+    quantity_basis: "log10 activity in dex" # printed description, retained verbatim
     locator: { page: 12, note: "Quoted sentence from the source, retained verbatim." }
 extraction:
   method: manual_from_draft              # required free text
@@ -69,10 +71,13 @@ species: {}                              # map: canonical U0 / manifest id → s
 ```
 
 `source.method_uncertainty` applies only to rows from this source that do not
-state their own uncertainty. `meaning` records the printed convention;
-`quantity_basis` names the measured quantity and units; `locator.page` and
-`locator.note` give the page and exact quoted sentence. No value or meaning is
-inferred when this field is absent.
+state their own uncertainty. `quantity` is a `Quantity` enum value and selects
+the only rows the field can band. `basis` records the printed width basis:
+`log10_dex`, `absolute`, or `relative_percent`. `meaning` records the printed
+convention; `quantity_basis` retains the printed description without being
+matched to infer a quantity or unit. `locator.page` and `locator.note` give the
+page and exact quoted sentence. No value or meaning is inferred when this field
+is absent.
 
 ### `review_status`
 

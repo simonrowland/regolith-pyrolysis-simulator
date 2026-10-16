@@ -696,6 +696,8 @@ class Uncertainty:
 class SourceMethodUncertainty:
     value: Decimal
     meaning: str
+    quantity: Quantity
+    basis: str
     quantity_basis: str
     locator: Locator
 

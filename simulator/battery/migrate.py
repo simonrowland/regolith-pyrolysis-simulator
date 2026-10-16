@@ -1767,9 +1767,13 @@ def _source_method_uncertainty_from_plain(
     locator = _locator_from_plain(payload.get("locator"))
     if locator is None:
         raise ValueError("source.method_uncertainty requires a locator")
+    if "quantity" not in payload:
+        raise ValueError("source.method_uncertainty requires a quantity")
     return SourceMethodUncertainty(
         value=parse_declared_amount(payload.get("value")),
         meaning=str(payload.get("meaning") or ""),
+        quantity=Quantity(str(payload["quantity"])),
+        basis=str(payload.get("basis") or ""),
         quantity_basis=str(payload.get("quantity_basis") or ""),
         locator=locator,
     )

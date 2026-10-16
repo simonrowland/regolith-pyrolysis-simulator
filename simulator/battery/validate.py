@@ -716,9 +716,9 @@ def validate_work(work: Work, path: str = "work") -> list[ValidationIssue]:
                 _issue(field, RefusalReason.CONDITIONAL_FIELD, "requires a SourceMethodUncertainty record")
             )
             continue
-        if not uncertainty.value.is_finite() or uncertainty.value < 0:
+        if not uncertainty.value.is_finite() or uncertainty.value <= 0:
             issues.append(
-                _issue(f"{field}.value", RefusalReason.CONDITIONAL_FIELD, "requires a finite nonnegative value")
+                _issue(f"{field}.value", RefusalReason.CONDITIONAL_FIELD, "requires a finite positive value")
             )
         if uncertainty.meaning not in {"one_sigma", "two_sigma", "range_half_width"}:
             issues.append(
@@ -727,6 +727,14 @@ def validate_work(work: Work, path: str = "work") -> list[ValidationIssue]:
         if not uncertainty.quantity_basis.strip():
             issues.append(
                 _issue(f"{field}.quantity_basis", RefusalReason.CONDITIONAL_FIELD, "requires the printed quantity basis")
+            )
+        if not isinstance(uncertainty.quantity, Quantity):
+            issues.append(
+                _issue(f"{field}.quantity", RefusalReason.CONDITIONAL_FIELD, "requires a Quantity enum value")
+            )
+        if uncertainty.basis not in {"log10_dex", "absolute", "relative_percent"}:
+            issues.append(
+                _issue(f"{field}.basis", RefusalReason.CONDITIONAL_FIELD, "requires log10_dex, absolute, or relative_percent")
             )
         locator = uncertainty.locator
         if (
