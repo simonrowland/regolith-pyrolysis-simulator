@@ -196,9 +196,23 @@ def test_nakano_numeric_runs_emit_stable_mass_loss_points(migrated_targets) -> N
     ]
     assert len(points) == 8
     assert len({observation.observation_id for observation in points}) == 8
+    assert sum(point.identity.species.formula == "Lsil" for point in points) == 5
+    assert sum(point.identity.species.formula == "Allende" for point in points) == 3
     for observation in points:
         assert observation.identity.quantity.is_value
         assert observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        assert observation.identity.species.formula in {"Lsil", "Allende"}
+        assert observation.point_conditions["heating_duration_s"].state.is_value
+        assert observation.point_conditions["heating_duration_s"].locator is not None
+        basis = observation.provenance["printed_run_basis"]
+        assert basis["material"] == observation.identity.species.formula
+        assert basis["temperature_basis"] == "Tmax"
+        assert basis["heating_duration_s"] == observation.point_conditions[
+            "heating_duration_s"
+        ].state.value
+        assert basis["mass_loss_basis"].startswith(
+            "Mass loss includes sample, Re wire, and graphite disk"
+        )
         temperature = observation.point_conditions["temperature_K"]
         assert temperature.state.is_value
         assert temperature.state.value == observation.identity.temperature_K.value

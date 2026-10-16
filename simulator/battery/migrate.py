@@ -15210,11 +15210,17 @@ class Migrator:
                     str(parent_values["gas_species"]), Phase.G, charge=species.charge
                 )
             elif q_for_species in _BULK_PROPERTY_QUANTITIES:
-                species_formula = bulk_property_species_formula(
-                    quantity=q_for_species,
-                    parent_formula=species.formula,
-                    sample_label=sample_label,
-                    oxide_map=point_oxide_map,
+                material = raw_item.get("material")
+                species_formula = (
+                    str(material)
+                    if q_for_species is Quantity.MASS_LOSS_FRACTION
+                    and isinstance(material, str)
+                    else bulk_property_species_formula(
+                        quantity=q_for_species,
+                        parent_formula=species.formula,
+                        sample_label=sample_label,
+                        oxide_map=point_oxide_map,
+                    )
                 )
                 species = make_species(
                     species_formula,
@@ -15426,6 +15432,20 @@ class Migrator:
         ):
             provenance = dict(provenance or {})
             provenance["activity_coefficient_table_row_as_printed"] = dict(raw_item)
+        if (
+            q_token_point is Quantity.MASS_LOSS_FRACTION
+            and isinstance(raw_item, Mapping)
+            and isinstance(raw_item.get("material"), str)
+            and isinstance(parent_values, Mapping)
+            and isinstance(parent_values.get("note"), str)
+        ):
+            provenance = dict(provenance or {})
+            provenance["printed_run_basis"] = {
+                "material": raw_item.get("material"),
+                "temperature_basis": "Tmax",
+                "heating_duration_s": raw_item.get("heating_duration_s"),
+                "mass_loss_basis": parent_values["note"],
+            }
         if (
             q_token_point not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
             and provenance is not None
