@@ -1166,8 +1166,8 @@ class EvaporationMixin:
             }
             if overhead_partials_override_Pa is not None
             else {
-                species: self._evaporation_bulk_partial_pressure_pa(species)
-                for species in vapor_pressures
+                species: max(0.0, float(pressure)) * 100.0
+                for species, pressure in self._melt_headspace_composition_mbar.items()
             }
         )
         for species in vapor_pressures:
@@ -3088,11 +3088,7 @@ class EvaporationMixin:
             max(0.0, float(value))
             for value in overhead_partials_Pa.values()
         )
-        control_floor_Pa = max(
-            0.0,
-            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) * 100.0,
-        )
-        return max(partial_sum_Pa, control_floor_Pa)
+        return partial_sum_Pa
 
     def _resolve_evaporation_vapour_batch(
         self,

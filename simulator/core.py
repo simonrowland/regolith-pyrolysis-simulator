@@ -3561,11 +3561,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             max(0.0, float(value))
             for value in upstream_partials_mbar.values()
         )
-        commanded_mbar = max(
-            0.0,
-            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0),
-        )
-        return max(partial_sum_mbar, commanded_mbar) / 1000.0
+        return partial_sum_mbar / 1000.0
 
     @staticmethod
     def _normalize_condensation_carrier_gas(
@@ -3777,11 +3773,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.p_total_mbar = applied_total_mbar
         self.melt.background_gas_species = carrier_gas
         self.melt.background_gas_mole_fraction = 1.0
-        self.overhead.composition[carrier_gas] = applied_pN2_mbar
-        self.overhead.pressure_mbar = max(
-            float(self.overhead.pressure_mbar),
-            applied_total_mbar,
-        )
         staged_control = self.campaign_mgr.last_c2a_staged_gas_control
         if isinstance(staged_control, dict):
             staged_control['pN2_mbar'] = applied_pN2_mbar
@@ -3932,38 +3923,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 None,
             )
         return 0.0
-
-    def _sync_c2a_staged_overhead_gas_control(self) -> None:
-        control = getattr(
-            self.campaign_mgr, 'last_c2a_staged_gas_control', None)
-        if self.melt.campaign != CampaignPhase.C2A_STAGED:
-            return
-        if not isinstance(control, Mapping):
-            return
-
-        pO2_mbar = max(0.0, float(control.get('pO2_mbar', 0.0) or 0.0))
-        p_total_mbar = max(
-            0.0, float(control.get('p_total_mbar', 0.0) or 0.0))
-        pN2_mbar = max(
-            0.0,
-            float(control.get('pN2_mbar', p_total_mbar - pO2_mbar) or 0.0),
-        )
-
-        composition: Dict[str, float] = {}
-        if pN2_mbar > 0.0:
-            # Kr audit follow-through (NOT-FIXED lens, 2026-07-25): this
-            # write is a dead transient today (_reset_gas wipes it before
-            # the honest overhead write, no intra-step reader), but a
-            # literal 'N2' here is a re-divergence trap — key it off the
-            # stamped carrier like every other sweep write.
-            _sweep_key = (
-                getattr(self.melt, 'background_gas_species', '') or 'N2'
-            )
-            composition[_sweep_key] = pN2_mbar
-        if pO2_mbar > 0.0:
-            composition['O2'] = pO2_mbar
-        self.overhead.composition = composition
-        self.overhead.pressure_mbar = p_total_mbar
 
     def _headspace_bleed_conductance_kg_s(
         self,
@@ -7787,17 +7746,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if callable(carrier_resolver)
             else 'N2'
         )
-        overhead_pressure_mbar = float(
-            getattr(self.melt, 'p_total_mbar', 0.0) or 0.0
-        )
-        pressure_source = 'melt.p_total_mbar'
-        if overhead_pressure_mbar <= 0.0:
-            overhead_pressure_mbar = sum(
-                max(0.0, float(value))
-                for value in self._melt_headspace_composition_mbar.values()
-            )
-            pressure_source = '_melt_headspace_composition_mbar'
-        overhead_pressure_pa = max(0.0, overhead_pressure_mbar) * 100.0
+        overhead_pressure_pa = self._melt_headspace_total_pressure_bar() * 1.0e5
+        pressure_source = '_melt_headspace_composition_mbar'
         P_bulk_Pa = max(0.0, self._evaporation_bulk_partial_pressure_pa('Fe'))
         gas_temperature_K = float(
             getattr(self.overhead, 'headspace_temperature_K', 0.0) or T_K
@@ -13952,7 +13902,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             sample_time_h=sample_time_h,
         )
         self.campaign_mgr.apply_c2a_staged_gas_controls(self.melt)
-        self._sync_c2a_staged_overhead_gas_control()
         self.melt.validate_melt_pressures()
 
         # --- 2. Temperature ramp and carried-in passive exchange ---

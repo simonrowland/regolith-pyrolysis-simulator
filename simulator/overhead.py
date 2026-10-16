@@ -1298,7 +1298,7 @@ class OverheadGasModel:
         flows = {s: _required_finite_nonnegative_float(q, f'stream.{s}.mol_hr')
                  for s, q in flows.items()}
         atmosphere = getattr(melt.atmosphere, 'name', '')
-        _, supplied_partials = self._pressure_commands(melt)
+        command_total, supplied_partials = self._pressure_commands(melt)
         controlled = atmosphere in {'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE'}
         carrier = str(getattr(melt, 'background_gas_species', '') or '')
         if atmosphere in {'PN2_SWEEP', 'ARGON_FLOW', 'CO2_BACKPRESSURE'}:
@@ -1320,6 +1320,7 @@ class OverheadGasModel:
             'provenance': 'emitted_plus_existing_bleed',
             'prior_inventory_discharge_dt_hr': 1.0,
         }
+        supply_infeasible = False
         if carrier:
             # Existing PIPE-1 gives mass capacity M_bar*Q. Divide by the same
             # M_bar: composition-independent viscosity cancels M_bar exactly.
@@ -1335,30 +1336,35 @@ class OverheadGasModel:
                 species_kg_for_M_avg=mixture,
             )
             throughput = capacity * 3600.0 / mean_mass
-            if controlled and pressure_mbar > 0.0:
-                oxygen_target = supplied_partials.get('O2', 0.0)
-                nonoxygen = sum(q for s, q in flows.items() if s != 'O2')
-                # With no background makeup, Dalton's law fixes the dose:
-                # qO2/(qO2+q_other)=pO2/P => qO2=q_other*pO2/(P-pO2).
-                # mol/hr on both sides; zero other flow uses the pure supply.
-                # The controlled outlet can throttle below the open pipe limit.
-                if carrier == 'O2' and nonoxygen > 0.0 and pressure_mbar > oxygen_target:
-                    oxygen_flow = nonoxygen * oxygen_target / (pressure_mbar - oxygen_target)
-                else:
-                    oxygen_flow = throughput * oxygen_target / pressure_mbar
-                flows['O2'] = max(flows.get('O2', 0.0), oxygen_flow)
             # Steady outlet balance: q_carrier = Q_out - sum(q_noncarrier).
             # mol/hr throughout. At zero emitted flow the pure sweep survives.
             required_carrier = throughput - sum(q for s, q in flows.items() if s != carrier)
-            if controlled:
-                if carrier == 'O2':
-                    required_carrier = flows['O2']
-                else:
-                    required_carrier = min(required_carrier, throughput * supplied_partials[carrier] / pressure_mbar)
+            if supplied_partials and pressure_mbar > 0.0:
+                # Premise: supplied partials fix y_i=p_i/P, while the known
+                # nonsupplied source fixes q_other. Dalton gives
+                # Q=q_other/(1-sum(y_i)), q_i=y_i*Q, dose_i=q_i-source_i.
+                # (mol/h)/dimensionless=mol/h. For q_N2=1 and y_O2/Ar=.2/.4,
+                # Q=2.5, q_O2=.5, q_Ar=1 mol/h; as source -> 0, Q -> 0.
+                # With no nonsupplied gas, use the declared supply mixture at
+                # the open-duct limit. Otherwise the regulator throttles to Q.
+                fractions = {s: p / pressure_mbar for s, p in supplied_partials.items()}
+                other_flow = sum(q for s, q in flows.items() if s not in fractions)
+                remainder = 1.0 - sum(fractions.values())
+                required_total = other_flow / remainder if other_flow > 0.0 and remainder > 0.0 else throughput
+                supply_total = min(required_total, throughput)
+                supply_infeasible = (
+                    (other_flow > 0.0 and remainder <= 0.0)
+                    or required_total > throughput
+                    or any(flows.get(s, 0.0) > fraction * supply_total
+                           for s, fraction in fractions.items())
+                )
+                for species, fraction in fractions.items():
+                    flows[species] = max(flows.get(species, 0.0), fraction * supply_total)
+                required_carrier = flows.get(carrier, 0.0)
             self.last_stream_boundary.update(provenance='ideal_regulator_open_duct',
                                              required_carrier_out_mol_hr=required_carrier)
             if required_carrier >= 0.0:
-                flows[carrier] = max(flows.get(carrier, 0.0), required_carrier) if controlled else required_carrier
+                flows[carrier] = required_carrier
             else:
                 if controlled:
                     flows.setdefault(carrier, 0.0)
@@ -1369,7 +1375,8 @@ class OverheadGasModel:
                     'required_carrier_out_mol_hr': required_carrier,
                     'authority_level': 'extrapolated', 'output_status': 'status_bearing',
                 })
-            if pressure_mbar > 0.0 and throughput > 0.0:
+            actual_throughput = sum(flows.values())
+            if pressure_mbar > 0.0 and actual_throughput > 0.0:
                 # Diagnostic only, not a new choking/transport law. Continuity
                 # gives u=(Q/3600)RT/(P A) [m/s]. For ideal diatomic N2 use
                 # gamma=1.4 as an explicitly approximate property: a=sqrt(gamma RT/M).
@@ -1379,16 +1386,16 @@ class OverheadGasModel:
                 area = math.pi * self.pipe_diameter_m**2 / 4.0
                 mass = _species_molar_mass_g_mol(carrier, self.species_formula_registry) / 1000.0
                 gamma = 1.4
-                speed = throughput / 3600.0 * GAS_CONSTANT * temperature_K / (pressure_mbar * 100.0 * area)
+                speed = actual_throughput / 3600.0 * GAS_CONSTANT * temperature_K / (pressure_mbar * 100.0 * area)
                 sound = math.sqrt(gamma * GAS_CONSTANT * temperature_K / mass)
                 sonic = (area * pressure_mbar * 100.0 * math.sqrt(gamma / (mass * GAS_CONSTANT * temperature_K))
                          * (2.0 / (gamma + 1.0))**((gamma + 1.0) / (2.0 * (gamma - 1.0))) * 3600.0)
-                if speed > sound or throughput > sonic:
+                if speed > sound or actual_throughput > sonic:
                     self.stream_physics_notices.append({
                         'reason': 'stream_throughput_out_of_domain', 'status': 'extrapolated',
                         'authority_level': 'extrapolated', 'output_status': 'status_bearing',
                         'provenance': 'ideal_regulator_open_duct',
-                        'throughput_mol_hr': throughput, 'sonic_ceiling_mol_hr': sonic,
+                        'throughput_mol_hr': actual_throughput, 'sonic_ceiling_mol_hr': sonic,
                         'mach': speed / sound, 'gamma_approximation': gamma, 'property_basis': carrier,
                     })
             # Finite-vessel makeup differs from outlet flow: n=pV/(RT),
@@ -1426,6 +1433,25 @@ class OverheadGasModel:
         if sum(flows.values()) == 0.0:
             self.last_stream_boundary['pressure_mbar'] = 0.0
             self.last_stream_boundary['status'] = 'zero_flow_no_composition'
+        if command_total is not None:
+            achieved = self.species_partial_pressures(
+                EvaporationFlux(), self.last_stream_boundary['pressure_mbar'],
+                self.species_formula_registry, molar_flow_by_species=flows,
+            )
+            if supply_infeasible or not math.isclose(
+                self.last_stream_boundary['pressure_mbar'], command_total, rel_tol=1e-6, abs_tol=1e-9,
+            ) or any(
+                not math.isclose(achieved.get(s, 0.0), target, rel_tol=1e-6, abs_tol=1e-9)
+                for s, target in supplied_partials.items()
+            ):
+                self.stream_physics_notices.append({
+                    'reason': 'stream_pressure_command_unmet', 'status': 'extrapolated',
+                    'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                    'target_total_pressure_mbar': command_total,
+                    'achieved_total_pressure_mbar': self.last_stream_boundary['pressure_mbar'],
+                    'target_partial_pressures_mbar': dict(supplied_partials),
+                    'achieved_partial_pressures_mbar': {s: achieved.get(s, 0.0) for s in supplied_partials},
+                })
         for notice in self.stream_physics_notices:
             if notice.get('reason') != 'finite_headspace_command_unmet':
                 notice.update(hour=getattr(melt, 'hour', None), campaign=getattr(melt.campaign, 'name', ''),
