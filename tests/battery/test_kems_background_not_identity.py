@@ -537,7 +537,7 @@ def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
     """Controls: non-Knudsen vacuum bound still works; Knudsen row oxygen preserved."""
 
     from simulator.battery.generators.bench import melt_activity_requests
-    from simulator.battery.waypoints import oxygen_condition
+    from simulator.battery.waypoints import ReadinessStatus, oxygen_condition
     from tests.battery.test_melt_activity_requirements import _case, _composition
 
     # Non-Knudsen (langmuir): chamber vacuum upper bound remains a usable oxygen route.
@@ -569,7 +569,18 @@ def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
     assert selected.route == "vacuum_total_pressure_upper_bound"
     assert selected.value.point == Decimal("-9")
     melt = melt_activity_requests(collect_consumer_inputs(experiment, bench, observation))
-    assert all(item.payload is not None and item.payload.get("fO2_log") == -9.0 for item in melt)
+    applicable = [
+        item for item in melt
+        if item.readiness.status is not ReadinessStatus.NOT_APPLICABLE
+    ]
+    assert applicable
+    assert all(
+        item.payload is not None and item.payload.get("fO2_log") == -9.0
+        for item in applicable
+    )
+    magemin = next(item for item in melt if item.readiness.engine == "magemin")
+    assert magemin.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert magemin.payload is None
 
     # Knudsen with source-grounded printed sample oxygen still commands fO2_log.
     knudsen, bench_k, obs_k = _case(
@@ -591,4 +602,15 @@ def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
     assert selected_k is not None
     assert selected_k.route == "observation_fO2_log"
     melt_k = melt_activity_requests(collect_consumer_inputs(knudsen, bench_k, obs_k))
-    assert all(item.payload is not None and item.payload.get("fO2_log") == -7.0 for item in melt_k)
+    applicable_k = [
+        item for item in melt_k
+        if item.readiness.status is not ReadinessStatus.NOT_APPLICABLE
+    ]
+    assert applicable_k
+    assert all(
+        item.payload is not None and item.payload.get("fO2_log") == -7.0
+        for item in applicable_k
+    )
+    magemin_k = next(item for item in melt_k if item.readiness.engine == "magemin")
+    assert magemin_k.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert magemin_k.payload is None

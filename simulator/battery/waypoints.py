@@ -199,6 +199,7 @@ MELT_ACTIVITY_ENGINES = (
     "thermoengine",
     "openimcc",
     "internal-analytical",
+    "magemin",
 )
 # Activity and activity coefficient only. Interaction parameters stay on
 # engine_point; they are not this observable.

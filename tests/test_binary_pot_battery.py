@@ -391,6 +391,71 @@ def test_equilibrate_cell_refuses_invalid_fraction_without_assemblage():
     assert cell.refusal_reason == "liquid_fraction_invalid"
 
 
+def test_magemin_native_activity_uses_backend_fo2_default_when_uncommanded() -> None:
+    captured = {}
+
+    class _Backend:
+        def equilibrate(
+            self,
+            *,
+            temperature_C,
+            composition_kg,
+            composition_mol,
+            pressure_bar,
+            fO2_log=-9.0,
+            call_timeout_s=None,
+            native_activity_formula=None,
+        ):
+            captured.update(
+                {
+                    "fO2_log": fO2_log,
+                    "call_timeout_s": call_timeout_s,
+                    "native_activity_formula": native_activity_formula,
+                }
+            )
+            return SimpleNamespace(
+                status="ok",
+                diagnostics={},
+                warnings=[],
+                activity_coefficients={"MgO": 0.2},
+                activity_coefficient_details={},
+                vapor_pressures_Pa={},
+                liquid_fraction=1.0,
+                phase_assemblage_available=True,
+            )
+
+    handle = EngineHandle(
+        name="magemin",
+        backend=_Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = BinaryPot(
+        pot_id="magemin-uncommanded-fo2",
+        kato_1993_table4_system=None,
+        why="native activity uses MAGEMin's declared default redox seed",
+        composition_wt_pct={"MgO": 50.0, "SiO2": 50.0},
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1800.0,
+        po2=Po2Request(mode="not_an_input", po2_bar=None),
+        native_activity_formula="MgO",
+    )
+
+    assert cell.status == "ok"
+    assert cell.melt_activities == {"MgO": 0.2}
+    assert captured == {
+        "fO2_log": -9.0,
+        "call_timeout_s": 20.0,
+        "native_activity_formula": "MgO",
+    }
+
+
 def test_classify_composition_projected_is_typed_refusal() -> None:
     status, reason, engine_reason = classify_equilibrate_outcome(
         SimpleNamespace(
