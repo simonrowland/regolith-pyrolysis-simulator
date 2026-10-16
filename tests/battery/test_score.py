@@ -5034,7 +5034,7 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
                         "first_step": 3,
                         "fraction_of_time_at_floor": 0.25,
                         "time_at_floor_s": 12.0,
-                        "pO2_bar": 0.125,
+                        "pO2_bar": 1.0e-30,
                     }
                     if index == 0
                     else {
@@ -5101,9 +5101,14 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
             if notice.reason == "surface_pO2_at_balance_floor"
         )
         assert floor_notice.kind is NoticeKind.FLOOR_INVERSION
-        assert "steps_at_floor=2" in floor_notice.band
-        assert "first_step=3" in floor_notice.band
-        assert "fraction_of_time_at_floor=0.25" in floor_notice.band
+        assert float(floor_notice.original) == 1.0e-30
+        assert first_prediction.refusal_detail["surface_pO2_balance_floor"] == {
+            "steps_at_floor": 2,
+            "first_step": 3,
+            "fraction_of_time_at_floor": 0.25,
+            "time_at_floor_s": 12.0,
+            "pO2_bar": 1.0e-30,
+        }
         assert not any(
             notice.reason == "surface_pO2_at_balance_floor"
             for notice in second_prediction.notices
