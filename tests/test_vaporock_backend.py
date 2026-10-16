@@ -2871,6 +2871,22 @@ def _healthy_finite_plus_inventory_mask():
     return {**finite, **masked}
 
 
+@pytest.mark.parametrize(
+    ("gas_species", "parent_oxide"),
+    (
+        ("Ti2O3(g)", "TiO2"),
+        ("NaOH(g)", "Na2O"),
+        ("KOH(g)", "K2O"),
+    ),
+)
+def test_oxygen_balance_gases_resolve_to_their_parent_oxide(
+    gas_species, parent_oxide
+):
+    from simulator.melt_backend.vaporock import _parent_oxide_for_vaporock_gas
+
+    assert _parent_oxide_for_vaporock_gas(gas_species) == parent_oxide
+
+
 def test_neginf_is_retained_as_proven_empty_inventory_zero():
     """-inf is the empty-parent-oxide mask, not missing thermo.
 

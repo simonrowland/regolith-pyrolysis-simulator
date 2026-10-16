@@ -1509,6 +1509,18 @@ class _OxygenBalanceRefusal(RuntimeError):
         super().__init__(self.backend_status_reason)
 
 
+class _OxygenBalanceEngineTrialRefusal(_OxygenBalanceRefusal):
+    def __init__(self, cell: Any) -> None:
+        self.cell = cell
+        code = str(
+            getattr(cell, "refusal_reason", None)
+            or getattr(cell, "status", None)
+            or "oxygen_balance_engine_trial_refused"
+        )
+        detail = str(getattr(cell, "engine_reason", None) or code)
+        super().__init__(code, detail)
+
+
 _CELL_OXIDE_GAS_TABLES: dict[str, tuple[tuple[str, str], ...]] = {
     "W": (
         ("WO", "O-027"),
@@ -1724,6 +1736,8 @@ def _solve_cell_oxygen_balance(
         pO2_bar, pressures, balance = oxygen_balance_solver(
             combined_pressure_model, all_metadata, bracket=(-30.0, 0.0)
         )
+    except _OxygenBalanceRefusal:
+        raise
     except Exception as exc:  # noqa: BLE001 - preserve engine refusal as typed
         raise _OxygenBalanceRefusal(
             str(getattr(exc, "code", "") or "imcc_gas_oxygen_balance_failed"),
@@ -1804,6 +1818,149 @@ def _solve_cell_oxygen_balance(
         "cell_oxide_janaf_sources": sources,
     }
     return float(pO2_bar), pressures, balance, fraction, info
+
+
+def _gas_formula_for_oxygen_balance(species: Any) -> str:
+    try:
+        from simulator.melt_backend.vaporock import _GAS_NAMESPACE_SUFFIX
+    except Exception as exc:  # noqa: BLE001 - keep adapter metadata failures typed
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_species_metadata_failed", str(exc)
+        ) from exc
+
+    name = str(species).strip()
+    if name.endswith(_GAS_NAMESPACE_SUFFIX):
+        return name[: -len(_GAS_NAMESPACE_SUFFIX)]
+    return name
+
+
+def _vapor_engine_oxygen_balance_species_metadata(
+    channels: Sequence[str],
+) -> dict[str, Any]:
+    """Build common oxygen metadata for channels returned by the engine."""
+
+    try:
+        from openimcc import oxygen_balance_species_metadata
+        from simulator.melt_backend.vaporock import (
+            _parent_oxide_for_vaporock_gas,
+        )
+        from simulator.state import OXIDE_SPECIES
+    except Exception as exc:  # noqa: BLE001 - keep optional-engine failure typed
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_species_metadata_failed", str(exc)
+        ) from exc
+
+    parent_by_formula: dict[str, str | None] = {}
+    for channel in channels:
+        formula = _gas_formula_for_oxygen_balance(channel)
+        if not formula or formula in parent_by_formula:
+            continue
+        parent = _parent_oxide_for_vaporock_gas(channel)
+        if parent is None and formula in OXIDE_SPECIES:
+            parent = formula
+        if parent is None and formula not in {"O", "O2"}:
+            continue
+        parent_by_formula[formula] = parent
+
+    if not parent_by_formula:
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_species_metadata_failed",
+            "engine gas catalog has no species with a known parent-oxide balance",
+        )
+    try:
+        return oxygen_balance_species_metadata(parent_by_formula)
+    except Exception as exc:  # noqa: BLE001 - preserve a typed metadata refusal
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_species_metadata_failed", str(exc)
+        ) from exc
+
+
+def _engine_gas_pressures_bar_for_oxygen_balance(
+    pressures_pa: Mapping[str, Any],
+    species_metadata: Mapping[str, Any],
+) -> dict[str, float]:
+    """Normalize positive engine gas channels to formula keys for the solver."""
+
+    by_formula: dict[str, float] = {}
+    for channel, raw_pressure in pressures_pa.items():
+        formula = _gas_formula_for_oxygen_balance(channel)
+        try:
+            pressure_pa = float(raw_pressure)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_engine_pressure_invalid",
+                f"engine pressure for {channel!r} is not numeric: {raw_pressure!r}",
+            ) from exc
+        if not math.isfinite(pressure_pa) or pressure_pa < 0.0:
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_engine_pressure_invalid",
+                f"engine pressure for {channel!r} is not finite and non-negative",
+            )
+        if formula not in species_metadata:
+            if pressure_pa > 0.0:
+                raise _OxygenBalanceRefusal(
+                    "oxygen_balance_species_metadata_failed",
+                    f"engine returned positive pressure for unmapped gas {channel!r}",
+                )
+            continue
+        if formula in by_formula:
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_species_metadata_failed",
+                f"engine returned duplicate gas channels for {formula!r}",
+            )
+        by_formula[formula] = pressure_pa / PA_PER_BAR
+    return {formula: by_formula.get(formula, 0.0) for formula in species_metadata}
+
+
+def _solve_vapor_engine_cell_oxygen_balance(
+    engine_call_at_po2: Callable[[float], Any],
+    *,
+    temperature_K: float,
+    cell_material: str | None,
+) -> tuple[float, Mapping[str, float], Mapping[str, Any], float, dict[str, Any]]:
+    cells_by_po2: dict[float, Any] = {}
+
+    def cell_at_po2(pO2_bar: float) -> Any:
+        if pO2_bar not in cells_by_po2:
+            cell = engine_call_at_po2(pO2_bar)
+            if getattr(cell, "status", None) != "ok":
+                raise _OxygenBalanceEngineTrialRefusal(cell)
+            cells_by_po2[pO2_bar] = cell
+        return cells_by_po2[pO2_bar]
+
+    endpoint_cells = (cell_at_po2(1e-30), cell_at_po2(1.0))
+    channels = tuple(
+        dict.fromkeys(
+            channel
+            for cell in endpoint_cells
+            for channel in (
+                getattr(cell, "gas_partial_pressures_Pa", None) or {}
+            )
+        )
+    )
+    species_metadata = _vapor_engine_oxygen_balance_species_metadata(channels)
+
+    def pressure_model(pO2_bar: float) -> Mapping[str, float]:
+        cell = cell_at_po2(pO2_bar)
+        invalid = tuple(
+            getattr(cell, "invalid_gas_partial_pressure_components", ()) or ()
+        )
+        if invalid:
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_engine_pressure_invalid",
+                f"engine returned invalid gas channels {list(invalid)!r}",
+            )
+        return _engine_gas_pressures_bar_for_oxygen_balance(
+            getattr(cell, "gas_partial_pressures_Pa", None) or {},
+            species_metadata,
+        )
+
+    return _solve_cell_oxygen_balance(
+        pressure_model,
+        species_metadata,
+        temperature_K=temperature_K,
+        cell_material=cell_material,
+    )
 
 
 # ---------------------------------------------------------------------------

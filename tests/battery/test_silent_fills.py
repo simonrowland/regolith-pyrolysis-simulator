@@ -401,14 +401,15 @@ def test_uniform_modelled_reactive_cell_requests_cell_oxide_reservoir(
 
 
 @pytest.mark.parametrize(
-    ("materials", "reason"),
+    ("engine", "materials", "reason"),
     (
-        ((CellMaterial.AL2O3,), "cell_material_not_inert"),
-        ((CellMaterial.PT, CellMaterial.AL2O3), "cell_material_not_inert"),
-        ((CellMaterial.OTHER,), "cell_material_not_inert"),
+        (Engine.OPENIMCC, (CellMaterial.AL2O3,), "cell_material_not_inert"),
+        (Engine.VAPOROCK, (CellMaterial.PT, CellMaterial.AL2O3), "cell_material_not_inert"),
+        (Engine.ALPHAMELTS, (CellMaterial.OTHER,), "cell_material_not_inert"),
     ),
 )
 def test_noninert_knudsen_cell_refuses_oxygen_balance(
+    engine: Engine,
     materials: tuple[CellMaterial, ...],
     reason: str,
     monkeypatch,
@@ -417,7 +418,7 @@ def test_noninert_knudsen_cell_refuses_oxygen_balance(
     observation, experiment = _kems_partial(cell_material=None)
 
     prediction = predict_with_engine(
-        Engine.OPENIMCC,
+        engine,
         observation,
         experiment=experiment,
         bench=_cell_material_bench(materials),
@@ -714,14 +715,18 @@ def test_oxygen_balance_vapour_rows_use_engine_pressures_at_commanded_po2(
         if notice.reason.startswith("fo2_oxygen_balance_effusion_solved:")
     )
     solved = json.loads(solved_notice.reason.split(":", 1)[1])
+    score_pO2_bar, score_pressures = calls[-1]
     direct_pressures = _cell(
         handle,
         None,
         po2=Po2Request(PO2_COMMANDED, solved["pO2_bar"]),
     ).gas_partial_pressures_Pa
-    assert calls[-1][0] == pytest.approx(solved["pO2_bar"], rel=1e-12)
+    assert score_pO2_bar == pytest.approx(solved["pO2_bar"], rel=1e-12)
     assert math.isclose(
         float(prediction.value), direct_pressures["K"], rel_tol=1e-9
+    )
+    assert math.isclose(
+        score_pressures["K"], direct_pressures["K"], rel_tol=1e-9
     )
 
 
