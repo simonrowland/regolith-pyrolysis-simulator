@@ -692,8 +692,12 @@ class OverheadGasModel:
 
         default_config = config.get('default_C', base_C)  # °C or schedule — default segment temperature source
         if 'default_C' in config:
-            default_C, default_floor_notice = self._resolve_liner_temperature_value(
-                default_config, melt)
+            if default_config is None:
+                default_C, default_floor_notice = base_C, base_floor_notice
+            else:
+                default_C, default_floor_notice = self._resolve_liner_temperature_value(
+                    default_config, melt,
+                )
         else:
             default_C, default_floor_notice = base_C, base_floor_notice
         segments = config.get('segments', {}) or {}  # °C mapping — per-segment wall temperature configs
@@ -707,6 +711,14 @@ class OverheadGasModel:
             segment_config = segments.get(name)  # °C or schedule — segment wall temperature source
             if segment_config is None:
                 resolved[name] = max(0.0, float(default_C))  # °C — default segment wall temperature
+                if name == UPSTREAM_PIPE_SEGMENT_NAME:
+                    upstream_floor_notice = default_floor_notice
+            elif (
+                isinstance(segment_config, Mapping)
+                and 'default_C' in segment_config
+                and segment_config['default_C'] is None
+            ):
+                resolved[name] = max(0.0, float(default_C))
                 if name == UPSTREAM_PIPE_SEGMENT_NAME:
                     upstream_floor_notice = default_floor_notice
             else:
@@ -935,15 +947,22 @@ class OverheadGasModel:
         if not isinstance(config, Mapping):
             return DEFAULT_PIPE_TEMPERATURE_C, None
 
-        default_C = self._optional_float(  # °C — default liner wall temperature
-            config.get('default_C'),
-            DEFAULT_PIPE_TEMPERATURE_C,
-        )
+        default_floor_notice = None
+        raw_default_C = config.get('default_C')
+        if 'default_C' in config and raw_default_C is None and melt is not None:
+            default_C, default_floor_notice = self._resolve_liner_temperature_value(
+                None, melt,
+            )
+        else:
+            default_C = self._optional_float(  # °C — default liner wall temperature
+                raw_default_C,
+                DEFAULT_PIPE_TEMPERATURE_C,
+            )
         schedule = config.get('schedule', ())  # unitless sequence — liner temperature schedule
         if isinstance(schedule, Mapping):
             schedule = schedule.get('segments', ())  # unitless sequence — segment schedule entries
         if not isinstance(schedule, (list, tuple)):
-            return default_C, None
+            return default_C, default_floor_notice
 
         campaign_name = ''
         campaign_hour = 0.0  # hr — campaign-relative time
@@ -982,7 +1001,7 @@ class OverheadGasModel:
                 selected.get('end_C', selected.get('start_C')),
                 default_C,
             ), None
-        return default_C, None
+        return default_C, default_floor_notice
 
     @staticmethod
     def _optional_float(value: Any, default: float) -> float:

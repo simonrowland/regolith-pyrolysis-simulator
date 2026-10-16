@@ -24,6 +24,7 @@ from simulator.optimize.recipe import (
     RecipeSchema,
     RecipeValidationError,
 )
+from simulator.overhead import OverheadGasModel
 from simulator.state import BatchRecord, CondensationTrain, EvaporationFlux, MeltState
 
 
@@ -389,6 +390,29 @@ def test_wall_temperature_knobs_render_to_setpoints_patch() -> None:
         == 425.0
     )
     assert patch.validated(schema).recipe_id() != RecipePatch({}).recipe_id(schema)
+
+
+def test_optimizer_liner_temperature_override_changes_upstream_wall() -> None:
+    schema = RecipeSchema()
+    path = _path("overhead_headspace.liner_temperature_C.default_C")
+    baseline = yaml.safe_load(SETPOINTS_PATH.read_text())
+    overridden = yaml.safe_load(SETPOINTS_PATH.read_text())
+    patch = RecipePatch({path: 1600.0}).validated(schema)
+    nested = schema.to_setpoints_patch(patch)
+    overridden["overhead_headspace"].update(nested["overhead_headspace"])
+    melt = MeltState(temperature_C=1225.0)
+    upstream = "stage_0_to_stage_1"
+
+    default_wall_C = OverheadGasModel(
+        baseline["overhead_headspace"]
+    ).resolve_pipe_segment_temperatures_C([upstream], melt)[upstream]
+    overridden_wall_C = OverheadGasModel(
+        overridden["overhead_headspace"]
+    ).resolve_pipe_segment_temperatures_C([upstream], melt)[upstream]
+
+    assert default_wall_C == pytest.approx(melt.temperature_C)
+    assert overridden_wall_C == pytest.approx(1600.0)
+    assert overridden_wall_C != default_wall_C
 
 
 def test_c3_alkali_dosing_knobs_render_to_setpoints_patch() -> None:

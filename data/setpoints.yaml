@@ -1749,11 +1749,17 @@ overhead_headspace:
   temperature_model: "melt"
   temperature_offset_K: null
 
-  # Absent liner/upstream schedules track melt T through OverheadGasModel.
-  # Explicit scalar or recipe schedules still override that default. Keep
-  # the downstream design schedules independent of the furnace temperature.
+  # A null default preserves melt tracking while exposing the optimizer's
+  # explicit upstream liner setpoint. Downstream design schedules stay separate.
+  liner_temperature_C:
+    default_C: null
+
+  # Null inherits the liner above; explicit segment defaults remain tunable.
   pipe_segment_temperatures_C:
+    default_C: null
     segments:
+      stage_0_to_stage_1:
+        default_C: null
       stage_1_to_stage_2:
         default_C: 1500
         schedule:
