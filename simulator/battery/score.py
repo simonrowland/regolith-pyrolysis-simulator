@@ -6878,9 +6878,23 @@ def compile_residual(
                 if method_uncertainties is None or source_reference.source_id is None
                 else method_uncertainties.get(source_reference.source_id)
             )
-            if source_method_uncertainty is not None:
+            if source_method_uncertainty is not None and quantity is not None:
                 quantity_basis = source_method_uncertainty.quantity_basis
                 basis_lower = quantity_basis.casefold()
+                basis_words = re.sub(r"[\W_]+", " ", basis_lower).strip()
+                quantity_words = re.sub(
+                    r"[\W_]+", " ", quantity.value.casefold()
+                ).strip()
+                quantity_names = (quantity_words,)
+                if quantity is Quantity.P_PARTIAL:
+                    quantity_names += ("partial pressure",)
+                if not any(
+                    re.search(rf"(?<!\w){re.escape(name)}(?!\w)", basis_words)
+                    for name in quantity_names
+                ):
+                    source_method_uncertainty = None
+            if source_method_uncertainty is not None:
+                quantity_basis = source_method_uncertainty.quantity_basis
                 printed_unit = (
                     "dex"
                     if "dex" in basis_lower

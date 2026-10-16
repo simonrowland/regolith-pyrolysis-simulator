@@ -1073,6 +1073,69 @@ def test_source_method_uncertainty_supplies_a_source_method_band() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    "quantity",
+    (Quantity.ACTIVITY_COEFFICIENT, Quantity.P_PARTIAL, Quantity.FE3_FE2_RATIO),
+)
+def test_activity_source_method_uncertainty_does_not_band_other_quantities(
+    quantity: Quantity,
+) -> None:
+    experiment = F.kems_experiment()
+    if quantity is Quantity.ACTIVITY_COEFFICIENT:
+        identity = replace(F.activity_identity(), quantity=quantity)
+        value = Decimal("0.2")
+    elif quantity is Quantity.P_PARTIAL:
+        na = State.not_applicable("not an activity identity axis for partial pressure")
+        identity = replace(
+            F.activity_identity(),
+            quantity=quantity,
+            per=na,
+            reference_state=na,
+        )
+        value = Decimal("1")
+    else:
+        na = State.not_applicable("not a redox identity axis")
+        identity = replace(
+            F.activity_identity(formula="Fe"),
+            quantity=quantity,
+            species=Species("Fe", Phase.L),
+            per=na,
+            reference_state=na,
+        )
+        value = Decimal("0.72")
+    reference = F.observation(
+        f"activity-method-{quantity.value}",
+        experiment.experiment_id,
+        identity,
+        value,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="activity-method-fixture",
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=Decimal("0.10"),
+        meaning="one_sigma",
+        quantity_basis="log10 activity in dex",
+        locator=F.loc(
+            page=12, note="The standard deviation of log10(a) is 0.10."
+        ),
+    )
+    base_work = F.work()
+    work = replace(
+        base_work,
+        source_ids=(*base_work.source_ids, "activity-method-fixture"),
+        source_method_uncertainties={"activity-method-fixture": method_uncertainty},
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(work, experiment, reference, review="reviewed"),
+        prediction=_predict(value, identity),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+
+
 def test_pooled_log_pressure_sd_known_replicates() -> None:
     from simulator.battery.score import pooled_log_pressure_sd
 
