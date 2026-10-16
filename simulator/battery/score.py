@@ -32,6 +32,7 @@ import yaml
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
+    AmountBasis,
     Authority,
     CellMaterial,
     CONDENSED_PHASES,
@@ -50,6 +51,7 @@ from simulator.battery.enums import (
     PerBasis,
     Phase,
     Polymorph,
+    PolymorphRejectionKind,
     PURE_STANDARD_THERMO,
     Quantity,
     ReferenceStateConvention,
@@ -68,6 +70,7 @@ from simulator.battery.identity import (
     PA_PER_BAR_DEC,
     THERMOCHEMICAL_CALORIE_J,
     identity_equal,
+    _same_row_redox_identity_equal,
     log10K_from_delta_fG_kJ_mol,
     profile_for,
     quantity_token,
@@ -235,6 +238,8 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.ACTIVITY: MetricOperation.DEX,
     Quantity.ACTIVITY_COEFFICIENT: MetricOperation.DEX,
     Quantity.DELTA_FG: MetricOperation.ABSOLUTE,
+    Quantity.ENTHALPY_OF_FUSION: MetricOperation.ABSOLUTE,
+    Quantity.ENTROPY_OF_FUSION: MetricOperation.ABSOLUTE,
     Quantity.H_MINUS_H298: MetricOperation.ABSOLUTE,
     Quantity.PARTIAL_MOLAR_ENTHALPY: MetricOperation.ABSOLUTE,
     Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW: MetricOperation.ABSOLUTE,
@@ -252,7 +257,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.MASS_LOSS_RATE: MetricOperation.RELATIVE,
     Quantity.WALL_DEPOSIT_MASS: MetricOperation.RELATIVE,
     Quantity.TRANSITION_TEMPERATURE: MetricOperation.ABSOLUTE,
-    Quantity.FE3_FE2_RATIO: MetricOperation.RELATIVE,
+    Quantity.FE3_FE2_RATIO: MetricOperation.DEX,
     Quantity.VISCOSITY: MetricOperation.DEX,
     Quantity.DENSITY: MetricOperation.RELATIVE,
     Quantity.ELECTRICAL_CONDUCTIVITY: MetricOperation.DEX,
@@ -327,6 +332,20 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.OPENIMCC: (),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
 }
+
+
+def _attempt_coefficient_sources(
+    engine: Engine, coefficient_sources: tuple[str, ...] | None
+) -> tuple[str, ...]:
+    """Use explicit attempt ancestry, falling back only when it was unspecified."""
+
+    return (
+        ENGINE_COEFFICIENT_SOURCES[engine]
+        if coefficient_sources is None
+        else coefficient_sources
+    )
+
+
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
 # Unmapped aliases (MELTS calibration DBs) stay incomplete; do not invent
 # a work. VapoRock/Ellingham consume JANAF; Antoine sidecar is NIST WebBook;
@@ -379,6 +398,8 @@ FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
+FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
+FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 
 
 @dataclass(frozen=True)
@@ -1189,6 +1210,10 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
         strata.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
+    if NoticeKind.OUT_OF_CERTIFIED_BAND.value in kinds:
+        strata.append(FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND)
+    if NoticeKind.OUT_OF_GAMMA_DOMAIN.value in kinds:
+        strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
     return tuple(strata)
 
 
@@ -1208,6 +1233,39 @@ def _is_fusion_conversion_reason(reason: object) -> bool:
 
 def _is_flagged_stratum_notice(notice: Notice) -> bool:
     return bool(flagged_strata((notice,)))
+
+
+def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
+    if source_polymorph is None:
+        return True
+    if not source_polymorph.is_unknown:
+        return False
+    return source_polymorph.rejection_kind is PolymorphRejectionKind.OMITTED
+
+
+def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
+    return (
+        source_polymorph is not None
+        and source_polymorph.is_unknown
+        and source_polymorph.rejection_kind
+        in (
+            PolymorphRejectionKind.UNRECOGNISED,
+            PolymorphRejectionKind.CONTRADICTS_FORMULA,
+        )
+    )
+
+
+def _score_eligibility_notices(notices: Sequence[Notice]) -> tuple[Notice, ...]:
+    """Remove diagnostic engine band flags; authority gates eligibility."""
+
+    return tuple(
+        notice
+        for notice in notices
+        if not (
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and notice.origin.startswith("engine:")
+        )
+    )
 
 
 @lru_cache(maxsize=1)
@@ -1270,8 +1328,6 @@ def _janaf_pure_solid_table_temperature_range(
     if len(set(temperatures)) < 2:
         return None
     return min(temperatures), max(temperatures)
-
-
 @lru_cache(maxsize=1)
 def _b1259_tridymite_cristobalite_offset_rows() -> tuple[
     tuple[Decimal, Decimal, Decimal], ...
@@ -1427,8 +1483,12 @@ def fusion_comparison_reference(
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     from simulator.battery.generators.janaf import (
+        _JANAF_POLYMORPH_BY_TABLE,
         JANAF_R_J_PER_MOL_K,
+        JANAFFusionPolymorphUnavailable,
+        _janaf_eligible_pure_crystal_tables,
         _janaf_fusion_energy_for_pair,
+        _janaf_stable_crystal_set,
         janaf_fusion_energy,
     )
 
@@ -1446,6 +1506,7 @@ def fusion_comparison_reference(
                 "needed JANAF table node row missing or changed",
                 "JANAF cached table is incomplete",
                 "JANAF table values are missing",
+                "JANAF cache hash does not match source sidecar",
                 "JANAF table has fewer than two Gibbs points",
                 "spans missing grid node",
             )
@@ -1473,12 +1534,7 @@ def fusion_comparison_reference(
     # Thus ΔG_fus=+28.47061 kJ/mol and Δlog10(a)=ΔG_fus*1000/(R*T*ln(10))
     # = +0.793984 dex (R=8.31441 J mol^-1 K^-1). Their branches cross at
     # 3104.945598 K, where ΔG_fus and the reference shift go to zero.
-    expected_polymorph = {
-        "Ca-027": Polymorph.LIME,
-        "Al-096": Polymorph.CORUNDUM,
-        "Mg-008": Polymorph.PERICLASE,
-        "O-035": Polymorph.CRISTOBALITE_HIGH,
-    }.get(fusion.crystal_table)
+    expected_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
     tridymite_to_cristobalite = (
         formula == "SiO2"
@@ -1488,11 +1544,10 @@ def fusion_comparison_reference(
     source_polymorph = standard_state.endmember.polymorph
     source_polymorph_is_unknown = (
         source_polymorph is not None
-        and source_polymorph.is_unknown
-        and not (source_polymorph.reason or "").startswith("unrecognised polymorph ")
+        and _source_polymorph_is_unspecified(source_polymorph)
     )
-    source_polymorph_is_unspecified = (
-        source_polymorph is None or source_polymorph_is_unknown
+    source_polymorph_is_unspecified = _source_polymorph_is_unspecified(
+        source_polymorph
     )
     unique_unknown_polymorph_table = False
     inferred_reference_notice: Notice | None = None
@@ -1502,48 +1557,49 @@ def fusion_comparison_reference(
         and observed_polymorph is not expected_polymorph
         and source_polymorph_is_unspecified
     ):
-        eligible_solid_tables = tuple(
-            (table_id, table_polymorph)
-            for candidate_formula, table_id, table_polymorph
-            in _janaf_pure_solid_table_index()
-            if candidate_formula == formula
-            and (
-                table_range := _janaf_pure_solid_table_temperature_range(table_id)
-            ) is not None
-            and table_range[0] <= temperature_K <= table_range[1]
-        )
+        stability = None
+        try:
+            eligible_solid_tables = _janaf_eligible_pure_crystal_tables(
+                formula, temperature_K
+            )
+            if len(eligible_solid_tables) > 1:
+                stability = _janaf_stable_crystal_set(
+                    formula,
+                    temperature_K,
+                    eligible_solid_tables,
+                )
+        except JANAFFusionPolymorphUnavailable as exc:
+            notice = fusion_missing_input_notice(str(exc))
+            if notice is None:
+                notice = Notice(
+                    kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                    affected_quantities=(Quantity.ACTIVITY,),
+                    reason=(
+                        f"fusion conversion missing input for {formula}: "
+                        f"incomplete JANAF stability candidate set: {exc}"
+                    ),
+                    origin=reference.observation_id,
+                    band=f"JANAF stability data for {formula}: {exc}",
+                )
+            return replace(
+                reference,
+                notices=union_notices(reference.notices, (notice,)),
+            )
         if len(eligible_solid_tables) == 1:
             unique_unknown_polymorph_table = eligible_solid_tables[0][0] == (
                 fusion.crystal_table
             )
         elif len(eligible_solid_tables) > 1:
-            from simulator.battery.generators import janaf as janaf_tables
-
-            candidates: list[tuple[str, Polymorph, Decimal]] = []
-            for table_id, table_polymorph in eligible_solid_tables:
-                if table_polymorph is None:
-                    candidates = []
-                    break
-                try:
-                    points, _source_sha256 = janaf_tables._fusion_table_points(
-                        table_id
-                    )
-                    gibbs_kJ_per_mol = janaf_tables._interpolate_formation_gibbs(
-                        points, temperature_K
-                    )
-                except ValueError:
-                    continue
-                candidates.append((table_id, table_polymorph, gibbs_kJ_per_mol))
-
-            if len(candidates) == len(eligible_solid_tables) and candidates:
-                stable_table, stable_polymorph, stable_gibbs_kJ_per_mol = min(
-                    candidates, key=lambda item: item[2]
-                )
-                alternatives = tuple(
-                    item for item in candidates if item[0] != stable_table
-                )
-                if alternatives:
-                    # For equal chemical potential, changing the pure-solid
+            assert stability is not None
+            stable_table = stability.selected.table_id
+            stable_polymorph = stability.selected.polymorph
+            stable_gibbs_kJ_per_mol = stability.selected.gibbs_kJ_per_mol
+            alternatives = tuple(
+                (item.table_id, item.polymorph, item.gibbs_kJ_per_mol)
+                for item in stability.alternatives
+            )
+            if alternatives:
+                # For equal chemical potential, changing the pure-solid
                     # standard state shifts activity by exp(dG/RT). Therefore
                     # d log10(a) = dG / (R T ln 10); J/mol divided by
                     # (J/mol/K) K is dimensionless, and ln(10) converts ln to
@@ -2008,6 +2064,27 @@ def resolve_source_relation(
     return SourceRelation.INDEPENDENT
 
 
+KC91_CALIBRATION_SOURCES = {
+    "citation": "Kress & Carmichael (1991); Partzsch et al. (2004), p. 566",
+    "attributions": (
+        "K&C88+; K&C91",
+        "Kilinc et al. (1983)",
+        "Sack et al. (1980)",
+        "Thornber et al. (1980)",
+    ),
+}
+
+
+def _kc91_calibration_source_overlap(attribution: str | None) -> bool:
+    if not attribution:
+        return False
+    normalized = attribution.casefold()
+    return any(
+        normalized.startswith(label.casefold())
+        for label in KC91_CALIBRATION_SOURCES["attributions"]
+    )
+
+
 def selected_lineage_level(
     observation: Observation,
     comparison_ids: set[str],
@@ -2079,6 +2156,9 @@ def build_conjuncts(
     independent = (
         source_relation is SourceRelation.INDEPENDENT and lineage_complete
     )
+    # Engine band notices remain visible to the measured report's flagged
+    # population. Prediction authority is already gated separately.
+    eligibility_notices = _score_eligibility_notices(notices)
     return EligibleConjuncts(
         status=status,
         finite_numeric_point_endpoints=finite_points,
@@ -2092,11 +2172,11 @@ def build_conjuncts(
         candidate_engine_prediction_authority_allowed=cand_ok,
         no_blocking_qualification=not blocking_qualifications(
             quantity,
-            notices,
+            eligibility_notices,
             oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
         ),
         not_flagged_stratum=not any(
-            _is_flagged_stratum_notice(notice) for notice in notices
+            _is_flagged_stratum_notice(notice) for notice in eligibility_notices
         ),
         selected_independent_lineage_level=selected_lineage_level(
             reference, comparison_ids
@@ -3895,13 +3975,45 @@ def _comparison_identity(
     solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
         prediction.engine, prediction.notices
     )
+    redox = quantity_token(identity) is Quantity.FE3_FE2_RATIO
+    fusion_polymorph_flag = (
+        quantity_token(identity) in FUSION_QUANTITIES
+        and any(
+            notice.reason.startswith("fusion_solid_polymorph_unspecified:")
+            for notice in prediction.notices
+        )
+    )
     comparison_activity = (
         quantity_token(identity) in MELT_ACTIVITY_QUANTITIES
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
-    if not solved_oxygen_balance and not comparison_activity:
+    if (
+        not solved_oxygen_balance
+        and not comparison_activity
+        and not redox
+        and not fusion_polymorph_flag
+    ):
         return identity
     updates: dict[str, State] = {}
+    if redox and isinstance(prediction.identity, Identity):
+        # Redox predictions consume the row's printed composition and oxygen
+        # condition; compare both sides at those exact point conditions.
+        for field_name in ("composition", "fO2_Pa", "total_pressure_Pa"):
+            actual = getattr(identity, field_name)
+            used = getattr(prediction.identity, field_name)
+            if (actual is None or not actual.is_value) and used is not None and used.is_value:
+                updates[field_name] = used
+    if fusion_polymorph_flag:
+        call_evidence = prediction.execution.call_evidence or ""
+        fusion_pair = call_evidence.partition("janaf-fusion:")[2].partition(":")[0]
+        solid_table = fusion_pair.partition("/")[0]
+        from simulator.battery.generators.janaf import _JANAF_POLYMORPH_BY_TABLE
+
+        solid_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(solid_table)
+        if solid_polymorph is not None:
+            updates["species"] = replace(
+                identity.species, polymorph=State.of(solid_polymorph)
+            )
     if identity.composition is None or not identity.composition.is_value:
         point = _printed_point_composition(reference)
         if point is not None:
@@ -3951,6 +4063,264 @@ def _has_printed_fo2(observation: Observation, identity: Identity) -> bool:
         point is not None
         and point.inference is None
         and point.state.is_value
+    )
+
+
+def _predict_fe_redox(
+    engine: Engine, observation: Observation, identity: Identity, channel: str
+) -> EnginePrediction:
+    """Predict Fe3+/Fe2+ with the production Kress91 melt-redox split."""
+
+    from simulator.fe_redox import (
+        KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+        KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+        _kress91_fe3_fe2_ratio,
+        kress91_dropped_components,
+        kress91_split,
+        kress91_temperature_band_case,
+        melt_mol_fractions_for_kress91,
+    )
+
+    sources = ("Kress and Carmichael 1991, doi:10.1007/BF00307328",)
+    if engine is not Engine.INTERNAL_ANALYTICAL:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            refusal_reason=RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX,
+            refusal_detail={
+                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value,
+                "engine": engine.value,
+                "detail": "no fixed-T/fO2/composition ferric output without phase-equilibrium execution",
+            },
+            identity=identity,
+        )
+
+    def refused(reason: RefusalReason, detail: Mapping[str, object]) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            refusal_reason=reason,
+            refusal_detail=detail,
+            identity=identity,
+        )
+
+    def point_value(key: str) -> Decimal | None:
+        located = (observation.point_conditions or {}).get(key)
+        if not isinstance(located, Located) or located.inference is not None:
+            return None
+        if not located.state.is_value or located.state.value is None:
+            return None
+        raw = located.state.value
+        if isinstance(raw, Value):
+            return point_magnitude(raw)
+        try:
+            return as_decimal(raw)
+        except (TypeError, ValueError):
+            return None
+
+    temperature = temperature_of(identity) or point_value("temperature_K")
+    if temperature is None or not temperature.is_finite() or temperature <= 0:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "temperature_K"},
+        )
+
+    composition_state = identity.composition
+    if composition_state is None or not composition_state.is_value:
+        composition_state = _printed_point_composition(observation)
+    if (
+        composition_state is None
+        or not composition_state.is_value
+        or not isinstance(composition_state.value, Composition)
+    ):
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "composition"},
+        )
+    composition = composition_state.value
+
+    # Premise: Borisov stores mole fractions of oxide formula units and the
+    # combined iron key is single-cation. Algebra: x_i -> w_i ∝ x_i M_i, then
+    # the production converter divides by M_i and renormalizes to x_i while
+    # treating FeO as FeOt. Unit check: (mol fraction × g/mol)/(g/mol) is a
+    # mole fraction. Sanity: no measured redox split is used, and the printed
+    # six-significant-figure composition remains closed after the FeOt rename.
+    try:
+        composition_wt = (
+            {oxide: float(amount) for oxide, amount in composition.components}
+            if composition.amount_basis is AmountBasis.MASS_PERCENT
+            else composition_wt_pct(composition)
+        )
+        if composition_wt is None:
+            raise ValueError("composition cannot be converted to oxide weights")
+        dropped_components, dropped_mass_fraction = kress91_dropped_components(
+            composition_wt
+        )
+        mol_fractions = melt_mol_fractions_for_kress91(composition_wt)
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        return refused(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_redox_composition", "detail": str(exc)},
+        )
+    if not mol_fractions or mol_fractions.get("FeOt", 0.0) <= 0.0:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "total_iron"},
+        )
+
+    fO2_log = point_value("fO2_log")
+    if fO2_log is None:
+        if _derived_fo2_condition(observation):
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "printed_fO2"},
+            )
+        oxygen_pa = identity.fO2_Pa
+        point_oxygen = (observation.point_conditions or {}).get("fO2_Pa")
+        if (
+            (oxygen_pa is None or not oxygen_pa.is_value or oxygen_pa.value is None)
+            and isinstance(point_oxygen, Located)
+            and point_oxygen.inference is None
+            and point_oxygen.state.is_value
+            and point_oxygen.state.value is not None
+        ):
+            oxygen_pa = point_oxygen.state
+        if oxygen_pa is not None and oxygen_pa.is_value and oxygen_pa.value is not None:
+            oxygen_value = float(oxygen_pa.value)
+            if oxygen_value > 0.0 and math.isfinite(oxygen_value):
+                fO2_log = Decimal(str(math.log10(oxygen_value / 100000.0)))
+    if fO2_log is None or not fO2_log.is_finite():
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "printed_fO2"},
+        )
+    # The extract labels this column log10 fO2; its air rows are about -0.68,
+    # i.e. log10(0.21 bar), matching the simulator's log10(bar) convention.
+    # For identity comparison, fO2(Pa) = 10**log10(fO2/bar) * 1e5 Pa/bar;
+    # the predictor itself receives the printed log value without a frame shift.
+
+    pressure_pa = identity.total_pressure_Pa
+    point_pressure = point_value("total_pressure_Pa")
+    if (
+        (pressure_pa is None or not pressure_pa.is_value or pressure_pa.value is None)
+        and point_pressure is not None
+    ):
+        pressure_pa = State.of(point_pressure)
+    if pressure_pa is not None and pressure_pa.is_value and pressure_pa.value is not None:
+        pressure_bar = float(pressure_pa.value) / 100000.0
+    elif observation.source_id == "borisov-2018-compilation":
+        # The cited compilation is explicitly a 1-atm dataset.
+        pressure_bar = 1.01325
+        pressure_pa = State.of(Decimal("101325"))
+    else:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "total_pressure_Pa"},
+        )
+    if pressure_bar < 0.0 or not math.isfinite(pressure_bar):
+        return refused(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_input", "input": "total_pressure_Pa"},
+        )
+
+    band = kress91_temperature_band_case(float(temperature) - 273.15)
+    try:
+        split = kress91_split(
+            fO2_log=float(fO2_log),
+            mol_fractions=mol_fractions,
+            T_K=float(temperature),
+            pressure_bar=pressure_bar,
+        )
+        prediction_value = _kress91_fe3_fe2_ratio(float(split["ratio"]))
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        return refused(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_redox_controls", "detail": str(exc)},
+        )
+    if not math.isfinite(prediction_value) or prediction_value <= 0.0:
+        return refused(
+            RefusalReason.METRIC_DOMAIN,
+            {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
+        )
+
+    authority = Authority.BRIDGE
+    if not band["authoritative"]:
+        authority = Authority.EXTRAPOLATED
+    certified_band = {
+        "temperature_K": (
+            Decimal(str(KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15)),
+            Decimal(str(KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15)),
+        )
+    }
+    certified_band_text = (
+        f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
+        f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
+    )
+    notices: tuple[Notice, ...] = ()
+    if dropped_components and dropped_mass_fraction is not None:
+        notices = (
+            Notice(
+                kind=NoticeKind.COMPOSITION_PROJECTED,
+                affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                reason=(
+                    "Kress91 oxide basis omits composition components: "
+                    f"{', '.join(dropped_components)}; "
+                    f"dropped_mass_fraction={dropped_mass_fraction:.6g}; "
+                    f"authority={authority.value}; certified_band={certified_band_text}"
+                ),
+                origin="simulator.fe_redox:melt_mol_fractions_for_kress91",
+                band=certified_band_text,
+                dropped=dropped_components,
+                dropped_mass_fraction=Decimal(str(dropped_mass_fraction)),
+                authority=authority,
+            ),
+        )
+    if not band["authoritative"]:
+        notices += (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                reason=(
+                    f"kress91_{band['status']}; authority={band['source']}; "
+                    f"calibrated_temperature_C=[{KRESS91_LIQUID_CALIBRATION_MIN_T_C:g},"
+                    f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C:g}]"
+                ),
+                origin="simulator.fe_redox:kress91_split",
+                band=(
+                    f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
+                    f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
+                ),
+                authority=authority,
+            ),
+        )
+    prediction_identity = replace(
+        identity,
+        composition=composition_state,
+        fO2_Pa=State.of(Decimal(str(100000.0 * 10.0 ** float(fO2_log)))),
+        total_pressure_Pa=pressure_pa,
+    )
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="simulator.fe_redox:kress91_split",
+        ),
+        value=as_decimal(str(prediction_value)),
+        unit="dimensionless",
+        authority=authority,
+        notices=notices,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        certified_band=certified_band,
+        identity=prediction_identity,
+        version="Kress-Carmichael-1991",
     )
 
 
@@ -4234,10 +4604,15 @@ def predict_with_engine(
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "quantity_unknown"},
         )
+    if quantity is Quantity.FE3_FE2_RATIO:
+        return _predict_fe_redox(engine, observation, identity, channel)
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
-        if quantity not in _engine_thermo_quantities(engine):
+        if (
+            quantity not in _engine_thermo_quantities(engine)
+            and quantity not in FUSION_QUANTITIES
+        ):
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
@@ -4437,15 +4812,30 @@ def predict_with_engine(
     # Formation and pure-standard quantities are not melt activities or
     # partial pressures. A missing branch used to read those maps and
     # return the wrong unit. Refuse instead of emitting 0.
-    if quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO:
+    if (
+        quantity in FORMATION_QUANTITIES
+        or quantity in PURE_STANDARD_THERMO
+        or quantity in FUSION_QUANTITIES
+    ):
         from simulator.battery.compilation_tier import predict_thermo_attempt
 
         attempt = predict_thermo_attempt(engine, observation)
+        coefficient_sources = _attempt_coefficient_sources(
+            engine, attempt.coefficient_sources
+        )
+        lineage_complete = (
+            lineage_complete_for(coefficient_sources)
+            if attempt.value is not None
+            else False
+        )
         if attempt.value is not None:
             exec_state = ExecutionState.PRODUCED
         elif attempt.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE:
             exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
-        elif attempt.refusal_reason is RefusalReason.UNSUPPORTED:
+        elif attempt.refusal_reason in {
+            RefusalReason.UNSUPPORTED,
+            RefusalReason.ENGINE_DOES_NOT_REPORT_FUSION,
+        }:
             exec_state = ExecutionState.UNSUPPORTED
         else:
             exec_state = ExecutionState.NOT_PROBED
@@ -4459,8 +4849,8 @@ def predict_with_engine(
             unit=attempt.unit,
             authority=attempt.authority,
             notices=attempt.notices,
-            coefficient_sources=sources,
-            lineage_complete=lineage_complete_for(sources) if attempt.value is not None else False,
+            coefficient_sources=coefficient_sources,
+            lineage_complete=lineage_complete,
             refusal_reason=attempt.refusal_reason,
             refusal_detail=attempt.refusal_detail,
             identity=identity,
@@ -5289,6 +5679,11 @@ def candidate_observation(
 _HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
 
 
+def _is_residue_worker_infrastructure_failure(reason: object) -> bool:
+    """A single slow cell is transient infrastructure, not a cohort refusal."""
+    return str(reason).startswith(("engine_timeout:", "engine_transport_error:"))
+
+
 def _hashimoto_residue_prediction(
     context: ScoreContext,
     reference: Observation,
@@ -5404,9 +5799,21 @@ def _hashimoto_residue_prediction(
             }
         )
         primary_geometry = primary.primary_geometry_policy_id
-        run_refusal = (primary.provenance.get("geometry_refusal_by_geometry") or {}).get(
-            primary_geometry
+        geometry_refusals = primary.provenance.get("geometry_refusal_by_geometry") or {}
+        production_refusals = production.provenance.get("geometry_refusal_by_geometry") or {}
+        timeout_refusal = next(
+            (
+                refusal
+                for refusal in (
+                    *geometry_refusals.values(),
+                    *production_refusals.values(),
+                )
+                if isinstance(refusal, Mapping)
+                and str(refusal.get("reason") or "").startswith("engine_timeout:")
+            ),
+            None,
         )
+        run_refusal = timeout_refusal or geometry_refusals.get(primary_geometry)
         if run_refusal:
             from simulator.battery.residue import ResidueInventoryRefusal
 
@@ -5469,7 +5876,8 @@ def _hashimoto_residue_prediction(
         )
     except Exception as exc:  # the scorer records typed per-cell refusal and continues
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
-        if cache_key not in cache:
+        infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
+        if cache_key not in cache and not infrastructure_failure:
             cache[cache_key] = {"__cohort_error__": str(reason)}
         detail: dict[str, object] = {
             "reason": str(reason),
@@ -5482,10 +5890,18 @@ def _hashimoto_residue_prediction(
         return EnginePrediction(
             engine=engine,
             channel=channel,
-            execution=Execution(state=ExecutionState.NOT_PROBED),
+            execution=Execution(
+                state=(
+                    ExecutionState.ATTEMPTED_UNAVAILABLE
+                    if infrastructure_failure
+                    else ExecutionState.NOT_PROBED
+                )
+            ),
             coefficient_sources=sources,
             refusal_reason=(
-                RefusalReason.OPENIMCC_NOT_IMPORTABLE
+                RefusalReason.ATTEMPTED_UNAVAILABLE
+                if infrastructure_failure
+                else RefusalReason.OPENIMCC_NOT_IMPORTABLE
                 if str(reason) == "openimcc_not_importable"
                 else RefusalReason.UNSUPPORTED
             ),
@@ -5601,6 +6017,12 @@ def _sossi_residue_prediction(
         prediction = cache[cache_key].get(short_id)
         if prediction is None:
             raise ValueError("sossi_prediction_row_missing")
+        run_refusal = prediction.provenance.get("run_refusal")
+        if isinstance(run_refusal, Mapping):
+            raise ResidueInventoryRefusal(
+                str(run_refusal.get("reason") or "sossi_run_refused"),
+                json.dumps(run_refusal, sort_keys=True, default=str),
+            )
         if formula in prediction.channel_missing_elements:
             raise ResidueInventoryRefusal(
                 "channel_missing", f"no {formula} evaporation channel for {engine.value}"
@@ -5704,9 +6126,12 @@ def _sossi_residue_prediction(
         )
     except Exception as exc:  # preserve a typed per-cell absence and keep scoring
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
-        if cache_key not in cache:
+        infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
+        if cache_key not in cache and not infrastructure_failure:
             cache[cache_key] = {"__cohort_error__": str(reason)}
-        if reason == "oxygen_condition_missing":
+        if infrastructure_failure:
+            refusal = RefusalReason.ATTEMPTED_UNAVAILABLE
+        elif reason == "oxygen_condition_missing":
             refusal = RefusalReason.IDENTITY_INCOMPLETE
         elif reason == "channel_missing":
             refusal = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
@@ -5717,7 +6142,13 @@ def _sossi_residue_prediction(
         return EnginePrediction(
             engine=engine,
             channel=channel,
-            execution=Execution(state=ExecutionState.NOT_PROBED),
+            execution=Execution(
+                state=(
+                    ExecutionState.ATTEMPTED_UNAVAILABLE
+                    if infrastructure_failure
+                    else ExecutionState.NOT_PROBED
+                )
+            ),
             coefficient_sources=sources,
             refusal_reason=refusal,
             refusal_detail={
@@ -5898,6 +6329,27 @@ def compile_residual(
             ),
             candidate,
         )
+
+    if (
+        quantity is Quantity.ACTIVITY
+        and isinstance(identity, Identity)
+        and identity.reference_state is not None
+        and identity.reference_state.is_value
+        and isinstance(identity.reference_state.value, StandardState)
+    ):
+        source_polymorph = identity.reference_state.value.endmember.polymorph
+        if _source_polymorph_is_rejected(source_polymorph):
+            assert source_polymorph is not None
+            return _refused(
+                RefusalReason.IDENTITY_MISMATCH,
+                {
+                    "reason": "solid_reference_polymorph_rejected",
+                    "formula": identity.reference_state.value.endmember.formula,
+                    "polymorph_reason": source_polymorph.reason,
+                },
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                exclusions=("identity_equal", "status_match_or_mismatch"),
+            )
 
     if quantity is None:
         detail: dict[str, object] = {"reason": "quantity_unknown"}
@@ -6097,6 +6549,28 @@ def compile_residual(
         observations=context.observations,
         experiments=context.experiments,
     )
+    if (
+        rail is Rail.REDOX
+        and engine is Engine.INTERNAL_ANALYTICAL
+        and quantity is Quantity.FE3_FE2_RATIO
+    ):
+        attribution = (
+            None
+            if reference.evidence is None
+            else reference.evidence.attribution
+        )
+        source_relation = (
+            SourceRelation.TRAINING
+            if _kc91_calibration_source_overlap(attribution)
+            else SourceRelation.INDEPENDENT
+        )
+    if (
+        quantity in FUSION_QUANTITIES
+        and prediction.engine is Engine.INTERNAL_ANALYTICAL
+        and reference.read_from in prediction.coefficient_sources
+        and source_relation is SourceRelation.SAME_INPUT
+    ):
+        source_relation = SourceRelation.TRAINING
     compilation = is_compilation_evidence(reference) or is_compilation_source(
         reference.source_id, origin
     )
@@ -6221,7 +6695,11 @@ def compile_residual(
         compared_candidate = _comparison_identity(
             compared_candidate, reference, prediction
         )
-    equal = identity_equal(compared_reference, compared_candidate)
+    equal = (
+        _same_row_redox_identity_equal(compared_reference, compared_candidate)
+        if quantity is Quantity.FE3_FE2_RATIO
+        else identity_equal(compared_reference, compared_candidate)
+    )
     if equal.kind is not IdentityEqualKind.EQUAL:
         reason = (
             RefusalReason.IDENTITY_MISMATCH
@@ -6560,7 +7038,19 @@ def _refusal_diagnostic_references(context: ScoreContext) -> tuple[Observation, 
             and obs.value.kind is ValueKind.CATEGORICAL
             and obs.identity.quantity.is_unknown
         )
-        if activity_reference_unknown or categorical_quantity_unknown:
+        unavailable_on_known_rail = (
+            status is AdmissionStatus.REJECTED
+            and obs.value.kind is ValueKind.UNAVAILABLE
+            and rail_for_quantity(
+                quantity_token(obs.identity),
+                species_formula=obs.identity.species.formula,
+            ) is not None
+        )
+        if (
+            activity_reference_unknown
+            or categorical_quantity_unknown
+            or unavailable_on_known_rail
+        ):
             out.append(obs)
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
@@ -6573,6 +7063,7 @@ def _score_store_with_decisions(
     work_id: str | None = None,
     limit: int | None = None,
     include_diagnostics: bool = True,
+    measured_only: bool = False,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
     _stream: _ResidualJsonlStream | None = None,
@@ -6619,6 +7110,12 @@ def _score_store_with_decisions(
             if obs.observation_id not in seen:
                 refs.append(obs)
                 seen.add(obs.observation_id)
+    if measured_only:
+        refs = [
+            obs for obs in refs
+            if obs.evidence.class_.is_value
+            and obs.evidence.class_.value in MEASURED_EVIDENCE
+        ]
     if work_id:
         filtered: list[Observation] = []
         for obs in refs:
@@ -6884,6 +7381,7 @@ def _score_store_to_jsonl(
     work_id: str | None = None,
     limit: int | None = None,
     include_diagnostics: bool = True,
+    measured_only: bool = False,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
 ) -> tuple[int, _ResidualReportMetadata]:
@@ -6898,6 +7396,7 @@ def _score_store_to_jsonl(
             work_id=work_id,
             limit=limit,
             include_diagnostics=include_diagnostics,
+            measured_only=measured_only,
             predict=predict,
             handles=handles,
             _stream=stream,
@@ -7239,14 +7738,27 @@ def _iqr(values: Sequence[Decimal]) -> Decimal | None:
 def _measured_residuals(
     residuals: Sequence[Residual],
     context: ScoreContext | None,
+    *,
+    include_engine_out_of_band: bool = False,
 ) -> list[Residual]:
-    """Keep only measured-evidence rows outside flagged and compilation tiers."""
+    """Keep measured rows outside flagged/compilation tiers.
+
+    The headline can retain engine band diagnostics; certified metrics cannot.
+    """
+
+    def unflagged(residual: Residual) -> bool:
+        notices = (
+            _score_eligibility_notices(residual.notices)
+            if include_engine_out_of_band
+            else residual.notices
+        )
+        return not flagged_strata(notices)
 
     if context is None:
         return [
             residual
             for residual in residuals
-            if not flagged_strata(residual.notices)
+            if unflagged(residual)
             and _reference_has_measured_evidence(
                 None, exclusions=residual.exclusions
             )
@@ -7256,7 +7768,7 @@ def _measured_residuals(
     return [
         residual
         for residual in residuals
-        if not flagged_strata(residual.notices)
+        if unflagged(residual)
         if _reference_has_measured_evidence(
             context.observations.get(residual.reference),
             exclusions=residual.exclusions,
@@ -8062,10 +8574,12 @@ def headline_rows(
         return _all_numeric_rows_from_residuals(
             residuals, context=context, engines=engines
         )
-    groups: dict[tuple[str, str], list[Residual]] = {}
+    groups: dict[tuple[str, str, str], list[Residual]] = {}
     engines_seen: set[str] = set()
     if tier == "measured":
-        tier_residuals = _measured_residuals(residuals, context)
+        tier_residuals = _measured_residuals(
+            residuals, context, include_engine_out_of_band=True
+        )
     elif tier == "compilation":
         tier_residuals = _compilation_residuals(residuals, context)
     else:
@@ -8075,15 +8589,26 @@ def headline_rows(
             continue
         engine = _engine_of(residual)
         engines_seen.add(engine)
-        groups.setdefault((residual.rail.value, engine), []).append(residual)
+        relation = _source_relation_headline_key(
+            residual.rail.value, engine, residual.source_relation.value
+        )
+        groups.setdefault(
+            (residual.rail.value, engine, relation), []
+        ).append(residual)
     engine_names = [engine.value for engine in engines or ()]
     engine_names.extend(name for name in sorted(engines_seen) if name not in engine_names)
     for rail in Rail:
         for engine in engine_names or [e.value for e in SCORE_ENGINE_SET]:
-            groups.setdefault((rail.value, engine), [])
+            special_redox = _has_source_relation_headline_group(
+                groups, rail.value, engine
+            )
+            if not special_redox:
+                groups.setdefault((rail.value, engine, ""), [])
     rows: list[dict[str, object]] = []
-    for (rail, engine), bucket in sorted(groups.items()):
+    for (rail, engine, relation), bucket in sorted(groups.items()):
         row = _headline_metric_row(rail, engine, bucket, tier=tier)
+        if relation:
+            row.update(_redox_source_relation_fields(relation))
         row["decision_strata"] = (
             _compilation_decision_strata(
                 [
@@ -8092,6 +8617,10 @@ def headline_rows(
                     if _engine_of(r) == engine
                     and r.rail is not None
                     and r.rail.value == rail
+                    and (
+                        not relation
+                        or r.source_relation.value == relation
+                    )
                 ],
                 context,
             )
@@ -8105,6 +8634,122 @@ def headline_rows(
         )
         rows.append(row)
     return rows
+
+
+def measured_engine_rail_records(
+    residuals: Iterable[Mapping[str, object]],
+    *,
+    context: ScoreContext,
+    engines: Sequence[Engine],
+) -> list[dict[str, object]]:
+    """Measured-candidate counts and native-unit error metrics by engine/rail."""
+
+    measured_reference = _payload_measured_reference(
+        context.observations, context.origins
+    )
+    groups: dict[tuple[str, str, str], list[Mapping[str, object]]] = defaultdict(list)
+    certified: set[int] = set()
+    flagged: dict[int, bool] = {}
+    for residual in residuals:
+        rail = str(residual.get("rail") or "")
+        if not rail:
+            continue
+        engine = _ScorePayloadAccumulator._engine(residual)
+        relation = str(residual.get("source_relation") or SourceRelation.UNKNOWN.value)
+        groups[(rail, engine, relation)].append(residual)
+        flagged[id(residual)] = bool(_flagged_payload_strata(residual))
+        if measured_reference(residual) and _headline_payload_admits(
+            residual, tier="measured"
+        ):
+            certified.add(id(residual))
+
+    records: list[dict[str, object]] = []
+    for rail in Rail:
+        for engine in engines:
+            relations = tuple(
+                relation
+                for relation in SourceRelation
+                if (rail.value, engine.value, relation.value) in groups
+            ) or (SourceRelation.UNKNOWN,)
+            for relation in relations:
+                bucket = groups.get((rail.value, engine.value, relation.value), [])
+                numeric: list[tuple[Mapping[str, object], Mapping[str, object], Decimal]] = []
+                for row in bucket:
+                    metric = row.get("numeric")
+                    if not isinstance(metric, Mapping) or metric.get("value") is None:
+                        continue
+                    try:
+                        value = as_decimal(metric["value"])
+                    except (KeyError, TypeError, ValueError, ArithmeticError):
+                        continue
+                    numeric.append((row, metric, value))
+                certified_numeric = [item for item in numeric if id(item[0]) in certified]
+                flagged_numeric = [item for item in numeric if flagged[id(item[0])]]
+                by_metric: dict[tuple[str, str], list[tuple[Mapping[str, object], Decimal]]] = defaultdict(list)
+                for row, metric, value in numeric:
+                    by_metric[(str(metric.get("operation") or ""), str(metric.get("unit") or ""))].append((row, value))
+                metrics: list[dict[str, object]] = []
+                for (operation, unit), metric_rows in sorted(by_metric.items()):
+                    values = [value for _row, value in metric_rows]
+                    metrics.append({
+                        "operation": operation,
+                        "unit": "dex" if operation == MetricOperation.DEX.value else unit,
+                        "n": len(values),
+                        "all_numeric": {
+                            "rms": _optional_decimal(_rms(values)),
+                            "median_abs": _optional_decimal(_median_abs(values)),
+                        },
+                        "certified": {
+                            "n": sum(id(row) in certified for row, _value in metric_rows),
+                            "rms": _optional_decimal(_rms([value for row, value in metric_rows if id(row) in certified])),
+                            "median_abs": _optional_decimal(_median_abs([value for row, value in metric_rows if id(row) in certified])),
+                        },
+                        "flagged": {
+                            "n": sum(flagged[id(row)] for row, _value in metric_rows),
+                            "rms": _optional_decimal(_rms([value for row, value in metric_rows if flagged[id(row)]])),
+                            "median_abs": _optional_decimal(_median_abs([value for row, value in metric_rows if flagged[id(row)]])),
+                        },
+                    })
+                refusal_counts: dict[str, int] = defaultdict(int)
+                for row in bucket:
+                    if row.get("status") == ResidualStatus.REFUSED.value:
+                        refusal = row.get("refusal")
+                        reason = (
+                            str(refusal.get("reason") or "untyped_refusal")
+                            if isinstance(refusal, Mapping)
+                            else "untyped_refusal"
+                        )
+                        refusal_counts[reason] += 1
+                record = {
+                    "rail": rail.value,
+                    "engine": engine.value,
+                    "candidates": len(bucket),
+                    "numeric": len(numeric),
+                    "certified_numeric": len(certified_numeric),
+                    "flagged_numeric": len(flagged_numeric),
+                    "refused": sum(row.get("status") == ResidualStatus.REFUSED.value for row in bucket),
+                    "refused_by_reason": dict(sorted(refusal_counts.items())),
+                    "in_band": sum(
+                        isinstance(row.get("numeric"), Mapping)
+                        and row["numeric"].get("decision_band") is not None
+                        and row.get("status") == ResidualStatus.MATCH.value
+                        for row in bucket
+                    ),
+                    "metrics": metrics,
+                }
+                relation_key = _source_relation_headline_key(
+                    rail.value, engine.value, relation.value
+                )
+                if relation_key:
+                    record.update(_redox_source_relation_fields(relation_key))
+                else:
+                    record["source_relation"] = relation.value
+                records.append(record)
+    return records
+
+
+def _optional_decimal(value: Decimal | None) -> str | None:
+    return None if value is None else str(value)
 
 
 def flagged_stratum_rows(
@@ -8661,14 +9306,29 @@ def notice_backlog(residuals: Sequence[Residual]) -> dict[str, int]:
 
 
 def _engine_of(residual: Residual) -> str:
-    if residual.candidate_request is not None:
-        return residual.candidate_request.engine.value
-    if residual.candidate and residual.candidate.startswith("engine:"):
-        parts = residual.candidate.split(":")
+    request = residual.candidate_request
+    return _engine_from_payload(
+        {
+            "candidate_request": (
+                {"engine": request.engine.value} if request is not None else None
+            ),
+            "candidate": residual.candidate,
+            "key": residual.key,
+        }
+    )
+
+
+def _engine_from_payload(row: Mapping[str, object]) -> str:
+    request = row.get("candidate_request")
+    if isinstance(request, Mapping) and request.get("engine"):
+        return str(request["engine"])
+    candidate = row.get("candidate")
+    if isinstance(candidate, str) and candidate.startswith("engine:"):
+        parts = candidate.split(":")
         if len(parts) >= 2:
             return parts[1]
-    if residual.key:
-        return residual.key.rsplit("::", 1)[-1]
+    if row.get("key"):
+        return str(row["key"]).rsplit("::", 1)[-1]
     return "unknown"
 
 
@@ -8835,6 +9495,67 @@ def render_score_report(
     )
 
 
+def _append_nasa9_fit_comparison_stratum(
+    report: str, comparisons: Iterable[Mapping[str, object]]
+) -> str:
+    counts: dict[tuple[str, str], list[int]] = defaultdict(lambda: [0, 0, 0])
+    refusals: dict[tuple[str, str, str, str], int] = defaultdict(int)
+    for row in comparisons:
+        channel = row.get("comparison_channel")
+        if not isinstance(channel, str) or not channel.startswith("nasa9_fit:"):
+            continue
+        engine = channel.partition(":")[2]
+        quantity = str(row.get("quantity") or "unknown")
+        numeric = row.get("value") is not None and row.get("status") != "refused"
+        group = counts[(engine, quantity)]
+        group[0] += 1
+        group[1 if numeric else 2] += 1
+        if numeric:
+            continue
+        reason = str(row.get("refusal_reason") or "untyped")
+        detail = row.get("refusal_detail")
+        detail_text = json.dumps(
+            dict(detail) if isinstance(detail, Mapping) else {},
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        refusals[(engine, quantity, reason, detail_text)] += 1
+
+    if not counts:
+        return report
+
+    lines = [
+        "## NASA-9 fit comparison stratum",
+        "",
+        "Fit comparisons are separate from printed-cell comparisons and measured-tier counts.",
+        "",
+        "| engine | quantity | n comparisons | n numeric | n refused |",
+        "|---|---|---:|---:|---:|",
+    ]
+    for (engine, quantity), (total, numeric, refused) in sorted(counts.items()):
+        lines.append(
+            f"| {engine} | {quantity} | {total} | {numeric} | {refused} |"
+        )
+    lines.extend(["", "### Typed refusal diagnostics", ""])
+    if not refusals:
+        lines.append("None.")
+    else:
+        lines.extend(
+            [
+                "| engine | quantity | reason | count | detail |",
+                "|---|---|---|---:|---|",
+            ]
+        )
+        for (engine, quantity, reason, detail), count in sorted(refusals.items()):
+            safe_detail = detail.replace("|", "\\|").replace("`", "\\`")
+            lines.append(
+                f"| {engine} | {quantity} | `{reason}` | {count} | `{safe_detail}` |"
+            )
+    section = "\n".join(lines)
+    return f"{report.rstrip()}\n\n{section}\n"
+
+
 def _render_score_report_from_payloads_legacy(
     rows: Iterable[Mapping[str, object]],
     *,
@@ -8941,10 +9662,11 @@ def _render_score_report_from_payloads_legacy(
     else:
         lines.extend(
             [
-                "| rail | engine | n candidates | n refused | n scored | n score eligible | "
+                "| rail | engine | population / source relation | n candidates | "
+                "n refused | n scored | n score eligible | "
                 "n inside band | RMS dex | median dex | median abs dex | band width dex | "
                 "RMS/band | n no band | match rate |",
-                "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+                "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
         for row in aggregate.headline_records(engines=report_engines):
@@ -8953,7 +9675,9 @@ def _render_score_report_from_payloads_legacy(
             rate = row["match_rate"]
             rate_s = "—" if rate is None else f"{rate:.3f}"
             lines.append(
-                f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
+                f"| {row['rail']} | {row['engine']} | "
+                f"{row.get('population', row.get('source_relation', '—'))} | "
+                f"{row['n_candidates']} | "
                 f"{row['n_refused']} | {row['n']} | {row['n_score_eligible']} | "
                 f"{row['n_inside_band']} | {row['rms_dex'] or '—'} | "
                 f"{row['median_dex'] or '—'} | {row['median_abs_dex'] or '—'} | "
@@ -9331,6 +10055,20 @@ def _headline_payload_record(
     return record
 
 
+def _source_relation_headline_key(rail: str, engine: str, relation: str) -> str:
+    if rail == Rail.REDOX.value and engine == Engine.INTERNAL_ANALYTICAL.value:
+        return relation or SourceRelation.UNKNOWN.value
+    return ""
+
+
+def _has_source_relation_headline_group(
+    groups: Mapping[tuple[str, str, str], object], rail: str, engine: str
+) -> bool:
+    return any(
+        key[0] == rail and key[1] == engine and bool(key[2]) for key in groups
+    )
+
+
 def headline_payloads(
     rows: Iterable[Mapping[str, object]],
     engines: Sequence[Engine],
@@ -9341,11 +10079,11 @@ def headline_payloads(
 ) -> list[dict[str, object]]:
     if tier not in {"measured", "compilation"}:
         raise ValueError(f"unknown headline tier {tier!r}")
-    groups: dict[tuple[str, str], dict[str, object]] = {}
+    groups: dict[tuple[str, str, str], dict[str, object]] = {}
     engine_names = [e.value for e in engines]
     for rail in Rail:
         for engine in engine_names:
-            groups[(rail.value, engine)] = _empty_headline_payload_stats()
+            groups[(rail.value, engine, "")] = _empty_headline_payload_stats()
     for row in rows:
         if not _headline_payload_admits(row, tier=tier):
             continue
@@ -9354,8 +10092,11 @@ def headline_payloads(
             ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
             or str(row.get("key") or "").rsplit("::", 1)[-1]
         )
+        relation = _source_relation_headline_key(
+            rail, engine, str(row.get("source_relation") or "")
+        )
         stats = groups.setdefault(
-            (rail, engine),
+            (rail, engine, relation),
             _empty_headline_payload_stats(),
         )
         stats["n_candidates"] = int(stats["n_candidates"]) + 1
@@ -9400,20 +10141,26 @@ def headline_payloads(
             except (TypeError, ValueError, ArithmeticError):
                 pass
     out: list[dict[str, object]] = []
-    for (rail, engine), stats in sorted(groups.items()):
+    for (rail, engine, relation), stats in sorted(groups.items()):
+        if (
+            not relation
+            and _has_source_relation_headline_group(groups, rail, engine)
+        ):
+            continue
         typed_widths = getattr(rows, "_typed_headline_band_values", {}).get(
             (tier, rail, engine)
         )
-        out.append(
-            _headline_payload_record(
-                tier,
-                rail,
-                engine,
-                stats,
-                typed_widths=typed_widths,
-                include_eligible_references=False,
-            )
+        record = _headline_payload_record(
+            tier,
+            rail,
+            engine,
+            stats,
+            typed_widths=typed_widths,
+            include_eligible_references=False,
         )
+        if relation:
+            record.update(_redox_source_relation_fields(relation))
+        out.append(record)
     return out
 
 
@@ -9751,6 +10498,22 @@ def flagged_stratum_payloads(
     ]
 
 
+def _redox_source_relation_fields(relation: str) -> dict[str, str]:
+    population = {
+        SourceRelation.TRAINING.value: "calibration_source_overlap_fit_fidelity",
+        SourceRelation.INDEPENDENT.value: "independent_source_accuracy",
+    }.get(relation)
+    fields = {"source_relation": relation}
+    if population is not None:
+        fields["population"] = population
+    if relation == SourceRelation.TRAINING.value:
+        fields["attribution_basis"] = (
+            "Observation.evidence.attribution via Residual.reference"
+        )
+        fields["calibration_source_citation"] = KC91_CALIBRATION_SOURCES["citation"]
+    return fields
+
+
 def headline_payload_records(
     rows: Iterable[Mapping[str, object]],
     *,
@@ -9759,6 +10522,8 @@ def headline_payload_records(
     origins: Mapping[str, str] | None = None,
 ) -> list[dict[str, object]]:
     """Machine-readable headline records from residual payloads."""
+
+    rows = tuple(rows)
 
     compilation_rows: Iterable[Mapping[str, object]] = ()
     is_measured = _payload_measured_reference(observations, origins)
@@ -9972,7 +10737,7 @@ class _ScorePayloadAccumulator:
             {} if typed_tier_band_values is None else typed_tier_band_values
         )
         self.headline_groups: dict[
-            str, dict[tuple[str, str], dict[str, object]]
+            str, dict[tuple[str, str, str], dict[str, object]]
         ] = {"measured": {}, "compilation": {}}
         self.all_numeric = _AllNumericHeadline()
         self.e15_points: list[_E15ResidualPoint] = []
@@ -9997,7 +10762,7 @@ class _ScorePayloadAccumulator:
         for tier in self.headline_groups:
             for rail in Rail:
                 for engine in engines:
-                    self.headline_groups[tier][(rail.value, engine.value)] = (
+                    self.headline_groups[tier][(rail.value, engine.value, "")] = (
                         _empty_headline_payload_stats()
                     )
 
@@ -10022,12 +10787,7 @@ class _ScorePayloadAccumulator:
 
     @staticmethod
     def _engine(row: Mapping[str, object]) -> str:
-        request = row.get("candidate_request")
-        return str(
-            request.get("engine")
-            if isinstance(request, Mapping) and request.get("engine")
-            else str(row.get("key") or "").rsplit("::", 1)[-1]
-        )
+        return _engine_from_payload(row)
 
     def _add_headline(
         self,
@@ -10040,7 +10800,12 @@ class _ScorePayloadAccumulator:
         observation: Observation | None = None,
     ) -> None:
         groups = self.headline_groups[tier]
-        stats = groups.setdefault((rail, engine), _empty_headline_payload_stats())
+        relation = _source_relation_headline_key(
+            rail, engine, str(row.get("source_relation") or "")
+        )
+        stats = groups.setdefault(
+            (rail, engine, relation), _empty_headline_payload_stats()
+        )
         stats["n_candidates"] = int(stats["n_candidates"]) + 1
         status = str(row.get("status") or "")
         exclusions = tuple(row.get("exclusions") or ())
@@ -10403,23 +11168,40 @@ class _ScorePayloadAccumulator:
             keys = {
                 key for key in groups
                 if engines is None or key[1] in selected_names
+                if not (
+                    key[0] == Rail.REDOX.value
+                    and key[1] == Engine.INTERNAL_ANALYTICAL.value
+                    and key[2] == ""
+                    and any(
+                        other[0] == key[0]
+                        and other[1] == key[1]
+                        and other[2]
+                        for other in groups
+                    )
+                )
             }
             for rail in Rail:
                 for engine in selected_names:
-                    keys.add((rail.value, engine))
-            for rail, engine in sorted(keys):
-                stats = groups.get((rail, engine), _empty_headline_payload_stats())
-                records.append(
-                    _headline_payload_record(
-                        tier,
-                        rail,
-                        engine,
-                        stats,
-                        typed_widths=self.typed_headline_band_values.get(
-                            (tier, rail, engine)
-                        ),
-                    )
+                    if not _has_source_relation_headline_group(
+                        groups, rail.value, engine
+                    ):
+                        keys.add((rail.value, engine, ""))
+            for rail, engine, relation in sorted(keys):
+                stats = groups.get(
+                    (rail, engine, relation), _empty_headline_payload_stats()
                 )
+                record = _headline_payload_record(
+                    tier,
+                    rail,
+                    engine,
+                    stats,
+                    typed_widths=self.typed_headline_band_values.get(
+                        (tier, rail, engine)
+                    ),
+                )
+                if relation:
+                    record.update(_redox_source_relation_fields(relation))
+                records.append(record)
         self._add_compilation_decision_strata(records)
         return records
 
@@ -10685,10 +11467,11 @@ def render_score_report_from_payloads(
                 if observations is not None
                 else []
             ),
-            "| rail | engine | n candidates | n refused | n scored | n score eligible | "
+            "| rail | engine | population / source relation | n candidates | "
+            "n refused | n scored | n score eligible | "
             "n inside band | RMS dex | median dex | median abs dex | band width dex | "
             "RMS/band | n no band | match rate |",
-            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+            "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
     hulls: dict[tuple[str, str, str], _ConditionHull] | None = (
@@ -10705,7 +11488,9 @@ def render_score_report_from_payloads(
         band = row["band_width_dex"] or "—"
         ratio = row["rms_over_band"] or "—"
         lines.append(
-            f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
+            f"| {row['rail']} | {row['engine']} | "
+            f"{row.get('population', row.get('source_relation', '—'))} | "
+            f"{row['n_candidates']} | "
             f"{row['n_refused']} | {row['n']} | {row['n_score_eligible']} | "
             f"{row['n_inside_band']} | {rms} | {med} | {med_abs} | {band} | {ratio} | "
             f"{row['n_no_band']} | {rate_s} |"

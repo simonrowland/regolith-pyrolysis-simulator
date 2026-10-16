@@ -3395,16 +3395,34 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
-      phase: silicate_melt
+      phase: l
       standard_state:
         state:
-          tag: unknown
-          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge:
+                tag: value
+                value: 0
+            component_basis: Fe(1-x)O
+            reference_pressure_bar: '1.01325'
+        inferred: false
         note: >-
-          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
-          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
-          wüstite nonstoichiometry Fe(1-x)O; see the source-specific calculation record above.
-        locator: {published_page: 30, equation: '9'}
+          The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
+          non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
+          no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
+        locator:
+          published_page: 31
+          section: 4.1 Activity coefficients
       regime: experimental_melt_equilibration
       units: mole percent and dimensionless activity coefficient as printed
       values:
@@ -3423,6 +3441,7 @@ species:
           state: unknown
           reason: not_published; pages 22-25 and 29-30 searched, log fO2 scale and imposition/measurement not specified
         FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
+        alloy_note: The source warns that alloy composition and alloy activity-coefficient uncertainty add uncertainty after recalculation to pure metals.
         series:
         - run: AD 10
           system: AD
@@ -3431,9 +3450,68 @@ species:
           XCoO_mol_pct: 0.25
           XNiO_mol_pct: 0.027
           XFeO_mol_pct: 5.56
-          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated
+            to pure-metal equilibria
           gamma: 1.62
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: AD 10
+          composition_mol:
+            SiO2: '0.4735380563674062899857733873'
+            CaO: '0.2482008643230627535788091642'
+            MgO: '0.1442360775315450659763003108'
+            Al2O3: '0.07565500177798589045911713776'
+            FeO: '0.0556'
+            NiO: '0.00027'
+            CoO: '0.0025'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1677'
+              locator:
+                page: 23
+                table: '2'
+                row: AD 10
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4735380563674062899857733873'
+                  - - CaO
+                    - '0.2482008643230627535788091642'
+                  - - MgO
+                    - '0.1442360775315450659763003108'
+                  - - Al2O3
+                    - '0.07565500177798589045911713776'
+                  - - FeO
+                    - '0.0556'
+                  - - NiO
+                    - '0.00027'
+                  - - CoO
+                    - '0.0025'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: AD 10
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1
+                - Table 2 run AD 10, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 AD starting bulk plus Table 2
+                  run mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: AD 6
           system: AD
           T_K: 1677
@@ -3441,9 +3519,68 @@ species:
           XCoO_mol_pct: 0.13
           XNiO_mol_pct: 0.025
           XFeO_mol_pct: 8.77
-          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated
+            to pure-metal equilibria
           gamma: 1.64
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: AD 6
+          composition_mol:
+            SiO2: '0.4580087559196449546048268561'
+            CaO: '0.2400613162093703501607854957'
+            MgO: '0.1395059711477487642045341674'
+            Al2O3: '0.07317395672323593102985348089'
+            FeO: '0.0877'
+            NiO: '0.00025'
+            CoO: '0.0013'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1677'
+              locator:
+                page: 23
+                table: '2'
+                row: AD 6
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4580087559196449546048268561'
+                  - - CaO
+                    - '0.2400613162093703501607854957'
+                  - - MgO
+                    - '0.1395059711477487642045341674'
+                  - - Al2O3
+                    - '0.07317395672323593102985348089'
+                  - - FeO
+                    - '0.0877'
+                  - - NiO
+                    - '0.00025'
+                  - - CoO
+                    - '0.0013'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: AD 6
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1
+                - Table 2 run AD 6, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 AD starting bulk plus Table 2
+                  run mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: AD 1
           system: AD
           T_K: 1679
@@ -3451,9 +3588,68 @@ species:
           XCoO_mol_pct: 0.12
           XNiO_mol_pct: 0.013
           XFeO_mol_pct: 8.13
-          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated
+            to pure-metal equilibria
           gamma: 1.74
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: AD 1
+          composition_mol:
+            SiO2: '0.4613378999923191787052758858'
+            CaO: '0.2418062581948834236914628495'
+            MgO: '0.1405200030214771164626006139'
+            Al2O3: '0.07370583879132028114066065085'
+            FeO: '0.0813'
+            NiO: '0.00013'
+            CoO: '0.0012'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1679'
+              locator:
+                page: 23
+                table: '2'
+                row: AD 1
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4613378999923191787052758858'
+                  - - CaO
+                    - '0.2418062581948834236914628495'
+                  - - MgO
+                    - '0.1405200030214771164626006139'
+                  - - Al2O3
+                    - '0.07370583879132028114066065085'
+                  - - FeO
+                    - '0.0813'
+                  - - NiO
+                    - '0.00013'
+                  - - CoO
+                    - '0.0012'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: AD 1
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1
+                - Table 2 run AD 1, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 AD starting bulk plus Table 2
+                  run mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: AD 8
           system: AD
           T_K: 1682
@@ -3461,9 +3657,68 @@ species:
           XCoO_mol_pct: 0.095
           XNiO_mol_pct: 0.013
           XFeO_mol_pct: 6.66
-          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated
+            to pure-metal equilibria
           gamma: 1.61
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: AD 8
+          composition_mol:
+            SiO2: '0.4688561332077994884185255828'
+            CaO: '0.2457468749144333405016783237'
+            MgO: '0.1428099994734769452024938731'
+            Al2O3: '0.07490699240429022587730222048'
+            FeO: '0.0666'
+            NiO: '0.00013'
+            CoO: '0.00095'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1682'
+              locator:
+                page: 23
+                table: '2'
+                row: AD 8
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4688561332077994884185255828'
+                  - - CaO
+                    - '0.2457468749144333405016783237'
+                  - - MgO
+                    - '0.1428099994734769452024938731'
+                  - - Al2O3
+                    - '0.07490699240429022587730222048'
+                  - - FeO
+                    - '0.0666'
+                  - - NiO
+                    - '0.00013'
+                  - - CoO
+                    - '0.00095'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: AD 8
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1
+                - Table 2 run AD 8, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 AD starting bulk plus Table 2
+                  run mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: AD 5
           system: AD
           T_K: 1677
@@ -3471,9 +3726,68 @@ species:
           XCoO_mol_pct: 0.085
           XNiO_mol_pct: 0.0085
           XFeO_mol_pct: 4.61
-          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated
+            to pure-metal equilibria
           gamma: 1.56
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: AD 5
+          composition_mol:
+            SiO2: '0.4792383355311166117650165522'
+            CaO: '0.2511886161970492624111698599'
+            MgO: '0.1459723390555195180677177083'
+            Al2O3: '0.07656570921631460775609587968'
+            FeO: '0.0461'
+            NiO: '0.000085'
+            CoO: '0.00085'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1677'
+              locator:
+                page: 23
+                table: '2'
+                row: AD 5
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4792383355311166117650165522'
+                  - - CaO
+                    - '0.2511886161970492624111698599'
+                  - - MgO
+                    - '0.1459723390555195180677177083'
+                  - - Al2O3
+                    - '0.07656570921631460775609587968'
+                  - - FeO
+                    - '0.0461'
+                  - - NiO
+                    - '0.000085'
+                  - - CoO
+                    - '0.00085'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: AD 5
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1
+                - Table 2 run AD 5, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 AD starting bulk plus Table 2
+                  run mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: AD 9
           system: AD
           T_K: 1679
@@ -3481,9 +3795,68 @@ species:
           XCoO_mol_pct: 0.065
           XNiO_mol_pct: 0.0071
           XFeO_mol_pct: 4.16
-          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated
+            to pure-metal equilibria
           gamma: 1.63
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: AD 9
+          composition_mol:
+            SiO2: '0.4816089677302988311622245169'
+            CaO: '0.2524311624991200522334679030'
+            MgO: '0.1466944155287454172436278637'
+            Al2O3: '0.07694445424183569936067971642'
+            FeO: '0.0416'
+            NiO: '0.000071'
+            CoO: '0.00065'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1679'
+              locator:
+                page: 23
+                table: '2'
+                row: AD 9
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4816089677302988311622245169'
+                  - - CaO
+                    - '0.2524311624991200522334679030'
+                  - - MgO
+                    - '0.1466944155287454172436278637'
+                  - - Al2O3
+                    - '0.07694445424183569936067971642'
+                  - - FeO
+                    - '0.0416'
+                  - - NiO
+                    - '0.000071'
+                  - - CoO
+                    - '0.00065'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: AD 9
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1
+                - Table 2 run AD 9, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 AD starting bulk plus Table 2
+                  run mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: AD 2
           system: AD
           T_K: 1680
@@ -3491,9 +3864,68 @@ species:
           XCoO_mol_pct: 0.044
           XNiO_mol_pct: 0.0066
           XFeO_mol_pct: 2.60
-          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated
+            to pure-metal equilibria
           gamma: 1.52
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: AD 2
+          composition_mol:
+            SiO2: '0.4895622023993838544475117381'
+            CaO: '0.2565997814569583087119667475'
+            MgO: '0.1491169101032188146698092613'
+            Al2O3: '0.07821510604043902217071225312'
+            FeO: '0.026'
+            NiO: '0.000066'
+            CoO: '0.00044'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1680'
+              locator:
+                page: 23
+                table: '2'
+                row: AD 2
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4895622023993838544475117381'
+                  - - CaO
+                    - '0.2565997814569583087119667475'
+                  - - MgO
+                    - '0.1491169101032188146698092613'
+                  - - Al2O3
+                    - '0.07821510604043902217071225312'
+                  - - FeO
+                    - '0.026'
+                  - - NiO
+                    - '0.000066'
+                  - - CoO
+                    - '0.00044'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: AD 2
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1
+                - Table 2 run AD 2, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 AD starting bulk plus Table 2
+                  run mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: AD 3
           system: AD
           T_K: 1680
@@ -3501,9 +3933,68 @@ species:
           XCoO_mol_pct: 0.037
           XNiO_mol_pct: 0.0043
           XFeO_mol_pct: 2.66
-          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated
+            to pure-metal equilibria
           gamma: 1.39
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: AD 3
+          composition_mol:
+            SiO2: '0.4893072362294675656833232701'
+            CaO: '0.2564661431508170506636203097'
+            MgO: '0.1490392493539770813473259247'
+            Al2O3: '0.07817437126573830230573049554'
+            FeO: '0.0266'
+            NiO: '0.000043'
+            CoO: '0.00037'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1680'
+              locator:
+                page: 23
+                table: '2'
+                row: AD 3
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4893072362294675656833232701'
+                  - - CaO
+                    - '0.2564661431508170506636203097'
+                  - - MgO
+                    - '0.1490392493539770813473259247'
+                  - - Al2O3
+                    - '0.07817437126573830230573049554'
+                  - - FeO
+                    - '0.0266'
+                  - - NiO
+                    - '0.000043'
+                  - - CoO
+                    - '0.00037'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: AD 3
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1
+                - Table 2 run AD 3, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 AD starting bulk plus Table 2
+                  run mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 60 a
           system: BK
           T_K: 1672
@@ -3513,6 +4004,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 2.27
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 60 a
+          composition_mol:
+            SiO2: '0.4467998814491098097529949388'
+            CaO: '0.1871973184530754342366570892'
+            MgO: '0.1437940385945292183749357561'
+            Al2O3: '0.07560876150328553763541221590'
+            FeO: '0.0386'
+            NiO: '0'
+            CoO: '0.108'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1672'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 60 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4467998814491098097529949388'
+                  - - CaO
+                    - '0.1871973184530754342366570892'
+                  - - MgO
+                    - '0.1437940385945292183749357561'
+                  - - Al2O3
+                    - '0.07560876150328553763541221590'
+                  - - FeO
+                    - '0.0386'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.108'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 60 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1
+                - Table 2 run BK 60 a, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 BK starting bulk plus Table 2
+                  run mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 60 b
           system: BK
           T_K: 1672
@@ -3522,6 +4071,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.78
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 60 b
+          composition_mol:
+            SiO2: '0.4943908226533798844032729326'
+            CaO: '0.2071366625442220911057830904'
+            MgO: '0.1591102772964775496970375375'
+            Al2O3: '0.08366223750592047479390643951'
+            FeO: '0.0472'
+            NiO: '0.0085'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1672'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 60 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4943908226533798844032729326'
+                  - - CaO
+                    - '0.2071366625442220911057830904'
+                  - - MgO
+                    - '0.1591102772964775496970375375'
+                  - - Al2O3
+                    - '0.08366223750592047479390643951'
+                  - - FeO
+                    - '0.0472'
+                  - - NiO
+                    - '0.0085'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 60 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1
+                - Table 2 run BK 60 b, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 BK starting bulk plus Table 2
+                  run mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 59 a
           system: BK
           T_K: 1672
@@ -3531,6 +4138,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 2.47
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 59 a
+          composition_mol:
+            SiO2: '0.4686320293943030123153336882'
+            CaO: '0.1963444102968687850776092811'
+            MgO: '0.1508202999132447895094972993'
+            Al2O3: '0.07930326039558341309755973098'
+            FeO: '0.0437'
+            NiO: '0'
+            CoO: '0.0612'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1672'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 59 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4686320293943030123153336882'
+                  - - CaO
+                    - '0.1963444102968687850776092811'
+                  - - MgO
+                    - '0.1508202999132447895094972993'
+                  - - Al2O3
+                    - '0.07930326039558341309755973098'
+                  - - FeO
+                    - '0.0437'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0612'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 59 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 59 a, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 59 b
           system: BK
           T_K: 1672
@@ -3540,6 +4205,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.78
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 59 b
+          composition_mol:
+            SiO2: '0.4989980864883367233133108460'
+            CaO: '0.2090669840843991051921231212'
+            MgO: '0.1605930374788443848525325393'
+            Al2O3: '0.08444189194841978664203349302'
+            FeO: '0.0407'
+            NiO: '0.0062'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1672'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 59 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4989980864883367233133108460'
+                  - - CaO
+                    - '0.2090669840843991051921231212'
+                  - - MgO
+                    - '0.1605930374788443848525325393'
+                  - - Al2O3
+                    - '0.08444189194841978664203349302'
+                  - - FeO
+                    - '0.0407'
+                  - - NiO
+                    - '0.0062'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 59 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 59 b, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 58 a
           system: BK
           T_K: 1675
@@ -3549,6 +4272,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.82
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 58 a
+          composition_mol:
+            SiO2: '0.4837103473996163032936395872'
+            CaO: '0.2026618262465390129965402914'
+            MgO: '0.1556729696009907954729354874'
+            Al2O3: '0.08185485675285388823688463351'
+            FeO: '0.0423'
+            NiO: '0'
+            CoO: '0.0338'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1675'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 58 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4837103473996163032936395872'
+                  - - CaO
+                    - '0.2026618262465390129965402914'
+                  - - MgO
+                    - '0.1556729696009907954729354874'
+                  - - Al2O3
+                    - '0.08185485675285388823688463351'
+                  - - FeO
+                    - '0.0423'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0338'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 58 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 58 a, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 58 b
           system: BK
           T_K: 1675
@@ -3558,6 +4339,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.72
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 58 b
+          composition_mol:
+            SiO2: '0.5075319956371772317489492541'
+            CaO: '0.2126424660281360744656847694'
+            MgO: '0.1633395137257284090610062361'
+            Al2O3: '0.08588602460895828472435973993'
+            FeO: '0.0269'
+            NiO: '0.0037'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1675'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 58 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5075319956371772317489492541'
+                  - - CaO
+                    - '0.2126424660281360744656847694'
+                  - - MgO
+                    - '0.1633395137257284090610062361'
+                  - - Al2O3
+                    - '0.08588602460895828472435973993'
+                  - - FeO
+                    - '0.0269'
+                  - - NiO
+                    - '0.0037'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 58 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 58 b, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 57 a
           system: BK
           T_K: 1673
@@ -3567,6 +4406,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.69
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 57 a
+          composition_mol:
+            SiO2: '0.4943384673825281021429315924'
+            CaO: '0.2071147270721746250366201354'
+            MgO: '0.1590934277489506538429978214'
+            Al2O3: '0.08365337779634661897745045022'
+            FeO: '0.0369'
+            NiO: '0'
+            CoO: '0.0189'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 57 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4943384673825281021429315924'
+                  - - CaO
+                    - '0.2071147270721746250366201354'
+                  - - MgO
+                    - '0.1590934277489506538429978214'
+                  - - Al2O3
+                    - '0.08365337779634661897745045022'
+                  - - FeO
+                    - '0.0369'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0189'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 57 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 57 a, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 57 b
           system: BK
           T_K: 1673
@@ -3576,6 +4473,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.65
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 57 b
+          composition_mol:
+            SiO2: '0.5131340096183179336054726263'
+            CaO: '0.2149895615372149438661209433'
+            MgO: '0.1651424153111062654432558407'
+            Al2O3: '0.08683401353336085708515058914'
+            FeO: '0.018'
+            NiO: '0.0019'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 57 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5131340096183179336054726263'
+                  - - CaO
+                    - '0.2149895615372149438661209433'
+                  - - MgO
+                    - '0.1651424153111062654432558407'
+                  - - Al2O3
+                    - '0.08683401353336085708515058914'
+                  - - FeO
+                    - '0.018'
+                  - - NiO
+                    - '0.0019'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 57 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 57 b, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 56 a
           system: BK
           T_K: 1674
@@ -3585,6 +4540,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.93
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 56 a
+          composition_mol:
+            SiO2: '0.5026106001771096992768633009'
+            CaO: '0.2105805316556742639643670091'
+            MgO: '0.1617556562582001987812729386'
+            Al2O3: '0.08505321190901583797749675092'
+            FeO: '0.0301'
+            NiO: '0'
+            CoO: '0.0099'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1674'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 56 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5026106001771096992768633009'
+                  - - CaO
+                    - '0.2105805316556742639643670091'
+                  - - MgO
+                    - '0.1617556562582001987812729386'
+                  - - Al2O3
+                    - '0.08505321190901583797749675092'
+                  - - FeO
+                    - '0.0301'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0099'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 56 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 56 a, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 56 b
           system: BK
           T_K: 1674
@@ -3594,6 +4607,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.73
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 56 b
+          composition_mol:
+            SiO2: '0.5159245455547179280816660444'
+            CaO: '0.2161587221973448853525064393'
+            MgO: '0.1660404961942898144635726998'
+            Al2O3: '0.08730623605364737210225481589'
+            FeO: '0.0137'
+            NiO: '0.00087'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1674'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 56 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5159245455547179280816660444'
+                  - - CaO
+                    - '0.2161587221973448853525064393'
+                  - - MgO
+                    - '0.1660404961942898144635726998'
+                  - - Al2O3
+                    - '0.08730623605364737210225481589'
+                  - - FeO
+                    - '0.0137'
+                  - - NiO
+                    - '0.00087'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 56 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 56 b, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 54 a
           system: BK
           T_K: 1674
@@ -3603,6 +4674,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.49
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 54 a
+          composition_mol:
+            SiO2: '0.5108827329716912964107950094'
+            CaO: '0.2140463362391739028921138828'
+            MgO: '0.1644178847674497437195480557'
+            Al2O3: '0.08645304602168505697754305161'
+            FeO: '0.0174'
+            NiO: '0'
+            CoO: '0.0068'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1674'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 54 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5108827329716912964107950094'
+                  - - CaO
+                    - '0.2140463362391739028921138828'
+                  - - MgO
+                    - '0.1644178847674497437195480557'
+                  - - Al2O3
+                    - '0.08645304602168505697754305161'
+                  - - FeO
+                    - '0.0174'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0068'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 54 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 54 a, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 54 b
           system: BK
           T_K: 1674
@@ -3612,6 +4741,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.70
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 54 b
+          composition_mol:
+            SiO2: '0.5185684867327329322289037107'
+            CaO: '0.2172664635357419218452356616'
+            MgO: '0.1668913983443980550925783544'
+            Al2O3: '0.08775365138712709083328227276'
+            FeO: '0.0091'
+            NiO: '0.00042'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1674'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 54 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5185684867327329322289037107'
+                  - - CaO
+                    - '0.2172664635357419218452356616'
+                  - - MgO
+                    - '0.1668913983443980550925783544'
+                  - - Al2O3
+                    - '0.08775365138712709083328227276'
+                  - - FeO
+                    - '0.0091'
+                  - - NiO
+                    - '0.00042'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 54 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 54 b, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 55 a
           system: BK
           T_K: 1675
@@ -3621,6 +4808,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.12
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 55 a
+          composition_mol:
+            SiO2: '0.5159611942443141756639049824'
+            CaO: '0.2161740770277781116009205078'
+            MgO: '0.1660522908775586415614005010'
+            Al2O3: '0.08731243785034907117377400836'
+            FeO: '0.0111'
+            NiO: '0'
+            CoO: '0.0034'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1675'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 55 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5159611942443141756639049824'
+                  - - CaO
+                    - '0.2161740770277781116009205078'
+                  - - MgO
+                    - '0.1660522908775586415614005010'
+                  - - Al2O3
+                    - '0.08731243785034907117377400836'
+                  - - FeO
+                    - '0.0111'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0034'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 55 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 55 a, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 55 b
           system: BK
           T_K: 1675
@@ -3630,6 +4875,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.59
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 55 b
+          composition_mol:
+            SiO2: '0.5200187277353273008403588267'
+            CaO: '0.2178740761114567319610495123'
+            MgO: '0.1673581308108930702494784857'
+            Al2O3: '0.08799906534232289694911317484'
+            FeO: '0.0065'
+            NiO: '0.00025'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1675'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 55 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5200187277353273008403588267'
+                  - - CaO
+                    - '0.2178740761114567319610495123'
+                  - - MgO
+                    - '0.1673581308108930702494784857'
+                  - - Al2O3
+                    - '0.08799906534232289694911317484'
+                  - - FeO
+                    - '0.0065'
+                  - - NiO
+                    - '0.00025'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 55 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 55 b, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 49 a
           system: BK
           T_K: 1673
@@ -3639,6 +4942,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.57
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 49 a
+          composition_mol:
+            SiO2: '0.5168512338487944740897077611'
+            CaO: '0.2165469800525850347766907410'
+            MgO: '0.1663387331855158710800756718'
+            Al2O3: '0.08746305291310462005352582552'
+            FeO: '0.0108'
+            NiO: '0'
+            CoO: '0.002'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 49 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5168512338487944740897077611'
+                  - - CaO
+                    - '0.2165469800525850347766907410'
+                  - - MgO
+                    - '0.1663387331855158710800756718'
+                  - - Al2O3
+                    - '0.08746305291310462005352582552'
+                  - - FeO
+                    - '0.0108'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.002'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 49 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 49 a, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 49 b
           system: BK
           T_K: 1673
@@ -3648,6 +5009,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.48
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 49 b
+          composition_mol:
+            SiO2: '0.5201757935478826476213828465'
+            CaO: '0.2179398825275991301685383770'
+            MgO: '0.1674086794534737578115976334'
+            Al2O3: '0.08802564447104446439848114257'
+            FeO: '0.0063'
+            NiO: '0.00015'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 49 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5201757935478826476213828465'
+                  - - CaO
+                    - '0.2179398825275991301685383770'
+                  - - MgO
+                    - '0.1674086794534737578115976334'
+                  - - Al2O3
+                    - '0.08802564447104446439848114257'
+                  - - FeO
+                    - '0.0063'
+                  - - NiO
+                    - '0.00015'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 49 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 49 b, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 53 a
           system: BK
           T_K: 1675
@@ -3657,6 +5076,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.59
           gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 23
+            table: '2'
+            row: BK 53 a
+          composition_mol:
+            SiO2: '0.5195213526622353693671160974'
+            CaO: '0.2176656891270058043040014407'
+            MgO: '0.1671980601093875596361011843'
+            Al2O3: '0.08791489810137126669278127701'
+            FeO: '0.0034'
+            NiO: '0'
+            CoO: '0.0043'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1675'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 53 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5195213526622353693671160974'
+                  - - CaO
+                    - '0.2176656891270058043040014407'
+                  - - MgO
+                    - '0.1671980601093875596361011843'
+                  - - Al2O3
+                    - '0.08791489810137126669278127701'
+                  - - FeO
+                    - '0.0034'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0043'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 53 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 53 a, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
         - run: BK 53 b
           system: BK
           T_K: 1675
@@ -3666,7 +5143,64 @@ species:
           metal_phase: Co and Ni, as printed in the Table 2(b) group heading
           gamma: 1.71
           gamma_FeO_uncertainty: not_reported per experiment
-        alloy_note: The source warns that alloy composition and alloy activity-coefficient uncertainty add uncertainty after recalculation to pure metals.
+          locator:
+            page: 23
+            table: '2'
+            row: BK 53 b
+          composition_mol:
+            SiO2: '0.5219192240672469968907494661'
+            CaO: '0.2186703337467797502716647750'
+            MgO: '0.1679697693861193897511201739'
+            Al2O3: '0.08832067279985386308646558443'
+            FeO: '0.003'
+            NiO: '0.00012'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1675'
+              locator:
+                page: 23
+                table: '2'
+                row: BK 53 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5219192240672469968907494661'
+                  - - CaO
+                    - '0.2186703337467797502716647750'
+                  - - MgO
+                    - '0.1679697693861193897511201739'
+                  - - Al2O3
+                    - '0.08832067279985386308646558443'
+                  - - FeO
+                    - '0.003'
+                  - - NiO
+                    - '0.00012'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 23
+                table: '2'
+                row: BK 53 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 53 b, page 23, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
       uncertainty:
         reported_status: no individual γFeO uncertainty printed for these Table 2 rows
       equipment: {}
@@ -3678,16 +5212,34 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
-      phase: silicate_melt
+      phase: l
       standard_state:
         state:
-          tag: unknown
-          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge:
+                tag: value
+                value: 0
+            component_basis: Fe(1-x)O
+            reference_pressure_bar: '1.01325'
+        inferred: false
         note: >-
-          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
-          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
-          wüstite nonstoichiometry Fe(1-x)O.
-        locator: {published_page: 30, equation: '9'}
+          The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
+          non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
+          no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
+        locator:
+          published_page: 31
+          section: 4.1 Activity coefficients
       regime: experimental_melt_equilibration
       units: mole percent and dimensionless activity coefficient as printed
       values:
@@ -3706,83 +5258,1717 @@ species:
           state: unknown
           reason: not_published; pages 22-25 and 29-30 searched, log fO2 scale and imposition/measurement not specified
         FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
-        series:
-        - {run: BK 59 a, system: BK, T_K: 1672, log_fO2: -8.58, XCoO_mol_pct: 5.15, XFeO_mol_pct: 4.24,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 2.00,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 59 b, system: BK, T_K: 1672, log_fO2: -8.58, XNiO_mol_pct: 0.47, XFeO_mol_pct: 5.88,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.19,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 58 a, system: BK, T_K: 1675, log_fO2: -9.05, XCoO_mol_pct: 2.35, XFeO_mol_pct: 3.42,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 2.45,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 58 b, system: BK, T_K: 1675, log_fO2: -9.05, XNiO_mol_pct: 0.26, XFeO_mol_pct: 5.21,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.85,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 57 a, system: BK, T_K: 1673, log_fO2: -9.58, XCoO_mol_pct: 1.69, XFeO_mol_pct: 3.64,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 2.06,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 57 b, system: BK, T_K: 1673, log_fO2: -9.58, XNiO_mol_pct: 0.14, XFeO_mol_pct: 4.42,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.77,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 56 a, system: BK, T_K: 1674, log_fO2: -10.06, XCoO_mol_pct: 1.06, XFeO_mol_pct: 3.79,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.89,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 56 b, system: BK, T_K: 1674, log_fO2: -10.06, XNiO_mol_pct: 0.075, XFeO_mol_pct: 2.93,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.76,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 54 a, system: BK, T_K: 1674, log_fO2: -10.61, XCoO_mol_pct: 0.54, XFeO_mol_pct: 3.75,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.75,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 54 b, system: BK, T_K: 1674, log_fO2: -10.61, XNiO_mol_pct: 0.037, XFeO_mol_pct: 4.17,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.56,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 55 a, system: BK, T_K: 1675, log_fO2: -11.05, XCoO_mol_pct: 0.26, XFeO_mol_pct: 3.66,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.81,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 55 b, system: BK, T_K: 1675, log_fO2: -11.05, XNiO_mol_pct: 0.016, XFeO_mol_pct: 3.07,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.68,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 51 a, system: BK, T_K: 1672, log_fO2: -11.58, XCoO_mol_pct: 0.093, XFeO_mol_pct: 5.01,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.40,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 51 b, system: BK, T_K: 1672, log_fO2: -11.58, XNiO_mol_pct: 0.0052, XFeO_mol_pct: 4.46,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.52,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 53 a, system: BK, T_K: 1675, log_fO2: -11.89, XCoO_mol_pct: 0.0072, XFeO_mol_pct: 4.35,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.81,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 53 b, system: BK, T_K: 1675, log_fO2: -11.89, XNiO_mol_pct: 0.015, XFeO_mol_pct: 4.95,
-          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.59,
-          gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: AD 50, system: AD, T_K: 1578, log_fO2: -12.54, XCoO_mol_pct: 0.030, XNiO_mol_pct: 0.0046,
-          XFeO_mol_pct: 2.99, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
-          gamma: 1.58, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: AD 43, system: AD, T_K: 1623, log_fO2: -12.03, XCoO_mol_pct: 0.036, XNiO_mol_pct: 0.0046,
-          XFeO_mol_pct: 2.67, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
-          gamma: 2.02, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: AD 49, system: AD, T_K: 1673, log_fO2: -11.57, XCoO_mol_pct: 0.056, XNiO_mol_pct: 0.0056,
-          XFeO_mol_pct: 3.05, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
-          gamma: 1.58, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: AD 46, system: AD, T_K: 1711, log_fO2: -11.29, XCoO_mol_pct: 0.042, XNiO_mol_pct: 0.0066,
-          XFeO_mol_pct: 3.19, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
-          gamma: 1.64, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: AD 47, system: AD, T_K: 1755, log_fO2: -10.79, XCoO_mol_pct: 0.037, XNiO_mol_pct: 0.0055,
-          XFeO_mol_pct: 3.05, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
-          gamma: 2.00, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: AD 48, system: AD, T_K: 1780, log_fO2: -10.59, XCoO_mol_pct: 0.044, XNiO_mol_pct: 0.0067,
-          XFeO_mol_pct: 3.48, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
-          gamma: 1.70, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: AD 44, system: AD, T_K: 1795, log_fO2: -10.46, XCoO_mol_pct: 0.044, XNiO_mol_pct: 0.0063,
-          XFeO_mol_pct: 3.27, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
-          gamma: 1.78, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: AD 52, system: AD, T_K: 1826, log_fO2: -10.23, XCoO_mol_pct: 0.045, XNiO_mol_pct: 0.0080,
-          XFeO_mol_pct: 3.36, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
-          gamma: 1.73, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: AD 45, system: AD, T_K: 1872, log_fO2: -9.73, XCoO_mol_pct: 0.049, XNiO_mol_pct: 0.0085,
-          XFeO_mol_pct: 3.34, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
-          gamma: 2.02, gamma_FeO_uncertainty: not_reported per experiment}
         alloy_note: The source warns that alloy composition and alloy activity-coefficient uncertainty add uncertainty after recalculation to pure metals.
+        series:
+        - run: BK 59 a
+          system: BK
+          T_K: 1672
+          log_fO2: -8.58
+          XCoO_mol_pct: 5.15
+          XFeO_mol_pct: 4.24
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 2.00
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 59 a
+          composition_mol:
+            SiO2: '0.4743911091879990609528810802'
+            CaO: '0.1987573122220900526855343197'
+            MgO: '0.1526737501412033334538660517'
+            Al2O3: '0.08027782844870755290771854792'
+            FeO: '0.0424'
+            NiO: '0'
+            CoO: '0.0515'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1672'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 59 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4743911091879990609528810802'
+                  - - CaO
+                    - '0.1987573122220900526855343197'
+                  - - MgO
+                    - '0.1526737501412033334538660517'
+                  - - Al2O3
+                    - '0.08027782844870755290771854792'
+                  - - FeO
+                    - '0.0424'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0515'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 59 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 59 a, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 59 b
+          system: BK
+          T_K: 1672
+          log_fO2: -8.58
+          XNiO_mol_pct: 0.47
+          XFeO_mol_pct: 5.88
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.19
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 59 b
+          composition_mol:
+            SiO2: '0.4903071115269408680966484180'
+            CaO: '0.2054256957245197377110726083'
+            MgO: '0.1577960125893796730819396948'
+            Al2O3: '0.08297118015915972111033927837'
+            FeO: '0.0588'
+            NiO: '0.0047'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1672'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 59 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4903071115269408680966484180'
+                  - - CaO
+                    - '0.2054256957245197377110726083'
+                  - - MgO
+                    - '0.1577960125893796730819396948'
+                  - - Al2O3
+                    - '0.08297118015915972111033927837'
+                  - - FeO
+                    - '0.0588'
+                  - - NiO
+                    - '0.0047'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 59 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 59 b, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 58 a
+          system: BK
+          T_K: 1675
+          log_fO2: -9.05
+          XCoO_mol_pct: 2.35
+          XFeO_mol_pct: 3.42
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 2.45
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 58 a
+          composition_mol:
+            SiO2: '0.4933437172363442391964461338'
+            CaO: '0.2066979531032727697225239924'
+            MgO: '0.1587732863459396326162432188'
+            Al2O3: '0.08348504331444335846478665457'
+            FeO: '0.0342'
+            NiO: '0'
+            CoO: '0.0235'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1675'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 58 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4933437172363442391964461338'
+                  - - CaO
+                    - '0.2066979531032727697225239924'
+                  - - MgO
+                    - '0.1587732863459396326162432188'
+                  - - Al2O3
+                    - '0.08348504331444335846478665457'
+                  - - FeO
+                    - '0.0342'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0235'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 58 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 58 a, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 58 b
+          system: BK
+          T_K: 1675
+          log_fO2: -9.05
+          XNiO_mol_pct: 0.26
+          XFeO_mol_pct: 5.21
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.85
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 58 b
+          composition_mol:
+            SiO2: '0.4949143753618977070066863316'
+            CaO: '0.2073560172646967517974126393'
+            MgO: '0.1592787727717465082374346967'
+            Al2O3: '0.08375083460165903295846633192'
+            FeO: '0.0521'
+            NiO: '0.0026'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1675'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 58 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4949143753618977070066863316'
+                  - - CaO
+                    - '0.2073560172646967517974126393'
+                  - - MgO
+                    - '0.1592787727717465082374346967'
+                  - - Al2O3
+                    - '0.08375083460165903295846633192'
+                  - - FeO
+                    - '0.0521'
+                  - - NiO
+                    - '0.0026'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 58 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 58 b, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 57 a
+          system: BK
+          T_K: 1673
+          log_fO2: -9.58
+          XCoO_mol_pct: 1.69
+          XFeO_mol_pct: 3.64
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 2.06
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 57 a
+          composition_mol:
+            SiO2: '0.4956473491538226586514650906'
+            CaO: '0.2076631138733612767656940078'
+            MgO: '0.1595146664371230501939907197'
+            Al2O3: '0.08387487053569301438885018135'
+            FeO: '0.0364'
+            NiO: '0'
+            CoO: '0.0169'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 57 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4956473491538226586514650906'
+                  - - CaO
+                    - '0.2076631138733612767656940078'
+                  - - MgO
+                    - '0.1595146664371230501939907197'
+                  - - Al2O3
+                    - '0.08387487053569301438885018135'
+                  - - FeO
+                    - '0.0364'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0169'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 57 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 57 a, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 57 b
+          system: BK
+          T_K: 1673
+          log_fO2: -9.58
+          XNiO_mol_pct: 0.14
+          XFeO_mol_pct: 4.42
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.77
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 57 b
+          composition_mol:
+            SiO2: '0.4996787050094098926977482650'
+            CaO: '0.2093521452210161640912415349'
+            MgO: '0.1608120815966940309550488464'
+            Al2O3: '0.08455706817287991225596135320'
+            FeO: '0.0442'
+            NiO: '0.0014'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 57 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4996787050094098926977482650'
+                  - - CaO
+                    - '0.2093521452210161640912415349'
+                  - - MgO
+                    - '0.1608120815966940309550488464'
+                  - - Al2O3
+                    - '0.08455706817287991225596135320'
+                  - - FeO
+                    - '0.0442'
+                  - - NiO
+                    - '0.0014'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 57 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 57 b, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 56 a
+          system: BK
+          T_K: 1674
+          log_fO2: -10.06
+          XCoO_mol_pct: 1.06
+          XFeO_mol_pct: 3.79
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.89
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 56 a
+          composition_mol:
+            SiO2: '0.4981604021547082071478494071'
+            CaO: '0.2087160165316396480855158429'
+            MgO: '0.1603234447184140511878970844'
+            Al2O3: '0.08430013659523809357873766510'
+            FeO: '0.0379'
+            NiO: '0'
+            CoO: '0.0106'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1674'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 56 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4981604021547082071478494071'
+                  - - CaO
+                    - '0.2087160165316396480855158429'
+                  - - MgO
+                    - '0.1603234447184140511878970844'
+                  - - Al2O3
+                    - '0.08430013659523809357873766510'
+                  - - FeO
+                    - '0.0379'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0106'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 56 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 56 a, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 56 b
+          system: BK
+          T_K: 1674
+          log_fO2: -10.06
+          XNiO_mol_pct: 0.075
+          XFeO_mol_pct: 2.93
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.76
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 56 b
+          composition_mol:
+            SiO2: '0.5078199496268620341808266237'
+            CaO: '0.2127631111243971378460810213'
+            MgO: '0.1634321862371263362582246737'
+            Al2O3: '0.08593475301161449171486768078'
+            FeO: '0.0293'
+            NiO: '0.00075'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1674'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 56 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5078199496268620341808266237'
+                  - - CaO
+                    - '0.2127631111243971378460810213'
+                  - - MgO
+                    - '0.1634321862371263362582246737'
+                  - - Al2O3
+                    - '0.08593475301161449171486768078'
+                  - - FeO
+                    - '0.0293'
+                  - - NiO
+                    - '0.00075'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 56 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 56 b, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 54 a
+          system: BK
+          T_K: 1674
+          log_fO2: -10.61
+          XCoO_mol_pct: 0.54
+          XFeO_mol_pct: 3.75
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.75
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 54 a
+          composition_mol:
+            SiO2: '0.5010922973224080137269644430'
+            CaO: '0.2099444029662977479586413171'
+            MgO: '0.1612670193799202190141211766'
+            Al2O3: '0.08479628033137401930027306281'
+            FeO: '0.0375'
+            NiO: '0'
+            CoO: '0.0054'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1674'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 54 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5010922973224080137269644430'
+                  - - CaO
+                    - '0.2099444029662977479586413171'
+                  - - MgO
+                    - '0.1612670193799202190141211766'
+                  - - Al2O3
+                    - '0.08479628033137401930027306281'
+                  - - FeO
+                    - '0.0375'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0054'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 54 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 54 a, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 54 b
+          system: BK
+          T_K: 1674
+          log_fO2: -10.61
+          XNiO_mol_pct: 0.037
+          XFeO_mol_pct: 4.17
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.56
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 54 b
+          composition_mol:
+            SiO2: '0.5015268460704778064877975644'
+            CaO: '0.2101264673842917163326938427'
+            MgO: '0.1614068706243934546026508188'
+            Al2O3: '0.08486981592083702257685777355'
+            FeO: '0.0417'
+            NiO: '0.00037'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1674'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 54 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5015268460704778064877975644'
+                  - - CaO
+                    - '0.2101264673842917163326938427'
+                  - - MgO
+                    - '0.1614068706243934546026508188'
+                  - - Al2O3
+                    - '0.08486981592083702257685777355'
+                  - - FeO
+                    - '0.0417'
+                  - - NiO
+                    - '0.00037'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 54 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 54 b, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 55 a
+          system: BK
+          T_K: 1675
+          log_fO2: -11.05
+          XCoO_mol_pct: 0.26
+          XFeO_mol_pct: 3.66
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.81
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 55 a
+          composition_mol:
+            SiO2: '0.5030294423439239573595940203'
+            CaO: '0.2107560154320539925176706483'
+            MgO: '0.1618904526384153656135906660'
+            Al2O3: '0.08512408958560668450914466487'
+            FeO: '0.0366'
+            NiO: '0'
+            CoO: '0.0026'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1675'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 55 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5030294423439239573595940203'
+                  - - CaO
+                    - '0.2107560154320539925176706483'
+                  - - MgO
+                    - '0.1618904526384153656135906660'
+                  - - Al2O3
+                    - '0.08512408958560668450914466487'
+                  - - FeO
+                    - '0.0366'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0026'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 55 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 55 a, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 55 b
+          system: BK
+          T_K: 1675
+          log_fO2: -11.05
+          XNiO_mol_pct: 0.016
+          XFeO_mol_pct: 3.07
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.68
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 55 b
+          composition_mol:
+            SiO2: '0.5073958719329625978720617703'
+            CaO: '0.2125854338008126626858610867'
+            MgO: '0.1632957049021584798405029747'
+            Al2O3: '0.08586298936406625960157416790'
+            FeO: '0.0307'
+            NiO: '0.00016'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1675'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 55 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5073958719329625978720617703'
+                  - - CaO
+                    - '0.2125854338008126626858610867'
+                  - - MgO
+                    - '0.1632957049021584798405029747'
+                  - - Al2O3
+                    - '0.08586298936406625960157416790'
+                  - - FeO
+                    - '0.0307'
+                  - - NiO
+                    - '0.00016'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 55 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 55 b, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 51 a
+          system: BK
+          T_K: 1672
+          log_fO2: -11.58
+          XCoO_mol_pct: 0.093
+          XFeO_mol_pct: 5.01
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.40
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 51 a
+          composition_mol:
+            SiO2: '0.4968358138021581159612135070'
+            CaO: '0.2081610490888387565356930840'
+            MgO: '0.1598971511659835860806922714'
+            Al2O3: '0.08407598594301954142240113720'
+            FeO: '0.0501'
+            NiO: '0'
+            CoO: '0.00093'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1672'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 51 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4968358138021581159612135070'
+                  - - CaO
+                    - '0.2081610490888387565356930840'
+                  - - MgO
+                    - '0.1598971511659835860806922714'
+                  - - Al2O3
+                    - '0.08407598594301954142240113720'
+                  - - FeO
+                    - '0.0501'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.00093'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 51 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 51 a, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 51 b
+          system: BK
+          T_K: 1672
+          log_fO2: -11.58
+          XNiO_mol_pct: 0.0052
+          XFeO_mol_pct: 4.46
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.52
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 51 b
+          composition_mol:
+            SiO2: '0.5001750329770847885257841675'
+            CaO: '0.2095600934960261424269063473'
+            MgO: '0.1609718153072490036513453534'
+            Al2O3: '0.08464105821964006539596413124'
+            FeO: '0.0446'
+            NiO: '0.000052'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1672'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 51 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5001750329770847885257841675'
+                  - - CaO
+                    - '0.2095600934960261424269063473'
+                  - - MgO
+                    - '0.1609718153072490036513453534'
+                  - - Al2O3
+                    - '0.08464105821964006539596413124'
+                  - - FeO
+                    - '0.0446'
+                  - - NiO
+                    - '0.000052'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 51 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 51 b, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 53 a
+          system: BK
+          T_K: 1675
+          log_fO2: -11.89
+          XCoO_mol_pct: 0.0072
+          XFeO_mol_pct: 4.35
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.81
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 53 a
+          composition_mol:
+            SiO2: '0.5007404699022840369374706387'
+            CaO: '0.2097969965941387759738662602'
+            MgO: '0.1611537904205394788749742855'
+            Al2O3: '0.08473674308303770821368881509'
+            FeO: '0.0435'
+            NiO: '0'
+            CoO: '0.000072'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1675'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 53 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5007404699022840369374706387'
+                  - - CaO
+                    - '0.2097969965941387759738662602'
+                  - - MgO
+                    - '0.1611537904205394788749742855'
+                  - - Al2O3
+                    - '0.08473674308303770821368881509'
+                  - - FeO
+                    - '0.0435'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.000072'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 53 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 53 a, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 53 b
+          system: BK
+          T_K: 1675
+          log_fO2: -11.89
+          XNiO_mol_pct: 0.015
+          XFeO_mol_pct: 4.95
+          metal_phase: FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.59
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: BK 53 b
+          composition_mol:
+            SiO2: '0.4975583165399127111539239980'
+            CaO: '0.2084637586030937882901418615'
+            MgO: '0.1601296749218547488664403512'
+            Al2O3: '0.08419824993513875168949378878'
+            FeO: '0.0495'
+            NiO: '0.00015'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1675'
+              locator:
+                page: 24
+                table: '2'
+                row: BK 53 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4975583165399127111539239980'
+                  - - CaO
+                    - '0.2084637586030937882901418615'
+                  - - MgO
+                    - '0.1601296749218547488664403512'
+                  - - Al2O3
+                    - '0.08419824993513875168949378878'
+                  - - FeO
+                    - '0.0495'
+                  - - NiO
+                    - '0.00015'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: BK 53 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 53 b, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: AD 50
+          system: AD
+          T_K: 1578
+          log_fO2: -12.54
+          XCoO_mol_pct: 0.030
+          XNiO_mol_pct: 0.0046
+          XFeO_mol_pct: 2.99
+          metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.58
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: AD 50
+          composition_mol:
+            SiO2: '0.4876813868658790813152338874'
+            CaO: '0.2556139683110642158109496321'
+            MgO: '0.1485440280476683558412339577'
+            Al2O3: '0.07791461677538834703258252263'
+            FeO: '0.0299'
+            NiO: '0.000046'
+            CoO: '0.0003'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1578'
+              locator:
+                page: 24
+                table: '2'
+                row: AD 50
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4876813868658790813152338874'
+                  - - CaO
+                    - '0.2556139683110642158109496321'
+                  - - MgO
+                    - '0.1485440280476683558412339577'
+                  - - Al2O3
+                    - '0.07791461677538834703258252263'
+                  - - FeO
+                    - '0.0299'
+                  - - NiO
+                    - '0.000046'
+                  - - CoO
+                    - '0.0003'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: AD 50
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1 row AD
+                - Table 2 run AD 50, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: AD 43
+          system: AD
+          T_K: 1623
+          log_fO2: -12.03
+          XCoO_mol_pct: 0.036
+          XNiO_mol_pct: 0.0046
+          XFeO_mol_pct: 2.67
+          metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 2.02
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: AD 43
+          composition_mol:
+            SiO2: '0.4892604672870568854958094090'
+            CaO: '0.2564416296153710210807875311'
+            MgO: '0.1490250038910984202053319399'
+            Al2O3: '0.07816689920647367321807111987'
+            FeO: '0.0267'
+            NiO: '0.000046'
+            CoO: '0.00036'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1623'
+              locator:
+                page: 24
+                table: '2'
+                row: AD 43
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4892604672870568854958094090'
+                  - - CaO
+                    - '0.2564416296153710210807875311'
+                  - - MgO
+                    - '0.1490250038910984202053319399'
+                  - - Al2O3
+                    - '0.07816689920647367321807111987'
+                  - - FeO
+                    - '0.0267'
+                  - - NiO
+                    - '0.000046'
+                  - - CoO
+                    - '0.00036'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: AD 43
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1 row AD
+                - Table 2 run AD 43, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: AD 49
+          system: AD
+          T_K: 1673
+          log_fO2: -11.57
+          XCoO_mol_pct: 0.056
+          XNiO_mol_pct: 0.0056
+          XFeO_mol_pct: 3.05
+          metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.58
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: AD 49
+          composition_mol:
+            SiO2: '0.4872438709530049763352655104'
+            CaO: '0.2553846481407626487457397684'
+            MgO: '0.1484107640400937838677418416'
+            Al2O3: '0.07784471686613859105125287945'
+            FeO: '0.0305'
+            NiO: '0.000056'
+            CoO: '0.00056'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673'
+              locator:
+                page: 24
+                table: '2'
+                row: AD 49
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4872438709530049763352655104'
+                  - - CaO
+                    - '0.2553846481407626487457397684'
+                  - - MgO
+                    - '0.1484107640400937838677418416'
+                  - - Al2O3
+                    - '0.07784471686613859105125287945'
+                  - - FeO
+                    - '0.0305'
+                  - - NiO
+                    - '0.000056'
+                  - - CoO
+                    - '0.00056'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: AD 49
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1 row AD
+                - Table 2 run AD 49, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: AD 46
+          system: AD
+          T_K: 1711
+          log_fO2: -11.29
+          XCoO_mol_pct: 0.042
+          XNiO_mol_pct: 0.0066
+          XFeO_mol_pct: 3.19
+          metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.64
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: AD 46
+          composition_mol:
+            SiO2: '0.4866051982985795587208289140'
+            CaO: '0.2550498934094028899264104271'
+            MgO: '0.1482162292244389489179315112'
+            Al2O3: '0.07774267906757860243482914745'
+            FeO: '0.0319'
+            NiO: '0.000066'
+            CoO: '0.00042'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1711'
+              locator:
+                page: 24
+                table: '2'
+                row: AD 46
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4866051982985795587208289140'
+                  - - CaO
+                    - '0.2550498934094028899264104271'
+                  - - MgO
+                    - '0.1482162292244389489179315112'
+                  - - Al2O3
+                    - '0.07774267906757860243482914745'
+                  - - FeO
+                    - '0.0319'
+                  - - NiO
+                    - '0.000066'
+                  - - CoO
+                    - '0.00042'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: AD 46
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1 row AD
+                - Table 2 run AD 46, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: AD 47
+          system: AD
+          T_K: 1755
+          log_fO2: -10.79
+          XCoO_mol_pct: 0.037
+          XNiO_mol_pct: 0.0055
+          XFeO_mol_pct: 3.05
+          metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 2.00
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: AD 47
+          composition_mol:
+            SiO2: '0.4873399232970957281182240851'
+            CaO: '0.2554349931436679353083318190'
+            MgO: '0.1484400208509521094389337889'
+            Al2O3: '0.07786006270828422713451030686'
+            FeO: '0.0305'
+            NiO: '0.000055'
+            CoO: '0.00037'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1755'
+              locator:
+                page: 24
+                table: '2'
+                row: AD 47
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4873399232970957281182240851'
+                  - - CaO
+                    - '0.2554349931436679353083318190'
+                  - - MgO
+                    - '0.1484400208509521094389337889'
+                  - - Al2O3
+                    - '0.07786006270828422713451030686'
+                  - - FeO
+                    - '0.0305'
+                  - - NiO
+                    - '0.000055'
+                  - - CoO
+                    - '0.00037'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: AD 47
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1 row AD
+                - Table 2 run AD 47, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: AD 48
+          system: AD
+          T_K: 1780
+          log_fO2: -10.59
+          XCoO_mol_pct: 0.044
+          XNiO_mol_pct: 0.0067
+          XFeO_mol_pct: 3.48
+          metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.70
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: AD 48
+          composition_mol:
+            SiO2: '0.4851362511934010982076247425'
+            CaO: '0.2542799575272754446419529422'
+            MgO: '0.1477687991484328285333677513'
+            Al2O3: '0.07750799213089062861705456385'
+            FeO: '0.0348'
+            NiO: '0.000067'
+            CoO: '0.00044'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1780'
+              locator:
+                page: 24
+                table: '2'
+                row: AD 48
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4851362511934010982076247425'
+                  - - CaO
+                    - '0.2542799575272754446419529422'
+                  - - MgO
+                    - '0.1477687991484328285333677513'
+                  - - Al2O3
+                    - '0.07750799213089062861705456385'
+                  - - FeO
+                    - '0.0348'
+                  - - NiO
+                    - '0.000067'
+                  - - CoO
+                    - '0.00044'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: AD 48
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1 row AD
+                - Table 2 run AD 48, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: AD 44
+          system: AD
+          T_K: 1795
+          log_fO2: -10.46
+          XCoO_mol_pct: 0.044
+          XNiO_mol_pct: 0.0063
+          XFeO_mol_pct: 3.27
+          metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.78
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: AD 44
+          composition_mol:
+            SiO2: '0.4861943356539610026649275761'
+            CaO: '0.2548345433184415332686213942'
+            MgO: '0.1480910835989350117888015585'
+            Al2O3: '0.07767703742866245227764947104'
+            FeO: '0.0327'
+            NiO: '0.000063'
+            CoO: '0.00044'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1795'
+              locator:
+                page: 24
+                table: '2'
+                row: AD 44
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4861943356539610026649275761'
+                  - - CaO
+                    - '0.2548345433184415332686213942'
+                  - - MgO
+                    - '0.1480910835989350117888015585'
+                  - - Al2O3
+                    - '0.07767703742866245227764947104'
+                  - - FeO
+                    - '0.0327'
+                  - - NiO
+                    - '0.000063'
+                  - - CoO
+                    - '0.00044'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: AD 44
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1 row AD
+                - Table 2 run AD 44, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: AD 52
+          system: AD
+          T_K: 1826
+          log_fO2: -10.23
+          XCoO_mol_pct: 0.045
+          XNiO_mol_pct: 0.0080
+          XFeO_mol_pct: 3.36
+          metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 1.73
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: AD 52
+          composition_mol:
+            SiO2: '0.4857281549054158356345474778'
+            CaO: '0.2545901987231891738784495049'
+            MgO: '0.1479490885012090023411840969'
+            Al2O3: '0.07760255787018598814581892020'
+            FeO: '0.0336'
+            NiO: '0.00008'
+            CoO: '0.00045'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1826'
+              locator:
+                page: 24
+                table: '2'
+                row: AD 52
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4857281549054158356345474778'
+                  - - CaO
+                    - '0.2545901987231891738784495049'
+                  - - MgO
+                    - '0.1479490885012090023411840969'
+                  - - Al2O3
+                    - '0.07760255787018598814581892020'
+                  - - FeO
+                    - '0.0336'
+                  - - NiO
+                    - '0.00008'
+                  - - CoO
+                    - '0.00045'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: AD 52
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1 row AD
+                - Table 2 run AD 52, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: AD 45
+          system: AD
+          T_K: 1872
+          log_fO2: -9.73
+          XCoO_mol_pct: 0.049
+          XNiO_mol_pct: 0.0085
+          XFeO_mol_pct: 3.34
+          metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal
+            equilibria
+          gamma: 2.02
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 24
+            table: '2'
+            row: AD 45
+          composition_mol:
+            SiO2: '0.4858061031427669692804039128'
+            CaO: '0.2546310546155992231831708025'
+            MgO: '0.1479728309393401042445074049'
+            Al2O3: '0.07761501130229370329191787961'
+            FeO: '0.0334'
+            NiO: '0.000085'
+            CoO: '0.00049'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1872'
+              locator:
+                page: 24
+                table: '2'
+                row: AD 45
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.4858061031427669692804039128'
+                  - - CaO
+                    - '0.2546310546155992231831708025'
+                  - - MgO
+                    - '0.1479728309393401042445074049'
+                  - - Al2O3
+                    - '0.07761501130229370329191787961'
+                  - - FeO
+                    - '0.0334'
+                  - - NiO
+                    - '0.000085'
+                  - - CoO
+                    - '0.00049'
+                  amount_basis: mole_fraction
+              locator:
+                page: 24
+                table: '2'
+                row: AD 45
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 AD starting composition, page 22, table 1 row AD
+                - Table 2 run AD 45, page 24, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
       uncertainty:
         reported_status: no individual γFeO uncertainty printed for these Table 2 rows
       equipment: {}
@@ -3794,16 +6980,34 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
-      phase: silicate_melt
+      phase: l
       standard_state:
         state:
-          tag: unknown
-          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge:
+                tag: value
+                value: 0
+            component_basis: Fe(1-x)O
+            reference_pressure_bar: '1.01325'
+        inferred: false
         note: >-
-          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
-          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
-          wüstite nonstoichiometry Fe(1-x)O.
-        locator: {published_page: 30, equation: '9'}
+          The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
+          non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
+          no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
+        locator:
+          published_page: 31
+          section: 4.1 Activity coefficients
       regime: experimental_melt_equilibration
       units: mole percent and dimensionless activity coefficient as printed
       values:
@@ -3817,18 +7021,408 @@ species:
           reason: not_published; pages 22-25 and 29-30 searched, log fO2 scale and imposition/measurement not specified
         FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
         series:
-        - {run: BK 50 a, system: BK, T_K: 1578, log_fO2: -12.54, XCoO_mol_pct: 0.34, XFeO_mol_pct: 0.91,
-          metal_phase: Co and Ni, gamma: 1.39, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 50 b, system: BK, T_K: 1578, log_fO2: -12.54, XNiO_mol_pct: 0.024, XFeO_mol_pct: 0.25,
-          metal_phase: Co and Ni, gamma: 1.68, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 49 a, system: BK, T_K: 1673, log_fO2: -11.57, XCoO_mol_pct: 0.20, XFeO_mol_pct: 1.08,
-          metal_phase: Co and Ni, gamma: 1.57, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 49 b, system: BK, T_K: 1673, log_fO2: -11.57, XNiO_mol_pct: 0.015, XFeO_mol_pct: 0.63,
-          metal_phase: Co and Ni, gamma: 1.48, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 46 a, system: BK, T_K: 1711, log_fO2: -11.19, XCoO_mol_pct: 0.36, XFeO_mol_pct: 0.83,
-          metal_phase: Co and Ni, gamma: 1.53, gamma_FeO_uncertainty: not_reported per experiment}
-        - {run: BK 46 b, system: BK, T_K: 1711, log_fO2: -11.19, XNiO_mol_pct: 0.018, XFeO_mol_pct: 0.45,
-          metal_phase: Co and Ni, gamma: 1.54, gamma_FeO_uncertainty: not_reported per experiment}
+        - run: BK 50 a
+          system: BK
+          T_K: 1578
+          log_fO2: -12.54
+          XCoO_mol_pct: 0.34
+          XFeO_mol_pct: 0.91
+          metal_phase: Co and Ni
+          gamma: 1.39
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 25
+            table: '2'
+            row: BK 50 a
+          composition_mol:
+            SiO2: '0.5170082996613498208707317809'
+            CaO: '0.2166127864687274329841796057'
+            MgO: '0.1663892818280965586421948196'
+            Al2O3: '0.08748963204182618750289379326'
+            FeO: '0.0091'
+            NiO: '0'
+            CoO: '0.0034'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1578'
+              locator:
+                page: 25
+                table: '2'
+                row: BK 50 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5170082996613498208707317809'
+                  - - CaO
+                    - '0.2166127864687274329841796057'
+                  - - MgO
+                    - '0.1663892818280965586421948196'
+                  - - Al2O3
+                    - '0.08748963204182618750289379326'
+                  - - FeO
+                    - '0.0091'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0034'
+                  amount_basis: mole_fraction
+              locator:
+                page: 25
+                table: '2'
+                row: BK 50 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 50 a, page 25, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 50 b
+          system: BK
+          T_K: 1578
+          log_fO2: -12.54
+          XNiO_mol_pct: 0.024
+          XFeO_mol_pct: 0.25
+          metal_phase: Co and Ni
+          gamma: 1.68
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 25
+            table: '2'
+            row: BK 50 b
+          composition_mol:
+            SiO2: '0.5221181740964837694800465578'
+            CaO: '0.2187536885405601213344840036'
+            MgO: '0.1680337976667215939964710945'
+            Al2O3: '0.08835433969623451518899834356'
+            FeO: '0.0025'
+            NiO: '0.00024'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1578'
+              locator:
+                page: 25
+                table: '2'
+                row: BK 50 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5221181740964837694800465578'
+                  - - CaO
+                    - '0.2187536885405601213344840036'
+                  - - MgO
+                    - '0.1680337976667215939964710945'
+                  - - Al2O3
+                    - '0.08835433969623451518899834356'
+                  - - FeO
+                    - '0.0025'
+                  - - NiO
+                    - '0.00024'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 25
+                table: '2'
+                row: BK 50 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 50 b, page 25, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 49 a
+          system: BK
+          T_K: 1673
+          log_fO2: -11.57
+          XCoO_mol_pct: 0.20
+          XFeO_mol_pct: 1.08
+          metal_phase: Co and Ni
+          gamma: 1.57
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 25
+            table: '2'
+            row: BK 49 a
+          composition_mol:
+            SiO2: '0.5168512338487944740897077611'
+            CaO: '0.2165469800525850347766907410'
+            MgO: '0.1663387331855158710800756718'
+            Al2O3: '0.08746305291310462005352582552'
+            FeO: '0.0108'
+            NiO: '0'
+            CoO: '0.002'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673'
+              locator:
+                page: 25
+                table: '2'
+                row: BK 49 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5168512338487944740897077611'
+                  - - CaO
+                    - '0.2165469800525850347766907410'
+                  - - MgO
+                    - '0.1663387331855158710800756718'
+                  - - Al2O3
+                    - '0.08746305291310462005352582552'
+                  - - FeO
+                    - '0.0108'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.002'
+                  amount_basis: mole_fraction
+              locator:
+                page: 25
+                table: '2'
+                row: BK 49 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 49 a, page 25, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 49 b
+          system: BK
+          T_K: 1673
+          log_fO2: -11.57
+          XNiO_mol_pct: 0.015
+          XFeO_mol_pct: 0.63
+          metal_phase: Co and Ni
+          gamma: 1.48
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 25
+            table: '2'
+            row: BK 49 b
+          composition_mol:
+            SiO2: '0.5201757935478826476213828465'
+            CaO: '0.2179398825275991301685383770'
+            MgO: '0.1674086794534737578115976334'
+            Al2O3: '0.08802564447104446439848114257'
+            FeO: '0.0063'
+            NiO: '0.00015'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673'
+              locator:
+                page: 25
+                table: '2'
+                row: BK 49 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5201757935478826476213828465'
+                  - - CaO
+                    - '0.2179398825275991301685383770'
+                  - - MgO
+                    - '0.1674086794534737578115976334'
+                  - - Al2O3
+                    - '0.08802564447104446439848114257'
+                  - - FeO
+                    - '0.0063'
+                  - - NiO
+                    - '0.00015'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 25
+                table: '2'
+                row: BK 49 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 49 b, page 25, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 46 a
+          system: BK
+          T_K: 1711
+          log_fO2: -11.19
+          XCoO_mol_pct: 0.36
+          XFeO_mol_pct: 0.83
+          metal_phase: Co and Ni
+          gamma: 1.53
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 25
+            table: '2'
+            row: BK 46 a
+          composition_mol:
+            SiO2: '0.5173224312864605144327798205'
+            CaO: '0.2167443993010122293991573351'
+            MgO: '0.1664903791132579337664331152'
+            Al2O3: '0.08754279029926932240162972873'
+            FeO: '0.0083'
+            NiO: '0'
+            CoO: '0.0036'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1711'
+              locator:
+                page: 25
+                table: '2'
+                row: BK 46 a
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5173224312864605144327798205'
+                  - - CaO
+                    - '0.2167443993010122293991573351'
+                  - - MgO
+                    - '0.1664903791132579337664331152'
+                  - - Al2O3
+                    - '0.08754279029926932240162972873'
+                  - - FeO
+                    - '0.0083'
+                  - - NiO
+                    - '0'
+                  - - CoO
+                    - '0.0036'
+                  amount_basis: mole_fraction
+              locator:
+                page: 25
+                table: '2'
+                row: BK 46 a
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 46 a, page 25, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
+        - run: BK 46 b
+          system: BK
+          T_K: 1711
+          log_fO2: -11.19
+          XNiO_mol_pct: 0.018
+          XFeO_mol_pct: 0.45
+          metal_phase: Co and Ni
+          gamma: 1.54
+          gamma_FeO_uncertainty: not_reported per experiment
+          locator:
+            page: 25
+            table: '2'
+            row: BK 46 b
+          composition_mol:
+            SiO2: '0.5211024818419591936294245632'
+            CaO: '0.2183281403828392795927226786'
+            MgO: '0.1677069164446998144281006054'
+            Al2O3: '0.08818246133050171234975215221'
+            FeO: '0.0045'
+            NiO: '0.00018'
+            CoO: '0'
+          composition_mol_basis: simple_oxide_mole_fraction
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1711'
+              locator:
+                page: 25
+                table: '2'
+                row: BK 46 b
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: simple_oxide_mole_fraction
+                  components:
+                  - - SiO2
+                    - '0.5211024818419591936294245632'
+                  - - CaO
+                    - '0.2183281403828392795927226786'
+                  - - MgO
+                    - '0.1677069164446998144281006054'
+                  - - Al2O3
+                    - '0.08818246133050171234975215221'
+                  - - FeO
+                    - '0.0045'
+                  - - NiO
+                    - '0.00018'
+                  - - CoO
+                    - '0'
+                  amount_basis: mole_fraction
+              locator:
+                page: 25
+                table: '2'
+                row: BK 46 b
+              inference:
+                relation: calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios
+                inputs:
+                - Table 1 BK starting composition, page 22, table 1 row BK
+                - Table 2 run BK 46 b, page 25, table 2
+                - 'method_class=calculated. Premise: Table 1 starting bulk plus Table 2 run
+                  mole fractions. Formula: x_i=(1-X_FeO-X_NiO-X_CoO)*(w_i/M_i)/sum_remaining(w_j/M_j),
+                  for remaining oxides; printed Table 2 values replace FeO/NiO/CoO. Check:
+                  Σx_i=1. Assumption: other oxide ratios assumed to persist. This is a declared
+                  model assumption, not a renormalisation of a partial analysis (d-131).'
+                output_unit: mole_fraction
       uncertainty:
         reported_status: no individual γFeO uncertainty printed for these Table 2 rows
       equipment: {}
@@ -3840,16 +7434,34 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
-      phase: komatiitic_basalt_silicate_melt
+      phase: l
       standard_state:
         state:
-          tag: unknown
-          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge:
+                tag: value
+                value: 0
+            component_basis: Fe(1-x)O
+            reference_pressure_bar: '1.01325'
+        inferred: false
         note: >-
-          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
-          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
-          wüstite nonstoichiometry Fe(1-x)O.
-        locator: {published_page: 30, equation: '9'}
+          The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
+          non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
+          no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
+        locator:
+          published_page: 31
+          section: 4.1 Activity coefficients
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
@@ -4041,13 +7653,31 @@ species:
       phase: l
       standard_state:
         state:
-          tag: unknown
-          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge:
+                tag: value
+                value: 0
+            component_basis: Fe(1-x)O
+            reference_pressure_bar: '1.01325'
+        inferred: false
         note: >-
-          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
-          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
-          wüstite nonstoichiometry Fe(1-x)O.
-        locator: {published_page: 30, equation: '9'}
+          The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
+          non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
+          no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
+        locator:
+          published_page: 31
+          section: 4.1 Activity coefficients
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
@@ -4115,13 +7745,31 @@ species:
       phase: l
       standard_state:
         state:
-          tag: unknown
-          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge:
+                tag: value
+                value: 0
+            component_basis: Fe(1-x)O
+            reference_pressure_bar: '1.01325'
+        inferred: false
         note: >-
-          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
-          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
-          wüstite nonstoichiometry Fe(1-x)O.
-        locator: {published_page: 30, equation: '9'}
+          The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
+          non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
+          no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
+        locator:
+          published_page: 31
+          section: 4.1 Activity coefficients
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
@@ -4189,13 +7837,31 @@ species:
       phase: l
       standard_state:
         state:
-          tag: unknown
-          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge:
+                tag: value
+                value: 0
+            component_basis: Fe(1-x)O
+            reference_pressure_bar: '1.01325'
+        inferred: false
         note: >-
-          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
-          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
-          wüstite nonstoichiometry Fe(1-x)O.
-        locator: {published_page: 30, equation: '9'}
+          The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
+          non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
+          no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
+        locator:
+          published_page: 31
+          section: 4.1 Activity coefficients
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
@@ -4263,13 +7929,31 @@ species:
       phase: l
       standard_state:
         state:
-          tag: unknown
-          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge:
+                tag: value
+                value: 0
+            component_basis: Fe(1-x)O
+            reference_pressure_bar: '1.01325'
+        inferred: false
         note: >-
-          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
-          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
-          wüstite nonstoichiometry Fe(1-x)O.
-        locator: {published_page: 30, equation: '9'}
+          The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
+          non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
+          no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
+        locator:
+          published_page: 31
+          section: 4.1 Activity coefficients
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
@@ -4337,13 +8021,31 @@ species:
       phase: l
       standard_state:
         state:
-          tag: unknown
-          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge:
+                tag: value
+                value: 0
+            component_basis: Fe(1-x)O
+            reference_pressure_bar: '1.01325'
+        inferred: false
         note: >-
-          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
-          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
-          wüstite nonstoichiometry Fe(1-x)O.
-        locator: {published_page: 30, equation: '9'}
+          The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
+          non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
+          no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
+        locator:
+          published_page: 31
+          section: 4.1 Activity coefficients
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
@@ -4411,13 +8113,31 @@ species:
       phase: l
       standard_state:
         state:
-          tag: unknown
-          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge:
+                tag: value
+                value: 0
+            component_basis: Fe(1-x)O
+            reference_pressure_bar: '1.01325'
+        inferred: false
         note: >-
-          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
-          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
-          wüstite nonstoichiometry Fe(1-x)O.
-        locator: {published_page: 30, equation: '9'}
+          The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
+          non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
+          no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
+        locator:
+          published_page: 31
+          section: 4.1 Activity coefficients
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
@@ -4485,13 +8205,31 @@ species:
       phase: l
       standard_state:
         state:
-          tag: unknown
-          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge:
+                tag: value
+                value: 0
+            component_basis: Fe(1-x)O
+            reference_pressure_bar: '1.01325'
+        inferred: false
         note: >-
-          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
-          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
-          wüstite nonstoichiometry Fe(1-x)O.
-        locator: {published_page: 30, equation: '9'}
+          The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
+          non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
+          no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
+        locator:
+          published_page: 31
+          section: 4.1 Activity coefficients
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:

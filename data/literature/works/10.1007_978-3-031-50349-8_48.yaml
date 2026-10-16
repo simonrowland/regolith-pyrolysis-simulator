@@ -17,18 +17,6 @@ work:
       sha256:
         tag: value
         value: 145eeaee821e66da05007e5efadd265fb577e707add57466a4d79ccc5fc5a34e
-    - asset_id: pdftotext:shornikov-2024-wollastonite-evaporation
-      role: pdftotext
-      path: text/shornikov-2024-wollastonite-evaporation
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:shornikov-2024-wollastonite-evaporation
-      role: table_csv
-      path: tables/shornikov-2024-wollastonite-evaporation
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:shornikov-2024-wollastonite-evaporation
       role: pdftotext
       path: unknown

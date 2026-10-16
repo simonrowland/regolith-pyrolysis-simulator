@@ -521,14 +521,14 @@ class AtomLedger:
         payload = _species_mol_to_kg(
             species_mol,
             self.registry,
-            tolerance_kg=self.balance_tolerance_kg,
+            tolerance_kg=0.0,
         )
         lot_meta = dict(meta or {})
-        lot_meta.setdefault("amount_basis", "mol")
+        lot_meta["amount_basis"] = "mol"
         lot_meta["species_mol"] = dict(_clean_species_mol(
             species_mol,
             self.registry,
-            tolerance_kg=self.balance_tolerance_kg,
+            tolerance_kg=0.0,
         ))
         return MaterialLot(account, payload, source=source, meta=lot_meta)
 
@@ -543,14 +543,14 @@ class AtomLedger:
         payload = _species_mol_to_kg(
             species_mol,
             self.registry,
-            tolerance_kg=self.balance_tolerance_kg,
+            tolerance_kg=0.0,
         )
         lot_meta = dict(meta or {})
-        lot_meta.setdefault("amount_basis", "mol")
+        lot_meta["amount_basis"] = "mol"
         lot_meta["species_mol"] = dict(_clean_species_mol(
             species_mol,
             self.registry,
-            tolerance_kg=self.balance_tolerance_kg,
+            tolerance_kg=0.0,
         ))
         return MaterialLot(account, payload, source=source, meta=lot_meta)
 
@@ -2339,7 +2339,13 @@ def _species_mol_to_kg_value(
     species: str, species_mol: float, registry: Mapping[str, Any] | None
 ) -> float:
     formula = resolve_species_formula(str(species), registry)
-    return float(species_mol) * formula.molar_mass_kg_per_mol()
+    amount = float(species_mol)
+    kg = amount * formula.molar_mass_kg_per_mol()
+    if amount != 0.0 and kg == 0.0:
+        raise AccountingError(
+            f"nonzero amount for species {species!r} underflows during mol-to-kg conversion"
+        )
+    return kg
 
 
 def _lot_report(lot: MaterialLot) -> dict[str, Any]:

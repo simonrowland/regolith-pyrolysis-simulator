@@ -5524,8 +5524,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         applied_delta_ln = 0.0
         refusal_context: Dict[str, Any] = {}
         skip_reason = ''
-        if not self._melt_redox_temperature_shift_is_liquid(
-            T_K, gate_authority=gate_authority,
+        if (
+            C_m <= OXYGEN_RESERVOIR_NOOP_MOL
+            or not self._melt_redox_temperature_shift_is_liquid(
+                T_K, gate_authority=gate_authority,
+            )
         ):
             skip_reason = 'no_melt_redox_capacity'
         elif abs(net_o2_equiv_mol) < OXYGEN_RESERVOIR_NOOP_MOL:

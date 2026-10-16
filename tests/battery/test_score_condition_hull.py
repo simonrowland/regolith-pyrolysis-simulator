@@ -250,10 +250,10 @@ PIN_RECORD_KEYS = [
 ]
 PIN_SUMMARY_SHA256 = "30345d844ade8f69a341c7b7f99ca2400ca340244cf4c39a9ff96aef9f625588"
 PIN_HEADLINE_LINES = (
-    "| melt_activity | internal-analytical | 4 | 1 | 3 | 3 | 2 | "
+    "| melt_activity | internal-analytical | — | 4 | 1 | 3 | 3 | 2 | "
     "0.3162277660168379331998893544 | 0.10 | 0.20 | 0.3 | "
     "1.054092553389459777332964515 | 0 | 0.667 |",
-    "| vapour | internal-analytical | 2 | 0 | 2 | 2 | 2 | "
+    "| vapour | internal-analytical | — | 2 | 0 | 2 | 2 | 2 | "
     "0.1118033988749894848204586834 | -0.05 | 0.10 | 0.3 | "
     "0.3726779962499649494015289447 | 0 | 1.000 |",
 )

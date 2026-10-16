@@ -716,10 +716,7 @@ species:
         published_page: 1913
         pdf_page_index: 3
         note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
-      T_range_K:
-      - 1573.0
-      - 1573.0
-      phase: PbO-P2O5_oxide_melt_in_Pd_crucible
+      phase: gas
       condensed_form: &id003
         state: liquid_melt
         metastable: false
@@ -731,14 +728,21 @@ species:
       values:
         quantity: ion_current_ratio
         method_class: measured
-        T_C_as_printed: 1300
-        T_K: 1573.0
-        T_K_conversion: authors use T_C + 273
         internal_standard: Pd(g) from the Pd crucible
         activity_ion_ratio_column: (I(PO2+)/I(Pd+))^3 / (I(PO+)/I(Pd+)); proportional to a_P2O5
         composition_basis: Pb and P in wt% as printed; X_P2O5 mole fraction
         rows:
         - Pb_wt_percent: 63.84
+          T_C: 1300
+          composition_mol: &kb85_pbo_sample_1_mol {basis: printed_mole_fraction, PbO: '0.641', P2O5: '0.359'}
+          point_conditions: &kb85_pbo_sample_1_conditions
+            composition:
+              state: {tag: value, value: &kb85_pbo_sample_1_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[PbO, '0.641'], [P2O5, '0.359']]}}
+              locator:
+                published_page: 1913
+                pdf_page_index: 3
+                table: '3'
+                note: "Table 3 row 1 prints X_P2O5=0.359 mole fraction; binary PbO is the complement."
           P_wt_percent: 10.68
           X_P2O5: 0.359
           I_PbO_over_I_Pd: 17.25
@@ -747,6 +751,16 @@ species:
           I_PO_over_I_Pd: 46.05
           I_PO2_over_I_Pd_cubed_over_I_PO_over_I_Pd: 49.83
         - Pb_wt_percent: 66.84
+          T_C: 1300
+          composition_mol: &kb85_pbo_sample_2_mol {basis: printed_mole_fraction, PbO: '0.639', P2O5: '0.361'}
+          point_conditions: &kb85_pbo_sample_2_conditions
+            composition:
+              state: {tag: value, value: &kb85_pbo_sample_2_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[PbO, '0.639'], [P2O5, '0.361']]}}
+              locator:
+                published_page: 1913
+                pdf_page_index: 3
+                table: '3'
+                note: "Table 3 row 2 prints X_P2O5=0.361 mole fraction; binary PbO is the complement."
           P_wt_percent: 11.28
           X_P2O5: 0.361
           I_PbO_over_I_Pd: 11.75
@@ -755,6 +769,16 @@ species:
           I_PO_over_I_Pd: 41.71
           I_PO2_over_I_Pd_cubed_over_I_PO_over_I_Pd: 97.28
         - Pb_wt_percent: 64.79
+          T_C: 1300
+          composition_mol: &kb85_pbo_sample_3_mol {basis: printed_mole_fraction, PbO: '0.618', P2O5: '0.382'}
+          point_conditions: &kb85_pbo_sample_3_conditions
+            composition:
+              state: {tag: value, value: &kb85_pbo_sample_3_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[PbO, '0.618'], [P2O5, '0.382']]}}
+              locator:
+                published_page: 1913
+                pdf_page_index: 3
+                table: '3'
+                note: "Table 3 row 3 prints X_P2O5=0.382 mole fraction; binary PbO is the complement."
           P_wt_percent: 12.0
           X_P2O5: 0.382
           I_PbO_over_I_Pd: 9.67
@@ -774,10 +798,7 @@ species:
         published_page: 1914
         pdf_page_index: 4
         note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
-      T_range_K:
-      - 1643.0
-      - 1663.0
-      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      phase: l
       condensed_form: &id002
         state: liquid_melt
         metastable: false
@@ -793,6 +814,15 @@ species:
         composition_basis: wt_percent as printed under the Table 4 wt% header; X_P2O5 mole fraction
         rows:
         - sample_no: 1
+          composition_mol: &kb85_sample_1_mol {basis: printed_mole_fraction, P2O5: '0.008376120687', FeO: '0.942298348183', Fe2O3: '0.049325531130'}
+          point_conditions: &kb85_sample_1_conditions
+            composition:
+              state: {tag: value, value: &kb85_sample_1_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.008376120687'], [FeO, '0.942298348183'], [Fe2O3, '0.049325531130']]}}
+              locator:
+                published_page: 1914
+                pdf_page_index: 4
+                table: '4'
+                note: "Normalized from sample 1's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 1.52
           Total_Fe_wt_percent: 75.02
           FeO_wt_percent: 86.55
@@ -800,6 +830,15 @@ species:
           t_in_FetO: 0.955
           X_P2O5: 0.0075
         - sample_no: 2
+          composition_mol: &kb85_sample_2_mol {basis: printed_mole_fraction, P2O5: '0.022459868353', FeO: '0.921581588885', Fe2O3: '0.055958542762'}
+          point_conditions: &kb85_sample_2_conditions
+            composition:
+              state: {tag: value, value: &kb85_sample_2_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.022459868353'], [FeO, '0.921581588885'], [Fe2O3, '0.055958542762']]}}
+              locator:
+                published_page: 1914
+                pdf_page_index: 4
+                table: '4'
+                note: "Normalized from sample 2's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 4.06
           Total_Fe_wt_percent: 73.5
           FeO_wt_percent: 84.32
@@ -807,6 +846,15 @@ species:
           t_in_FetO: 0.949
           X_P2O5: 0.0202
         - sample_no: 3
+          composition_mol: &kb85_sample_3_mol {basis: printed_mole_fraction, P2O5: '0.030152487955', FeO: '0.911941491152', Fe2O3: '0.057906020893'}
+          point_conditions: &kb85_sample_3_conditions
+            composition:
+              state: {tag: value, value: &kb85_sample_3_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.030152487955'], [FeO, '0.911941491152'], [Fe2O3, '0.057906020893']]}}
+              locator:
+                published_page: 1914
+                pdf_page_index: 4
+                table: '4'
+                note: "Normalized from sample 3's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 5.42
           Total_Fe_wt_percent: 72.68
           FeO_wt_percent: 82.97
@@ -814,6 +862,15 @@ species:
           t_in_FetO: 0.947
           X_P2O5: 0.0271
         - sample_no: 4
+          composition_mol: &kb85_sample_4_mol {basis: printed_mole_fraction, P2O5: '0.047032894998', FeO: '0.903727131891', Fe2O3: '0.049239973111'}
+          point_conditions: &kb85_sample_4_conditions
+            composition:
+              state: {tag: value, value: &kb85_sample_4_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.047032894998'], [FeO, '0.903727131891'], [Fe2O3, '0.049239973111']]}}
+              locator:
+                published_page: 1914
+                pdf_page_index: 4
+                table: '4'
+                note: "Normalized from sample 4's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 8.38
           Total_Fe_wt_percent: 70.25
           FeO_wt_percent: 81.5
@@ -821,6 +878,15 @@ species:
           t_in_FetO: 0.953
           X_P2O5: 0.0427
         - sample_no: 5
+          composition_mol: &kb85_sample_5_mol {basis: printed_mole_fraction, P2O5: '0.054853396862', FeO: '0.898384771315', Fe2O3: '0.046761831823'}
+          point_conditions: &kb85_sample_5_conditions
+            composition:
+              state: {tag: value, value: &kb85_sample_5_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.054853396862'], [FeO, '0.898384771315'], [Fe2O3, '0.046761831823']]}}
+              locator:
+                published_page: 1914
+                pdf_page_index: 4
+                table: '4'
+                note: "Normalized from sample 5's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 9.77
           Total_Fe_wt_percent: 69.5
           FeO_wt_percent: 80.99
@@ -828,6 +894,15 @@ species:
           t_in_FetO: 0.955
           X_P2O5: 0.0499
         - sample_no: 6
+          composition_mol: &kb85_sample_6_mol {basis: printed_mole_fraction, P2O5: '0.075561170773', FeO: '0.882239734492', Fe2O3: '0.042199094735'}
+          point_conditions: &kb85_sample_6_conditions
+            composition:
+              state: {tag: value, value: &kb85_sample_6_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.075561170773'], [FeO, '0.882239734492'], [Fe2O3, '0.042199094735']]}}
+              locator:
+                published_page: 1914
+                pdf_page_index: 4
+                table: '4'
+                note: "Normalized from sample 6's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 13.29
           Total_Fe_wt_percent: 66.89
           FeO_wt_percent: 78.54
@@ -835,6 +910,15 @@ species:
           t_in_FetO: 0.958
           X_P2O5: 0.0691
         - sample_no: 7
+          composition_mol: &kb85_sample_7_mol {basis: printed_mole_fraction, P2O5: '0.083407986819', FeO: '0.875210550207', Fe2O3: '0.041381462974'}
+          point_conditions: &kb85_sample_7_conditions
+            composition:
+              state: {tag: value, value: &kb85_sample_7_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.083407986819'], [FeO, '0.875210550207'], [Fe2O3, '0.041381462974']]}}
+              locator:
+                published_page: 1914
+                pdf_page_index: 4
+                table: '4'
+                note: "Normalized from sample 7's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 14.53
           Total_Fe_wt_percent: 65.66
           FeO_wt_percent: 77.17
@@ -842,6 +926,15 @@ species:
           t_in_FetO: 0.959
           X_P2O5: 0.0764
         - sample_no: 8
+          composition_mol: &kb85_sample_8_mol {basis: printed_mole_fraction, P2O5: '0.108572450085', FeO: '0.845178784247', Fe2O3: '0.046248765668'}
+          point_conditions: &kb85_sample_8_conditions
+            composition:
+              state: {tag: value, value: &kb85_sample_8_state {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[P2O5, '0.108572450085'], [FeO, '0.845178784247'], [Fe2O3, '0.046248765668']]}}
+              locator:
+                published_page: 1914
+                pdf_page_index: 4
+                table: '4'
+                note: "Normalized from sample 8's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights."
           P2O5_wt_percent: 18.53
           Total_Fe_wt_percent: 62.96
           FeO_wt_percent: 73.01
@@ -857,10 +950,7 @@ species:
         published_page: 1915
         pdf_page_index: 5
         note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
-      T_range_K:
-      - 1643.0
-      - 1663.0
-      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      phase: gas
       condensed_form: *id002
       standard_state: ion current ratios vs Fe+ internal standard; Fe activity taken as 1
       regime: kems_effusion
@@ -876,9 +966,9 @@ species:
           a_P2O5
         rows:
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1370
-          T_K: 1643.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 1.52
           Total_Fe_wt_percent: 75.02
@@ -894,9 +984,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1380
-          T_K: 1653.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 1.52
           Total_Fe_wt_percent: 75.02
@@ -912,9 +1002,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1390
-          T_K: 1663.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 1.52
           Total_Fe_wt_percent: 75.02
@@ -930,9 +1020,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1370
-          T_K: 1643.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 4.06
           Total_Fe_wt_percent: 73.5
@@ -948,9 +1038,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1380
-          T_K: 1653.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 4.06
           Total_Fe_wt_percent: 73.5
@@ -966,9 +1056,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1390
-          T_K: 1663.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 4.06
           Total_Fe_wt_percent: 73.5
@@ -984,9 +1074,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1370
-          T_K: 1643.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 5.42
           Total_Fe_wt_percent: 72.68
@@ -1002,9 +1092,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1380
-          T_K: 1653.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 5.42
           Total_Fe_wt_percent: 72.68
@@ -1020,9 +1110,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1390
-          T_K: 1663.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 5.42
           Total_Fe_wt_percent: 72.68
@@ -1038,9 +1128,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1370
-          T_K: 1643.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 8.38
           Total_Fe_wt_percent: 70.25
@@ -1056,9 +1146,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1380
-          T_K: 1653.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 8.38
           Total_Fe_wt_percent: 70.25
@@ -1074,9 +1164,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1390
-          T_K: 1663.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 8.38
           Total_Fe_wt_percent: 70.25
@@ -1092,9 +1182,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 5
+          composition_mol: *kb85_sample_5_mol
+          point_conditions: *kb85_sample_5_conditions
           T_C: 1370
-          T_K: 1643.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 9.77
           Total_Fe_wt_percent: 69.5
@@ -1110,9 +1200,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1370
-          T_K: 1643.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 13.29
           Total_Fe_wt_percent: 66.89
@@ -1128,9 +1218,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1380
-          T_K: 1653.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 13.29
           Total_Fe_wt_percent: 66.89
@@ -1146,9 +1236,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1390
-          T_K: 1663.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 13.29
           Total_Fe_wt_percent: 66.89
@@ -1164,9 +1254,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1370
-          T_K: 1643.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 14.53
           Total_Fe_wt_percent: 65.66
@@ -1182,9 +1272,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1380
-          T_K: 1653.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 14.53
           Total_Fe_wt_percent: 65.66
@@ -1200,9 +1290,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1390
-          T_K: 1663.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 14.53
           Total_Fe_wt_percent: 65.66
@@ -1218,9 +1308,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1370
-          T_K: 1643.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 18.53
           Total_Fe_wt_percent: 62.96
@@ -1236,9 +1326,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1380
-          T_K: 1653.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 18.53
           Total_Fe_wt_percent: 62.96
@@ -1254,9 +1344,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1390
-          T_K: 1663.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 18.53
           Total_Fe_wt_percent: 62.96
@@ -1272,9 +1362,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1370
-          T_K: 1643.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 8.38
           Total_Fe_wt_percent: 70.25
@@ -1290,9 +1380,9 @@ species:
           column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
             / (I(PO+)/I(Fe+)) x 10^5
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1370
-          T_K: 1643.0
-          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
           composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
           P2O5_wt_percent: 14.53
           Total_Fe_wt_percent: 65.66
@@ -1318,10 +1408,7 @@ species:
         published_page: 1917
         pdf_page_index: 7
         note: Table 7 Raoultian a_P2O5 x 10^17; standard state P2O5(s)
-      T_range_K:
-      - 1643.0
-      - 1663.0
-      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      phase: l
       condensed_form: *id002
       standard_state: Raoultian a_P2O5 relative to P2O5(s); a = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (12)-(14)
         and JANAF
@@ -1336,8 +1423,9 @@ species:
           a_P2O5 rises steeply
         rows:
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0075
           P2O5_wt_percent: 1.52
           t_in_FetO: 0.955
@@ -1346,8 +1434,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0075
           P2O5_wt_percent: 1.52
           t_in_FetO: 0.955
@@ -1356,8 +1445,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0075
           P2O5_wt_percent: 1.52
           t_in_FetO: 0.955
@@ -1366,8 +1456,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0202
           P2O5_wt_percent: 4.06
           t_in_FetO: 0.949
@@ -1376,8 +1467,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0202
           P2O5_wt_percent: 4.06
           t_in_FetO: 0.949
@@ -1386,8 +1478,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0202
           P2O5_wt_percent: 4.06
           t_in_FetO: 0.949
@@ -1396,8 +1489,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0271
           P2O5_wt_percent: 5.42
           t_in_FetO: 0.947
@@ -1406,8 +1500,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0271
           P2O5_wt_percent: 5.42
           t_in_FetO: 0.947
@@ -1416,8 +1511,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0271
           P2O5_wt_percent: 5.42
           t_in_FetO: 0.947
@@ -1426,8 +1522,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0427
           P2O5_wt_percent: 8.38
           t_in_FetO: 0.953
@@ -1436,8 +1533,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0427
           P2O5_wt_percent: 8.38
           t_in_FetO: 0.953
@@ -1446,8 +1544,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0427
           P2O5_wt_percent: 8.38
           t_in_FetO: 0.953
@@ -1456,8 +1555,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 5
+          composition_mol: *kb85_sample_5_mol
+          point_conditions: *kb85_sample_5_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0499
           P2O5_wt_percent: 9.77
           t_in_FetO: 0.955
@@ -1466,8 +1566,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0691
           P2O5_wt_percent: 13.29
           t_in_FetO: 0.958
@@ -1476,8 +1577,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0691
           P2O5_wt_percent: 13.29
           t_in_FetO: 0.958
@@ -1486,8 +1588,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0691
           P2O5_wt_percent: 13.29
           t_in_FetO: 0.958
@@ -1496,8 +1599,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0764
           P2O5_wt_percent: 14.53
           t_in_FetO: 0.959
@@ -1506,8 +1610,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0764
           P2O5_wt_percent: 14.53
           t_in_FetO: 0.959
@@ -1516,8 +1621,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0764
           P2O5_wt_percent: 14.53
           t_in_FetO: 0.959
@@ -1526,8 +1632,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0991
           P2O5_wt_percent: 18.53
           t_in_FetO: 0.953
@@ -1536,8 +1643,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0991
           P2O5_wt_percent: 18.53
           t_in_FetO: 0.953
@@ -1546,8 +1654,9 @@ species:
           a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
           standard_state_as_printed: P2O5(s)
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0991
           P2O5_wt_percent: 18.53
           t_in_FetO: 0.953
@@ -1626,23 +1735,22 @@ species:
         figure: '2'
         published_page: 1913
         pdf_page_index: 3
-        note: Ion current ratios vs X_PbO for PbO-P2O5 at 1300 C; dashed Gibbs-Duhem
-      T_range_K:
-      - 1573.0
-      - 1573.0
-      phase: PbO-P2O5_oxide_melt_in_Pd_crucible
+        note: "Ion current ratios vs X_PbO for PbO-P2O5 at 1300 C; dashed Gibbs-Duhem; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
+      phase: gas
       condensed_form: *id003
       standard_state: ion current ratios proportional to a_PbO and a_P2O5
       regime: kems_effusion
       units: ion current ratios as plotted; not digitised
       values:
-        quantity: ion_current_ratio
-        method_class: measured
+        quantity: ion_intensity_ratio
+        method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
-        T_K: 1573.0
-        T_K_conversion: authors use T_C + 273
-        T_C_as_printed: 1300
+        status: typed_refusal
+        reason: figure_not_digitized
+        ion_intensity_ratio: null
+        unavailable_reason: figure_not_digitized
+        T_C: 1300
         dashed_curve: Gibbs-Duhem calculated values from I(PbO+)/I(Pd+)
         authors_text: PO+/Pd+ and PO2+/Pd+ points agree with the Gibbs-Duhem dashed curve from PbO+
       uncertainty:
@@ -1653,20 +1761,21 @@ species:
         figure: '6'
         published_page: 1915
         pdf_page_index: 5
-        note: Henrian activity of P2O5 for FetO-P2O5 from Table 5 and eq. (3')
-      T_range_K:
-      - 1643.0
-      - 1663.0
-      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+        note: "Henrian activity of P2O5 for FetO-P2O5 from Table 5 and eq. (3'); figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
+      phase: l
       condensed_form: *id002
       standard_state: Henrian a_P2O5 from ion-current eq. (3'); not the Table 7 Raoultian scale
       regime: kems_effusion
       units: Henrian a as plotted; not digitised
       values:
-        quantity: henrian_activity
-        method_class: measured
+        quantity: activity
+        method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
+        status: typed_refusal
+        reason: figure_not_digitized
+        activity: null
+        unavailable_reason: figure_not_digitized
         labeled_T_C:
         - 1370
         - 1380
@@ -1679,20 +1788,21 @@ species:
         figure: '7'
         published_page: 1916
         pdf_page_index: 6
-        note: Raoultian a_P2O5 and a_FetO vs X_P2O5
-      T_range_K:
-      - 1643.0
-      - 1663.0
-      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+        note: "Raoultian a_P2O5 and a_FetO vs X_P2O5; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
+      phase: l
       condensed_form: *id002
       standard_state: Raoultian a_P2O5 vs P2O5(s); a_FetO vs Fe0.95O from Gibbs-Duhem
       regime: kems_effusion
       units: a_P2O5 x 10^17 and a_FetO as plotted; not digitised
       values:
-        quantity: raoultian_activity
-        method_class: model_derived
+        quantity: activity
+        method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
+        status: typed_refusal
+        reason: figure_not_digitized
+        activity: null
+        unavailable_reason: figure_not_digitized
         a_FetO_source: Gibbs-Duhem integral of eq. (8) with mean t=0.95
         labeled_T_C:
         - 1370
@@ -1709,10 +1819,7 @@ species:
         published_page: 1913
         pdf_page_index: 3
         note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
-      T_range_K:
-      - 1573.0
-      - 1573.0
-      phase: PbO-P2O5_oxide_melt_in_Pd_crucible
+      phase: gas
       condensed_form: *id003
       standard_state: I(PbO+)/I(Pd+) proportional to a_PbO via eq. (6)
       regime: kems_effusion
@@ -1721,18 +1828,24 @@ species:
         quantity: ion_current_ratio
         method_class: measured
         gas_species: PbO(g)
-        T_K: 1573.0
-        T_K_conversion: authors use T_C + 273
-        T_C_as_printed: 1300
         internal_standard: Pd+
         rows:
         - Pb_wt_percent: 63.84
+          T_C: 1300
+          composition_mol: *kb85_pbo_sample_1_mol
+          point_conditions: *kb85_pbo_sample_1_conditions
           X_P2O5: 0.359
           I_PbO_over_I_Pd: 17.25
         - Pb_wt_percent: 66.84
+          T_C: 1300
+          composition_mol: *kb85_pbo_sample_2_mol
+          point_conditions: *kb85_pbo_sample_2_conditions
           X_P2O5: 0.361
           I_PbO_over_I_Pd: 11.75
         - Pb_wt_percent: 64.79
+          T_C: 1300
+          composition_mol: *kb85_pbo_sample_3_mol
+          point_conditions: *kb85_pbo_sample_3_conditions
           X_P2O5: 0.382
           I_PbO_over_I_Pd: 9.67
       uncertainty:
@@ -1746,20 +1859,21 @@ species:
         published_page: 1916
         pdf_page_index: 6
         equation: '8'
-        note: Raoultian a_FetO from Gibbs-Duhem on Fe0.95O-P2O5
-      T_range_K:
-      - 1643.0
-      - 1663.0
-      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+        note: "Raoultian a_FetO from Gibbs-Duhem on Fe0.95O-P2O5; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
+      phase: l
       condensed_form: *id002
       standard_state: Raoultian a_FetO for the pseudo-binary Fe0.95O-P2O5
       regime: kems_effusion
       units: dimensionless activity as plotted; not digitised
       values:
-        quantity: raoultian_activity
-        method_class: model_derived
+        quantity: activity
+        method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
+        status: typed_refusal
+        reason: figure_not_digitized
+        activity: null
+        unavailable_reason: figure_not_digitized
         oxide_formula_as_published: FetO
         t_average: 0.95
         model_or_data_source: Gibbs-Duhem integral eq. (8) of gamma_P2O5; t from Fe2+/Fe3+ analysis
@@ -1833,10 +1947,7 @@ species:
         published_page: 1917
         pdf_page_index: 7
         note: Table 6 partial pressures above FetO-P2O5 and Delta-G for P2+2PO2=4PO
-      T_range_K:
-      - 1643.0
-      - 1663.0
-      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      phase: gas
       condensed_form: *id002
       standard_state: partial pressure in atm; P_Fe from JANAF at the measurement T
       regime: kems_effusion
@@ -1867,8 +1978,9 @@ species:
           1390C: 90.0
         rows:
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0075
           P_P2_atm: 1.14e-08
           P_P2_x1e8_atm_as_printed: 1.14
@@ -1880,8 +1992,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0075
           P_P2_atm: 1.4e-08
           P_P2_x1e8_atm_as_printed: 1.4
@@ -1893,8 +2006,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0075
           P_P2_atm: 1.81e-08
           P_P2_x1e8_atm_as_printed: 1.81
@@ -1906,8 +2020,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0202
           P_P2_atm: 3.03e-08
           P_P2_x1e8_atm_as_printed: 3.03
@@ -1919,8 +2034,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0202
           P_P2_atm: 3.77e-08
           P_P2_x1e8_atm_as_printed: 3.77
@@ -1932,8 +2048,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0202
           P_P2_atm: 4.72e-08
           P_P2_x1e8_atm_as_printed: 4.72
@@ -1945,8 +2062,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0271
           P_P2_atm: 1.5000000000000002e-08
           P_P2_x1e8_atm_as_printed: 1.5
@@ -1958,8 +2076,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0271
           P_P2_atm: 1.93e-08
           P_P2_x1e8_atm_as_printed: 1.93
@@ -1971,8 +2090,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0271
           P_P2_atm: 2.32e-08
           P_P2_x1e8_atm_as_printed: 2.32
@@ -1984,8 +2104,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0427
           P_P2_atm: 5.6399999999999995e-08
           P_P2_x1e8_atm_as_printed: 5.64
@@ -1997,8 +2118,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0427
           P_P2_atm: 7.0e-08
           P_P2_x1e8_atm_as_printed: 7.0
@@ -2010,8 +2132,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0427
           P_P2_atm: 8.68e-08
           P_P2_x1e8_atm_as_printed: 8.68
@@ -2023,8 +2146,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 5
+          composition_mol: *kb85_sample_5_mol
+          point_conditions: *kb85_sample_5_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0499
           P_P2_atm: 7.040000000000001e-08
           P_P2_x1e8_atm_as_printed: 7.04
@@ -2036,8 +2160,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0691
           P_P2_atm: 6.85e-08
           P_P2_x1e8_atm_as_printed: 6.85
@@ -2049,8 +2174,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0691
           P_P2_atm: 8.52e-08
           P_P2_x1e8_atm_as_printed: 8.52
@@ -2062,8 +2188,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0691
           P_P2_atm: 1.1150000000000001e-07
           P_P2_x1e8_atm_as_printed: 11.15
@@ -2075,8 +2202,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0764
           P_P2_atm: 8.660000000000001e-08
           P_P2_x1e8_atm_as_printed: 8.66
@@ -2088,8 +2216,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0764
           P_P2_atm: 1.084e-07
           P_P2_x1e8_atm_as_printed: 10.84
@@ -2101,8 +2230,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0764
           P_P2_atm: 1.367e-07
           P_P2_x1e8_atm_as_printed: 13.67
@@ -2114,8 +2244,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0991
           P_P2_atm: 7.16e-08
           P_P2_x1e8_atm_as_printed: 7.16
@@ -2127,8 +2258,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0991
           P_P2_atm: 8.93e-08
           P_P2_x1e8_atm_as_printed: 8.93
@@ -2140,8 +2272,9 @@ species:
           pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
             atm)'
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0991
           P_P2_atm: 1.14e-07
           P_P2_x1e8_atm_as_printed: 11.4
@@ -2164,10 +2297,7 @@ species:
         published_page: 1917
         pdf_page_index: 7
         note: Table 6 partial pressures above FetO-P2O5 and Delta-G for P2+2PO2=4PO
-      T_range_K:
-      - 1643.0
-      - 1663.0
-      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      phase: gas
       condensed_form: *id002
       standard_state: P_PO2 in atm from Table 6 (x 10^-8 atm column)
       regime: kems_effusion
@@ -2180,134 +2310,156 @@ species:
         column_scale: 10^-8 atm
         rows:
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0075
           P_PO2_x1e8_atm_as_printed: 3.78
           P_atm: 3.78e-08
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0075
           P_PO2_x1e8_atm_as_printed: 4.53
           P_atm: 4.53e-08
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0075
           P_PO2_x1e8_atm_as_printed: 5.52
           P_atm: 5.52e-08
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0202
           P_PO2_x1e8_atm_as_printed: 6.93
           P_atm: 6.93e-08
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0202
           P_PO2_x1e8_atm_as_printed: 8.47
           P_atm: 8.470000000000001e-08
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0202
           P_PO2_x1e8_atm_as_printed: 10.64
           P_atm: 1.0640000000000001e-07
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0271
           P_PO2_x1e8_atm_as_printed: 9.45
           P_atm: 9.449999999999999e-08
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0271
           P_PO2_x1e8_atm_as_printed: 11.81
           P_atm: 1.181e-07
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0271
           P_PO2_x1e8_atm_as_printed: 13.9
           P_atm: 1.3900000000000001e-07
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0427
           P_PO2_x1e8_atm_as_printed: 10.89
           P_atm: 1.089e-07
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0427
           P_PO2_x1e8_atm_as_printed: 13.33
           P_atm: 1.333e-07
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0427
           P_PO2_x1e8_atm_as_printed: 16.55
           P_atm: 1.6550000000000002e-07
         - sample_no: 5
+          composition_mol: *kb85_sample_5_mol
+          point_conditions: *kb85_sample_5_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0499
           P_PO2_x1e8_atm_as_printed: 12.7
           P_atm: 1.2699999999999999e-07
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0691
           P_PO2_x1e8_atm_as_printed: 13.89
           P_atm: 1.389e-07
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0691
           P_PO2_x1e8_atm_as_printed: 17.3
           P_atm: 1.73e-07
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0691
           P_PO2_x1e8_atm_as_printed: 21.1
           P_atm: 2.1100000000000002e-07
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0764
           P_PO2_x1e8_atm_as_printed: 14.23
           P_atm: 1.423e-07
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0764
           P_PO2_x1e8_atm_as_printed: 17.45
           P_atm: 1.745e-07
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0764
           P_PO2_x1e8_atm_as_printed: 21.14
           P_atm: 2.114e-07
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0991
           P_PO2_x1e8_atm_as_printed: 18.32
           P_atm: 1.832e-07
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0991
           P_PO2_x1e8_atm_as_printed: 22.87
           P_atm: 2.287e-07
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0991
           P_PO2_x1e8_atm_as_printed: 29.97
           P_atm: 2.997e-07
@@ -2322,10 +2474,7 @@ species:
         published_page: 1917
         pdf_page_index: 7
         note: Table 6 partial pressures above FetO-P2O5 and Delta-G for P2+2PO2=4PO
-      T_range_K:
-      - 1643.0
-      - 1663.0
-      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      phase: gas
       condensed_form: *id002
       standard_state: P_P2 in atm from Table 6 (x 10^-8 atm column)
       regime: kems_effusion
@@ -2339,134 +2488,156 @@ species:
         fragment_note: authors treat P2+ as parent; P+ contains fragment contributions from P2 and PO
         rows:
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0075
           P_P2_x1e8_atm_as_printed: 1.14
           P_atm: 1.14e-08
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0075
           P_P2_x1e8_atm_as_printed: 1.4
           P_atm: 1.4e-08
         - sample_no: 1
+          composition_mol: *kb85_sample_1_mol
+          point_conditions: *kb85_sample_1_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0075
           P_P2_x1e8_atm_as_printed: 1.81
           P_atm: 1.81e-08
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0202
           P_P2_x1e8_atm_as_printed: 3.03
           P_atm: 3.03e-08
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0202
           P_P2_x1e8_atm_as_printed: 3.77
           P_atm: 3.77e-08
         - sample_no: 2
+          composition_mol: *kb85_sample_2_mol
+          point_conditions: *kb85_sample_2_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0202
           P_P2_x1e8_atm_as_printed: 4.72
           P_atm: 4.72e-08
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0271
           P_P2_x1e8_atm_as_printed: 1.5
           P_atm: 1.5000000000000002e-08
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0271
           P_P2_x1e8_atm_as_printed: 1.93
           P_atm: 1.93e-08
         - sample_no: 3
+          composition_mol: *kb85_sample_3_mol
+          point_conditions: *kb85_sample_3_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0271
           P_P2_x1e8_atm_as_printed: 2.32
           P_atm: 2.32e-08
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0427
           P_P2_x1e8_atm_as_printed: 5.64
           P_atm: 5.6399999999999995e-08
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0427
           P_P2_x1e8_atm_as_printed: 7.0
           P_atm: 7.0e-08
         - sample_no: 4
+          composition_mol: *kb85_sample_4_mol
+          point_conditions: *kb85_sample_4_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0427
           P_P2_x1e8_atm_as_printed: 8.68
           P_atm: 8.68e-08
         - sample_no: 5
+          composition_mol: *kb85_sample_5_mol
+          point_conditions: *kb85_sample_5_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0499
           P_P2_x1e8_atm_as_printed: 7.04
           P_atm: 7.040000000000001e-08
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0691
           P_P2_x1e8_atm_as_printed: 6.85
           P_atm: 6.85e-08
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0691
           P_P2_x1e8_atm_as_printed: 8.52
           P_atm: 8.52e-08
         - sample_no: 6
+          composition_mol: *kb85_sample_6_mol
+          point_conditions: *kb85_sample_6_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0691
           P_P2_x1e8_atm_as_printed: 11.15
           P_atm: 1.1150000000000001e-07
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0764
           P_P2_x1e8_atm_as_printed: 8.66
           P_atm: 8.660000000000001e-08
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0764
           P_P2_x1e8_atm_as_printed: 10.84
           P_atm: 1.084e-07
         - sample_no: 7
+          composition_mol: *kb85_sample_7_mol
+          point_conditions: *kb85_sample_7_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0764
           P_P2_x1e8_atm_as_printed: 13.67
           P_atm: 1.367e-07
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1370
-          T_K: 1643.0
           X_P2O5: 0.0991
           P_P2_x1e8_atm_as_printed: 7.16
           P_atm: 7.16e-08
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1380
-          T_K: 1653.0
           X_P2O5: 0.0991
           P_P2_x1e8_atm_as_printed: 8.93
           P_atm: 8.93e-08
         - sample_no: 8
+          composition_mol: *kb85_sample_8_mol
+          point_conditions: *kb85_sample_8_conditions
           T_C: 1390
-          T_K: 1663.0
           X_P2O5: 0.0991
           P_P2_x1e8_atm_as_printed: 11.4
           P_atm: 1.14e-07
@@ -2515,9 +2686,6 @@ species:
         figure: '8'
         equation: '9'
         note: Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C
-      T_range_K:
-      - 1643.0
-      - 1643.0
       phase: Fe_crucible_internal_standard
       standard_state: Delta-H_sub of Fe at 1370 C from the Fig. 8 slope
       regime: kems_effusion
@@ -2527,9 +2695,7 @@ species:
         method_class: model_derived
         model_or_data_source: eq. (9') slope of Fig. 8; compared with JANAF 395 kJ
         delta_H_sub_kJ: 429
-        T_K: 1643.0
-        T_K_conversion: authors use T_C + 273
-        T_C_as_printed: 1370
+        T_C: 1370
         janaf_comparison_kJ: 395
         authors_text: 429 kJ agrees with JANAF 395 kJ once long-run sensitivity drift is allowed for;
           Fe(g) is in equilibrium with the Fe crucible
@@ -2542,20 +2708,21 @@ species:
         figure: '8'
         published_page: 1916
         pdf_page_index: 6
-        note: ln I_Fe+ T vs 1/T x 10^4 for FetO-P2O5 samples
-      T_range_K:
-      - 1643.0
-      - 1663.0
-      phase: Fe_crucible_internal_standard
+        note: "ln I_Fe+ T vs 1/T x 10^4 for FetO-P2O5 samples; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
+      phase: gas
       standard_state: I_Fe+ T vs 1/T; not digitised
       regime: kems_effusion
       units: ln I T as plotted; not digitised
       values:
         quantity: ion_intensity
         gas_species: Fe
-        method_class: measured
+        method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
+        status: typed_refusal
+        reason: figure_not_digitized
+        ion_intensity: null
+        unavailable_reason: figure_not_digitized
         labeled_samples:
         - No.7
         - No.2
@@ -2572,20 +2739,22 @@ species:
         figure: '3'
         published_page: 1914
         pdf_page_index: 4
-        note: Time dependence of ion current ratios at X_P2O5=0.0499
-      T_range_K:
-      - 1643.0
-      - 1643.0
-      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+        note: "Time dependence of ion current ratios at X_P2O5=0.0499; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
+      phase: gas
       standard_state: I/I_Fe vs time (h)
       regime: kems_effusion
       units: ion current ratios as plotted; not digitised
       values:
-        quantity: ion_current_ratio_vs_time
-        method_class: measured
+        quantity: ion_intensity_ratio
+        method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
+        status: typed_refusal
+        reason: figure_not_digitized
+        ion_intensity_ratio: null
+        unavailable_reason: figure_not_digitized
         X_P2O5: 0.0499
+        T_C: 1370
         stability_as_printed: ratios nearly stable after about 1 h at constant T; unchanged for 10 h
       uncertainty:
         note: figure-only; not digitised
@@ -2595,19 +2764,20 @@ species:
         figure: '4'
         published_page: 1914
         pdf_page_index: 4
-        note: Temperature-cycle reproducibility at X_P2O5=0.0427
-      T_range_K:
-      - 1633.0
-      - 1663.0
-      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+        note: "Temperature-cycle reproducibility at X_P2O5=0.0427; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
+      phase: gas
       standard_state: I/I_Fe vs time through 1370-1390-1380-1370-1360-1370 C holds
       regime: kems_effusion
       units: ion current ratios as plotted; not digitised
       values:
-        quantity: ion_current_ratio_vs_time
-        method_class: measured
+        quantity: ion_intensity_ratio
+        method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
+        status: typed_refusal
+        reason: figure_not_digitized
+        ion_intensity_ratio: null
+        unavailable_reason: figure_not_digitized
         X_P2O5: 0.0427
         authors_text: good reproducibility against temperature change
       uncertainty:
@@ -2618,19 +2788,23 @@ species:
         figure: '5'
         published_page: 1915
         pdf_page_index: 5
-        note: Activity ion-current ratio vs T for samples 1-8
+        note: "Activity ion-current ratio vs T for samples 1-8; figure-only placeholder; no digitization. bound_not_point_ordering: ordering or bound only, never a point value."
       T_range_K:
       - 1643.0
       - 1663.0
-      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      phase: gas
       standard_state: (I_PO2/I_Fe)^3/(I_PO/I_Fe) vs T
       regime: kems_effusion
       units: ion current ratio as plotted; not digitised
       values:
-        quantity: ion_current_ratio_vs_T
-        method_class: measured
+        quantity: ion_intensity_ratio
+        method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
+        status: typed_refusal
+        reason: figure_not_digitized
+        ion_intensity_ratio: null
+        unavailable_reason: figure_not_digitized
         weak_T_dependence_below_X: 0.0764
         T_dependence_at_X: 0.0991
       uncertainty:

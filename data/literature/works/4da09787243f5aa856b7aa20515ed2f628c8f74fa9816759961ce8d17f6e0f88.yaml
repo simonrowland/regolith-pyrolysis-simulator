@@ -10,24 +10,6 @@ work:
       tag: value
       value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
-    - asset_id: pdf:nist-webbook
-      role: pdf
-      path: raw/nist-webbook/nist-webbook.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:nist-webbook
-      role: pdftotext
-      path: text/nist-webbook
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:nist-webbook
-      role: table_csv
-      path: tables/nist-webbook
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
     - asset_id: unknown:nist-webbook
       role: pdftotext
       path: unknown

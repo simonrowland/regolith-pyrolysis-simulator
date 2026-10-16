@@ -121,6 +121,55 @@ def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> 
     )
 
 
+def test_internal_analytical_core_out_of_band_flag_reaches_cell_notices() -> None:
+    pot = BinaryPot(
+        pot_id="sio2_na2o_60_40",
+        kato_1993_table4_system=None,
+        why="core out-of-band notice probe",
+        composition_wt_pct={"SiO2": 60.0, "Na2O": 40.0},
+    )
+    handle = open_battery_engine("internal-analytical")
+    po2 = Po2Request(mode="commanded", po2_bar=1e-10)
+
+    extrapolated = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=4500.0,
+        po2=po2,
+        timeout_s=30.0,
+        isolated=False,
+    )
+    assert extrapolated.authority == AUTHORITY_EXTRAPOLATED, (
+        extrapolated.status,
+        extrapolated.refusal_reason,
+        extrapolated.engine_status,
+        extrapolated.engine_reason,
+    )
+    notices = [
+        notice
+        for notice in extrapolated.notices
+        if notice.get("kind") == "out_of_certified_band"
+    ]
+    assert notices
+    notice = notices[0]
+    assert notice["reason"]
+    assert notice["authority"] == AUTHORITY_EXTRAPOLATED
+    assert notice["band"]
+
+    in_band = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1500.0,
+        po2=po2,
+        timeout_s=30.0,
+        isolated=False,
+    )
+    assert not any(
+        notice.get("kind") in {"out_of_certified_band", "floor_inversion"}
+        for notice in in_band.notices
+    )
+
+
 def test_pots_load_and_sum_to_100_wt_pct() -> None:
     pots, grid = load_binary_pots(DEFAULT_POTS_PATH)
     assert len(pots) == 8

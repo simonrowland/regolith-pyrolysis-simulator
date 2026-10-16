@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import pytest
 
+from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.ledger import AtomLedger
 from simulator.chemistry.kernel import (
     AtomBalanceError,
@@ -89,6 +90,53 @@ def test_atom_balance_proof_within_tight_tolerance_passes():
         atom_balance_proof={"O": 1e-15},  # well below 1e-12 cross-check
     )
     validate_atom_balance(proposal, species_formula_registry={})
+
+
+def test_captured_hour_261_si_dust_survives_lot_materialization():
+    proposal = LedgerTransitionProposal(
+        debits={
+            "process.metal_phase": {
+                "Si": 1208.8340934601026,
+            },
+        },
+        credits={
+            "process.metal_phase_float_layer": {
+                "Si": 1208.8340934600913,
+            },
+            "process.metal_phase_bottom_pool": {
+                "Si": 1.1487449696710447e-11,
+            },
+        },
+        reason="metal_phase_stratification_diagnostic",
+        atom_balance_proof={"Si": 2.2737367544323206e-13},
+    )
+
+    validate_atom_balance(proposal, species_formula_registry={})
+
+
+def test_mol_lot_materialization_keeps_nonzero_species_or_refuses_underflow():
+    si_mol = 1.1487449696710447e-11
+    lot = AtomLedger().credit_mol(
+        "process.metal_phase_bottom_pool",
+        {"Si": si_mol},
+    )
+
+    assert lot.species_kg.get("Si", 0.0) > 0.0
+    kept = lot.without_empty()
+    assert kept.species_kg.get("Si", 0.0) > 0.0
+    assert kept.species_moles_for()["Si"] == pytest.approx(si_mol, rel=1e-14)
+
+    with pytest.raises(AccountingError, match="underflows"):
+        AtomLedger().credit_mol(
+            "process.metal_phase_bottom_pool",
+            {"Si": 1e-323},
+        )
+
+    with pytest.raises(AccountingError, match="non-negative"):
+        AtomLedger().credit_mol(
+            "process.metal_phase_bottom_pool",
+            {"Si": -si_mol},
+        )
 
 
 # ---------------------------------------------------------------------------

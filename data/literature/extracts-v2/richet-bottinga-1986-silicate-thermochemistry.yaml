@@ -92,7 +92,7 @@ observations:
     pdf_page_index: 15
     table: '5'
     note: row=Anorthite; column=ΔS_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
   point_conditions:
     temperature_K:
       state:
@@ -194,7 +194,7 @@ observations:
     pdf_page_index: 15
     table: '5'
     note: row=Anorthite; column=T_f (K)
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_cristobalite_entropy_of_fusion_table5
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -207,8 +207,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: unrecognised polymorph 'Cristobalite' is not a closed Polymorph token
+        tag: value
+        value: cristobalite_high
       charge:
         tag: value
         value: 0
@@ -285,7 +285,7 @@ observations:
     pdf_page_index: 15
     table: '5'
     note: row=Cristobalite; column=ΔS_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
   point_conditions:
     temperature_K:
       state:
@@ -309,8 +309,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: unrecognised polymorph 'Cristobalite' is not a closed Polymorph token
+        tag: value
+        value: cristobalite_high
       charge:
         tag: value
         value: 0
@@ -387,7 +387,7 @@ observations:
     pdf_page_index: 15
     table: '5'
     note: row=Cristobalite; column=T_f (K)
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_diopside_entropy_of_fusion_table5
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -400,8 +400,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: unrecognised polymorph 'Diopside' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -478,7 +478,7 @@ observations:
     pdf_page_index: 15
     table: '5'
     note: row=Diopside; column=ΔS_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
   point_conditions:
     temperature_K:
       state:
@@ -502,8 +502,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: unrecognised polymorph 'Diopside' is not a closed Polymorph token
+        tag: value
+        value: diopside
       charge:
         tag: value
         value: 0
@@ -580,7 +580,7 @@ observations:
     pdf_page_index: 15
     table: '5'
     note: row=Diopside; column=T_f (K)
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_high_albite_entropy_of_fusion_table5
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -593,8 +593,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: unrecognised polymorph 'High albite' is not a closed Polymorph token
+        tag: value
+        value: albite_high
       charge:
         tag: value
         value: 0
@@ -671,7 +671,7 @@ observations:
     pdf_page_index: 15
     table: '5'
     note: row=High albite; column=ΔS_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
   point_conditions:
     temperature_K:
       state:
@@ -695,8 +695,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: unrecognised polymorph 'High albite' is not a closed Polymorph token
+        tag: value
+        value: albite_high
       charge:
         tag: value
         value: 0
@@ -773,7 +773,7 @@ observations:
     pdf_page_index: 15
     table: '5'
     note: row=High albite; column=T_f (K)
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_high_sanidine_entropy_of_fusion_table5
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -786,8 +786,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: unrecognised polymorph 'High sanidine' is not a closed Polymorph token
+        tag: value
+        value: sanidine_high
       charge:
         tag: value
         value: 0
@@ -864,7 +864,7 @@ observations:
     pdf_page_index: 15
     table: '5'
     note: row=High sanidine; column=ΔS_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
   point_conditions:
     temperature_K:
       state:
@@ -888,8 +888,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: unrecognised polymorph 'High sanidine' is not a closed Polymorph token
+        tag: value
+        value: sanidine_high
       charge:
         tag: value
         value: 0
@@ -966,7 +966,7 @@ observations:
     pdf_page_index: 15
     table: '5'
     note: row=High sanidine; column=T_f (K)
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_entropy_of_fusion_table4
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -981,6 +981,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1061,7 +1062,7 @@ observations:
     pdf_page_index: 14
     table: '4'
     note: row=K2Si2O5; column=ΔS_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
   derived_from:
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_heat_of_fusion_table4
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_transition_table4
@@ -1086,6 +1087,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1166,7 +1168,7 @@ observations:
     pdf_page_index: 14
     table: '4'
     note: row=K2Si2O5; column=ΔH_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_transition_table4
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -1181,6 +1183,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1257,7 +1260,7 @@ observations:
     pdf_page_index: 14
     table: '4'
     note: row=K2Si2O5; column=T_f (K)
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_entropy_of_fusion_table4
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -1272,6 +1275,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1352,7 +1356,7 @@ observations:
     pdf_page_index: 14
     table: '4'
     note: row=K2SiO3; column=ΔS_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
   derived_from:
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_heat_of_fusion_table4
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_transition_table4
@@ -1377,6 +1381,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1457,7 +1462,7 @@ observations:
     pdf_page_index: 14
     table: '4'
     note: row=K2SiO3; column=ΔH_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_transition_table4
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -1472,6 +1477,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1548,7 +1554,7 @@ observations:
     pdf_page_index: 14
     table: '4'
     note: row=K2SiO3; column=T_f (K)
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_entropy_of_fusion_table4
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -1561,8 +1567,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: unrecognised polymorph 'clinoenstatite' is not a closed Polymorph token
+        tag: value
+        value: clinoenstatite
       charge:
         tag: value
         value: 0
@@ -1643,7 +1649,7 @@ observations:
     pdf_page_index: 14
     table: '4'
     note: row=MgSiO3; column=ΔS_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
   point_conditions:
     temperature_K:
       state:
@@ -1677,8 +1683,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: unrecognised polymorph 'clinoenstatite' is not a closed Polymorph token
+        tag: value
+        value: clinoenstatite
       charge:
         tag: value
         value: 0
@@ -1759,7 +1765,7 @@ observations:
     pdf_page_index: 14
     table: '4'
     note: row=MgSiO3; column=ΔH_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
   point_conditions:
     temperature_K:
       state:
@@ -1783,8 +1789,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: unrecognised polymorph 'clinoenstatite' is not a closed Polymorph token
+        tag: value
+        value: clinoenstatite
       charge:
         tag: value
         value: 0
@@ -1861,7 +1867,7 @@ observations:
     pdf_page_index: 14
     table: '4'
     note: row=MgSiO3; column=T_f (K)
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_entropy_of_fusion_table4
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -1876,6 +1882,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1956,7 +1963,7 @@ observations:
     pdf_page_index: 14
     table: '4'
     note: row=Na2Si2O5; column=ΔS_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
   derived_from:
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_heat_of_fusion_table4
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_transition_table4
@@ -1981,6 +1988,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2061,7 +2069,7 @@ observations:
     pdf_page_index: 14
     table: '4'
     note: row=Na2Si2O5; column=ΔH_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_transition_table4
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -2076,6 +2084,7 @@ observations:
       polymorph:
         tag: unknown
         reason: source does not state polymorph
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2152,7 +2161,7 @@ observations:
     pdf_page_index: 14
     table: '4'
     note: row=Na2Si2O5; column=T_f (K)
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_quartz_entropy_of_fusion_table5
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -2243,7 +2252,7 @@ observations:
     pdf_page_index: 15
     table: '5'
     note: row=Quartz; column=ΔS_f
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry
   point_conditions:
     temperature_K:
       state:
@@ -2345,4 +2354,4 @@ observations:
     pdf_page_index: 15
     table: '5'
     note: row=Quartz; column=T_f (K)
-  read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  read_from: unknown:richet-bottinga-1986-silicate-thermochemistry

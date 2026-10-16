@@ -152,10 +152,16 @@ species:
         table: '6'
         row: Fe(s) + 0.5O2 = FeO(liq)
       regime: quench_equilibration
-      units: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+      units: dimensionless
       uncertainty:
-        note: Table 7 parenthetical uncertainties are one standard deviation and exclude systematic errors, including standard-state thermodynamic data.
+        note: "Errors are one standard deviation and do not include systematic errors, e.g., in the standard state thermodynamic data. Table 7 parenthetical digits apply to the last printed digits (for example, 1.367 (11) gives a one-sigma width of 0.011)."
         confidence_level: one_sigma
+        locator:
+          page: 163
+          published_page: 163
+          pdf_page_index: 12
+          table: '7'
+          note: Table 7 closing note
       values:
         quantity: activity_coefficient
         method_class: directly_reduced_measurement
@@ -218,6 +224,7 @@ species:
               locator: *loc4_ad_eutectic
           gamma: '1.367'
           gamma_as_printed: '1.367 (11)'
+          sigma: '0.011'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -258,6 +265,7 @@ species:
               locator: *loc4_ad_fo
           gamma: '1.468'
           gamma_as_printed: '1.468 (25)'
+          sigma: '0.025'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -298,6 +306,7 @@ species:
               locator: *loc4_ad_en
           gamma: '1.167'
           gamma_as_printed: '1.167 (10)'
+          sigma: '0.010'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -338,6 +347,7 @@ species:
               locator: *loc4_ad_wo
           gamma: '1.231'
           gamma_as_printed: '1.231 (19)'
+          sigma: '0.019'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -378,6 +388,7 @@ species:
               locator: *loc4_ad_qz
           gamma: '1.121'
           gamma_as_printed: '1.121 (19)'
+          sigma: '0.019'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -421,6 +432,7 @@ species:
               locator: *loc4_ad_tio2
           gamma: '0.935'
           gamma_as_printed: '0.935 (17)'
+          sigma: '0.017'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -461,6 +473,7 @@ species:
               locator: *loc4_cmas_a
           gamma: '1.359'
           gamma_as_printed: '1.359 (22)'
+          sigma: '0.022'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -501,6 +514,7 @@ species:
               locator: *loc4_cmas_b
           gamma: '1.193'
           gamma_as_printed: '1.193 (27)'
+          sigma: '0.027'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -541,6 +555,7 @@ species:
               locator: *loc4_cmas_c
           gamma: '1.091'
           gamma_as_printed: '1.091 (14)'
+          sigma: '0.014'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -581,6 +596,7 @@ species:
               locator: *loc4_cmas_d
           gamma: '1.76'
           gamma_as_printed: '1.76 (10)'
+          sigma: '0.10'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -621,6 +637,7 @@ species:
               locator: *loc4_cmas_e
           gamma: '1.450'
           gamma_as_printed: '1.450 (24)'
+          sigma: '0.024'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -661,6 +678,7 @@ species:
               locator: *loc4_cmas_f
           gamma: '0.875'
           gamma_as_printed: '0.875 (9)'
+          sigma: '0.009'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -701,6 +719,7 @@ species:
               locator: *loc4_cmas_g
           gamma: '1.091'
           gamma_as_printed: '1.091 (14)'
+          sigma: '0.014'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -741,6 +760,7 @@ species:
               locator: *loc4_mas1
           gamma: '1.034'
           gamma_as_printed: '1.034 (17)'
+          sigma: '0.017'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -781,6 +801,7 @@ species:
               locator: *loc4_mas2
           gamma: '1.052'
           gamma_as_printed: '1.052 (14)'
+          sigma: '0.014'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -821,6 +842,7 @@ species:
               locator: *loc4_cas1
           gamma: '1.863'
           gamma_as_printed: '1.863 (45)'
+          sigma: '0.045'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -861,6 +883,7 @@ species:
               locator: *loc4_cas2
           gamma: '1.82'
           gamma_as_printed: '1.82 (11)'
+          sigma: '0.11'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -901,6 +924,7 @@ species:
               locator: *loc4_cas3
           gamma: '2.263'
           gamma_as_printed: '2.263 (59)'
+          sigma: '0.059'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced
@@ -941,6 +965,7 @@ species:
               locator: *loc4_cas4
           gamma: '1.168'
           gamma_as_printed: '1.168 (13)'
+          sigma: '0.013'
           admission_status: admitted
           method_class: directly_reduced_measurement
           evidence_class: measured_reduced

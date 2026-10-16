@@ -14,8 +14,8 @@
   "pdf_page": 228,
   "page": 222,
   "name_as_published": "CLINOENSTATITE",
-  "formula_as_published": "MgSiO",
-  "formula": "MgSiO",
+  "formula_as_published": "MgSiO3",
+  "formula": "MgSiO3",
   "phase": "Crystals 298.15° to melting point 1830°K.",
   "gram_formula_weight": {
     "as_published": "100.396",
@@ -1467,6 +1467,14 @@
   "identity_disagreements": [],
   "ambiguities": [],
   "corrections": [
+    {
+      "correction_id": "b1259-p228-formula_as_published",
+      "pdf_page": 228,
+      "field": "formula_as_published",
+      "layout_as_extracted": "MgSiO",
+      "printed_token": "MgSiO3",
+      "evidence": "PDF page 228 image visibly prints 'MgSiO3'"
+    },
     {
       "correction_id": "b1259-p228-temperature-13",
       "pdf_page": 228,

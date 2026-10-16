@@ -332,7 +332,10 @@ def _additives_result(
 
 def _magemin_status() -> dict[str, Any]:
     backend = MAGEMinBackend()
-    initialized = backend.initialize({"python_bridge": "subprocess"})
+    initialized = backend.initialize({
+        "python_bridge": "subprocess",
+        "warm_worker": False,
+    })
     return {
         "initialized": initialized,
         "available": backend.is_available(),

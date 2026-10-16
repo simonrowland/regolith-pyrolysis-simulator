@@ -1176,12 +1176,16 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # kg/h entirely PO/PO2/P2. Fresh executable probe, with unchanged
         # non-P flux, moves transport and the P2O5 source debit accordingly.
         # b-850: alkali composite vapour rows now use the parent-oxide activity.
+        # b-894 (d-145): melt oxygen at ferric saturation leaves to the gas
+        # ledger and re-speciation settles once after the evaporation batch,
+        # so less oxygen stays in the melt: melt mass 995.6386 -> 994.9920 kg
+        # (fresh executable measurement; flux and transport values unchanged).
         (
             1,
             1550.0,
             3.123653392791531,
             1390584.7638444814,
-            995.6386216113149,
+            994.9920372838491,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
