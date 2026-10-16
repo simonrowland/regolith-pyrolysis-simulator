@@ -1078,30 +1078,38 @@ GRID_25_SIO_ALLOWED_STATUSES = {
 # and may be regenerated only with a reviewed provider change.
 GRID_25_SIO_RUNTIME_DRIFT_TRIPWIRE = {
     "grid-25-sio:cj2015@1700K:SiO": (
-        "model-spread-within-envelope", 1.1478173030187133,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "model-spread-within-envelope", 1.1367262297977332,
     ),
     "grid-25-sio:cj2015@1800K:SiO": (
-        "model-spread-within-envelope", 0.4163100520193938,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "model-spread-within-envelope", 0.4052554776922509,
     ),
     "grid-25-sio:cj2015@1900K:SiO": (
-        "model-spread-within-envelope", 0.25049547025978586,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "model-spread-within-envelope", 0.2615173876819086,
     ),
     # VR-5: T ceiling 1950 K — 2000 K is out-of-engine-T-range (was live).
     "grid-25-sio:cj2015@2000K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:sf2004@1700K:SiO": (
-        "model-spread-within-envelope", 0.9269341194554767,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "model-spread-within-envelope", 0.9292485550185771,
     ),
     "grid-25-sio:sf2004@1900K:SiO": (
-        "model-spread-within-envelope", 1.8389253800391663,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "model-spread-within-envelope", 1.84115529883729,
     ),
     "grid-25-sio:sof2018-mineru@1673K:SiO": (
-        "model-spread-within-envelope", 1.3838136652001243,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "model-spread-within-envelope", 1.3804779708721886,
     ),
     "grid-25-sio:sof2018-mineru@1773K:SiO": (
-        "model-spread-within-envelope", 0.545068148962061,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "model-spread-within-envelope", 0.5417552586190092,
     ),
     "grid-25-sio:sof2018-mineru@1873K:SiO": (
-        "pass", 0.13230855453336143,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "pass", 0.1356010759139446,
     ),
     # VR-5: 1973 K is above the 1950 K external domain ceiling.
     "grid-25-sio:sof2018-mineru@1973K:SiO": ("out-of-engine-T-range", None),
@@ -1430,40 +1438,67 @@ _CJ_PRESSURE_MODEL_SPREAD_ENVELOPE_DECADES = 2.7
 # Runtime drift tripwires while t-430/t-450 own the KEMS error-bar program.
 # These values pin current provider behavior, not literature agreement.
 _CJ_PRESSURE_RUNTIME_DRIFT_TRIPWIRE = {
-    ("Ir", 1700, "Fe"): ("pass", 0.139027752255191),
-    ("Ir", 1700, "Mg"): ("model-spread-within-envelope", 0.8169983177173599),
-    ("Ir", 1700, "SiO"): ("model-spread-within-envelope", 1.1482159091449784),
-    ("Ir", 1800, "Fe"): ("model-spread-within-envelope", 0.5366212419896286),
-    ("Ir", 1800, "Mg"): ("model-spread-within-envelope", 0.9075506426761047),
-    ("Ir", 1800, "SiO"): ("model-spread-within-envelope", 0.41598308349814067),
-    ("Ir", 1900, "Fe"): ("model-spread-within-envelope", 0.9023568639218107),
-    ("Ir", 1900, "Mg"): ("model-spread-within-envelope", 0.9959124657587983),
-    ("Ir", 1900, "SiO"): ("model-spread-within-envelope", 0.2510644934192934),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Ir", 1700, "Fe"): ("pass", 0.1248225688425242),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Ir", 1700, "Mg"): ("model-spread-within-envelope", 0.8111995886402231),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Ir", 1700, "SiO"): ("model-spread-within-envelope", 1.1371248359239985),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Ir", 1800, "Fe"): ("model-spread-within-envelope", 0.5225661394317171),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Ir", 1800, "Mg"): ("model-spread-within-envelope", 0.9017639053976874),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Ir", 1800, "SiO"): ("model-spread-within-envelope", 0.4049285091709977),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Ir", 1900, "Fe"): ("model-spread-within-envelope", 0.8884360442339494),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Ir", 1900, "Mg"): ("model-spread-within-envelope", 0.9901364579845087),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Ir", 1900, "SiO"): ("model-spread-within-envelope", 0.26208641084141604),
     # VR-5: 2000 K is above the 1950 K external domain ceiling.
     ("Ir", 2000, "Fe"): ("out-of-engine-range", None),
     ("Ir", 2000, "Mg"): ("out-of-engine-range", None),
     ("Ir", 2000, "SiO"): ("out-of-engine-range", None),
-    ("Mo", 1700, "Fe"): ("model-spread-within-envelope", 1.2403840124506909),
-    ("Mo", 1700, "Mg"): ("model-spread-within-envelope", 1.0130016822826402),
-    ("Mo", 1700, "SiO"): ("model-spread-within-envelope", 2.274686497380271),
-    ("Mo", 1800, "Fe"): ("model-spread-within-envelope", 0.585600980232595),
-    ("Mo", 1800, "Mg"): ("model-spread-within-envelope", 0.6057826906572288),
-    ("Mo", 1800, "SiO"): ("model-spread-within-envelope", 1.4382053057203628),
-    ("Mo", 1900, "Fe"): ("pass", 0.010251600763916128),
-    ("Mo", 1900, "Mg"): ("model-spread-within-envelope", 0.23408753424120385),
-    ("Mo", 1900, "SiO"): ("model-spread-within-envelope", 0.6778828750017594),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Mo", 1700, "Fe"): ("model-spread-within-envelope", 1.2545891958633577),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Mo", 1700, "Mg"): ("model-spread-within-envelope", 1.018800411359777),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Mo", 1700, "SiO"): ("model-spread-within-envelope", 2.2635954241592913),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Mo", 1800, "Fe"): ("model-spread-within-envelope", 0.5996560827905064),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Mo", 1800, "Mg"): ("model-spread-within-envelope", 0.6115694279356462),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Mo", 1800, "SiO"): ("model-spread-within-envelope", 1.42715073139322),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Mo", 1900, "Fe"): ("pass", 0.0036692189239451198),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Mo", 1900, "Mg"): ("model-spread-within-envelope", 0.2398635420154936),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Mo", 1900, "SiO"): ("model-spread-within-envelope", 0.6668609575796367),
     ("Mo", 2000, "Fe"): ("out-of-engine-range", None),
     ("Mo", 2000, "Mg"): ("out-of-engine-range", None),
     ("Mo", 2000, "SiO"): ("out-of-engine-range", None),
-    ("Re", 1700, "Fe"): ("model-spread-within-envelope", 1.9056781300977503),
-    ("Re", 1700, "Mg"): ("model-spread-within-envelope", 1.4159428587532297),
-    ("Re", 1700, "SiO"): ("model-spread-within-envelope", 2.604686497380273),
-    ("Re", 1800, "Fe"): ("model-spread-within-envelope", 1.3489343135659269),
-    ("Re", 1800, "Mg"): ("model-spread-within-envelope", 0.9668938017683414),
-    ("Re", 1800, "SiO"): ("model-spread-within-envelope", 1.9237608612759178),
-    ("Re", 1900, "Fe"): ("model-spread-within-envelope", 0.8408010308150304),
-    ("Re", 1900, "Mg"): ("pass", 0.5577717447675202),
-    ("Re", 1900, "SiO"): ("model-spread-within-envelope", 1.3026197171070235),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Re", 1700, "Fe"): ("model-spread-within-envelope", 1.9198833135104172),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Re", 1700, "Mg"): ("model-spread-within-envelope", 1.4217415878303665),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Re", 1700, "SiO"): ("model-spread-within-envelope", 2.593595424159293),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Re", 1800, "Fe"): ("model-spread-within-envelope", 1.3629894161238383),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Re", 1800, "Mg"): ("model-spread-within-envelope", 0.9726805390467588),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Re", 1800, "SiO"): ("model-spread-within-envelope", 1.912706286948775),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Re", 1900, "Fe"): ("model-spread-within-envelope", 0.8547218505028917),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Re", 1900, "Mg"): ("pass", 0.56354775254181),
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ("Re", 1900, "SiO"): ("model-spread-within-envelope", 1.2915977996849008),
     ("Re", 2000, "Fe"): ("out-of-engine-range", None),
     ("Re", 2000, "Mg"): ("out-of-engine-range", None),
     ("Re", 2000, "SiO"): ("out-of-engine-range", None),
