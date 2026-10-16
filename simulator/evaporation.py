@@ -9,6 +9,7 @@ from collections.abc import Mapping
 from numbers import Real
 from typing import Any
 
+from engines.builtin.evaporation_transition import reaction_oxygen_destination
 from simulator.alpha_kinetics import parse_alpha_contract
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
@@ -65,19 +66,6 @@ PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID = (
     'equilibrium_backend_effective_pressure_pre_rg'
 )
 PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C = 1050.0
-
-
-def reaction_oxygen_destination(oxygen_amount: float, vapor_oxygen_atoms: float,
-                                explicit_destination: str) -> str:
-    """Ledger destination for signed coproduct oxygen (negative means debit)."""
-    if explicit_destination not in {'', 'process.overhead_gas', 'reservoir.fo2_buffer'}:
-        raise AccountingError(f'unsupported oxygen_destination {explicit_destination!r}')
-    if oxygen_amount < 0.0:
-        return 'process.overhead_gas'
-    if explicit_destination:
-        return explicit_destination
-    return ('process.overhead_gas' if vapor_oxygen_atoms > 0.0
-            else 'reservoir.fo2_buffer')
 
 
 class EvaporationFluxRefusal(ProviderUnavailableError):

@@ -85,10 +85,24 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.accounting.exceptions import AccountingError
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
 _NUMERICAL_FLOOR_KG = 1.0e-12
+
+
+def reaction_oxygen_destination(oxygen_amount: float, vapor_oxygen_atoms: float,
+                                explicit_destination: str) -> str:
+    """Ledger destination for signed coproduct oxygen (negative means debit)."""
+    if explicit_destination not in {'', 'process.overhead_gas', 'reservoir.fo2_buffer'}:
+        raise AccountingError(f'unsupported oxygen_destination {explicit_destination!r}')
+    if oxygen_amount < 0.0:
+        return 'process.overhead_gas'
+    if explicit_destination:
+        return explicit_destination
+    return ('process.overhead_gas' if vapor_oxygen_atoms > 0.0
+            else 'reservoir.fo2_buffer')
 
 
 class BuiltinEvaporationTransitionProvider(ChemistryProvider):
@@ -182,8 +196,6 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         sp_data = dict(controls.get("sp_data") or {})
         available_kg = float(controls.get("available_kg") or 0.0)
         oxygen_destination = str(sp_data.get("oxygen_destination") or "")
-        from simulator.accounting import AccountingError
-        from simulator.evaporation import reaction_oxygen_destination
         try:
             reaction_oxygen_destination(0.0, 0.0, oxygen_destination)
         except AccountingError as exc:
