@@ -3398,8 +3398,13 @@ species:
         published_page: 306
         pdf_page_index: 10
         table: '2'
+        note: >-
+          Phase context: "hatrurite melts incongruently at 2343 ± 10 K to form calcium oxide and liquid"
+          (published p. 298); "the kink absence in these temperature dependences indicates the absence
+          of a change in phase equilibrium up to a temperature of 2200 K, which indicates the stability
+          of tricalcium silicate at this temperature" (published p. 309).
       phase: gas
-      condensed_form: liquid
+      condensed_form: solid
       units: atm
       values:
         quantity: partial_pressure
@@ -3407,6 +3412,10 @@ species:
         gas_species: Ca
         formula: Ca
         reservoir_formula: Ca3SiO5
+        reservoir:
+          formula: Ca3SiO5
+          phase: {tag: value, value: cr}
+          polymorph: {tag: unknown, reason: polymorph_not_stated_in_paper}
         standard_state: partial pressure of Ca(g)
         reaction_as_printed: (CaO) = (Ca) + (O)
         reaction:
@@ -3721,8 +3730,13 @@ species:
         published_page: 306
         pdf_page_index: 10
         table: '2'
+        note: >-
+          Phase context: "hatrurite melts incongruently at 2343 ± 10 K to form calcium oxide and liquid"
+          (published p. 298); "the kink absence in these temperature dependences indicates the absence
+          of a change in phase equilibrium up to a temperature of 2200 K, which indicates the stability
+          of tricalcium silicate at this temperature" (published p. 309).
       phase: gas
-      condensed_form: liquid
+      condensed_form: solid
       units: atm
       values:
         quantity: partial_pressure
@@ -3730,6 +3744,10 @@ species:
         gas_species: CaO
         formula: CaO
         reservoir_formula: Ca3SiO5
+        reservoir:
+          formula: Ca3SiO5
+          phase: {tag: value, value: cr}
+          polymorph: {tag: unknown, reason: polymorph_not_stated_in_paper}
         standard_state: partial pressure of CaO(g)
         reaction_as_printed: (CaSiO3) = (CaO) + (SiO2)
         reaction:
@@ -5348,8 +5366,13 @@ species:
         published_page: 306
         pdf_page_index: 10
         table: '2'
+        note: >-
+          Phase context: "hatrurite melts incongruently at 2343 ± 10 K to form calcium oxide and liquid"
+          (published p. 298); "the kink absence in these temperature dependences indicates the absence
+          of a change in phase equilibrium up to a temperature of 2200 K, which indicates the stability
+          of tricalcium silicate at this temperature" (published p. 309).
       phase: gas
-      condensed_form: liquid
+      condensed_form: solid
       units: atm
       values:
         quantity: partial_pressure
@@ -5357,11 +5380,15 @@ species:
         gas_species: CaSiO3
         formula: CaSiO3
         reservoir_formula: Ca3SiO5
+        reservoir:
+          formula: Ca3SiO5
+          phase: {tag: value, value: cr}
+          polymorph: {tag: unknown, reason: polymorph_not_stated_in_paper}
         standard_state: partial pressure of CaSiO3(g)
         reaction_as_printed: '[Ca3SiO5] = (CaSiO3) + 2(CaO)'
         reaction:
           terms:
-          - {species: {formula: Ca3SiO5, phase: l}, coefficient: -1}
+          - {species: {formula: Ca3SiO5, phase: cr, polymorph: {tag: unknown, reason: polymorph_not_stated_in_paper}}, coefficient: -1}
           - {species: {formula: CaSiO3, phase: g}, coefficient: 1}
           - {species: {formula: CaO, phase: g}, coefficient: 2}
         method: Knudsen effusion mass spectrometry
