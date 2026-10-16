@@ -6,14 +6,14 @@ standard_pressure_Pa: 100000.0
 temperature_unit: K
 pressure_unit: Pa
 tabulation_max_temperature_K: 3500.0
-derivation: For M(condensed) ⇌ M(g), below the JANAF normal boiling marker log10(P_sat/bar) = log10 Kf[M(g)]. At and above
+derivation: For M(condensed) ⇌ M(g), below the JANAF FUGACITY=1 bar marker log10(P_sat/bar) = log10 Kf[M(g)]. At and above
   that marker the gas is the standard elemental phase, so log10(P_sat/bar) = -[G(g)-G(cr or l)]/(R T ln 10). JANAF supplies
   p°=0.1 MPa=1 bar; P_sat(Pa)=100000×10^log10(P_sat/bar). G(T)=ΔfH°(298.15 K) - T×(-[G°-H°(298.15 K)]/T)/1000, using kJ/mol
-  for enthalpy and J/(mol K) for the Gibbs-enthalpy function. The normal-boiling transition marker must recover 1 bar within
+  for enthalpy and J/(mol K) for the Gibbs-enthalpy function. The FUGACITY=1 bar transition marker must recover 1 bar within
   0.002 dex after interpolating the JANAF Gibbs functions.
 metals:
   Na:
-    normal_boiling_point_K: 1170.525
+    one_bar_fugacity_marker_K: 1170.525
     melting_point_K: 370.98
     temperature_range_K:
     - 298.15
@@ -936,7 +936,7 @@ metals:
           as_published: '0.'
           locator: *id002
   K:
-    normal_boiling_point_K: 1039.54
+    one_bar_fugacity_marker_K: 1039.54
     melting_point_K: 336.35
     temperature_range_K:
     - 298.15
@@ -1805,7 +1805,7 @@ metals:
           as_published: '0.'
           locator: *id004
   Mg:
-    normal_boiling_point_K: 1366.104
+    one_bar_fugacity_marker_K: 1366.104
     melting_point_K: 923.0
     temperature_range_K:
     - 298.15
@@ -2930,7 +2930,7 @@ metals:
           as_published: '0.'
           locator: *id006
   Ca:
-    normal_boiling_point_K: 1773.658
+    one_bar_fugacity_marker_K: 1773.658
     melting_point_K: 1115.0
     temperature_range_K:
     - 298.15
@@ -4318,7 +4318,7 @@ metals:
           as_published: '0.'
           locator: *id008
   Fe:
-    normal_boiling_point_K: 3133.345
+    one_bar_fugacity_marker_K: 3133.345
     melting_point_K: 1809.0
     temperature_range_K:
     - 298.15
@@ -6166,7 +6166,7 @@ metals:
           as_published: '0.'
           locator: *id010
   Al:
-    normal_boiling_point_K: 2790.812
+    one_bar_fugacity_marker_K: 2790.812
     melting_point_K: 933.45
     temperature_range_K:
     - 298.15
@@ -7859,7 +7859,7 @@ metals:
           as_published: '0.'
           locator: *id012
   Si:
-    normal_boiling_point_K: 3504.616
+    one_bar_fugacity_marker_K: 3504.616
     melting_point_K: 1685.0
     temperature_range_K:
     - 298.15
@@ -9843,7 +9843,7 @@ metals:
           as_published: '0.'
           locator: *id014
   Ti:
-    normal_boiling_point_K: 3630.956
+    one_bar_fugacity_marker_K: 3630.956
     melting_point_K: 1939.0
     temperature_range_K:
     - 298.15
@@ -11827,7 +11827,7 @@ metals:
           as_published: '0.'
           locator: *id016
   Cr:
-    normal_boiling_point_K: 2952.078
+    one_bar_fugacity_marker_K: 2952.078
     melting_point_K: 2130.0
     temperature_range_K:
     - 298.15
@@ -13769,7 +13769,7 @@ metals:
           as_published: '0.'
           locator: *id018
   Mn:
-    normal_boiling_point_K: 2334.526
+    one_bar_fugacity_marker_K: 2334.526
     melting_point_K: 1519.0
     temperature_range_K:
     - 298.15

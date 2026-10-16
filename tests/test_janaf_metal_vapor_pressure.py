@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.reference_data.janaf_metal_vapor_pressure import (
@@ -24,11 +26,13 @@ def test_generated_pure_metal_vapor_pressure_data_is_fresh() -> None:
     )
 
 
-def test_generated_metal_rows_reproduce_normal_boiling_pressure() -> None:
+def test_generated_metal_rows_reproduce_one_bar_fugacity_marker() -> None:
     data = yaml.safe_load(GENERATED_DATA.read_text(encoding="utf-8"))
     assert set(data["metals"]) == set(METAL_TABLES)
 
     for element, metal in data["metals"].items():
+        assert "one_bar_fugacity_marker_K" in metal
+        assert "normal_boiling_point_K" not in metal
         check = metal["boiling_point_check"]
         assert check["absolute_log10_error_from_1_bar"] <= (
             BOILING_CHECK_TOLERANCE_LOG10_BAR
@@ -40,6 +44,33 @@ def test_generated_metal_rows_reproduce_normal_boiling_pressure() -> None:
             and row["provenance"]["condensed_temperature"]["locator"]
             for row in metal["rows"]
         ), element
+
+
+def test_pressure_readers_interpolate_reciprocal_temperature_midpoint() -> None:
+    data = yaml.safe_load(GENERATED_DATA.read_text(encoding="utf-8"))
+    rows = data["metals"]["Na"]["rows"]
+    lower = next(row for row in rows if row["temperature_K"] == 450.0)
+    upper = next(row for row in rows if row["temperature_K"] == 500.0)
+
+    midpoint_temperature = 2.0 * lower["temperature_K"] * upper["temperature_K"] / (
+        lower["temperature_K"] + upper["temperature_K"]
+    )
+    midpoint_pressure = math.sqrt(lower["pressure_Pa"] * upper["pressure_Pa"])
+    assert lower["pressure_Pa"] < midpoint_pressure < upper["pressure_Pa"]
+    assert pressure_pa_at_temperature(data, "Na", midpoint_temperature) == pytest.approx(
+        midpoint_pressure, rel=1e-12
+    )
+    assert wall_temperature_for_pressure(data, "Na", midpoint_pressure) == pytest.approx(
+        midpoint_temperature, abs=1e-10
+    )
+
+    for row in (lower, upper):
+        assert pressure_pa_at_temperature(data, "Na", row["temperature_K"]) == pytest.approx(
+            row["pressure_Pa"], rel=1e-12
+        )
+        assert wall_temperature_for_pressure(data, "Na", row["pressure_Pa"]) == pytest.approx(
+            row["temperature_K"], abs=1e-10
+        )
 
 
 def test_crc_100_pa_temperature_anchors() -> None:

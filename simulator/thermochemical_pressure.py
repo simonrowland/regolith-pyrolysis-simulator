@@ -4,8 +4,8 @@ Premise: for M(condensed) ⇌ M(g) at unit condensed activity, the equilibrium
 constant is Kp = P/P0. Algebra: log10(Kp) = -ΔvapG°/(R T ln 10), then
 P = P0 × 10**log10(Kp). Units: ΔG in kJ/mol is multiplied by 1000 to J/mol;
 R is J/(mol K), T is K, and Kp is dimensionless; P0 in Pa therefore yields
-P in Pa. Sanity: at a normal boiling point ΔvapG° = 0, so log10(Kp) = 0 and
-P = P0 = 1 bar = 100000 Pa for JANAF.
+P in Pa. Sanity: at JANAF's FUGACITY = 1 bar marker ΔvapG° = 0, so
+log10(Kp) = 0 and P = P0 = 1 bar = 100000 Pa.
 """
 
 from __future__ import annotations

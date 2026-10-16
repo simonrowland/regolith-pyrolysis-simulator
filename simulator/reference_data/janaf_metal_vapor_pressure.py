@@ -30,7 +30,7 @@ TABULATION_MAX_TEMPERATURE_K = 3500.0
 BOILING_CHECK_TOLERANCE_LOG10_BAR = 0.002
 
 # Each condensed table is JANAF's combined crystal/liquid path. The reference
-# table supplies the published melting and normal-boiling transition rows.
+# table supplies the published melting and 1-bar fugacity transition rows.
 METAL_TABLES: dict[str, dict[str, str]] = {
     "Na": {"condensed": "Na-004", "gas": "Na-005", "reference": "Na-001"},
     "K": {"condensed": "K-004", "gas": "K-005", "reference": "K-001"},
@@ -160,15 +160,15 @@ def _gibbs_from_janaf_function(
     return reference_enthalpy_kj_mol - temperature_K * gibbs_function / 1000.0
 
 
-def _interpolate(points: Mapping[float, float], temperature_K: float) -> float:
-    temperatures = sorted(points)
-    if not temperatures or temperature_K < temperatures[0] or temperature_K > temperatures[-1]:
-        raise ValueError(f"temperature {temperature_K:g} K is outside JANAF table coverage")
-    lower = max(value for value in temperatures if value <= temperature_K)
-    upper = min(value for value in temperatures if value >= temperature_K)
+def _interpolate(points: Mapping[float, float], coordinate: float) -> float:
+    coordinates = sorted(points)
+    if not coordinates or coordinate < coordinates[0] or coordinate > coordinates[-1]:
+        raise ValueError(f"coordinate {coordinate:g} is outside JANAF table coverage")
+    lower = max(value for value in coordinates if value <= coordinate)
+    upper = min(value for value in coordinates if value >= coordinate)
     if lower == upper:
         return points[lower]
-    fraction = (temperature_K - lower) / (upper - lower)
+    fraction = (coordinate - lower) / (upper - lower)
     return points[lower] + fraction * (points[upper] - points[lower])
 
 
@@ -262,7 +262,7 @@ def build_janaf_metal_vapor_pressure_data(
         }
 
         # Premise: for M(condensed) <=> M(g), JANAF's neutral-atom formation
-        # equilibrium constant below the normal boiling point is Kf = P/P°.
+        # equilibrium constant below the 1-bar fugacity marker is Kf = P/P°.
         # Therefore log10(P_sat/bar) = log10(Kf). Above the boiling marker the
         # gas is the standard elemental state, so equilibrium gives
         # log10(P_sat/bar) = -[G(g)-G(condensed)]/[R*T*ln(10)]. Here G is in
@@ -270,7 +270,7 @@ def build_janaf_metal_vapor_pressure_data(
         # J/(mol K), and the result is dimensionless log10(bar/bar). Finally,
         # P_sat(Pa) = 100000 Pa * 10**log10(P_sat/bar), since p° is 1 bar.
         # Sanity check: interpolate both condensed and gas Gibbs functions at
-        # each JANAF normal-boiling marker. P must reproduce 1 bar within the
+        # each JANAF 1-bar fugacity marker. P must reproduce 1 bar within the
         # table's 0.002 dex resolution before any values are generated.
         # Agreement between pre-boiling log Kf and the Gibbs difference also
         # catches a wrong phase table or standard-state assumption.
@@ -309,7 +309,7 @@ def build_janaf_metal_vapor_pressure_data(
         )
         if abs(boiling_log_pressure) > BOILING_CHECK_TOLERANCE_LOG10_BAR:
             raise ValueError(
-                f"{element} JANAF normal-boiling check is "
+                f"{element} JANAF 1-bar fugacity-marker check is "
                 f"10^{boiling_log_pressure:.6g} bar, outside table resolution"
             )
 
@@ -389,7 +389,7 @@ def build_janaf_metal_vapor_pressure_data(
             )
 
         metals[element] = {
-            "normal_boiling_point_K": boiling_temperature,
+            "one_bar_fugacity_marker_K": boiling_temperature,
             "melting_point_K": melting_temperature,
             "temperature_range_K": [
                 tabulated_temperatures[0],
@@ -424,13 +424,13 @@ def build_janaf_metal_vapor_pressure_data(
         "pressure_unit": "Pa",
         "tabulation_max_temperature_K": max_temperature_K,
         "derivation": (
-            "For M(condensed) ⇌ M(g), below the JANAF normal boiling marker "
+            "For M(condensed) ⇌ M(g), below the JANAF FUGACITY=1 bar marker "
             "log10(P_sat/bar) = log10 Kf[M(g)]. At and above that marker the "
             "gas is the standard elemental phase, so log10(P_sat/bar) = "
             "-[G(g)-G(cr or l)]/(R T ln 10). JANAF supplies p°=0.1 MPa=1 bar; "
             "P_sat(Pa)=100000×10^log10(P_sat/bar). G(T)=ΔfH°(298.15 K) - "
             "T×(-[G°-H°(298.15 K)]/T)/1000, using kJ/mol for enthalpy and "
-            "J/(mol K) for the Gibbs-enthalpy function. The normal-boiling "
+            "J/(mol K) for the Gibbs-enthalpy function. The FUGACITY=1 bar "
             "transition marker must recover 1 bar within 0.002 dex after "
             "interpolating the JANAF Gibbs functions."
         ),
@@ -441,14 +441,22 @@ def build_janaf_metal_vapor_pressure_data(
 def pressure_pa_at_temperature(
     data: Mapping[str, Any], element: str, temperature_K: float
 ) -> float:
-    """Interpolate the JANAF curve linearly in log pressure versus temperature."""
+    """Interpolate JANAF log pressure linearly in reciprocal temperature."""
 
     rows = data["metals"][element]["rows"]
-    points = {
-        float(row["temperature_K"]): float(row["log10_pressure_bar"])
+    inverse_temperature_to_log_pressure = {
+        1.0 / float(row["temperature_K"]): float(row["log10_pressure_bar"])
         for row in rows
     }
-    log_pressure_bar = _interpolate(points, temperature_K)
+    # Premise: Clausius-Clapeyron makes ln(P) affine in 1/T between JANAF
+    # nodes. Algebra: log10(P/bar) = y_lo + f*(y_hi-y_lo), where
+    # f=(1/T - 1/T_lo)/(1/T_hi - 1/T_lo). Units: both terms in f are K^-1,
+    # so f is dimensionless; the 1-bar standard pressure converts the ratio
+    # to Pa. Sanity: f=0 or 1 reproduces an exact node, and f=1/2 at the
+    # reciprocal-temperature midpoint places ln(P) between its neighbours.
+    log_pressure_bar = _interpolate(
+        inverse_temperature_to_log_pressure, 1.0 / temperature_K
+    )
     return pressure_pa_from_log10_equilibrium_constant(
         log_pressure_bar, STANDARD_PRESSURE_PA
     )
@@ -457,7 +465,7 @@ def pressure_pa_at_temperature(
 def wall_temperature_for_pressure(
     data: Mapping[str, Any], element: str, pressure_Pa: float
 ) -> float:
-    """Invert the generated P_sat curve by linear interpolation in log P."""
+    """Invert the JANAF P_sat curve using log pressure linear in reciprocal T."""
 
     if not math.isfinite(pressure_Pa) or pressure_Pa <= 0.0:
         raise ValueError("partial pressure must be finite and positive")
@@ -471,10 +479,14 @@ def wall_temperature_for_pressure(
         if lower_log <= target_log_pressure_bar <= upper_log:
             if upper_log == lower_log:
                 raise ValueError(f"{element} JANAF pressure curve is not monotonic")
-            fraction = (target_log_pressure_bar - lower_log) / (upper_log - lower_log)
-            return float(lower["temperature_K"]) + fraction * (
-                float(upper["temperature_K"]) - float(lower["temperature_K"])
+            inverse_temperature = _interpolate(
+                {
+                    lower_log: 1.0 / float(lower["temperature_K"]),
+                    upper_log: 1.0 / float(upper["temperature_K"]),
+                },
+                target_log_pressure_bar,
             )
+            return 1.0 / inverse_temperature
     raise ValueError(
         f"{element} JANAF table does not bracket {pressure_Pa:g} Pa"
     )

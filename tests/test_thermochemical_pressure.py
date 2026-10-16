@@ -10,11 +10,11 @@ from simulator.thermochemical_pressure import (
 )
 
 
-def test_normal_boiling_point_gives_one_bar() -> None:
-    # At the normal boiling point ΔvapG° = 0; JANAF P0 is 1 bar.
+def test_zero_delta_g_uses_janaf_one_bar_standard_pressure() -> None:
+    # For ΔvapG° = 0 at any T, Kp = 1 and JANAF P0 is 1 bar.
     log10_kp = log10_equilibrium_constant_from_delta_g_kj_mol(
         0.0,
-        1156.0,
+        1000.0,
         8.31441,
     )
     assert log10_kp == pytest.approx(0.0)
