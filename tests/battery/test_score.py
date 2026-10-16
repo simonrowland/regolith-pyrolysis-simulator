@@ -1101,6 +1101,152 @@ def test_source_method_uncertainty_supplies_a_source_method_band(
 
 
 @pytest.mark.parametrize(
+    ("basis", "value", "meaning", "note", "reference_value", "expected_band", "rule"),
+    (
+        (
+            "relative_percent",
+            "10",
+            "one_sigma",
+            "The standard deviation of log10(a) is 0.10.",
+            "0.2",
+            "0.08968303352185472833542869883",
+            "printed_1sigma",
+        ),
+        (
+            "absolute",
+            "0.02",
+            "one_sigma",
+            "The standard deviation of log10(a) is 0.10.",
+            "0.2",
+            "0.08968303352185472833542869883",
+            "printed_1sigma",
+        ),
+        (
+            "log10_dex",
+            "0.20",
+            "two_sigma",
+            "The standard deviation of log10(a) is 0.10.",
+            "0.2",
+            "0.20",
+            "printed_2sigma",
+        ),
+        (
+            "log10_dex",
+            "0.10",
+            "one_sigma",
+            "An explicitly stated dex uncertainty.",
+            "0.2",
+            str(Decimal("0.10") * Decimal("1.959963984540054")),
+            "printed_1sigma",
+        ),
+    ),
+)
+def test_source_method_activity_band_uses_explicit_basis_and_meaning(
+    basis: str,
+    value: str,
+    meaning: str,
+    note: str,
+    reference_value: str,
+    expected_band: str,
+    rule: str,
+) -> None:
+    # Independently, a 10% relative width spans log10(0.9) to log10(1.1);
+    # the larger magnitude is log10(10/9), then the 95% one-sigma multiplier
+    # gives 0.08968303352185472833542869883. This is the metric's conservative
+    # dex width and does not use the production uncertainty converter.
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(endmember_phase=Phase.L)
+    reference = F.observation(
+        "source-method-explicit-band",
+        experiment.experiment_id,
+        identity,
+        Decimal(reference_value),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="source-method-explicit-fixture",
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=Decimal(value),
+        meaning=meaning,
+        quantity=Quantity.ACTIVITY,
+        basis=basis,
+        quantity_basis="activity in the stated basis",
+        locator=F.loc(page=12, note=note),
+    )
+    base_work = F.work()
+    work = replace(
+        base_work,
+        source_ids=(*base_work.source_ids, "source-method-explicit-fixture"),
+        source_method_uncertainties={
+            "source-method-explicit-fixture": method_uncertainty
+        },
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(work, experiment, reference, review="reviewed"),
+        prediction=_predict(Decimal(reference_value), identity),
+    )
+
+    assert residual.numeric is not None
+    band = residual.numeric.decision_band
+    assert band is not None
+    assert band.band_basis == "source_method"
+    assert band.value == Decimal(expected_band)
+    assert band.rule.startswith(f"{rule}:")
+
+
+@pytest.mark.parametrize(
+    ("basis", "value", "expected_reason"),
+    (
+        ("not_a_basis", Decimal("0.10"), "source_method_uncertainty_basis_unmapped"),
+        ("log10_dex", Decimal("0"), "source_method_uncertainty_value_nonpositive"),
+    ),
+)
+def test_source_method_invalid_basis_or_zero_value_refuses_band(
+    basis: str, value: Decimal, expected_reason: str
+) -> None:
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(endmember_phase=Phase.L)
+    reference = F.observation(
+        "source-method-invalid-band",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="source-method-invalid-fixture",
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=value,
+        meaning="one_sigma",
+        quantity=Quantity.ACTIVITY,
+        basis=basis,
+        quantity_basis="activity in the stated basis",
+        locator=F.loc(page=12, note="invalid fixture"),
+    )
+    base_work = F.work()
+    work = replace(
+        base_work,
+        source_ids=(*base_work.source_ids, "source-method-invalid-fixture"),
+        source_method_uncertainties={
+            "source-method-invalid-fixture": method_uncertainty
+        },
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(work, experiment, reference, review="reviewed"),
+        prediction=_predict(Decimal("0.2"), identity),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert residual.refusal.detail["reason"] == expected_reason
+
+
+@pytest.mark.parametrize(
     ("field_quantity", "quantity"),
     (
         (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT),

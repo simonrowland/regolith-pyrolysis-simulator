@@ -2854,7 +2854,9 @@ def _printed_uncertainty_band(
         else "not_stated"
     )
     log10_activity_sigma = (
-        quantity is Quantity.ACTIVITY and _is_log10_activity_standard_deviation(raw_text)
+        band_basis == "row_printed"
+        and quantity is Quantity.ACTIVITY
+        and _is_log10_activity_standard_deviation(raw_text)
     )
     if log10_activity_sigma:
         confidence_level = "one_sigma"
@@ -6888,35 +6890,53 @@ def compile_residual(
             ):
                 source_method_uncertainty = None
             if source_method_uncertainty is not None:
-                printed_unit = {
-                    "log10_dex": "dex",
-                    "absolute": QUANTITY_UNITS[quantity],
-                    "relative_percent": "%",
-                }[source_method_uncertainty.basis]
-                band_uncertainty = Uncertainty(
-                    kind=UncertaintyKind.PRINTED,
-                    verbatim={
-                        "value": source_method_uncertainty.value,
-                        "unit": printed_unit,
-                        "confidence_level": source_method_uncertainty.meaning,
-                        "note": source_method_uncertainty.locator.note,
-                    },
-                    value=source_method_uncertainty.value,
-                    basis=printed_unit,
-                )
                 band_basis = "source_method"
-        printed = _printed_uncertainty_band(
-            quantity,
-            band_uncertainty,
-            ref_point,
-            source_observation=source_reference,
-            method=(
-                experiment.method.value
-                if experiment is not None and experiment.method.is_value
-                else None
-            ),
-            band_basis=band_basis or "row_printed",
-        )
+                if source_method_uncertainty.basis not in {
+                    "log10_dex", "absolute", "relative_percent"
+                }:
+                    printed = _PrintedBandResolution(
+                        refusal={
+                            "reason": "source_method_uncertainty_basis_unmapped",
+                            "basis": source_method_uncertainty.basis,
+                        }
+                    )
+                elif source_method_uncertainty.value <= 0:
+                    printed = _PrintedBandResolution(
+                        refusal={
+                            "reason": "source_method_uncertainty_value_nonpositive",
+                            "value": str(source_method_uncertainty.value),
+                        }
+                    )
+                else:
+                    printed_unit = {
+                        "log10_dex": "dex",
+                        "absolute": QUANTITY_UNITS[quantity],
+                        "relative_percent": "%",
+                    }[source_method_uncertainty.basis]
+                    band_uncertainty = Uncertainty(
+                        kind=UncertaintyKind.PRINTED,
+                        verbatim={
+                            "value": source_method_uncertainty.value,
+                            "unit": printed_unit,
+                            "confidence_level": source_method_uncertainty.meaning,
+                            "note": source_method_uncertainty.locator.note,
+                        },
+                        value=source_method_uncertainty.value,
+                        basis=printed_unit,
+                    )
+        if printed.refusal is None:
+            printed = _printed_uncertainty_band(
+                quantity,
+                band_uncertainty,
+                ref_point,
+                source_observation=source_reference,
+                method=(
+                    experiment.method.value
+                    if experiment is not None and experiment.method.is_value
+                    else None
+                ),
+                band_basis=band_basis or "row_printed",
+            )
         if printed.notice is not None:
             notices = union_notices(notices, (printed.notice,))
 
@@ -7096,7 +7116,9 @@ def compile_residual(
         band_preserving_kinds.add(NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG)
     has_no_band_flag = any(
         notice.kind not in band_preserving_kinds for notice in flagged_notices
-    ) or fusion_band_refusal is not None
+    ) or fusion_band_refusal is not None or (
+        band_basis == "source_method" and printed.refusal is not None
+    )
     if has_no_band_flag:
         numeric = replace(numeric, decision_band=None)
     if implied_alpha:
