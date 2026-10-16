@@ -30,6 +30,7 @@ from simulator.battery.migrate import (
     Migrator,
     _identity_from_plain,
     map_quantity,
+    oxide_molar_mass,
     to_plain,
     wt_pct_to_mole_fraction,
 )
@@ -411,6 +412,8 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
     ]
     assert len(rows) == 38
     assert migrator.result.registry_issues == []
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.hard_issues == ()
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in rows) == 3
     assert all(
         row.identity.quantity.is_value
@@ -423,22 +426,68 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
         and row.point_conditions["fO2_log"].state.is_value
         for row in rows
     )
-    high_fe = next(
+    fe_free_analysis = {
+        "SiO2": Decimal("50.47"),
+        "Al2O3": Decimal("15.12"),
+        "MgO": Decimal("10.46"),
+        "CaO": Decimal("23.94"),
+    }
+    table4 = [
+        (Decimal("1.75"), Decimal("0.0134"), Decimal("0.0002")),
+        (Decimal("3.67"), Decimal("0.0282"), Decimal("0.0006")),
+        (Decimal("6.44"), Decimal("0.0494"), Decimal("0.0010")),
+        (Decimal("9.81"), Decimal("0.0766"), Decimal("0.0005")),
+        (Decimal("18.75"), Decimal("0.1498"), Decimal("0.0011")),
+        (Decimal("27.06"), Decimal("0.2201"), Decimal("0.0009")),
+        (Decimal("1.49"), Decimal("0.0114"), Decimal("0.0004")),
+        (Decimal("2.79"), Decimal("0.0214"), Decimal("0.0007")),
+        (Decimal("5.36"), Decimal("0.0414"), Decimal("0.0007")),
+        (Decimal("7.96"), Decimal("0.0620"), Decimal("0.0010")),
+        (Decimal("16.36"), Decimal("0.1298"), Decimal("0.0009")),
+        (Decimal("3.52"), Decimal("0.0271"), Decimal("0.0008")),
+        (Decimal("5.83"), Decimal("0.0451"), Decimal("0.0006")),
+        (Decimal("7.96"), Decimal("0.0619"), Decimal("0.0007")),
+        (Decimal("26.82"), Decimal("0.2186"), Decimal("0.0011")),
+    ]
+    high_fe_source_points = observations[2]["values"]["points"]
+    assert len(high_fe_source_points) == len(table4)
+    high_fe_rows = [
         row
         for row in rows
         if "jayasuriya_2004_rt_high_fe" in row.observation_id
-        and row.point_conditions["FeOT_wt_percent"].state.value
-        == Decimal("1.75")
-    )
-    assert high_fe.identity.composition.value == wt_pct_to_mole_fraction(
-        {
-            "SiO2": Decimal("50.47"),
-            "Al2O3": Decimal("15.12"),
-            "MgO": Decimal("10.46"),
-            "CaO": Decimal("23.94"),
-            "FeO": Decimal("1.75"),
+    ]
+    assert len(high_fe_rows) == len(table4)
+    for source_point, migrated_row, table_entry in zip(
+        high_fe_source_points, high_fe_rows, table4, strict=True
+    ):
+        feot, printed_x, printed_x_uncertainty = table_entry
+        closed = {
+            oxide: weight * (Decimal(100) - feot) / Decimal(100)
+            for oxide, weight in fe_free_analysis.items()
         }
-    )
+        closed["FeO"] = feot
+        assert Decimal(str(source_point["FeOT_wt_percent"])) == feot
+        assert source_point["composition_wt_pct"] == {
+            **{oxide: float(weight) for oxide, weight in closed.items() if oxide != "FeO"},
+            "FeOT": float(feot),
+        }
+        composition = migrated_row.identity.composition.value
+        assert composition == wt_pct_to_mole_fraction(closed)
+        mole_amounts = {
+            oxide: fraction * oxide_molar_mass(oxide)
+            for oxide, fraction in composition.components
+        }
+        recovered_feo = Decimal(100) * mole_amounts["FeO"] / sum(mole_amounts.values())
+        assert abs(recovered_feo - feot) <= Decimal("0.002")
+        mole_fractions = composition.as_map()
+        single_cation_x = mole_fractions["FeO"] / (
+            mole_fractions["SiO2"]
+            + Decimal(2) * mole_fractions["Al2O3"]
+            + mole_fractions["MgO"]
+            + mole_fractions["CaO"]
+            + mole_fractions["FeO"]
+        )
+        assert abs(single_cation_x - printed_x) <= printed_x_uncertainty
     low_fe = next(
         row
         for row in rows
