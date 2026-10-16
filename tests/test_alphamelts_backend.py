@@ -4378,16 +4378,15 @@ def test_configured_unavailable_alphamelts_backend_fail_closes():
         sim._get_equilibrium()
 
 
-def test_alphamelts_vapor_species_are_canonical_formula_names():
+def test_alphamelts_vaporock_species_pin_current_advertised_list():
     backend = AlphaMELTSBackend()
     backend._vaporock_available = True
 
-    species = set(backend.get_vapor_species())
-
-    assert 'SiO2' in species
-    assert 'Fe2O3' in species
-    assert 'SiO2_gas' not in species
-    assert 'Fe2O3_gas' not in species
+    assert backend.get_vapor_species() == [
+        'Na', 'K', 'Fe', 'Mg', 'Ca', 'Si', 'Al', 'Ti', 'Cr', 'Mn',
+        'SiO', 'FeO', 'MgO', 'CaO', 'AlO', 'TiO', 'NaO', 'KO',
+        'O2', 'O', 'SiO2', 'Fe2O3',
+    ]
 
 
 def test_alphamelts_rejects_metal_and_gas_account_inputs():
