@@ -349,7 +349,10 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # 2026-08-05 batch data fold (1a1ab47, 7e6bebc, d1b4f5d): the parsed
     # carrier/P catalogs and MC-1 feedstock payloads are deliberate key inputs.
     # Two in-process evaluations and the cross-process test pin determinism.
-    assert key_hash == "aa4dd3b20f35e622b503841d42cc094556dea5607ebbd4ec91f2257fda19358b"
+    # Owner-approved b-899 rebaseline: the serialized input now carries the
+    # initialized FeO/Fe2O3 split, whole-assay normalization, and ledger-derived
+    # fO2; key schema and descriptor are unchanged.
+    assert key_hash == "00cc481cf430aedec4559cdb48ca088eb52c9b69b8aa7823e1289bee78fa4e0d"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 
@@ -798,8 +801,10 @@ def test_alphamelts_provider_key_partitions_mode_not_engine_version() -> None:
         "mode": "subprocess",
         "magemin_database": None,
     }
+    # This mode/version pin moves with the same normalized FeO/Fe2O3 and
+    # ledger-derived fO2 inputs; provider identity and version are not key fields.
     assert _key_hash(base) == (
-        "3914dfa4cca7d7503c290122f70e67ab003fbcdaca1d5c230e49120236a8b048"
+        "d9dac67ef403c1d8040620915ea8f8083f1038db5969202a1a679c54d92bb343"
     )
     assert thermoengine["model"]["mode"] == "thermoengine"
     assert "engine_version" not in next_engine["model"]
@@ -928,15 +933,17 @@ def test_python_api_identity_pins_current_model_and_provider_fields(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
-        (None, "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088"),
-        ("", "b43e6955cdee10f871c8aaceaa9b45eea9524da6d6fc9449f252c9f463281dd9"),
-        (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
-        ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
-        ("MELTSv1.1.0", "da91bc89b90ad478d80e727462027fcffa9fd12435c60126dbcb9ffb315249c6"),
-        ("MELTSv1.2.0", "faecc7fca96b82b0121c50de8a431908cfaaccfe79bbe154fee91d5b7135d982"),
+        # Each API digest reflects the initialized FeO/Fe2O3 split, normalized
+        # assay, and ledger-derived fO2 entering the key; identity is unchanged.
+        (None, "d337e6e7bda5edbd1b261dbc53b62187e17489a3cc1875ed07576f94a25fefc1"),
+        ("", "63490e80241bd9bd6581d236fd8468f779716857d35ddc4d7e60230f7c8a3359"),
+        (DEFAULT_ALPHAMELTS_MODEL, "2067a4a39b7186e8966afe76eccf27b19bd2dfb65d6356426668ba50a354fb0f"),
+        ("pMELTS", "ddd3d54af3b5ab9e1317843167fb32082a0e9793213e0ea3f56e64029e01d6e2"),
+        ("MELTSv1.1.0", "9e4e0b58bfc30ed9525f08b824b80bc33a3accd21baaae1d6328f199bdb7360e"),
+        ("MELTSv1.2.0", "1ebb492dc61d3867a56f28c1d8925ac8b45a9b497fa6875580846a96b26acf37"),
     ],
 )
-def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
+def test_python_api_accepted_replay_key_hashes_pin_physical_input_vector(
     model: str | None,
     expected_hash: str,
 ) -> None:
@@ -951,15 +958,17 @@ def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
-        (None, "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088"),
-        ("", "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
-        (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
-        ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
-        ("MELTSv1.1.0", "da91bc89b90ad478d80e727462027fcffa9fd12435c60126dbcb9ffb315249c6"),
-        ("MELTSv1.2.0", "faecc7fca96b82b0121c50de8a431908cfaaccfe79bbe154fee91d5b7135d982"),
+        # Cached-real API digests change for the same physical input vector;
+        # cached-real authorization and model identity remain pinned separately.
+        (None, "d337e6e7bda5edbd1b261dbc53b62187e17489a3cc1875ed07576f94a25fefc1"),
+        ("", "2067a4a39b7186e8966afe76eccf27b19bd2dfb65d6356426668ba50a354fb0f"),
+        (DEFAULT_ALPHAMELTS_MODEL, "2067a4a39b7186e8966afe76eccf27b19bd2dfb65d6356426668ba50a354fb0f"),
+        ("pMELTS", "ddd3d54af3b5ab9e1317843167fb32082a0e9793213e0ea3f56e64029e01d6e2"),
+        ("MELTSv1.1.0", "9e4e0b58bfc30ed9525f08b824b80bc33a3accd21baaae1d6328f199bdb7360e"),
+        ("MELTSv1.2.0", "1ebb492dc61d3867a56f28c1d8925ac8b45a9b497fa6875580846a96b26acf37"),
     ],
 )
-def test_cached_real_python_api_replay_key_hashes_remain_base_bytes(
+def test_cached_real_python_api_replay_key_hashes_pin_physical_input_vector(
     tmp_path: Path,
     model: str | None,
     expected_hash: str,
@@ -1097,9 +1106,11 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
         fe_redox_policy="intrinsic",
     )
     magemin_bytes = canonical_json_bytes(magemin_key)
-    assert len(magemin_bytes) == 1648
+    # Fe2O3, whole-assay normalization, and ledger-derived fO2 change the
+    # serialized physical inputs without adding a key field or descriptor.
+    assert len(magemin_bytes) == 1668
     assert hashlib.sha256(magemin_bytes).hexdigest() == (
-        "13ada0c3401a52f88761e3a2b0abcd64caefc16765e943e9812398bf3fcb7d90"
+        "fb983942c0a915b9e6e8ea05d0c37fd35235f76ec052db222eaa1a49b3acc8f5"
     )
 
     generic_store = PT0DeterminismStore("capture")
@@ -1107,9 +1118,11 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     generic_key = generic_store._equilibrium_key(generic_sim)
     generic_bytes = canonical_json_bytes(generic_key)
     assert generic_key["namespace_id"] == "internal-analytical:equilibrium-composite"
-    assert len(generic_bytes) == 1687
+    # The generic key carries the same normalized ledger input vector; its
+    # namespace/schema and redox descriptor are unchanged.
+    assert len(generic_bytes) == 1707
     assert hashlib.sha256(generic_bytes).hexdigest() == (
-        "f23032fcd2ddba188fccad867d238b352c63e4ca53b77c3dc643baae0af422f9"
+        "e92c2d0c11380284d97fde215668e1a262591a8959c7186bd1856c172b372f65"
     )
 
 
