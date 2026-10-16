@@ -114,6 +114,7 @@ class ValenceValueForm(StrEnum):
     FRACTION = "fraction"
     RATIO = "ratio"
     LOG10_RATIO = "log10_ratio"
+    AVERAGE_OXIDATION_STATE = "average_oxidation_state"
 
 
 class EvidenceClass(StrEnum):
