@@ -258,6 +258,11 @@ def test_beskok_rarefaction_factor_rejects_free_molecular_boundary():
     assert exc_info.value.reason == "transitional_correlation_out_of_range"
 
 
+def test_beskok_alpha_exponent_has_one_owner():
+    with open(tr.__file__, encoding="utf-8") as source_file:
+        assert source_file.read().count("0.4348") == 1
+
+
 def test_single_carrier_mean_free_path_fixture_m1():
     result = tr.single_species_mean_free_path(
         "N2",

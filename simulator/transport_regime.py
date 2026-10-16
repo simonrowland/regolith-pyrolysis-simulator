@@ -772,7 +772,10 @@ def beskok_karniadakis_rarefaction_factor(
         knudsen_number,
         allow_near_viscous_cross_check=allow_near_viscous_cross_check,
     )
-    alpha = 1.358 / (1.0 + 0.170 * knudsen_number ** (-0.4348))
+    alpha = beskok_karniadakis_civan_alpha(
+        knudsen_number,
+        allow_near_viscous_cross_check=allow_near_viscous_cross_check,
+    )
     slip_coefficient_b = -1.0
     return (1.0 + alpha * knudsen_number) * (
         1.0 + 4.0 * knudsen_number / (1.0 - slip_coefficient_b * knudsen_number)
