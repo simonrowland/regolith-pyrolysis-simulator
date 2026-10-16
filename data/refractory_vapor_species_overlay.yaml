@@ -1,0 +1,151 @@
+schema_version: 1
+overlay_citation:
+  type: project_curated_nonthermochemical_metadata
+  citation: >-
+    Material applicability, carrier selection, and species-gap notes are project-curated;
+    each literature-backed claim is cited inline below. The silica phase warning cites
+    NBS Special Publication 302 alongside the NIST-JANAF O-039 transition.
+  evidence_file: data/literature/refractory_vaporization_validation.yaml
+
+standard_pressure_pa: 100000.0
+interpolation: linear_in_log10_kf
+out_of_range_policy: frozen_dlog10_kf_d_inverse_temperature_with_t406_input_diagnostics
+extension_policy:
+  maximum_delta_temperature_K: 300.0
+  governing_maximum_delta_log10_pressure: 1.5
+  coefficient_projection_diagnostic_maximum_delta_log10_kf: 1.5
+  maximum_delta_inverse_temperature_K_inv: 2.0e-4
+  outside_policy: return_raw_model_limited_result_without_claiming_an_upper_loss_envelope
+  note: resultant carrier-pressure extrapolation and its upper-loss envelope are not inferred from coefficient distances
+kinetic_model:
+  evaporation_coefficient: 1.0
+  classification: included_carrier_equilibrium_effusion_sum
+  note: >
+    alpha=1 is a kinetic ceiling only for carriers listed in each material's
+    gas_species. It is NOT an absolute upper bound on total recession: omitted
+    carriers in unmodeled_species can both increase mass loss and shift the
+    self-buffered surface pO2 of the included set. Downstream lifespan/liner
+    ceilings must not treat this classification as a proven total bound.
+
+condensed_row_overrides:
+  SiO2:
+    source_conflict: >-
+      NIST-JANAF O-039 reports melting at 1696 K, while NBS Special Publication 302
+      reports about 1983 K; phase identity is unresolved
+
+materials:
+  Al2O3:
+    formula: Al2O3
+    execution_model: pure_oxide
+    certification_status: provisional_incomplete_species
+    gas_species: [Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species:
+      Al2O3:
+        reason: NASA identifies Al2O3(g), but no NIST-JANAF log10(Kf) table exists
+        evidence: NASA/TM-2005-213625 Figure 8
+    screening_candidates:
+      O3_O4:
+        status: missing_quantitative_oxygen_closure_screen
+        evidence: no evidence found that they carry condensed mass at 1500-2300 K
+  CaO:
+    formula: CaO
+    execution_model: pure_oxide
+    certification_status: provisional_boundary_mismatch
+    gas_species: [Ca, Ca2, CaO, O, O2]
+    screening_candidates:
+      O3_O4:
+        status: missing_quantitative_oxygen_closure_screen
+        evidence: no evidence found that they carry condensed mass at 1500-2300 K
+  MgO:
+    formula: MgO
+    execution_model: pure_oxide
+    certification_status: provisional_species_screen
+    gas_species: [Mg, Mg2, MgO, O, O2]
+    screening_candidates:
+      O3_O4:
+        status: missing_quantitative_oxygen_closure_screen
+        evidence: no evidence found that they carry condensed mass at 1500-2300 K
+  SiO2:
+    formula: SiO2
+    execution_model: pure_oxide
+    certification_status: provisional_incomplete_species_and_source_conflict
+    gas_species: [Si, Si2, Si3, SiO, SiO2, O, O2]
+    unmodeled_species:
+      Si2O2:
+        reason: no NIST-JANAF or redistributable primary coefficient set found
+        evidence: species-gap review 2026-07-29
+    screening_candidates:
+      O3_O4:
+        status: missing_quantitative_oxygen_closure_screen
+        evidence: no evidence found that they carry condensed mass at 1500-2300 K
+  TiO2:
+    formula: TiO2
+    execution_model: pure_oxide
+    certification_status: provisional_condensed_phase_stability
+    gas_species: [Ti, TiO, TiO2, O, O2]
+    screening_candidates:
+      Ti_clusters:
+        status: missing_quantitative_screen
+        evidence: no load-bearing neutral titanium cluster source identified
+      condensed_suboxides:
+        status: outside_phase_authority
+        evidence: reducing pO2 may stabilize Magneli or Ti2O3 phases instead of rutile
+      O3_O4:
+        status: missing_quantitative_oxygen_closure_screen
+        evidence: no evidence found that they carry condensed mass at 1500-2300 K
+  MgAl2O4:
+    formula: MgAl2O4
+    execution_model: refused_noncongruent
+    certification_status: refused_noncongruent
+    refusal_reason: >
+      Shornikov 2017 KEMS finds preferential Mg loss and an Al-rich residual;
+      a forced 1:2 Mg:Al vapor flux is experimentally false.
+    gas_species: [Mg, Mg2, MgO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species:
+      MgAlO:
+        reason: observed as a trace spinel vapor but no sourced coefficient set was found
+        evidence: Shornikov 2017, DOI 10.1134/S0036024417010241
+      Al2O3:
+        reason: NASA identifies Al2O3(g), but no NIST-JANAF log10(Kf) table exists
+        evidence: NASA/TM-2005-213625 Figure 8
+  CaAl2O4:
+    formula: CaAl2O4
+    execution_model: refused_missing_phase_model
+    certification_status: refused_missing_phase_model
+    refusal_reason: no sourced high-temperature solid activity model
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species: &caalo_gap
+      CaAlO:
+        reason: observed over CaO-Al2O3 melts but no sourced coefficient set was found
+        evidence: Shornikov et al. 1997, Russian Journal of Physical Chemistry 71, 19-22
+      Al2O3:
+        reason: NASA identifies Al2O3(g), but no NIST-JANAF log10(Kf) table exists
+        evidence: NASA/TM-2005-213625 Figure 8
+  CaAl4O7:
+    formula: CaAl4O7
+    execution_model: refused_missing_phase_model
+    certification_status: refused_missing_phase_model
+    refusal_reason: solid EMF data end at 1200 K; no sourced high-temperature activity model
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species: *caalo_gap
+  CaAl12O19:
+    formula: CaAl12O19
+    execution_model: refused_missing_phase_model
+    certification_status: refused_missing_phase_model
+    refusal_reason: solid EMF data end at 1200 K; no sourced high-temperature activity model
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species: *caalo_gap
+  Ca3Al2O6:
+    formula: Ca3Al2O6
+    execution_model: refused_missing_phase_model
+    certification_status: refused_missing_phase_model
+    refusal_reason: solid EMF data end at 1200 K; no sourced high-temperature activity model
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species: *caalo_gap
+  Ca12Al14O33:
+    formula: Ca12Al14O33
+    execution_model: refused_missing_phase_model
+    certification_status: refused_missing_phase_model
+    refusal_reason: no sourced high-temperature solid thermodynamics or activity model
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    unmodeled_species: *caalo_gap

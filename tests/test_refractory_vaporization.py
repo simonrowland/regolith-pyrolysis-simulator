@@ -256,14 +256,14 @@ def test_oxygen_boundary_inputs_refuse_ambiguous_or_nonphysical_combinations() -
         )
 
 
-def test_t406_range_extension_reports_input_distances_without_false_loss_claim() -> None:
+def test_compiled_grid_is_used_and_far_extrapolation_is_typed() -> None:
     value, range_use = refractory_log10_kf("AlO", 2400.0)
-    assert value == pytest.approx(2.152666666666667)
-    assert range_use.status == "extrapolated_input_projection_within_t406_distance_bounds"
+    assert value == pytest.approx(2.153)
+    assert range_use.status == "in_range"
     assert range_use.within_t406_input_distance_bounds
-    assert range_use.source_temperature_max_K == 2300.0
+    assert range_use.source_temperature_max_K == 3500.0
     projected = solve_congruent_vaporization("Al2O3", 2400.0)
-    assert "model_limited_extrapolation" in projected.certification_blockers
+    assert projected.certification_blockers == ("provisional_incomplete_species",)
 
     _, far_use = refractory_log10_kf("AlO", 1000.0)
     assert far_use.status == "extrapolated_model_limited"
@@ -343,10 +343,7 @@ def test_results_are_typed_as_included_carrier_sum_not_total_bound() -> None:
     assert silica.source_conflicts
     assert "Si2O2" in silica.unmodeled_species
     extrapolated = solve_congruent_vaporization("Al2O3", 2400.0)
-    assert set(extrapolated.certification_blockers) == {
-        "provisional_incomplete_species",
-        "model_limited_extrapolation",
-    }
+    assert extrapolated.certification_blockers == ("provisional_incomplete_species",)
 
 
 def test_brentq_nonconvergence_raises_typed_congruent_error(monkeypatch) -> None:

@@ -13,8 +13,8 @@ provenance:
   input_counts:
     inventory: 242
     gas_closure: 137
-    refractory_registry: 22
-    union_before_dedup_sum: 401
+    refractory_registry: 24
+    union_before_dedup_sum: 403
 membership_sets:
   vaporock_42:
   - Al
@@ -130,9 +130,11 @@ membership_sets:
   - Ca
   - Ca2
   - CaO
+  - KO
   - Mg
   - Mg2
   - MgO
+  - NaO
   - O
   - O2
   - Si
@@ -153,9 +155,11 @@ membership_sets:
   - Ca
   - Ca2
   - CaO_gas
+  - KO
   - Mg
   - Mg2
   - MgO_gas
+  - NaO
   - O
   - O2
   - Si
@@ -3535,7 +3539,7 @@ species:
   sources:
     inventory: true
     gas_closure: true
-    refractory_registry: false
+    refractory_registry: true
   regime:
     millibar:
       applicable: true
@@ -3548,7 +3552,9 @@ species:
   flags:
   - gas_closure_delta
   - rail_gap_dominant
+  - refractory_registry
   - vaporock_42
+  notes: refractory_registry
 - id: KOH
   formula: KOH
   atoms:
@@ -4653,7 +4659,7 @@ species:
   sources:
     inventory: true
     gas_closure: true
-    refractory_registry: false
+    refractory_registry: true
   regime:
     millibar:
       applicable: true
@@ -4666,7 +4672,9 @@ species:
   flags:
   - gas_closure_delta
   - rail_gap_dominant
+  - refractory_registry
   - vaporock_42
+  notes: refractory_registry
 - id: NaOH
   formula: NaOH
   atoms:
