@@ -148,11 +148,11 @@ def test_store_yields_adopted_target_type_observations(
             if obs.source_id.startswith("kems-") and obs.adoption_basis != "superseded"]
     # B1 harvest + class-tagged fence rows expanded the KEMS surface; keep the
     # count live-derived so a silent shrink is RED without hard-coding B1 IDs.
-    # 2026-09-06 b-481 attributed regen: deepening folds + supersession
-    # (parents excluded) + closed evidence-marker admission.
-    assert len(kems) == 1133
-    # b-480: 15 added KEMS sources; coverage includes typed-skipped evidence.
-    assert len({obs.source_id for obs in kems}) == 45
+    # Offer19 store growth: 37 new KEMS extract files add 732 observations;
+    # edits across existing KEMS extracts add a net 35 more (1133 -> 1900).
+    assert len(kems) == 1900
+    # Active KEMS source IDs grew from the previous 45 to 81.
+    assert len({obs.source_id for obs in kems}) == 81
     for obs in adopted_observations:
         assert obs.is_priority_winner or obs.adoption_basis in {"mass_spec_extract", "superseded"}
         assert obs.source_id
@@ -287,6 +287,7 @@ def test_silicate_melt_alpha_remains_comparable() -> None:
         values={
             "alpha": 0.02,
             "system_class": "silicate_melt",
+            "admission_status": "admitted",
             "transformation_class": "redox_reduction_required",
             "material": "FCMAS_silicate_melt",
         },
@@ -304,6 +305,9 @@ def test_silicate_melt_alpha_remains_comparable() -> None:
     pin_ok, pin_skip, _ = rail_alpha_comparability(obs)
     assert pin_ok is True
     assert pin_skip is None
+    evaluation = evaluate_observation(obs, vapor_pressure_data={"metals": {}})
+    assert evaluation.skip_reason is None
+    assert any(record.status in SCORING_STATUSES for record in evaluation.records)
 
 
 @pytest.mark.parametrize("markers", [
@@ -1328,51 +1332,51 @@ def test_engine_value_mutation_moves_residual_outside_band_goes_red(
     observations = [
         o
         for o in load_adopted_observations()
-        if o.species_id == "Fe" and o.obs_type == "rate_series"
+        if o.species_id == "Fe" and o.obs_type in {"alpha", "rate_series"}
     ]
-    assert observations, "Fe rate_series observation missing from store"
-    obs = observations[0]
-    evaluation = evaluate_observation(
-        obs, vapor_pressure_data=load_vapor_pressure_data()
-    )
-    mismatches = [r for r in evaluation.records if r.status == "mismatch"]
-    # Under 10×, Fe actual≈0.2 vs lit≈0.23 — may still mismatch on σ=0.02, or match.
-    comparable = [
-        r for r in evaluation.records if r.status in {"match", "mismatch"}
-    ]
-    assert comparable, "mutation must still produce comparable records"
-    # Residual pin must fail for at least one Fe point.
+    assert observations, "Fe alpha/rate_series observation missing from store"
     by_key = residual_baselines["by_key"]
+    vapor_pressure_data = load_vapor_pressure_data()
+    pinned_records = []
+    for obs in observations:
+        evaluation = evaluate_observation(
+            obs, vapor_pressure_data=vapor_pressure_data
+        )
+        for record in evaluation.records:
+            if record.status not in {"match", "mismatch"}:
+                continue
+            pin = by_key.get(_record_pin_key(record))
+            if pin is not None:
+                pinned_records.append((record, pin))
+    assert pinned_records, "Fe mutation must produce pinned comparable records"
+    # Some Fe rate rows are typed refusals; use live points with residual pins.
+    red_record = None
     reds: list[str] = []
-    for record in comparable:
-        pin = by_key.get(_record_pin_key(record))
-        if pin is None:
-            continue
+    for record, pin in pinned_records:
         measured = residual_dex(record)
         if measured is None:
-            reds.append(f"{record.observable_id}: residual_dex=None under mutation")
             continue
         if abs(measured - float(pin["residual_dex"])) > float(pin["band_dex"]):
             reds.append(
                 f"{record.observable_id}: measured_dex={measured:.4g} "
                 f"pin={pin['residual_dex']:.4g} band=±{pin['band_dex']}"
             )
+            red_record = red_record or (record, pin, measured)
     assert reds, (
         "mutation proof FAILED: 10× grounded_alpha did not move residual_dex "
         "outside the pin band — the battery still has no red path. "
-        f"records={[(r.observable_id, r.actual_value, residual_dex(r)) for r in comparable]}"
+        f"records={[(r.observable_id, r.actual_value, residual_dex(r)) for r, _ in pinned_records]}"
     )
     # Also assert the public param-style check would raise.
     with pytest.raises(AssertionError, match="RESIDUAL REGRESSION"):
-        for record in comparable:
-            pin = by_key[_record_pin_key(record)]
-            measured = residual_dex(record)
-            assert measured is not None
-            assert abs(measured - float(pin["residual_dex"])) <= float(pin["band_dex"]), (
-                f"RESIDUAL REGRESSION {record.observable_id}: residual_dex moved "
-                f"measured={measured:.6g} pin={float(pin['residual_dex']):.6g} "
-                f"band=±{float(pin['band_dex']):g}"
-            )
+        assert red_record is not None
+        record, pin, measured = red_record
+        assert measured is not None
+        assert abs(measured - float(pin["residual_dex"])) <= float(pin["band_dex"]), (
+            f"RESIDUAL REGRESSION {record.observable_id}: residual_dex moved "
+            f"measured={measured:.6g} pin={float(pin['residual_dex']):.6g} "
+            f"band=±{float(pin['band_dex']):g}"
+        )
 
 
 def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
@@ -1478,8 +1482,10 @@ def test_transition_point_is_an_adopted_target_type(
     assert "transition_point" in TARGET_TYPES
     rows = [obs for obs in adopted_observations if obs.obs_type == "transition_point"
             and obs.adoption_basis != "superseded"]
-    # Three superseded transition parents remain provenance only: 74 - 3.
-    assert len(rows) == 71
+    # Offer19 adds 40 points from 11 sources: Ueshima 1983 (+18), Ichise and
+    # Ueshima 1989 (+5), Ichise 1986 (+5), Nunoue 1987 (+4), Ichise 1989
+    # (+2), and six other KEMS extracts (+1 each); prior total was 71.
+    assert len(rows) == 111
     # NIST NBP/melting rows are priority winners; kems-020 Hastie Na2SO4
     # second-law prose is extract-adopted (mass_spec_extract).
     assert all(
