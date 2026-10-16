@@ -17,31 +17,36 @@ notes:
     at each temperature it is derivable from the stored S and H_T-H_298 columns.
   locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: '-(G-H298)/T'}
 - text: >-
-    Printed smooth-enthalpy equations and validity ranges (T in K, H in kcal/mole):
-    K2SiO3 crystal: H-H298 = 28.418e-3 T + 5.833e-6 T^2 + 3.383e2/T - 10.126
-    (298-1249 K; 0.2%); K2Si2O5 alpha: 45.855e-3 T + 4.372e-6 T^2 + 8.883e2/T
-    - 17.040 (298-510 K; <0.01%); beta: 37.764e-3 T + 10.854e-6 T^2 +
-    2.387e3/T - 13.035 (510-867 K; 0.1%); gamma: 53.591e-3 T + 0.528e-6 T^2
-    - 18.340 (867-1318 K; <0.1%); liquid with crystal at 298.15 K as base:
-    65.800e-3 T - 25.094 (1318-1600 K; <0.1%); K2Si2O5 glass:
-    43.807e-3 T + 7.268e-6 T^2 + 8.649e2/T - 16.608 (298-900 K; <0.1%).
-    The separately stated liquid equation relative to glass at 298.15 K is
-    H-H298 = 65.800e-3 T - 29.564 over 1318-1600 K (<0.1%).
+    Printed smooth-enthalpy equation and validity range (T in K, H in
+    kcal/mole) for K2SiO3 crystal: H-H298 = 28.418e-3 T + 5.833e-6 T^2 +
+    3.383e2/T - 10.126 (298-1249 K; 0.2%).
   locator: {pdf_page_index: 14, page: 15, published_page: 11}
-  secondary_locator: {pdf_page_index: 20, page: 21, published_page: 17}
+- text: >-
+    Printed smooth-enthalpy equations and validity ranges for K2Si2O5 (T in K,
+    H in kcal/mole): alpha: 45.855e-3 T + 4.372e-6 T^2 + 8.883e2/T - 17.040
+    (298-510 K; <0.01%); beta: 37.764e-3 T + 10.854e-6 T^2 + 2.387e3/T -
+    13.035 (510-867 K; 0.1%); gamma: 53.591e-3 T + 0.528e-6 T^2 - 18.340
+    (867-1318 K; <0.1%); liquid with crystal at 298.15 K as base:
+    65.800e-3 T - 25.094 (1318-1600 K; <0.1%); glass: 43.807e-3 T +
+    7.268e-6 T^2 + 8.649e2/T - 16.608 (298-900 K; <0.1%).
+  locator: {pdf_page_index: 15, page: 16, published_page: 12}
+- text: >-
+    The separately stated K2Si2O5 liquid equation relative to glass at
+    298.15 K is H-H298 = 65.800e-3 T - 29.564 over 1318-1600 K (<0.1%).
+  locator: {pdf_page_index: 20, page: 21, published_page: 17}
 species:
   K2Si2O5:
     observations:
     - observation_id: bey80_k2si2o5_cp_low_table1
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 7, page: 8, published_page: 4, table: '1', row: K2Si2O5 crystal, column: Cp}
-      phase: crystal
+      phase: cr
       units: cal/deg-mole
       values:
         quantity: cp
         method_class: measured_direct
         method: Adiabatic calorimetry; experimental low-temperature heat capacities.
-        series: &bey80_t2
+        series: &bey80_t1
         - {T_K: 4.80, cp: 0.014}
         - {T_K: 5.21, cp: 0.017}
         - {T_K: 5.79, cp: 0.024}
@@ -107,7 +112,7 @@ species:
     - observation_id: bey80_k2si2o5_reference_low_table2
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 8, page: 9, published_page: 5, table: '2', row: K2Si2O5 crystal}
-      phase: crystal
+      phase: cr
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_cp_low_table1]
       derivation:
@@ -117,7 +122,7 @@ species:
       values:
         quantity: cp
         method_class: model_derived
-        series:
+        series: &bey80_table2
         - {T_K: 5, cp: 0.015, entropy: 0.005, neg_gibbs_over_T: 0.001, enthalpy_increment: 0.019}
         - {T_K: 10, cp: 0.178, entropy: 0.050, neg_gibbs_over_T: 0.011, enthalpy_increment: 0.387}
         - {T_K: 15, cp: 0.673, entropy: 0.204, neg_gibbs_over_T: 0.047, enthalpy_increment: 2.362}
@@ -158,29 +163,54 @@ species:
     - observation_id: bey80_k2si2o5_entropy_low_table2
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 8, page: 9, published_page: 5, table: '2', row: K2Si2O5 crystal, column: S}
-      phase: crystal
+      phase: cr
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_cp_low_table1]
       derivation: {relation: Entropy function from the smoothed low-temperature table., inputs: [bey80_k2si2o5_cp_low_table1], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, series: *bey80_t2}
-    - observation_id: bey80_k2si2o5_enthalpy_low_table2
-      type: heat_capacity_and_heat_content_series
-      locator: {pdf_page_index: 8, page: 9, published_page: 5, table: '2', row: K2Si2O5 crystal, column: H_T-H_298}
-      phase: crystal
-      units: cal/mole
-      derived_from: [bey80_k2si2o5_cp_low_table1]
-      derivation: {relation: Enthalpy-increment function from the smoothed low-temperature table., inputs: [bey80_k2si2o5_cp_low_table1], output_unit: cal/mole}
-      values: {quantity: H_minus_H298, method_class: model_derived, series: *bey80_t2}
+      values: {quantity: S, method_class: model_derived, series: *bey80_table2}
     - observation_id: bey80_k2si2o5_heat_content_crystal_table3
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2Si2O5 crystal}
-      phase: crystal
+      phase: cr
       units: kcal/mole
       values:
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
-        series: [{T_K: 402.5, enthalpy_increment: 4.332}, {T_K: 442.0, enthalpy_increment: 6.092}, {T_K: 473.7, enthalpy_increment: 7.538}, {T_K: 503.0, enthalpy_increment: 9.020}, {T_K: 517.7, enthalpy_increment: 9.877}, {T_K: 531.5, enthalpy_increment: 10.564}, {T_K: 556.7, enthalpy_increment: 11.781}, {T_K: 594.1, enthalpy_increment: 13.619}, {T_K: 605.2, enthalpy_increment: 14.205}, {T_K: 704.8, enthalpy_increment: 19.303}, {T_K: 782.4, enthalpy_increment: 23.431}, {T_K: 803.2, enthalpy_increment: 24.638}, {T_K: 852.6, enthalpy_increment: 27.527}, {T_K: 872.5, enthalpy_increment: 28.806}, {T_K: 872.7, enthalpy_increment: 28.803}, {T_K: 879.6, enthalpy_increment: 29.201}, {T_K: 890.0, enthalpy_increment: 29.785}, {T_K: 902.2, enthalpy_increment: 30.457}, {T_K: 952.8, enthalpy_increment: 33.228}, {T_K: 1018.8, enthalpy_increment: 36.836}, {T_K: 1103.3, enthalpy_increment: 41.425}, {T_K: 1192.9, enthalpy_increment: 46.299}, {T_K: 1195.0, enthalpy_increment: 46.441}, {T_K: 1258.0, enthalpy_increment: 49.917}, {T_K: 1309.1, enthalpy_increment: 53.163}]
+        series: [{T_K: 402.5, enthalpy_increment: 4.332}, {T_K: 442.0, enthalpy_increment: 6.092}, {T_K: 473.7, enthalpy_increment: 7.538}, {T_K: 517.7, enthalpy_increment: 9.877}, {T_K: 531.5, enthalpy_increment: 10.564}, {T_K: 556.7, enthalpy_increment: 11.781}, {T_K: 594.1, enthalpy_increment: 13.619}, {T_K: 605.2, enthalpy_increment: 14.205}, {T_K: 704.8, enthalpy_increment: 19.303}, {T_K: 782.4, enthalpy_increment: 23.431}, {T_K: 803.2, enthalpy_increment: 24.638}, {T_K: 872.5, enthalpy_increment: 28.806}, {T_K: 872.7, enthalpy_increment: 28.803}, {T_K: 879.6, enthalpy_increment: 29.201}, {T_K: 890.0, enthalpy_increment: 29.785}, {T_K: 902.2, enthalpy_increment: 30.457}, {T_K: 952.8, enthalpy_increment: 33.228}, {T_K: 1018.8, enthalpy_increment: 36.836}, {T_K: 1103.3, enthalpy_increment: 41.425}, {T_K: 1192.9, enthalpy_increment: 46.299}, {T_K: 1195.0, enthalpy_increment: 46.441}, {T_K: 1258.0, enthalpy_increment: 49.917}]
+    - observation_id: bey80_k2si2o5_crystal_pretransition_503
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2Si2O5 crystal}
+      phase: cr
+      units: kcal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
+        reason: "source_internally_inconsistent: Table 3 footnote 2 marks this measurement as pretransition; it remains admitted as printed."
+        series: [{T_K: 503.0, enthalpy_increment: 9.020}]
+    - observation_id: bey80_k2si2o5_crystal_pretransition_852_6
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2Si2O5 crystal}
+      phase: cr
+      units: kcal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
+        reason: "source_internally_inconsistent: Table 3 footnote 2 marks this measurement as pretransition; it remains admitted as printed."
+        series: [{T_K: 852.6, enthalpy_increment: 27.527}]
+    - observation_id: bey80_k2si2o5_crystal_onset_1309_1
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2Si2O5 crystal}
+      phase: cr
+      units: kcal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
+        reason: "source_internally_inconsistent: Table 3 footnote 1 marks possible onset of melting; the authors exclude this point from their smooth fits."
+        series: [{T_K: 1309.1, enthalpy_increment: 53.163}]
     - observation_id: bey80_k2si2o5_heat_content_glass_table3
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2Si2O5 glass}
@@ -190,11 +220,44 @@ species:
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
-        series: [{T_K: 403.3, enthalpy_increment: 4.387}, {T_K: 453.2, enthalpy_increment: 6.644}, {T_K: 504.1, enthalpy_increment: 9.035}, {T_K: 573.6, enthalpy_increment: 12.418}, {T_K: 606.7, enthalpy_increment: 14.083}, {T_K: 653.6, enthalpy_increment: 16.468}, {T_K: 703.4, enthalpy_increment: 19.009}, {T_K: 753.2, enthalpy_increment: 21.662}, {T_K: 805.4, enthalpy_increment: 24.614}, {T_K: 903.2, enthalpy_increment: 30.854}, {T_K: 956.0, enthalpy_increment: 33.719}]
+        series: [{T_K: 403.3, enthalpy_increment: 4.387}, {T_K: 453.2, enthalpy_increment: 6.644}, {T_K: 504.1, enthalpy_increment: 9.035}, {T_K: 573.6, enthalpy_increment: 12.418}, {T_K: 606.7, enthalpy_increment: 14.083}, {T_K: 653.6, enthalpy_increment: 16.468}, {T_K: 703.4, enthalpy_increment: 19.009}, {T_K: 753.2, enthalpy_increment: 21.662}]
+    - observation_id: bey80_k2si2o5_glass_partial_805_4
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2Si2O5 glass}
+      phase: glass
+      units: kcal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
+        reason: "source_internally_inconsistent: Table 3 footnote 3 marks partial conversion of glass to crystal; the authors exclude this point from their glass smooth fits."
+        series: [{T_K: 805.4, enthalpy_increment: 24.614}]
+    - observation_id: bey80_k2si2o5_glass_partial_903_2
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2Si2O5 glass}
+      phase: glass
+      units: kcal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
+        reason: "source_internally_inconsistent: Table 3 footnote 3 marks partial conversion of glass to crystal; the authors exclude this point from their glass smooth fits."
+        series: [{T_K: 903.2, enthalpy_increment: 30.854}]
+    - observation_id: bey80_k2si2o5_glass_partial_956_0
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2Si2O5 glass}
+      phase: glass
+      units: kcal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
+        reason: "source_internally_inconsistent: Table 3 footnote 3 marks partial conversion of glass to crystal; the authors exclude this point from their glass smooth fits."
+        series: [{T_K: 956.0, enthalpy_increment: 33.719}]
     - observation_id: bey80_k2si2o5_heat_content_liquid_table3
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2Si2O5 liquid}
-      phase: liquid
+      phase: l
       units: kcal/mole
       values:
         quantity: H_minus_H298
@@ -204,39 +267,20 @@ species:
     - observation_id: bey80_k2si2o5_fusion_transition
       type: transition_point
       locator: {pdf_page_index: 10, page: 11, published_page: 7, section: Discussion, note: adopted melting point from Kracek}
-      phase: crystal
+      phase: cr
       units: K
       values: {quantity: transition_temperature, method_class: quoted_attributed, T_K: 1318, attribution: Kracek (reference 12), property_kind: melting_point}
-    - observation_id: bey80_k2si2o5_reference_crystal_fusion
-      type: heat_capacity_and_heat_content_series
-      locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 crystal, column: H_T-H_298}
-      phase: crystal
-      units: kcal/mole
-      derived_from: [bey80_k2si2o5_heat_content_crystal_table3]
-      derivation: {relation: Smoothed crystal enthalpy increment at the adopted melting point., inputs: [bey80_k2si2o5_heat_content_crystal_table3], output_unit: kcal/mole}
-      values: {quantity: H_minus_H298, method_class: model_derived, T_K: 1318, enthalpy_increment: 53.21}
-    - observation_id: bey80_k2si2o5_reference_liquid_fusion
-      type: heat_capacity_and_heat_content_series
-      locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: H_T-H_298}
-      phase: liquid
-      units: kcal/mole
-      derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
-      derivation: {relation: Smoothed liquid enthalpy increment at the adopted melting point., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: kcal/mole}
-      values: {quantity: H_minus_H298, method_class: model_derived, T_K: 1318, enthalpy_increment: 61.63}
     - observation_id: bey80_k2si2o5_heat_of_fusion
       type: heat_capacity_and_heat_content_series
-      locator: {pdf_page_index: 17, page: 18, published_page: 17, section: Discussion, note: indirect heat-of-fusion calculation}
-      phase: crystal
+      locator: {pdf_page_index: 20, page: 21, published_page: 17, section: Discussion, note: indirect heat-of-fusion calculation}
+      phase: cr
       units: kcal/mole
-      derived_from: [bey80_k2si2o5_reference_crystal_fusion, bey80_k2si2o5_reference_liquid_fusion]
+      derived_from: [bey80_k2si2o5_reference_high_crystal_H_table5, bey80_k2si2o5_reference_high_liquid_H_table5]
       derivation:
-        relation: Difference between liquid and crystal enthalpies at the melting point after applying the attributed crystal-to-glass transition enthalpy.
-        inputs: [bey80_k2si2o5_reference_crystal_fusion, bey80_k2si2o5_reference_liquid_fusion]
+        relation: Difference between Table 5 liquid and crystal enthalpy increments at 1318 K.
+        inputs: [bey80_k2si2o5_reference_high_crystal_H_table5, bey80_k2si2o5_reference_high_liquid_H_table5]
         output_unit: kcal/mole
-        quoted_crystal_to_glass_transition_enthalpy: 4.47
-        quoted_crystal_to_glass_units: kcal/mole
-        quoted_crystal_to_glass_attribution: Kracek (reference 14)
-      values: {quantity: heat_of_fusion, method_class: model_derived, value: 8.42, reaction: K2Si2O5(crystal) -> K2Si2O5(liquid), T_K: 1318}
+      values: {quantity: heat_of_fusion, method_class: model_derived, value: 8.42, reaction: 'K2Si2O5(cr) -> K2Si2O5(l)', T_K: 1318}
     - observation_id: bey80_k2si2o5_reference_high_crystal_table5
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 crystal}
@@ -274,7 +318,7 @@ species:
       values:
         quantity: cp
         method_class: model_derived
-        series: &bey80_t5l [{T_K: 1318, cp: 65.80, entropy: 126.5, neg_gibbs_over_T: 79.74, enthalpy_increment: 61.63}, {T_K: 1350, cp: 65.80, entropy: 128.1, neg_gibbs_over_T: 80.89, enthalpy_increment: 63.74}, {T_K: 1400, cp: 65.80, entropy: 130.5, neg_gibbs_over_T: 82.62, enthalpy_increment: 67.03}, {T_K: 1450, cp: 65.80, entropy: 132.8, neg_gibbs_over_T: 84.30, enthalpy_increment: 70.32}, {T_K: 1500, cp: 65.80, entropy: 135.0, neg_gibbs_over_T: 85.93, enthalpy_increment: 73.61, extrapolated: true}, {T_K: 1550, cp: 65.80, entropy: 137.2, neg_gibbs_over_T: 87.59, enthalpy_increment: 76.90, extrapolated: true}, {T_K: 1600, cp: 65.80, entropy: 139.3, neg_gibbs_over_T: 89.18, enthalpy_increment: 80.19, extrapolated: true}]
+        series: &bey80_t5l [{T_K: 1318, cp: 65.80, entropy: 126.5, neg_gibbs_over_T: 79.74, enthalpy_increment: 61.63}, {T_K: 1350, cp: 65.80, entropy: 128.1, neg_gibbs_over_T: 80.89, enthalpy_increment: 63.74}, {T_K: 1400, cp: 65.80, entropy: 130.5, neg_gibbs_over_T: 82.62, enthalpy_increment: 67.03}, {T_K: 1450, cp: 65.80, entropy: 132.8, neg_gibbs_over_T: 84.30, enthalpy_increment: 70.32}]
     - observation_id: bey80_k2si2o5_reference_high_liquid_S_table5
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: S}
@@ -291,6 +335,78 @@ species:
       derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
       derivation: {relation: Enthalpy-increment function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: kcal/mole}
       values: {quantity: H_minus_H298, method_class: model_derived, series: *bey80_t5l}
+    - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_cp_1500
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid}
+      phase: l
+      units: cal/deg-mole
+      derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
+      derivation: {relation: Authors' smooth liquid reference function., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: cal/deg-mole}
+      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2si2o5_t5_liquid_row_1500 [{T_K: 1500, cp: 65.80, entropy: 135.0, neg_gibbs_over_T: 85.93, enthalpy_increment: 73.61}]}
+    - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_s_1500
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: S}
+      phase: l
+      units: cal/deg-mole
+      derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
+      derivation: {relation: Entropy function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: cal/deg-mole}
+      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t5_liquid_row_1500}
+    - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_h_1500
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: H_T-H_298}
+      phase: l
+      units: kcal/mole
+      derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
+      derivation: {relation: Enthalpy-increment function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: kcal/mole}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t5_liquid_row_1500}
+    - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_cp_1550
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid}
+      phase: l
+      units: cal/deg-mole
+      derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
+      derivation: {relation: Authors' smooth liquid reference function., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: cal/deg-mole}
+      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2si2o5_t5_liquid_row_1550 [{T_K: 1550, cp: 65.80, entropy: 137.2, neg_gibbs_over_T: 87.59, enthalpy_increment: 76.90}]}
+    - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_s_1550
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: S}
+      phase: l
+      units: cal/deg-mole
+      derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
+      derivation: {relation: Entropy function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: cal/deg-mole}
+      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t5_liquid_row_1550}
+    - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_h_1550
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: H_T-H_298}
+      phase: l
+      units: kcal/mole
+      derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
+      derivation: {relation: Enthalpy-increment function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: kcal/mole}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t5_liquid_row_1550}
+    - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_cp_1600
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid}
+      phase: l
+      units: cal/deg-mole
+      derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
+      derivation: {relation: Authors' smooth liquid reference function., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: cal/deg-mole}
+      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2si2o5_t5_liquid_row_1600 [{T_K: 1600, cp: 65.80, entropy: 139.3, neg_gibbs_over_T: 89.18, enthalpy_increment: 80.19}]}
+    - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_s_1600
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: S}
+      phase: l
+      units: cal/deg-mole
+      derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
+      derivation: {relation: Entropy function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: cal/deg-mole}
+      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t5_liquid_row_1600}
+    - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_h_1600
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: H_T-H_298}
+      phase: l
+      units: kcal/mole
+      derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
+      derivation: {relation: Enthalpy-increment function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: kcal/mole}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t5_liquid_row_1600}
     - observation_id: bey80_k2si2o5_reference_glass_table6
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass}
@@ -301,7 +417,7 @@ species:
       values:
         quantity: cp
         method_class: model_derived
-        series: &bey80_t6 [{T_K: 298.15, cp: 38.41, entropy: 0, neg_gibbs_over_T: 0, enthalpy_increment: 0}, {T_K: 300, cp: 38.56, entropy: 0.238, neg_gibbs_over_T: 0.001, enthalpy_increment: 0.071}, {T_K: 350, cp: 41.83, entropy: 6.44, neg_gibbs_over_T: 0.48, enthalpy_increment: 2.086}, {T_K: 400, cp: 44.22, entropy: 12.19, neg_gibbs_over_T: 1.59, enthalpy_increment: 4.240}, {T_K: 450, cp: 46.08, entropy: 17.51, neg_gibbs_over_T: 3.07, enthalpy_increment: 6.499}, {T_K: 500, cp: 47.62, entropy: 22.45, neg_gibbs_over_T: 4.77, enthalpy_increment: 8.842}, {T_K: 550, cp: 48.94, entropy: 27.05, neg_gibbs_over_T: 6.59, enthalpy_increment: 11.255}, {T_K: 600, cp: 50.13, entropy: 31.36, neg_gibbs_over_T: 8.47, enthalpy_increment: 13.735}, {T_K: 650, cp: 51.21, entropy: 35.42, neg_gibbs_over_T: 10.39, enthalpy_increment: 16.270}, {T_K: 700, cp: 52.22, entropy: 39.25, neg_gibbs_over_T: 12.31, enthalpy_increment: 18.855}, {T_K: 750, cp: 53.17, entropy: 42.88, neg_gibbs_over_T: 14.23, enthalpy_increment: 21.490}, {T_K: 800, cp: 54.08, entropy: 46.34, neg_gibbs_over_T: 16.13, enthalpy_increment: 24.170, extrapolated: true}, {T_K: 850, cp: 54.97, entropy: 49.65, neg_gibbs_over_T: 18.01, enthalpy_increment: 26.895, extrapolated: true}, {T_K: 900, cp: 55.82, entropy: 52.82, neg_gibbs_over_T: 19.86, enthalpy_increment: 29.665, extrapolated: true}]
+        series: &bey80_t6 [{T_K: 298.15, cp: 38.41, entropy: 0, neg_gibbs_over_T: 0, enthalpy_increment: 0}, {T_K: 300, cp: 38.56, entropy: 0.238, neg_gibbs_over_T: 0.001, enthalpy_increment: 0.071}, {T_K: 350, cp: 41.83, entropy: 6.44, neg_gibbs_over_T: 0.48, enthalpy_increment: 2.086}, {T_K: 400, cp: 44.22, entropy: 12.19, neg_gibbs_over_T: 1.59, enthalpy_increment: 4.240}, {T_K: 450, cp: 46.08, entropy: 17.51, neg_gibbs_over_T: 3.07, enthalpy_increment: 6.499}, {T_K: 500, cp: 47.62, entropy: 22.45, neg_gibbs_over_T: 4.77, enthalpy_increment: 8.842}, {T_K: 550, cp: 48.94, entropy: 27.05, neg_gibbs_over_T: 6.59, enthalpy_increment: 11.255}, {T_K: 600, cp: 50.13, entropy: 31.36, neg_gibbs_over_T: 8.47, enthalpy_increment: 13.735}, {T_K: 650, cp: 51.21, entropy: 35.42, neg_gibbs_over_T: 10.39, enthalpy_increment: 16.270}, {T_K: 700, cp: 52.22, entropy: 39.25, neg_gibbs_over_T: 12.31, enthalpy_increment: 18.855}, {T_K: 750, cp: 53.17, entropy: 42.88, neg_gibbs_over_T: 14.23, enthalpy_increment: 21.490}]
     - observation_id: bey80_k2si2o5_reference_glass_S_table6
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: S}
@@ -318,6 +434,78 @@ species:
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Enthalpy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: kcal/mole}
       values: {quantity: H_minus_H298, method_class: model_derived, series: *bey80_t6}
+    - observation_id: bey80_k2si2o5_t6_glass_extrapolated_cp_800
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass}
+      phase: glass
+      units: cal/deg-mole
+      derived_from: [bey80_k2si2o5_heat_content_glass_table3]
+      derivation: {relation: Smoothed glass reference functions; values above 753 K are extrapolated after partial glass-to-crystal conversion., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
+      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2si2o5_t6_glass_row_800 [{T_K: 800, cp: 54.08, entropy: 46.34, neg_gibbs_over_T: 16.13, enthalpy_increment: 24.170}]}
+    - observation_id: bey80_k2si2o5_t6_glass_extrapolated_s_800
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: S}
+      phase: glass
+      units: cal/deg-mole
+      derived_from: [bey80_k2si2o5_heat_content_glass_table3]
+      derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
+      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t6_glass_row_800}
+    - observation_id: bey80_k2si2o5_t6_glass_extrapolated_h_800
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
+      phase: glass
+      units: kcal/mole
+      derived_from: [bey80_k2si2o5_heat_content_glass_table3]
+      derivation: {relation: Enthalpy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: kcal/mole}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t6_glass_row_800}
+    - observation_id: bey80_k2si2o5_t6_glass_extrapolated_cp_850
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass}
+      phase: glass
+      units: cal/deg-mole
+      derived_from: [bey80_k2si2o5_heat_content_glass_table3]
+      derivation: {relation: Smoothed glass reference functions; values above 753 K are extrapolated after partial glass-to-crystal conversion., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
+      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2si2o5_t6_glass_row_850 [{T_K: 850, cp: 54.97, entropy: 49.65, neg_gibbs_over_T: 18.01, enthalpy_increment: 26.895}]}
+    - observation_id: bey80_k2si2o5_t6_glass_extrapolated_s_850
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: S}
+      phase: glass
+      units: cal/deg-mole
+      derived_from: [bey80_k2si2o5_heat_content_glass_table3]
+      derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
+      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t6_glass_row_850}
+    - observation_id: bey80_k2si2o5_t6_glass_extrapolated_h_850
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
+      phase: glass
+      units: kcal/mole
+      derived_from: [bey80_k2si2o5_heat_content_glass_table3]
+      derivation: {relation: Enthalpy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: kcal/mole}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t6_glass_row_850}
+    - observation_id: bey80_k2si2o5_t6_glass_extrapolated_cp_900
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass}
+      phase: glass
+      units: cal/deg-mole
+      derived_from: [bey80_k2si2o5_heat_content_glass_table3]
+      derivation: {relation: Smoothed glass reference functions; values above 753 K are extrapolated after partial glass-to-crystal conversion., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
+      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2si2o5_t6_glass_row_900 [{T_K: 900, cp: 55.82, entropy: 52.82, neg_gibbs_over_T: 19.86, enthalpy_increment: 29.665}]}
+    - observation_id: bey80_k2si2o5_t6_glass_extrapolated_s_900
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: S}
+      phase: glass
+      units: cal/deg-mole
+      derived_from: [bey80_k2si2o5_heat_content_glass_table3]
+      derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
+      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t6_glass_row_900}
+    - observation_id: bey80_k2si2o5_t6_glass_extrapolated_h_900
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
+      phase: glass
+      units: kcal/mole
+      derived_from: [bey80_k2si2o5_heat_content_glass_table3]
+      derivation: {relation: Enthalpy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: kcal/mole}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t6_glass_row_900}
     - observation_id: bey80_k2si2o5_element_formation_h_table9
       type: gibbs_table
       locator: {pdf_page_index: 17, page: 18, published_page: 14, table: '9', row: K2Si2O5 crystal from elements, column: Hf}
@@ -355,20 +543,33 @@ species:
         quantity: delta_fH
         method_class: quoted_attributed
         reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(c)'
-        attribution: Beyer et al. Table 13 auxiliary-data citations 1, 25, and 26.
+        attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'
         series: &bey80_t10 [{T_K: 298.15, delta_fH: -77.6, delta_fG: -78.4, log10_Kf: 57.47}, {T_K: 300, delta_fH: -77.6, delta_fG: -78.4, log10_Kf: 57.11}, {T_K: 400, delta_fH: -77.6, delta_fG: -78.6, log10_Kf: 42.95}, {T_K: 500, delta_fH: -77.7, delta_fG: -78.9, log10_Kf: 34.49}, {T_K: 510, delta_fH: -77.7, delta_fG: -78.9, log10_Kf: 33.81}, {T_K: 510, delta_fH: -77.4, delta_fG: -78.9, log10_Kf: 33.81}, {T_K: 600, delta_fH: -77.5, delta_fG: -79.1, log10_Kf: 28.81}, {T_K: 700, delta_fH: -77.6, delta_fG: -79.4, log10_Kf: 24.79}, {T_K: 800, delta_fH: -77.7, delta_fG: -79.6, log10_Kf: 21.75}, {T_K: 847, delta_fH: -77.9, delta_fG: -79.8, log10_Kf: 20.59}, {T_K: 847, delta_fH: -78.3, delta_fG: -79.8, log10_Kf: 20.59}, {T_K: 867, delta_fH: -78.3, delta_fG: -78.8, log10_Kf: 20.12}, {T_K: 867, delta_fH: -77.9, delta_fG: -79.8, log10_Kf: 20.12}, {T_K: 900, delta_fH: -77.9, delta_fG: -79.9, log10_Kf: 19.40}, {T_K: 1000, delta_fH: -78.0, delta_fG: -80.1, log10_Kf: 17.51}, {T_K: 1100, delta_fH: -78.1, delta_fG: -80.2, log10_Kf: 15.93}, {T_K: 1154, delta_fH: -78.2, delta_fG: -80.4, log10_Kf: 15.23}]
     - observation_id: bey80_k2si2o5_oxide_formation_g_table10
       type: gibbs_table
       locator: {pdf_page_index: 18, page: 19, published_page: 15, table: '10', row: K2Si2O5 crystal from oxides, column: Gr}
       phase: cr
       units: kcal/mole
-      values: {quantity: delta_fG, method_class: quoted_attributed, reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(c)', series: *bey80_t10, attribution: 'Beyer et al. Table 13 auxiliary-data citations 1, 25, and 26.'}
+      values: {quantity: delta_fG, method_class: quoted_attributed, reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(c)', series: &bey80_t10g [{T_K: 298.15, delta_fH: -77.6, delta_fG: -78.4, log10_Kf: 57.47}, {T_K: 300, delta_fH: -77.6, delta_fG: -78.4, log10_Kf: 57.11}, {T_K: 400, delta_fH: -77.6, delta_fG: -78.6, log10_Kf: 42.95}, {T_K: 500, delta_fH: -77.7, delta_fG: -78.9, log10_Kf: 34.49}, {T_K: 510, delta_fH: -77.7, delta_fG: -78.9, log10_Kf: 33.81}, {T_K: 510, delta_fH: -77.4, delta_fG: -78.9, log10_Kf: 33.81}, {T_K: 600, delta_fH: -77.5, delta_fG: -79.1, log10_Kf: 28.81}, {T_K: 700, delta_fH: -77.6, delta_fG: -79.4, log10_Kf: 24.79}, {T_K: 800, delta_fH: -77.7, delta_fG: -79.6, log10_Kf: 21.75}, {T_K: 847, delta_fH: -77.9, delta_fG: -79.8, log10_Kf: 20.59}, {T_K: 847, delta_fH: -78.3, delta_fG: -79.8, log10_Kf: 20.59}, {T_K: 867, delta_fH: -77.9, delta_fG: -79.8, log10_Kf: 20.12}, {T_K: 900, delta_fH: -77.9, delta_fG: -79.9, log10_Kf: 19.40}, {T_K: 1000, delta_fH: -78.0, delta_fG: -80.1, log10_Kf: 17.51}, {T_K: 1100, delta_fH: -78.1, delta_fG: -80.2, log10_Kf: 15.93}, {T_K: 1154, delta_fH: -78.2, delta_fG: -80.4, log10_Kf: 15.23}], attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'}
+    - observation_id: bey80_k2si2o5_oxide_formation_g_table10_867_printed_minus_78_8
+      type: gibbs_table
+      locator: {pdf_page_index: 18, page: 19, published_page: 15, table: '10', row: K2Si2O5 crystal from oxides, column: Gr}
+      phase: cr
+      units: kcal/mole
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        reaction: "K2O(c) + 2SiO2(quartz) = K2Si2O5(c)"
+        attribution: "Calculated in this investigation; Table 13 lists the auxiliary data."
+        T_K: 867
+        delta_fG: -78.8
+        reason: "probable source misprint: Table 10 prints -78.8 kcal/mol at 867 K; neighboring values and the printed equilibrium constant support -79.8 but the printed value is retained."
     - observation_id: bey80_k2si2o5_oxide_formation_k_table10
       type: gibbs_table
       locator: {pdf_page_index: 18, page: 19, published_page: 15, table: '10', row: K2Si2O5 crystal from oxides, column: Log Kr}
       phase: cr
       units: log10(Kr)
-      values: {quantity: log10_Kf, method_class: quoted_attributed, reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(c)', series: *bey80_t10, attribution: 'Beyer et al. Table 13 auxiliary-data citations 1, 25, and 26.'}
+      values: {quantity: log10_Kf, method_class: quoted_attributed, reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(c)', series: *bey80_t10, attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'}
     - observation_id: bey80_k2si2o5_element_formation_h_table11
       type: gibbs_table
       locator: {pdf_page_index: 18, page: 19, published_page: 15, table: '11', row: K2Si2O5 glass from elements, column: Hf}
@@ -406,37 +607,37 @@ species:
         quantity: delta_fH
         method_class: quoted_attributed
         reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(glass)'
-        attribution: Beyer et al. Table 13 auxiliary-data citations 1, 25, and 26.
+        attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'
         series: &bey80_t12 [{T_K: 298.15, delta_fH: -73.1, delta_fG: -60.3, log10_Kf: 44.20}, {T_K: 300, delta_fH: -73.1, delta_fG: -60.2, log10_Kf: 43.86}, {T_K: 400, delta_fH: -73.1, delta_fG: -55.9, log10_Kf: 30.54}, {T_K: 500, delta_fH: -73.1, delta_fG: -51.6, log10_Kf: 22.55}, {T_K: 600, delta_fH: -73.2, delta_fG: -47.3, log10_Kf: 17.23}, {T_K: 700, delta_fH: -73.3, delta_fG: -43.0, log10_Kf: 13.43}, {T_K: 800, delta_fH: -73.5, delta_fG: -38.6, log10_Kf: 10.55}, {T_K: 847, delta_fH: -73.7, delta_fG: -36.6, log10_Kf: 9.44}, {T_K: 847, delta_fH: -74.1, delta_fG: -36.6, log10_Kf: 9.44}, {T_K: 900, delta_fH: -74.1, delta_fG: -34.2, log10_Kf: 8.30}]
     - observation_id: bey80_k2si2o5_oxide_formation_g_table12
       type: gibbs_table
       locator: {pdf_page_index: 18, page: 19, published_page: 15, table: '12', row: K2Si2O5 glass from oxides, column: Gr}
       phase: glass
       units: kcal/mole
-      values: {quantity: delta_fG, method_class: quoted_attributed, reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(glass)', series: *bey80_t12, attribution: 'Beyer et al. Table 13 auxiliary-data citations 1, 25, and 26.'}
+      values: {quantity: delta_fG, method_class: quoted_attributed, reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(glass)', series: *bey80_t12, attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'}
     - observation_id: bey80_k2si2o5_oxide_formation_k_table12
       type: gibbs_table
       locator: {pdf_page_index: 18, page: 19, published_page: 15, table: '12', row: K2Si2O5 glass from oxides, column: Log Kr}
       phase: glass
       units: log10(Kr)
-      values: {quantity: log10_Kf, method_class: quoted_attributed, reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(glass)', series: *bey80_t12, attribution: 'Beyer et al. Table 13 auxiliary-data citations 1, 25, and 26.'}
+      values: {quantity: log10_Kf, method_class: quoted_attributed, reaction: 'K2O(c) + 2SiO2(quartz) = K2Si2O5(glass)', series: *bey80_t12, attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'}
   K2SiO3:
     observations:
     - observation_id: bey80_k2sio3_reference_table4
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal}
-      phase: crystal
+      phase: cr
       units: cal/deg-mole
       derived_from: [bey80_k2sio3_heat_content_direct]
       derivation: {relation: Authors' smoothed high-temperature properties derived from heat-content measurements and Stull low-temperature heat capacities., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
       values:
         quantity: cp
         method_class: model_derived
-        series: &bey80_k2sio3_table4 [{T_K: 298.15, cp: 28.10, entropy: 34.93, neg_gibbs_over_T: 34.93, enthalpy_increment: 0}, {T_K: 300, cp: 28.17, entropy: 35.10, neg_gibbs_over_T: 34.93, enthalpy_increment: 0.052}, {T_K: 350, cp: 29.74, entropy: 39.57, neg_gibbs_over_T: 35.23, enthalpy_increment: 1.501}, {T_K: 400, cp: 30.97, entropy: 43.62, neg_gibbs_over_T: 36.07, enthalpy_increment: 3.020}, {T_K: 450, cp: 32.00, entropy: 47.33, neg_gibbs_over_T: 37.12, enthalpy_increment: 4.595}, {T_K: 500, cp: 32.90, entropy: 50.75, neg_gibbs_over_T: 38.31, enthalpy_increment: 6.218}, {T_K: 550, cp: 33.72, entropy: 53.93, neg_gibbs_over_T: 39.60, enthalpy_increment: 7.884}, {T_K: 600, cp: 34.48, entropy: 56.89, neg_gibbs_over_T: 40.91, enthalpy_increment: 9.589}, {T_K: 650, cp: 35.20, entropy: 59.68, neg_gibbs_over_T: 42.25, enthalpy_increment: 11.330}, {T_K: 700, cp: 35.89, entropy: 62.32, neg_gibbs_over_T: 43.59, enthalpy_increment: 13.110}, {T_K: 750, cp: 36.57, entropy: 64.81, neg_gibbs_over_T: 44.92, enthalpy_increment: 14.920}, {T_K: 800, cp: 37.22, entropy: 67.20, neg_gibbs_over_T: 46.24, enthalpy_increment: 16.765}, {T_K: 850, cp: 37.87, entropy: 69.47, neg_gibbs_over_T: 47.54, enthalpy_increment: 18.640}, {T_K: 900, cp: 38.50, entropy: 71.65, neg_gibbs_over_T: 48.82, enthalpy_increment: 20.550}, {T_K: 950, cp: 39.13, entropy: 73.75, neg_gibbs_over_T: 50.08, enthalpy_increment: 22.490}, {T_K: 1000, cp: 39.75, entropy: 75.78, neg_gibbs_over_T: 51.32, enthalpy_increment: 24.465}, {T_K: 1050, cp: 40.36, entropy: 77.73, neg_gibbs_over_T: 52.53, enthalpy_increment: 26.465}, {T_K: 1100, cp: 40.97, entropy: 79.62, neg_gibbs_over_T: 53.71, enthalpy_increment: 28.500}, {T_K: 1150, cp: 41.58, entropy: 81.46, neg_gibbs_over_T: 54.88, enthalpy_increment: 30.565, extrapolated: true}, {T_K: 1200, cp: 42.18, entropy: 83.24, neg_gibbs_over_T: 56.03, enthalpy_increment: 32.655, extrapolated: true}, {T_K: 1249, cp: 42.77, entropy: 84.94, neg_gibbs_over_T: 57.13, enthalpy_increment: 34.740, melting_point: true, extrapolated: true}]
+        series: &bey80_k2sio3_table4 [{T_K: 298.15, cp: 28.10, entropy: 34.93, neg_gibbs_over_T: 34.93, enthalpy_increment: 0}, {T_K: 300, cp: 28.17, entropy: 35.10, neg_gibbs_over_T: 34.93, enthalpy_increment: 0.052}, {T_K: 350, cp: 29.74, entropy: 39.57, neg_gibbs_over_T: 35.23, enthalpy_increment: 1.501}, {T_K: 400, cp: 30.97, entropy: 43.62, neg_gibbs_over_T: 36.07, enthalpy_increment: 3.020}, {T_K: 450, cp: 32.00, entropy: 47.33, neg_gibbs_over_T: 37.12, enthalpy_increment: 4.595}, {T_K: 500, cp: 32.90, entropy: 50.75, neg_gibbs_over_T: 38.31, enthalpy_increment: 6.218}, {T_K: 550, cp: 33.72, entropy: 53.93, neg_gibbs_over_T: 39.60, enthalpy_increment: 7.884}, {T_K: 600, cp: 34.48, entropy: 56.89, neg_gibbs_over_T: 40.91, enthalpy_increment: 9.589}, {T_K: 650, cp: 35.20, entropy: 59.68, neg_gibbs_over_T: 42.25, enthalpy_increment: 11.330}, {T_K: 700, cp: 35.89, entropy: 62.32, neg_gibbs_over_T: 43.59, enthalpy_increment: 13.110}, {T_K: 750, cp: 36.57, entropy: 64.81, neg_gibbs_over_T: 44.92, enthalpy_increment: 14.920}, {T_K: 800, cp: 37.22, entropy: 67.20, neg_gibbs_over_T: 46.24, enthalpy_increment: 16.765}, {T_K: 850, cp: 37.87, entropy: 69.47, neg_gibbs_over_T: 47.54, enthalpy_increment: 18.640}, {T_K: 900, cp: 38.50, entropy: 71.65, neg_gibbs_over_T: 48.82, enthalpy_increment: 20.550}, {T_K: 950, cp: 39.13, entropy: 73.75, neg_gibbs_over_T: 50.08, enthalpy_increment: 22.490}, {T_K: 1000, cp: 39.75, entropy: 75.78, neg_gibbs_over_T: 51.32, enthalpy_increment: 24.465}, {T_K: 1050, cp: 40.36, entropy: 77.73, neg_gibbs_over_T: 52.53, enthalpy_increment: 26.465}, {T_K: 1100, cp: 40.97, entropy: 79.62, neg_gibbs_over_T: 53.71, enthalpy_increment: 28.500}]
     - observation_id: bey80_k2sio3_entropy_table4
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: S}
-      phase: crystal
+      phase: cr
       units: cal/deg-mole
       derived_from: [bey80_k2sio3_heat_content_direct]
       derivation: {relation: Entropy function integrated from the authors' smoothed heat capacity., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
@@ -444,25 +645,108 @@ species:
     - observation_id: bey80_k2sio3_enthalpy_table4
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: H_T-H_298}
-      phase: crystal
+      phase: cr
       units: kcal/mole
       derived_from: [bey80_k2sio3_heat_content_direct]
       derivation: {relation: Authors' smoothed heat-content function., inputs: [bey80_k2sio3_heat_content_direct], output_unit: kcal/mole}
       values: {quantity: H_minus_H298, method_class: model_derived, series: *bey80_k2sio3_table4}
+    - observation_id: bey80_k2sio3_t4_extrapolated_cp_1150
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal}
+      phase: cr
+      units: cal/deg-mole
+      derived_from: [bey80_k2sio3_heat_content_direct]
+      derivation: {relation: Authors' smoothed high-temperature properties derived from heat-content measurements and Stull low-temperature heat capacities., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
+      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2sio3_t4_row_1150 [{T_K: 1150, cp: 41.58, entropy: 81.46, neg_gibbs_over_T: 54.88, enthalpy_increment: 30.565}]}
+    - observation_id: bey80_k2sio3_t4_extrapolated_s_1150
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: S}
+      phase: cr
+      units: cal/deg-mole
+      derived_from: [bey80_k2sio3_heat_content_direct]
+      derivation: {relation: Entropy function integrated from the authors' smoothed heat capacity., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
+      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2sio3_t4_row_1150}
+    - observation_id: bey80_k2sio3_t4_extrapolated_h_1150
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: H_T-H_298}
+      phase: cr
+      units: kcal/mole
+      derived_from: [bey80_k2sio3_heat_content_direct]
+      derivation: {relation: Authors' smoothed heat-content function., inputs: [bey80_k2sio3_heat_content_direct], output_unit: kcal/mole}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2sio3_t4_row_1150}
+    - observation_id: bey80_k2sio3_t4_extrapolated_cp_1200
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal}
+      phase: cr
+      units: cal/deg-mole
+      derived_from: [bey80_k2sio3_heat_content_direct]
+      derivation: {relation: Authors' smoothed high-temperature properties derived from heat-content measurements and Stull low-temperature heat capacities., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
+      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2sio3_t4_row_1200 [{T_K: 1200, cp: 42.18, entropy: 83.24, neg_gibbs_over_T: 56.03, enthalpy_increment: 32.655}]}
+    - observation_id: bey80_k2sio3_t4_extrapolated_s_1200
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: S}
+      phase: cr
+      units: cal/deg-mole
+      derived_from: [bey80_k2sio3_heat_content_direct]
+      derivation: {relation: Entropy function integrated from the authors' smoothed heat capacity., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
+      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2sio3_t4_row_1200}
+    - observation_id: bey80_k2sio3_t4_extrapolated_h_1200
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: H_T-H_298}
+      phase: cr
+      units: kcal/mole
+      derived_from: [bey80_k2sio3_heat_content_direct]
+      derivation: {relation: Authors' smoothed heat-content function., inputs: [bey80_k2sio3_heat_content_direct], output_unit: kcal/mole}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2sio3_t4_row_1200}
+    - observation_id: bey80_k2sio3_t4_extrapolated_cp_1249
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal}
+      phase: cr
+      units: cal/deg-mole
+      derived_from: [bey80_k2sio3_heat_content_direct]
+      derivation: {relation: Authors' smoothed high-temperature properties derived from heat-content measurements and Stull low-temperature heat capacities., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
+      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2sio3_t4_row_1249 [{T_K: 1249, cp: 42.77, entropy: 84.94, neg_gibbs_over_T: 57.13, enthalpy_increment: 34.740, melting_point: true}]}
+    - observation_id: bey80_k2sio3_t4_extrapolated_s_1249
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: S}
+      phase: cr
+      units: cal/deg-mole
+      derived_from: [bey80_k2sio3_heat_content_direct]
+      derivation: {relation: Entropy function integrated from the authors' smoothed heat capacity., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
+      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2sio3_t4_row_1249}
+    - observation_id: bey80_k2sio3_t4_extrapolated_h_1249
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: H_T-H_298}
+      phase: cr
+      units: kcal/mole
+      derived_from: [bey80_k2sio3_heat_content_direct]
+      derivation: {relation: Authors' smoothed heat-content function., inputs: [bey80_k2sio3_heat_content_direct], output_unit: kcal/mole}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2sio3_t4_row_1249}
     - observation_id: bey80_k2sio3_heat_content_direct
       type: heat_capacity_and_heat_content_series
-      locator: {pdf_page_index: 10, page: 11, published_page: 7, table: '3', row: K2SiO3 crystal, column: H_T-H_298}
-      phase: crystal
+      locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2SiO3 crystal, column: H_T-H_298}
+      phase: cr
       units: kcal/mole
       values:
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry above 298.15 K; merged with Stull's low-temperature heat capacities for the smooth table.
-        series: [{T_K: 403.2, enthalpy_increment: 3.097}, {T_K: 503.0, enthalpy_increment: 6.304}, {T_K: 602.9, enthalpy_increment: 9.698}, {T_K: 703.3, enthalpy_increment: 13.238}, {T_K: 803.4, enthalpy_increment: 16.881}, {T_K: 902.8, enthalpy_increment: 20.659}, {T_K: 1019.4, enthalpy_increment: 25.222}, {T_K: 1103.3, enthalpy_increment: 28.653}, {T_K: 1195.0, enthalpy_increment: 32.846}]
+        series: [{T_K: 403.2, enthalpy_increment: 3.097}, {T_K: 503.0, enthalpy_increment: 6.304}, {T_K: 602.9, enthalpy_increment: 9.698}, {T_K: 703.3, enthalpy_increment: 13.238}, {T_K: 803.4, enthalpy_increment: 16.881}, {T_K: 902.8, enthalpy_increment: 20.659}, {T_K: 1019.4, enthalpy_increment: 25.222}, {T_K: 1103.3, enthalpy_increment: 28.653}]
+    - observation_id: bey80_k2sio3_possible_melting_onset_1195
+      type: heat_capacity_and_heat_content_series
+      locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2SiO3 crystal, column: H_T-H_298}
+      phase: cr
+      units: kcal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry above 298.15 K; merged with Stull's low-temperature heat capacities for the smooth table.
+        reason: "source_internally_inconsistent: Table 3 footnote 1 marks possible onset of melting; the authors exclude this point from their smooth fits."
+        series: [{T_K: 1195.0, enthalpy_increment: 32.846}]
     - observation_id: bey80_k2sio3_transition
       type: transition_point
       locator: {pdf_page_index: 10, page: 11, published_page: 7, section: Discussion, note: adopted congruent melting point}
-      phase: crystal
+      phase: cr
       units: K
       values: {quantity: transition_temperature, method_class: quoted_attributed, T_K: 1249, attribution: 'Morey (reference 15), confirmed by Kracek (reference 12)', property_kind: melting_point}
     - observation_id: bey80_k2sio3_element_formation_h_table7
@@ -502,20 +786,20 @@ species:
         quantity: delta_fH
         method_class: quoted_attributed
         reaction: 'K2O(c) + SiO2(quartz) = K2SiO3(c)'
-        attribution: Beyer et al. Table 13 auxiliary-data citations 5, 20, 25, and 26.
+        attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'
         series: &bey80_t8 [{T_K: 298.15, delta_fH: -65.9, delta_fG: -66.5, log10_Kf: 48.75}, {T_K: 300, delta_fH: -65.9, delta_fG: -66.5, log10_Kf: 48.45}, {T_K: 400, delta_fH: -65.9, delta_fG: -66.7, log10_Kf: 36.44}, {T_K: 500, delta_fH: -66.0, delta_fG: -66.9, log10_Kf: 29.24}, {T_K: 600, delta_fH: -66.1, delta_fG: -67.0, log10_Kf: 24.40}, {T_K: 700, delta_fH: -66.2, delta_fG: -67.2, log10_Kf: 20.98}, {T_K: 800, delta_fH: -66.4, delta_fG: -67.3, log10_Kf: 18.39}, {T_K: 847, delta_fH: -66.5, delta_fG: -67.3, log10_Kf: 17.37}, {T_K: 847, delta_fH: -66.7, delta_fG: -67.3, log10_Kf: 17.37}, {T_K: 900, delta_fH: -66.7, delta_fG: -67.4, log10_Kf: 16.37}, {T_K: 1000, delta_fH: -66.6, delta_fG: -67.5, log10_Kf: 14.75}, {T_K: 1100, delta_fH: -66.5, delta_fG: -67.5, log10_Kf: 13.41}, {T_K: 1154, delta_fH: -66.4, delta_fG: -67.6, log10_Kf: 12.80}]
     - observation_id: bey80_k2sio3_oxide_formation_g_table8
       type: gibbs_table
       locator: {pdf_page_index: 17, page: 18, published_page: 14, table: '8', row: K2SiO3 from oxides, column: Gr}
       phase: cr
       units: kcal/mole
-      values: {quantity: delta_fG, method_class: quoted_attributed, reaction: 'K2O(c) + SiO2(quartz) = K2SiO3(c)', series: *bey80_t8, attribution: 'Beyer et al. Table 13 auxiliary-data citations 5, 20, 25, and 26.'}
+      values: {quantity: delta_fG, method_class: quoted_attributed, reaction: 'K2O(c) + SiO2(quartz) = K2SiO3(c)', series: *bey80_t8, attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'}
     - observation_id: bey80_k2sio3_oxide_formation_k_table8
       type: gibbs_table
       locator: {pdf_page_index: 17, page: 18, published_page: 14, table: '8', row: K2SiO3 from oxides, column: Log Kr}
       phase: cr
       units: log10(Kr)
-      values: {quantity: log10_Kf, method_class: quoted_attributed, reaction: 'K2O(c) + SiO2(quartz) = K2SiO3(c)', series: *bey80_t8, attribution: 'Beyer et al. Table 13 auxiliary-data citations 5, 20, 25, and 26.'}
+      values: {quantity: log10_Kf, method_class: quoted_attributed, reaction: 'K2O(c) + SiO2(quartz) = K2SiO3(c)', series: *bey80_t8, attribution: 'Calculated in this investigation; Table 13 lists the auxiliary data.'}
 fidelity_samples:
 - path: species.K2Si2O5.observations[0].values.series[0]
   value: {T_K: 4.80, cp: 0.014}
@@ -527,7 +811,7 @@ fidelity_samples:
   observation_id: bey80_k2si2o5_heat_of_fusion
   field: value
   value: 8.42
-  locator: {pdf_page_index: 17, page: 18, published_page: 17, section: Discussion}
-- path: species.K2SiO3.observations[3].values.series[0]
+  locator: {pdf_page_index: 20, page: 21, published_page: 17, section: Discussion}
+- path: species.K2SiO3.observations[bey80_k2sio3_heat_content_direct].values.series[0]
   value: {T_K: 403.2, enthalpy_increment: 3.097}
-  locator: {pdf_page_index: 10, page: 11, published_page: 7, table: '3', row: K2SiO3 crystal}
+  locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2SiO3 crystal}
