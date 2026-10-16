@@ -1,0 +1,599 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2002-spinel-mgal2o4
+source:
+  citation: Shornikov, S. I. (2002). Mass Spectrometric Study of Solid Solution Region of Spinel MgAl2O4. Herald of the Earth Sciences Department RAS, No. 1(20), 1–2.
+  year: 2002
+  corpus_asset: raw/shornikov-2002-spinel-mgal2o4/shornikov-2002-spinel-mgal2o4.pdf
+  corpus_sha256: d786534c1e88bd47987aa1727e0091c6a96844c7af41d683753de5b97ec1496c
+extraction:
+  method: Manual transcription from the owner-supplied PDF; both pages rendered at 300 dpi and visually checked. No printed tables. Prose estimates retained as author_estimate observations. Figures 1 and 2 are figure_only; curves were not digitized.
+  date: '2026-10-05'
+  worker: codex-resume-92271-1791207706
+review_status: draft
+fidelity_samples:
+- species: MgAl2O4
+  observation_id: shornikov_2002_peak_al2o3_boundary_estimate
+  observable: method
+  field: peak_x_Al2O3_mol_percent_as_printed
+  value: '83.02'
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Results
+    note: Peak Al2O3 mole fraction estimate checked against page image.
+- species: MgAl2O4
+  observation_id: shornikov_2002_spinel_formation_enthalpy_estimate
+  observable: gibbs_table
+  field: delta_f_H
+  value: -13.3
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Results
+    note: Formation enthalpy estimate checked against page image.
+benches:
+- id: shornikov-2002-mi1201-molybdenum-kems
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MI 1201 commercial mass spectrometer with ion source modified for high-temperature measurements
+    locator:
+      page: 1
+      published_page: 1
+      pdf_page_index: 0
+      section: Experimental
+      note: Printed instrument and source description.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum cells; liner not stated
+    locator:
+      page: 1
+      published_page: 1
+      pdf_page_index: 0
+      section: Experimental
+      note: The paper says vaporization was studied from molybdenum cells; no liner is identified.
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      page: 1
+      published_page: 1
+      pdf_page_index: 0
+      section: Experimental
+      note: The paper says vaporization was studied from molybdenum cells.
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: No orifice diameter is stated on either page.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: No orifice channel length is stated on either page.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Temperature sensor is not specified.
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Temperature calibration is not specified.
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Ionization energy is not stated.
+    cross_sections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Ionization cross-sections and their source are not stated.
+    multiplier_isotope_corrections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Multiplier and isotope corrections are not stated.
+experiments:
+- experiment_id: shornikov_2002_mgal2o4_kems_runs
+  bench_id: shornikov-2002-mi1201-molybdenum-kems
+  method: knudsen_effusion
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Experimental
+    note: Mass-spectrometric Knudsen-effusion study of MgAl2O4 spinel.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1850'
+          interval_high: '2250'
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Printed temperature range 1850–2250 K.
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          published_page: 1
+          pdf_page_index: 0
+          section: Results
+          note: No calibration substance or method for converting ion intensities to partial pressures is stated.
+      pressure_reduction:
+        state:
+          tag: value
+          value: Hertz-Knudsen equation
+        locator:
+          page: 1
+          published_page: 1
+          pdf_page_index: 0
+          section: Results
+          note: Authors say MgO and Al2O3 activities and spinel formation Gibbs energy were calculated from vapor-species partial pressures according to the Hertz-Knudsen equation; this is the thermodynamic reduction, not a stated ion-current calibration.
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          published_page: 1
+          pdf_page_index: 0
+          section: Experimental
+          note: Not stated.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          published_page: 1
+          pdf_page_index: 0
+          section: Experimental
+          note: Not stated.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Chamber background pressure is not stated; no sample vapor pressure is used as a substitute.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Sweep gas is not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  sample:
+    pretreatment:
+      state:
+        tag: unknown
+        reason: described_in_reference_only
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Sample synthesis and detailed experimental technique are referred to reference [2], not described here.
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Specific starting compositions and purity are not reported on these pages; spinel samples across the MgAl2O4–Al2O3 solid-solution region are studied.
+    composition_after_runs:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Results
+        note: Exact post-run analyses are not reported; authors state that condensed-phase composition changed during evaporation.
+    characterization:
+      state:
+        tag: unknown
+        reason: details_referred_to_reference_2
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Starting materials, synthesis details, and sample purity are not printed here; sample synthesis is referred to reference [2].
+species:
+  MgAl2O4:
+    observations:
+    - locator: &id001
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Results
+      phase: MgAl2O4 spinel
+      experiment: shornikov_2002_mgal2o4_kems_runs
+      type: gibbs_table
+      T_range_K: &id002
+      - 1851.0
+      - 2089.0
+      standard_state: &id003
+        state:
+          tag: unknown
+          reason: not_stated_in_this_source
+      observation_id: shornikov_2002_spinel_formation_enthalpy_estimate
+      units: kJ/mol
+      uncertainty:
+        note: Authors estimated ΔfH from the temperature dependence of ΔfGT; printed uncertainty ±1.2 kJ/mol.
+        delta_f_H_kJ_per_mol:
+        - -14.5
+        - -12.1
+      values:
+        quantity: delta_f_H
+        method_class: author_estimate
+        admission_status: admitted
+        uncertainty: 1.2
+        uncertainty_as_printed: ±1.2
+        estimation_temperature_range_K_as_printed: 1851–2089
+        note: Recalculated for 1 mole of the system compound.
+        units_as_printed: kJ/mole of system compound
+        delta_f_H: -13.3
+        delta_f_H_as_printed: −13.3
+    context:
+    - observation_id: shornikov_2002_printed_header_metadata
+      type: method
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Author and journal header above introduction
+      units: Source metadata as printed
+      values:
+        quantity: printed_author_contact_and_source_url
+        method_class: quoted_unattributed
+        statements:
+        - 'Fax/phone: (812) 328-91-55'
+        - 'URL: http://www.scgis.ru/russian/cp1251/h_dgggms/1-2002/informbul-1.htm#term-17.engl'
+        note: The URL is transcribed from the printed header; no retrieval from it is claimed.
+    - observation_id: shornikov_2002_fig1_solid_solution_boundaries
+      type: figure
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: as plotted
+      values:
+        quantity: spinel_solid_solution_boundary_and_evaporation_composition_curve
+        method_class: figure_only
+        admission_status: figure_only
+        reason: Figure 1 plots temperature dependence of condensed-phase composition during evaporation and boundaries from this study and references [1] and [3]; numeric coordinates were not digitized.
+        references:
+          curve_1: present_work_composition_during_evaporation
+          curve_2: present_work_boundaries
+          curve_3: Berezhnoi_1970_reference_1
+          curve_4: Hallstedt_1992_reference_3
+    - observation_id: shornikov_2002_fig2_formation_gibbs_energy_comparison
+      type: figure
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        figure: '2'
+      units: kJ/mol as plotted
+      values:
+        quantity: MgAl2O4_formation_Gibbs_energy_comparison
+        method_class: figure_only
+        admission_status: figure_only
+        reason: Figure 2 curves and markers were not digitized.
+        series: present_work_and_cited_formation_Gibbs_energy_results
+        references:
+          curves_1_to_3: heterogeneous_equilibria_references_6_to_8
+          curve_4: Jacob_et_al_1998_reference_4_EMF
+          curve_5: present_work_Knudsen_effusion_mass_spectrometry
+          curve_6: Hallstedt_1992_reference_3_compound_energy_model
+          curve_7: Chase_1998_reference_5_recommended_values
+    - observation_id: shornikov_2002_thermodynamic_qualifications
+      type: method
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Results
+      units: located statements
+      values:
+        quantity: data_qualification_and_comparison_statements
+        method_class: quoted_unattributed
+        statements:
+        - The identification of the gas phase composition over the MgAl2O4 samples shows that the predominant evaporation processes are heterogeneous reactions similar to those of individual oxides.
+        - Due to the difference in the reaction (1) and (2) rates, the composition of the condensed phase during the evaporation changed up to the compositions at the boundary of the concentration range of MgAl2O4 solid solutions.
+        - On the other hand, the evaporation of the boundary compositions took place at a constant concentration.
+        - Hence, different temperature regimes in the experiments made it possible to establish the concentration boundaries of the region of spinel solid solutions in the MgAl2O4-Al2O3 system.
+        - Comparing the phase diagrams obtained by Berezhnoi [1] and computed by Hallstedt [3] with our experimental data (see Fig. 1) shows the closeness of our data with the same of Berezhnoi.
+        - The accurate determination of the thermodynamic properties of stoichiometric spinel at more high temperatures was hampered due to the above-mentioned variations of the condensed phase composition.
+        - One can see that our data on the MgAl2O4 thermodynamic properties agree with the values determined by Hallstedt [3] and Jacob et al. [4] and recommended by Chase Tables [5], and shows the insignificant deviations from the ideality.
+        - On the contrary, Kalyanram and Bell [6] and Rein and Chipman [7] consider the system as being ideal.
+        - These discrepancies may be due to the crude approximation procedure of the Schuhmann method used in [6, 7].
+        - The values of ΔfGT(MgAl2O4) obtained by Grjotheim et al. [8] using the data on heterogeneous equilibrium ... are not usually recommended due to the significant errors, which are the result of the usage of the additional thermodynamic information.
+    - observation_id: shornikov_2002_introduction_context
+      type: method
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Introduction
+      units: located statements
+      values:
+        quantity: introduction_context
+        method_class: quoted_unattributed
+        statements:
+        - The information on thermodynamic properties of spinel MgAl2O4 is of great importance in geochemistry and petrology since it is usually considered as a component of complex systems, which determine the mechanisms of geological processes.
+        - The high melting point and chemical stability along with some specific physicochemical properties of spinel [1] are the background of its wide application in various technologies.
+    - observation_id: shornikov_2002_activity_reduction_context
+      type: method
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Results
+      units: located method statement
+      values:
+        quantity: activity_and_formation_energy_reduction
+        method_class: quoted_unattributed
+        statements:
+        - The values of the MgO and Al2O3 activities as well as the Gibbs energy of the spinel formation ΔfGT(MgAl2O4) were calculated using the data on the partial pressures of the vapor species in reactions (1) and (2) according to the Hertz-Knudsen equation.
+        activity_defining_gas_species:
+          MgO: Mg(g) and O(g), reaction (1)
+          Al2O3: Al(g) and O(g), reaction (2)
+        activity_standard_state:
+          MgO: not_stated_in_this_source
+          Al2O3: not_stated_in_this_source
+        partial_pressure_values:
+          state:
+            tag: unknown
+            reason: not_published
+    - observation_id: shornikov_2002_numeric_context
+      type: method
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Results
+      units: located numerical context
+      values:
+        quantity: printed_numerical_statements
+        method_class: quoted_unattributed
+        values_as_printed:
+          experimental_temperature_range_K: 1850–2250
+          peak_Al2O3_mole_percent: 83.02±0.18
+          peak_temperature_K: 2179±10
+          formation_parameter_estimation_range_K: 1851–2089
+          formation_enthalpy_kJ_per_mol: −13.3±1.2
+          formation_entropy_J_per_mol_K: 4.4±1.0
+          references: Figure 1 compares phase diagrams from references [1] and [3]; Figure 2 compares values from references [3]–[8].
+    - observation_id: shornikov_2002_peak_al2o3_boundary_estimate
+      type: method
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Results
+      T_range_K:
+      - 2169.0
+      - 2189.0
+      phase: MgAl2O4–Al2O3 spinel solid solution
+      experiment: shornikov_2002_mgal2o4_kems_runs
+      units: mole percent Al2O3 and K
+      uncertainty:
+        note: Printed peak composition and temperature uncertainties are ±0.18 mole % and ±10 K, respectively.
+        peak_x_Al2O3_mol_percent:
+        - 82.84
+        - 83.2
+        temperature_K:
+        - 2169.0
+        - 2189.0
+      values:
+        quantity: peak_Al2O3_solid_solution_concentration
+        method_class: author_estimate
+        peak_x_Al2O3_mol_percent_as_printed: '83.02'
+        peak_x_Al2O3_uncertainty_mol_percent_as_printed: '0.18'
+        temperature_K_as_printed: '2179'
+        temperature_uncertainty_K_as_printed: '10'
+        temperature_K: 2179.0
+        uncertainty: ±0.18 mole % and ±10 K
+        note: Author-estimated peak concentration and its temperature; this extract schema has no closed numeric quantity for composition boundary.
+    - locator: *id001
+      phase: MgAl2O4 spinel
+      experiment: shornikov_2002_mgal2o4_kems_runs
+      type: method
+      T_range_K: *id002
+      standard_state: *id003
+      observation_id: shornikov_2002_spinel_formation_entropy_estimate
+      units: J/mol/K
+      uncertainty:
+        note: Authors estimated ΔfS from the temperature dependence of ΔfGT; printed uncertainty ±1.0 J/(mol K).
+        entropy_J_per_mol_K:
+        - 3.4
+        - 5.4
+      values:
+        quantity: formation_entropy_estimate
+        method_class: author_estimate
+        delta_f_S_J_per_mol_K_as_printed: '4.4'
+        uncertainty_J_per_mol_K_as_printed: ±1.0
+        value_J_per_mol_K: 4.4
+        estimation_temperature_range_K_as_printed: 1851–2089
+        note: Authors estimated ΔfS from the temperature dependence of ΔfGT; recalculated for 1 mole of the system compound. The extract schema has no closed numeric entropy observation with the printed temperature range and no single temperature.
+    - observation_id: shornikov_2002_gas_reaction_notation
+      type: method
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Results
+        equation: 1-2
+      units: equations as printed
+      values:
+        quantity: gas_phase_reaction_notation
+        method_class: quoted_unattributed
+        equations_as_printed:
+        - '[MgO] = (Mg) + (O)'
+        - '[Al2O3] = 2(Al) + 3(O)'
+        phase_bracket_convention: Square brackets denote components in the condensed phase; round brackets denote components in the gas phase.
+    - observation_id: shornikov_2002_spinel_formation_equilibrium
+      type: method
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Results
+        equation: '3'
+      units: equation as printed
+      values:
+        quantity: spinel_formation_equilibrium
+        method_class: quoted_unattributed
+        equation_as_printed: 4[MgO] + 2[Al] = [MgAl2O4] + 3(Mg)
+  MgO:
+    context:
+    - observation_id: shornikov_2002_mgo_activity_reported_as_calculated
+      type: method
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Results
+      units: located method statement
+      values:
+        quantity: MgO_activity
+        method_class: quoted_unattributed
+        definition: Calculated from Mg(g) and O(g) partial pressures using reaction (1) and the Hertz-Knudsen equation.
+        standard_state: not_stated_in_this_source
+        pressure_species_used:
+        - Mg(g)
+        - O(g)
+        measured_ion_signals:
+          state:
+            tag: unknown
+            reason: not_identified_in_this_source
+        activity_value:
+          state:
+            tag: unknown
+            reason: not_published
+    observations: []
+  Al2O3:
+    context:
+    - observation_id: shornikov_2002_al2o3_activity_reported_as_calculated
+      type: method
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Results
+      units: located method statement
+      values:
+        quantity: Al2O3_activity
+        method_class: quoted_unattributed
+        definition: Calculated from Al(g) and O(g) partial pressures using reaction (2) and the Hertz-Knudsen equation.
+        measured_ion_signals:
+          state:
+            tag: unknown
+            reason: not_identified_in_this_source
+        pressure_species_used:
+        - Al(g)
+        - O(g)
+        standard_state: not_stated_in_this_source
+        activity_value:
+          state:
+            tag: unknown
+            reason: not_published
+    - observation_id: shornikov_2002_reference_list
+      type: method
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: References
+      units: bibliography as printed
+      values:
+        quantity: cited_comparison_sources
+        method_class: quoted_attributed
+        references:
+        - '[1] Berezhnoi A.S. (1970), Mnogokomponentnye sistemy okislov, Naukova Dumka, Kiev, 554p.'
+        - '[2] Shornikov S.I., Archakov I.Yu., Chemekova T.Yu. (2000), Russ. J. Phys. Chem. V.74. P.677.'
+        - '[3] Hallstedt B. (1992), J. Amer. Ceram. Soc. V.75. P.1497.'
+        - '[4] Jacob K.T., Jayadevan K.P., Waseda Y. (1998), J. Amer. Ceram. Soc. V.81. P.209.'
+        - '[5] Chase M.W. (1998), NIST-JANAF Thermochemical Tables.'
+        - '[6] Kalyanram M.R., Bell H.B. (1961), Trans. Brit. Ceram. Soc. V.60. P.135.'
+        - '[7] Rein R.H., Chipman J. (1965), Trans. Met. Soc. AIME. V.233. P.415.'
+        - '[8] Grjotheim K., Herstad O., Toguri J.M. (1961), Can. J. Chem. V.39. P.443.'
+    observations: []
