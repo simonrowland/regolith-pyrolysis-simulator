@@ -23,6 +23,21 @@ extraction:
   date: '2026-10-16'
   worker: rdxw-cr06-1016
 review_status: draft
+fidelity_samples:
+- path: species.Cr.observations[berry_2006_table1_row_01_quoted_berry_oneill_2004].values.points[2].value
+  value: 0.709
+  locator:
+    published_page: 1902
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 row 1 AD, italicized Berry and O'Neill (2004) value at log fO2 = -9
+- path: species.Cr.observations[berry_2006_table1_row_01_measured].values.composition_wt_pct.SiO2
+  value: 50.6
+  locator:
+    published_page: 1902
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 row 1 AD, SiO2 composition in wt%
 species:
   Cr:
     observations:
