@@ -7381,6 +7381,8 @@ def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
     band = residual.numeric.decision_band
     assert band.band_basis == "fusion_combined_row_printed"
     assert band.value > Decimal("0.10") * score_module.NORMAL_95_TICKET_MULTIPLIER
+    # sigma_conv = 1 kJ/mol * 1000 J/kJ / (8.31441 J/(mol K) * 2000 K * ln(10));
+    # sigma_total = sqrt(0.10^2 + sigma_conv^2) dex; ticket = 1.959963984540054 * sigma_total.
     assert band.value.quantize(Decimal("0.00001")) == Decimal("0.20257")
     assert any(
         item.reason.startswith("reference_converted_via_fusion;")
