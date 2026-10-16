@@ -967,8 +967,8 @@ class GasRatio:
             raise ValueError("gas ratio species must be nonempty")
         if self.numerator_species == self.denominator_species:
             raise ValueError("gas ratio species must differ")
-        if self.basis not in {"volume", "mole"}:
-            raise ValueError("gas ratio basis must be volume or mole")
+        if self.basis not in {"volume", "mole", "partial_pressure"}:
+            raise ValueError("gas ratio basis must be volume, mole, or partial_pressure")
         object.__setattr__(self, "value", _located_value(self.value))
 
 

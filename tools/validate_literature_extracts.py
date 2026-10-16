@@ -1571,8 +1571,8 @@ def _check_gas_ratios(doc: Mapping[str, Any], label: str, errors: list[str]) -> 
                 raise ValueError("denominator_species must be nonempty text")
             if numerator == denominator:
                 raise ValueError("ratio species must differ")
-            if ratio.get("basis") not in {"volume", "mole"}:
-                raise ValueError("basis must be volume or mole")
+            if ratio.get("basis") not in {"volume", "mole", "partial_pressure"}:
+                raise ValueError("basis must be volume, mole, or partial_pressure")
             located = _located_from_plain(ratio["value"], _value_or_point_from_plain)
             if located.state.is_value and located.locator is None:
                 errors.append(f"{path}.value: empirical Located value requires a locator")

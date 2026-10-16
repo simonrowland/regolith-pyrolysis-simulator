@@ -473,8 +473,8 @@ fO2_control:
     basis: mole
 ```
 
-`value` is a Located printed scalar, and `basis` is exactly `volume` or
-`mole`; `buffer` remains the source's verbatim printed description for buffer
+`value` is a Located printed scalar, and `basis` is exactly `volume`, `mole`,
+or `partial_pressure`; `buffer` remains the source's verbatim printed description for buffer
 systems. A commanded pure-O2 atmosphere uses `channel: gas_mix` and the
 printed `oxygen_partial_pressure_Pa` instead of `gas_ratio`.
 

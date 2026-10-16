@@ -1163,7 +1163,7 @@ def test_fo2_gas_ratio_round_trips_as_a_located_printed_value() -> None:
                 "state": {"tag": "value", "value": 1.4},
                 "locator": {"published_page": 800, "table": "I"},
             },
-            "basis": "mole",
+            "basis": "partial_pressure",
         },
     }
 
@@ -1173,7 +1173,7 @@ def test_fo2_gas_ratio_round_trips_as_a_located_printed_value() -> None:
     ratio = serialized["fO2_control"]["gas_ratio"]
     assert ratio["numerator_species"] == "CO2"
     assert ratio["denominator_species"] == "CO"
-    assert ratio["basis"] == "mole"
+    assert ratio["basis"] == "partial_pressure"
     assert ratio["value"]["state"]["value"]["point"] == "1.4"
     assert ratio["value"]["locator"] == {"published_page": 800, "table": "I"}
 
