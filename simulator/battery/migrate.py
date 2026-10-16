@@ -15121,10 +15121,8 @@ class Migrator:
     ) -> None:
         raw_item = item.get("item")
         index = item.get("index", 0)
-        if (
-            source_id == "kems-041-sossi-fegley-2018"
-            and isinstance(raw_item, Mapping)
-            and isinstance(raw_item.get("method_class"), str)
+        if isinstance(raw_item, Mapping) and isinstance(
+            raw_item.get("method_class"), str
         ):
             row_attribution = raw_item.get("references_as_published")
             row_model = raw_item.get("evidence_model")

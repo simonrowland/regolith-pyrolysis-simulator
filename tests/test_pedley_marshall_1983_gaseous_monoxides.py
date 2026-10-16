@@ -3,7 +3,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import AdmissionStatus
+from simulator.battery.enums import AdmissionStatus, EvidenceClass
 from simulator.battery.migrate import Migrator
 
 
@@ -50,3 +50,14 @@ def test_pedley_marshall_1983_tables_4_and_5_migrate_and_pin_enthalpies():
     table4_reason = table4["values"]["reason"]
     assert "no conversion is made" not in table4_reason
     assert "kcal/mol" in table4_reason and "kJ/mol" in table4_reason
+
+    for table in (table4, table5):
+        for formula in ("CdO", "OsO", "PdO", "ReO"):
+            observation = next(
+                observation
+                for observation in migrator.result.observations.values()
+                if f"::{table['observation_id']}::" in observation.observation_id
+                and observation.identity.species.formula == formula
+            )
+            assert observation.evidence.class_.value is EvidenceClass.AUTHOR_ESTIMATE
+    assert ag_observation.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
