@@ -41,9 +41,18 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 
-from simulator.battery.enums import Authority, NoticeKind, Rail  # noqa: E402
+from simulator.battery.enums import (  # noqa: E402
+    Authority,
+    NoticeKind,
+    Rail,
+    ResidualStatus,
+    residual_status_token,
+)
 from simulator.config import load_config_bundle  # noqa: E402
-from simulator.diagnostic_helpers.species_rail import parse_formula_elements  # noqa: E402
+from simulator.diagnostic_helpers.species_rail import (  # noqa: E402
+    lowest_tier,
+    parse_formula_elements,
+)
 from simulator.feedstock_composition import resolve_feedstock_composition  # noqa: E402
 
 
@@ -60,13 +69,11 @@ Y_LIMITS = (-3.0, 3.0)
 TIER_MAJOR = "major"
 TIER_MINOR = "minor"
 TIER_TRACE = "trace"
-TIER_RANK = {TIER_MAJOR: 0, TIER_MINOR: 1, TIER_TRACE: 2}
 TIER_STYLES: dict[str, dict[str, Any]] = {
     TIER_MAJOR: {"color": "#111111", "linewidth": 2.0, "markersize": 3.5},
     TIER_MINOR: {"color": "#777777", "linewidth": 1.2, "markersize": 3.0},
     TIER_TRACE: {"color": "#b9b9b9", "linewidth": 0.5, "markersize": 2.5},
 }
-_REFUSAL_STATUSES = {"refused", "typed-refusal", "typed_refusal"}
 _OUT_OF_BAND_NOTICE_KINDS = {
     NoticeKind.OUT_OF_CERTIFIED_BAND.value,
     NoticeKind.OUT_OF_GAMMA_DOMAIN.value,
@@ -386,8 +393,8 @@ def read_scores(
                 if rail:
                     rails_seen.add(rail)
 
-                status = str(row.get("status") or "")
-                if status in _REFUSAL_STATUSES:
+                status = residual_status_token(row.get("status"))
+                if status is ResidualStatus.REFUSED:
                     refusal = row.get("refusal")
                     reason = (
                         str(refusal.get("reason") or "untyped_refusal")
@@ -554,10 +561,7 @@ def species_tier(formula: str, abundance: ElementAbundance) -> str:
     elements = parse_formula_elements(formula) or ()
     if not elements:
         return TIER_TRACE
-    return max(
-        (element_tier(element, abundance) for element in elements),
-        key=TIER_RANK.get,
-    )
+    return lowest_tier(element_tier(element, abundance) for element in elements)
 
 
 def style_for_tier(tier: str) -> dict[str, Any]:

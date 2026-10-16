@@ -155,6 +155,35 @@ def test_binning_averages_same_experiment_duplicates_and_excludes_refusals(tmp_p
     assert element_points[12].flagged
 
 
+def test_refusal_status_legacy_spellings_are_counted(tmp_path: Path) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "test-store"}
+    ]
+    for index, status in enumerate(("refused", "typed-refusal", "typed_refusal")):
+        row = _record(
+            engine="openimcc",
+            experiment=f"refused-{index}",
+            formula="SiO2",
+            temperature_K=1000,
+            residual=None,
+        )
+        row["status"] = status
+        row["refusal"] = {"reason": f"reason-{index}"}
+        rows.append(row)
+    residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+
+    data = read_scores(residuals)
+
+    assert data.summaries["openimcc"].refusals == {
+        "reason-0": 1,
+        "reason-1": 1,
+        "reason-2": 1,
+    }
+
+
 def test_low_count_bins_are_markers_and_flagged_rows_are_hollow(tmp_path: Path) -> None:
     residuals = tmp_path / "residuals.jsonl"
     _score_file(residuals)
