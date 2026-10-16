@@ -670,6 +670,7 @@ def test_melt_fO2_log_is_live_in_vapor_pressure_producer(monkeypatch) -> None:
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -6.25
     sim.melt.fO2_log = -6.25
     sim.melt.melt_fO2_log = -6.25
+    expected_fO2_log = sim._current_melt_redox_fO2_log()
     seen_control_inputs: list[dict[str, Any]] = []
     original_dispatch_only = sim._dispatch_only
 
@@ -683,7 +684,10 @@ def test_melt_fO2_log_is_live_in_vapor_pressure_producer(monkeypatch) -> None:
     sim._get_equilibrium()
 
     assert seen_control_inputs
-    assert seen_control_inputs[-1]["intrinsic_fO2_log"] == pytest.approx(-6.25)
+    assert seen_control_inputs[-1]["intrinsic_fO2_log"] == pytest.approx(
+        expected_fO2_log
+    )
+    assert expected_fO2_log != pytest.approx(-6.25)
 
 
 def test_reductant_source_term_lowers_fO2_and_raises_native_drive() -> None:
