@@ -6894,7 +6894,12 @@ def compile_residual(
         None,
     )
     if missing_fusion_input is not None:
-        if engine is Engine.MAGEMIN:
+        native_pair_failure = (
+            engine is Engine.MAGEMIN
+            and "MAGEMin native reference could not be resolved:"
+            in missing_fusion_input.reason
+        )
+        if native_pair_failure:
             missing_input = "JANAF source/target tables for MAGEMin native reference"
         elif "JANAF solid table " in missing_fusion_input.reason:
             missing_input = "JANAF solid polymorph matching the selected table"
@@ -6905,11 +6910,9 @@ def compile_residual(
         return _refused(
             RefusalReason.IDENTITY_INCOMPLETE,
             {
-                "reason": (
-                    "magemin_native_reference_conversion_missing_input"
-                    if engine is Engine.MAGEMIN
-                    else "solid_liquid_reference_conversion_missing_input"
-                ),
+                "reason": "magemin_native_reference_conversion_missing_input"
+                if native_pair_failure
+                else "solid_liquid_reference_conversion_missing_input",
                 "missing_input": missing_input,
                 "notice": missing_fusion_input.reason,
             },

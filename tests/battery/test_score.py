@@ -7341,7 +7341,10 @@ def test_stated_silica_polymorph_is_not_reinferred() -> None:
     )
 
 
-def test_solid_reference_without_temperature_remains_a_missing_input_refusal() -> None:
+@pytest.mark.parametrize("engine", (Engine.OPENIMCC, Engine.MAGEMIN))
+def test_solid_reference_without_temperature_remains_a_missing_input_refusal(
+    engine: Engine,
+) -> None:
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
@@ -7364,13 +7367,16 @@ def test_solid_reference_without_temperature_remains_a_missing_input_refusal() -
 
     residual, _candidate = compile_residual(
         reference,
-        Engine.OPENIMCC,
+        engine,
         context=_context(F.work(), experiment, reference, review="reviewed"),
     )
 
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "solid_liquid_reference_conversion_missing_input"
+    )
     assert residual.refusal.detail["missing_input"] == (
         "activity observation temperature_K"
     )
@@ -9060,6 +9066,47 @@ def test_magemin_composition_gate_is_a_typed_out_of_domain_refusal(
     assert prediction.refusal_detail["reason"] == "out_of_domain"
     assert prediction.refusal_detail["out_of_domain_reason"] == "silicate_window"
     assert prediction.refusal_detail["gate"] == "magemin_composition_validity"
+
+
+def test_magemin_native_pair_failure_has_native_missing_input_label(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.generators import janaf
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        "cristobalite_high",
+    )
+    reference = F.observation(
+        "silica-native-pair-missing",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="silica-native-pair-missing-source",
+    )
+    monkeypatch.setattr(
+        janaf, "_janaf_eligible_pure_crystal_tables", lambda *_args: ()
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.MAGEMIN,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "magemin_native_reference_conversion_missing_input"
+    )
 
 
 def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
