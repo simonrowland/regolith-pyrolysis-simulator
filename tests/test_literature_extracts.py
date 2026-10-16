@@ -2491,6 +2491,47 @@ def test_allibert_printed_point_phases_are_typed_at_migration(tmp_path: Path):
     )
 
 
+def test_spinel_activities_get_solid_phase_but_bulk_residues_stay_unknown():
+    from simulator.battery.enums import Phase
+
+    migrator = battery_migrate.Migrator(REPO_ROOT)
+    migrator._migrate_extract(
+        EXTRACTS / "shornikov-2018-spinel-solid-solutions.yaml"
+    )
+    migrator._migrate_extract(
+        EXTRACTS / "shimaoka-nakamura-1989-nipr2-252.yaml"
+    )
+
+    spinel = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "shornikov-2018-spinel-solid-solutions"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value.value == "activity"
+    ]
+    assert len(spinel) == 60
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.CR
+        for observation in spinel
+    )
+
+    shimaoka = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "shimaoka-nakamura-1989-nipr2-252"
+    ]
+    assert len(shimaoka) == 12
+    # Table 2 reports bulk run-product Na; it does not identify those values
+    # as melt compositions (pp. 258, 260), so their phase remains unknown.
+    assert all(
+        observation.identity.species.phase.is_unknown
+        and observation.identity.species.phase.reason
+        == "phase string 'quenched_partial_melt_run_product' is not in the closed automatic map"
+        for observation in shimaoka
+    )
+
+
 def test_halwax_pure_solid_formation_enthalpies_are_symmetric():
     expected = {
         "halwax_2024_cao_third_law_formation_enthalpy": (-624.5, 3.5, "CaO(s)"),
