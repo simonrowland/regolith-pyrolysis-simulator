@@ -1108,10 +1108,32 @@ class NativeFeGasLimitedNotice:
     flag: str = 'NATIVE_FE_GAS_LIMITED'
 
 
+@dataclass(frozen=True)
+class NativeFeRemovalRateUnmodelledNotice:
+    melt_root_mol: float
+    authority: Literal['equilibrium_assumed'] = 'equilibrium_assumed'
+    flag: Literal['removal_rate_unmodelled'] = 'removal_rate_unmodelled'
+
+
+def _native_fe_open_sink_removal_cap(
+    extent_mol: float, *, melt_root_mol: float,
+) -> tuple[float, dict[str, object]]:
+    # Pending b-901's actual stream owner: at total P, the carrier/O2 ratio
+    # gives F_O2/F_total = p_IW/(P-p_IW). FeO -> Fe + 1/2 O2 therefore
+    # requires n_Fe <= 2*F_total*p_IW/(P-p_IW)*dt. Here F_total is the
+    # O2-free carrier stream in mol/s; pressure ratio is dimensionless,
+    # so mol/s*s gives mol Fe. At p_IW -> 0 capacity tends to zero;
+    # this expression requires 0 <= p_IW < P. No actual F_total exists on
+    # this branch. Controller authorizes an equilibrium sink, explicitly
+    # unmodelled in rate, rather than substituting a conductance capacity.
+    return extent_mol, asdict(NativeFeRemovalRateUnmodelledNotice(melt_root_mol))
+
+
 def native_fe_equilibrium_extent(
     *, comp_wt: Mapping[str, float], feo_mol: float, fe2o3_mol: float,
     T_K: float, pressure_bar: float,
     gas_fO2_log: Callable[[float], float],
+    open_sink: bool = False,
 ) -> dict[str, object]:
     """Instantaneous FeO -> Fe + 0.5 O2 extent at the supplied gas boundary."""
     from scipy.optimize import brentq
@@ -1119,7 +1141,11 @@ def native_fe_equilibrium_extent(
     if feo_mol <= 0.0:
         return {'native_fe_mol': 0.0, 'native_fe_frac': 0.0,
                 'native_fe_state': {'native_fe_saturation': False,
-                                    'native_fe_frac': 0.0}}
+                                    'native_fe_frac': 0.0},
+                'removal_rate_notice': (
+                    _native_fe_open_sink_removal_cap(0.0, melt_root_mol=0.0)[1]
+                    if open_sink else None),
+                }
     total_fe = feo_mol + 2.0 * fe2o3_mol
 
     def state(n):
@@ -1214,6 +1240,11 @@ def native_fe_equilibrium_extent(
         n = min(melt_root, gas_root)
         limit = ('both' if melt_root == gas_root else
                  'melt' if melt_root < gas_root else 'gas')
+    removal_notice = None
+    if open_sink:
+        n, removal_notice = _native_fe_open_sink_removal_cap(
+            n, melt_root_mol=melt_root,
+        )
     after, final = state(n)
     fraction = n / total_fe
     gas_notice = (asdict(NativeFeGasLimitedNotice(
@@ -1224,6 +1255,7 @@ def native_fe_equilibrium_extent(
         'native_fe_mol': n, 'native_fe_frac': fraction,
         'native_fe_state': {**initial, 'native_fe_frac': fraction},
         'gas_limited_notice': gas_notice,
+        'removal_rate_notice': removal_notice,
         'fO2_before_log': before, 'fO2_after_log': after,
         'iw_bound_after_log': final['iw_bound_log'], 'limit': limit,
         'melt_root_mol': melt_root, 'gas_root_mol': gas_root,

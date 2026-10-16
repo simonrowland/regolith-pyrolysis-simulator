@@ -7,7 +7,7 @@ import pytest
 
 from simulator.core import PyrolysisSimulator
 from simulator import fe_redox
-from simulator.state import MOLAR_MASS
+from simulator.state import Atmosphere, MOLAR_MASS
 
 
 @pytest.fixture(params=[
@@ -111,13 +111,13 @@ def _post_removal(probe, n):
     return value, bound
 
 
-def _solve(probe, gas=lambda n: -300.):
+def _solve(probe, gas=lambda n: -300., *, open_sink=False):
     sim, controls, _ = probe
     inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
     return fe_redox.native_fe_equilibrium_extent(
         comp_wt=controls['comp'], feo_mol=inventory['FeO'],
         fe2o3_mol=inventory['Fe2O3'], T_K=controls['T_K'],
-        pressure_bar=controls['pressure_bar'], gas_fO2_log=gas)
+        pressure_bar=controls['pressure_bar'], gas_fO2_log=gas, open_sink=open_sink)
 
 
 @pytest.fixture
@@ -174,10 +174,12 @@ def test_finite_gas_capacity_stops_at_gas_root(reducing_probe):
 def test_unbounded_low_ferric_band_prevents_precipitation(probe):
     probe[0].atom_ledger.mol_by_account('process.cleaned_melt')['Fe2O3'] *= 0.1
     probe[1]['comp']['Fe2O3'] *= 0.1
-    result = _solve(probe)
+    result = _solve(probe, open_sink=True)
     assert result['native_fe_state']['saturation_status'] == 'INDETERMINATE'
     assert result['native_fe_state']['band_lower_dex'] == math.inf
     assert result['native_fe_mol'] == 0.
+    assert result['removal_rate_notice']['melt_root_mol'] == 0.
+    assert result['removal_rate_notice']['authority'] == 'equilibrium_assumed'
 
 
 def test_gas_veto_preserves_saturation_and_reports_roots(reducing_probe):
@@ -193,12 +195,16 @@ def test_gas_veto_preserves_saturation_and_reports_roots(reducing_probe):
 
 def test_gas_veto_event_is_limited_not_empty_inventory(monkeypatch):
     sim = _reducing_sim()
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
     monkeypatch.setattr(sim, '_headspace_transport_pO2_bar_from_ledger',
                         lambda *a, **kw: 1.)
+    monkeypatch.setattr(sim, '_headspace_transport_pO2_bar', lambda: 1.)
     result = sim._apply_native_fe_saturation_split()
     assert result['native_fe_event_status'] == 'limited'
     assert result['native_fe_event_reason'] == 'native_fe_gas_limited'
     assert result['gas_limited_notice']['melt_root_mol'] > 0.
+    assert result['authority'] == 'equilibrium_assumed'
+    assert result['removal_rate_notice']['flag'] == 'removal_rate_unmodelled'
     assert any(n['flag'] == 'NATIVE_FE_GAS_LIMITED'
                for n in sim._redox_bound_notices_this_hr)
 
@@ -259,6 +265,8 @@ def test_no_precipitation_above_melt_bound(probe):
 @pytest.mark.parametrize('finite_gas', [False, True])
 def test_provider_split_closes_atoms_and_records_committed_event(monkeypatch, finite_gas):
     sim = _reducing_sim()
+    sim.melt.atmosphere = Atmosphere.O2_BACKPRESSURE
+    sim._overhead_headspace_config['conductance_kg_s'] = 0.
     expected_state = sim._compute_native_fe_saturation_extent()['native_fe_state']
     assert expected_state['saturation_status'] == 'BELOW'
 
@@ -296,6 +304,67 @@ def test_provider_split_closes_atoms_and_records_committed_event(monkeypatch, fi
     assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5e-12
     assert any(n['flag'] == 'REDOX_BELOW_FE_FEO_SATURATION'
                for n in sim._redox_bound_notices_this_hr)
+
+
+@pytest.mark.parametrize('atmosphere', [
+    Atmosphere.PN2_SWEEP, Atmosphere.ARGON_FLOW, Atmosphere.HARD_VACUUM,
+    Atmosphere.CONTROLLED_O2_FLOW,
+])
+def test_open_receiver_uses_transport_and_exposes_unmodelled_removal(monkeypatch, atmosphere):
+    sim = _reducing_sim()
+    sim.melt.atmosphere = atmosphere
+    monkeypatch.setattr(sim, '_overhead_headspace_enabled', lambda: True)
+    monkeypatch.setattr(sim, '_headspace_bleed_conductance_kg_s', lambda **kw: 1.)
+    monkeypatch.setattr(sim, '_vacuum_floor_bar', lambda: 1e-300)
+    # Reuse the oxygen-free limiting boundary of the provider closure test.
+    monkeypatch.setattr(sim, '_headspace_transport_pO2_bar', lambda: 1e-300)
+    # A 9.10-bar ledger projection must never veto the flowing receiver.
+    monkeypatch.setattr(sim, '_headspace_ledger_pO2_bar_from_o2_mol', lambda n: 9.10)
+    result = sim._compute_native_fe_saturation_extent()
+    assert result['native_fe_state']['saturation_status'] == 'BELOW'
+    assert result['native_fe_mol'] > 0.
+    assert result['native_fe_mol'] == result['melt_root_mol']
+    notice = result['removal_rate_notice']
+    assert notice['flag'] == 'removal_rate_unmodelled'
+    assert notice['authority'] == 'equilibrium_assumed'
+    assert notice['melt_root_mol'] == result['melt_root_mol']
+    event = sim._apply_native_fe_saturation_split()
+    assert event['removal_rate_notice'] == notice
+    assert event['precipitation_notice']['authority'] == 'equilibrium_assumed'
+    assert notice in sim._redox_bound_notices_this_hr
+
+
+def test_closed_receiver_keeps_finite_holdup_veto(monkeypatch):
+    sim = _reducing_sim()
+    sim.melt.atmosphere = Atmosphere.O2_BACKPRESSURE
+    sim._overhead_headspace_config['conductance_kg_s'] = 0.
+    monkeypatch.setattr(sim, '_headspace_transport_pO2_bar', lambda: 1e-30)
+    monkeypatch.setattr(sim, '_headspace_ledger_pO2_bar_from_o2_mol', lambda n: 9.10)
+    result = sim._compute_native_fe_saturation_extent()
+    assert result['native_fe_mol'] == 0.
+    assert result['gas_limited_notice']['melt_root_mol'] > 0.
+    assert result.get('removal_rate_notice') is None
+
+
+def test_finite_open_transport_can_limit_extent_without_ledger_veto(monkeypatch):
+    sim = _reducing_sim()
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    monkeypatch.setattr(sim, '_headspace_transport_pO2_bar', lambda: 1e-9)
+    monkeypatch.setattr(sim, '_headspace_ledger_pO2_bar_from_o2_mol', lambda n: 9.10)
+    result = sim._compute_native_fe_saturation_extent()
+    assert 0. < result['native_fe_mol'] < result['melt_root_mol']
+    assert result['native_fe_mol'] == result['gas_root_mol']
+    assert result['gas_limited_notice']['gas_boundary_log'] == -9.
+    assert result['removal_rate_notice']['melt_root_mol'] == result['melt_root_mol']
+
+
+def test_empty_open_inventory_still_exposes_unmodelled_removal():
+    result = fe_redox.native_fe_equilibrium_extent(
+        comp_wt={}, feo_mol=0., fe2o3_mol=0., T_K=2023.15,
+        pressure_bar=.01, gas_fO2_log=lambda n: -20., open_sink=True,
+    )
+    assert result['removal_rate_notice']['melt_root_mol'] == 0.
+    assert result['removal_rate_notice']['authority'] == 'equilibrium_assumed'
 
 
 def _reducing_sim():

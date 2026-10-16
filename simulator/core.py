@@ -7221,14 +7221,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ferric = max(0.0, float(inventory.get('Fe2O3', 0.0)))
         head_o2 = max(0.0, float(self.atom_ledger.mol_by_account(
             'process.overhead_gas').get(OXYGEN_SPECIES, 0.0)))
-        selected_pO2 = self._headspace_transport_pO2_bar_from_ledger(
-            self._headspace_ledger_pO2_bar_from_o2_mol(head_o2),
-            head_o2_mol=head_o2,
+        open_receiver = (
+            self.melt.atmosphere in {
+                Atmosphere.PN2_SWEEP, Atmosphere.ARGON_FLOW,
+                Atmosphere.CONTROLLED_O2_FLOW,
+            }
+            or (self._overhead_headspace_enabled()
+                and self._headspace_bleed_conductance_kg_s() > 0.0)
         )
+        if open_receiver:
+            selected_pO2 = self._headspace_transport_pO2_bar()
+        else:
+            selected_pO2 = self._headspace_transport_pO2_bar_from_ledger(
+                self._headspace_ledger_pO2_bar_from_o2_mol(head_o2),
+                head_o2_mol=head_o2,
+            )
 
         def gas_fO2_log(n):
-            # Instantaneous precipitation into finite gas holdup: no credit
-            # for a FUTURE hourly bleed. No precipitation rate is established.
+            if open_receiver:
+                # The installed transport boundary is the flowing receiver.
+                # Released O2 is removed by the assumed open sink; the owner
+                # flags its missing rate cap instead of using closed nRT/V.
+                return math.log10(max(selected_pO2, self._vacuum_floor_bar()))
+            # Genuinely closed vessel: released O2 accumulates in finite gas.
             # FeO -> Fe + 0.5 O2 gives delta p=n*R*T/(2*V*1e5) bar.
             # n is mol Fe, R*T/V is Pa/mol; n=0 recovers the gas boundary.
             # The selected transport/control boundary is also a lower bound;
@@ -7247,6 +7262,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 floor_bar=self._vacuum_floor_bar(),
             ),
             gas_fO2_log=gas_fO2_log,
+            open_sink=open_receiver,
         )
         return {**result, 'feo_available_mol': feo,
                 'total_fe_mol': feo + 2.0*ferric}
@@ -7568,9 +7584,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         native_extent = self._compute_native_fe_saturation_extent()
         split = self._compute_fe_redox_split_diagnostic()
         gas_notice = native_extent.get('gas_limited_notice')
-        if gas_notice is not None:
-            self._redox_bound_notices_this_hr = list(getattr(
-                self, '_redox_bound_notices_this_hr', [])) + [gas_notice]
+        removal_notice = native_extent.get('removal_rate_notice')
+        for notice in (gas_notice, removal_notice):
+            if notice is not None:
+                self._redox_bound_notices_this_hr = list(getattr(
+                    self, '_redox_bound_notices_this_hr', [])) + [notice]
         native_frac = max(
             0.0,
             float(native_extent.get('native_fe_frac', 0.0) or 0.0),
@@ -7615,6 +7633,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'native_fe_event_reason': 'native_fe_inventory_below_threshold',
                     'native_fe_event_status': 'ok',
                 }
+            if removal_notice is not None:
+                event.update(authority=removal_notice['authority'],
+                             removal_rate_notice=removal_notice)
             self._last_native_fe_saturation_event = dict(event)
             return {**split, **event}
         partition = self._native_fe_partition_diagnostic(native_fe_mol)
@@ -7819,6 +7840,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._redox_bound_notices_this_hr = list(getattr(
                 self, '_redox_bound_notices_this_hr', [])) + [notice]
             event['precipitation_notice'] = notice
+        if removal_notice is not None:
+            event.update(authority=removal_notice['authority'],
+                         removal_rate_notice=removal_notice)
         self._last_native_fe_saturation_event = dict(event)
         return {**split, 'native_fe_partition': dict(partition), **event}
 
