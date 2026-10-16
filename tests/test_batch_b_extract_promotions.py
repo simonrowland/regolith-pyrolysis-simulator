@@ -168,3 +168,18 @@ def test_shornikov_2000_migrates_printed_transition_temperatures() -> None:
         and observation.point_conditions["temperature_K"].locator is not None
         for observation in result.observations.values()
     )
+
+
+def test_shilov_1998_migrates_printed_po_pressures() -> None:
+    result = _migrate("shilov-1998-sno-zno-p2o5-vaporization.yaml")
+    assert len(result.observations) == 92
+    po_points = {
+        observation.value.point
+        for observation in result.observations.values()
+        if "table2_PO_partial_pressures::points:" in observation.observation_id
+        and observation.value.point is not None
+    }
+    # Table 2, p. 402 prints 1.51e-7 and 1.77e-7 atm at xSnO=40.0/46.7 mol%;
+    # the migrated pressure values are in Pa.
+    assert Decimal("0.015300075") in po_points
+    assert Decimal("0.017934525") in po_points
