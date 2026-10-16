@@ -1401,8 +1401,6 @@ def split_feot_composition(
     pressure_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> dict[str, object]:
     """Split canonical total-Fe-as-FeO input; callers canonicalize lab labels."""
-    from simulator.state import MOLAR_MASS
-
     state = redox_state or RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.0)
     fO2_log = state.log_fO2_at(T_K)
     comp = dict(composition_wt_pct)
@@ -1410,11 +1408,28 @@ def split_feot_composition(
         raise Kress91InvalidControls('canonical total Fe as FeO is required')
     if 'Fe2O3' in comp:
         raise Kress91InvalidControls('FeOt conversion requires an unsplit analysis')
-    feot = feot_equivalent_wt_pct(comp)
     x = kress91_fe3_over_sigma_fe(
         fO2_log=fO2_log, T_K=T_K, pressure_bar=pressure_bar,
         mol_fractions=melt_mol_fractions_for_kress91(comp),
     )
+    comp, factor = _split_feot_at_ferric_fraction(comp, x)
+    return {
+        'composition_wt_pct': comp, 'fO2_log': fO2_log,
+        'renormalization_factor': factor,
+        'fe3_over_sigma_fe': x,
+        'condition': 'condition_stated' if redox_state is not None else 'condition_defaulted',
+        'temperature_band': kress91_temperature_band_case(T_K - 273.15),
+        'certification_gaps': [] if redox_state is not None else ['intrinsic_delta_iw'],
+    }
+
+
+def _split_feot_at_ferric_fraction(
+    composition_wt_pct: Mapping[str, float], x: float,
+) -> tuple[dict[str, float], float]:
+    from simulator.state import MOLAR_MASS
+
+    comp = dict(composition_wt_pct)
+    feot = feot_equivalent_wt_pct(comp)
     # FeOt is analytical bookkeeping, not a declaration of zero ferric oxygen.
     # On a 100 g analysis basis n = FeOt/M_FeO mol Fe is conserved by
     # n_Fe2O3=x*n/2 and n_FeO=(1-x)*n. The hidden oxygen adds
@@ -1429,14 +1444,7 @@ def split_feot_composition(
     comp['Fe2O3'] = x * n * MOLAR_MASS['Fe2O3'] / 2.0
     factor = 100.0 / sum(comp.values())
     normalize_component_masses_kg(comp, 100.0)
-    return {
-        'composition_wt_pct': comp, 'fO2_log': fO2_log,
-        'renormalization_factor': factor,
-        'fe3_over_sigma_fe': x,
-        'condition': 'condition_stated' if redox_state is not None else 'condition_defaulted',
-        'temperature_band': kress91_temperature_band_case(T_K - 273.15),
-        'certification_gaps': [] if redox_state is not None else ['intrinsic_delta_iw'],
-    }
+    return comp, factor
 
 
 def collapse_feot_composition(
