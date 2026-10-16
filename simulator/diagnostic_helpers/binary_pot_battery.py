@@ -1916,16 +1916,19 @@ class _OpenImccBatteryBackend:
                 if domains
                 else None
             )
-            package_notices = tuple(
-                str(notice) for notice in (result.labels.notices or ())
+            certified_band_text = (
+                "unavailable"
+                if certified_domain is None
+                else f"[{certified_domain[0]:g}, {certified_domain[1]:g}] K"
             )
             extrapolation_notice: dict[str, Any] = {
                 "kind": "openimcc_temperature_extrapolated",
                 "authority": AUTHORITY_EXTRAPOLATED,
-                "reason": "; ".join(package_notices)
-                or (
-                    "T outside openimcc datapack domain; "
-                    "evaluate(allow_extrapolation=True)"
+                "reason": (
+                    "T outside openimcc datapack domain at "
+                    f"{temperature_K:g} K; certified band "
+                    f"{certified_band_text}; extrapolated: Delta_r Cp = 0 "
+                    "continuation; uncertainty band unavailable."
                 ),
             }
             if certified_domain is not None:

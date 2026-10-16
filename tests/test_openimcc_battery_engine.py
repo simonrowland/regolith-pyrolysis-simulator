@@ -1478,10 +1478,13 @@ def test_openimcc_below_floor_real_melt_activity_has_extrapolation_flag(
         )
     )["SiO2"]
     assert float(candidate.value.point) == pytest.approx(direct_activity, rel=1e-9)
-    assert notice.reason == "; ".join(package_result.labels.notices)
+    assert "T outside openimcc datapack" in notice.reason
+    assert "extrapolated: Delta_r Cp = 0 continuation" in notice.reason
+    assert "uncertainty band unavailable" in notice.reason
+    assert notice.reason != "; ".join(package_result.labels.notices)
 
 
-def test_openimcc_extrapolation_reason_preserves_package_notice(monkeypatch) -> None:
+def test_openimcc_temperature_reason_keeps_package_notice_separate(monkeypatch) -> None:
     _require_openimcc()
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _OpenImccBatteryBackend,
@@ -1496,6 +1499,7 @@ def test_openimcc_extrapolation_reason_preserves_package_notice(monkeypatch) -> 
         return replace(
             result,
             labels=replace(result.labels, notices=(package_notice,)),
+            notices=(package_notice,),
         )
 
     monkeypatch.setattr(openimcc_bridge, "evaluate", evaluate_with_package_notice)
@@ -1509,7 +1513,14 @@ def test_openimcc_extrapolation_reason_preserves_package_notice(monkeypatch) -> 
         for row in result.diagnostics["imcc_notices"]
         if row["kind"] == "openimcc_temperature_extrapolated"
     )
-    assert extrapolation_notice["reason"] == package_notice
+    assert "T outside openimcc datapack" in extrapolation_notice["reason"]
+    assert package_notice not in extrapolation_notice["reason"]
+    forwarded_notice = next(
+        row
+        for row in result.diagnostics["imcc_notices"]
+        if row["kind"] == "openimcc_notice"
+    )
+    assert forwarded_notice["reason"] == package_notice
 
 
 def test_openimcc_plante_candidates_match_mole_basis_package() -> None:
