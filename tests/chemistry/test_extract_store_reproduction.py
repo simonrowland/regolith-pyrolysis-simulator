@@ -35,6 +35,7 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     DEFAULT_PSAT_UNCERTAINTY,
     DEFAULT_TRANSITION_POINT_UNCERTAINTY,
     MODEL_LIMITATIONS_PATH,
+    ObservationEvaluation,
     ORDERING_VERDICT_STATUSES,
     RAIL_COMPARABLE_SYSTEM_CLASSES,
     RAIL_INCOMPARABLE_SYSTEM_CLASSES,
@@ -749,6 +750,24 @@ def test_dual_axis_skip_records_both_reasons() -> None:
     evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
     assert evaluation.skip_reason == f"typed-refusal:{pin_skip}"
     assert "glass_amorphous" in evaluation.skip_reason
+
+
+def test_coverage_primary_prefers_typed_refusal_over_point_drop() -> None:
+    obs = _form_gate_fixture(
+        observation_id="fixture_typed_refusal_with_point_drop",
+        values={"alpha": 0.14},
+        condensed_form=None,
+    )
+    evaluation = ObservationEvaluation(
+        observation=obs,
+        skip_reason="typed-refusal:rate_series_without_alpha_and_no_motzfeldt_geometry",
+        skip_reasons=["point_drop:missing_alpha_or_temperature"],
+    )
+
+    coverage = coverage_summary([evaluation])
+
+    assert coverage["entries"][0]["primary_skip_reason"] == evaluation.skip_reason
+    assert coverage["skip_reasons"] == {evaluation.skip_reason: 1}
 
 
 def test_wetzel_stale_duplicate_hits_system_class_and_form_gate() -> None:
