@@ -437,6 +437,7 @@ table2_row_locators:
     table: '2'
     published_page: '172'
     row: 'AII_− 35'
+    note: "At 1623.15 K, the printed log fO2 of -10.19 is 0.0066 dex below IW (-10.1834)."
   LW_minus_30: &row_LW_minus_30
     page: 6
     table: '2'
@@ -586,7 +587,7 @@ species:
               single_session_centroid_sigma_eV: '0.005'
               cross_session_drift_corrected_centroid_eV: '7112.079'
               cross_session_centroid_sigma_eV: '0.009'
-              Fe3_over_FeT_as_published: b.d.
+              Fe3_over_FeT: 'b.d. (below detection)'
               pressure_as_published: '1 atm'
               point_conditions:
                 temperature_C:
@@ -594,7 +595,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_minus_35
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-10.19'
@@ -626,7 +627,7 @@ species:
               single_session_centroid_sigma_eV: '0.011'
               cross_session_drift_corrected_centroid_eV: '7112.091'
               cross_session_centroid_sigma_eV: '0.011'
-              Fe3_over_FeT_as_published: b.d.
+              Fe3_over_FeT: 'b.d. (below detection)'
               pressure_as_published: '1 atm'
               point_conditions:
                 temperature_C:
@@ -634,7 +635,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_LW_minus_30
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-9.86'
@@ -666,7 +667,7 @@ species:
               single_session_centroid_sigma_eV: '0.001'
               cross_session_drift_corrected_centroid_eV: '7112.098'
               cross_session_centroid_sigma_eV: '0.006'
-              Fe3_over_FeT_as_published: b.d.
+              Fe3_over_FeT: 'b.d. (below detection)'
               pressure_as_published: '1 atm'
               point_conditions:
                 temperature_C:
@@ -674,7 +675,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_minus_25
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-9.31'
@@ -715,7 +716,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_LW_minus_20
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-8.72'
@@ -756,7 +757,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_minus_15
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-8.22'
@@ -797,7 +798,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_LW_minus_10
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-7.72'
@@ -838,7 +839,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_minus_05
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-7.20'
@@ -880,7 +881,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_LW_0
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-6.68'
@@ -921,7 +922,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_0
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-6.71'
@@ -962,7 +963,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_05
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-6.24'
@@ -1003,7 +1004,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_LW_10
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-5.72'
@@ -1044,7 +1045,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_15
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-5.24'
@@ -1085,7 +1086,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_LW_20
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-4.73'
@@ -1126,7 +1127,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_25
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-4.25'
@@ -1167,7 +1168,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_35
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-3.22'
@@ -1208,7 +1209,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_45
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-2.20'
@@ -1258,7 +1259,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_minus_35
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-10.19'
@@ -1294,7 +1295,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_LW_minus_30
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-9.86'
@@ -1330,7 +1331,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_minus_25
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-9.31'
@@ -1366,7 +1367,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_LW_minus_20
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-8.72'
@@ -1402,7 +1403,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_minus_15
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-8.22'
@@ -1438,7 +1439,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_LW_minus_10
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-7.72'
@@ -1474,7 +1475,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_minus_05
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-7.20'
@@ -1510,7 +1511,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_LW_0
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-6.68'
@@ -1546,7 +1547,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_0
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-6.71'
@@ -1582,7 +1583,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_05
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-6.24'
@@ -1618,7 +1619,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_LW_10
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-5.72'
@@ -1654,7 +1655,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_15
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-5.24'
@@ -1690,7 +1691,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_LW_20
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-4.73'
@@ -1726,7 +1727,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_25
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-4.25'
@@ -1762,7 +1763,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_35
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-3.22'
@@ -1798,7 +1799,7 @@ species:
                     tag: value
                     value: 1350
                   locator: *row_AII_45
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-2.20'
@@ -1865,7 +1866,7 @@ species:
                     tag: value
                     value: 1550
                   locator: *row_568_2
-                log_fO2:
+                fO2_log:
                   state:
                     tag: value
                     value: '-3.09'
@@ -1902,7 +1903,7 @@ species:
                     tag: unknown
                     reason: not_published
                   locator: *row_DT_46
-                log_fO2:
+                fO2_log:
                   state:
                     tag: unknown
                     reason: not_published
@@ -1938,7 +1939,7 @@ species:
                     tag: unknown
                     reason: not_published
                   locator: *row_DT_39
-                log_fO2:
+                fO2_log:
                   state:
                     tag: unknown
                     reason: not_published
@@ -1985,14 +1986,14 @@ species:
                 page: 6
                 published_page: '172'
                 section: '4.1 Fe3+/SumFe of the reference glasses'
-                note: The paragraph reports the rounded Moore et al. values as 0.57 ± 0.06 and 0.31 ± 0.09.
+                note: The paragraph reports the rounded Moore et al. values as 0.57 ± 0.06 and 0.31 ± 0.08.
               point_conditions:
                 temperature_C:
                   state:
                     tag: unknown
                     reason: not_published
                   locator: *row_DT_46
-                log_fO2:
+                fO2_log:
                   state:
                     tag: unknown
                     reason: not_published
@@ -2018,19 +2019,19 @@ species:
               locator: *row_DT_39
               delta_QFM_as_published: '0.85'
               Fe3_over_FeT: '0.315'
-              sigma: '0.09'
+              sigma: '0.08'
               sigma_locator:
                 page: 6
                 published_page: '172'
                 section: '4.1 Fe3+/SumFe of the reference glasses'
-                note: The paragraph reports the rounded Moore et al. values as 0.57 ± 0.06 and 0.31 ± 0.09.
+                note: The paragraph reports the rounded Moore et al. values as 0.57 ± 0.06 and 0.31 ± 0.08.
               point_conditions:
                 temperature_C:
                   state:
                     tag: unknown
                     reason: not_published
                   locator: *row_DT_39
-                log_fO2:
+                fO2_log:
                   state:
                     tag: unknown
                     reason: not_published
@@ -2066,7 +2067,7 @@ species:
                     tag: unknown
                     reason: not_published
                   locator: *row_H2O_63
-                log_fO2:
+                fO2_log:
                   state:
                     tag: unknown
                     reason: not_published
@@ -2102,7 +2103,7 @@ species:
                     tag: unknown
                     reason: not_published
                   locator: *row_DT_29
-                log_fO2:
+                fO2_log:
                   state:
                     tag: unknown
                     reason: not_published
@@ -2145,7 +2146,7 @@ species:
                     tag: unknown
                     reason: not_published
                   locator: *row_DT_31
-                log_fO2:
+                fO2_log:
                   state:
                     tag: unknown
                     reason: not_published
@@ -2181,7 +2182,7 @@ species:
                     tag: unknown
                     reason: not_published
                   locator: *row_DT_18
-                log_fO2:
+                fO2_log:
                   state:
                     tag: unknown
                     reason: not_published
@@ -2262,35 +2263,35 @@ species:
             average_1sigma_Fe3_sumFe_times_100_as_published: '0.45'
             equation_as_published: 'Fe3+/SumFe = a + b(x − μ) + c(x − μ)^2'
         derived_from:
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=fec06867ddf3
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=1d80e8cc47f8
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=84a0470db8d7
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=24b87faccb24
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=001a72daeca0
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=709c50ce0d8d
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=b9085ab87527
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=78013dc87e5f
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=f7f2b7b22839
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=5855c5a65fc9
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=f45cc956225c
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=53d0316fcd2f
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=586b61962238
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=25ca8cba6d87
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=634b0f866442
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=8acb242e3506
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=ec8697b4e4d5
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=e2f77398a2aa
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=c66a125e779f
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=db49b9c419c5
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=ccdb150debcf
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=565ed18459d2
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=9f18ca169a46
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=6ac0441f22fa
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=e6105b216809
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=6447401d415b
         derivation:
           relation: Least-squares SVD second-order fit of the stored Mössbauer Fe3+/SumFe fractions against the stored cross-session centroid energies.
           inputs:
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=fec06867ddf3
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=1d80e8cc47f8
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=84a0470db8d7
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=24b87faccb24
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=001a72daeca0
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=709c50ce0d8d
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=b9085ab87527
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=78013dc87e5f
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=f7f2b7b22839
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=5855c5a65fc9
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=f45cc956225c
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=53d0316fcd2f
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=586b61962238
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=25ca8cba6d87
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=634b0f866442
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=8acb242e3506
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=ec8697b4e4d5
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=e2f77398a2aa
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=c66a125e779f
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=db49b9c419c5
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=ccdb150debcf
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=565ed18459d2
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=9f18ca169a46
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=6ac0441f22fa
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=e6105b216809
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=6447401d415b
           output_unit: as_published
       - observation_id: cottrell_2009_rhyolite_centroid_calibration
         type: recalculation_table
@@ -2335,7 +2336,8 @@ species:
               table: '3'
               published_page: '175'
         values:
-          method_class: model_derived
+          method_class: quoted_attributed
+          attribution: Cottrell et al. (2009), Table 3
           quantity: xanes_centroid_fe3_sumfe_calibration_as_published
           admission_status: typed_refusal
           d-126_reason: No closed schema quantity represents this composition-specific calibration polynomial; coefficients and equation are preserved as printed.
@@ -2350,22 +2352,3 @@ species:
             centroid_c_sigma_1sigma_as_published: '19.9389'
             average_1sigma_Fe3_sumFe_times_100_as_published: '1.89'
             equation_as_published: 'Fe3+/SumFe = a + b(x − μ) + c(x − μ)^2'
-        derived_from:
-          - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=bcab8dd4736d
-          - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::point:1
-          - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::point:2
-          - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2
-          - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:3
-          - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:4
-          - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:5
-        derivation:
-          relation: Second-order centroid calibration fit to the three stored Mössbauer ratios and four stored Moore et al. wet-chemistry ratios.
-          inputs:
-            - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=bcab8dd4736d
-            - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::point:1
-            - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::point:2
-            - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2
-            - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:3
-            - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:4
-            - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:5
-          output_unit: as_published

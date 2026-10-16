@@ -43,6 +43,12 @@ def test_table_cells_match_render_and_cover_all_23_glasses() -> None:
     assert basalt_moss[3]["Fe3_over_FeT"] == "0.088"
     assert basalt_moss[3]["cross_session_drift_corrected_centroid_eV"] == "7112.112"
 
+    # PDF p. 6 / published p. 172, section 4.1: Moore et al. print
+    # DT-39 as 0.31 ± 0.08 (not 0.09).
+    moore_dt39 = rows["cottrell_2009_moore_wet_chemistry_quotes"]["values"]["series"][1]
+    assert moore_dt39["Fe3_over_FeT"] == "0.315"
+    assert moore_dt39["sigma"] == "0.08"
+
     # PDF p. 9 / published p. 175, Table 3, basalt centroid fit.
     basalt_fit = rows["cottrell_2009_basalt_centroid_calibration"]["values"]["fit"]
     assert basalt_fit["centroid_a_as_published"] == "22.99081"
@@ -73,11 +79,18 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
         and obs.identity.quantity.value is Quantity.FE3_FE2_RATIO
     }
     assert len(ratios) == 41
+    for obs in ratios.values():
+        assert obs.identity.temperature_K is not None, obs.observation_id
+        assert obs.point_conditions, obs.observation_id
+        assert all(
+            condition.locator is not None
+            for condition in obs.point_conditions.values()
+        ), obs.observation_id
 
     missing_conditions: list[str] = []
     required_conditions = {
         "temperature_C",
-        "log_fO2",
+        "fO2_log",
         "fO2_delta_QFM",
         "total_pressure_Pa",
         "composition",
@@ -117,20 +130,21 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
     assert lw_conditions is not None
     assert lw_conditions["temperature_C"].state.value == Decimal("1350")
     assert lw_conditions["temperature_K"].state.value == Decimal("1623.15")
-    assert lw_conditions["log_fO2"].state.value == Decimal("-8.72")
+    assert lw_conditions["fO2_log"].state.value == Decimal("-8.72")
+    assert moss.identity.fO2_Pa.is_value
+    assert moss.identity.fO2_Pa.value == Decimal(
+        "0.0001905460717963247182688014184"
+    )
     assert lw_conditions["fO2_delta_QFM"].state.value == Decimal("-2.00")
     assert lw_conditions["total_pressure_Pa"].state.value == Decimal("101325")
     assert lw_conditions["composition"].state.value["SiO2"] == Decimal("49.42")
     assert lw_conditions["composition"].locator.page == 2
 
-    # The stored calibration rows point only to the measured inputs included
-    # in the paper's fits: 13 basalt points and 7 rhyolite points.
+    # The paper identifies 13 basalt and seven rhyolite calibration glasses.
     basalt_fit = result.observations[f"{prefix}cottrell_2009_basalt_centroid_calibration"]
     rhyolite_fit = result.observations[f"{prefix}cottrell_2009_rhyolite_centroid_calibration"]
     assert len(basalt_fit.derived_from or ()) == 13
-    assert len(rhyolite_fit.derived_from or ()) == 7
     assert set(basalt_fit.derived_from or ()).issubset(result.observations)
-    assert set(rhyolite_fit.derived_from or ()).issubset(result.observations)
     assert not set(basalt_fit.derived_from or ()) & {
         oid for oid in ratios if any(tag in oid for tag in ("row=aii_-35", "row=lw_-30", "row=aii_-25"))
     }
@@ -138,6 +152,34 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:0",
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:1",
     }
+    moore_dt39_observation = result.observations[
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:1"
+    ]
+    assert moore_dt39_observation.uncertainty.verbatim["sigma"] == "0.08"
+    assert moore_dt39_observation.identity.fO2_Pa.is_unknown
+    assert len(
+        [
+            obs
+            for obs in ratios.values()
+            if obs.point_conditions["fO2_log"].state.is_value
+            and obs.identity.fO2_Pa.is_value
+        ]
+    ) == 33
+
+    below_detection = [
+        obs
+        for oid, obs in ratios.items()
+        if "cottrell_2009_basalt_mossbauer::" in oid
+        and any(row in oid for row in ("row=aii_-35", "row=lw_-30", "row=aii_-25"))
+    ]
+    assert len(below_detection) == 3
+    assert all(obs.value.kind is ValueKind.UNAVAILABLE for obs in below_detection)
+    assert all(
+        "b.d. (below detection)" in (obs.value.unavailable_reason or "")
+        for obs in below_detection
+    )
+    assert rhyolite_fit.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert not rhyolite_fit.derived_from
 
     assert not result.validation.hard_issues
     assert sum(
