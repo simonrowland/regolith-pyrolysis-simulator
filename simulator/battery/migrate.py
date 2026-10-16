@@ -125,6 +125,7 @@ from simulator.battery.records import (
     Experiment,
     FlowRegime,
     FO2Control,
+    GasRatio,
     Located,
     Locator,
     Notice,
@@ -2253,6 +2254,16 @@ def _experiment_from_plain(
             if fo2.get("oxygen_partial_pressure_Pa") is None
             else _located_from_plain(
                 fo2["oxygen_partial_pressure_Pa"], _value_or_point_from_plain
+            ),
+            gas_ratio=None
+            if fo2.get("gas_ratio") is None
+            else GasRatio(
+                numerator_species=str(fo2["gas_ratio"]["numerator_species"]),
+                denominator_species=str(fo2["gas_ratio"]["denominator_species"]),
+                value=_located_from_plain(
+                    fo2["gas_ratio"]["value"], _value_or_point_from_plain
+                ),
+                basis=str(fo2["gas_ratio"]["basis"]),
             ),
         )
     return Experiment(

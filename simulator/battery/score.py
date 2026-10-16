@@ -269,6 +269,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.EVOLVED_GAS_YIELD: MetricOperation.RELATIVE,
     Quantity.ISOTOPE_DELTA: MetricOperation.ABSOLUTE,
     Quantity.RESIDUE_COMPONENT_COMPOSITION: MetricOperation.ABSOLUTE,
+    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: MetricOperation.ABSOLUTE,
 }
 
 # The ticket line uses the two-sided normal percentile p=95. 1.95996398454 is

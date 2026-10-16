@@ -228,6 +228,14 @@ Exactly one of:
 | `gas_speciation` | Vapour/atmosphere/condensate composition: which gas-bearing species, how much, as published |
 | `sulfur_solubility_and_sulfate_capacity_series` | Measured sulfur solubility / sulfate capacity series, including ratio-conditioned variants |
 | `composition_series` | Measured composition series across runs/samples (per-sample rows as payload) |
+| `equilibrium_phase_composition` | Measured composition of an equilibrium condensed phase at stated temperature and atmosphere; preserve the printed basis on `values.basis_as_published` and identify the phase on the row's species |
+
+The battery quantity token `equilibrium_phase_composition` uses
+`units: subtype_defined`: units and basis are those printed (for example,
+O/Fe atom ratio, wt% O, or x in Fe(1-x)O). Migration stores that printed
+basis as the quantity subtype. No conversion between composition bases is
+implicit. Until an engine predicts this quantity, scoring retains the row and
+returns the typed `quantity_not_predicted` refusal.
 
 **Verbatim only.** Extracts store published numbers (and arithmetic that merely
 converts units with the conversion shown). No Antoine/refit coefficients invented
@@ -451,6 +459,24 @@ at `pressure_environment.pumping.base_pressure_Pa`; it is not run pressure.
 `pressure_environment.sweep_gas.state.value` uses the battery `SweepGas`
 field list below. The migrator and per-file validator share its parser and
 store validation rules. Existing single-species records serialize unchanged.
+
+An optional `fO2_control.gas_ratio` preserves a printed gas ratio without
+deriving oxygen fugacity:
+
+```yaml
+fO2_control:
+  channel: {tag: value, value: gas_mix}
+  gas_ratio:
+    numerator_species: CO2
+    denominator_species: CO
+    value: {state: {tag: value, value: 1.4}, locator: {published_page: 800, table: I}}
+    basis: mole
+```
+
+`value` is a Located printed scalar, and `basis` is exactly `volume` or
+`mole`; `buffer` remains the source's verbatim printed description for buffer
+systems. A commanded pure-O2 atmosphere uses `channel: gas_mix` and the
+printed `oxygen_partial_pressure_Pa` instead of `gas_ratio`.
 
 | SweepGas field | Meaning |
 |---|---|

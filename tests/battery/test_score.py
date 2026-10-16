@@ -4963,6 +4963,33 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
         assert prediction.refusal_detail["quantity"] == "residue_component_composition"
 
 
+def test_equilibrium_phase_composition_is_retained_but_not_predicted() -> None:
+    from simulator.battery.score import ENGINE_CHANNELS, predict_with_engine
+
+    identity = replace(
+        F.psat_identity("FeO(l)"),
+        quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        subtype=State.of("O/Fe atom ratio"),
+    )
+    observation = F.observation(
+        "fe-wustite-composition",
+        "darken-gurry-1946-iron-oxygen-ii",
+        identity,
+        Decimal("1.096"),
+        evidence=EvidenceClass.MEASURED_TABULATED,
+        source_id="darken-gurry-1946-iron-oxygen-ii",
+    )
+
+    for engine in ENGINE_CHANNELS:
+        prediction = predict_with_engine(engine, observation)
+        assert prediction.execution.state is ExecutionState.UNSUPPORTED
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail == {
+            "reason": "quantity_not_predicted",
+            "quantity": "equilibrium_phase_composition",
+        }
+
+
 def test_residue_metric_uses_dex_for_element_ppm_and_absolute_for_oxide() -> None:
     from simulator.battery.score import (
         metric_operation_for_identity,

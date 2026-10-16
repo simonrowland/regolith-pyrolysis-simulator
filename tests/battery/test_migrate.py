@@ -1148,6 +1148,36 @@ def test_registry_composition_accepts_existing_mapping_inference_inputs() -> Non
     )
 
 
+def test_fo2_gas_ratio_round_trips_as_a_located_printed_value() -> None:
+    from simulator.battery.migrate import _experiment_from_plain, to_plain
+
+    extract_path = Path(__file__).parents[2] / "data/literature/extracts/ta-badro-2021.yaml"
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    raw = extract["experiments"][0]
+    raw["fO2_control"] = {
+        "channel": {"tag": "value", "value": "gas_mix"},
+        "gas_ratio": {
+            "numerator_species": "CO2",
+            "denominator_species": "CO",
+            "value": {
+                "state": {"tag": "value", "value": 1.4},
+                "locator": {"published_page": 800, "table": "I"},
+            },
+            "basis": "mole",
+        },
+    }
+
+    experiment = _experiment_from_plain(raw, registry_issues=[])
+    serialized = to_plain(experiment)
+
+    ratio = serialized["fO2_control"]["gas_ratio"]
+    assert ratio["numerator_species"] == "CO2"
+    assert ratio["denominator_species"] == "CO"
+    assert ratio["basis"] == "mole"
+    assert ratio["value"]["state"]["value"]["point"] == "1.4"
+    assert ratio["value"]["locator"] == {"published_page": 800, "table": "I"}
+
+
 def test_malformed_registry_inference_records_issue_without_dropping_value() -> None:
     from simulator.battery.migrate import _experiment_from_plain
 

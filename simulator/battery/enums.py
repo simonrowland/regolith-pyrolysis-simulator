@@ -102,6 +102,7 @@ class Quantity(StrEnum):
     ION_INTENSITY = "ion_intensity"
     INTERACTION_PARAMETER = "interaction_parameter"
     RESIDUE_COMPONENT_COMPOSITION = "residue_component_composition"
+    EQUILIBRIUM_PHASE_COMPOSITION = "equilibrium_phase_composition"
 
 
 class EvidenceClass(StrEnum):
@@ -517,6 +518,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.ION_INTENSITY: "subtype_defined",
     Quantity.INTERACTION_PARAMETER: "subtype_defined",
     Quantity.RESIDUE_COMPONENT_COMPOSITION: "subtype_defined",
+    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: "subtype_defined",
 }
 
 MEASURED_EVIDENCE = frozenset(
