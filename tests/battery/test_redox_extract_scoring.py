@@ -16,6 +16,7 @@ from simulator.battery.enums import (
     Engine,
     MetricOperation,
     NoticeKind,
+    Quantity,
     Rail,
     RefusalReason,
     ResidualStatus,
@@ -138,6 +139,54 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert residuals[0].status is ResidualStatus.NO_BAND
     assert residuals[0].refusal is not None
     assert residuals[0].refusal.reason is RefusalReason.DECISION_RULE_MISSING
+
+
+@pytest.mark.parametrize(
+    "observation_id",
+    (
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes",
+    ),
+)
+def test_openimcc_in_domain_redox_flags_become_prediction_notices(
+    monkeypatch, observation_id
+):
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    _context, observations = _sossi_aithala_redox_context()
+    observation = observations[observation_id]
+    results = []
+    original_evaluate_redox = openimcc.evaluate_redox
+
+    def capture_redox_result(*args, **kwargs):
+        result = original_evaluate_redox(*args, **kwargs)
+        results.append(result)
+        return result
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_result)
+    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.authority is Authority.BRIDGE
+    assert len(results) == 1
+    flags = tuple(results[0].flags)
+    flag_notices = tuple(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+    )
+    assert flags
+    assert tuple(notice.reason for notice in flag_notices) == flags
+    assert all(
+        notice.origin == "openimcc.evaluate_redox"
+        and notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
+        for notice in flag_notices
+    )
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in prediction.notices
+    )
 
 
 def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
