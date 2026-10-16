@@ -11,6 +11,7 @@ import tempfile
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -810,6 +811,43 @@ def test_cell_balance_calls_pressure_model_at_commanded_po2(monkeypatch) -> None
     )
     assert solved > 0.0
     assert ratio == pytest.approx(1.0, rel=1e-9)
+
+
+def test_vapor_engine_brackets_inside_vaporock_sum_pressure_domain() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+    from simulator.melt_backend.vaporock import vaporock_sum_pressure_sane
+
+    trials: list[tuple[float, bool, float]] = []
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        pressures_pa = {
+            "K": 1e-6 * po2_bar**-0.25 * 1e5,
+            "O2": 0.02264 * po2_bar * 1e5,
+        }
+        admitted, sum_bar = vaporock_sum_pressure_sane(pressures_pa)
+        trials.append((po2_bar, admitted, sum_bar))
+        return SimpleNamespace(
+            status="ok" if admitted else "refusal",
+            refusal_reason=None if admitted else "sum_pressure_sanity",
+            engine_reason=f"sum pressure {sum_bar:g} bar",
+            gas_partial_pressures_Pa=pressures_pa,
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    po2_bar, pressures, _metadata, _fraction, balance = (
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+    )
+
+    assert po2_bar == pytest.approx(9.99164171950111e-05, rel=1e-8)
+    assert balance["residual"] < 1e-12
+    assert all(admitted for _po2, admitted, _sum_bar in trials)
+    assert pressures["O2"] > 0.0
 
 
 def test_unknown_cell_material_is_a_typed_refusal() -> None:
