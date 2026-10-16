@@ -6,7 +6,10 @@ import json
 import math
 import os
 import resource
+import subprocess
+import sys
 import time
+from functools import partial
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -1683,30 +1686,14 @@ def test_simulated_crash_yields_engine_crash() -> None:
     assert any(notice.get("kind") == "melts_domain_gate" for notice in cell.notices)
 
 
-_TEST_ISOLATED_CELL_BOOTSTRAP = r"""
-import json
-import os
-import subprocess
-import sys
-import time
-from pathlib import Path
+def _fake_isolated_cell_bootstrap(
+    _engine: str, *, initialization_delay_s: float = 0.0
+):
+    time.sleep(initialization_delay_s)
+    return None, "fake-ready"
 
-from simulator.diagnostic_helpers.binary_pot_battery import EquilibrateCell, Po2Request
 
-# Give the worker its own tight descriptor ceiling. It inherits the parent's
-# soft limit, which the fd test raises above 256 when the parent is busy, so
-# without this a one-fd-per-cell leak inside the worker could go unnoticed.
-import resource
-_fd_now = len(os.listdir("/dev/fd"))
-_soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
-_cap = _fd_now + 64
-if _hard != resource.RLIM_INFINITY:
-    _cap = min(_cap, _hard)
-if _soft == resource.RLIM_INFINITY or _cap < _soft:
-    resource.setrlimit(resource.RLIMIT_NOFILE, (_cap, _hard))
-
-for line in sys.stdin:
-    request = json.loads(line)
+def _fake_isolated_cell_handler(_resource, request, _diagnostic_log):
     mode = request.get("simulate_crash")
     if mode == "exit":
         os._exit(73)
@@ -1714,7 +1701,7 @@ for line in sys.stdin:
         marker = Path(request["why"])
         child_code = (
             "import time; from pathlib import Path; "
-            f"time.sleep(2.5); Path({str(marker)!r}).write_text('survived')"
+            f"time.sleep(10.0); Path({str(marker)!r}).write_text('survived')"
         )
         child = subprocess.Popen([sys.executable, "-c", child_code])
         marker.with_suffix(".pid").write_text(str(child.pid))
@@ -1742,35 +1729,44 @@ for line in sys.stdin:
         hostname="worker-test",
         arm=request["arm"],
     )
-    sys.stdout.write(chr(30) + json.dumps(cell.as_payload()) + chr(10))
-    sys.stdout.flush()
-"""
+    return cell.as_payload()
 
 
 def _install_fake_isolated_cell_worker(
     monkeypatch: pytest.MonkeyPatch,
+    *,
+    initialization_delay_s: float = 0.0,
 ):
-    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    import simulator.diagnostic_helpers.binary_pot_battery as binary_pot_battery
 
-    battery._close_isolated_cell_workers()
+    binary_pot_battery._close_isolated_cell_workers()
     monkeypatch.setattr(
-        battery,
-        "_ISOLATED_CELL_BOOTSTRAP",
-        _TEST_ISOLATED_CELL_BOOTSTRAP,
+        binary_pot_battery,
+        "_bootstrap_isolated_cell_engine",
+        partial(
+            _fake_isolated_cell_bootstrap,
+            initialization_delay_s=float(initialization_delay_s),
+        ),
     )
-    return battery
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_handle_isolated_cell_request",
+        _fake_isolated_cell_handler,
+    )
+    return binary_pot_battery
 
 
 def _run_fake_isolated_cell(
     battery,
     *,
     pot_id: str,
+    engine: str = "alphamelts",
     simulate_crash: str | None = None,
     why: str = "worker-test",
     timeout_s: float = 10.0,
 ) -> EquilibrateCell:
     handle = EngineHandle(
-        name="alphamelts",
+        name=engine,
         backend=object(),
         available=True,
         unavailable_reason=None,
@@ -1814,15 +1810,38 @@ def test_isolated_cell_worker_reuses_one_process_and_keeps_fds_bounded(
         capped_soft = min(capped_soft, hard)
     try:
         resource.setrlimit(resource.RLIMIT_NOFILE, (capped_soft, hard))
-        for index in range(300):
+        first = _run_fake_isolated_cell(battery, pot_id="worker-0")
+        assert first.status == "ok"
+        fd_after_start = len(os.listdir("/dev/fd"))
+        for index in range(1, 300):
             cell = _run_fake_isolated_cell(battery, pot_id=f"worker-{index}")
             assert cell.status == "ok"
         worker = battery._ISOLATED_CELL_WORKERS["alphamelts"]
         assert worker.start_count == 1
-        assert len(os.listdir("/dev/fd")) <= fd_before + 2
+        assert len(os.listdir("/dev/fd")) <= fd_after_start + 2
     finally:
         battery._close_isolated_cell_workers()
         resource.setrlimit(resource.RLIMIT_NOFILE, (soft, hard))
+
+
+def test_isolated_cell_startup_has_a_separate_budget_from_the_call_timeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    battery = _install_fake_isolated_cell_worker(
+        monkeypatch,
+        initialization_delay_s=2.2,
+    )
+    try:
+        cell = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-slow-initialization",
+            engine="thermoengine",
+            timeout_s=0.001,
+        )
+        assert cell.status == "ok"
+        assert battery._ISOLATED_CELL_WORKERS["thermoengine"].start_count == 1
+    finally:
+        battery._close_isolated_cell_workers()
 
 
 def test_isolated_cell_worker_crash_refuses_one_cell_then_restarts(

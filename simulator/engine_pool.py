@@ -125,9 +125,16 @@ class EngineWorkerDied(RuntimeError):
     Other exceptions are not rewritten into this type.
     """
 
-    def __init__(self, phase: str, detail: str) -> None:
+    def __init__(
+        self,
+        phase: str,
+        detail: str,
+        *,
+        returncode: Optional[int] = None,
+    ) -> None:
         self.phase = phase
         self.detail = str(detail)
+        self.returncode = None if returncode is None else int(returncode)
         super().__init__(self.detail)
 
 
@@ -451,6 +458,7 @@ class WarmEngineWorker:
             raise EngineWorkerDied(
                 'start',
                 f'{type(exc).__name__}: {exc}',
+                returncode=getattr(process, 'exitcode', None),
             ) from exc
         if message[0] == 'timeout':
             self._discard_current(
@@ -522,7 +530,9 @@ class WarmEngineWorker:
             except EngineWorkerDied as exc:
                 # Construction and this restart share start(); the phase
                 # records which caller observed the pre-ready death.
-                raise EngineWorkerDied('restart', exc.detail) from exc.__cause__
+                raise EngineWorkerDied(
+                    'restart', exc.detail, returncode=exc.returncode
+                ) from exc.__cause__
             _pool_debug(
                 f'{self.name}: cold start ok in '
                 f'{time.monotonic() - t_start:.2f}s pid='
@@ -569,6 +579,7 @@ class WarmEngineWorker:
                     raise EngineWorkerDied(
                         'call',
                         f'{self.name} worker exited without a result',
+                        returncode=getattr(process, 'exitcode', None),
                     )
                 poll_remaining = deadline - time.monotonic()
                 if poll_remaining <= 0.0:
@@ -605,6 +616,7 @@ class WarmEngineWorker:
             raise EngineWorkerDied(
                 'call',
                 f'{self.name} worker exited without a result',
+                returncode=getattr(process, 'exitcode', None),
             ) from exc
         with self._state_lock:
             current = (
@@ -618,6 +630,7 @@ class WarmEngineWorker:
             raise EngineWorkerDied(
                 'call',
                 f'{self.name} worker exited without a result',
+                returncode=getattr(process, 'exitcode', None),
             )
         if message[0] == 'ok':
             return message[1]

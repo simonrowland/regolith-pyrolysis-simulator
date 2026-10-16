@@ -23,7 +23,6 @@ import json
 import math
 import os
 import re
-import selectors
 import signal
 import socket
 import subprocess
@@ -48,6 +47,12 @@ from simulator.melt_regime import (
     liquid_fraction_invalidity,
 )
 from simulator.battery.enums import NoticeKind
+from simulator.engine_pool import (
+    EngineWorkerDied,
+    EngineWorkerRemoteError,
+    EngineWorkerTimeout,
+    WarmEngineWorker,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 
@@ -180,6 +185,8 @@ _ENGINE_OUTER_TIMEOUT_S: dict[str, float] = {
     "openimcc": 15.0,
 }
 
+# MELTS backend construction can outlast the warm-call timeout; initialize it
+# before the isolated-cell request clock starts.
 QUALIFICATION_SIO2_SWEEP_WT_PCT: tuple[float, ...] = (
     20.0,
     25.0,
@@ -196,18 +203,6 @@ QUALIFICATION_TEMPERATURES_K: tuple[float, ...] = (
 )
 QUALIFICATION_SWEEP_T_K = 1700.0
 QUALIFICATION_SOURCE_POT_ID = "feo_mgo_sio2_30_20_50"
-
-_ISOLATED_CELL_BOOTSTRAP = """
-import json
-import sys
-
-from simulator.diagnostic_helpers.binary_pot_battery import (
-    _run_isolated_cell_worker_loop,
-)
-
-_run_isolated_cell_worker_loop()
-"""
-
 
 class BinaryPotBatteryError(RuntimeError):
     """Raised when the pot catalog or residual inputs violate a hard contract."""
@@ -2836,10 +2831,9 @@ def _bypass_melts_domain_gate(backend: Any) -> None:
 def run_isolated_cell_worker(
     payload: Mapping[str, Any],
     *,
-    handles: dict[str, EngineHandle] | None = None,
-    protocol_stdout: Any | None = None,
-) -> None:
-    """Run one isolated cell and write one framed JSON response."""
+    handle: EngineHandle | None = None,
+) -> dict[str, Any]:
+    """Run one isolated cell and return its transport-safe payload."""
 
     simulate = payload.get("simulate_crash")
     if simulate:
@@ -2865,15 +2859,8 @@ def run_isolated_cell_worker(
         cell_material=po2_raw.get("cell_material"),
     )
     engine_name = str(payload["engine"])
-    handle = None if handles is None else handles.get(engine_name)
-    if handle is None:
+    if handle is None or handle.name != engine_name:
         handle = open_battery_engine(engine_name)
-        if (
-            handles is not None
-            and handle.available
-            and handle.backend is not None
-        ):
-            handles[engine_name] = handle
     if (
         bool(payload.get("qualification"))
         and handle.name in MELTS_FAMILY_ENGINES
@@ -2903,32 +2890,7 @@ def run_isolated_cell_worker(
         isolated=False,
         arm=str(payload.get("arm") or ARM_HEADLINE),
     )
-    output = protocol_stdout if protocol_stdout is not None else sys.stdout
-    output.write("\x1e")
-    output.write(json.dumps(cell.as_payload(), default=str))
-    output.write("\n")
-    output.flush()
-
-
-def _run_isolated_cell_worker_loop() -> None:
-    protocol_stdout = sys.stdout
-    sys.stdout = sys.stderr
-    handles: dict[str, EngineHandle] = {}
-    try:
-        for line in sys.stdin:
-            run_isolated_cell_worker(
-                json.loads(line),
-                handles=handles,
-                protocol_stdout=protocol_stdout,
-            )
-    finally:
-        for handle in handles.values():
-            close = getattr(handle.backend, "close", None)
-            if callable(close):
-                try:
-                    close()
-                except BaseException:  # noqa: BLE001 - close every engine on exit
-                    pass
+    return cell.as_payload()
 
 
 def _crash_cell_from_returncode(
@@ -3019,168 +2981,86 @@ class _IsolatedCellWorkerFailure(RuntimeError):
         self.detail = detail
 
 
+class _IsolatedCellEngine:
+    """EngineHandle resource closed by the shared warm-worker lifecycle."""
+
+    def __init__(self, handle: EngineHandle) -> None:
+        self.handle = handle
+
+    def close(self) -> None:
+        close = getattr(self.handle.backend, "close", None)
+        if callable(close):
+            close()
+
+
+def _bootstrap_isolated_cell_engine(engine: str) -> tuple[_IsolatedCellEngine, str]:
+    """Resolve the battery engine before WarmEngineWorker signals ready."""
+    return _IsolatedCellEngine(open_battery_engine(engine)), engine
+
+
+def _handle_isolated_cell_request(
+    resource: _IsolatedCellEngine,
+    payload: Mapping[str, Any],
+    _diagnostic_log: Any,
+) -> dict[str, Any]:
+    return run_isolated_cell_worker(payload, handle=resource.handle)
+
+
 class _IsolatedCellWorker:
-    """Persistent engine process; a failed request retires its whole group."""
+    """Battery requests on the shared worker's startup/call deadline split."""
 
     def __init__(self, engine: str) -> None:
         self.engine = str(engine)
-        self.process: subprocess.Popen[bytes] | None = None
-        self.start_count = 0
-        self._stdout_buffer = bytearray()
         self._lock = threading.Lock()
-
-    def _start(self) -> None:
-        env = dict(os.environ)
-        env.setdefault("PYTHONPATH", str(REPO_ROOT))
-        pythonpath = env.get("PYTHONPATH") or ""
-        if str(REPO_ROOT) not in pythonpath.split(os.pathsep):
-            env["PYTHONPATH"] = os.pathsep.join(
-                [str(REPO_ROOT), pythonpath] if pythonpath else [str(REPO_ROOT)]
-            )
-        self.process = subprocess.Popen(
-            [sys.executable, "-c", _ISOLATED_CELL_BOOTSTRAP],
-            cwd=str(REPO_ROOT),
-            env=env,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            bufsize=0,
-            start_new_session=True,
+        self._worker = WarmEngineWorker(
+            name=f"{self.engine} battery cell",
+            bootstrap=_bootstrap_isolated_cell_engine,
+            handler=_handle_isolated_cell_request,
+            bootstrap_args=(self.engine,),
+            startup_timeout_s=(
+                60.0 if self.engine == "thermoengine" else 30.0
+            ),
+            call_timeout_s=_ENGINE_OUTER_TIMEOUT_S.get(self.engine, 30.0) + 2.0,
+            # ThermoEngine cold start measured 43.99s here; only it needs this
+            # separate READY budget and child-capable worker.
+            daemon=self.engine != "thermoengine",
         )
-        self._stdout_buffer.clear()
-        self.start_count += 1
 
-    def _stop(self, *, kill_group: bool) -> int | None:
-        process = self.process
-        self.process = None
-        if process is None:
-            return None
-        if kill_group:
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-            except (OSError, ProcessLookupError):
-                if process.poll() is None:
-                    process.kill()
-        elif process.stdin is not None:
-            try:
-                process.stdin.close()
-            except OSError:
-                pass
-        try:
-            try:
-                process.wait(timeout=1.0)
-            except subprocess.TimeoutExpired:
-                try:
-                    os.killpg(process.pid, signal.SIGKILL)
-                except (OSError, ProcessLookupError):
-                    process.kill()
-                try:
-                    process.wait(timeout=1.0)
-                except subprocess.TimeoutExpired:
-                    process.kill()
-                    process.wait()
-        finally:
-            for stream in (process.stdin, process.stdout, process.stderr):
-                if stream is not None:
-                    try:
-                        stream.close()
-                    except OSError:
-                        pass
-        return process.returncode
+    @property
+    def start_count(self) -> int:
+        return self._worker.start_count
 
     def close(self) -> None:
         with self._lock:
-            self._stop(kill_group=False)
+            self._worker.close()
 
     def retire(self) -> None:
         with self._lock:
-            self._stop(kill_group=True)
-
-    def _failed(self, *, timed_out: bool, detail: str) -> None:
-        process = self.process
-        returncode = None if process is None else process.poll()
-        if process is not None and process.stdout is not None:
-            detail = (
-                detail
-                or bytes(self._stdout_buffer[-400:]).decode("utf-8", "replace")
-            )
-        stopped_returncode = self._stop(kill_group=True)
-        if stopped_returncode is not None:
-            returncode = stopped_returncode
-        raise _IsolatedCellWorkerFailure(
-            timed_out=timed_out,
-            returncode=returncode,
-            detail=detail,
-        )
+            self._worker.close()
 
     def request(
         self, payload: Mapping[str, Any], *, timeout_s: float
     ) -> dict[str, Any]:
         with self._lock:
-            if self.process is not None and self.process.poll() is not None:
-                self._stop(kill_group=True)
-            if self.process is None:
-                try:
-                    self._start()
-                except OSError as exc:
-                    raise _IsolatedCellWorkerFailure(detail=str(exc)) from exc
-            process = self.process
-            assert process is not None
-            if process.stdin is None or process.stdout is None:
-                self._failed(timed_out=False, detail="worker pipes unavailable")
-            deadline = time.monotonic() + max(0.001, float(timeout_s))
             try:
-                request_bytes = (json.dumps(payload) + "\n").encode("utf-8")
-                view = memoryview(request_bytes)
-                while view:
-                    written = os.write(process.stdin.fileno(), view)
-                    view = view[written:]
-            except OSError as exc:
-                self._failed(timed_out=False, detail=f"worker request failed: {exc}")
-
-            with selectors.DefaultSelector() as selector:
-                selector.register(process.stdout, selectors.EVENT_READ)
-                while True:
-                    remaining = deadline - time.monotonic()
-                    if remaining <= 0:
-                        self._failed(
-                            timed_out=True,
-                            detail="isolated cell exceeded hard timeout",
-                        )
-                    if not selector.select(remaining):
-                        self._failed(
-                            timed_out=True,
-                            detail="isolated cell exceeded hard timeout",
-                        )
-                    chunk = os.read(process.stdout.fileno(), 65536)
-                    if not chunk:
-                        self._failed(
-                            timed_out=False,
-                            detail=(
-                                "worker exited without a cell result "
-                                f"(returncode={process.poll()})"
-                            ),
-                        )
-                    self._stdout_buffer.extend(chunk)
-                    while b"\n" in self._stdout_buffer:
-                        line, _, remainder = self._stdout_buffer.partition(b"\n")
-                        self._stdout_buffer = bytearray(remainder)
-                        marker = line.rfind(b"\x1e")
-                        if marker < 0:
-                            continue
-                        try:
-                            result = json.loads(line[marker + 1 :])
-                        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-                            self._failed(
-                                timed_out=False,
-                                detail=f"invalid isolated worker response: {exc}",
-                            )
-                        if not isinstance(result, dict):
-                            self._failed(
-                                timed_out=False,
-                                detail="isolated worker response was not an object",
-                            )
-                        return result
+                result = self._worker.call(payload, timeout_s=timeout_s)
+            except EngineWorkerTimeout as exc:
+                raise _IsolatedCellWorkerFailure(
+                    timed_out=True,
+                    detail=str(exc),
+                ) from exc
+            except EngineWorkerDied as exc:
+                raise _IsolatedCellWorkerFailure(
+                    returncode=exc.returncode,
+                    detail=exc.detail,
+                ) from exc
+            except EngineWorkerRemoteError as exc:
+                raise _IsolatedCellWorkerFailure(detail=str(exc)) from exc
+            if not isinstance(result, dict):
+                raise _IsolatedCellWorkerFailure(
+                    detail="isolated worker response was not an object"
+                )
+            return result
 
 
 _ISOLATED_CELL_WORKERS: dict[str, _IsolatedCellWorker] = {}
