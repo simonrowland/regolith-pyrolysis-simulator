@@ -880,6 +880,39 @@ def test_vapor_engine_reports_domain_when_no_admitted_bracket_exists() -> None:
     assert "sum_pressure_sanity" in str(exc_info.value)
 
 
+@pytest.mark.parametrize("gas_species", ("NaOH(g)", "KOH(g)"))
+def test_positive_hydroxide_pressure_refuses_dry_cell_oxygen_balance(
+    gas_species: str,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        return SimpleNamespace(
+            status="ok",
+            gas_partial_pressures_Pa={
+                "K": 1e-6 * po2_bar**-0.25 * 1e5,
+                "O2": 0.02264 * po2_bar * 1e5,
+                gas_species: 1.0,
+            },
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    assert (
+        exc_info.value.reason_code == "h_bearing_channel_in_dry_cell_balance"
+    )
+    assert gas_species in str(exc_info.value)
+
+
 def test_unknown_cell_material_is_a_typed_refusal() -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
 

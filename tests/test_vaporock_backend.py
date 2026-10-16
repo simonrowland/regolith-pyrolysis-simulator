@@ -2873,11 +2873,7 @@ def _healthy_finite_plus_inventory_mask():
 
 @pytest.mark.parametrize(
     ("gas_species", "parent_oxide"),
-    (
-        ("Ti2O3(g)", "TiO2"),
-        ("NaOH(g)", "Na2O"),
-        ("KOH(g)", "K2O"),
-    ),
+    (("Ti2O3(g)", "TiO2"),),
 )
 def test_oxygen_balance_gases_resolve_to_their_parent_oxide(
     gas_species, parent_oxide
@@ -2885,6 +2881,13 @@ def test_oxygen_balance_gases_resolve_to_their_parent_oxide(
     from simulator.melt_backend.vaporock import _parent_oxide_for_vaporock_gas
 
     assert _parent_oxide_for_vaporock_gas(gas_species) == parent_oxide
+
+
+@pytest.mark.parametrize("gas_species", ("NaOH(g)", "KOH(g)"))
+def test_hydroxide_gases_have_no_dry_cell_parent_oxide(gas_species):
+    from simulator.melt_backend.vaporock import _parent_oxide_for_vaporock_gas
+
+    assert _parent_oxide_for_vaporock_gas(gas_species) is None
 
 
 def test_neginf_is_retained_as_proven_empty_inventory_zero():
