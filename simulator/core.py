@@ -1565,6 +1565,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         self._apply_stage0_carbon_reductant_reactions(fs, ledger_additives)
         self._apply_stage0_perchlorate_reactions(fs)
+        # Seeding records Stage 0 SulfSat notices against the new batch clock.
+        self.melt.hour = 0
+        self._sulfur_saturation_steps = []
         self._seed_atom_ledger(feedstock_key, fs, ledger_additives)
         self._project_cleaned_melt_from_atom_ledger()
         # NOTE: ``_seed_atom_ledger`` now rebuilds ``self._chem_kernel``
@@ -1580,7 +1583,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_backend_diagnostics = {}
         self._last_out_of_domain_diagnostics = {}
         self._engine_commissioning_steps = []
-        self._sulfur_saturation_steps = []
         self._backend_failed = False
 
         self.melt.temperature_C = 25.0
@@ -1598,7 +1600,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.fO2_log = base_intrinsic_fO2_log
         self.melt.melt_fO2_log = base_intrinsic_fO2_log
         self.melt.campaign = CampaignPhase.IDLE
-        self.melt.hour = 0
         self.melt.campaign_hour = 0
         self.melt.update_total_mass()
 
@@ -9055,8 +9056,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         without re-running the gate. The result never mutates the atom
         ledger; Stage 0 keeps its builtin sulfate / sulfide bucketing
         authoritative. When the gate reports ``out_of_range`` the
-        warning is preserved on the result; the caller is expected to
-        log it but not redirect inventory.
+        warning is preserved on the result and in the run notice ledger
+        without redirecting inventory.
         """
         s_input_ppm = self._stage0_sulfur_input_ppm()
         if s_input_ppm <= 0.0:
@@ -9086,6 +9087,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 S_input_ppm=s_input_ppm,
             )
         )
+        self._note_sulfur_saturation_step(self._last_sulfur_saturation_result)
 
     def _attach_post_equilibrium_sulfsat(
         self, result: 'Any'

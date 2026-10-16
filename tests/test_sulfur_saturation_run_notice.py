@@ -63,6 +63,8 @@ def test_in_range_sulfsat_leaves_run_notice_absent() -> None:
     )
     session = run._start_session()
     sim = session.simulator
+    # Stage 0 can flag actual vacuum; isolate the in-range recorder probe.
+    sim._sulfur_saturation_steps = []
     assert sim.sulfur_saturation_run_notice() is None
     sim._note_sulfur_saturation_step(_sulfur_result("in_range"))
     assert sim.sulfur_saturation_run_notice() is None
@@ -180,6 +182,8 @@ def test_attach_post_equilibrium_sulfsat_notes_out_of_range(monkeypatch) -> None
         allow_unmeasured_alpha_fallback=True,
     )
     sim = run._start_session().simulator
+    # Count only this post-equilibrium hook, independently of Stage 0 notices.
+    sim._sulfur_saturation_steps = []
     sim.melt.p_total_mbar = 10.0
     sim._melt_headspace_composition_mbar = {
         "Fe": 0.00042416384640343613,

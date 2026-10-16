@@ -538,6 +538,32 @@ def _sim_with_sulfur_feedstock() -> PyrolysisSimulator:
     return sim
 
 
+def test_stage0_pressure_resolution_notice_survives_load_and_reaches_runner():
+    from simulator.runner import _attach_sulfur_saturation_notice
+
+    sim = _sim_with_sulfur_feedstock()
+    sim.load_batch('mixed', mass_kg=1000.0)
+
+    notice = sim.sulfur_saturation_run_notice()
+    assert notice is not None
+    assert any(
+        'sulfsat_pressure_resolution_applied' in warning
+        for item in notice['notices']
+        for warning in item['warnings']
+    )
+    metadata = {}
+    _attach_sulfur_saturation_notice(metadata, sim)
+    assert metadata['sulfur_saturation_notice'] == notice
+
+    # A new batch keeps its own Stage 0 notice, with a fresh run clock.
+    sim.melt.hour = 20
+    sim.load_batch('mixed', mass_kg=1000.0)
+    reloaded_notice = sim.sulfur_saturation_run_notice()
+    assert reloaded_notice is not None
+    assert reloaded_notice['count'] == 1
+    assert reloaded_notice['first_hour'] == reloaded_notice['last_hour'] == 1
+
+
 def test_stage0_fallback_records_warning_when_gate_unavailable(monkeypatch):
     """
     When ``SulfSatGate.is_available()`` is False at Stage 0, builtin
