@@ -176,7 +176,13 @@ def test_provider_keeps_authoritative_pressure_dict_empty():
 
 
 def test_provider_dispatch_emits_status_bearing_h2_envelope_without_authority():
-    full_speciation = {"Na": 100.0, "SiO": 0.25, "O2": 1.0e-4}
+    full_speciation = {
+        "Na": 100.0,
+        "SiO": 0.25,
+        "O": 1.0e-3,
+        "O2": 1.0e-4,
+        "SiO2_gas": 1.0e-9,
+    }
 
     class FakeBackend:
         def __init__(self):
@@ -198,7 +204,13 @@ def test_provider_dispatch_emits_status_bearing_h2_envelope_without_authority():
             )
 
     backend = FakeBackend()
-    result = VapoRockProvider(backend=backend).dispatch(
+    result = VapoRockProvider(
+        backend=backend,
+        vapor_pressure_data={
+            "metals": {"Na": {}},
+            "oxide_vapors": {"SiO": {}},
+        },
+    ).dispatch(
         _vaporock_po2_request(1e-9)
     )
     expected = asdict(
@@ -213,6 +225,8 @@ def test_provider_dispatch_emits_status_bearing_h2_envelope_without_authority():
     assert result.transition is None
     assert result.diagnostic["vapor_pressures_Pa"] == {}
     assert result.diagnostic["vaporock_full_speciation_Pa"] == full_speciation
+    assert result.warnings == ()
+    assert result.diagnostic["backend_warnings"] == ()
     assert {key: result.diagnostic[key] for key in expected} == expected
 
 
