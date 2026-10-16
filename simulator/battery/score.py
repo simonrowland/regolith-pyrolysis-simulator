@@ -618,7 +618,7 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
         return Rail.THERMOCHEMISTRY
     if quantity is Quantity.WALL_DEPOSIT_MASS:
         return Rail.WALL_DEPOSITION
-    if quantity is Quantity.FE3_FE2_RATIO:
+    if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
         return Rail.REDOX
     if quantity in {
         Quantity.YIELD_FRACTION,
@@ -6697,7 +6697,7 @@ def compile_residual(
         )
     equal = (
         _same_row_redox_identity_equal(compared_reference, compared_candidate)
-        if quantity is Quantity.FE3_FE2_RATIO
+        if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
         else identity_equal(compared_reference, compared_candidate)
     )
     if equal.kind is not IdentityEqualKind.EQUAL:
@@ -6979,21 +6979,33 @@ def load_score_context(
 
 
 def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
-    """Measured or figure_only evidence, admitted or pending (pending is diagnostic).
+    """Scoring references: measured/figure rows plus quoted valence ratios.
 
     FIGURE_ONLY rows are candidates (owner mandate: score everything; evidence
     class is a label). They stay out of the certified/measured headline via
     the figure_only notice and by not being in MEASURED_EVIDENCE.
+
+    Quoted valence ratios are routed so unsupported engine attempts remain
+    counted refusals while the quoted evidence class stays unchanged.
     """
 
     out: list[Observation] = []
     for obs in context.observations.values():
         ev = obs.evidence.class_
+        quoted_valence_ratio = (
+            isinstance(obs.identity, Identity)
+            and quantity_token(obs.identity) is Quantity.VALENCE_RATIO
+            and ev.is_value
+            and ev.value is EvidenceClass.QUOTED_ATTRIBUTED
+        )
         if not (
-            ev.is_value
-            and (
-                ev.value in MEASURED_EVIDENCE
-                or ev.value is EvidenceClass.FIGURE_ONLY
+            quoted_valence_ratio
+            or (
+                ev.is_value
+                and (
+                    ev.value in MEASURED_EVIDENCE
+                    or ev.value is EvidenceClass.FIGURE_ONLY
+                )
             )
         ):
             continue

@@ -86,18 +86,23 @@ from simulator.battery.enums import (
     StateTag,
     UncertaintyKind,
     ValueKind,
+    ValenceDenominatorKind,
+    ValenceValueForm,
 )
 from simulator.yaml_cache import YAML12SafeLoader
 from simulator.battery.identity import (
     Exposure,
     Identity,
+    IdentityRefusal,
     PA_PER_ATM_DEC,
     StandardState,
     SweepIdentity,
+    ValenceBasis,
     WallIdentity,
     atm_to_pa,
     bar_to_pa,
     celsius_to_kelvin,
+    parse_valence_basis,
     _uncompared_axes_for,
     identity_equal,
     profile_for,
@@ -372,6 +377,7 @@ PHASE_MAP: dict[str, Phase] = {
     "solid_arsenolite": Phase.CR,
     "basaltic_silicate_melt": Phase.L,
     "silicate_melt_ferrobasalt_FCMAS": Phase.L,
+    "silicate_melt_terrestrial_FMQ_and_lunar_IW_minus_1": Phase.L,
     "cao-al2o3-sio2 liquid oxide melt": Phase.L,
     # Published parenthetical spellings (Kelley / Pankratz tables).
     "(g)": Phase.G,
@@ -1477,6 +1483,10 @@ def _identity_from_plain(payload: object) -> Identity:
         "quantity": _state_from_plain(payload["quantity"], lambda v: Quantity(str(v))),
         "species": _species_from_plain(payload["species"]),
     }
+    if payload.get("valence_basis") is not None:
+        kwargs["valence_basis"] = _state_from_plain(
+            payload["valence_basis"], _valence_basis_from_plain
+        )
     if payload.get("subtype") is not None:
         kwargs["subtype"] = _state_from_plain(payload["subtype"], str)
     if payload.get("per") is not None:
@@ -1526,6 +1536,52 @@ def _identity_from_plain(payload: object) -> Identity:
     if payload.get("wall") is not None:
         kwargs["wall"] = _state_from_plain(payload["wall"], _wall_from_plain)
     return Identity(**kwargs)
+
+
+def _valence_basis_from_plain(payload: object) -> ValenceBasis:
+    if isinstance(payload, ValenceBasis):
+        return payload
+    if not isinstance(payload, Mapping):
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "valence_basis",
+            "must be a mapping of typed basis fields",
+        )
+    numerator = payload.get("numerator_oxidation_states")
+    if not isinstance(numerator, (list, tuple)) or any(
+        type(value) is not int for value in numerator
+    ):
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "valence_basis.numerator_oxidation_states",
+            "must be a list of integer oxidation states",
+        )
+    try:
+        denominator = payload.get("denominator_oxidation_state")
+        if denominator is not None and type(denominator) is not int:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_SOURCE,
+                "valence_basis.denominator_oxidation_state",
+                "must be an integer oxidation state",
+            )
+        return ValenceBasis(
+            numerator_oxidation_states=tuple(numerator),
+            denominator_kind=ValenceDenominatorKind(
+                str(payload["denominator_kind"])
+            ),
+            denominator_oxidation_state=(
+                denominator
+            ),
+            value_form=ValenceValueForm(str(payload["value_form"])),
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        if isinstance(exc, IdentityRefusal):
+            raise
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "valence_basis",
+            f"malformed typed basis: {exc}",
+        ) from exc
 
 
 def _sweep_identity_from_plain(payload: object) -> SweepIdentity:
@@ -5479,6 +5535,13 @@ def map_quantity(
             if contradiction:
                 return State.unknown(contradiction), contradiction
             return State.of(inferred), None
+        if isinstance(raw, str) and "plus_over_" in raw:
+            try:
+                parse_valence_basis(raw)
+            except IdentityRefusal as refusal:
+                detail = f"{refusal.reason.value}: {refusal.detail}"
+                return State.unknown(detail), detail
+            return State.of(Quantity.VALENCE_RATIO), None
         if isinstance(raw, str) and raw:
             qualified, _suffix = split_qualified_quantity(raw)
             if qualified is not None and _co_present_quantity_field(qualified, values):
@@ -8068,6 +8131,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.EVAPORATION_RATE: ("evaporation_rate",),
     Quantity.ION_INTENSITY: ("ion_intensity",),
     Quantity.ION_INTENSITY_RATIO: ("ion_intensity_ratio", "ion_current_ratio"),
+    Quantity.VALENCE_RATIO: ("value",),
     Quantity.O2_YIELD: (
         "o2_yield",
         "fraction_of_feedstock_oxygen_percent",
@@ -13950,6 +14014,36 @@ class Migrator:
 
         ident_kwargs: dict[str, Any] = {}
         q_token = quantity.value if quantity.is_value else None
+        if q_token is Quantity.VALENCE_RATIO:
+            raw_valence_quantity = values.get("quantity")
+            try:
+                if isinstance(raw_valence_quantity, str) and "plus_over_" in raw_valence_quantity:
+                    valence_basis = parse_valence_basis(
+                        raw_valence_quantity, species_formula=formula
+                    )
+                elif isinstance(values.get("valence_basis"), Mapping):
+                    valence_basis = _valence_basis_from_plain(
+                        values["valence_basis"]
+                    )
+                else:
+                    raise IdentityRefusal(
+                        RefusalReason.INVALID_SOURCE,
+                        "valence_basis",
+                        "valence_ratio quantity requires a printed basis",
+                    )
+            except IdentityRefusal as refusal:
+                self.result.add_queue(
+                    work.work_id,
+                    locator,
+                    ["quantity"],
+                    f"{refusal.reason.value}: {refusal.detail}",
+                    source=source_key,
+                    observation_id=obs_id,
+                )
+                quantity = State.unknown(str(refusal))
+                q_token = None
+            else:
+                ident_kwargs["valence_basis"] = State.of(valence_basis)
         value_derivation = source_derivation
         value_conversion: Derivation | None = None
         if (

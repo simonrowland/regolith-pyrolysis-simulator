@@ -77,6 +77,7 @@ class Quantity(StrEnum):
     YIELD_FRACTION = "yield_fraction"
     O2_YIELD = "o2_yield"
     FE3_FE2_RATIO = "fe3_fe2_ratio"
+    VALENCE_RATIO = "valence_ratio"
     ION_INTENSITY_RATIO = "ion_intensity_ratio"
     DELTA_FH = "delta_fH"
     DELTA_FG = "delta_fG"
@@ -102,6 +103,17 @@ class Quantity(StrEnum):
     ION_INTENSITY = "ion_intensity"
     INTERACTION_PARAMETER = "interaction_parameter"
     RESIDUE_COMPONENT_COMPOSITION = "residue_component_composition"
+
+
+class ValenceDenominatorKind(StrEnum):
+    TOTAL_ELEMENT = "total_element"
+    OXIDATION_STATE = "oxidation_state"
+
+
+class ValenceValueForm(StrEnum):
+    FRACTION = "fraction"
+    RATIO = "ratio"
+    LOG10_RATIO = "log10_ratio"
 
 
 class EvidenceClass(StrEnum):
@@ -491,6 +503,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.YIELD_FRACTION: "dimensionless",
     Quantity.O2_YIELD: "dimensionless",
     Quantity.FE3_FE2_RATIO: "dimensionless",
+    Quantity.VALENCE_RATIO: "dimensionless",
     Quantity.ION_INTENSITY_RATIO: "dimensionless",
     Quantity.DELTA_FH: "kJ_per_declared_mol_basis",
     Quantity.DELTA_FG: "kJ_per_declared_mol_basis",

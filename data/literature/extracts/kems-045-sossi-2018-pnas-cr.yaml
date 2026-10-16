@@ -663,18 +663,37 @@ species:
       values:
         quantity: Cr2plus_over_total_Cr
         method_class: quoted_measurement
+        admission_status: admitted
         reaction_as_printed: CrO1.5 = CrO + 1/4 O2
         logK_approx: 1.9
-        T_C_as_printed: 1400
-        T_K: 1673.15
-        T_conversion: T_K = 1400 + 273.15
-        terrestrial_Cr2plus_fraction: 0.32
-        lunar_Cr2plus_fraction: 0.91
-        terrestrial_fO2: near FMQ
-        lunar_fO2: ~1 log unit below IW
         logK_cited_as: Herd 2008 (ref. 33)
-        fractions_cited_as: Berry, O'Neill, Scott, Foran and Shelley 2006 Am. Mineral. 91:1901-1908 (ref.
+        attribution: Berry, O'Neill, Scott, Foran and Shelley 2006 Am. Mineral. 91:1901-1908 (ref.
           34)
+        points:
+        - label: terrestrial
+          value: 0.32
+          T_C: 1400
+          point_conditions:
+            fO2_control:
+              state:
+                tag: value
+                value: near FMQ
+              locator:
+                published_page: 10921
+                pdf_page_index: 2
+                equation: '1'
+        - label: lunar
+          value: 0.91
+          T_C: 1400
+          point_conditions:
+            fO2_control:
+              state:
+                tag: value
+                value: "~1 log unit below IW"
+              locator:
+                published_page: 10921
+                pdf_page_index: 2
+                equation: '1'
     - observation_id: sossi_2018_pnas_chromite_opx_fractionation_model
       type: gibbs_table
       locator:
