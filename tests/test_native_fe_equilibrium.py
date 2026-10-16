@@ -203,6 +203,49 @@ def test_gas_veto_event_is_limited_not_empty_inventory(monkeypatch):
                for n in sim._redox_bound_notices_this_hr)
 
 
+def _prepared_ci_composition():
+    from tests.chemistry.conftest import _load_yaml
+
+    prepared, _ = fe_redox.initialize_feedstock_iron(
+        _load_yaml('feedstocks.yaml')['ci_carbonaceous_chondrite'])
+    return {s: w for s, w in prepared['composition_wt_pct'].items() if s in MOLAR_MASS}
+
+
+def test_feo_rich_ci_checks_monotonicity_instead_of_assuming_it():
+    comp = _prepared_ci_composition()
+    basis = fe_redox.melt_mol_fractions_for_kress91(comp)
+    assert basis['FeOt'] == pytest.approx(0.270073, abs=1e-6)
+    result = fe_redox.native_fe_equilibrium_extent(
+        comp_wt=comp, feo_mol=comp['FeO']/MOLAR_MASS['FeO'],
+        fe2o3_mol=comp['Fe2O3']/MOLAR_MASS['Fe2O3'], T_K=2023.15,
+        pressure_bar=.01, gas_fO2_log=lambda n: -300.)
+    assert result['melt_monotonicity_proven'] is False
+
+
+def test_unproven_bracket_selects_first_of_multiple_roots(monkeypatch):
+    # Prepared CI lies outside the proof. Supply a controlled three-crossing
+    # residual to test fallback selection on that bracket, not fit Kress.
+    comp = _prepared_ci_composition()
+    assert fe_redox.melt_mol_fractions_for_kress91(comp)['FeOt'] == pytest.approx(.270073, abs=1e-6)
+    bound = fe_redox._feo_activity_saturation_log10_fO2_bar(2023.15, a_feo=.3)
+    monkeypatch.setattr(fe_redox, 'calphad_ferrous_feo_activity_diagnostic',
+                        lambda **kw: {'a_FeO_authoritative': .3})
+
+    def nonmonotonic(**kw):
+        n = 100. - kw['feo_mol']
+        x = n / 100.
+        return {'fO2_log': bound + 100*(x-.1)*(x-.2)*(x-.8)}
+
+    monkeypatch.setattr(fe_redox, 'kress91_intrinsic_state', nonmonotonic)
+    result = fe_redox.native_fe_equilibrium_extent(
+        comp_wt=comp, feo_mol=100.,
+        fe2o3_mol=100. * comp['Fe2O3']/MOLAR_MASS['Fe2O3'] / (comp['FeO']/MOLAR_MASS['FeO']),
+        T_K=2023.15, pressure_bar=.01, gas_fO2_log=lambda n: -300.)
+    assert result['melt_monotonicity_proven'] is False
+    assert result['native_fe_state']['saturation_status'] == 'BELOW'
+    assert result['melt_root_mol'] == pytest.approx(10., abs=1e-9)
+
+
 def test_no_precipitation_above_melt_bound(probe):
     sim, controls, _ = probe
     inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')

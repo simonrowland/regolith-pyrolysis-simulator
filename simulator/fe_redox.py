@@ -1145,7 +1145,7 @@ def native_fe_equilibrium_extent(
     # composition term B, dB/dn=D/S'^2, D=sum_i(c_i+1.828)*N_i.
     # On this reducing limb a_FeO=gamma(T)*F'/S', hence
     # g'=[(1+2*a_K)/F' - D/S'^2 - 2*a_K/S']/(a_K*ln(10)), in dex/mol.
-    # For both b-899 basalts y=F'/S' <= 0.2 throughout the root bracket.
+    # Check, rather than assume, y=F'/S' <= 0.2 on this bracket.
     # Since c_i+1.828 <= 8.043, g' is bounded below by
     # [1.392/y - 0.392 - 8.043*(1-y)]/(0.196*ln(10)*S'). The numerator
     # decreases up to y=0.2, where it is 0.1336 > 0: g is strictly increasing.
@@ -1155,6 +1155,21 @@ def native_fe_equilibrium_extent(
     # h=log(pO2_gas(n))-IW(a(n)) also increases for a nondecreasing gas
     # boundary. Reduction requires BOTH g<0 and h<0, giving the minimum
     # of their roots. Equal initial potentials give zero extent.
+    y0 = (melt_mol_fractions_for_kress91(comp_wt)['FeOt']
+          * feo_mol / total_fe)
+    a_k = KRESS91_LN_FO2_COEFFICIENT
+    derivative_lower_numerator = (
+        (1.0 + 2.0*a_k)/y0 - 2.0*a_k - 8.043*(1.0-y0)
+    )
+    # 8.043 = max(c_i)-c_FeOt = 6.215-(-1.828), from Kress91 above.
+    # The lower numerator decreases up to y=.2, while y decreases with n.
+    # gamma*y0<1 excludes the activity cap. This proves g'>0 up to its
+    # first crossing, which is below pure IW; the later blend can only
+    # lower a_FeO and cannot introduce an earlier crossing.
+    monotonic = bool(
+        y0 <= 0.2 and derivative_lower_numerator > 0.0
+        and float(holzheid_stoich_feo_gamma_band(T_K)['central'])*y0 < 1.0
+    )
     def melt_gap(n):
         potential, comparison = state(n)
         return potential - float(comparison['iw_bound_log'])
@@ -1168,9 +1183,21 @@ def native_fe_equilibrium_extent(
     def root(gap):
         if gap(0.0) >= 0.0:
             return 0.0
-        if gap(hi) <= 0.0:
+        low, high = 0.0, hi
+        if not monotonic:
+            # No sign proof (e.g. prepared CI xFeOt=.270): search in
+            # ascending extent for the first sampled sign change BEFORE
+            # deciding from the far endpoint or handing a bracket to Brent.
+            for i in range(1, 257):
+                high = hi * (i / 256.0)
+                if gap(high) >= 0.0:
+                    break
+                low = high
+            else:
+                return feo_mol
+        elif gap(high) <= 0.0:
             return feo_mol
-        n = brentq(gap, 0.0, hi, xtol=1e-300, rtol=1e-14, maxiter=200)
+        n = brentq(gap, low, high, xtol=1e-300, rtol=1e-14, maxiter=200)
         if abs(gap(n)) > NATIVE_FE_ROOT_TOLERANCE_DEX:
             raise Kress91InvalidControls('native Fe root failed its dex tolerance')
         return n
@@ -1197,6 +1224,7 @@ def native_fe_equilibrium_extent(
         'fO2_before_log': before, 'fO2_after_log': after,
         'iw_bound_after_log': final['iw_bound_log'], 'limit': limit,
         'melt_root_mol': melt_root, 'gas_root_mol': gas_root,
+        'melt_monotonicity_proven': monotonic,
     }
 
 
