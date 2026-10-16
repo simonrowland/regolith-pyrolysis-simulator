@@ -113,7 +113,17 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         if not math.isfinite(fO2_log):
             raise ValueError(f"fO2_log must be finite, got {request.fO2_log!r}")
         temperature_band = kress91_temperature_band_case(float(request.temperature_C))
-        if not bool(temperature_band.get("authoritative")):
+        band_diagnostic = {} if temperature_band.get("authoritative") else {
+            "temperature_C": float(request.temperature_C),
+            "temperature_band_case": temperature_band.get("case"),
+            "temperature_band_status": temperature_band.get("status"),
+            "temperature_band_source": temperature_band.get("source"),
+            "temperature_band_authoritative": bool(temperature_band.get("authoritative")),
+            "flags": ["OUT_OF_CERTIFIED_BAND"] if temperature_band.get("extrapolation") else [],
+        }
+        if not bool(temperature_band.get("authoritative")) and (
+            temperature_band.get("case") != "1630C_2100C_extrapolation_experimentally_confirmed"
+        ):
             return IntentResult(
                 intent=ChemistryIntent.FE_REDOX_RESPECIATION,
                 status="refused",
@@ -123,13 +133,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                     "respeciation_status": "refused",
                     "direction": "none",
                     "reason": "fe_redox_respeciation_temperature_unauthorized",
-                    "temperature_C": float(request.temperature_C),
-                    "temperature_band_case": temperature_band.get("case"),
-                    "temperature_band_status": temperature_band.get("status"),
-                    "temperature_band_source": temperature_band.get("source"),
-                    "temperature_band_authoritative": bool(
-                        temperature_band.get("authoritative")
-                    ),
+                    **band_diagnostic,
                     "o2_account": o2_account,
                     "oxygen_source": oxygen_source,
                 },
@@ -147,6 +151,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                 transition=None,
                 control_audit=control_audit,
                 diagnostic={
+                    **band_diagnostic,
                     "respeciation_status": "no_oxidized_iron",
                     "direction": "none",
                     "current_ferric_fraction": 0.0,
@@ -168,6 +173,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                 transition=None,
                 control_audit=control_audit,
                 diagnostic={
+                    **band_diagnostic,
                     "respeciation_status": "no_kress91_basis",
                     "direction": "none",
                     "current_ferric_fraction": (
@@ -195,6 +201,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         target_fe2o3_mol = 0.5 * target_ferric * total_fe_mol
         delta_fe2o3_mol = target_fe2o3_mol - fe2o3_mol
         diagnostic = {
+            **band_diagnostic,
             "respeciation_status": "ok",
             "current_ferric_fraction": current_ferric,
             "target_ferric_fraction": target_ferric,

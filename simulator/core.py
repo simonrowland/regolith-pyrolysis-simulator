@@ -855,8 +855,6 @@ CHAR_LANCE_BASIS_CO2 = 'C_plus_O2_to_CO2'
 CHAR_LANCE_BASIS_CO = 'C_plus_half_O2_to_CO'
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
 OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
-OXYGEN_RESERVOIR_REDOX_SOURCE_MIN_FO2_LOG10_BAR = -1.0e11
-OXYGEN_RESERVOIR_REDOX_SOURCE_MAX_FO2_LOG10_BAR = 1.0e11
 # Coarse absolute ferric-fraction tripwire until SSO-R ch2 re-speciation
 # samples implied and ledger speciation at the same boundary.
 # TODO(SSO-R ch2 re-speciation): replace with the final respeciation gate.
@@ -2990,10 +2988,54 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 + internal_o2_mol
             )
-        return self._apply_oxygen_reservoir_redox_source_terms(
+        reservoir = self._apply_oxygen_reservoir_redox_source_terms(
             terms,
             exchange_direction=exchange_direction,
         )
+        return reservoir
+
+    def _settle_evaporative_redox_after_batch(self) -> None:
+        # Parent/shared-O2 caps reserve inventory for the whole carrier batch.
+        # Only after every carrier commits may Fe re-speciation consume FeO.
+        reservoir = self.melt.oxygen_reservoir
+        saturated = (
+            self._fe_redox_internal_o2_capacity_mol_this_hr > OXYGEN_RESERVOIR_NOOP_MOL
+        ) and (
+            reservoir.melt_intrinsic_fO2_log >= self._melt_redox_fO2_upper_bound_log()
+            or reservoir.melt_redox_capacity_mol_per_ln_fO2 <= OXYGEN_RESERVOIR_NOOP_MOL
+        )
+        if saturated:
+            # The evaporation transition already credited its O2 to the buffer.
+            # At saturation, solve the finite Fe split BEFORE moving the remainder:
+            # 2 FeO + 1/2 O2 = Fe2O3, so uptake is Δn(Fe2O3)/2 mol O2.
+            # Its ledger debit, not C_m * Δln(fO2), owns the absorbed atoms.
+            # At zero Fe uptake all the credited O2 leaves to overhead; no second
+            # source or parallel redox inventory is introduced.
+            diagnostic = self._apply_fe_redox_respeciation(
+                oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
+                fO2_log_override=self._melt_redox_fO2_upper_bound_log(),
+            )
+            excess_o2_mol = max(0.0, float(
+                self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(OXYGEN_SPECIES, 0.0)
+            ))
+            if excess_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+                # Drain only this evaporation-owned carrier, including a
+                # solid/no-capacity or hot-band refusal. Bubbler passthrough
+                # has its own booking and must not be drained a second time.
+                # Move the SAME mol: ΔO_atoms = -2n + 2n = 0 exactly.
+                self._dispatch_and_commit(
+                    ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
+                    control_inputs={'dn_to_headspace_mol': excess_o2_mol},
+                )
+                diagnostic['excess_o2_to_headspace_mol'] = excess_o2_mol
+                diagnostic.setdefault('flags', []).append('EXCESS_OXYGEN_TO_GAS')
+                self._fe_redox_respeciation_diagnostics_this_hr[-1].update(diagnostic)
+        elif self._has_remaining_fe_redox_internal_o2_capacity():
+            self._apply_fe_redox_respeciation(
+                oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
+            )
+        else:
+            self._apply_fe_redox_respeciation()
 
     def _c6_back_reduction_redox_source_terms_from_transition(
         self,
@@ -5290,6 +5332,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         reservoir.reference_T_K = reference_T_K
         self._sync_oxygen_reservoir_mirror()
 
+    def _melt_redox_fO2_upper_bound_log(self) -> float:
+        # INTERIM rapid-release/local-equilibrium sanity bound at the liquid
+        # interface, not a rewrite of the bulk or quenched reference. Premise:
+        # the gas is ideal (f_O2 = p_O2). Mole fraction y_O2 <= 1 gives
+        # f_O2/bar = y_O2 * P_total/bar <= P_total/bar. P[bar] = P[mbar]/1000;
+        # hence log10(f_O2/bar) <= log10(max(P_total[mbar]/1000, vacuum_floor)).
+        # This is dimensionless and independent of T in the ideal-gas limit.
+        # At 1400 C, 0.2 mbar gives 2e-4 bar and -3.6989700043 dex (pure O2);
+        # N2-sweep passive exchange uses actual headspace pO2 below this bound;
+        # the ceiling does not mean equilibrium with pure O2. As P -> 0 the
+        # vacuum floor is numerical pressure resolution, not physics.
+        return math.log10(floor_vacuum_pressure_bar(
+            float(self.melt.p_total_mbar) / 1000.0,
+            floor_bar=self._vacuum_floor_bar(),
+        ))
+
     def _melt_fO2_reference_state_at_temperature(
         self,
         temperature_K: Optional[float] = None,
@@ -5490,38 +5548,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         skip_reason = ''
         refusal_context: Dict[str, Any] = {}
         if C_m <= OXYGEN_RESERVOIR_NOOP_MOL:
-            # At or below the project's negligible-mol numerical floor (NOOP_MOL = 1e-15) the
-            # melt retains no MEANINGFUL authoritative differential redox capacity. A saturated/
-            # exhausted melt drives C_m into this band (observed down to denormalized ~1e-293 mol
-            # per ln fO2 after the C3 alkali shuttle). Dividing a residual source term by such a
-            # C_m yields an absurd candidate fO2 (finite ~1e9..1e287, or overflow to non-finite),
-            # so APPLYING it would corrupt the reservoir. Diagnose the honest root cause
-            # (no_melt_redox_capacity) at the floor instead. A full-grid SSO-R scan (review
-            # codex-7466, 2026-07-08) found 846/15082 real source-term calls in this band and
-            # confirmed the floor REFUSES 37 real rows the prior branch would have applied as
-            # absurd fO2 jumps (candidate log10 fO2 up to ~1.9e9) — a correctness fix, and NOT a
-            # fail-open: skipped terms are recorded as refusal, never as success. The graded
-            # range/saturation refusals below still apply ABOVE the floor (C_m > NOOP_MOL), where
-            # a real capacity meets an out-of-range or non-finite demand.
-            # The refusal follows from the denominator, not from a pressure claim. The
-            # update would be delta(ln fO2) = n_O2eq / C_m: mol divided by
-            # (mol per unit ln fO2) is a dimensionless log increment. Therefore
-            # C_m <= NOOP_MOL says the melt has no resolvable differential capacity;
-            # it places no upper bound on the independent source term n_O2eq. Sanity
-            # check: n_O2eq = 1 mol and C_m = 0 enters this branch, so neither
-            # "tiny oxygen" nor a ~1e-15 bar ballistic regime follows. Refusal is
-            # correct because division by a zero/numerically meaningless capacity
-            # cannot yield an authoritative redox state; the skipped source term is
-            # retained in the diagnostic rather than reinterpreted as pressure.
+            # No resolvable differential uptake: Δln(fO2) = n_O2eq/C_m
+            # (mol / (mol per ln) is dimensionless) cannot be integrated at
+            # C_m -> 0. This does NOT discard the oxygen: evaporation's caller
+            # attempts the finite Fe split, then routes the unabsorbed ledger
+            # buffer to gas even when this numerical integration is refused.
+            # Limit: at zero Fe uptake, all source O2 goes to the overhead.
             skip_reason = 'no_melt_redox_capacity'
         elif abs(net_o2_equiv_mol) < OXYGEN_RESERVOIR_NOOP_MOL:
             skip_reason = 'below_threshold'
         else:
             x_m = base_fO2_log * math.log(10.0)
-            applied_delta_ln = net_o2_equiv_mol / C_m
-            candidate_fO2_log = (
-                x_m + applied_delta_ln
-            ) / math.log(10.0)
+            upper_bound = self._melt_redox_fO2_upper_bound_log()
+            delta_to_bound = (upper_bound - base_fO2_log) * math.log(10.0)
+            # Compare in mol BEFORE division: even a finite oxygen source
+            # divided by a collapsing C_m can overflow. The finite Kress
+            # ledger split below owns the actual uptake, not this tangent.
+            if net_o2_equiv_mol >= C_m * delta_to_bound:
+                applied_delta_ln = delta_to_bound
+                candidate_fO2_log = upper_bound
+            else:
+                applied_delta_ln = net_o2_equiv_mol / C_m
+                candidate_fO2_log = (
+                    x_m + applied_delta_ln
+                ) / math.log(10.0)
             if (
                 not math.isfinite(applied_delta_ln)
                 or not math.isfinite(candidate_fO2_log)
@@ -5536,28 +5586,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     candidate_fO2_log=candidate_fO2_log,
                 )
                 applied_delta_ln = 0.0
-            elif not (
-                OXYGEN_RESERVOIR_REDOX_SOURCE_MIN_FO2_LOG10_BAR
-                <= candidate_fO2_log
-                <= OXYGEN_RESERVOIR_REDOX_SOURCE_MAX_FO2_LOG10_BAR
-            ):
-                skip_reason = 'redox_candidate_fO2_out_of_range_refusal'
-                refusal_context = self._oxygen_reservoir_guard_context(
-                    context='redox_source_terms_fO2_range_refusal',
-                    source_terms_mol_o2_equiv=terms,
-                    net_o2_equiv_mol=net_o2_equiv_mol,
-                    melt_redox_capacity_mol_per_ln_fO2=C_m,
-                    delta_ln_fO2=applied_delta_ln,
-                    candidate_fO2_log=candidate_fO2_log,
-                )
-                refusal_context['candidate_fO2_log_min'] = (
-                    OXYGEN_RESERVOIR_REDOX_SOURCE_MIN_FO2_LOG10_BAR
-                )
-                refusal_context['candidate_fO2_log_max'] = (
-                    OXYGEN_RESERVOIR_REDOX_SOURCE_MAX_FO2_LOG10_BAR
-                )
-                applied_delta_ln = 0.0
             else:
+                # The derivative is a local tangent, not an unlimited oxygen
+                # capacity. Stop its prediction at the gas pressure ceiling;
+                # evaporative oxygen left after the finite Fe split is moved
+                # by OXYGEN_RESERVOIR_EXCHANGE, never discarded by this clamp.
+                candidate_fO2_log = min(
+                    candidate_fO2_log, self._melt_redox_fO2_upper_bound_log(),
+                )
+                applied_delta_ln = (
+                    candidate_fO2_log - base_fO2_log
+                ) * math.log(10.0)
                 reservoir.melt_intrinsic_fO2_log = (
                     self._finite_oxygen_reservoir_fO2_log(
                         candidate_fO2_log,
@@ -5823,6 +5862,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_authority=gate_authority,
         )
         current_fO2_log = self._current_melt_redox_fO2_log()
+        target_fO2_log = min(target_fO2_log, self._melt_redox_fO2_upper_bound_log())
         C_m = self._melt_redox_source_capacity_mol_per_ln_fO2(
             fO2_log=current_fO2_log,
             T_K=T_K,
@@ -5959,6 +5999,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 candidate_fO2_log = (
                     current_fO2_log * math.log(10.0) + applied_delta_ln
                 ) / math.log(10.0)
+                candidate_fO2_log = min(
+                    candidate_fO2_log, self._melt_redox_fO2_upper_bound_log(),
+                )
                 reservoir.melt_intrinsic_fO2_log = (
                     self._finite_oxygen_reservoir_fO2_log(
                         candidate_fO2_log,
@@ -6227,7 +6270,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return 'respeciation_pending'
 
     def _remaining_fe_redox_internal_o2_capacity_mol(self) -> float:
-        return max(
+        capacity_mol = max(
             0.0,
             float(
                 getattr(
@@ -6246,6 +6289,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 or 0.0
             ),
         )
+        return min(capacity_mol, max(0.0, float(
+            self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(OXYGEN_SPECIES, 0.0)
+        )))
 
     def _has_remaining_fe_redox_internal_o2_capacity(self) -> bool:
         return (
@@ -6272,6 +6318,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
         oxygen_source = str(oxygen_source or FE_REDOX_OXYGEN_SOURCE_OVERHEAD)
+        if (
+            oxygen_source == FE_REDOX_OXYGEN_SOURCE_OVERHEAD
+            and abs(self.melt.oxygen_reservoir.exchange_o2_mol)
+            > OXYGEN_RESERVOIR_NOOP_MOL
+        ):
+            # Passive exchange already moved the physical O2 between overhead
+            # and this buffer. The finite Fe split must settle that same move,
+            # not draw/release gas again. Select by the signed exchange, not a
+            # positive balance: release may have depleted the buffer to zero.
+            # The existing provider caps uptake by real buffer mol and flags
+            # any finite Kress demand beyond the differential exchange step.
+            oxygen_source = FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER
         buffer_capacity_mol = 0.0
         if internal_o2_capacity_mol is not None:
             buffer_capacity_mol = max(0.0, float(internal_o2_capacity_mol))
@@ -6330,6 +6388,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 context='fe_redox_respeciation_override',
                 candidate_fO2_log=float(fO2_log_override),
             )
+        fO2_log = min(fO2_log, self._melt_redox_fO2_upper_bound_log())
         control_inputs = {
             'source': 'scalar Kress91 fO2 ledger re-speciation',
             'o2_account': (
@@ -6555,7 +6614,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return reservoir
 
         x_m = base_fO2_log * math.log(10.0)
-        effective_transport_pO2 = max(transport_pO2, self._vacuum_floor_bar())
+        # Holdup nRT/V can exceed the controlled pressure before the bleed.
+        # The exchange target uses the same physical boundary as the source
+        # step; solve dn against that target so the ledger move and potential
+        # increment remain paired, rather than clipping fO2 after booking dn.
+        effective_transport_pO2 = min(
+            max(transport_pO2, self._vacuum_floor_bar()),
+            10.0 ** self._melt_redox_fO2_upper_bound_log(),
+        )
         if not math.isfinite(effective_transport_pO2) or effective_transport_pO2 <= 0.0:
             raise AccountingError(
                 'oxygen reservoir exchange requires finite positive transport pO2; '
@@ -6595,6 +6661,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 exchange_clamped = True
             max_real_absorbable = max(0.0, head_o2_mol - n_floor_mol)
             dn_ledger_to_headspace = max(dn_to_headspace, -max_real_absorbable)
+        elif dn_to_headspace > 0.0:
+            # Premise: positive exchange moves O2 molecules, while the ledger
+            # validates their oxygen atoms (n_O = 2 * n_O2). Compare in mol O2
+            # against the buffer's mol O2 inventory; the excess stays in the
+            # existing typed unbacked amount. At zero inventory the booked
+            # transfer is zero; with enough inventory the requested flow stays
+            # unchanged. Melt potential alone is not an O2 ledger parcel.
+            buffer_o2_mol = max(0.0, float(
+                self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+                    OXYGEN_SPECIES,
+                    0.0,
+                )
+            ))
+            dn_ledger_to_headspace = min(dn_to_headspace, buffer_o2_mol)
+            if dn_ledger_to_headspace < dn_to_headspace:
+                exchange_clamped = True
+            if dn_ledger_to_headspace < OXYGEN_RESERVOIR_NOOP_MOL:
+                dn_ledger_to_headspace = 0.0
 
         if abs(dn_to_headspace) < OXYGEN_RESERVOIR_NOOP_MOL:
             dn_to_headspace = 0.0
@@ -13927,12 +14011,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 6. Update melt composition ---
         # Subtract evaporated mass from the melt.
         self._update_melt_composition(evap_flux)
-        if self._has_remaining_fe_redox_internal_o2_capacity():
-            self._apply_fe_redox_respeciation(
-                oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
-            )
-        else:
-            self._apply_fe_redox_respeciation()
+        self._settle_evaporative_redox_after_batch()
 
         # --- 7. Overhead gas (with cold-train capacity feedback) ---   [LOOP-2]
         # Equipment sizing also supplies the runtime pipe/throat geometry used

@@ -2368,6 +2368,27 @@ def _redox_source_breakdown_observables(snapshot: HourSnapshot) -> dict[str, Any
     return {"redox_source_breakdown": _json_safe(summary)}
 
 
+def _oxygen_reservoir_exchange_observables(
+    snapshot: HourSnapshot,
+) -> dict[str, Any]:
+    reservoir = getattr(snapshot, "oxygen_reservoir", {}) or {}
+    if (
+        not isinstance(reservoir, Mapping)
+        or not reservoir.get("exchange_clamped")
+    ):
+        return {}
+    # Unclamped exchanges need no warning row; keep existing normal rows stable.
+    exchange = {
+        "exchange_o2_mol": reservoir.get("exchange_o2_mol", 0.0),
+        "exchange_unbacked_o2_mol": reservoir.get(
+            "exchange_unbacked_o2_mol", 0.0
+        ),
+        "exchange_direction": reservoir.get("exchange_direction", ""),
+        "exchange_clamped": reservoir.get("exchange_clamped", False),
+    }
+    return {"oxygen_reservoir": _json_safe(exchange)}
+
+
 def _mre_uncertified_yield_observables(snapshot: HourSnapshot) -> dict[str, Any]:
     summary = dict(getattr(snapshot, "mre_uncertified_yield", {}) or {})
     if not summary:
@@ -2652,6 +2673,7 @@ def build_per_hour_summary(
         **_knudsen_regime_observables(snapshot),
         **_evap_plane_selectivity_observables(snapshot),
         **_redox_source_breakdown_observables(snapshot),
+        **_oxygen_reservoir_exchange_observables(snapshot),
         **_mre_uncertified_yield_observables(snapshot),
         **_mre_ellingham_ladder_diagnostic_observables(snapshot),
         **fe_redox_split_observables,
