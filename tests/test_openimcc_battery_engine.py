@@ -1580,23 +1580,23 @@ def test_openimcc_below_floor_vapour_residual_has_temperature_flag() -> None:
 
 def test_openimcc_in_domain_score_store_row_has_no_temperature_flag() -> None:
     observation_id = (
-        "shornikov-1997-diopside-vaporization::"
-        "shornikov_1997_mgo_activity_table3::T=1743:h=8812a850c056"
+        "kems-ms2000-044::"
+        "ms2000_044_sio2_activity_k_system_xsio2_0892_t1723_class_quote_r2"
     )
-    context = load_score_context(
-        sources=("shornikov-1997-diopside-vaporization",)
-    )
+    context = load_score_context(sources=("kems-ms2000-044",))
     reference = context.observations[observation_id]
     floor, ceiling = _openimcc_pack_temperature_band()
     temperature_K = float(reference.identity.temperature_K.value)
     assert floor <= temperature_K <= ceiling
+    focused_context = replace(context, observations={observation_id: reference})
 
     residuals, _candidates = score_store(
-        context,
+        focused_context,
         engines=(Engine.OPENIMCC,),
         rail=Rail.MELT_ACTIVITY,
     )
     residual = next(row for row in residuals if row.reference == observation_id)
+    assert residual.numeric is not None
     assert not any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         and notice.origin == "engine:openimcc"
