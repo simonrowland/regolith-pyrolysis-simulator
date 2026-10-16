@@ -2184,6 +2184,47 @@ def test_hard_vacuum_actual_total_reaches_both_pressure_consumers(accessor):
         ) == pytest.approx(gas.pressure_mbar * 100.0)
 
 
+def test_transport_estimate_has_no_command_pressure_floor():
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import MeltState
+
+    model = OverheadGasModel({"enabled": False})
+    melt = MeltState(temperature_C=1500.0, p_total_mbar=10.0)
+    flux = EvaporationFlux(species_kg_hr={"Fe": 0.1})
+    flux.update_totals()
+    transport = model.estimate_transport_state(flux, melt, p_downstream_bar=0.0)
+    assert transport["pressure_mbar"] == transport["vapor_pressure_mbar"]
+    assert transport["pressure_mbar"] < melt.p_total_mbar
+
+
+def test_live_carrier_report_closes_over_the_complete_residual_stream():
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, MeltState
+
+    model = OverheadGasModel({"enabled": False})
+    melt = MeltState(temperature_C=1500.0, p_total_mbar=10.0, atmosphere=Atmosphere.PN2_SWEEP)
+    inlet = EvaporationFlux(species_kg_hr={"Fe": 1.0})
+    inlet.update_totals()
+    model.flowing_stream_mol_hr(
+        {"Fe": 1.0 / (MOLAR_MASS["Fe"] / 1000.0)}, melt,
+        model.estimate_transport_state(inlet, melt, p_downstream_bar=0.0),
+    )
+    residual = EvaporationFlux(species_kg_hr={"Fe": 0.1})
+    residual.update_totals()
+    n2_kg_hr = model.last_stream_mol_hr["N2"] * MOLAR_MASS["N2"] / 1000.0
+    expected = model._vapor_pressure_mbar_from_flux(
+        (n2_kg_hr + 0.1) / 3600.0, melt.temperature_C,
+        p_downstream_bar=0.0, species_kg_for_M_avg={"N2": n2_kg_hr, "Fe": 0.1},
+    )
+    gas = model.update(
+        residual, melt, CondensationTrain.create_default(),
+        transport_inlet_flux=inlet, p_downstream_bar=0.0,
+    )
+    assert gas.pressure_mbar == pytest.approx(expected)
+    assert gas.pressure_mbar < melt.p_total_mbar
+    assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar)
+
+
 @pytest.mark.parametrize("carrier,total_mbar,o2_mbar", [("", 1.5, 1.5), ("Ar", 10.0, 2.0)])
 def test_closed_finite_headspace_is_the_melt_surface_state(
     monkeypatch, carrier, total_mbar, o2_mbar,

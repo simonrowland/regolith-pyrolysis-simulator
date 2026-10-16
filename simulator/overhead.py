@@ -773,7 +773,7 @@ class OverheadGasModel:
             # P_down->P_up this full-upstream state makes the following live
             # flux (and therefore saturation) recover instead of relatching.
             vapor_pressure_mbar = allowed_pressure_Pa / 100.0
-        pressure_mbar = max(vapor_pressure_mbar, allowed_pressure_mbar)  # mbar — reported total overhead pressure
+        pressure_mbar = vapor_pressure_mbar  # mbar — actual throughput pressure
         if controlled_flow:
             pipe_capacity_used_pct = (
                 effective_transport_capacity.saturation * 100.0
@@ -1146,6 +1146,29 @@ class OverheadGasModel:
                 headspace_volume_m3=gas.headspace_volume_m3,
             )
             gas.pressure_mbar = self.last_stream_boundary['pressure_mbar']
+        else:
+            carrier = self.last_stream_boundary['carrier_species']
+            inlet_pressure_mbar = self.last_stream_boundary['pressure_mbar']
+            carrier_mass = _species_molar_mass_g_mol(carrier, self.species_formula_registry) / 1000.0
+            molar_capacity = self._pipe_conductance(
+                inlet_pressure_mbar * 100.0, melt.temperature_C,
+                p_downstream_Pa=gas.p_downstream_bar * 1.0e5,
+                species_kg_for_M_avg={carrier: 1.0},
+            ) * 3600.0 / carrier_mass
+            if molar_capacity > 0.0:
+                # PIPE-1 has q=C_mol*(P_up²-P_down²). Its mass capacity
+                # divided by the same carrier M cancels M, so this molar
+                # coefficient needs no invented ambient_other mass. Therefore
+                # P_report²=P_down²+(q_report/q_capacity)*(P_in²-P_down²).
+                # Units are mbar²; no capture restores P_in at full capacity.
+                downstream_mbar = gas.p_downstream_bar * 1000.0
+                gas.pressure_mbar = math.sqrt(
+                    downstream_mbar ** 2
+                    + sum(flows.values()) / molar_capacity
+                    * (inlet_pressure_mbar ** 2 - downstream_mbar ** 2)
+                )
+            else:
+                gas.pressure_mbar = inlet_pressure_mbar
         if self._finite_headspace_enabled:
             self._update_finite_headspace(
                 gas, melt, overhead_holdup_mol or {},
@@ -1310,6 +1333,12 @@ class OverheadGasModel:
         if atmosphere in {'PN2_SWEEP', 'ARGON_FLOW', 'CO2_BACKPRESSURE'}:
             carrier = carrier or {'PN2_SWEEP': 'N2', 'ARGON_FLOW': 'Ar',
                                   'CO2_BACKPRESSURE': 'CO2'}[atmosphere]
+            if atmosphere in {'PN2_SWEEP', 'ARGON_FLOW'}:
+                # The regulator supplies the remainder at its setpoint. This
+                # boundary closes actual carrier flow below; the transport
+                # estimate itself contains only the source pressure.
+                if command_total is not None and pressure_mbar < command_total:
+                    pressure_mbar = command_total
             if atmosphere == 'CO2_BACKPRESSURE' and not any(q > 0.0 and s != carrier for s, q in flows.items()):
                 pressure_mbar = sum(supplied_partials.values())
         elif controlled:
