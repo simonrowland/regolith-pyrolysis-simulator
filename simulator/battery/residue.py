@@ -632,6 +632,13 @@ def integrate_residue_inventory(
             }
             return pressure_model(engine_inventory, float(log10_pO2_bar))
 
+        def accepted_pressure_evaluation(log10_pO2_bar: float) -> None:
+            accepted_callback = getattr(
+                pressure_model, "_on_accepted_evaluation", None
+            )
+            if callable(accepted_callback):
+                accepted_callback(float(log10_pO2_bar))
+
         balance = None
         if buffered_logp is None:
             try:
@@ -658,6 +665,7 @@ def integrate_residue_inventory(
                     for term in terms
                 ),
                 temperature_K=temperature,
+                on_accepted_evaluation=accepted_pressure_evaluation,
                 )
             except ValueError as exc:
                 # No positive parent pressure is the zero-flux limit, not a
@@ -1038,17 +1046,14 @@ def _hashimoto_integrate_geometry(
         pO2_steps.extend(
             float(value) for value in step.pO2_bar_by_step if value is not None
         )
-        substep_duration_s = duration / len(step.pO2_balance_bracket_boundary_by_step)
-        for index, boundary in enumerate(
-            step.pO2_balance_bracket_boundary_by_step
+        pO2_balance_floor_steps += step.pO2_balance_floor_steps
+        pO2_balance_floor_time_s += step.pO2_balance_floor_time_s
+        if (
+            pO2_balance_floor_first_step is None
+            and step.pO2_balance_floor_first_step is not None
         ):
-            if boundary != "lower":
-                continue
-            pO2_balance_floor_steps += 1
-            pO2_balance_floor_time_s += substep_duration_s
-            if pO2_balance_floor_first_step is None:
-                pO2_balance_floor_first_step = step_number
-                pO2_balance_floor_pO2_bar = step.pO2_bar_by_step[index]
+            pO2_balance_floor_first_step = step_number
+            pO2_balance_floor_pO2_bar = step.pO2_balance_floor_pO2_bar
 
     for step_number in range(1, steps + 1):
         try:
@@ -1472,6 +1477,17 @@ def _predict_hashimoto_residue_cohort(
             )
 
             analytical_core = _new_internal_analytical_core()
+            accepted_diagnostics_by_logp: dict[
+                float, tuple[dict[str, object], ...]
+            ] = {}
+
+            def accept_pressure_diagnostics(log10_pO2_bar: float) -> None:
+                for diagnostic in accepted_diagnostics_by_logp.get(
+                    log10_pO2_bar, ()
+                ):
+                    engine_floor_inversion_diagnostics.setdefault(
+                        str(diagnostic["species"]), diagnostic
+                    )
 
             def pressure_model(
                 inventory: Mapping[str, float], log10_pO2_bar: float
@@ -1495,6 +1511,7 @@ def _predict_hashimoto_residue_cohort(
                     if isinstance(vapor_diagnostic, Mapping)
                     else None
                 )
+                evaluation_diagnostics: list[dict[str, object]] = []
                 if isinstance(floor_notices, Mapping):
                     for species, detail in floor_notices.items():
                         if not isinstance(detail, Mapping):
@@ -1509,9 +1526,10 @@ def _predict_hashimoto_residue_cohort(
                             "band": detail.get("certified_band"),
                             "detail": dict(detail),
                         }
-                        engine_floor_inversion_diagnostics.setdefault(
-                            str(species), diagnostic
-                        )
+                        evaluation_diagnostics.append(diagnostic)
+                accepted_diagnostics_by_logp[float(log10_pO2_bar)] = tuple(
+                    evaluation_diagnostics
+                )
                 pressures = response.vapor_pressures_Pa
                 missing = [
                     str(species)
@@ -1539,6 +1557,8 @@ def _predict_hashimoto_residue_cohort(
                     str(species): float(pressures[str(species)])
                     for species, _reaction in gas_channels
                 }
+
+            pressure_model._on_accepted_evaluation = accept_pressure_diagnostics
 
         arm_channels = (
             ("alpha_common_unity_sensitivity", common_channels, common_alpha_records, "common"),

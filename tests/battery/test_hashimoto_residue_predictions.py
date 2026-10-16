@@ -600,7 +600,7 @@ def test_hashimoto_without_melt_pack_identity_has_no_sf04_fallback(
     assert provenance["openimcc_model_id"] is None
 
 
-def test_hashimoto_internal_floor_diagnostic_survives_channel_refusal(
+def test_hashimoto_internal_probe_diagnostic_does_not_survive_channel_refusal(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from types import SimpleNamespace
@@ -651,8 +651,7 @@ def test_hashimoto_internal_floor_diagnostic_survives_channel_refusal(
     assert diagnostic_calls
     assert all(call["include_diagnostic_shadows"] is False for call in diagnostic_calls)
     refusal_detail = json.loads(exc_info.value.detail)
-    assert refusal_detail["engine_floor_inversion_diagnostics"][0]["species"] == "Mg"
-    assert refusal_detail["engine_floor_inversion_diagnostics"][0]["original"] == 0.25
+    assert refusal_detail["engine_floor_inversion_diagnostics"] == []
 
 
 def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
