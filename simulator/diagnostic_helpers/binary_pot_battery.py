@@ -1661,13 +1661,15 @@ def _solve_cell_oxygen_balance(
     temperature_K: float,
     cell_material: str | None,
     oxygen_balance_from_pressure_model: Callable[..., Any] | None = None,
+    bracket: tuple[float, float] = (-30.0, 0.0),
 ) -> tuple[float, Mapping[str, float], Mapping[str, Any], float, dict[str, Any]]:
     """Add shared JANAF wall gases to an engine's commanded-pO2 pressure model.
 
-    Knudsen effusion gives J_i = p_i / sqrt(2*pi*M_i*k*T). Balancing oxygen
-    atoms over every effusing species, including cell oxides, leaves
+    For molar flux, Knudsen effusion gives J_i = p_i / sqrt(2*pi*M_i*R*T),
+    where M_i is molar mass and R is the gas constant. Balancing oxygen atoms
+    over every effusing species, including cell oxides, leaves
     sum((nu_O,i - parent_demand_i) * p_i / sqrt(M_i)) = 0 because the common
-    sqrt(2*pi*k*T) cancels. For a pure MO evaporating congruently as M + O,
+    sqrt(2*pi*R*T) cancels. For a pure MO evaporating congruently as M + O,
     the solved p_O*sqrt(M_M)/(p_M*sqrt(M_O)) is 1.
     """
 
@@ -1734,7 +1736,7 @@ def _solve_cell_oxygen_balance(
         else:
             oxygen_balance_solver = oxygen_balance_from_pressure_model
         pO2_bar, pressures, balance = oxygen_balance_solver(
-            combined_pressure_model, all_metadata, bracket=(-30.0, 0.0)
+            combined_pressure_model, all_metadata, bracket=bracket
         )
     except _OxygenBalanceRefusal:
         raise
@@ -1919,23 +1921,40 @@ def _solve_vapor_engine_cell_oxygen_balance(
     cell_material: str | None,
 ) -> tuple[float, Mapping[str, float], Mapping[str, Any], float, dict[str, Any]]:
     cells_by_po2: dict[float, Any] = {}
+    last_admitted_po2_bar: float | None = None
+    last_refused_trial: tuple[float, _OxygenBalanceEngineTrialRefusal] | None = None
 
     def cell_at_po2(pO2_bar: float) -> Any:
+        nonlocal last_admitted_po2_bar, last_refused_trial
         if pO2_bar not in cells_by_po2:
             cell = engine_call_at_po2(pO2_bar)
             if getattr(cell, "status", None) != "ok":
-                raise _OxygenBalanceEngineTrialRefusal(cell)
+                refusal = _OxygenBalanceEngineTrialRefusal(cell)
+                last_refused_trial = (pO2_bar, refusal)
+                raise refusal
             cells_by_po2[pO2_bar] = cell
+        last_admitted_po2_bar = pO2_bar
         return cells_by_po2[pO2_bar]
 
-    endpoint_cells = (cell_at_po2(1e-30), cell_at_po2(1.0))
-    channels = tuple(
+    start_logp = -6.0
+    try:
+        start_cell = cell_at_po2(10.0**start_logp)
+    except _OxygenBalanceEngineTrialRefusal as exc:
+        refused_po2 = (
+            "unknown"
+            if last_refused_trial is None
+            else f"{last_refused_trial[0]:g}"
+        )
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_no_admitted_bracket",
+            "no admitted starting cell at pO2="
+            f"{refused_po2} bar; last_admitted_pO2_bar=none; "
+            f"guard={exc.backend_status_reason}",
+        ) from exc
+
+    channels = list(
         dict.fromkeys(
-            channel
-            for cell in endpoint_cells
-            for channel in (
-                getattr(cell, "gas_partial_pressures_Pa", None) or {}
-            )
+            getattr(start_cell, "gas_partial_pressures_Pa", None) or {}
         )
     )
     species_metadata = _vapor_engine_oxygen_balance_species_metadata(channels)
@@ -1955,11 +1974,98 @@ def _solve_vapor_engine_cell_oxygen_balance(
             species_metadata,
         )
 
-    return _solve_cell_oxygen_balance(
-        pressure_model,
-        species_metadata,
-        temperature_K=temperature_K,
-        cell_material=cell_material,
+    low_logp = high_logp = start_logp
+    lower_stop: str | None = None
+    upper_stop: str | None = None
+    while lower_stop is None or upper_stop is None:
+        for side in ("lower", "upper"):
+            if side == "lower":
+                if lower_stop is not None:
+                    continue
+                candidate_logp = low_logp - 1.0
+                if candidate_logp < -30.0:
+                    lower_stop = (
+                        "OpenIMCC Knudsen bracket lower limit "
+                        "log10(pO2/bar)=-30"
+                    )
+                    continue
+            else:
+                if upper_stop is not None:
+                    continue
+                candidate_logp = high_logp + 1.0
+                if candidate_logp > 0.0:
+                    upper_stop = "OpenIMCC Knudsen molecular-flow limit pO2=1 bar"
+                    continue
+
+            candidate_po2_bar = 10.0**candidate_logp
+            try:
+                candidate_cell = cell_at_po2(candidate_po2_bar)
+            except _OxygenBalanceEngineTrialRefusal as exc:
+                stop = (
+                    f"pO2={candidate_po2_bar:g} bar; "
+                    f"guard={exc.backend_status_reason}"
+                )
+                if side == "lower":
+                    lower_stop = stop
+                else:
+                    upper_stop = stop
+                continue
+
+            candidate_channels = tuple(
+                getattr(candidate_cell, "gas_partial_pressures_Pa", None) or {}
+            )
+            new_channels = [
+                channel for channel in candidate_channels if channel not in channels
+            ]
+            if new_channels:
+                channels.extend(new_channels)
+                species_metadata = _vapor_engine_oxygen_balance_species_metadata(
+                    channels
+                )
+            if side == "lower":
+                low_logp = candidate_logp
+            else:
+                high_logp = candidate_logp
+
+            try:
+                return _solve_cell_oxygen_balance(
+                    pressure_model,
+                    species_metadata,
+                    temperature_K=temperature_K,
+                    cell_material=cell_material,
+                    bracket=(low_logp, high_logp),
+                )
+            except _OxygenBalanceEngineTrialRefusal as exc:
+                refused_po2 = (
+                    "unknown"
+                    if last_refused_trial is None
+                    else f"{last_refused_trial[0]:g}"
+                )
+                raise _OxygenBalanceRefusal(
+                    "oxygen_balance_no_admitted_bracket",
+                    "engine refused a trial while checking an admitted bracket; "
+                    f"last_admitted_pO2_bar={last_admitted_po2_bar!r}; "
+                    f"guard at pO2={refused_po2} bar: {exc.backend_status_reason}",
+                ) from exc
+            except _OxygenBalanceRefusal as exc:
+                detail = str(exc)
+                no_sign_change = "oxygen-balance root is not bracketed" in detail
+                above_knudsen_limit = (
+                    "oxygen-balance root lies above pO2 = 1 bar" in detail
+                )
+                if not (no_sign_change or above_knudsen_limit):
+                    raise
+
+    last_admitted = (
+        "none"
+        if last_admitted_po2_bar is None
+        else f"{last_admitted_po2_bar:g} bar"
+    )
+    raise _OxygenBalanceRefusal(
+        "oxygen_balance_no_admitted_bracket",
+        "no sign-changing bracket inside the admitted engine domain; "
+        f"last_admitted_pO2_bar={last_admitted}; "
+        f"lower_stop={lower_stop}; upper_stop={upper_stop}",
     )
 
 

@@ -836,7 +836,7 @@ def test_vapor_engine_brackets_inside_vaporock_sum_pressure_domain() -> None:
             invalid_gas_partial_pressure_components=(),
         )
 
-    po2_bar, pressures, _metadata, _fraction, balance = (
+    po2_bar, pressures, balance, _fraction, _info = (
         _solve_vapor_engine_cell_oxygen_balance(
             engine_call_at_po2,
             temperature_K=1800.0,
