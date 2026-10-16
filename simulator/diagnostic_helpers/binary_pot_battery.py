@@ -1978,6 +1978,8 @@ def _solve_vapor_engine_cell_oxygen_balance(
     # cell says nothing about the solver's log10(pO2/bar) range [-30, 0]. Try
     # it first, then walk outward by 1 dex, preferring the higher side at each
     # tie. Rows admitted at -6 therefore keep the same anchor and solver path.
+    # Nearest-to-seed window selection is an algorithmic convention, not a
+    # physical branch choice; expansion never jumps across a refused gap.
     for candidate_logp in sorted(
         range(-30, 1),
         key=lambda logp: (abs(logp - start_logp), logp < start_logp),
@@ -2157,9 +2159,15 @@ def _solve_vapor_engine_cell_oxygen_balance(
             )
             raise _OxygenBalanceRefusal(
                 "oxygen_balance_no_admitted_bracket",
-                "no sign-changing bracket inside the admitted engine domain; "
-                f"last_admitted_pO2_bar={last_admitted}; "
-                f"lower_stop={lower_stop}; upper_stop={upper_stop}",
+                "no sign-changing bracket was found in the admitted pO2 window "
+                "reachable from the chosen start; "
+                f"start_pO2_bar={10.0**activity_anchor_logp:g}; "
+                "searched_window_pO2_bar="
+                f"[{10.0**low_logp:g}, {10.0**high_logp:g}]; "
+                f"lower_stop={lower_stop}; upper_stop={upper_stop}; "
+                "expansion stops at the first refused one-dex trial or solver "
+                "limit on each side and does not establish whether a root exists "
+                "in another admitted window in log10(pO2/bar) range [-30, 0]",
             )
 
         if not fixed_point_activities:
