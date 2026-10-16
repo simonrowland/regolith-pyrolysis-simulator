@@ -4069,7 +4069,7 @@ def _has_printed_fo2(observation: Observation, identity: Identity) -> bool:
 def _predict_fe_redox(
     engine: Engine, observation: Observation, identity: Identity, channel: str
 ) -> EnginePrediction:
-    """Predict Fe3+/Fe2+ with the production Kress91 melt-redox split."""
+    """Predict Fe3+/Fe2+ with the production model selected by the engine."""
 
     from simulator.fe_redox import (
         KRESS91_LIQUID_CALIBRATION_MAX_T_C,
@@ -4082,7 +4082,7 @@ def _predict_fe_redox(
     )
 
     sources = ("Kress and Carmichael 1991, doi:10.1007/BF00307328",)
-    if engine is not Engine.INTERNAL_ANALYTICAL:
+    if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -4097,6 +4097,9 @@ def _predict_fe_redox(
             },
             identity=identity,
         )
+
+    if engine is Engine.OPENIMCC:
+        sources = ()
 
     def refused(reason: RefusalReason, detail: Mapping[str, object]) -> EnginePrediction:
         return EnginePrediction(
@@ -4195,6 +4198,123 @@ def _predict_fe_redox(
     if input_refusal is not None:
         return input_refusal
 
+    try:
+        composition_wt = composition_weight_percent(composition)
+        if composition_wt is None:
+            raise ValueError("composition cannot be converted to oxide weights")
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        return refused(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_redox_composition", "detail": str(exc)},
+        )
+
+    if engine is Engine.OPENIMCC:
+        fO2_log, input_refusal = printed_fo2_input()
+        if input_refusal is not None:
+            return input_refusal
+        try:
+            from simulator.accounting.formulas import parse_formula
+
+            inventory: dict[str, float] = {}
+            for oxide, weight_percent in composition_wt.items():
+                formula = parse_formula(oxide, species=oxide)
+                oxide_moles = weight_percent / formula.molar_mass_g_mol
+                for element, atoms in formula.elements.items():
+                    inventory[element] = (
+                        inventory.get(element, 0.0) + oxide_moles * atoms
+                    )
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            return refused(
+                RefusalReason.INVALID_IDENTITY,
+                {"reason": "invalid_redox_composition", "detail": str(exc)},
+            )
+        if inventory.get("Fe", 0.0) <= 0.0:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "total_iron"},
+            )
+        try:
+            import openimcc
+        except ImportError as exc:
+            return refused(
+                RefusalReason.OPENIMCC_NOT_IMPORTABLE,
+                {
+                    "reason": RefusalReason.OPENIMCC_NOT_IMPORTABLE.value,
+                    "detail": str(exc),
+                },
+            )
+        try:
+            result = openimcc.evaluate_redox(
+                inventory,
+                float(temperature),
+                "imposed",
+                lambda_imposed=float(fO2_log) * math.log(10.0),
+            )
+        except openimcc.ImccRefusal as exc:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "openimcc_redox_refused", "detail": str(exc)},
+            )
+        prediction_value = result.ferric_fe_mol / result.ferrous_fe_mol
+        if not math.isfinite(prediction_value) or prediction_value <= 0.0:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
+            )
+
+        extrapolated_rows = tuple(result.extrapolated_redox_rows)
+        authority = (
+            Authority.EXTRAPOLATED if extrapolated_rows else Authority.BRIDGE
+        )
+        band = tuple(
+            Decimal(str(value))
+            for value in result.active_row_band_intersection_K
+        )
+        notices: tuple[Notice, ...] = ()
+        if extrapolated_rows:
+            band_text = f"[{band[0]:g}, {band[1]:g}] K"
+            notices = (
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                    reason=(
+                        "openimcc_redox_pack_extrapolation; rows="
+                        f"{', '.join(extrapolated_rows)}; "
+                        f"flags={', '.join(result.flags)}"
+                    ),
+                    origin="openimcc.evaluate_redox",
+                    band=band_text,
+                    authority=authority,
+                ),
+            )
+        prediction_identity = replace(
+            identity,
+            composition=composition_state,
+            fO2_Pa=State.of(
+                Decimal(str(100000.0 * 10.0 ** float(fO2_log)))
+            ),
+        )
+        sources = (
+            f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="openimcc.evaluate_redox",
+            ),
+            value=as_decimal(str(prediction_value)),
+            unit="dimensionless",
+            authority=authority,
+            notices=notices,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            certified_band={"temperature_K": band},
+            identity=prediction_identity,
+            version="openimcc-redox",
+        )
+
     # Premise: Borisov stores mole fractions of oxide formula units and the
     # combined iron key is single-cation. Algebra: x_i -> w_i ∝ x_i M_i, then
     # the production converter divides by M_i and renormalizes to x_i while
@@ -4202,9 +4322,6 @@ def _predict_fe_redox(
     # mole fraction. Sanity: no measured redox split is used, and the printed
     # six-significant-figure composition remains closed after the FeOt rename.
     try:
-        composition_wt = composition_weight_percent(composition)
-        if composition_wt is None:
-            raise ValueError("composition cannot be converted to oxide weights")
         dropped_components, dropped_mass_fraction = kress91_dropped_components(
             composition_wt
         )
