@@ -4023,6 +4023,26 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
     assert flagged_strata(notices) == expected
     assert _flagged_payload_strata(payload) == expected
 
+    evidence_class_notice = Notice(
+        kind=NoticeKind.FIGURE_ONLY,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason="evidence_class:model_derived",
+        origin="evidence-class-pin",
+    )
+    assert FLAGGED_STRATUM_FIGURE_ONLY not in flagged_strata(
+        (evidence_class_notice,)
+    )
+    assert FLAGGED_STRATUM_FIGURE_ONLY not in _flagged_payload_strata(
+        {
+            "notices": [
+                {
+                    "kind": NoticeKind.FIGURE_ONLY.value,
+                    "reason": "evidence_class:model_derived",
+                }
+            ]
+        }
+    )
+
 
 def test_knudsen_absolute_flux_requires_orifice_area() -> None:
     exp = F.kems_experiment(orifice_area=None, clausing=None)
