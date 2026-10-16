@@ -4219,9 +4219,9 @@ def _predict_fe_redox(
             for oxide, weight_percent in composition_wt.items():
                 formula = parse_formula(oxide, species=oxide)
                 oxide_moles = weight_percent / formula.molar_mass_g_mol
-                for element, atoms in formula.elements.items():
+                for element, atom_moles in formula.atom_moles(oxide_moles).items():
                     inventory[element] = (
-                        inventory.get(element, 0.0) + oxide_moles * atoms
+                        inventory.get(element, 0.0) + atom_moles
                     )
         except (KeyError, TypeError, ValueError, OverflowError) as exc:
             return refused(
