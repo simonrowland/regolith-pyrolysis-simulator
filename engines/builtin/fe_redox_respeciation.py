@@ -121,7 +121,12 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
             "temperature_band_status": temperature_band.get("status"),
             "temperature_band_source": temperature_band.get("source"),
             "temperature_band_authoritative": bool(temperature_band.get("authoritative")),
-            "flags": ["OUT_OF_CERTIFIED_BAND"] if temperature_band.get("extrapolation") else [],
+            "flags": (
+                ["OUT_OF_CERTIFIED_BAND", temperature_band.get("case")]
+                if temperature_band.get("extrapolation") else []
+            ),
+            **({"authority": "extrapolated"}
+               if temperature_band.get("extrapolation") else {}),
         }
         if not bool(temperature_band.get("authoritative")) and (
             temperature_band.get("case") in {

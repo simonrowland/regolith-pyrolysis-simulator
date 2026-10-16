@@ -223,7 +223,10 @@ def test_hot_respeciation_predicts_flagged_kress_split(formula_registry, tempera
     assert result.transition is not None
     assert result.diagnostic["temperature_band_authoritative"] is False
     assert "OUT_OF_CERTIFIED_BAND" in result.diagnostic["flags"]
-    assert result.diagnostic["temperature_band_case"] == kress91_temperature_band_case(temperature_C)["case"]
+    band_case = kress91_temperature_band_case(temperature_C)["case"]
+    assert result.diagnostic["temperature_band_case"] == band_case
+    assert band_case in result.diagnostic["flags"]
+    assert result.diagnostic["authority"] == "extrapolated"
     validate_atom_balance(result.transition, formula_registry)
     expected = kress91_fe3_over_sigma_fe(
         fO2_log=request.fO2_log, T_K=temperature_C + 273.15, pressure_bar=2e-4,
