@@ -13154,6 +13154,19 @@ class Migrator:
         rows = list(iter_extract_observations(doc))
         fusion_transition_rows = self._fusion_transition_rows_by_table_row(rows)
         pressure_identity_context = _pressure_identity_context(doc, rows)
+        raw_experiments = doc.get("experiments") or ()
+        if isinstance(raw_experiments, Mapping):
+            raw_experiments = [
+                dict(value, experiment_id=key)
+                for key, value in raw_experiments.items()
+                if isinstance(value, Mapping)
+            ]
+        experiment_source_rows = {
+            str(row.get("experiment_id") or row.get("id")): row
+            for row in raw_experiments
+            if isinstance(row, Mapping)
+            and (row.get("experiment_id") or row.get("id"))
+        }
         sample_compositions: dict[str, tuple[dict[str, Decimal], Locator | None]] = {}
         ambiguous_sample_compositions: set[str] = set()
         for _formula, row in rows:
@@ -13174,6 +13187,7 @@ class Migrator:
             elif sample_id not in ambiguous_sample_compositions:
                 sample_compositions[sample_id] = candidate
         source_context = dict(pressure_identity_context or {})
+        source_context["experiment_source_rows"] = experiment_source_rows
         source_context["sample_compositions"] = sample_compositions
         records = phase_field_records(doc)
         self._phase_field_records[source_id] = records
@@ -13410,6 +13424,28 @@ class Migrator:
             context.get("sample_compositions", {}).get(sample_id)
             if isinstance(sample_id, str)
             and isinstance(context.get("sample_compositions"), Mapping)
+            else None
+        )
+        experiment_key = obs.get("experiment")
+        experiment_source_row = (
+            context.get("experiment_source_rows", {}).get(experiment_key)
+            if isinstance(experiment_key, str)
+            and isinstance(context.get("experiment_source_rows"), Mapping)
+            else None
+        )
+        experiment_conditions = (
+            experiment_source_row.get("conditions")
+            if isinstance(experiment_source_row, Mapping)
+            else None
+        )
+        experiment_log_f_o2 = (
+            experiment_conditions.get("log_fO2")
+            if isinstance(experiment_conditions, Mapping)
+            else None
+        )
+        experiment_oxygen_fallback = (
+            {"point_conditions": {"fO2_log": experiment_log_f_o2}}
+            if experiment_log_f_o2 is not None
             else None
         )
         row_oxide_map = _oxide_map_from_mapping(values)
@@ -14467,6 +14503,9 @@ class Migrator:
             point_conditions,
             oxygen_roots,
             locator,
+            fallback=(experiment_oxygen_fallback,)
+            if isinstance(experiment_oxygen_fallback, Mapping)
+            else (),
             skip_tables=True,
         )
         if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
