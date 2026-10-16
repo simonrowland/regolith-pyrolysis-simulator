@@ -63,6 +63,7 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
             name: 850.0 + index * 25.0
             for index, name in enumerate(names)
         },
+        _upstream_wall_floor_notice=None,
     )
     condensation = SimpleNamespace(
         pipe_segments=(SimpleNamespace(name="duct_a"), SimpleNamespace(name="duct_b")),
@@ -77,6 +78,7 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
             campaign_hour=0.0,
         ),
         _resolve_condensation_carrier_gas=lambda: "N2",
+        _organic_tar_kg_from_overhead_gas=lambda: 0.0,
     )
 
     PyrolysisSimulator._configure_condensation_operating_conditions(
