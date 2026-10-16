@@ -513,6 +513,7 @@ def test_stale_dynamic_import_site_fails(tmp_path: Path) -> None:
 
 def test_builtin_and_simulator_import_in_either_order() -> None:
     for imports in (
+        "import engines.evaporation_oxygen",
         "import engines.builtin\nimport simulator",
         "import simulator\nimport engines.builtin",
     ):
