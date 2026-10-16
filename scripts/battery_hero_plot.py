@@ -90,6 +90,7 @@ class EngineSummary:
     residual_square_sum: float = 0.0
     rms_count: int = 0
     refusals: Counter[str] = field(default_factory=Counter)
+    excluded_d139_rows: int = 0
     non_dex_rows: int = 0
     missing_identity_rows: int = 0
     source_relations: Counter[str] = field(default_factory=Counter)
@@ -417,6 +418,26 @@ def read_scores(
                 if not isinstance(identity, Mapping):
                     summary.missing_identity_rows += 1
                     continue
+                quantity = _state_value(identity.get("quantity"))
+                if numeric.get("decision_band") is None and quantity == "p_partial":
+                    notices = (
+                        row.get("notices"),
+                        candidate_observation.get("notices"),
+                    )
+                    has_calibration_notice = any(
+                        isinstance(notice, Mapping)
+                        and notice.get("kind") == NoticeKind.UNVERIFIED_APPARATUS.value
+                        and isinstance(notice.get("reason"), str)
+                        and notice["reason"].startswith("calibration_not_grounded:")
+                        for source in notices
+                        if isinstance(source, Sequence)
+                        and not isinstance(source, (str, bytes))
+                        for notice in source
+                    )
+                    if has_calibration_notice:
+                        # Use the scorer's d-139 output marker; do not infer calibration here.
+                        summary.excluded_d139_rows += 1
+                        continue
                 species_identity = identity.get("species")
                 formula = (
                     str(species_identity.get("formula") or "")
@@ -1037,6 +1058,13 @@ def render_plots(
         openimcc_commit=openimcc_commit,
         render_date=render_date,
     )
+    d139_exclusions = [
+        f"{engine} {data.summaries[engine].excluded_d139_rows:,} uncalibrated KEMS p_partial"
+        for engine in data.engines
+        if data.summaries[engine].excluded_d139_rows
+    ]
+    if d139_exclusions:
+        footer += "  |  excluded under d-139: " + ", ".join(d139_exclusions)
     files: dict[str, Path] = {}
     empty_engines = _empty_engine_names(data)
     tile_engines = (

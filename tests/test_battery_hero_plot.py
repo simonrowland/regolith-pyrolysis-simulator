@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from simulator.battery.enums import NoticeKind
 from scripts.battery_hero_plot import (
     draw_panel,
     element_tier,
@@ -355,6 +356,101 @@ def test_species_view_labels_major_curves_and_element_view_labels_elements(
         )
     finally:
         plt.close(element_figure)
+
+
+def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "test-store"}
+    ]
+    rows.append(
+        _record(
+            engine="openimcc",
+            experiment="ordinary-1",
+            formula="SiO2",
+            temperature_K=1000,
+            residual=1.0,
+        )
+    )
+    uncalibrated = _record(
+        engine="openimcc",
+        experiment="d139-openimcc",
+        formula="SiO2",
+        temperature_K=1100,
+        residual=4.5,
+        status="no_band",
+    )
+    uncalibrated["candidate_observation"]["identity"]["quantity"] = "p_partial"
+    uncalibrated["candidate_observation"]["notices"] = [
+        {
+            "kind": NoticeKind.UNVERIFIED_APPARATUS.value,
+            "reason": "calibration_not_grounded: No calibration entry has been recorded yet.",
+        }
+    ]
+    uncalibrated["numeric"]["decision_band"] = None
+    rows.append(uncalibrated)
+
+    unmarked_no_band = _record(
+        engine="openimcc",
+        experiment="ordinary-no-band",
+        formula="SiO2",
+        temperature_K=1200,
+        residual=3.0,
+        status="no_band",
+    )
+    unmarked_no_band["numeric"]["decision_band"] = None
+    rows.append(unmarked_no_band)
+
+    other_engine = _record(
+        engine="thermoengine",
+        experiment="d139-thermoengine",
+        formula="Al2O",
+        temperature_K=1100,
+        residual=-4.5,
+        status="no_band",
+    )
+    other_engine["candidate_observation"]["identity"]["quantity"] = "p_partial"
+    other_engine["candidate_observation"]["notices"] = [
+        {
+            "kind": NoticeKind.UNVERIFIED_APPARATUS.value,
+            "reason": "calibration_not_grounded: No calibration entry has been recorded yet.",
+        }
+    ]
+    other_engine["numeric"]["decision_band"] = None
+    rows.append(other_engine)
+
+    residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+    data = read_scores(residuals)
+
+    openimcc = data.summaries["openimcc"]
+    assert openimcc.excluded_d139_rows == 1
+    assert openimcc.scored_rows == 2
+    assert openimcc.unique_points == 2
+    assert openimcc.rms_dex == pytest.approx(5**0.5)
+    assert [
+        point.bin_index for point in data.series["openimcc", "SiO2", "vapour"]
+    ] == [10, 12]
+    assert data.summaries["thermoengine"].excluded_d139_rows == 1
+    assert data.summaries["thermoengine"].scored_rows == 0
+
+    files = render_plots(
+        data,
+        tmp_path / "images",
+        simulator_commit="sim-test",
+        openimcc_commit="openimcc-test",
+        render_date="2026-10-15",
+        group_by=("species",),
+        omit_empty_engines=True,
+    )
+    footer = files["species:tile_svg"].read_text(encoding="utf-8")
+    assert (
+        "excluded under d-139: openimcc 1 uncalibrated KEMS p_partial, "
+        "thermoengine 1 uncalibrated KEMS p_partial"
+    ) in footer
 
 
 def test_lunar_feedstock_abundance_drives_plot_styling() -> None:
