@@ -4378,14 +4378,19 @@ def test_configured_unavailable_alphamelts_backend_fail_closes():
         sim._get_equilibrium()
 
 
-def test_alphamelts_vaporock_species_pin_current_advertised_list():
+def test_alphamelts_vapor_species_follow_vaporock_delegate():
     backend = AlphaMELTSBackend()
+    delegate = alphamelts_module.VapoRockBackend()
     backend._vaporock_available = True
+    backend._vaporock_helper = delegate
 
+    species = backend.get_vapor_species()
+    assert species == delegate.get_vapor_species()
+    assert {'SiO2_gas', 'CrO2', 'O', 'O2'} <= set(species)
+
+    backend._vaporock_available = False
     assert backend.get_vapor_species() == [
-        'Na', 'K', 'Fe', 'Mg', 'Ca', 'Si', 'Al', 'Ti', 'Cr', 'Mn',
-        'SiO', 'FeO', 'MgO', 'CaO', 'AlO', 'TiO', 'NaO', 'KO',
-        'O2', 'O', 'SiO2', 'Fe2O3',
+        'Na', 'K', 'Fe', 'Mg', 'Ca', 'SiO', 'Mn', 'Cr'
     ]
 
 

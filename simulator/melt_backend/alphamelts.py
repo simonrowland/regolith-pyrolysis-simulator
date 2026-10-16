@@ -1426,15 +1426,8 @@ class _MELTSBackendSupport(MeltBackend):
 
     def get_vapor_species(self) -> List[str]:
         if self._vaporock_available:
-            # This wrapper returns this fixed 22-name list when
-            # _vaporock_available is true. It is not
-            # VapoRockBackend.get_vapor_species() (42 names on current
-            # VapoRockBackend) and does not track that delegate's vocabulary.
-            return [
-                'Na', 'K', 'Fe', 'Mg', 'Ca', 'Si', 'Al', 'Ti', 'Cr', 'Mn',
-                'SiO', 'FeO', 'MgO', 'CaO', 'AlO', 'TiO', 'NaO', 'KO',
-                'O2', 'O', 'SiO2', 'Fe2O3',
-            ]
+            assert self._vaporock_helper is not None
+            return self._vaporock_helper.get_vapor_species()
         return ['Na', 'K', 'Fe', 'Mg', 'Ca', 'SiO', 'Mn', 'Cr']
 
     def equilibrate(self, temperature_C: float,
