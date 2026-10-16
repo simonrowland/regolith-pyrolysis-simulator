@@ -7,6 +7,7 @@ import multiprocessing
 from collections import Counter
 from pathlib import Path
 
+from simulator.battery.enums import Engine
 from simulator.battery.migrate import migrate
 from simulator.battery.score import load_score_context, score_store
 
@@ -15,7 +16,9 @@ def main() -> None:
     root = Path(__file__).resolve().parents[1]
     migrated = migrate(root, write=True)
     context = load_score_context(root)
-    residuals, candidates = score_store(context)
+    residuals, candidates = score_store(
+        context, engines=(Engine.INTERNAL_ANALYTICAL,)
+    )
     banded = sum(
         residual.numeric is not None
         and residual.numeric.decision_band is not None
@@ -24,6 +27,7 @@ def main() -> None:
     statuses = Counter(residual.status.value for residual in residuals)
     print(
         f"fresh_migration_observations={len(migrated.observations)} "
+        f"engine={Engine.INTERNAL_ANALYTICAL.value} "
         f"scored_rows={len(residuals)} candidates={len(candidates)} "
         f"rows_with_band={banded} statuses={dict(sorted(statuses.items()))}"
     )
