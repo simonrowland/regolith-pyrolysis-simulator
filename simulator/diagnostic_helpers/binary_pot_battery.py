@@ -2063,7 +2063,10 @@ def _solve_vapor_engine_cell_oxygen_balance(
 
     previous_root_logp: float | None = None
     max_fixed_point_iterations = 8
-    fixed_point_tolerance_dex = 1e-4
+    # The inner OpenIMCC solve uses Brent xtol=1e-12 dex. Require the
+    # re-anchored engine root to settle to that same resolution before its
+    # pressure map and closure diagnostics are published.
+    fixed_point_tolerance_dex = 1e-12
     iteration_count = max_fixed_point_iterations if fixed_point_activities else 1
     for iteration in range(1, iteration_count + 1):
         low_logp = high_logp = activity_anchor_logp
@@ -2163,11 +2166,32 @@ def _solve_vapor_engine_cell_oxygen_balance(
             return solution
         solved_logp = math.log10(solution[0])
         activity_anchor_cell = cell_at_po2(solution[0])
+        activity_anchor_logp = solved_logp
         if (
             previous_root_logp is not None
             and abs(solved_logp - previous_root_logp) <= fixed_point_tolerance_dex
         ):
-            return solution
+            fresh_solution = _solve_cell_oxygen_balance(
+                pressure_model,
+                species_metadata,
+                temperature_K=temperature_K,
+                cell_material=cell_material,
+                bracket=tuple(solution[2]["bracket"]),
+            )
+            fresh_logp = math.log10(fresh_solution[0])
+            if abs(fresh_logp - solved_logp) <= fixed_point_tolerance_dex:
+                return fresh_solution
+            if iteration == max_fixed_point_iterations:
+                raise _OxygenBalanceRefusal(
+                    "oxygen_balance_activity_fixed_point_not_converged",
+                    "alphaMELTS fresh-cell oxygen-balance root did not converge; "
+                    f"tolerance={fixed_point_tolerance_dex:g} dex; "
+                    f"last_pO2_bar={fresh_solution[0]:g}",
+                )
+            previous_root_logp = fresh_logp
+            activity_anchor_logp = fresh_logp
+            activity_anchor_cell = cell_at_po2(fresh_solution[0])
+            continue
         if iteration == max_fixed_point_iterations:
             raise _OxygenBalanceRefusal(
                 "oxygen_balance_activity_fixed_point_not_converged",
