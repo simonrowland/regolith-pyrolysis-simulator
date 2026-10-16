@@ -61,7 +61,7 @@ def test_explicit_scalar_wall_override_is_preserved(setpoints_data, key):
 def test_explicit_upstream_recipe_schedule_is_preserved(setpoints_data):
     config = deepcopy(setpoints_data["overhead_headspace"])
     config["pipe_segment_temperatures_C"]["segments"][NAMES[0]] = {
-        "default_C": 1250.0,
+        "default_C": None,
         "schedule": [{"campaign": "C2A", "from_campaign_hour": 0.0,
                       "to_campaign_hour": 6.0, "start_C": 1200.0, "end_C": 1800.0}],
     }

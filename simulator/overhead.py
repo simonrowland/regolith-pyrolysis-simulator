@@ -718,9 +718,14 @@ class OverheadGasModel:
                 and 'default_C' in segment_config
                 and segment_config['default_C'] is None
             ):
-                resolved[name] = max(0.0, float(default_C))
+                segment_C, segment_floor_notice = self._resolve_liner_temperature_value(
+                    segment_config,
+                    melt,
+                    inherited_default=(default_C, default_floor_notice),
+                )
+                resolved[name] = max(0.0, float(segment_C))
                 if name == UPSTREAM_PIPE_SEGMENT_NAME:
-                    upstream_floor_notice = default_floor_notice
+                    upstream_floor_notice = segment_floor_notice
             else:
                 segment_C, segment_floor_notice = self._resolve_liner_temperature_value(
                     segment_config, melt)
@@ -914,6 +919,8 @@ class OverheadGasModel:
         self,
         config: Any,
         melt: Optional[MeltState],
+        *,
+        inherited_default: tuple[float, dict[str, Any] | None] | None = None,
     ) -> tuple[float, dict[str, Any] | None]:
         if config is None and melt is not None:
             # d-148: p_i <= a_i*Psat_i(T_melt), a_i<=1. Monotone Psat gives
@@ -949,10 +956,15 @@ class OverheadGasModel:
 
         default_floor_notice = None
         raw_default_C = config.get('default_C')
-        if 'default_C' in config and raw_default_C is None and melt is not None:
-            default_C, default_floor_notice = self._resolve_liner_temperature_value(
-                None, melt,
-            )
+        if 'default_C' in config and raw_default_C is None:
+            if inherited_default is not None:
+                default_C, default_floor_notice = inherited_default
+            elif melt is not None:
+                default_C, default_floor_notice = self._resolve_liner_temperature_value(
+                    None, melt,
+                )
+            else:
+                default_C = DEFAULT_PIPE_TEMPERATURE_C
         else:
             default_C = self._optional_float(  # °C — default liner wall temperature
                 raw_default_C,
