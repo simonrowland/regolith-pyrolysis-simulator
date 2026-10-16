@@ -52,6 +52,8 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     # 2026-10-13 t-1236: the hour-18 overhead_bleed debit now keeps its
     # 1.5660402193050345e-12 mol SiO2_gas (9.409239449650439e-14 kg) mol-lot
     # entry, so it consumes the residual that the old lot materialization lost.
+    # b-894/t-1236 merged-tree measurement: the matching mol-basis credit
+    # retains that parcel in terminal.offgas, leaving overhead empty.
     expected_overhead: dict[str, float] = {}
     assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
         expected_overhead,
@@ -61,6 +63,9 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     assert sim.atom_ledger.project_account_kg(
         "process.overhead_gas"
     ) == pytest.approx(expected_overhead, rel=1.0e-12, abs=0.0)
+    assert sim.atom_ledger.kg_by_account("terminal.offgas")["SiO2_gas"] == pytest.approx(
+        9.409239449650439e-14, rel=1.0e-12, abs=0.0,
+    )
 
 
 def test_finite_headspace_keeps_oxygen_bins_distinct():

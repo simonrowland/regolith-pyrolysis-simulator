@@ -82,10 +82,12 @@ from simulator.runner import (
     RunnerError,
     _attach_diagnostic_gate_authority_notice,
     _attach_engine_commissioning_notice,
+    _attach_high_t_melt_activity_fallback_notice,
     _attach_rump_expectation_notice,
     _attach_sulfur_saturation_notice,
     _composition_projected_liquidus_notice,
     _deep_merge_setpoints,
+    _oxygen_reservoir_exchange_observables,
 )
 from simulator.session import (
     DecisionPolicy,
@@ -2129,6 +2131,7 @@ def _tick_payload(
         'condensation': {
             k: round(v, 3) for k, v in snapshot.condensation_totals.items()
         },
+        **_oxygen_reservoir_exchange_observables(snapshot),
         'stage_purity_report': stage_purity_report(sim.train),
         'energy_electrical_plus_evaporation_kWh': round(
             snapshot.energy.electrical_plus_evaporation_kWh, 4),
@@ -2829,6 +2832,7 @@ def _available_runner_payload(
         _attach_diagnostic_gate_authority_notice,
         _attach_sulfur_saturation_notice,
         _attach_rump_expectation_notice,
+        _attach_high_t_melt_activity_fallback_notice,
     ):
         try:
             attach_notice(metadata, sim)

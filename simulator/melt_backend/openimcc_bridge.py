@@ -53,6 +53,12 @@ except (ImportError, OSError, RuntimeError) as exc:  # pragma: no cover
 else:
     _OPENIMCC_IMPORT_ERROR = None
 
+_IMCC_REFUSAL_ERROR_TYPE: type[BaseException] | None = (
+    getattr(_openimcc, "ImccRefusal", None)
+    if _openimcc is not None
+    else None
+)
+
 
 OPENIMCC_INSTALL_HINT = (
     "python -m pip install --no-deps "
@@ -60,7 +66,7 @@ OPENIMCC_INSTALL_HINT = (
 )
 OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
-    "@e256a69794390fda513ab7e7fe13972f3203f36b"
+    "@e975edd229b7653ceac5dbac9558d0156e51c2f6"
 )
 
 
