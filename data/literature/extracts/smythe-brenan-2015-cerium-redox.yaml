@@ -31,6 +31,12 @@ species:
         locator:
           table: '3'
           note: Table 3; point locators carry exact PDF pages.
+        derivation:
+          relation: Ce4+/Ce3+ ratios reduced from measured Ce M4,5-edge XANES spectra using the paper's empirical potentiometric calibration
+          locator: {table: '3', note: Empirically calibrated ratios reported in Table 3.}
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {table: '3', note: Raw calibration inputs are not printed for these reported ratios.}
         phase: glass
         standard_state: "Ce4+/Ce3+ as printed in log10 form"
         units: log10 ratio

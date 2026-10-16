@@ -63,13 +63,16 @@ def test_table3_ce_log_ratio_rows_match_render_and_migrate_with_conditions():
     assert all(row.uncertainty.kind is UncertaintyKind.PRINTED for row in migrated)
 
     # The paper's printed calibration turns XANES into the reported ratio.
-    # Its calibration input rows are not stored, so the existing validator's
-    # measured_reduced ancestry issue is explicit and consistent for all rows.
+    # Its calibration inputs are unprinted and typed as such on each row.
     hard = migrator.result.validation.hard_issues
-    assert len(hard) == 45
-    assert {issue.detail for issue in hard} == {
-        "derived observation requires derived_from"
-    }
+    assert not hard
+    assert all(row.derivation is not None for row in migrated)
+    assert all(row.derivation.inputs == () for row in migrated)
+    assert all(
+        row.derivation.declares_unprinted_raw_inputs
+        and row.derivation.has_located_unprinted_raw_inputs
+        for row in migrated
+    )
 
     for row in migrated:
         conditions = row.point_conditions or {}
