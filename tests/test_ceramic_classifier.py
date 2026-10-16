@@ -7,12 +7,52 @@ import yaml
 
 from simulator.ceramic_classifier import (
     DEFAULT_CERAMIC_TYPES_PATH,
+    _resolve_fe2_fraction,
     classify_ceramic_rump,
     classify_industrial_glass,
     load_ceramic_types,
     load_glass_types,
 )
 from simulator.terminal_product_taxonomy import DEFAULT_TAXONOMY_PATH
+
+
+@pytest.mark.parametrize(
+    ("composition", "explicit", "expected"),
+    (
+        pytest.param(
+            {"FeO": 10.0, "SiO2": 90.0},
+            None,
+            (1.0, "ledger_speciation"),
+            id="ferrous-ledger",
+        ),
+        pytest.param(
+            {"Fe2O3": 10.0, "SiO2": 90.0},
+            None,
+            (0.0, "ledger_speciation"),
+            id="ferric-ledger",
+        ),
+        pytest.param(
+            {"SiO2": 100.0},
+            None,
+            (None, "unavailable"),
+            id="iron-free",
+        ),
+        pytest.param(
+            {"FeO": 10.0, "Fe2O3": 1.0, "SiO2": 89.0},
+            0.37,
+            (0.37, "provided"),
+            id="explicit",
+        ),
+    ),
+)
+def test_fe2_fraction_output_pin(composition, explicit, expected):
+    assert _resolve_fe2_fraction(
+        composition,
+        pO2_mbar=1.0,
+        temperature_C=1200.0,
+        pressure_mbar=2.0,
+        explicit=explicit,
+    ) == expected
 
 
 CERAMIC_LEAF_WITNESSES = {
