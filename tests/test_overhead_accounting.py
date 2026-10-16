@@ -2066,3 +2066,22 @@ def test_argon_flow_uses_inert_sweep_transport_po2():
         0.0,
         head_o2_mol=0.0,
     ) == pytest.approx(0.0015)
+
+
+def test_zero_molar_bleed_basis_returns_empty_without_division():
+    from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
+
+    # A stale mass total cannot define composition when the molar vector is empty.
+    result = BuiltinOverheadBleedProvider._bled_species_mol(
+        {"O2": 0.0},
+        total_mol=0.0,
+        total_kg=1.0,
+        controls={
+            "bleed_conductance_kg_s": 1.0,
+            "dt_hr": 1.0,
+            "p_total_bar": 1.0,
+            "p_downstream_bar": 0.0,
+        },
+    )
+
+    assert result == {}
