@@ -1962,20 +1962,40 @@ def _solve_vapor_engine_cell_oxygen_balance(
         return cells_by_po2[pO2_bar]
 
     start_logp = -6.0
-    try:
-        start_cell = cell_at_po2(10.0**start_logp)
-    except _OxygenBalanceEngineTrialRefusal as exc:
-        refused_po2 = (
-            "unknown"
-            if last_refused_trial is None
-            else f"{last_refused_trial[0]:g}"
+    start_cell = None
+    starting_refusal_counts: dict[str, int] = {}
+    # -6 is an arbitrary interior seed, not a domain boundary: refusing that
+    # cell says nothing about the solver's log10(pO2/bar) range [-30, 0]. Try
+    # it first, then walk outward by 1 dex, preferring the higher side at each
+    # tie. Rows admitted at -6 therefore keep the same anchor and solver path.
+    for candidate_logp in sorted(
+        range(-30, 1),
+        key=lambda logp: (abs(logp - start_logp), logp < start_logp),
+    ):
+        try:
+            start_cell = cell_at_po2(10.0**candidate_logp)
+        except _OxygenBalanceEngineTrialRefusal as exc:
+            guard_reason = exc.reason_code
+            engine_reason = getattr(exc.cell, "engine_reason", None)
+            if engine_reason:
+                guard_reason = f"{guard_reason}: {engine_reason}"
+            starting_refusal_counts[guard_reason] = (
+                starting_refusal_counts.get(guard_reason, 0) + 1
+            )
+            continue
+        start_logp = float(candidate_logp)
+        break
+
+    if start_cell is None:
+        refusal_counts = ", ".join(
+            f"{reason}: {count}"
+            for reason, count in sorted(starting_refusal_counts.items())
         )
         raise _OxygenBalanceRefusal(
             "oxygen_balance_no_admitted_bracket",
-            "no admitted starting cell at pO2="
-            f"{refused_po2} bar; last_admitted_pO2_bar=none; "
-            f"guard={exc.backend_status_reason}",
-        ) from exc
+            "no admitted starting cell in log10(pO2/bar) range [-30, 0]; "
+            f"last_admitted_pO2_bar=none; starting-cell guard refusals: {refusal_counts}",
+        )
 
     channels = list(
         dict.fromkeys(
