@@ -6412,7 +6412,11 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # Gibson & Hubbard (1972), Table 2: K 4220/3027/1437/88 and Na
     # 4660/4110/3140/1730. These are residual component abundances, so all eight
     # are residue_component_composition points.
-    assert census.get("residue_component_composition") == 1282
+    # Ivanova (2018), Table 1, p. 1 adds 32 printed residue oxide-abundance
+    # cells: four components across eight evaporated samples. The count moved
+    # because the data was added, not because a check was relaxed; mismatches
+    # stays 0.
+    assert census.get("residue_component_composition") == 1314
     assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
     assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
@@ -6420,6 +6424,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     }
     assert per_source.get("kems-026-markova-1984") == {
         "residue_component_composition": 110
+    }
+    assert per_source.get("ivanova-2018-spinel-rich-cai-evaporation") == {
+        "residue_component_composition": 32
     }
     # Current total includes the 110 Markova 1984 residue components and omits
     # the 12 duplicate Fedkin mirror cells (b677: the pre-item24 total 1877->1865).
@@ -6433,9 +6440,12 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     assert per_source.get("sugawara-akaogi-2004-liquid-calorimetry") == {
         "H_minus_H298": 6
     }
-    # The merged store adds 65 Holzheid points, 109 Sato points, and six Sugawara
-    # heat-content points to the green baseline's 1891 numeric series: 2071 total.
-    assert n_numeric == 2071, (n_numeric, census, n_unavailable)
+    # Fresh regeneration restores 33 missing extract siblings. Three add numeric
+    # series cells: Gaillard (82 activity), Ivanova (32 residue oxides), and
+    # Tsuchiyama (18 areal mass-loss cells). Their 132 cells have zero mismatches;
+    # the merged numeric-series count moves 2071->2203 because the data became
+    # visible, not because a check was relaxed.
+    assert n_numeric == 2203, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
