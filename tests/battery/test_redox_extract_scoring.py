@@ -140,6 +140,24 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert residuals[0].refusal.reason is RefusalReason.DECISION_RULE_MISSING
 
 
+def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
+    pytest.importorskip("openimcc")
+    context, _observations = _sossi_aithala_redox_context()
+    residuals, _ = score_store(
+        context, engines=(Engine.OPENIMCC,), rail=Rail.REDOX
+    )
+    values = [
+        float(residual.numeric.value).hex()
+        for residual in residuals
+        if residual.numeric is not None
+    ]
+    assert len(values) == 18
+    encoded = json.dumps(values, separators=(",", ":"), ensure_ascii=False).encode()
+    assert hashlib.sha256(encoded).hexdigest() == (
+        "12100581851275f022f1e7ed747ee7aeb578a99537e11ca0aaf3eabe7a8bbc82"
+    )
+
+
 def test_openimcc_redox_without_printed_fo2_still_refuses():
     pytest.importorskip("openimcc")
     _context, observations = _sossi_aithala_redox_context()
