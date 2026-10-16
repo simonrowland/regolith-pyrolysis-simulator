@@ -58,6 +58,25 @@ defaulted anchor as certification gaps. The ledger split then determines
 the melt's redox state. This fallback does not infer metallic iron or claim
 a measured ferric split; the source analysis remains unchanged.
 
+**Batch-mass convention (owner-visible).** A declared unsplit `FeO` assay is
+treated as total iron expressed as FeO (FeOt), then re-split using the cited
+Kress & Carmichael (1991), REF-001, relation and the feedstock's stated anchor
+([doi:10.1007/BF00307328](https://doi.org/10.1007/BF00307328)). The citation
+supports the ferric/ferrous relation; preserving the requested batch mass is
+the simulator's accounting convention. Ferric iron adds oxygen to the
+reconstructed analysis, so the complete batch, including iron-free species,
+is renormalized. If the original complete analysis has mass A and ferric
+oxygen adds dA, an originally normalized non-iron mass scales by A/(A+dA).
+For the FeO 95 / Na2CO3 5 default-anchor example, the factor is
+0.9994940904872219: 50.0 kg Na2CO3 becomes 49.974704524361094 kg in a
+1000 kg batch. Stage 0 cleanup carbon demand uses this same correction;
+any carbon supplied beyond the corrected demand remains additive inventory.
+
+The alternative is to preserve the declared non-iron masses and let the total
+batch mass increase by the added ferric oxygen. That alternative is not the
+current convention. Changing this owner-visible choice requires an owner
+ruling.
+
 Other raw components are preserved in the batch inventory instead of being
 silently dropped. Examples include `H2O`, `C`, `S`, `SO3`, `Cl`, `ClO4`,
 native `Fe`/`Ni`/`Co`, `ZrO2`, and `REE_oxides`. The inventory also has
