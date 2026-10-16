@@ -1,4 +1,4 @@
-from engines.builtin._common import merge_species_amounts_from_accounts
+from simulator.accounting.account_views import merge_species_amounts_from_accounts
 
 
 def test_merge_species_amounts_from_accounts_pins_current_provider_output() -> None:
