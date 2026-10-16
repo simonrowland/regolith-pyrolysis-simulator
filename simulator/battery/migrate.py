@@ -13681,7 +13681,7 @@ class Migrator:
             ),
         )
         total_iron_notice = _total_iron_reported_as_feo_notice(
-            initial_oxide_map, q_token, obs_id
+            projected_oxide_map, q_token, obs_id
         )
         composition_located = _composition_located_from_values(values, locator)
         catalogue_composition = _catalogue_composition_located_from_values(values, locator)

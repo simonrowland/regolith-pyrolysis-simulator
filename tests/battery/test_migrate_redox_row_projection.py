@@ -5,6 +5,7 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
+from simulator.battery.enums import NoticeKind
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
 
 REPO = Path(__file__).resolve().parents[2]
@@ -169,3 +170,58 @@ def test_aithala_rejected_row_f_o2_refuses_experiment_fallback(tmp_path: Path) -
     f_o2 = observation.point_conditions["fO2_log"]
     assert f_o2.state.is_unknown
     assert "bounded or not absolute" in f_o2.state.reason
+
+
+def test_feot_notice_follows_row_local_and_joined_compositions() -> None:
+    aithala = _migrate(AITHALA)
+    aithala_rows = [
+        row
+        for row in aithala.observations.values()
+        if row.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
+    ]
+    feot_rows = [
+        row
+        for row in aithala_rows
+        if (composition := (row.point_conditions or {}).get("composition"))
+        is not None
+        and composition.inference is not None
+        and any(
+            "FeOT (total iron) treated as FeO" in item
+            for item in composition.inference.inputs
+        )
+    ]
+    assert len(aithala_rows) == 28
+    assert len(feot_rows) == 18
+    projected_redox_rows = [
+        row
+        for row in feot_rows
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "fe3_fe2_ratio"
+    ]
+    assert len(projected_redox_rows) == 6
+    missing_aithala_notice = [
+        row.observation_id
+        for row in projected_redox_rows
+        if not any(
+            notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+            for notice in row.notices
+        )
+    ]
+    assert not missing_aithala_notice
+
+    sossi = _migrate(SOSS)
+    sossi_rows = [
+        row
+        for row in sossi.observations.values()
+        if row.source_id == "sossi-2020-magma-ocean-redox"
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "fe3_fe2_ratio"
+    ]
+    assert len(sossi_rows) == 12
+    assert all(
+        any(
+            notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+            for notice in row.notices
+        )
+        for row in sossi_rows
+    )
