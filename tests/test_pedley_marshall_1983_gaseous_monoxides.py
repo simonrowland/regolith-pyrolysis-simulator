@@ -59,5 +59,5 @@ def test_pedley_marshall_1983_tables_4_and_5_migrate_and_pin_enthalpies():
                 if f"::{table['observation_id']}::" in observation.observation_id
                 and observation.identity.species.formula == formula
             )
-            assert observation.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
+            assert observation.evidence.class_.value is EvidenceClass.AUTHOR_ESTIMATE
     assert ag_observation.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED

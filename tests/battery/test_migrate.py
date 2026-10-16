@@ -15225,3 +15225,70 @@ def test_kambayashi_printed_compositions_and_conditions_reach_observations(
         assert observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
         assert observation.locator is not None
         assert "bound_not_point_ordering" in observation.locator.note
+
+
+@pytest.mark.parametrize(
+    ("filename", "observation_ids", "expected_class", "expected_count"),
+    [
+        (
+            "busemann-2000-phase-q-noble-gases.yaml",
+            ("busemann_2000_table3_he_quoted_prior_work",),
+            EvidenceClass.QUOTED_ATTRIBUTED,
+            8,
+        ),
+        (
+            "kems-020-hastie-1981-nbsir.yaml",
+            ("hastie_1981_table2_k_logP_coefficients_quoted_20260906",),
+            EvidenceClass.MODEL_DERIVED,
+            17,
+        ),
+        (
+            "kems-118-yamamoto-1983.yaml",
+            ("yamamoto_1983_table6_comparison",),
+            EvidenceClass.QUOTED_UNATTRIBUTED,
+            7,
+        ),
+        (
+            "kems-190-wu-1993.yaml",
+            (
+                "wu_1993_table1_mgo_compiled_thermochemistry",
+                "wu_1993_table1_sio2_compiled_thermochemistry",
+            ),
+            EvidenceClass.COMPILATION_ASSESSED,
+            6,
+        ),
+    ],
+)
+def test_exploded_rows_keep_parent_evidence_outside_author_estimates(
+    tmp_path: Path,
+    filename: str,
+    observation_ids: tuple[str, ...],
+    expected_class: EvidenceClass,
+    expected_count: int,
+) -> None:
+    result = _migrate_real_extract(tmp_path / Path(filename).stem, filename)
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            f"::{observation_id}::" in observation.observation_id
+            for observation_id in observation_ids
+        )
+    ]
+
+    assert len(observations) == expected_count
+    assert {observation.evidence.class_.value for observation in observations} == {
+        expected_class
+    }
+
+    if filename == "busemann-2000-phase-q-noble-gases.yaml":
+        source_row = next(
+            row
+            for row in _extract_observations(filename)
+            if row.get("observation_id") == observation_ids[0]
+        )
+        expected_attribution = source_row["values"]["attribution"]
+        assert expected_attribution
+        assert {
+            observation.evidence.attribution for observation in observations
+        } == {expected_attribution}
