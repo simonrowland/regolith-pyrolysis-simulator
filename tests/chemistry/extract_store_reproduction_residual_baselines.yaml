@@ -455,25 +455,7 @@ points:
   status: mismatch
   note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
   temperature_K: 1673.0
-- key: zhang_2021_table4_K_evaporation_coefficients:T=1473.15
-  case_id: "kems-006-zhang-2021::zhang_2021_table4_K_evaporation_coefficients"
-  source_id: kems-006-zhang-2021
-  observation_type: alpha
-  species: K
-  residual_dex: 0.414973347970818
-  band_dex: 0.01
-  residual: 0.08
-  status: mismatch
-  note: Newly comparable Zhang 2021 Table 4 K evaporation coefficient at 1473.15 K. Residual reported, not tuned.
-  temperature_K: 1473.15
-- key: zhang_2021_table4_K_evaporation_coefficients:T=1673.15
-  case_id: "kems-006-zhang-2021::zhang_2021_table4_K_evaporation_coefficients"
-  source_id: kems-006-zhang-2021
-  observation_type: alpha
-  species: K
-  residual_dex: 0.0
-  band_dex: 0.01
-  residual: 0.0
-  status: match
-  note: Newly comparable Zhang 2021 Table 4 K evaporation coefficient at 1673.15 K. Residual reported, not tuned.
-  temperature_K: 1673.15
+# Offer19 review: Zhang Table 4 gives alpha-times-gamma evidence, not per-point
+# alpha; production evaluation typed-refuses it as
+# rate_series_without_alpha_and_no_motzfeldt_geometry. Removed stale pins:
+# 1473.15 K residual 0.414973347970818 and 1673.15 K residual 0.0.

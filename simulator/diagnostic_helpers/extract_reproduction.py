@@ -474,7 +474,8 @@ _EVIDENCE_VOCABULARY = {
         "proxy", "qualitative_comparison", "second_law_kems", "third_law_kems",
     })},
     "admission_status": {**_MARKER_REFUSALS, **dict.fromkeys({
-        "bound_not_point", "equipment_metadata", "note_parent_unaltered", "true_absence",
+        "admitted", "bound_not_point", "equipment_metadata", "note_parent_unaltered",
+        "true_absence",
     })},
     "status": {**_MARKER_REFUSALS, **dict.fromkeys({
         "CONTESTED", "not_observed", "pointer_or_anchor_without_numeric_points",
