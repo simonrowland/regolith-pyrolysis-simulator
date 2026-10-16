@@ -110,36 +110,62 @@ species:
         locator: {page: 4, published_page: 1280, pdf_page_index: 3, equation: '11'}
         phase: reaction phases as assigned tentatively by McCready
         standard_state: >-
-          Na2CO3(s) + Na4SiO4(s) = Na6Si2O7(s) + CO2(g), reaction assignment
+          Na2CO3(s) + Na6Si2O7(s) = 2Na4SiO4(s) + CO2(g), reaction assignment
           uncertain because products were not identified; printed equation's
           heat-capacity correction is not exact.
         units: log10 pressure equation, pressure unit not stated in McCready's summary
+        derived_from: [kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5]
+        derivation:
+          relation: McCready least-squares fit to the Table 5 CO2-pressure series over the overlapping 1050 to 1150°C range.
+          inputs: [kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5]
         values:
-          method_class: quoted_attributed
+          method_class: model_derived
           quantity: equilibrium_log_pressure_relation
-          reaction: Na2CO3(s) + Na4SiO4(s) = Na6Si2O7(s) + CO2(g)
-          log_p_relation_as_printed: 'log p = 9.13 - 5570/T'
+          reaction: Na2CO3(s) + Na6Si2O7(s) = 2Na4SiO4(s) + CO2(g)
+          log_p_relation_as_printed: 'log p = 9.179 - 9570/T'
           temperature_range: 1050 to 1150°C
-          attribution: Kröger and Fingas (1935)
+          calculation_method_as_described: >-
+            McCready's least-squares fit to the Kröger and Fingas (1935)
+            carbon dioxide pressure measurements.
           caveat: McCready says the products were not identified and this reaction assignment is not certain.
       - observation_id: mccready_1948_kroger_fingas_reaction9
         type: gibbs_table
-        locator: {page: 4, published_page: 1280, pdf_page_index: 3, equation: '9'}
+        locator: {page: 3, published_page: 1279, pdf_page_index: 2, equation: '9'}
         phase: carbonate and crystalline sodium metasilicate/pyrosilicate as tentatively assigned by McCready
         standard_state: >-
           Na2CO3(s) + 2Na2SiO3(s) = Na6Si2O7(s) + CO2(g); McCready notes that
           the reaction assignment is uncertain because products were not
           identified.
         units: log10 pressure equation, pressure unit not stated in McCready's summary
+        derived_from: [kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation]
+        derivation:
+          relation: McCready least-squares fit to the Table 2 continuation CO2-pressure series over the overlapping 870 to 1050°C range.
+          inputs: [kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation]
         values:
-          method_class: quoted_attributed
+          method_class: model_derived
           quantity: equilibrium_log_pressure_relation
           reaction: 2Na2SiO3(s) + Na2CO3(s) = Na6Si2O7(s) + CO2(g)
           log_p_relation_as_printed: 'log p = 10.334 - 10410/T'
           temperature_range: 870 to 1050°C
-          attribution: Kröger and Fingas (1935)
+          calculation_method_as_described: >-
+            McCready's least-squares fit to the Kröger and Fingas (1935)
+            carbon dioxide pressure measurements.
           McCready_estimated_delta_H_f_cal_mol: -846600
           caveat: This rough estimate is not accepted; it is omitted from McCready's most probable value.
+      - observation_id: mccready_1948_zintl_leverkus_reaction14
+        type: gibbs_table
+        locator: {page: 4, published_page: 1280, pdf_page_index: 3, equation: '14'}
+        phase: crystalline sodium silicates
+        standard_state: >-
+          2NaOH(l) + Na6Si2O7(cr) = 2Na4SiO4(cr) + H2O(g), as interpreted
+          by McCready from the Zintl and Leverkus pressure measurements.
+        units: log10 pressure equation, pressure unit not stated in McCready's summary
+        values:
+          method_class: quoted_attributed
+          quantity: equilibrium_log_pressure_relation
+          reaction: 2NaOH(l) + Na6Si2O7(cr) = 2Na4SiO4(cr) + H2O(g)
+          log_p_relation_as_printed: 'log p = 4.234 - 1254/T'
+          attribution: Zintl and Leverkus, as interpreted by McCready
       - observation_id: mccready_1948_zintl_leverkus_reaction12
         type: gibbs_table
         locator: {page: 4, published_page: 1280, pdf_page_index: 3, equation: '12'}
@@ -153,17 +179,17 @@ species:
           quantity: equilibrium_log_pressure_relation
           reaction: 2NaOH(l) + Na2SiO3(s) = Na4SiO4(s) + H2O(g)
           log_p_relation_as_printed: 'log p = 6.250 - 2609/T'
-          attribution: Zintl and Leverkus
+          attribution: Zintl and Leverkus, as interpreted by McCready
       - observation_id: mccready_1948_pyrosilicate_reaction16
         type: gibbs_table
         locator: {page: 5, published_page: 1281, pdf_page_index: 4, equation: '16'}
         phase: crystalline sodium silicates
         standard_state: Reaction between crystalline compounds; heat capacities assumed additive.
         units: cal per gram molecular weight
-        derived_from: [mccready_1948_kroger_fingas_reaction11, mccready_1948_zintl_leverkus_reaction12]
+        derived_from: [mccready_1948_zintl_leverkus_reaction14, mccready_1948_zintl_leverkus_reaction12]
         derivation:
-          relation: Difference between Kröger-Fingas reaction (11) and Zintl-Leverkus reaction (12), evaluated with the stated logarithmic-pressure slopes.
-          inputs: [mccready_1948_kroger_fingas_reaction11, mccready_1948_zintl_leverkus_reaction12]
+          relation: Difference between McCready equations (14) and (12), evaluated with their printed logarithmic-pressure slopes.
+          inputs: [mccready_1948_zintl_leverkus_reaction14, mccready_1948_zintl_leverkus_reaction12]
         values:
           method_class: model_derived
           quantity: reaction_enthalpy
@@ -226,9 +252,9 @@ species:
           reaction: formation from the elements in standard states at 25°C
       - observation_id: mccready_1948_kroger_fingas_reaction3
         type: gibbs_table
-        locator: {page: 4, published_page: 1280, pdf_page_index: 3, equation: '3'}
+        locator: {page: 3, published_page: 1279, pdf_page_index: 2, equation: '3'}
         phase: Na2CO3(s), SiO2(quartz), Na2SiO3(s), CO2(g)
-        standard_state: Reaction as reported by Kröger and Fingas; McCready's room-temperature correction is approximate.
+        standard_state: McCready's least-squares fit to Kröger and Fingas pressure data; room-temperature correction is approximate.
         units: log10 pressure equation
         values:
           method_class: quoted_attributed
@@ -236,26 +262,33 @@ species:
           reaction: Na2CO3(s) + SiO2(quartz) = Na2SiO3(s) + CO2(g)
           log_p_relation_as_printed: 'log p = 8.634 - 4987/T'
           temperature_range: 425 to 600°C
-          attribution: Kröger and Fingas (1935)
+          attribution: McCready's least-squares fit to Kröger and Fingas (1935) pressure data
           derived_enthalpy_by_McCready_cal_mol: 23900
           derived_formation_enthalpy_by_McCready_cal_mol: -361200
           calculation_method_as_described: >-
-            McCready estimates the equilibrium-reaction enthalpy at about
-            500°C, corrects it to 25°C, then uses the carbonate, quartz and
-            carbon dioxide formation enthalpies.
+            McCready's least-squares fit to the Kröger and Fingas (1935)
+            carbon dioxide pressure measurements; he estimates the reaction
+            enthalpy at about 500°C, corrects it to 25°C, then uses the
+            carbonate, quartz and carbon dioxide formation enthalpies.
       - observation_id: mccready_1948_na2si2o5_reaction10
         type: gibbs_table
-        locator: {page: 4, published_page: 1280, pdf_page_index: 3, equation: '10'}
+        locator: {page: 3, published_page: 1279, pdf_page_index: 2, equation: '10'}
         phase: Na2CO3(s), Na2Si2O5(s), Na2SiO3(s), CO2(g)
-        standard_state: Reaction as assigned by McCready to the Kröger-Fingas equilibrium data.
+        standard_state: McCready's least-squares fit to the Kröger-Fingas equilibrium data.
         units: log10 pressure equation
+        derived_from: [kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1]
+        derivation:
+          relation: McCready least-squares fit to the Table 1 CO2-pressure series over the overlapping 450 to 600°C range.
+          inputs: [kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1]
         values:
-          method_class: quoted_attributed
+          method_class: model_derived
           quantity: equilibrium_log_pressure_relation
           reaction: Na2CO3(s) + Na2Si2O5(s) = 2Na2SiO3(s) + CO2(g)
           log_p_relation_as_printed: 'log p = 8.8650 - 5580/T'
           temperature_range: 450 to 600°C
-          attribution: Kröger and Fingas (1935)
+          calculation_method_as_described: >-
+            McCready's least-squares fit to the Kröger and Fingas (1935)
+            carbon dioxide pressure measurements.
   Na2Si2O5:
     observations:
       - observation_id: mccready_1948_table1_Na2Si2O5
@@ -294,15 +327,6 @@ species:
           units_as_printed: cal per gram molecular weight
           uncertainty_cal_mol: 350
           attribution: Troitzsch; the article says the temperature correction is smaller than the probable error.
-  Na2O:
-    observations:
-      - observation_id: mccready_1948_oxide_reference_Na2O
-        type: gibbs_table
-        locator: {page: 6, published_page: 1282, pdf_page_index: 5, table: '1'}
-        phase: solid sodium oxide
-        standard_state: Formation from Na(s) and O2(g) in their standard states at 25°C.
-        units: cal/mol
-        values: {method_class: quoted_attributed, quantity: deltafH, delta_f_H: -119200, units_as_printed: cal per gram molecular weight, attribution: Bichowsky and Rossini}
   Na2O2:
     observations:
       - observation_id: mccready_1948_na2o2_formation_enthalpy
@@ -329,3 +353,4 @@ metadata:
     authors; calculations made by McCready are marked model_derived. The
     repository's cal/mol unit token normalizes the printed calories per gram
     molecular weight, which the migrator converts to kJ/mol.
+  source_calorie_definition_as_printed: 'McCready defines the calorie as 4.1833 J (page 1277); the repository uses the thermochemical calorie, 4.184 J.'

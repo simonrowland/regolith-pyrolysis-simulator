@@ -9933,6 +9933,19 @@ def test_g1_formation_enthalpy_maps_to_delta_fh_quantity() -> None:
     assert sel.field_name == "delta_f_H_298_15"
 
 
+def test_thermochemical_calorie_to_kilojoule_conversion_is_independently_pinned(
+) -> None:
+    # 1000 thermochemical cal/mol = 4184 J/mol = 4.184 kJ/mol.
+    named = select_declared_source(
+        Quantity.DELTA_FH,
+        None,
+        {"delta_h": "1000", "units": {"delta_h": "cal/mol"}},
+    )
+    assert named.value.kind is ValueKind.POINT
+    assert named.amount == as_decimal("4.184")
+    assert named.unit_trail == "thermochemical_cal_to_kJ_exact"
+
+
 def test_g1_delta_fh_migrate_refuses_blank_units_and_admits_declared_point(
     tmp_path: Path,
 ) -> None:
