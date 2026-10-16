@@ -495,6 +495,8 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         total_kg: float,
         controls: dict,
     ) -> dict[str, float]:
+        if total_mol <= 0.0 or total_kg <= 0.0:
+            return {}
         if controls.get("force_drain_all", False):
             return dict(holdup_mol)
 

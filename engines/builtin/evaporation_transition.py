@@ -69,6 +69,7 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
+from engines.evaporation_oxygen import reaction_oxygen_destination
 from engines.builtin._common import (
     build_atom_balance_proof,
     diagnostic_control_audit,
@@ -90,19 +91,6 @@ from simulator.scalar_boundary import is_declared_real_scalar
 
 
 _NUMERICAL_FLOOR_KG = 1.0e-12
-
-
-def reaction_oxygen_destination(oxygen_amount: float, vapor_oxygen_atoms: float,
-                                explicit_destination: str) -> str:
-    """Ledger destination for signed coproduct oxygen (negative means debit)."""
-    if explicit_destination not in {'', 'process.overhead_gas', 'reservoir.fo2_buffer'}:
-        raise AccountingError(f'unsupported oxygen_destination {explicit_destination!r}')
-    if oxygen_amount < 0.0:
-        return 'process.overhead_gas'
-    if explicit_destination:
-        return explicit_destination
-    return ('process.overhead_gas' if vapor_oxygen_atoms > 0.0
-            else 'reservoir.fo2_buffer')
 
 
 class BuiltinEvaporationTransitionProvider(ChemistryProvider):

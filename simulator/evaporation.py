@@ -9,7 +9,7 @@ from collections.abc import Mapping
 from numbers import Real
 from typing import Any
 
-from engines.builtin.evaporation_transition import reaction_oxygen_destination
+from engines.evaporation_oxygen import reaction_oxygen_destination
 from simulator.alpha_kinetics import parse_alpha_contract
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
