@@ -1152,7 +1152,7 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
 def _point_condition_from_plain(
     payload: object, *, key: str | None = None
 ) -> Located[Any]:
-    """Decimal lab axes, or a printed/derived composition map."""
+    """Located lab axes, printed condition text, or a printed composition map."""
 
     if isinstance(payload, Located):
         return payload
@@ -1161,6 +1161,10 @@ def _point_condition_from_plain(
             payload,
             lambda value: value if isinstance(value, str) else as_decimal(value),
         )
+    if isinstance(payload, Mapping) and isinstance(payload.get("state"), Mapping):
+        state = payload["state"]
+        if state.get("tag") == "value" and isinstance(state.get("value"), str):
+            return _located_from_plain(payload, lambda value: value)
     if key == "pressure_on_throw_Torr":
         return _located_from_plain(
             payload,
@@ -8111,7 +8115,11 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "MgO_wt_pct",
         "CaO_wt_pct",
     ),
-    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: ("r_as_printed", "value"),
+    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: (
+        "r_as_printed",
+        "pCO2_over_pCO_as_printed",
+        "value",
+    ),
 }
 
 _CONDITION_RANGE_KEYS = ("T_range_K", "temperature_range_k", "temperature_range_K")
@@ -14303,6 +14311,15 @@ class Migrator:
                     _temperature_field_raw(t_payload, t_sel.field_name),
                     temperature_locator,
                 )
+            }
+        raw_point_conditions = obs.get("point_conditions")
+        if isinstance(raw_point_conditions, Mapping):
+            point_conditions = {
+                **(point_conditions or {}),
+                **{
+                    str(key): _point_condition_from_plain(value, key=str(key))
+                    for key, value in raw_point_conditions.items()
+                },
             }
         if composition_located is not None:
             point_conditions = {

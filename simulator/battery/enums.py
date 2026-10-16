@@ -59,7 +59,7 @@ class Rail(StrEnum):
 
 
 class Quantity(StrEnum):
-    """Complete storage enum (v2.1 quantity_units)."""
+    """Complete v2.1 storage enum; equilibrium composition preserves the printed gas or condensed phase basis."""
 
     P_SAT = "p_sat"
     P_PARTIAL = "p_partial"

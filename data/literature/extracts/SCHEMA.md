@@ -228,13 +228,14 @@ Exactly one of:
 | `gas_speciation` | Vapour/atmosphere/condensate composition: which gas-bearing species, how much, as published |
 | `sulfur_solubility_and_sulfate_capacity_series` | Measured sulfur solubility / sulfate capacity series, including ratio-conditioned variants |
 | `composition_series` | Measured composition series across runs/samples (per-sample rows as payload) |
-| `equilibrium_phase_composition` | Measured composition of an equilibrium condensed phase at stated temperature and atmosphere; preserve the printed basis on `values.basis_as_published` and identify the phase on the row's species |
+| `equilibrium_phase_composition` | Measured composition of an equilibrium gas or condensed phase at stated temperature and conditions; preserve the printed basis on `values.basis_as_published` and identify the phase on the row |
 
 The battery quantity token `equilibrium_phase_composition` uses
 `units: subtype_defined`: units and basis are those printed (for example,
 O/Fe atom ratio, wt% O, or x in Fe(1-x)O). Migration stores that printed
 basis as the quantity subtype. No conversion between composition bases is
-implicit. Until an engine predicts this quantity, scoring retains the row and
+implicit. For gas-phase ratios, state numerator and denominator species in the
+printed basis and retain coexisting phases in `point_conditions`. Until an engine predicts this quantity, scoring retains the row and
 returns the typed `quantity_not_predicted` refusal.
 
 **Verbatim only.** Extracts store published numbers (and arithmetic that merely
