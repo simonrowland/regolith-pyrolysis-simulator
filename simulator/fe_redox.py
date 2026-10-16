@@ -1093,6 +1093,9 @@ class NativeFePrecipitationNotice:
     fO2_after_log: float
     iw_bound_after_log: float
     limit: Literal['melt', 'gas', 'both']
+    # Jayasuriya 2004 reports reduced glass without observed metal. This
+    # equilibrium extent does not establish a nucleation rate or barrier.
+    authority: Literal['equilibrium_assumed'] = 'equilibrium_assumed'
     flag: str = 'NATIVE_FE_PRECIPITATION'
 
 

@@ -279,6 +279,7 @@ def test_provider_split_closes_atoms_and_records_committed_event(monkeypatch, fi
     assert before['FeO'] - after['FeO'] == pytest.approx(notice['n_fe_mol'], abs=1e-9)
     assert notice['n_fe_mol'] == pytest.approx(expected['native_fe_mol'], abs=1e-9)
     assert notice['flag'] == 'NATIVE_FE_PRECIPITATION'
+    assert notice['authority'] == 'equilibrium_assumed'
     assert notice['limit'] == ('gas' if finite_gas else 'melt')
     assert after['Fe2O3'] == before['Fe2O3']
     for transition in sim.atom_ledger.transitions[transition_start:]:
