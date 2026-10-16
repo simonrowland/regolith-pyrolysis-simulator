@@ -3933,6 +3933,7 @@ class CondensationModel:
         self.last_wall_capture_fixed_point_iterations = 0
         if not stage_route_by_species:
             self.wall_species_partial_pressures_pa_by_segment = {}
+            self.stage_species_partial_pressures_pa = {}
             return {}
 
         inlet_rates = {

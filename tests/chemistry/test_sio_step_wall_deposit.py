@@ -62,6 +62,20 @@ def test_stage_feed_uses_resolved_stage_and_wall_capture(monkeypatch):
     })
 
 
+def test_empty_stage_routes_clear_stage_partial_pressures():
+    model = CondensationModel(CondensationTrain.create_default())
+    model.stage_species_partial_pressures_pa = {0: {'K': 0.25}}
+
+    result = model._resolve_wall_deposit_candidates_by_species_segment_kg(
+        evap_flux=EvaporationFlux(species_kg_hr={}),
+        melt=MeltState(),
+        stage_route_by_species={},
+    )
+
+    assert result == {}
+    assert model.stage_species_partial_pressures_pa == {}
+
+
 def test_complete_first_stage_capture_converges_with_two_perfect_sinks(monkeypatch):
     model = CondensationModel(CondensationTrain.create_default())
     model.overhead_pressure_mbar = 10.0
