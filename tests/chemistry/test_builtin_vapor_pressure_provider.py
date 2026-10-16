@@ -665,6 +665,63 @@ def test_alkali_gas_exchange_ratio_is_independent_of_melt_composition(
     assert low_ratio == pytest.approx(high_ratio, rel=1e-10)
 
 
+def test_gas_rail_authority_status_selects_the_same_graph_rail(
+    vapor_pressure_data,
+):
+    status_cases = (
+        (None, True),
+        ("", True),
+        ("dormant", False),
+        ("dormant_non_authoritative", False),
+        ("inactive", False),
+        ("inactive_dormant", False),
+        ("inactive_provenance_only", False),
+        ("status_bearing_non_authoritative", False),
+        ("non_authoritative", False),
+        ("provenance_only", False),
+        ("dormant_future", False),
+        ("DORMANT ", False),
+        ("authoritative: False", False),
+        ("active", True),
+    )
+
+    def data_with_gas_rail_status(status):
+        data = copy.deepcopy(vapor_pressure_data)
+        gas_rail = data["metals"]["Mg"]["gas_rail_standard_reaction"]
+        gas_rail.pop("authoritative", None)
+        for key in ("status", "runtime_disposition", "authority_status"):
+            gas_rail.pop(key, None)
+        if status == "authoritative: False":
+            gas_rail["authoritative"] = False
+        elif status is not None:
+            gas_rail["status"] = status
+        return data
+
+    def graph_pressure(data):
+        return ellingham_graph.effective_equilibrium_pressure_Pa(
+            "Mg",
+            1773.15,
+            1e-3,
+            vapor_pressure_data=data,
+            a_oxide=0.5,
+        )
+
+    authoritative_pressure = graph_pressure(data_with_gas_rail_status("active"))
+    fallback_pressure = graph_pressure(data_with_gas_rail_status("dormant"))
+    assert authoritative_pressure != fallback_pressure
+
+    for status, expected_authority in status_cases:
+        data = data_with_gas_rail_status(status)
+        gas_rail = data["metals"]["Mg"]["gas_rail_standard_reaction"]
+
+        assert vapor_pressure_module._gas_rail_block_is_authoritative(
+            gas_rail
+        ) is expected_authority
+        assert graph_pressure(data) == (
+            authoritative_pressure if expected_authority else fallback_pressure
+        )
+
+
 def test_mg_high_t_uses_gas_fugacity_after_te_gas_rail_demotion(
     vapor_pressure_data,
 ):
