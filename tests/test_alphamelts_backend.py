@@ -1668,7 +1668,20 @@ def test_first_row_mapping_propagates_table_access_key_error():
         AlphaMELTSBackend()._first_row_mapping(BrokenTable())
 
 
-def test_oxide_mole_fractions_propagates_formula_resolution_key_error(
+def test_activity_from_coefficients_pins_mixed_oxide_projection():
+    activities, gammas = AlphaMELTSBackend()._activities_from_coefficients(
+        {'SiO2': 1.0, 'FeO': 1.0},
+        {'SiO2': 70.0, 'FeO': 30.0},
+    )
+
+    assert activities == {
+        'SiO2': 0.736152890184833,
+        'FeO': 0.26384710981516696,
+    }
+    assert gammas == {'SiO2': 1.0, 'FeO': 1.0}
+
+
+def test_activities_from_coefficients_propagates_formula_resolution_key_error(
     monkeypatch,
 ):
     def fail_resolution(*_args, **_kwargs):
@@ -1680,7 +1693,9 @@ def test_oxide_mole_fractions_propagates_formula_resolution_key_error(
         fail_resolution,
     )
     with pytest.raises(KeyError, match='formula resolution defect'):
-        AlphaMELTSBackend()._oxide_mole_fractions({'SiO2': 50.0})
+        AlphaMELTSBackend()._activities_from_coefficients(
+            {'SiO2': 1.0}, {'SiO2': 50.0}
+        )
 
 
 @pytest.mark.parametrize(
@@ -4363,16 +4378,20 @@ def test_configured_unavailable_alphamelts_backend_fail_closes():
         sim._get_equilibrium()
 
 
-def test_alphamelts_vapor_species_are_canonical_formula_names():
+def test_alphamelts_vapor_species_follow_vaporock_delegate():
     backend = AlphaMELTSBackend()
+    delegate = alphamelts_module.VapoRockBackend()
     backend._vaporock_available = True
+    backend._vaporock_helper = delegate
 
-    species = set(backend.get_vapor_species())
+    species = backend.get_vapor_species()
+    assert species == delegate.get_vapor_species()
+    assert {'SiO2_gas', 'CrO2', 'O', 'O2'} <= set(species)
 
-    assert 'SiO2' in species
-    assert 'Fe2O3' in species
-    assert 'SiO2_gas' not in species
-    assert 'Fe2O3_gas' not in species
+    backend._vaporock_available = False
+    assert backend.get_vapor_species() == [
+        'Na', 'K', 'Fe', 'Mg', 'Ca', 'SiO', 'Mn', 'Cr'
+    ]
 
 
 def test_alphamelts_rejects_metal_and_gas_account_inputs():

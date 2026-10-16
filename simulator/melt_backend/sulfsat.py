@@ -172,19 +172,6 @@ class SulfurSaturationResult:
     calibration_status: str = 'unavailable'
 
 
-def _qfm_logfo2_oneill(T_K: float) -> float:
-    """
-    Return absolute log10(fO2) of QFM at temperature ``T_K``, using the
-    O'Neill (1987) formulation that PySulfSat exposes via
-    ``calculate_fo2_QFM_buffers``.
-
-    Retained for consumers and explicit buffer comparisons; Jugo (2010)
-    requires the Frost (1991) QFM reference instead.
-    """
-    # logfo2_QFM_Oneill = 8.58 - 25050 / T_K  (PySulfSat src/.../s6_corrections.py:640).
-    return 8.58 - 25050.0 / float(T_K)
-
-
 def _qfm_logfo2_frost(T_K: float, P_bar: float) -> float:
     """Return absolute log10(fO2) of the Frost (1991) QFM buffer."""
     T_K = float(T_K)

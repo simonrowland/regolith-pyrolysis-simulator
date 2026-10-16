@@ -2124,11 +2124,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 [ChemistryIntent.VAPOR_PRESSURE],
             )
 
-        # VapoRockProvider receives the same vapor_pressures.yaml payload
-        # so its diagnostic output is filtered onto the simulator species
-        # universe. It is shadow-only: the builtin result remains the
-        # authoritative pressure dict even when VapoRock reports
-        # non_authoritative or empty diagnostics.
+        # VapoRockProvider accepts the same payload for wiring
+        # compatibility. Its full-speciation diagnostic is not filtered;
+        # the builtin result remains the authoritative pressure dict
+        # even when VapoRock reports non_authoritative or empty diagnostics.
         if not any(
             isinstance(provider, VapoRockProvider)
             for provider in self._chem_registry.shadows_for(
@@ -11442,18 +11441,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         sio2_gate = min(1.0, sio2_mol_available / species_mol)
         return max(0.0, min(1.0, thermal_extent * sio2_gate))
-
-    @classmethod
-    def _melt_from_composition(
-        cls, comp: Mapping[str, Any], mass_kg: float
-    ) -> Dict[str, float]:
-        for component, raw_value in comp.items():
-            cls._declared_nonnegative_number(
-                raw_value, f'composition_wt_pct.{component}')
-        return {
-            oxide: cls._mass_from_wt_pct(comp.get(oxide, 0.0), mass_kg) or 0.0
-            for oxide in OXIDE_SPECIES
-        }
 
     @classmethod
     def _melt_from_raw_inventory(

@@ -21,6 +21,7 @@ from engines.builtin.cco_redox_buffer import (
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MODULE_PATH = REPO_ROOT / "engines" / "builtin" / "cco_redox_buffer.py"
+QFM_OWNER_PATH = REPO_ROOT / "simulator" / "chemistry" / "qfm_oneill.py"
 
 
 def _imported_modules(path: Path) -> set[str]:
@@ -88,12 +89,15 @@ def test_reference_delta_uses_absolute_log10_minus_qfm() -> None:
     result = cco_buffered_fO2(temperature_K, 1.0, reference_buffer="QFM")
     qfm = qfm_log10_fO2_bar(temperature_K)
 
-    assert qfm == pytest.approx(8.58 - 25050.0 / temperature_K)
     assert result.reference_log10_fO2_bar == pytest.approx(qfm)
     assert result.delta_log10_fO2_from_reference == pytest.approx(
         result.log10_fO2_bar - qfm
     )
     assert result.delta_log10_fO2_from_reference < 0.0
+
+
+def test_oneill_qfm_reference_anchor() -> None:
+    assert qfm_log10_fO2_bar(1473.15) == -8.424378372874452
 
 
 def test_cco_log10_fO2_increases_with_temperature() -> None:
@@ -127,9 +131,12 @@ def test_purity_no_ledger_provider_or_melt_imports() -> None:
         "dataclasses",
         "dataclasses.dataclass",
         "math",
+        "simulator.chemistry.qfm_oneill",
+        "simulator.chemistry.qfm_oneill.oneill_qfm_log10_fO2_bar",
         "simulator.scalar_boundary",
         "simulator.scalar_boundary.is_declared_real_scalar",
     }
+    assert _imported_modules(QFM_OWNER_PATH) == set()
     assert all("melt_backend" not in module for module in modules)
     assert all("inventory" not in module for module in modules)
     assert all("ledger" not in module for module in modules)

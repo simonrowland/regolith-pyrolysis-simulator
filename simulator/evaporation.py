@@ -2658,7 +2658,6 @@ class EvaporationMixin:
         temperature_C: float | None = None,
         pressure_bar: float | None = None,
         composition_mol_by_account: Mapping[str, Mapping[str, float]] | None = None,
-        allow_parametric: bool = False,
         repair_notices: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_determinism import (
@@ -2706,8 +2705,6 @@ class EvaporationMixin:
                 f'kernel liquidus provider unavailable: {type(exc).__name__}',
             )
             reasons.append(f'kernel liquidus unavailable: {exc}')
-            if allow_parametric:
-                return self._freeze_gate_curve_from_parametric_liquidus(reasons)
             return None
 
         diagnostic = dict(getattr(result, 'diagnostic', None) or {})
@@ -2718,8 +2715,6 @@ class EvaporationMixin:
         )
         if status != 'ok':
             reasons.append(f'kernel liquidus unavailable: status={status}')
-            if allow_parametric:
-                return self._freeze_gate_curve_from_parametric_liquidus(reasons)
             return None
         curve = self._freeze_gate_curve_from_bounds(
             solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
@@ -2735,26 +2730,6 @@ class EvaporationMixin:
             curve = dict(curve)
             curve['composition_derived'] = True
         return curve
-
-    def _freeze_gate_curve_from_parametric_liquidus(
-        self,
-        reasons: list[str],
-    ) -> dict[str, Any] | None:
-        cleaned_mol = self.atom_ledger.mol_by_account(
-            _FREEZE_GATE_ACCOUNT
-        )
-        if not any(
-            species in _FREEZE_GATE_COMPOSITION_SPECIES and float(mol) > 0.0
-            for species, mol in cleaned_mol.items()
-        ):
-            reasons.append('parametric liquidus unavailable: no cleaned melt')
-            return None
-        return self._freeze_gate_curve_from_bounds(
-            solidus_T_C=900.0,
-            liquidus_T_C=1200.0,
-            source='liquidus_solidus:kernel:parametric_dry_silicate_lower_bound',
-            reasons=reasons,
-        )
 
     def _freeze_gate_curve_from_liquidus_result(
         self,

@@ -1426,15 +1426,8 @@ class _MELTSBackendSupport(MeltBackend):
 
     def get_vapor_species(self) -> List[str]:
         if self._vaporock_available:
-            # This wrapper returns this fixed 22-name list when
-            # _vaporock_available is true. It is not
-            # VapoRockBackend.get_vapor_species() (42 names on current
-            # VapoRockBackend) and does not track that delegate's vocabulary.
-            return [
-                'Na', 'K', 'Fe', 'Mg', 'Ca', 'Si', 'Al', 'Ti', 'Cr', 'Mn',
-                'SiO', 'FeO', 'MgO', 'CaO', 'AlO', 'TiO', 'NaO', 'KO',
-                'O2', 'O', 'SiO2', 'Fe2O3',
-            ]
+            assert self._vaporock_helper is not None
+            return self._vaporock_helper.get_vapor_species()
         return ['Na', 'K', 'Fe', 'Mg', 'Ca', 'SiO', 'Mn', 'Cr']
 
     def equilibrate(self, temperature_C: float,
@@ -5701,24 +5694,6 @@ class _MELTSBackendSupport(MeltBackend):
                 table[str(species)] = dict(spec or {})
         self._vapor_pressure_table = table
         return table
-
-    def _oxide_mole_fractions(self, comp_wt: Mapping[str, float]) -> Dict[str, float]:
-        moles: Dict[str, float] = {}
-        for oxide, wt in comp_wt.items():
-            if not self._is_number(wt) or float(wt) <= 0.0:
-                continue
-            molar_mass = resolve_species_formula(
-                oxide, None).molar_mass_kg_per_mol()
-            if molar_mass > 0.0:
-                moles[str(oxide)] = float(wt) / molar_mass
-        total_moles = sum(moles.values())
-        if total_moles <= 0.0:
-            return {}
-        return {
-            oxide: mol / total_moles
-            for oxide, mol in moles.items()
-        }
-
 
 class AlphaMELTSBackend(_MELTSBackendSupport, RealBackendAuthority):
     """alphaMELTS subprocess/PetThermoTools backend."""

@@ -3253,17 +3253,15 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
     buffer_n_args = [a for a in buffer_args if a.startswith("--buffer_n=")]
     assert len(buffer_n_args) == 1, buffer_args
     buffer_n = float(buffer_n_args[0].split("=", 1)[1])
-    # O'Neill 1987: logfo2_QFM = 8.58 - 25050 / T_K. At T_C = 1450,
-    # T_K = 1723.15, QFM ~ 8.58 - 14.537 = -5.957. So delta should be
-    # ~-12 - (-5.957) = -6.043. Allow generous tolerance for the
-    # calibration fit.
-    expected_offset = -12.0 - (8.58 - 25050.0 / (1450.0 + 273.15))
+    # Independent O'Neill QFM value at 1723.15 K and its expected offset.
+    qfm_at_1450C = -5.957329890026985
+    expected_offset = -6.042670109973015
     assert buffer_n == pytest.approx(expected_offset, abs=0.05), (
         f"buffer_n={buffer_n} should approximate {expected_offset}"
     )
     # Once the offset round-trips through QFM(T) we recover the
     # requested absolute fO2_log within calibration accuracy.
-    recovered_fo2_log = buffer_n + (8.58 - 25050.0 / (1450.0 + 273.15))
+    recovered_fo2_log = buffer_n + qfm_at_1450C
     assert recovered_fo2_log == pytest.approx(-12.0, abs=0.05)
     # The warning chain must explicitly name the substitution so the
     # caller knows their absolute fO2 was translated, not ignored.
@@ -3385,6 +3383,52 @@ def test_magemin_resolve_buffer_qfm_calibration_at_1450C():
     # A5 honest-substitution path; a wrong constant would silently shift
     # every Mars reducing fO2 by ~6 decades.
     qfm_at_1450C = MAGEMinBackend._qfm_logfo2_oneill(1450.0)
-    expected = 8.58 - 25050.0 / (1450.0 + 273.15)
-    assert qfm_at_1450C == pytest.approx(expected, abs=1e-9)
+    assert qfm_at_1450C == -5.957329890026985
     assert -7.0 < qfm_at_1450C < -5.0, qfm_at_1450C
+
+
+def test_magemin_qfm_buffer_offsets_are_bit_pinned():
+    backend = MAGEMinBackend()
+    expected_hex = {
+        1000.0: "-0x1.cf0c806fa67b0p-1",
+        1200.0: "-0x1.c9adf82faff0cp+1",
+        1450.0: "-0x1.82bb1b69b673ep+2",
+        1600.0: "-0x1.cd3c4b84b9f52p+2",
+    }
+
+    for temperature_C, pinned_hex in expected_hex.items():
+        _, offset, _ = backend._resolve_buffer(
+            temperature_C=temperature_C,
+            fO2_log=-12.0,
+        )
+        assert offset.hex() == pinned_hex
+
+
+def test_magemin_qfm_nonpositive_kelvin_behavior_is_bit_pinned():
+    assert MAGEMinBackend._qfm_logfo2_oneill(-200.0).hex() == "-0x1.4dddf57582f36p+8"
+    assert MAGEMinBackend._qfm_logfo2_oneill(-274.0).hex() == "0x1.cc9cac45df6b9p+14"
+    with pytest.raises(ZeroDivisionError):
+        MAGEMinBackend._qfm_logfo2_oneill(-273.15)
+
+
+def test_oneill_qfm_coefficient_has_one_production_owner():
+    repo_root = Path(__file__).resolve().parents[1]
+    tracked = subprocess.run(
+        ["git", "ls-files", "--", "simulator", "engines"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.splitlines()
+    coefficient = re.compile(r"(?<!\d)25_?050(?:\.0)?(?!\d)")
+    occurrences = []
+
+    for relative_path in tracked:
+        if not relative_path.endswith(".py"):
+            continue
+        source_path = repo_root / relative_path
+        for line in source_path.read_text(encoding="utf-8").splitlines():
+            if coefficient.search(line):
+                occurrences.append(relative_path)
+
+    assert occurrences == ["simulator/chemistry/qfm_oneill.py"]

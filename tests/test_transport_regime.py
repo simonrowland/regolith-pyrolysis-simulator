@@ -230,6 +230,39 @@ def test_beskok_karniadakis_civan_fixtures_b1_b2_b3(
     ) * 1000.0 == pytest.approx(expected_c_bk_l_s, rel=1e-6)
 
 
+@pytest.mark.parametrize(
+    ("knudsen_number", "allow_near_viscous_cross_check", "expected_hex"),
+    (
+        (1.0e-4, True, "0x1.001b12f775da9p+0"),
+        (0.01, False, "0x1.0bbd0bc8a943bp+0"),
+        (0.1, False, "0x1.7d809d78bb4f4p+0"),
+        (1.0, False, "0x1.9ed9ed9ed9edbp+2"),
+    ),
+)
+def test_beskok_rarefaction_factor_exact_pins(
+    knudsen_number, allow_near_viscous_cross_check, expected_hex
+):
+    actual = tr.beskok_karniadakis_rarefaction_factor(
+        knudsen_number,
+        allow_near_viscous_cross_check=allow_near_viscous_cross_check,
+    )
+
+    assert actual == float.fromhex(expected_hex)
+
+
+def test_beskok_rarefaction_factor_rejects_free_molecular_boundary():
+    with pytest.raises(tr.TransportRegimeRefusal) as exc_info:
+        tr.beskok_karniadakis_rarefaction_factor(10.0)
+
+    assert exc_info.value.category == "transitional_correlation_out_of_range"
+    assert exc_info.value.reason == "transitional_correlation_out_of_range"
+
+
+def test_beskok_alpha_exponent_has_one_owner():
+    with open(tr.__file__, encoding="utf-8") as source_file:
+        assert source_file.read().count("0.4348") == 1
+
+
 def test_single_carrier_mean_free_path_fixture_m1():
     result = tr.single_species_mean_free_path(
         "N2",

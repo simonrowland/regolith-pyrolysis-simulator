@@ -4,15 +4,78 @@ from pathlib import Path
 
 import pytest
 import yaml
+import simulator.ceramic_classifier as ceramic_classifier
 
 from simulator.ceramic_classifier import (
     DEFAULT_CERAMIC_TYPES_PATH,
+    _resolve_fe2_fraction,
     classify_ceramic_rump,
     classify_industrial_glass,
     load_ceramic_types,
     load_glass_types,
 )
 from simulator.terminal_product_taxonomy import DEFAULT_TAXONOMY_PATH
+
+
+@pytest.mark.parametrize(
+    ("composition", "explicit", "expected"),
+    (
+        pytest.param(
+            {"FeO": 10.0, "SiO2": 90.0},
+            None,
+            (1.0, "ledger_speciation"),
+            id="ferrous-ledger",
+        ),
+        pytest.param(
+            {"Fe2O3": 10.0, "SiO2": 90.0},
+            None,
+            (0.0, "ledger_speciation"),
+            id="ferric-ledger",
+        ),
+        pytest.param(
+            {"SiO2": 100.0},
+            None,
+            (None, "unavailable"),
+            id="iron-free",
+        ),
+        pytest.param(
+            {"FeO": 10.0, "Fe2O3": 1.0, "SiO2": 89.0},
+            0.37,
+            (0.37, "provided"),
+            id="explicit",
+        ),
+    ),
+)
+def test_fe2_fraction_output_pin(composition, explicit, expected):
+    assert _resolve_fe2_fraction(
+        composition,
+        explicit=explicit,
+    ) == expected
+
+
+def test_fe2_fraction_nonfinite_iron_is_unavailable_without_kress(monkeypatch):
+    kress_calls = []
+    monkeypatch.setattr(
+        ceramic_classifier,
+        "iron_oxide_values",
+        lambda composition: (10.0, 0.0),
+    )
+    monkeypatch.setattr(
+        ceramic_classifier,
+        "feot_equivalent_moles",
+        lambda composition: float("nan"),
+    )
+    monkeypatch.setattr(
+        ceramic_classifier,
+        "kress91_fe3_over_sigma_fe",
+        lambda **kwargs: kress_calls.append(kwargs) or 0.5,
+        raising=False,
+    )
+
+    assert ceramic_classifier._resolve_fe2_fraction(
+        {"FeO": 10.0}, explicit=None
+    ) == (None, "unavailable")
+    assert kress_calls == []
 
 
 CERAMIC_LEAF_WITNESSES = {

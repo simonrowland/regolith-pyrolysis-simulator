@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass, replace
+import inspect
 import math
 from types import SimpleNamespace
 
@@ -267,7 +268,6 @@ class _Sim:
         temperature_C: float | None = None,
         pressure_bar: float | None = None,
         composition_mol_by_account: dict[str, dict[str, float]] | None = None,
-        allow_parametric: bool = False,
     ) -> dict[str, object] | None:
         self.kernel_curve_requests.append(
             {
@@ -275,7 +275,6 @@ class _Sim:
                 "temperature_C": temperature_C,
                 "pressure_bar": pressure_bar,
                 "composition_mol_by_account": composition_mol_by_account,
-                "allow_parametric": allow_parametric,
             }
         )
         if self._freeze_curve is None:
@@ -1450,6 +1449,42 @@ def test_below_solidus_with_routed_flow_is_honest_infeasible() -> None:
         assert margin.output_status != "not_attempted"
         assert margin.status_reason != "not-attempted-no-volatilization"
         assert "not-attempted-no-volatilization" not in margin.detail
+
+
+@pytest.mark.parametrize(
+    ("knudsen_number", "expected_regime"),
+    [
+        (0.0, "viscous"),
+        (math.nextafter(0.01, 0.0), "viscous"),
+        (0.01, "transitional"),
+        (1.0, "transitional"),
+        (math.nextafter(10.0, 0.0), "transitional"),
+        (10.0, "free_molecular"),
+        (1e6, "free_molecular"),
+    ],
+)
+def test_optimizer_knudsen_regime_boundary_pin(
+    knudsen_number: float,
+    expected_regime: str,
+) -> None:
+    assert evaluate_module._knudsen_summary_regime(
+        {}, knudsen_number
+    ) == expected_regime
+
+
+def test_optimizer_knudsen_summary_uses_owner_and_refuses_negative() -> None:
+    regime_source = inspect.getsource(evaluate_module._knudsen_summary_regime)
+    assert "0.01" not in regime_source
+    assert "10.0" not in regime_source
+
+    prepared, missing_reason = evaluate_module._knudsen_summary_with_segment(
+        {"knudsen_number": -1.0}, 7
+    )
+
+    assert prepared is None
+    assert missing_reason == (
+        "snapshot 7 missing overhead flow state: knudsen regime unavailable"
+    )
 
 
 def test_flow_present_missing_knudsen_summary_fails_closed() -> None:
@@ -4360,7 +4395,6 @@ def test_real_backend_out_of_domain_subsolidus_rump_terminal_is_scored_success()
     requests = execution.simulator.kernel_curve_requests
     assert requests, "rump earning must request a kernel curve"
     earned_request = requests[-1]
-    assert earned_request["allow_parametric"] is False
     assert earned_request["temperature_C"] == pytest.approx(1100.0)
     assert earned_request["pressure_bar"] == pytest.approx(1.0e-6)
     assert earned_request["fO2_log"] == pytest.approx(-9.0)

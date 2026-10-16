@@ -109,6 +109,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Tuple
 
 from engines.domain_reason import OutOfDomainReason
+from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
@@ -2666,17 +2667,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
     @staticmethod
     def _qfm_logfo2_oneill(temperature_C: float) -> float:
-        """
-        Absolute log10(fO2) of the QFM buffer at ``temperature_C``.
-
-        O'Neill (1987) formulation: ``logfO2_QFM = 8.58 - 25050 / T_K``.
-        Kept in sync with ``sulfsat.py::_qfm_logfo2_oneill`` for engine-aligned
-        buffer reporting only. NOTE (b-094): the Jugo-2010 S6+/ST path no
-        longer uses this fit — Jugo deltaQFM is referenced to Frost (1991)
-        per PySulfSat's own requirement.
-        """
+        """Convert Celsius to Kelvin and evaluate the O'Neill QFM fit."""
         T_K = float(temperature_C) + 273.15
-        return 8.58 - 25050.0 / T_K
+        return oneill_qfm_log10_fO2_bar(T_K)
 
     def _resolve_buffer(
         self, *, temperature_C: float, fO2_log: float,

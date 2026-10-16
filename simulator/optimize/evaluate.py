@@ -137,7 +137,10 @@ from simulator.run_executor import RunExecutor
 from simulator.recipe_errors import MalformedRecipeError
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.runner import PyrolysisRun, RunnerError
-from simulator.transport_regime import TransportRegimeRefusal
+from simulator.transport_regime import (
+    TransportRegimeRefusal,
+    classify_knudsen_regime,
+)
 from simulator.optimize.backend_status import (
     crash_point_from_carrier,
     backend_statuses_from_carrier as _backend_statuses_from_carrier,
@@ -2324,16 +2327,15 @@ def _fallback_provenance(value: Any) -> str | None:
 def _knudsen_summary_regime(
     summary: Mapping[str, Any],
     knudsen_number: float,
-) -> str:
+) -> str | None:
     raw_regime = summary.get("regime", summary.get("knudsen_regime", ""))
     regime = str(raw_regime).strip().lower()
     if regime:
         return regime
-    if knudsen_number < 0.01:
-        return "viscous"
-    if knudsen_number < 10.0:
-        return "transitional"
-    return "free_molecular"
+    try:
+        return classify_knudsen_regime(knudsen_number).value
+    except TransportRegimeRefusal:
+        return None
 
 
 def _knudsen_summary_status_detail(summary: Mapping[str, Any]) -> str:
@@ -4985,7 +4987,6 @@ def _assess_rump_terminal(run_execution: Any) -> RumpTerminalAssessment:
             temperature_C=T_crash_C,
             pressure_bar=pressure_bar,
             composition_mol_by_account=composition_mol_by_account,
-            allow_parametric=False,
         )
     except Exception as exc:  # noqa: BLE001 - proof source unavailable, not earned
         return _rump_terminal_not_earned(

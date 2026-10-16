@@ -9,6 +9,8 @@ import yaml
 
 import pytest
 
+from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.evaporation_classes import (
     EVAPORATION_CLASSES,
     e_down_from_s,
@@ -148,7 +150,101 @@ def test_report_species_class_diagnostics_class_alpha_fallback_unchanged():
     assert diag.alpha_runtime is None
     assert diag.alpha_runtime_note.endswith("+class_alpha_fallback_for_s")
     assert diag.series is not None
-    assert diag.series.alpha_intrinsic == pytest.approx(0.083)
+    assert diag.series.alpha_intrinsic == 0.083
+    assert diag.interface_share_s == 0.057762384084735774
+    assert diag.r_interface == 16479.794223102974
+    assert diag.r_gas == 268823.42662262224
+    assert diag.r_melt == 0.0
+    assert diag.flux_band_factor_high == 1.087402437000731
+    assert diag.flux_band_factor_low == 0.9196227320937371
+    assert (
+        diag.series.flux_kg_s_m2,
+        diag.series.alpha_effective,
+        diag.series.k_hk_kg_s_m2_pa,
+        diag.series.knudsen_number,
+        diag.series.k_mt_kg_s_m2_pa,
+        diag.series.d_ab_m2_s,
+    ) == (
+        3.5050427998523708e-06,
+        0.004794277879033069,
+        0.0007310887871520878,
+        0.0003590519097018557,
+        3.7199138950185795e-06,
+        0.03631724814709421,
+    )
+
+
+@pytest.mark.parametrize(
+    ("species", "formula"),
+    [
+        ("Al2", "Al2"),
+        ("Al2O", "Al2O"),
+        ("Al2O2", "Al2O2"),
+        ("Al2O3_gas", "Al2O3"),
+        ("AlO", "AlO"),
+        ("AlO2", "AlO2"),
+        ("Ca2", "Ca2"),
+        ("CrO", "CrO"),
+        ("CrO2", "CrO2"),
+        ("CrO3", "CrO3"),
+        ("TiO", "TiO"),
+        ("TiO2_gas", "TiO2"),
+        ("SiO", "SiO"),
+        ("Na", "Na"),
+        ("Na2", "Na2"),
+        ("Si", "Si"),
+        ("Si2", "Si2"),
+        ("Al", "Al"),
+        ("Cr", "Cr"),
+        ("Mn", "Mn"),
+        ("MgO_gas", "MgO"),
+        ("Na2O_gas", "Na2O"),
+        ("K2O_gas", "K2O"),
+        ("SiO2_gas", "SiO2"),
+        ("CaO_gas", "CaO"),
+        ("Cr2O3_gas", "Cr2O3"),
+        ("Fe2O3_gas", "Fe2O3"),
+        ("FeO_gas", "FeO"),
+        ("P2O5_gas", "P2O5"),
+    ],
+)
+def test_report_species_class_diagnostics_default_mass_uses_formula_owner(
+    species, formula, monkeypatch
+):
+    formula_mass = resolve_species_formula(formula).molar_mass_kg_per_mol()
+    observed_masses = []
+    original_share = evaporation_classes.interface_resistance_share
+
+    def capture_mass(**kwargs):
+        observed_masses.append(kwargs["molar_mass_kg_mol"])
+        # Some formula-covered species have no diagnostic transport proxy;
+        # use Fe downstream while preserving the mass handed to the owner.
+        return original_share(**{**kwargs, "species": "Fe"})
+
+    monkeypatch.setattr(
+        evaporation_classes, "interface_resistance_share", capture_mass
+    )
+    diag = report_species_class_diagnostics(
+        species,
+        T_K=2000.0,
+        overhead_pressure_pa=1000.0,
+        alpha_override=0.1,
+        vapor_pressure_data={},
+    )
+
+    assert diag.series is not None
+    assert observed_masses == [formula_mass]
+
+
+def test_report_species_class_diagnostics_unknown_species_refuses_typed():
+    with pytest.raises(UnknownSpeciesError, match="unknown species"):
+        report_species_class_diagnostics(
+            "not_a_catalog_species",
+            T_K=2000.0,
+            overhead_pressure_pa=1000.0,
+            alpha_override=0.1,
+            vapor_pressure_data={},
+        )
 
 
 def test_costa_redox_grounding_uses_owner_figure_series_once():

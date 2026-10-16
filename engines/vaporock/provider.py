@@ -75,19 +75,8 @@ class VapoRockProvider(ChemistryProvider):
             of returning a result -- silent fallback is forbidden, the
             kernel handles fallback opt-in at the dispatch layer.
         vapor_pressure_data: Optional ``data/vapor_pressures.yaml``
-            payload.  When supplied the provider filters the VapoRock
-            output to active species the YAML declares (the universe
-            the simulator's downstream ``EVAPORATION_FLUX`` step is
-            wired to consume); without this filter VapoRock's broader
-            ~30-species output (``O2``, ``Si2``, ``Al2O2``, etc.) would
-            crash the downstream stoichiometry validator.  Rows marked
-            ``consumer_status: inactive`` are excluded from the VapoRock
-            consumer surface. Goal #10 hard-constraint binds this: the
-            authority swap must keep mass balance at 0.000%.
-            When omitted, no filtering happens and the full VapoRock
-            output is returned -- appropriate for tests that operate
-            below the simulator (the vapor-pressure dict alone is
-            harmless when no evaporation step consumes it).
+            payload. Retained for compatibility with simulator wiring;
+            it does not filter diagnostic full-speciation output.
     """
 
     name = 'vaporock'
@@ -107,15 +96,6 @@ class VapoRockProvider(ChemistryProvider):
         # first dispatch probes availability; if the probe fails the
         # provider raises ``ProviderUnavailableError`` cleanly.
         self._backend_initialised: bool = backend is not None
-        # Set of vapor-species names the simulator knows how to
-        # consume downstream.  Computed lazily from the YAML so an
-        # empty payload yields no filter (the full VapoRock output
-        # passes through -- used by adapter-level tests that do not
-        # exercise EVAPORATION_FLUX).
-        self._allowed_species: frozenset[str] = self._build_allowed_species(
-            vapor_pressure_data
-        )
-
     def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
             provider_id=self.PROVIDER_ID,
@@ -244,7 +224,6 @@ class VapoRockProvider(ChemistryProvider):
             pO2_bar=pO2_bar,
             mode=self._mode_label(backend),
             engine_version=self._engine_version(backend),
-            allowed_species=self._allowed_species,
             melt_envelope=melt_envelope,
             backend_failure_warning=backend_failure_warning,
         )
@@ -439,7 +418,6 @@ class VapoRockProvider(ChemistryProvider):
         pO2_bar: float,
         mode: str,
         engine_version: str,
-        allowed_species: frozenset[str],
         melt_envelope: MeltExtrapolationEnvelope,
         backend_failure_warning: Optional[str] = None,
     ) -> VapoRockDiagnostics:
@@ -448,10 +426,8 @@ class VapoRockProvider(ChemistryProvider):
         Mirrors the MAGEMin shadow's projection.  Missing or empty
         results surface as ``backend_status='unavailable'``.
 
-        ``allowed_species`` is retained in the signature for callers
-        that share construction code with the builtin provider. VapoRock
-        no longer exports a filtered authoritative pressure dict; every
-        finite non-negative pressure (including proven-empty 0 Pa
+        VapoRock does not export a filtered authoritative pressure dict;
+        every finite non-negative pressure (including proven-empty 0 Pa
         inventory zeros) stays under ``vaporock_full_speciation_Pa``.
         """
         envelope_fields = asdict(melt_envelope)
@@ -488,7 +464,6 @@ class VapoRockProvider(ChemistryProvider):
                 vaporock_full_speciation_Pa[str(species)] = pressure
             else:
                 rejected_pressure_count += 1
-        del allowed_species
         vapor_pressures_Pa: dict[str, float] = {}
         warnings = tuple(
             str(w) for w in (getattr(equilibrium, 'warnings', ()) or ())
@@ -555,66 +530,6 @@ class VapoRockProvider(ChemistryProvider):
             engine_version=engine_version,
             backend_status=backend_status,
             backend_warnings=warnings,
-        )
-
-    @staticmethod
-    def _build_allowed_species(
-        vapor_pressure_data: Optional[Mapping[str, Any]],
-    ) -> frozenset[str]:
-        """Compute the allowed-vapor-species filter from the YAML payload.
-
-        Returns ``frozenset()`` (empty / disabled filter) when the
-        payload is missing or carries no ``metals`` / ``oxide_vapors``
-        sections.
-
-        Otherwise returns the active species set the builtin Antoine
-        path actually emits: the intersection of the YAML ``metals``
-        section with the
-        :data:`engines.builtin.vapor_pressure._ELLINGHAM_THERMO` table
-        (the builtin only computes a vapor pressure for metals that
-        also have an Ellingham entry), plus the active YAML
-        ``oxide_vapors`` section. Rows explicitly marked
-        ``consumer_status: inactive`` are excluded; missing status is
-        active.
-
-        Goal #10 hard constraint binds this: the authority swap must
-        not change the species set the downstream
-        ``EVAPORATION_FLUX`` / ``EVAPORATION_TRANSITION`` pipeline
-        sees.  VapoRock's broader ~30-species output is a richer
-        chemistry surface than the simulator's downstream is wired
-        for; pinning the filter to the builtin's effective output
-        keeps mass balance closed at 0.000% while still letting
-        VapoRock be the canonical source for the species both
-        engines compute.  Future work can widen this set per-species
-        as the downstream stoichiometry validators learn the new
-        species.
-        """
-        if not vapor_pressure_data:
-            return frozenset()
-        # Lazy import: the builtin module re-enters this engine at
-        # package-init under some test orderings (the cycle
-        # documented in engines/builtin/__init__.py).  Deferring the
-        # import to first-call keeps the module pair importable in
-        # any order.
-        from engines.builtin.vapor_pressure import _ELLINGHAM_THERMO
-
-        def active_species(section: Mapping[str, Any]) -> frozenset[str]:
-            names: set[str] = set()
-            for species, row in section.items():
-                status = ''
-                if isinstance(row, Mapping):
-                    status = str(row.get('consumer_status') or '').lower()
-                if status == 'inactive':
-                    continue
-                names.add(str(species))
-            return frozenset(names)
-
-        metals = dict(vapor_pressure_data.get('metals', {}) or {})
-        oxide_vapors = dict(vapor_pressure_data.get('oxide_vapors', {}) or {})
-        ellingham_metals = frozenset(_ELLINGHAM_THERMO.keys())
-        return (
-            (active_species(metals) & ellingham_metals)
-            | active_species(oxide_vapors)
         )
 
     @staticmethod

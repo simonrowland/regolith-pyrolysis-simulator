@@ -43,6 +43,7 @@ from typing import Any, Dict
 
 import pytest
 
+from engines.builtin.cco_redox_buffer import qfm_log10_fO2_bar
 import simulator.melt_backend.sulfsat as sulfsat_module
 from simulator.core import PyrolysisSimulator
 from simulator.fe_redox import kress91_split, melt_mol_fractions_for_kress91
@@ -363,7 +364,7 @@ def test_jugo_delta_qfm_uses_frost_1991_buffer(monkeypatch):
     )
 
     frost_logfo2 = 8.735 - 25096.3 / T_K + 0.110 * (P_bar - 1.0) / T_K
-    oneill_logfo2 = 8.58 - 25050.0 / T_K
+    oneill_logfo2 = qfm_log10_fO2_bar(T_K)
     assert captured_delta_qfm == pytest.approx([fO2_log - frost_logfo2])
     assert abs(frost_logfo2 - oneill_logfo2) > 0.1
 

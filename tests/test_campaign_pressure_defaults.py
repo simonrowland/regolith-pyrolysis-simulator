@@ -304,6 +304,73 @@ def test_c0_and_c2b_temperature_ramps_follow_campaign_config(
     assert actual == (target, ramp)
 
 
+def test_c2a_staged_shipped_stage_targets_and_ramps_are_pinned() -> None:
+    # Golden values captured before removing the missing-key fallbacks.
+    manager = CampaignManager(_setpoints())
+    stage_samples = (
+        ("alkali_early_fe", 0, (1250.0, 600.0)),
+        ("sio_window", 4, (1600.0, 175.0)),
+        ("fe_hot_hold", 7, (1750.0, 150.0)),
+        ("cool_for_na_shuttle", 8, (1150.0, 600.0)),
+    )
+
+    for stage_name, hour, expected in stage_samples:
+        actual = manager.get_temp_target(
+            CampaignPhase.C2A_STAGED,
+            hour,
+            MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=hour),
+        )
+        assert actual == expected
+
+
+def test_c2a_staged_missing_stage_target_refuses_with_setpoint_key() -> None:
+    setpoints = deepcopy(_setpoints())
+    _stage(setpoints, "sio_window").pop("target_C")
+    manager = CampaignManager(setpoints)
+
+    with pytest.raises(
+        ValueError,
+        match=r"Missing numeric campaign setpoint: C2A_staged\.stages\.sio_window\.target_C",
+    ):
+        manager.get_temp_target(
+            CampaignPhase.C2A_STAGED,
+            4,
+            MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=4),
+        )
+
+
+def test_c2a_staged_missing_hold_default_refuses_with_setpoint_key() -> None:
+    setpoints = deepcopy(_setpoints())
+    setpoints["campaigns"]["C2A_staged"].pop("default_hold_T_C")
+    manager = CampaignManager(setpoints)
+
+    with pytest.raises(
+        ValueError,
+        match=r"Missing numeric campaign setpoint: C2A_staged\.default_hold_T_C",
+    ):
+        manager.get_temp_target(
+            CampaignPhase.C2A_STAGED,
+            7,
+            MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=7),
+        )
+
+
+def test_c2a_staged_missing_stage_ramp_refuses_with_setpoint_key() -> None:
+    setpoints = deepcopy(_setpoints())
+    _stage(setpoints, "alkali_early_fe").pop("ramp_rate_C_per_hr")
+    manager = CampaignManager(setpoints)
+
+    with pytest.raises(
+        ValueError,
+        match=r"Missing numeric campaign setpoint: C2A_staged\.stages\.alkali_early_fe\.ramp_rate_C_per_hr",
+    ):
+        manager.get_temp_target(
+            CampaignPhase.C2A_STAGED,
+            0,
+            MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=0),
+        )
+
+
 @pytest.mark.parametrize("config_key", ["C0", "C2B"])
 def test_configured_temperature_ramp_refuses_nonfinite_values(config_key):
     setpoints = deepcopy(_setpoints())

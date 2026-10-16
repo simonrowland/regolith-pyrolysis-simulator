@@ -18,20 +18,9 @@ mirrors the way the simulator actually consumes vapor pressures
 (account filter, control_inputs, fO2 channel) that a direct adapter
 call would miss.
 
-Why we replace the registry's provider before dispatch
-------------------------------------------------------
-The default :class:`VapoRockProvider` instantiated by
-``PyrolysisSimulator.__init__`` is constructed with the
-``data/vapor_pressures.yaml`` payload, which restricts the diagnostic
-``vapor_pressures_Pa`` surface to the metal and declared oxide-vapor
-species ``EVAPORATION_FLUX`` knows how to consume (for example SiO and
-CrO2, with Fe represented by metallic Fe rather than FeO vapor).
-That filter is correct for production — emitting a broader species set
-crashes the downstream stoichiometry validator — but the §25 grid asks
-for SiO2 and O2 partial pressures too, which the filter drops. The test
-swaps in an *unfiltered* provider (constructed with
-``vapor_pressure_data=None``) so the full VapoRock vocabulary is
-visible.
+VapoRock full-speciation diagnostics retain the gas vocabulary produced
+by the backend, including species such as SiO2 and O2 that the builtin
+authoritative pressure surface does not expose.
 
 Acceptance gate (§25 cohort-1)
 ------------------------------
@@ -150,8 +139,8 @@ def _build_sim_for_anchor(
     §25 v1 feedstock metadata from
     :data:`tests.chemistry.corpus_fixtures.GRID_25_FEEDSTOCKS`.
 
-    ``engine='vaporock'``: swaps in an *unfiltered* VapoRock shadow so
-    SiO2 / O2 / etc. are visible in the diagnostic trace.
+    ``engine='vaporock'``: uses the registered VapoRock shadow, whose
+    full-speciation diagnostic includes SiO2 / O2 / etc.
 
     ``engine='builtin-antoine'``: uses the default builtin authoritative
     provider.
@@ -180,54 +169,12 @@ def _build_sim_for_anchor(
     sim.melt.temperature_C = anchor.T_K - 273.15
 
     setattr(sim, "_corpus_vapor_engine", engine)
-    if engine == "vaporock":
-        _install_unfiltered_vaporock(sim)
-    elif engine == "builtin-antoine":
-        pass
-    else:
+    if engine not in {"vaporock", "builtin-antoine"}:
         raise AssertionError(
             f"unknown engine {engine!r}; expected 'vaporock' or "
             f"'builtin-antoine'"
         )
     return sim
-
-
-def _install_unfiltered_vaporock(sim: PyrolysisSimulator) -> VapoRockProvider:
-    """Replace the registry's VapoRock with one that has no species filter.
-
-    The default provider construction inside
-    ``PyrolysisSimulator._build_chemistry_kernel`` passes the
-    ``data/vapor_pressures.yaml`` payload, which restricts the
-    diagnostic ``vapor_pressures_Pa`` surface to species the simulator's
-    downstream ``EVAPORATION_FLUX`` can consume. For the corpus parity
-    test we need the full VapoRock vocabulary (SiO2, O2, ...) so we
-    construct a fresh provider with ``vapor_pressure_data=None``.
-
-    The replacement preserves the same backend instance to keep the
-    lazy-init / availability probe behaviour the rest of the chemistry
-    suite relies on.
-    """
-    from simulator.chemistry.kernel.capabilities import ChemistryIntent
-
-    registry = sim._chem_registry
-    shadows = list(registry.shadows_for(ChemistryIntent.VAPOR_PRESSURE))
-    current = next((p for p in shadows if isinstance(p, VapoRockProvider)), None)
-    if current is None:
-        raise ProviderUnavailableError("VapoRock shadow is not registered")
-    unfiltered = VapoRockProvider(
-        backend=getattr(current, "_backend", None),
-        vapor_pressure_data=None,
-    )
-    # Mirror the lazy-init flag from the original so the new provider
-    # does not re-probe upstream library availability.
-    unfiltered._backend_initialised = getattr(
-        current, "_backend_initialised", False
-    )
-    registry._shadows[ChemistryIntent.VAPOR_PRESSURE] = [
-        unfiltered if provider is current else provider
-        for provider in shadows
-    ]
-    return unfiltered
 
 
 def _force_vaporock_unavailable(sim: PyrolysisSimulator) -> None:
