@@ -1,0 +1,147 @@
+schema_version: literature_extract.v1
+source_id: jugo-2010-sulfur-xanes
+source:
+  citation: "Jugo, P. J., Wilke, M. & Botcharnikov, R. E. (2010). Sulfur K-edge XANES analysis of natural and synthetic basaltic glasses: Implications for S speciation and S content as function of oxygen fugacity. Geochimica et Cosmochimica Acta 74, 5926-5938."
+  doi: 10.1016/j.gca.2010.07.022
+  year: 2010
+  corpus_asset: raw/jugo-2010-sulfur-xanes/jugo-2010-sulfur-xanes.pdf
+extraction:
+  method: Values transcribed from page renders. Table 4 ratios are measured_reduced from the authors' XANES calibration in Eq. 3; Table 2 provides conditions and Table 3 provides per-sample EPMA compositions. Natural-glass Table 5 values lack printed run temperature, pressure, and fO2 in this paper and are not assigned those conditions. Figure-only points are not digitised.
+  date: '2026-10-16'
+  worker: rdxw2-s10
+review_status: draft
+fidelity_samples:
+- species: S
+  observation_id: jugo_2010_table4_xanes_s6_fraction
+  field: row_count
+  value: 7
+  locator:
+    published_page: 5933
+    pdf_page_index: 7
+    table: '4'
+    note: Seven synthetic internally-heated pressure-vessel samples.
+species:
+  S:
+    observations:
+    - observation_id: jugo_2010_table4_xanes_s6_fraction
+      type: concentration_series
+      locator:
+        published_page: 5933
+        pdf_page_index: 8
+        table: '4'
+      phase: L
+      standard_state: S6+/ΣS as printed in percent
+      units: percent
+      uncertainty:
+        note: No uncertainty is printed for the Table 4 S6+/ΣS estimates.
+      derivation:
+        relation: Eq. 3 calibration of XANES peak-integral ratio against mixtures of SB-5 and SB-41 endpoint spectra
+        output_unit: percent
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {published_page: 5933, pdf_page_index: 7, figure: '8'}
+      values:
+        quantity: S6plus_over_sum_S
+        method_class: measured_reduced
+        admission_status: admitted
+        calibration: Eq. 3; XANES peak-integral calibration against SB-5 (100%) and SB-41 (0%)
+        points:
+        - label: SB-5
+          value: 100.83
+          T_C: 1050
+          point_conditions:
+            fO2_control: {state: {tag: value, value: 'FMQ+2.7'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            composition: {state: {tag: value, value: {SiO2: 47.48, TiO2: 1.61, Al2O3: 16.52, FeO: 7.90, MnO: 0.02, MgO: 5.44, CaO: 9.90, Na2O: 3.49, K2O: 1.95, P2O5: 0.54, S: 0.60}}, locator: {published_page: 5928, pdf_page_index: 2, table: '3'}}
+        - label: SB-15
+          value: 94.44
+          T_C: 1050
+          point_conditions:
+            fO2_control: {state: {tag: value, value: 'FMQ+1.8'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            composition: {state: {tag: value, value: {SiO2: 45.64, TiO2: 1.69, Al2O3: 15.73, FeO: 9.46, MnO: 0.14, MgO: 5.34, CaO: 10.25, Na2O: 3.40, K2O: 1.90, P2O5: 0.56, S: 0.60}}, locator: {published_page: 5928, pdf_page_index: 2, table: '3'}}
+        - label: SB-19
+          value: 91.33
+          T_C: 1050
+          point_conditions:
+            fO2_control: {state: {tag: value, value: 'FMQ+1.6'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            composition: {state: {tag: value, value: {SiO2: 45.41, TiO2: 1.71, Al2O3: 15.39, FeO: 9.90, MnO: 0.17, MgO: 5.21, CaO: 10.15, Na2O: 3.43, K2O: 1.89, P2O5: 0.49, S: 0.52}}, locator: {published_page: 5928, pdf_page_index: 2, table: '3'}}
+        - label: SB-35
+          value: 71.87
+          T_C: 1050
+          point_conditions:
+            fO2_control: {state: {tag: value, value: 'FMQ+1.3'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            composition: {state: {tag: value, value: {SiO2: 45.06, TiO2: 1.67, Al2O3: 15.22, FeO: 9.70, MnO: 0.12, MgO: 5.40, CaO: 10.13, Na2O: 3.20, K2O: 1.83, P2O5: 0.47, S: 0.41}}, locator: {published_page: 5928, pdf_page_index: 2, table: '3'}}
+        - label: SB-6
+          value: 40.41
+          T_C: 1050
+          point_conditions:
+            fO2_control: {state: {tag: value, value: 'FMQ+0.9'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            composition: {state: {tag: value, value: {SiO2: 45.72, TiO2: 1.70, Al2O3: 15.67, FeO: 9.56, MnO: 0.18, MgO: 5.48, CaO: 10.31, Na2O: 3.33, K2O: 1.88, P2O5: 0.53, S: 0.28}}, locator: {published_page: 5928, pdf_page_index: 2, table: '3'}}
+        - label: SB-36
+          value: 0.19
+          T_C: 1050
+          point_conditions:
+            fO2_control: {state: {tag: value, value: 'FMQ-0.1'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            composition: {state: {tag: value, value: {SiO2: 45.33, TiO2: 1.68, Al2O3: 15.69, FeO: 8.38, MnO: 0.13, MgO: 5.39, CaO: 10.09, Na2O: 3.32, K2O: 1.78, P2O5: 0.58, S: 0.12}}, locator: {published_page: 5928, pdf_page_index: 2, table: '3'}}
+        - label: SB-41
+          value: -0.24
+          T_C: 1050
+          point_conditions:
+            fO2_control: {state: {tag: value, value: 'FMQ-1.4'}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            pressure_MPa: {state: {tag: value, value: 200}, locator: {published_page: 5928, pdf_page_index: 2, table: '2'}}
+            composition: {state: {tag: value, value: {SiO2: 47.97, TiO2: 1.97, Al2O3: 17.39, FeO: 7.95, MnO: 0.17, MgO: 3.68, CaO: 7.90, Na2O: 4.28, K2O: 2.58, P2O5: 0.72, S: 0.07}}, locator: {published_page: 5928, pdf_page_index: 2, table: '3'}}
+    - observation_id: jugo_2010_eq10_sulfate_fraction_vs_delta_fmq_fit
+      type: concentration_series
+      locator:
+        published_page: 5935
+        pdf_page_index: 9
+        equation: '10'
+      phase: L
+      standard_state: S6+/ΣS fraction as a function of ΔFMQ
+      units: percent as printed; ΔFMQ
+      derived_from:
+      - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=b77ab6c54253
+      - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=7a57577814c0
+      - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=83ac5b5b305b
+      - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=497365d87119
+      - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=1d140014b00c
+      - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=c65599bd2d30
+      - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=2d2636f52b02
+      derivation:
+        relation: "Equation 10 fit to the seven stored synthetic S6+/ΣS rows against ΔFMQ: S6+/ΣS = 1 / (1 + 10^(A - BΔFMQ)); slope B is fixed at 2 and A is fitted."
+        output_unit: percent
+        inputs:
+        - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=b77ab6c54253
+        - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=7a57577814c0
+        - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=83ac5b5b305b
+        - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=497365d87119
+        - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=1d140014b00c
+        - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=c65599bd2d30
+        - jugo-2010-sulfur-xanes::jugo_2010_table4_xanes_s6_fraction::T=1323.15:h=2d2636f52b02
+        parameters:
+        - - A
+          - state: {tag: value, value: 2.1}
+            locator: {published_page: 5935, pdf_page_index: 9, equation: '10'}
+        - - A_uncertainty
+          - state: {tag: value, value: 0.1}
+            locator: {published_page: 5935, pdf_page_index: 9, equation: '10'}
+        - - B
+          - state: {tag: value, value: 2}
+            locator: {published_page: 5935, pdf_page_index: 9, equation: '10'}
+      values:
+        quantity: S6plus_over_sum_S_vs_delta_FMQ_function
+        method_class: model_derived
+        admission_status: typed_refusal
+        reason: schema_gap_function_valued_fit
+        unavailable_reason: schema_gap_function_valued_fit
+        printed_quantity: S6+/ΣS
+        printed_form: continuous fitted function of ΔFMQ
+        equation_as_printed: "S6+/ΣS = 1 / (1 + 10^(2.1 - 2ΔFMQ))"
+        A: 2.1
+        A_uncertainty: 0.1
+        B: 2
