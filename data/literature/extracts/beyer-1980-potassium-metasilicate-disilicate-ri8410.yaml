@@ -187,7 +187,7 @@ species:
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
-        reason: "source_internally_inconsistent: Table 3 footnote 2 marks this measurement as pretransition; it remains admitted as printed."
+        reason: "Table 3 footnote 2 identifies this measurement as pretransition; it remains admitted as printed."
         series: [{T_K: 503.0, enthalpy_increment: 9.020}]
     - observation_id: bey80_k2si2o5_crystal_pretransition_852_6
       type: heat_capacity_and_heat_content_series
@@ -198,7 +198,7 @@ species:
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
-        reason: "source_internally_inconsistent: Table 3 footnote 2 marks this measurement as pretransition; it remains admitted as printed."
+        reason: "Table 3 footnote 2 identifies this measurement as pretransition; it remains admitted as printed."
         series: [{T_K: 852.6, enthalpy_increment: 27.527}]
     - observation_id: bey80_k2si2o5_crystal_onset_1309_1
       type: heat_capacity_and_heat_content_series
@@ -209,7 +209,8 @@ species:
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; table marks pretransition and possible melting onset.
-        reason: "source_internally_inconsistent: Table 3 footnote 1 marks possible onset of melting; the authors exclude this point from their smooth fits."
+        reason: "out_of_certified_band: Table 3 footnote 1 marks possible onset of melting; the authors exclude this point from their smooth fits."
+        band: "298-1258 K"
         series: [{T_K: 1309.1, enthalpy_increment: 53.163}]
     - observation_id: bey80_k2si2o5_heat_content_glass_table3
       type: heat_capacity_and_heat_content_series
@@ -230,7 +231,8 @@ species:
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
-        reason: "source_internally_inconsistent: Table 3 footnote 3 marks partial conversion of glass to crystal; the authors exclude this point from their glass smooth fits."
+        reason: "out_of_certified_band: Table 3 footnote 3 marks partial conversion of glass to crystal; the authors exclude this point from their glass smooth fits."
+        band: "298-753.2 K"
         series: [{T_K: 805.4, enthalpy_increment: 24.614}]
     - observation_id: bey80_k2si2o5_glass_partial_903_2
       type: heat_capacity_and_heat_content_series
@@ -241,7 +243,8 @@ species:
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
-        reason: "source_internally_inconsistent: Table 3 footnote 3 marks partial conversion of glass to crystal; the authors exclude this point from their glass smooth fits."
+        reason: "out_of_certified_band: Table 3 footnote 3 marks partial conversion of glass to crystal; the authors exclude this point from their glass smooth fits."
+        band: "298-753.2 K"
         series: [{T_K: 903.2, enthalpy_increment: 30.854}]
     - observation_id: bey80_k2si2o5_glass_partial_956_0
       type: heat_capacity_and_heat_content_series
@@ -252,7 +255,8 @@ species:
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.
-        reason: "source_internally_inconsistent: Table 3 footnote 3 marks partial conversion of glass to crystal; the authors exclude this point from their glass smooth fits."
+        reason: "out_of_certified_band: Table 3 footnote 3 marks partial conversion of glass to crystal; the authors exclude this point from their glass smooth fits."
+        band: "298-753.2 K"
         series: [{T_K: 956.0, enthalpy_increment: 33.719}]
     - observation_id: bey80_k2si2o5_heat_content_liquid_table3
       type: heat_capacity_and_heat_content_series
@@ -342,7 +346,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
       derivation: {relation: Authors' smooth liquid reference function., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: cal/deg-mole}
-      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2si2o5_t5_liquid_row_1500 [{T_K: 1500, cp: 65.80, entropy: 135.0, neg_gibbs_over_T: 85.93, enthalpy_increment: 73.61}]}
+      values: {quantity: cp, method_class: model_derived, reason: "out_of_certified_band: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "1318-1450 K", series: &bey80_k2si2o5_t5_liquid_row_1500 [{T_K: 1500, cp: 65.80, entropy: 135.0, neg_gibbs_over_T: 85.93, enthalpy_increment: 73.61}]}
     - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_s_1500
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: S}
@@ -350,7 +354,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
       derivation: {relation: Entropy function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t5_liquid_row_1500}
+      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "1318-1450 K", series: *bey80_k2si2o5_t5_liquid_row_1500}
     - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_h_1500
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: H_T-H_298}
@@ -358,7 +362,7 @@ species:
       units: kcal/mole
       derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
       derivation: {relation: Enthalpy-increment function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: kcal/mole}
-      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t5_liquid_row_1500}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "out_of_certified_band: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "1318-1450 K", series: *bey80_k2si2o5_t5_liquid_row_1500}
     - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_cp_1550
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid}
@@ -366,7 +370,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
       derivation: {relation: Authors' smooth liquid reference function., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: cal/deg-mole}
-      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2si2o5_t5_liquid_row_1550 [{T_K: 1550, cp: 65.80, entropy: 137.2, neg_gibbs_over_T: 87.59, enthalpy_increment: 76.90}]}
+      values: {quantity: cp, method_class: model_derived, reason: "out_of_certified_band: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "1318-1450 K", series: &bey80_k2si2o5_t5_liquid_row_1550 [{T_K: 1550, cp: 65.80, entropy: 137.2, neg_gibbs_over_T: 87.59, enthalpy_increment: 76.90}]}
     - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_s_1550
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: S}
@@ -374,7 +378,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
       derivation: {relation: Entropy function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t5_liquid_row_1550}
+      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "1318-1450 K", series: *bey80_k2si2o5_t5_liquid_row_1550}
     - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_h_1550
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: H_T-H_298}
@@ -382,7 +386,7 @@ species:
       units: kcal/mole
       derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
       derivation: {relation: Enthalpy-increment function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: kcal/mole}
-      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t5_liquid_row_1550}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "out_of_certified_band: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "1318-1450 K", series: *bey80_k2si2o5_t5_liquid_row_1550}
     - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_cp_1600
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid}
@@ -390,7 +394,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
       derivation: {relation: Authors' smooth liquid reference function., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: cal/deg-mole}
-      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2si2o5_t5_liquid_row_1600 [{T_K: 1600, cp: 65.80, entropy: 139.3, neg_gibbs_over_T: 89.18, enthalpy_increment: 80.19}]}
+      values: {quantity: cp, method_class: model_derived, reason: "out_of_certified_band: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "1318-1450 K", series: &bey80_k2si2o5_t5_liquid_row_1600 [{T_K: 1600, cp: 65.80, entropy: 139.3, neg_gibbs_over_T: 89.18, enthalpy_increment: 80.19}]}
     - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_s_1600
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: S}
@@ -398,7 +402,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
       derivation: {relation: Entropy function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t5_liquid_row_1600}
+      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "1318-1450 K", series: *bey80_k2si2o5_t5_liquid_row_1600}
     - observation_id: bey80_k2si2o5_t5_liquid_extrapolated_h_1600
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 13, page: 14, published_page: 10, table: '5', row: K2Si2O5 liquid, column: H_T-H_298}
@@ -406,7 +410,7 @@ species:
       units: kcal/mole
       derived_from: [bey80_k2si2o5_heat_content_liquid_table3]
       derivation: {relation: Enthalpy-increment function from the same smooth reference table., inputs: [bey80_k2si2o5_heat_content_liquid_table3], output_unit: kcal/mole}
-      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t5_liquid_row_1600}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "out_of_certified_band: Table 5 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "1318-1450 K", series: *bey80_k2si2o5_t5_liquid_row_1600}
     - observation_id: bey80_k2si2o5_reference_glass_table6
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass}
@@ -441,7 +445,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Smoothed glass reference functions; values above 753 K are extrapolated after partial glass-to-crystal conversion., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2si2o5_t6_glass_row_800 [{T_K: 800, cp: 54.08, entropy: 46.34, neg_gibbs_over_T: 16.13, enthalpy_increment: 24.170}]}
+      values: {quantity: cp, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: &bey80_k2si2o5_t6_glass_row_800 [{T_K: 800, cp: 54.08, entropy: 46.34, neg_gibbs_over_T: 16.13, enthalpy_increment: 24.170}]}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_s_800
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: S}
@@ -449,7 +453,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t6_glass_row_800}
+      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_800}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_h_800
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
@@ -457,7 +461,7 @@ species:
       units: kcal/mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Enthalpy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: kcal/mole}
-      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t6_glass_row_800}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_800}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_cp_850
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass}
@@ -465,7 +469,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Smoothed glass reference functions; values above 753 K are extrapolated after partial glass-to-crystal conversion., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2si2o5_t6_glass_row_850 [{T_K: 850, cp: 54.97, entropy: 49.65, neg_gibbs_over_T: 18.01, enthalpy_increment: 26.895}]}
+      values: {quantity: cp, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: &bey80_k2si2o5_t6_glass_row_850 [{T_K: 850, cp: 54.97, entropy: 49.65, neg_gibbs_over_T: 18.01, enthalpy_increment: 26.895}]}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_s_850
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: S}
@@ -473,7 +477,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t6_glass_row_850}
+      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_850}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_h_850
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
@@ -481,7 +485,7 @@ species:
       units: kcal/mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Enthalpy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: kcal/mole}
-      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t6_glass_row_850}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_850}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_cp_900
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass}
@@ -489,7 +493,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Smoothed glass reference functions; values above 753 K are extrapolated after partial glass-to-crystal conversion., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2si2o5_t6_glass_row_900 [{T_K: 900, cp: 55.82, entropy: 52.82, neg_gibbs_over_T: 19.86, enthalpy_increment: 29.665}]}
+      values: {quantity: cp, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: &bey80_k2si2o5_t6_glass_row_900 [{T_K: 900, cp: 55.82, entropy: 52.82, neg_gibbs_over_T: 19.86, enthalpy_increment: 29.665}]}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_s_900
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: S}
@@ -497,7 +501,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Entropy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t6_glass_row_900}
+      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_900}
     - observation_id: bey80_k2si2o5_t6_glass_extrapolated_h_900
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 14, page: 15, published_page: 11, table: '6', row: K2Si2O5 glass, column: H_T-H_298}
@@ -505,7 +509,7 @@ species:
       units: kcal/mole
       derived_from: [bey80_k2si2o5_heat_content_glass_table3]
       derivation: {relation: Enthalpy function from Table 6., inputs: [bey80_k2si2o5_heat_content_glass_table3], output_unit: kcal/mole}
-      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2si2o5_t6_glass_row_900}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "out_of_certified_band: Table 6 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-750 K", series: *bey80_k2si2o5_t6_glass_row_900}
     - observation_id: bey80_k2si2o5_element_formation_h_table9
       type: gibbs_table
       locator: {pdf_page_index: 17, page: 18, published_page: 14, table: '9', row: K2Si2O5 crystal from elements, column: Hf}
@@ -657,7 +661,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2sio3_heat_content_direct]
       derivation: {relation: Authors' smoothed high-temperature properties derived from heat-content measurements and Stull low-temperature heat capacities., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
-      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2sio3_t4_row_1150 [{T_K: 1150, cp: 41.58, entropy: 81.46, neg_gibbs_over_T: 54.88, enthalpy_increment: 30.565}]}
+      values: {quantity: cp, method_class: model_derived, reason: "out_of_certified_band: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-1100 K", series: &bey80_k2sio3_t4_row_1150 [{T_K: 1150, cp: 41.58, entropy: 81.46, neg_gibbs_over_T: 54.88, enthalpy_increment: 30.565}]}
     - observation_id: bey80_k2sio3_t4_extrapolated_s_1150
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: S}
@@ -665,7 +669,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2sio3_heat_content_direct]
       derivation: {relation: Entropy function integrated from the authors' smoothed heat capacity., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2sio3_t4_row_1150}
+      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-1100 K", series: *bey80_k2sio3_t4_row_1150}
     - observation_id: bey80_k2sio3_t4_extrapolated_h_1150
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: H_T-H_298}
@@ -673,7 +677,7 @@ species:
       units: kcal/mole
       derived_from: [bey80_k2sio3_heat_content_direct]
       derivation: {relation: Authors' smoothed heat-content function., inputs: [bey80_k2sio3_heat_content_direct], output_unit: kcal/mole}
-      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2sio3_t4_row_1150}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "out_of_certified_band: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-1100 K", series: *bey80_k2sio3_t4_row_1150}
     - observation_id: bey80_k2sio3_t4_extrapolated_cp_1200
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal}
@@ -681,7 +685,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2sio3_heat_content_direct]
       derivation: {relation: Authors' smoothed high-temperature properties derived from heat-content measurements and Stull low-temperature heat capacities., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
-      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2sio3_t4_row_1200 [{T_K: 1200, cp: 42.18, entropy: 83.24, neg_gibbs_over_T: 56.03, enthalpy_increment: 32.655}]}
+      values: {quantity: cp, method_class: model_derived, reason: "out_of_certified_band: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-1100 K", series: &bey80_k2sio3_t4_row_1200 [{T_K: 1200, cp: 42.18, entropy: 83.24, neg_gibbs_over_T: 56.03, enthalpy_increment: 32.655}]}
     - observation_id: bey80_k2sio3_t4_extrapolated_s_1200
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: S}
@@ -689,7 +693,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2sio3_heat_content_direct]
       derivation: {relation: Entropy function integrated from the authors' smoothed heat capacity., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2sio3_t4_row_1200}
+      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-1100 K", series: *bey80_k2sio3_t4_row_1200}
     - observation_id: bey80_k2sio3_t4_extrapolated_h_1200
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: H_T-H_298}
@@ -697,7 +701,7 @@ species:
       units: kcal/mole
       derived_from: [bey80_k2sio3_heat_content_direct]
       derivation: {relation: Authors' smoothed heat-content function., inputs: [bey80_k2sio3_heat_content_direct], output_unit: kcal/mole}
-      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2sio3_t4_row_1200}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "out_of_certified_band: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-1100 K", series: *bey80_k2sio3_t4_row_1200}
     - observation_id: bey80_k2sio3_t4_extrapolated_cp_1249
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal}
@@ -705,7 +709,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2sio3_heat_content_direct]
       derivation: {relation: Authors' smoothed high-temperature properties derived from heat-content measurements and Stull low-temperature heat capacities., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
-      values: {quantity: cp, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: &bey80_k2sio3_t4_row_1249 [{T_K: 1249, cp: 42.77, entropy: 84.94, neg_gibbs_over_T: 57.13, enthalpy_increment: 34.740, melting_point: true}]}
+      values: {quantity: cp, method_class: model_derived, reason: "out_of_certified_band: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-1100 K", series: &bey80_k2sio3_t4_row_1249 [{T_K: 1249, cp: 42.77, entropy: 84.94, neg_gibbs_over_T: 57.13, enthalpy_increment: 34.740, melting_point: true}]}
     - observation_id: bey80_k2sio3_t4_extrapolated_s_1249
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: S}
@@ -713,7 +717,7 @@ species:
       units: cal/deg-mole
       derived_from: [bey80_k2sio3_heat_content_direct]
       derivation: {relation: Entropy function integrated from the authors' smoothed heat capacity., inputs: [bey80_k2sio3_heat_content_direct], output_unit: cal/deg-mole}
-      values: {quantity: S, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2sio3_t4_row_1249}
+      values: {quantity: S, method_class: model_derived, reason: "out_of_certified_band: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-1100 K", series: *bey80_k2sio3_t4_row_1249}
     - observation_id: bey80_k2sio3_t4_extrapolated_h_1249
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: H_T-H_298}
@@ -721,7 +725,7 @@ species:
       units: kcal/mole
       derived_from: [bey80_k2sio3_heat_content_direct]
       derivation: {relation: Authors' smoothed heat-content function., inputs: [bey80_k2sio3_heat_content_direct], output_unit: kcal/mole}
-      values: {quantity: H_minus_H298, method_class: model_derived, reason: "source_internally_inconsistent: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", series: *bey80_k2sio3_t4_row_1249}
+      values: {quantity: H_minus_H298, method_class: model_derived, reason: "out_of_certified_band: Table 4 parentheses identify this point as extrapolated beyond the authors' smooth-fit range.", band: "298-1100 K", series: *bey80_k2sio3_t4_row_1249}
     - observation_id: bey80_k2sio3_heat_content_direct
       type: heat_capacity_and_heat_content_series
       locator: {pdf_page_index: 11, page: 12, published_page: 8, table: '3', row: K2SiO3 crystal, column: H_T-H_298}
@@ -741,7 +745,8 @@ species:
         quantity: H_minus_H298
         method_class: measured_direct
         method: Copper-block drop calorimetry above 298.15 K; merged with Stull's low-temperature heat capacities for the smooth table.
-        reason: "source_internally_inconsistent: Table 3 footnote 1 marks possible onset of melting; the authors exclude this point from their smooth fits."
+        reason: "out_of_certified_band: Table 3 footnote 1 marks possible onset of melting; the authors exclude this point from their smooth fits."
+        band: "298-1103.3 K"
         series: [{T_K: 1195.0, enthalpy_increment: 32.846}]
     - observation_id: bey80_k2sio3_transition
       type: transition_point

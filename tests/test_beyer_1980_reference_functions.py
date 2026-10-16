@@ -7,6 +7,12 @@ import yaml
 
 from simulator.battery.enums import NoticeKind, Phase, Quantity
 from simulator.battery.migrate import Migrator
+from simulator.battery.records import Notice
+from simulator.battery.score import (
+    FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND,
+    FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+    flagged_strata,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -167,41 +173,57 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
         assert len(matches) == 1, (table, formula, phase, quantity, temperature)
         return matches[0]
 
-    source_disagreement_points = [
-        ("3", "K2Si2O5", Phase.CR, Quantity.H_MINUS_H298, "503.0"),
-        ("3", "K2Si2O5", Phase.CR, Quantity.H_MINUS_H298, "852.6"),
-        ("3", "K2Si2O5", Phase.CR, Quantity.H_MINUS_H298, "1309.1"),
-        ("3", "K2Si2O5", Phase.GLASS, Quantity.H_MINUS_H298, "805.4"),
-        ("3", "K2Si2O5", Phase.GLASS, Quantity.H_MINUS_H298, "903.2"),
-        ("3", "K2Si2O5", Phase.GLASS, Quantity.H_MINUS_H298, "956.0"),
-        ("3", "K2SiO3", Phase.CR, Quantity.H_MINUS_H298, "1195.0"),
+    out_of_band_points = [
+        ("3", "K2Si2O5", Phase.CR, Quantity.H_MINUS_H298, "1309.1", "298-1258 K"),
+        ("3", "K2Si2O5", Phase.GLASS, Quantity.H_MINUS_H298, "805.4", "298-753.2 K"),
+        ("3", "K2Si2O5", Phase.GLASS, Quantity.H_MINUS_H298, "903.2", "298-753.2 K"),
+        ("3", "K2Si2O5", Phase.GLASS, Quantity.H_MINUS_H298, "956.0", "298-753.2 K"),
+        ("3", "K2SiO3", Phase.CR, Quantity.H_MINUS_H298, "1195.0", "298-1103.3 K"),
     ]
-    for table, formula, phase, quantity, temperature in source_disagreement_points:
+    for table, formula, phase, quantity, temperature, band in out_of_band_points:
         observation = assert_noticed(
             table,
             formula,
             phase,
             quantity,
             temperature,
-            NoticeKind.SOURCE_DISAGREEMENT,
+            NoticeKind.OUT_OF_CERTIFIED_BAND,
         )
         notice = next(
             notice
             for notice in observation.notices
-            if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+            if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         )
-        if temperature in {"503.0", "852.6"}:
-            assert "pretransition" in notice.reason
-            assert observation.admission.status.value == "admitted"
-        elif table == "3" and formula == "K2SiO3":
-            assert "possible onset of melting" in notice.reason
-            assert "exclude" in notice.reason
-        elif table == "3" and phase is Phase.GLASS:
-            assert "partial conversion of glass to crystal" in notice.reason
-            assert "exclude" in notice.reason
-        else:
-            assert "possible onset of melting" in notice.reason
-            assert "exclude" in notice.reason
+        assert notice.band == band
+        assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND in flagged_strata(
+            observation.notices
+        )
+        assert FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT not in flagged_strata(
+            observation.notices
+        )
+
+    for temperature in ("503.0", "852.6"):
+        observation = next(
+            item
+            for item in stored
+            if item.locator.table == "3"
+            and item.identity.species.formula == "K2Si2O5"
+            and item.identity.species.phase.value is Phase.CR
+            and item.identity.quantity.value is Quantity.H_MINUS_H298
+            and item.identity.temperature_K.value == Decimal(temperature)
+        )
+        assert observation.admission.status.value == "admitted"
+        assert flagged_strata(observation.notices) == ()
+
+    source_inconsistency = Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(Quantity.H_MINUS_H298,),
+        reason="source_internally_inconsistent: legacy stratum remains diagnostic",
+        origin="test:legacy-source-inconsistency",
+    )
+    assert flagged_strata((source_inconsistency,)) == (
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+    )
 
     for table, formula, phase, temperatures in (
         ("4", "K2SiO3", Phase.CR, ("1150", "1200", "1249")),
@@ -210,26 +232,28 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
     ):
         for temperature in temperatures:
             for quantity in (Quantity.CP, Quantity.S, Quantity.H_MINUS_H298):
-                assert_noticed(
+                observation = assert_noticed(
                     table,
                     formula,
                     phase,
                     quantity,
                     temperature,
-                    NoticeKind.SOURCE_DISAGREEMENT,
+                    NoticeKind.OUT_OF_CERTIFIED_BAND,
                 )
                 notice = next(
                     notice
-                    for observation in stored
-                    if observation.locator.table == table
-                    and observation.identity.species.formula == formula
-                    and observation.identity.species.phase.value is phase
-                    and observation.identity.quantity.value is quantity
-                    and observation.identity.temperature_K.value == Decimal(temperature)
                     for notice in observation.notices
-                    if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+                    if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
                 )
                 assert "extrapolated" in notice.reason
+                assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND in flagged_strata(
+                    observation.notices
+                )
+                assert notice.band == {
+                    "4": "298-1100 K",
+                    "5": "1318-1450 K",
+                    "6": "298-750 K",
+                }[table]
 
     misprint = assert_noticed(
         "10",
@@ -251,7 +275,11 @@ def test_beyer_flagged_points_are_split_from_main_series_and_noticed():
         for observation in stored
         for notice in observation.notices
         if notice.kind
-        in {NoticeKind.SOURCE_DISAGREEMENT, NoticeKind.PROBABLE_SOURCE_MISPRINT}
+        in {
+            NoticeKind.OUT_OF_CERTIFIED_BAND,
+            NoticeKind.SOURCE_DISAGREEMENT,
+            NoticeKind.PROBABLE_SOURCE_MISPRINT,
+        }
         and observation.locator.table in {"3", "4", "5", "6", "10"}
     ]
-    assert len(noticed) == 35
+    assert len(noticed) == 33
