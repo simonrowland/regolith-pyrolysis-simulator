@@ -1731,6 +1731,13 @@ def test_step_overhead_composition_uses_real_condensation_residual():
     sim.overhead_model.update = _spy_update
     sim.step()
 
+    # Pre-refactor golden: the real step installs the upstream Fe projection.
+    assert {
+        species: pressure.hex()
+        for species, pressure in sim._melt_headspace_composition_mbar.items()
+    } == {"Fe": "0x1.7db4dbe81311dp-4"}
+    assert sim._melt_headspace_total_pressure_bar().hex() == "0x1.86de1049cde53p-14"
+
     residual_kg = seen["flux"].species_kg_hr["Fe"]
     assert 0.0 < residual_kg < evolved_kg
     expected_transport = sim.overhead_model.estimate_transport_state(
