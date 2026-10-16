@@ -180,6 +180,29 @@ def test_unbounded_low_ferric_band_prevents_precipitation(probe):
     assert result['native_fe_mol'] == 0.
 
 
+def test_gas_veto_preserves_saturation_and_reports_roots(reducing_probe):
+    result = _solve(reducing_probe, gas=lambda n: 0.)
+    assert result['native_fe_mol'] == 0.
+    assert result['native_fe_state']['native_fe_saturation']
+    notice = result['gas_limited_notice']
+    assert notice['flag'] == 'NATIVE_FE_GAS_LIMITED'
+    assert notice['melt_root_mol'] > 0.
+    assert notice['gas_root_mol'] == 0.
+    assert notice['gas_boundary_log'] == 0.
+
+
+def test_gas_veto_event_is_limited_not_empty_inventory(monkeypatch):
+    sim = _reducing_sim()
+    monkeypatch.setattr(sim, '_headspace_transport_pO2_bar_from_ledger',
+                        lambda *a, **kw: 1.)
+    result = sim._apply_native_fe_saturation_split()
+    assert result['native_fe_event_status'] == 'limited'
+    assert result['native_fe_event_reason'] == 'native_fe_gas_limited'
+    assert result['gas_limited_notice']['melt_root_mol'] > 0.
+    assert any(n['flag'] == 'NATIVE_FE_GAS_LIMITED'
+               for n in sim._redox_bound_notices_this_hr)
+
+
 def test_no_precipitation_above_melt_bound(probe):
     sim, controls, _ = probe
     inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')

@@ -7567,6 +7567,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         native_extent = self._compute_native_fe_saturation_extent()
         split = self._compute_fe_redox_split_diagnostic()
+        gas_notice = native_extent.get('gas_limited_notice')
+        if gas_notice is not None:
+            self._redox_bound_notices_this_hr = list(getattr(
+                self, '_redox_bound_notices_this_hr', [])) + [gas_notice]
         native_frac = max(
             0.0,
             float(native_extent.get('native_fe_frac', 0.0) or 0.0),
@@ -7591,11 +7595,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 native_fe_source_account = 'process.metal_phase'
                 native_fe_intent = ChemistryIntent.NATIVE_FE_METALLIC_TAP
         if native_fe_mol <= 1.0e-12:
-            event = {
-                'native_fe_event': 'no_native_fe_below_threshold',
-                'native_fe_event_reason': 'native_fe_inventory_below_threshold',
-                'native_fe_event_status': 'ok',
-            }
+            if gas_notice is not None:
+                event = {
+                    'native_fe_event': 'native_fe_gas_limited',
+                    'native_fe_event_reason': 'native_fe_gas_limited',
+                    'native_fe_event_status': 'limited',
+                    'gas_limited_notice': gas_notice,
+                }
+            elif native_extent['native_fe_state'].get('saturation_status') == 'INDETERMINATE':
+                event = {
+                    'native_fe_event': 'native_fe_saturation_indeterminate',
+                    'native_fe_event_reason': 'within_propagated_inverse_band',
+                    'native_fe_event_status': 'INDETERMINATE',
+                    'saturation_notice': native_extent['native_fe_state']['saturation_notice'],
+                }
+            else:
+                event = {
+                    'native_fe_event': 'no_native_fe_below_threshold',
+                    'native_fe_event_reason': 'native_fe_inventory_below_threshold',
+                    'native_fe_event_status': 'ok',
+                }
             self._last_native_fe_saturation_event = dict(event)
             return {**split, **event}
         partition = self._native_fe_partition_diagnostic(native_fe_mol)

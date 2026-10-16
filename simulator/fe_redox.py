@@ -1080,6 +1080,15 @@ class NativeFePrecipitationNotice:
     flag: str = 'NATIVE_FE_PRECIPITATION'
 
 
+@dataclass(frozen=True)
+class NativeFeGasLimitedNotice:
+    melt_root_mol: float
+    gas_root_mol: float
+    gas_boundary_log: float
+    iw_bound_log: float
+    flag: str = 'NATIVE_FE_GAS_LIMITED'
+
+
 def native_fe_equilibrium_extent(
     *, comp_wt: Mapping[str, float], feo_mol: float, fe2o3_mol: float,
     T_K: float, pressure_bar: float,
@@ -1161,10 +1170,14 @@ def native_fe_equilibrium_extent(
                  'melt' if melt_root < gas_root else 'gas')
     after, final = state(n)
     fraction = n / total_fe
+    gas_notice = (asdict(NativeFeGasLimitedNotice(
+        melt_root_mol=melt_root, gas_root_mol=gas_root,
+        gas_boundary_log=gas_fO2_log(n), iw_bound_log=float(final['iw_bound_log']),
+    )) if gas_root < melt_root else None)
     return {
         'native_fe_mol': n, 'native_fe_frac': fraction,
-        'native_fe_state': {**initial, 'native_fe_frac': fraction,
-                            'native_fe_saturation': n > 0.0},
+        'native_fe_state': {**initial, 'native_fe_frac': fraction},
+        'gas_limited_notice': gas_notice,
         'fO2_before_log': before, 'fO2_after_log': after,
         'iw_bound_after_log': final['iw_bound_log'], 'limit': limit,
         'melt_root_mol': melt_root, 'gas_root_mol': gas_root,
