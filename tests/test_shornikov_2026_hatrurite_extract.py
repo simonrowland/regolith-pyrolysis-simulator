@@ -132,7 +132,6 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
             for item in document["species"][formula]["observations"]
             if item["observation_id"].startswith("shornikov_2026_table2_")
         )
-        assert row["condensed_form"] == "liquid"
         assert row["values"]["reservoir_formula"] == "Ca3SiO5"
         assert row["values"]["standard_state"] == f"partial pressure of {gas_formula}(g)"
         migrated = [
@@ -146,8 +145,28 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
             record.identity.species.phase.is_value
             and record.identity.species.phase.value.value == "g"
             and record.identity.composition.is_value
+            and record.identity.reservoir is not None
+            and record.identity.reservoir.is_value
+            and record.identity.reservoir.value.formula == "Ca3SiO5"
+            and record.identity.reservoir.value.phase.value == "cr"
             for record in migrated
         )
+        if formula == "CaSiO3":
+            for record in migrated:
+                reaction = record.identity.reaction
+                assert reaction is not None and reaction.is_value
+                assert {
+                    (
+                        term.species.formula,
+                        term.species.phase.value.value,
+                        term.coefficient,
+                    )
+                    for term in reaction.value.terms
+                } == {
+                    ("Ca3SiO5", "cr", -1),
+                    ("CaSiO3", "g", 1),
+                    ("CaO", "g", 2),
+                }
 
     # A closed Knudsen cell does not state oxygen fugacity or in-cell total
     # pressure. Composition, temperature, and gas species are known.
