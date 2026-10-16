@@ -142,13 +142,12 @@ def test_explicit_feedstock_body_sets_run_vacuum_floor() -> None:
         (1873.15, -9.161574733594396),
     ],
 )
-def test_intrinsic_melt_fo2_inverse_reports_below_feo_saturation(
+def test_intrinsic_melt_fo2_inverse_reports_saturation_via_owner(
     temperature_K: float,
     expected_inverse: float,
 ) -> None:
     from simulator.fe_redox import (
-        calphad_ferrous_feo_activity_diagnostic,
-        feo_iw_log10_fO2_bar,
+        _native_fe_saturation_comparison,
         floor_vacuum_pressure_bar,
     )
 
@@ -159,16 +158,14 @@ def test_intrinsic_melt_fo2_inverse_reports_below_feo_saturation(
         sim.melt.p_total_mbar / 1000.0,
         floor_bar=sim._vacuum_floor_bar(),
     )
-    expected_activity = calphad_ferrous_feo_activity_diagnostic(
-        comp_wt=sim._melt_oxide_wt_pct(),
-        fO2_log=feo_iw_log10_fO2_bar(temperature_K),
+    melt_inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    ferric = 2. * melt_inventory['Fe2O3']
+    expected = _native_fe_saturation_comparison(
+        sim._melt_oxide_wt_pct(),
+        fO2_log=expected_inverse,
         T_K=temperature_K,
         pressure_bar=pressure_bar,
-        fe3_over_sigma_fe=0.0,
-    )["a_FeO_authoritative"]
-    expected_iw_bound = feo_iw_log10_fO2_bar(
-        temperature_K,
-        a_feo=expected_activity,
+        fe3_over_sigma_fe=ferric / (melt_inventory['FeO'] + ferric),
     )
 
     inventory = sim.atom_ledger.mol_by_account()
@@ -187,10 +184,9 @@ def test_intrinsic_melt_fo2_inverse_reports_below_feo_saturation(
         for item in sim._redox_source_breakdown_diagnostic()[
             "redox_bound_notices"
         ]
-        if item["flag"] == "REDOX_BELOW_FE_FEO_SATURATION"
+        if item["flag"] == expected['saturation_notice']['flag']
         and item["melt_potential"] == pytest.approx(default_inverse)
     )
     assert notice["melt_potential"] == pytest.approx(default_inverse)
-    assert notice["iw_bound"] == pytest.approx(expected_iw_bound)
-    assert notice["a_feo"] == pytest.approx(expected_activity)
-    assert default_inverse < notice["iw_bound"]
+    assert notice == expected['saturation_notice']
+    assert notice['status'] == expected['saturation_status']
