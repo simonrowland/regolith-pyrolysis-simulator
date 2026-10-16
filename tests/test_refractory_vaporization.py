@@ -28,11 +28,24 @@ VALIDATION_PATH = (
     / "literature"
     / "refractory_vaporization_validation.yaml"
 )
+CAO_EXTRACT_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "data"
+    / "literature"
+    / "extracts"
+    / "shornikov-2025-calcium-oxide-evaporation.yaml"
+)
 
 
 @pytest.fixture(scope="module")
 def literature() -> dict:
     with VALIDATION_PATH.open() as handle:
+        return yaml.safe_load(handle)
+
+
+@pytest.fixture(scope="module")
+def cao_extract() -> dict:
+    with CAO_EXTRACT_PATH.open() as handle:
         return yaml.safe_load(handle)
 
 
@@ -117,16 +130,32 @@ def test_alumina_Al_bearing_vapor_crosses_nasa_screen(
 
 def test_cao_kems_raw_points_are_preserved_and_fit_within_reported_uncertainty(
     literature: dict,
+    cao_extract: dict,
 ) -> None:
     anchor = literature["cao_reducing_cell_kems"]
     fit = anchor["fitted_log10_pCa_atm"]
-    for point in anchor["raw_pCa"]:
+    assert anchor["raw_pCa"] == []
+    raw_points = cao_extract["species"]["Ca"]["observations"][0]["values"]["points"]
+    assert len(raw_points) == 15
+    points_by_temperature = {
+        float(point["T_K"]): float(point["pressure_atm"])
+        for point in raw_points
+    }
+    assert {
+        temperature: points_by_temperature[temperature]
+        for temperature in (1812.0, 1913.0, 2000.0, 2100.0)
+    } == {
+        1812.0: 6.59e-8,
+        1913.0: 4.09e-7,
+        2000.0: 1.76e-6,
+        2100.0: 7.85e-6,
+    }
+    for temperature_K, pressure_atm in points_by_temperature.items():
         fitted = 10.0 ** (
-            fit["intercept"]
-            + fit["inverse_temperature_coefficient_K"] / point["temperature_K"]
+            fit["intercept"] + fit["inverse_temperature_coefficient_K"] / temperature_K
         )
         assert fitted == pytest.approx(
-            point["pressure_atm"],
+            pressure_atm,
             rel=anchor["pressure_uncertainty_relative_max"],
         )
 
