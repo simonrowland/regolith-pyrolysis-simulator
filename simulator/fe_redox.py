@@ -1174,6 +1174,29 @@ def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, di
     # native metal and nonoxide masses; use a nonzero corrected oxide as probe.
     probe = next(k for k, v in prepared['composition_wt_pct'].items() if v > 0.0)
     factor = complete[probe] / prepared['composition_wt_pct'][probe]
+    # The cleanup dose is per tonne of the original complete analysis. If its
+    # mass is A and ferric oxygen adds dA, sulfate and its stoichiometric C dose
+    # both scale by A/(A+dA). Since factor=100/(A+dA), this is 1-factor*dA/100.
+    # All masses use the same 100 g analysis basis; the ratio is dimensionless
+    # and becomes one when no oxygen is added, even when A is not 100 g.
+    added_oxygen = sum(prepared['composition_wt_pct'].values()) - sum(comp.values())
+    dose_scale = 1.0 - factor * added_oxygen / 100.0
+    cleanup = prepared.get('stage0_carbon_cleanup')
+    if isinstance(cleanup, Mapping):
+        prepared['stage0_carbon_cleanup'] = dict(cleanup)
+    for declaration, key in (
+        (prepared, 'stage0_carbon_reductant_kg_per_tonne'),
+        (prepared.get('stage0_carbon_cleanup'), 'carbon_reductant_kg_per_tonne'),
+    ):
+        if not isinstance(declaration, dict):
+            continue
+        value = declaration.get(key)
+        if is_declared_real_scalar(value) and isinstance(value, (int, float)):
+            declaration[key] = float(value) * dose_scale
+        elif isinstance(value, (list, tuple)) and len(value) == 2 and all(
+            is_declared_real_scalar(v, allow_numeric_str=True) for v in value
+        ):
+            declaration[key] = [float(v) * dose_scale for v in value]
     return prepared, {
         **result, 'method': 'predicted_kress91_split',
         'condition': ('condition_defaulted' if anchor.get('estimated', True)

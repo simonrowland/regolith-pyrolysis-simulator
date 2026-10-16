@@ -11607,6 +11607,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _carbon_reductant_required_kg(
         cls, feedstock: Mapping[str, Any], batch_mass_kg: float
     ) -> float:
+        feedstock, _ = initialize_feedstock_iron(feedstock)
         raw_value = feedstock.get('stage0_carbon_reductant_kg_per_tonne')
         cleanup = feedstock.get('stage0_carbon_cleanup') or {}
         if not isinstance(cleanup, Mapping):

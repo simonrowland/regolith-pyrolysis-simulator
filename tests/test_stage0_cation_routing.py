@@ -468,6 +468,42 @@ def test_feso4_sulfide_carbothermal_route_balances_fes_and_four_co(
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
 
 
+@pytest.mark.parametrize("analysis_scale", [1.0, 0.8])
+@pytest.mark.parametrize("ranged_dose", [False, True])
+@pytest.mark.parametrize("legacy_declaration", [False, True])
+def test_caso4_carbon_requirement_shares_prepared_sulfate_basis(
+    mars_caso4_sulfide_feedstock, analysis_scale, ranged_dose, legacy_declaration,
+):
+    from simulator.fe_redox import initialize_feedstock_iron
+    from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
+
+    feedstock = dict(mars_caso4_sulfide_feedstock)
+    feedstock["composition_wt_pct"] = {
+        species: mass * analysis_scale
+        for species, mass in feedstock["composition_wt_pct"].items()
+    }
+    feedstock["stage0_carbon_cleanup"] = dict(feedstock["stage0_carbon_cleanup"])
+    registry = _sim({"test": feedstock}).species_formula_registry
+    declared = _expected_caso4_sulfide_carbon_cleanup(50.0, registry)["C"]
+    dose = [declared / 2, declared * 1.5] if ranged_dose else declared
+    if legacy_declaration:
+        feedstock["stage0_carbon_reductant_kg_per_tonne"] = dose
+    else:
+        feedstock["stage0_carbon_cleanup"]["carbon_reductant_kg_per_tonne"] = dose
+    prepared, _ = initialize_feedstock_iron(feedstock)
+    sulfate_kg = normalized_feedstock_component_masses_kg(feedstock, 1000.0)["CaSO4"]
+    expected = _expected_caso4_sulfide_carbon_cleanup(sulfate_kg, registry)["C"]
+
+    for analysis in (feedstock, prepared):
+        assert PyrolysisSimulator._carbon_reductant_required_kg(
+            analysis, 1000.0
+        ) == pytest.approx(expected, rel=0, abs=1e-12)
+    assert feedstock["stage0_carbon_cleanup"]["carbon_reductant_kg_per_tonne"] == (
+        mars_caso4_sulfide_feedstock["stage0_carbon_cleanup"]["carbon_reductant_kg_per_tonne"]
+        if legacy_declaration else dose
+    )
+
+
 def test_caso4_sulfide_carbothermal_routes_s_to_matte_and_four_co_per_sulfate(
     mars_caso4_sulfide_feedstock,
 ):
