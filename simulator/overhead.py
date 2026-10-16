@@ -1135,9 +1135,16 @@ class OverheadGasModel:
                 if species in {'O2', carrier}:
                     flows[species] = rate
         if O2_flow_mol_hr > 0.0:
-            flows['O2'] = O2_flow_mol_hr
+            flows['O2'] = (
+                max(flows.get('O2', 0.0), O2_flow_mol_hr)
+                if 'O2' in self._pressure_commands(melt)[1]
+                else O2_flow_mol_hr
+            )
         if not has_live_inlet or not self.last_stream_boundary.get('carrier_species'):
-            flows = self.flowing_stream_mol_hr(flows, melt, report_transport_state)
+            flows = self.flowing_stream_mol_hr(
+                flows, melt, report_transport_state,
+                headspace_volume_m3=gas.headspace_volume_m3,
+            )
             gas.pressure_mbar = self.last_stream_boundary['pressure_mbar']
         if self._finite_headspace_enabled:
             self._update_finite_headspace(
@@ -1291,10 +1298,19 @@ class OverheadGasModel:
         flows = {s: _required_finite_nonnegative_float(q, f'stream.{s}.mol_hr')
                  for s, q in flows.items()}
         atmosphere = getattr(melt.atmosphere, 'name', '')
+        _, supplied_partials = self._pressure_commands(melt)
+        controlled = atmosphere in {'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE'}
         carrier = str(getattr(melt, 'background_gas_species', '') or '')
         if atmosphere in {'PN2_SWEEP', 'ARGON_FLOW', 'CO2_BACKPRESSURE'}:
             carrier = carrier or {'PN2_SWEEP': 'N2', 'ARGON_FLOW': 'Ar',
                                   'CO2_BACKPRESSURE': 'CO2'}[atmosphere]
+            if atmosphere == 'CO2_BACKPRESSURE' and not any(q > 0.0 and s != carrier for s, q in flows.items()):
+                pressure_mbar = sum(supplied_partials.values())
+        elif controlled:
+            carrier = carrier if carrier in supplied_partials else ('O2' if melt.pO2_mbar > 0.0 else '')
+            # No emitted gas fills the unspecified remainder of a lab mixture.
+            if not any(q > 0.0 and s not in supplied_partials for s, q in flows.items()):
+                pressure_mbar = sum(supplied_partials.values())
         else:
             carrier = ''
         self.last_stream_boundary = {
@@ -1319,15 +1335,35 @@ class OverheadGasModel:
                 species_kg_for_M_avg=mixture,
             )
             throughput = capacity * 3600.0 / mean_mass
+            if controlled and pressure_mbar > 0.0:
+                oxygen_target = supplied_partials.get('O2', 0.0)
+                nonoxygen = sum(q for s, q in flows.items() if s != 'O2')
+                # With no background makeup, Dalton's law fixes the dose:
+                # qO2/(qO2+q_other)=pO2/P => qO2=q_other*pO2/(P-pO2).
+                # mol/hr on both sides; zero other flow uses the pure supply.
+                # The controlled outlet can throttle below the open pipe limit.
+                if carrier == 'O2' and nonoxygen > 0.0 and pressure_mbar > oxygen_target:
+                    oxygen_flow = nonoxygen * oxygen_target / (pressure_mbar - oxygen_target)
+                else:
+                    oxygen_flow = throughput * oxygen_target / pressure_mbar
+                flows['O2'] = max(flows.get('O2', 0.0), oxygen_flow)
             # Steady outlet balance: q_carrier = Q_out - sum(q_noncarrier).
             # mol/hr throughout. At zero emitted flow the pure sweep survives.
             required_carrier = throughput - sum(q for s, q in flows.items() if s != carrier)
+            if controlled:
+                if carrier == 'O2':
+                    required_carrier = flows['O2']
+                else:
+                    required_carrier = min(required_carrier, throughput * supplied_partials[carrier] / pressure_mbar)
             self.last_stream_boundary.update(provenance='ideal_regulator_open_duct',
                                              required_carrier_out_mol_hr=required_carrier)
             if required_carrier >= 0.0:
-                flows[carrier] = required_carrier
+                flows[carrier] = max(flows.get(carrier, 0.0), required_carrier) if controlled else required_carrier
             else:
-                flows[carrier] = 0.0
+                if controlled:
+                    flows.setdefault(carrier, 0.0)
+                else:
+                    flows[carrier] = 0.0
                 self.stream_physics_notices.append({
                     'reason': 'stream_carrier_boundary_infeasible', 'status': 'extrapolated',
                     'required_carrier_out_mol_hr': required_carrier,
@@ -1405,13 +1441,14 @@ class OverheadGasModel:
         tick = getattr(melt, 'hour', None)
         if getattr(self, '_stream_inventory_tick', None) != tick:
             self._stream_inventory_start = dict(getattr(self, '_stream_carrier_inventory', {}))
+            self._stream_carrier_inventory = {}
             self._stream_inventory_tick = tick
         previous = getattr(self, '_stream_inventory_start', {}).get(
             carrier, float(holdup_mol.get(carrier, 0.0)))
         makeup = outlet_mol_hr + (n_now - previous) / 1.0
         self.last_stream_boundary['carrier_inlet_makeup_mol_hr'] = makeup
         self.last_stream_boundary['carrier_inventory_change_mol'] = n_now - previous
-        self._stream_carrier_inventory = {carrier: n_now}
+        self._stream_carrier_inventory = {**getattr(self, '_stream_carrier_inventory', {}), carrier: n_now}
         if makeup < 0.0:
             self.stream_physics_notices.append({
                 'reason': 'stream_carrier_makeup_infeasible', 'status': 'extrapolated',
@@ -1427,8 +1464,21 @@ class OverheadGasModel:
                                   mre_anode_O2_mol_hr: float) -> None:  # mol/hr — MRE anode O2 flow
         inventory = dict(overhead_holdup_mol)
         carrier = self.last_stream_boundary.get('carrier_species', '')
+        _, supplied_partials = self._pressure_commands(melt)
+        mol_per_mbar = 100.0 * gas.headspace_volume_m3 / (GAS_CONSTANT * gas.headspace_temperature_K)
+        if getattr(melt.atmosphere, 'name', '') in {'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE'}:
+            # Supplied gas is actual regulator stock. n=pV/RT [mol]; adding
+            # makeup cannot remove an evolved inventory already above target.
+            for species, target in supplied_partials.items():
+                if species == carrier and species != 'O2':
+                    continue
+                n_now = max(float(inventory.get(species, 0.0)), target * mol_per_mbar)
+                self._update_stream_carrier_inventory(
+                    species, n_now, self.last_stream_mol_hr.get(species, 0.0), melt, inventory,
+                )
+                inventory[species] = n_now
         outlet_mol_hr = self.last_stream_mol_hr.get(carrier, 0.0)
-        if carrier and outlet_mol_hr > 0.0:
+        if carrier and carrier != 'O2' and (outlet_mol_hr > 0.0 or carrier in supplied_partials):
             # The ideal regulated supply inferred by the open-duct owner also
             # fills the finite vessel. Target n=PV/(RT) [Pa*m³/(J/mol)=mol];
             # subtract actual noncarrier mol, rather than adding a commanded
@@ -1437,15 +1487,18 @@ class OverheadGasModel:
             # retain it and let the target-miss diagnostic below report it.
             # Actual carrier stock has already survived the ledger bleed;
             # regulator makeup cannot erase it either.
-            target_mol = (float(melt.p_total_mbar) * 100.0 * gas.headspace_volume_m3
-                          / (GAS_CONSTANT * gas.headspace_temperature_K))
-            n_now = max(float(inventory.get(carrier, 0.0)), target_mol - sum(
-                n for species, n in inventory.items() if species != carrier))
+            target_mol = float(melt.p_total_mbar) * mol_per_mbar
+            remaining_mol = target_mol - sum(n for species, n in inventory.items() if species != carrier)
+            if carrier in supplied_partials:
+                remaining_mol = min(remaining_mol, supplied_partials[carrier] * mol_per_mbar)
+            n_now = max(float(inventory.get(carrier, 0.0)), remaining_mol)
             self._update_stream_carrier_inventory(
                 carrier, n_now, outlet_mol_hr, melt, inventory,
             )
             self._stream_inventory_report_tick = getattr(melt, 'hour', None)
             inventory[carrier] = n_now
+        if supplied_partials:
+            self._stream_inventory_report_tick = getattr(melt, 'hour', None)
         partials_bar = self._compute_partial_pressures(  # bar — species partial pressures
             inventory,
             gas.headspace_volume_m3,
