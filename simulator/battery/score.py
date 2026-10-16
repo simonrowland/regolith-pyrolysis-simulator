@@ -4287,6 +4287,15 @@ def _predict_fe_redox(
                     authority=authority,
                 ),
             )
+        notices += tuple(
+            Notice(
+                kind=NoticeKind.SOURCE_DISAGREEMENT,
+                affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                reason=str(flag),
+                origin="openimcc.evaluate_redox",
+            )
+            for flag in result.flags
+        )
         prediction_identity = replace(
             identity,
             composition=composition_state,
