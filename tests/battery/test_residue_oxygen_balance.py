@@ -316,6 +316,63 @@ def _relative_residual_at(
     return abs(oxygen_flux - parent_flux) / max(oxygen_flux, parent_flux, 1.0e-300)
 
 
+def _boundary_test_channels() -> tuple[_VacuumOxygenChannel, ...]:
+    source = "bracket-boundary test"
+    return (
+        _VacuumOxygenChannel(
+            species="O2",
+            molar_mass_kg_per_mol=1.0,
+            oxygen_atoms=2.0,
+            parent_oxygen_demand=0.0,
+            pO2_exponent=1.0,
+            alpha=1.0,
+            alpha_source=source,
+        ),
+        _VacuumOxygenChannel(
+            species="Fe",
+            molar_mass_kg_per_mol=1.0,
+            oxygen_atoms=0.0,
+            parent_oxygen_demand=1.0,
+            pO2_exponent=-0.5,
+            alpha=1.0,
+            alpha_source=source,
+        ),
+    )
+
+
+def _boundary_test_pressure_model(root_logp: float):
+    def pressure_model(logp: float) -> dict[str, float]:
+        displacement = logp - root_logp
+        return {
+            "O2": 10.0**displacement,
+            "Fe": 2.0 * 10.0 ** (-0.5 * displacement),
+        }
+
+    return pressure_model
+
+
+def test_vacuum_oxygen_balance_marks_a_root_on_the_lower_bracket() -> None:
+    result = _solve_vacuum_oxygen_balance(
+        _boundary_test_pressure_model(-20.0),
+        _boundary_test_channels(),
+        temperature_K=1500.0,
+        bracket_log10_pO2_bar=(-20.0, -5.0),
+    )
+
+    assert result.bracket_boundary == "lower"
+
+
+def test_vacuum_oxygen_balance_leaves_an_interior_root_unmarked() -> None:
+    result = _solve_vacuum_oxygen_balance(
+        _boundary_test_pressure_model(-12.5),
+        _boundary_test_channels(),
+        temperature_K=1500.0,
+        bracket_log10_pO2_bar=(-20.0, -5.0),
+    )
+
+    assert result.bracket_boundary is None
+
+
 def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted() -> None:
     temperature_K, _total_pressure_bar, _composition_kg = _hashimoto_start()
     models = _engine_models()
@@ -500,6 +557,46 @@ def test_residue_two_channel_hkl_and_parent_stoichiometric_anchors() -> None:
     )
 
 
+def test_residue_integrator_retains_floor_steps_and_time_fraction(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.residue as residue
+
+    original_solve = residue._solve_vacuum_oxygen_balance
+    calls = 0
+
+    def mark_middle_step(*args, **kwargs):
+        nonlocal calls
+        result = original_solve(*args, **kwargs)
+        calls += 1
+        return replace(result, bracket_boundary="lower" if calls == 2 else None)
+
+    monkeypatch.setattr(residue, "_solve_vacuum_oxygen_balance", mark_middle_step)
+
+    def pressure_model(inventory: dict[str, float], log10_pO2_bar: float):
+        pO2_bar = 10.0**log10_pO2_bar
+        return {
+            "Fe": 1.0e-3 * inventory.get("FeO", 0.0) / math.sqrt(pO2_bar),
+            "O2": 1.0e5 * pO2_bar,
+        }
+
+    result = residue.integrate_residue_inventory(
+        {"FeO": 1.0e-3},
+        (_residue_channels()[0], _residue_channels()[2]),
+        pressure_model,
+        temperature_K=2073.0,
+        duration_s=90.0,
+        area_evolution_m2=(1.0e-4, 1.0e-4, 1.0e-4),
+    )
+
+    assert result.pO2_balance_bracket_boundary_by_step == (None, "lower", None)
+    assert result.pO2_balance_floor_steps == 1
+    assert result.pO2_balance_floor_first_step == 2
+    assert result.pO2_balance_floor_time_fraction == pytest.approx(1.0 / 3.0)
+    assert result.pO2_balance_floor_time_s == pytest.approx(30.0)
+    assert result.pO2_balance_floor_pO2_bar == result.pO2_bar_by_step[1]
+
+
 def test_buffered_residue_keeps_printed_fo2_and_accounts_reservoir_exchange() -> None:
     from simulator.battery.residue import ResidueChannel, integrate_residue_inventory
 
@@ -651,7 +748,7 @@ def test_hashimoto_exhaustion_is_removed_before_either_engine_and_atom_closes(
 
     # IA and OpenIMCC both enter the same engine-neutral integration policy.
     assert engine in {"IA", "openimcc"}
-    values, _pO2, exhausted, refusal, atom_closure = _hashimoto_integrate_geometry(
+    values, _pO2, exhausted, refusal, atom_closure, _floor = _hashimoto_integrate_geometry(
         starting,
         _residue_channels(),
         engine_pressure,
