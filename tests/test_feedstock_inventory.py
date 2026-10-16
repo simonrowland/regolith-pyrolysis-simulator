@@ -1122,7 +1122,8 @@ def test_stage0_carbon_cleanup_debits_process_reagent_inventory():
     assert sim.atom_ledger.kg_by_account(
         "process.reagent_inventory").get("C", 0.0) == pytest.approx(0.0)
     assert sim.atom_ledger.kg_by_account(
-        "reservoir.reagent.C").get("C", 0.0) == pytest.approx(0.0)
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "reservoir.reagent.C").get("C", 0.0) == pytest.approx(0.02219727511238506)
     assert "process.stage0_carbon_reductant" not in sim.atom_ledger.kg_by_account()
 
 
@@ -1182,8 +1183,10 @@ def test_surplus_c_reports_unspent():
         }
     )
     sim.load_batch("mars", mass_kg=1000.0, additives_kg={"C": 50.0})
-    assert sim.product_ledger()["consumed_C_reagent"] == pytest.approx(45.0)
-    assert sim.product_ledger()["unspent_C_reagent"] == pytest.approx(5.0)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert sim.product_ledger()["consumed_C_reagent"] == pytest.approx(44.97780272488762)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert sim.product_ledger()["unspent_C_reagent"] == pytest.approx(5.0221972751123785)
 
 
 def test_mars_carbon_cleanup_requires_carbon_additive():
