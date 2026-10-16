@@ -1,0 +1,1046 @@
+schema_version: literature_extract.v1
+source_id: smythe-brenan-2015-cerium-redox
+source:
+  citation: "Smythe, D. J. & Brenan, J. M. (2015), Cerium oxidation state in silicate melts, Geochimica et Cosmochimica Acta 170:173-187."
+  doi: 10.1016/j.gca.2015.09.006
+  url: https://doi.org/10.1016/j.gca.2015.09.006
+  year: 2015
+extraction:
+  method: "Table 3 values and parenthetical widths transcribed from rendered PDF pages 39-41. Samples joined to Table 2 run conditions and Table 1 starting materials. The Fig. 4 caption identifies Table 2 log fO2 as delta FMQ; noble-metal buffer labels are retained. Printed pressure in GPa is converted to Pa using the exact SI factor. Confidence level for parenthetical widths is not stated. Table 1 gives CeO2 only as a 1.0-1.2 wt% range; this range is retained and no point amount inferred. Figure-only candidates are not extracted."
+  date: '2026-10-16'
+  worker: rdxw2-ce15
+review_status: draft
+corrections: []
+fidelity_samples:
+  - species: Ce
+    observation_id: smythe_brenan_2015_table3_ce_log_ratio
+    field: points
+    value:
+      - {sample: DS11-C38, value: -0.15, pdf_page_index: 38}
+      - {sample: DS09-C2-13, value: -0.41, pdf_page_index: 38}
+      - {sample: DS11-C66, value: -2.57, pdf_page_index: 39}
+      - {sample: DS09-C3-15, value: -1.93, pdf_page_index: 39}
+      - {sample: DS11-C22, value: -1.68, pdf_page_index: 40}
+      - {sample: DS09-C3-14, value: -2.98, pdf_page_index: 40}
+      - {sample: DS09-C3-04, value: -1.12, pdf_page_index: 40}
+species:
+  Ce:
+    observations:
+      - observation_id: smythe_brenan_2015_table3_ce_log_ratio
+        type: concentration_series
+        locator:
+          table: '3'
+          note: Table 3; point locators carry exact PDF pages.
+        phase: glass
+        standard_state: "Ce4+/Ce3+ as printed in log10 form"
+        units: log10 ratio
+        uncertainty:
+          note: Table 3 parenthetical widths as printed; confidence level not stated.
+        values:
+          quantity: log10_Ce4plus_over_Ce3plus
+          method_class: measured_reduced
+          instrument: Ce M4,5-edge XANES; corrected by the paper's empirical potentiometric calibration
+          compositions_as_published_wt_pct:
+            RH08:
+              SiO2: 72.1
+              TiO2: 0.3
+              Al2O3: 14.8
+              MgO: 0.7
+              CaO: 1.7
+              Na2O: 6.4
+              K2O: 3.9
+              P2O5: 0.1
+            AA08:
+              SiO2: 61.5
+              TiO2: 0.6
+              Al2O3: 18.7
+              MgO: 4.2
+              CaO: 11.5
+              Na2O: 2.8
+              K2O: 0.7
+            BH09:
+              SiO2: 51.7
+              TiO2: 1.1
+              Al2O3: 16.8
+              MgO: 11.9
+              CaO: 15.9
+              Na2O: 2.6
+          compositions_mole_fraction_from_table1:
+            RH08: &rh08
+              SiO2: '0.7782292817542516198257140579'
+              TiO2: '0.002436063871078598050680098485'
+              Al2O3: '0.09413594197732396289121338376'
+              MgO: '0.01126351137559419770761349129'
+              CaO: '0.01966020589595715219843866275'
+              Na2O: '0.06696726381623317691814180992'
+              K2O: '0.02685084158737774411042934968'
+              P2O5: '0.0004568897221835482977691464399'
+            AA08: &aa08
+              SiO2: '0.6493202205495891163875579532'
+              TiO2: '0.004765738135699231829311187569'
+              Al2O3: '0.1163447719686480507773717569'
+              MgO: '0.06610534273157339346803210520'
+              CaO: '0.1300913706863663603996045582'
+              Na2O: '0.02865841193156538430416210164'
+              K2O: '0.004714143996558462833960337083'
+            BH09: &bh09
+              SiO2: '0.5184327210510110696775922091'
+              TiO2: '0.008298310094803038132017666168'
+              Al2O3: '0.09927333171358709135598353555'
+              MgO: '0.1778903058366683934128291306'
+              CaO: '0.1708306617033230094822128676'
+              Na2O: '0.02527466960060739793936459085'
+          series:
+            - sample: DS11-C38
+              T_K: 1476
+              value: -0.15
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1476}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C40
+              T_K: 1474
+              value: -0.05
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1474}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C41
+              T_K: 1478
+              value: -0.19
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1478}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C44
+              T_K: 1473
+              value: -0.15
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1473}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C2-13
+              T_K: 1572
+              value: -0.41
+              sigma: 0.01
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1572}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: 0.00}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-10
+              T_K: 1571
+              value: -0.99
+              sigma: 0.03
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1571}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -2.73}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-05
+              T_K: 1571
+              value: -1.63
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1571}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -6.02}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-19
+              T_K: 1672
+              value: -0.60
+              sigma: 0.03
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-24
+              T_K: 1672
+              value: -1.58
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 39, pdf_page_index: 38}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -4.30}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-32
+              T_K: 1672
+              value: -2.09
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -6.31}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C66
+              T_K: 1672
+              value: -2.57
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -9.31}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C36
+              T_K: 1773
+              value: -0.82
+              sigma: 0.03
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1773}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: 0.00}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C24
+              T_K: 1772
+              value: -1.58
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1772}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -2.40}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C28
+              T_K: 1772
+              value: -1.83
+              sigma: 0.13
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1772}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -6.77}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS08-C1-02
+              T_K: 1373
+              value: -1.47
+              sigma: 0.11
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              noble_metal_oxide_buffer_as_published: Ru
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1373}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -2.72}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS08-C1-20
+              T_K: 1373
+              value: -0.56
+              sigma: 0.11
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              noble_metal_oxide_buffer_as_published: Ir
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1373}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.06}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS09-C3-37
+              T_K: 1573
+              value: -1.62
+              sigma: 0.11
+              sample_composition_as_published: RH08
+              composition_mol: *rh08
+              oxygen_buffer_as_published: FMQ
+              noble_metal_oxide_buffer_as_published: Ru
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1573}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -1.30}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS09-C2-09
+              T_K: 1572
+              value: -0.44
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1572}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: 0.00}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C50
+              T_K: 1574
+              value: -0.57
+              sigma: 0.02
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1574}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -0.01}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-08
+              T_K: 1571
+              value: -1.26
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1571}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -2.73}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-06
+              T_K: 1574
+              value: -2.01
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1574}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_log:
+                  state: {tag: value, value: -6.01}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 36, pdf_page_index: 35}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 36, pdf_page_index: 35, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-15
+              T_K: 1574
+              value: -1.93
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1574}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -7.28}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-18
+              T_K: 1672
+              value: -0.87
+              sigma: 0.03
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-23
+              T_K: 1674
+              value: -1.72
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1674}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -4.29}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-29
+              T_K: 1674
+              value: -2.33
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1674}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -6.30}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C63
+              T_K: 1672
+              value: -3.04
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -9.31}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C34
+              T_K: 1773
+              value: -1.03
+              sigma: 0.09
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 40, pdf_page_index: 39}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1773}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: 0.00}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C22
+              T_K: 1772
+              value: -1.68
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1772}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -2.40}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS08-C1-09
+              T_K: 1573
+              value: -0.94
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              noble_metal_oxide_buffer_as_published: Ir
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1573}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: 1.08}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS09-C2-06
+              T_K: 1573
+              value: -1.09
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              noble_metal_oxide_buffer_as_published: Ir
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1573}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: 1.08}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS09-C3-22
+              T_K: 1673
+              value: -1.02
+              sigma: 0.11
+              sample_composition_as_published: AA08
+              composition_mol: *aa08
+              oxygen_buffer_as_published: FMQ
+              noble_metal_oxide_buffer_as_published: Ir
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1673}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: 1.54}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS09-C2-12
+              T_K: 1572
+              value: -1.09
+              sigma: 0.07
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1572}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: 0.00}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C49
+              T_K: 1574
+              value: -0.93
+              sigma: 0.02
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1574}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -0.01}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-07
+              T_K: 1572
+              value: -1.46
+              sigma: 0.09
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1572}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -2.73}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-03
+              T_K: 1571
+              value: -2.09
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1571}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -5.32}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-13
+              T_K: 1574
+              value: -2.83
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1574}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -7.28}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-14
+              T_K: 1575
+              value: -2.98
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1575}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -7.28}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-17
+              T_K: 1672
+              value: -1.04
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -0.02}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-20
+              T_K: 1672
+              value: -2.47
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1672}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -4.30}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-28
+              T_K: 1674
+              value: -2.80
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1674}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -6.30}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C64
+              T_K: 1673
+              value: -3.57
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1673}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -9.31}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C33
+              T_K: 1773
+              value: -1.28
+              sigma: 0.08
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1773}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: 0.00}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS11-C21
+              T_K: 1772
+              value: -1.96
+              sigma: 0.32
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1772}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -2.40}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 0.001 GPa converted to Pa."}
+            - sample: DS09-C3-09
+              T_K: 1573
+              value: -1.60
+              sigma: 0.11
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              noble_metal_oxide_buffer_as_published: Ru
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1573}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_log:
+                  state: {tag: value, value: -1.30}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 37, pdf_page_index: 36}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 37, pdf_page_index: 36, note: "Table 2 1 GPa converted to Pa."}
+            - sample: DS09-C3-04
+              T_K: 1573
+              value: -1.12
+              sigma: 0.10
+              sample_composition_as_published: BH09
+              composition_mol: *bh09
+              oxygen_buffer_as_published: FMQ
+              noble_metal_oxide_buffer_as_published: Ir
+              locator: {table: '3', page: 41, pdf_page_index: 40}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: 1573}
+                  locator: {table: '2', page: 38, pdf_page_index: 37}
+                fO2_log:
+                  state: {tag: value, value: 1.08}
+                  locator: {table: '2', page: 38, pdf_page_index: 37}
+                fO2_control:
+                  state: {tag: value, value: ΔFMQ}
+                  locator: {table: '2', page: 38, pdf_page_index: 37}
+                total_pressure_Pa:
+                  state: {tag: value, value: 1000000000}
+                  locator: {table: '2', page: 38, pdf_page_index: 37, note: "Table 2 1 GPa converted to Pa."}
