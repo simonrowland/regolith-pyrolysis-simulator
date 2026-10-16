@@ -90,8 +90,12 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
+    # Recomputed after 80c78a4f7 restored nullable optimizer paths for
+    # overhead_headspace.liner_temperature_C.default_C, the pipe default, and
+    # stage_0_to_stage_1.default_C. Null keeps melt tracking; explicit values
+    # now override it through the optimizer's existing setpoint levers.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "d8527229bbb3a92dacb0a4b248db38cce26c979e9864bcb19b8a402b03f6f6a2"
+        "7c8413ec83b7193c56d407c6b1dd541c8665e4a141663f9cac7ac7828d807c6c"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
