@@ -130,11 +130,12 @@ def test_yakovlev_1984_o2_table_is_model_derived_with_located_points():
         (EXTRACTS / "kems-028-yakovlev-1984.yaml").read_text()
     )
     points = extract["species"]["O2"]["observations"][0]["values"]["points"]
-    assert (points[0]["T_C"], points[0]["p_torr"]) == (2020, 1.4e-06)
-    assert (points[10]["T_C"], points[10]["p_torr"]) == (2348, 1.9e-04)
+    assert (points[0]["T_C"], points[0]["P"]) == (2020, 1.4e-06)
+    assert (points[10]["T_C"], points[10]["P"]) == (2348, 1.9e-04)
+    assert all("p_Pa" not in point for point in points)
     assert check_all_fidelity_samples_match(extract) == []
     mutated = deepcopy(extract)
-    mutated["species"]["O2"]["observations"][0]["values"]["points"][10]["p_torr"] += 1
+    mutated["species"]["O2"]["observations"][0]["values"]["points"][10]["P"] += 1
     assert check_all_fidelity_samples_match(mutated)
 
     result = _migrate("kems-028-yakovlev-1984.yaml")
@@ -147,9 +148,16 @@ def test_yakovlev_1984_o2_table_is_model_derived_with_located_points():
     _validate_rows(result, observations)
     first = next(row for row in observations if "T=2293.15" in row.observation_id)
     last = next(row for row in observations if "T=2621.15" in row.observation_id)
-    assert first.value.point == Decimal(str(points[0]["p_Pa"]))
-    assert last.value.point == Decimal(str(points[10]["p_Pa"]))
-    assert all(row.evidence.class_.value is EvidenceClass.MODEL_DERIVED for row in observations)
+    assert first.value.point == convert_pressure_to_pa(
+        Decimal(str(points[0]["P"])), "torr"
+    )[0]
+    assert last.value.point == convert_pressure_to_pa(
+        Decimal(str(points[10]["P"])), "torr"
+    )[0]
+    assert all(
+        row.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        for row in observations
+    )
     for row in observations:
         condition = row.point_conditions["temperature_K"]
         assert row.identity.temperature_K.is_value
