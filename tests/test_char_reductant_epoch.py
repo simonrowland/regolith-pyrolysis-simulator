@@ -114,7 +114,8 @@ def test_ci_commits_refractory_char_account_from_sephton_partition() -> None:
     # Magnitude pin: Alexander 0.5075 nascent + tar coke − Boudouard at
     # Stage-0 1050 C. Self-parity above is necessary; this catches a
     # silent class-constant move (B4).
-    assert char_mol == pytest.approx(1305.7985635282805)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert char_mol == pytest.approx(1304.0917213254336)
     assert char_mol > f_ref * resolve_species_formula(
         "carbonaceous_organic", sim.species_formula_registry
     ).atom_moles(

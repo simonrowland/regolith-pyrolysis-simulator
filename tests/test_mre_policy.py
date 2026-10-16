@@ -157,10 +157,14 @@ def test_tc8_si_target_mre_policy_splits_cache_key_and_internal_analytical_outco
     # 2026-08-05 MC-1 trace wiring d1b4f5d: these Stage-0 products exist for
     # both policies and are orthogonal to the C5 Si-target cache-key contract.
     assert _product_ledger(off) == pytest.approx({
-        "Cl": 0.015407403867280558,
-        "Co": 0.035950609023654635,
-        "Ni": 0.20543205156374078,
-        "S": 0.7190121804730926,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "Cl": 0.01540212160632227,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "Co": 0.0359382837480853,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "Ni": 0.20536162141763029,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "S": 0.718765674961706,
     })
     assert _product_ledger(si_target) != _product_ledger(off)
     assert _product_ledger(si_target)["Si"] > 0.0

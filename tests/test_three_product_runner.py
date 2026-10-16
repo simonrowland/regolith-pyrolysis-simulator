@@ -278,4 +278,5 @@ def test_default_classification_values_preserve_pre_change_digest():
     digest = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    assert digest == "772f0f439134828e15d32621b4ecea084d26f30c3d5c7b0dacfb5a01b80dd38c"
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert digest == "1be1f955f474ee2ccabbbc3e119378d6104c4c56d750208452f44511814ca1d6"

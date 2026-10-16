@@ -139,8 +139,10 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
     # 2026-08-05 MC-1 trace wiring d1b4f5d: feedstock-native Co/Ni are already
     # in the drain tap before the Fe split; the migration contract is no Fe yet.
     assert before_tap == pytest.approx({
-        "Co": 0.035950609023654635,
-        "Ni": 0.20543205156374078,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "Co": 0.0359382837480853,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "Ni": 0.20536162141763029,
     })
     assert "Fe" not in before_tap
 

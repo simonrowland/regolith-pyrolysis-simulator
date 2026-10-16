@@ -34,7 +34,8 @@ PINNED_NATIVE_FE_MIGRATION_GOLDENS = {
     "lunar_mare_low_ti": {
         # 2026-08-05 MC-1 trace wiring d1b4f5d: Co/Ni/S/Cl passengers shift
         # the lunar cleaned-melt basis; migration routing assertions below stay.
-        "native_fe_mol": 1607.3611432553353,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "native_fe_mol": 1606.810076957207,
         "native_vapor_Fe_kg": 0.1682078458614615,
     },
     "mars_basalt": {
@@ -45,7 +46,8 @@ PINNED_NATIVE_FE_MIGRATION_GOLDENS = {
         # which changes cleaned-melt CaO and therefore FeO activity.  The
         # regression below proves this remains the FeO-saturation path: the
         # later metallic-tap fold never touches process.metal_phase here.
-        "native_fe_mol": 1683.5583423071594,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "native_fe_mol": 1681.7444646556064,
     },
 }
 

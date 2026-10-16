@@ -104,7 +104,8 @@ SIO_ANCHOR_HOUR = 6
 # mass-balance artifact (AtomLedger closes). Pin = executed probe value;
 # never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
 # b-850: alkali composite vapour rows now use the parent-oxide activity.
-EXPECTED_SIO_DECADE_DRIFT = 0.2090602025512069
+# d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+EXPECTED_SIO_DECADE_DRIFT = 0.37628851814242326
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
