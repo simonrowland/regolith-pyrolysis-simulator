@@ -141,21 +141,11 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert residuals[0].refusal.reason is RefusalReason.DECISION_RULE_MISSING
 
 
-@pytest.mark.parametrize(
-    "observation_id",
-    (
-        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes",
-    ),
-)
-def test_openimcc_in_domain_redox_flags_become_prediction_notices(
-    monkeypatch, observation_id
-):
+def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
     pytest.importorskip("openimcc")
     import openimcc
 
     _context, observations = _sossi_aithala_redox_context()
-    observation = observations[observation_id]
     results = []
     original_evaluate_redox = openimcc.evaluate_redox
 
@@ -165,28 +155,35 @@ def test_openimcc_in_domain_redox_flags_become_prediction_notices(
         return result
 
     monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_result)
-    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+    total_flags = 0
+    for observation_id, observation in sorted(observations.items()):
+        calls_before = len(results)
+        prediction = predict_with_engine(Engine.OPENIMCC, observation)
 
-    assert prediction.value is not None, prediction.refusal_detail
-    assert prediction.authority is Authority.BRIDGE
-    assert len(results) == 1
-    flags = tuple(results[0].flags)
-    flag_notices = tuple(
-        notice
-        for notice in prediction.notices
-        if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
-    )
-    assert flags
-    assert tuple(notice.reason for notice in flag_notices) == flags
-    assert all(
-        notice.origin == "openimcc.evaluate_redox"
-        and notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
-        for notice in flag_notices
-    )
-    assert not any(
-        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-        for notice in prediction.notices
-    )
+        assert prediction.value is not None, (observation_id, prediction.refusal_detail)
+        assert prediction.authority is Authority.BRIDGE
+        assert len(results) == calls_before + 1
+        flags = tuple(results[-1].flags)
+        flag_notices = tuple(
+            notice
+            for notice in prediction.notices
+            if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        )
+        assert flags
+        assert tuple(notice.reason for notice in flag_notices) == flags
+        assert all(
+            notice.origin == "openimcc.evaluate_redox"
+            and notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
+            for notice in flag_notices
+        )
+        assert not any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            for notice in prediction.notices
+        )
+        total_flags += len(flags)
+
+    assert len(results) == 18
+    assert total_flags == 130
 
 
 def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
@@ -205,6 +202,20 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     assert hashlib.sha256(encoded).hexdigest() == (
         "12100581851275f022f1e7ed747ee7aeb578a99537e11ca0aaf3eabe7a8bbc82"
     )
+    for backlog in (
+        score_module.notice_backlog(residuals),
+        score_module.notice_backlog_payloads(
+            [residual_to_plain(residual) for residual in residuals]
+        ),
+    ):
+        assert backlog.get(NoticeKind.SOURCE_DISAGREEMENT.value, 0) == 0
+        assert backlog["engine_model_caveat"] == 130
+        assert backlog["admission_defaulted"] == 18
+        assert backlog["total_iron_reported_as_feo"] == 18
+    assert all(
+        not score_module.flagged_strata(residual.notices) for residual in residuals
+    )
+    assert not any(residual.score_eligible for residual in residuals)
 
 
 def test_openimcc_redox_without_printed_fo2_still_refuses():
