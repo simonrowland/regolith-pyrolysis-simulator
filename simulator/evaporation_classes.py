@@ -28,7 +28,7 @@ from engines.builtin.evaporation_flux import (
     SeriesEvaporationFlux,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
-from simulator.accounting.formulas import resolve_species_formula
+from simulator.accounting.formulas import load_species_formulas, resolve_species_formula
 from simulator.evaporation import _load_evaporation_alpha_by_species
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -39,6 +39,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 
 _REPO_ROOT: Final[Path] = Path(__file__).resolve().parents[1]
 _EXTRACTS_DIR: Final[Path] = _REPO_ROOT / "data" / "literature" / "extracts"
+_SPECIES_CATALOG_PATH: Final[Path] = _REPO_ROOT / "data" / "species_catalog.yaml"
 _VAPOR_PRESSURES_PATH: Final[Path] = _REPO_ROOT / "data" / "vapor_pressures.yaml"
 
 
@@ -46,9 +47,7 @@ _VAPOR_PRESSURES_PATH: Final[Path] = _REPO_ROOT / "data" / "vapor_pressures.yaml
 def _species_formula_registry() -> dict[str, Any]:
     """Return the simulator's cached base catalog formula registry."""
 
-    from simulator.core import PyrolysisSimulator
-
-    return PyrolysisSimulator._load_species_formula_registry()
+    return load_species_formulas(_SPECIES_CATALOG_PATH)
 
 
 # ---------------------------------------------------------------------------

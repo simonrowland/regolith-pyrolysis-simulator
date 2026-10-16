@@ -202,6 +202,10 @@ def test_report_species_class_diagnostics_class_alpha_fallback_unchanged():
         ("K2O_gas", "K2O"),
         ("SiO2_gas", "SiO2"),
         ("CaO_gas", "CaO"),
+        ("Cr2O3_gas", "Cr2O3"),
+        ("Fe2O3_gas", "Fe2O3"),
+        ("FeO_gas", "FeO"),
+        ("P2O5_gas", "P2O5"),
     ],
 )
 def test_report_species_class_diagnostics_default_mass_uses_formula_owner(
