@@ -1097,17 +1097,6 @@ class OverheadGasModel:
 
         gas.evap_exceeds_transport = gas.transport_saturation_pct > 100.0  # dimensionless bool — transport over-capacity flag
 
-        if self._finite_headspace_enabled:
-            self._update_finite_headspace(
-                gas,
-                melt,
-                overhead_holdup_mol or {},
-                actual_O2_kg_hr=actual_O2_kg_hr,  # kg/hr — melt/offgas O2 mass flow
-                actual_O2_mol_hr=actual_O2_mol_hr,  # mol/hr — melt/offgas O2 molar flow
-                mre_anode_O2_mol_hr=mre_anode_O2_mol_hr,  # mol/hr — MRE anode O2 flow
-            )
-            return gas
-
         # ── Overhead pressure ───────────────────────────────────────
         # Premise: the shared pipe law is F=C₀(P_up²-P_down²), where
         # C₀ has units kg/(s·Pa²). Algebra gives
@@ -1150,6 +1139,14 @@ class OverheadGasModel:
         if not has_live_inlet or not self.last_stream_boundary.get('carrier_species'):
             flows = self.flowing_stream_mol_hr(flows, melt, report_transport_state)
             gas.pressure_mbar = self.last_stream_boundary['pressure_mbar']
+        if self._finite_headspace_enabled:
+            self._update_finite_headspace(
+                gas, melt, overhead_holdup_mol or {},
+                actual_O2_kg_hr=actual_O2_kg_hr,
+                actual_O2_mol_hr=actual_O2_mol_hr,
+                mre_anode_O2_mol_hr=mre_anode_O2_mol_hr,
+            )
+            return gas
         gas.composition.update(self.species_partial_pressures(
             evap_flux, gas.pressure_mbar, self.species_formula_registry,
             molar_flow_by_species=flows,
@@ -1366,6 +1363,12 @@ class OverheadGasModel:
                 n_now = (flows[carrier] / total * pressure_mbar * 100.0
                          * self._resolve_headspace_volume(headspace_volume_m3)
                          / (GAS_CONSTANT * self._headspace_temperature_K(melt))) if total else 0.0
+                # The post-bleed finite report owns achieved inventory. Later
+                # same-tick inlet projections have a different composition and
+                # must not replace next tick's initial vessel state.
+                if (hasattr(self, '_stream_inventory_report_tick')
+                        and self._stream_inventory_report_tick == getattr(melt, 'hour', None)):
+                    n_now = self._stream_carrier_inventory.get(carrier, n_now)
                 self._update_stream_carrier_inventory(
                     carrier, n_now, flows[carrier], melt, holdup_mol or {},
                 )
@@ -1422,8 +1425,29 @@ class OverheadGasModel:
                                   actual_O2_kg_hr: float,  # kg/hr — melt/offgas O2 mass flow
                                   actual_O2_mol_hr: Optional[float],  # mol/hr — melt/offgas O2 molar flow
                                   mre_anode_O2_mol_hr: float) -> None:  # mol/hr — MRE anode O2 flow
+        inventory = dict(overhead_holdup_mol)
+        carrier = self.last_stream_boundary.get('carrier_species', '')
+        outlet_mol_hr = self.last_stream_mol_hr.get(carrier, 0.0)
+        if carrier and outlet_mol_hr > 0.0:
+            # The ideal regulated supply inferred by the open-duct owner also
+            # fills the finite vessel. Target n=PV/(RT) [Pa*m³/(J/mol)=mol];
+            # subtract actual noncarrier mol, rather than adding a commanded
+            # partial above them. With no evaporation this is a pure carrier
+            # at P_command. Excess noncarrier cannot be removed by makeup:
+            # retain it and let the target-miss diagnostic below report it.
+            # Actual carrier stock has already survived the ledger bleed;
+            # regulator makeup cannot erase it either.
+            target_mol = (float(melt.p_total_mbar) * 100.0 * gas.headspace_volume_m3
+                          / (GAS_CONSTANT * gas.headspace_temperature_K))
+            n_now = max(float(inventory.get(carrier, 0.0)), target_mol - sum(
+                n for species, n in inventory.items() if species != carrier))
+            self._update_stream_carrier_inventory(
+                carrier, n_now, outlet_mol_hr, melt, inventory,
+            )
+            self._stream_inventory_report_tick = getattr(melt, 'hour', None)
+            inventory[carrier] = n_now
         partials_bar = self._compute_partial_pressures(  # bar — species partial pressures
-            overhead_holdup_mol,
+            inventory,
             gas.headspace_volume_m3,
             gas.headspace_temperature_K,
         )
@@ -1443,14 +1467,9 @@ class OverheadGasModel:
             command_total_pressure_mbar = melt.p_total_mbar
             command_partial_pressures_mbar['CO2'] = melt.p_total_mbar * 0.96
         elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
-            _sweep_key = (
-                getattr(melt, 'background_gas_species', '')
-                or ('Ar' if atmosphere_name == 'ARGON_FLOW' else 'N2')
-            )
+            # Sweep regulates total P; its carrier partial is the remainder
+            # after all actual noncarrier gas, not a second pressure command.
             command_total_pressure_mbar = melt.p_total_mbar
-            sweep_target = max(0.0, melt.p_total_mbar - melt.pO2_mbar)
-            if sweep_target > 0.0:
-                command_partial_pressures_mbar[_sweep_key] = sweep_target
 
         if atmosphere_name in {
             'CONTROLLED_O2',

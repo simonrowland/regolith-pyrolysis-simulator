@@ -1941,13 +1941,18 @@ def test_finite_headspace_reports_o2_command_targets_separately(atmosphere):
     }
 
 
+@pytest.mark.parametrize("atmosphere,carrier", [
+    (Atmosphere.PN2_SWEEP, "N2"),
+    (Atmosphere.ARGON_FLOW, "Ar"),
+    (Atmosphere.CO2_BACKPRESSURE, "CO2"),
+])
 @pytest.mark.parametrize("evap_kg_hr", [0.0, 1.0e-6])
-def test_pn2_sweep_finite_headspace_retains_regulated_carrier(evap_kg_hr):
+def test_pn2_sweep_finite_headspace_retains_regulated_carrier(evap_kg_hr, atmosphere, carrier):
     from simulator.state import CondensationTrain, EvaporationFlux, MeltState
     from simulator.overhead import OverheadGasModel
 
     melt = MeltState(
-        atmosphere=Atmosphere.PN2_SWEEP,
+        atmosphere=atmosphere,
         p_total_mbar=10.0,
         temperature_C=1500.0,
     )
@@ -1964,9 +1969,12 @@ def test_pn2_sweep_finite_headspace_retains_regulated_carrier(evap_kg_hr):
 
     assert gas.pressure_mbar / 1000.0 == pytest.approx(0.01)
     assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar)
-    assert gas.composition["N2"] > 0.0
-    assert model.last_stream_mol_hr["N2"] > 0.0
+    assert gas.composition[carrier] > 0.0
+    assert model.last_stream_mol_hr[carrier] > 0.0
     assert model.last_stream_boundary["provenance"] == "ideal_regulator_open_duct"
+    if atmosphere in {Atmosphere.PN2_SWEEP, Atmosphere.ARGON_FLOW}:
+        assert not any(n["reason"] == "finite_headspace_command_unmet"
+                       for n in model.stream_physics_notices)
     # The carrier inventory is real finite-vessel makeup, not an additive
     # partial divorced from nRT/V. The existing ideal-gas owner closes both.
     inventory = {**holdup, **model._stream_carrier_inventory}
@@ -1975,9 +1983,23 @@ def test_pn2_sweep_finite_headspace_retains_regulated_carrier(evap_kg_hr):
             inventory, gas.headspace_volume_m3, gas.headspace_temperature_K,
         ).items()
     })
+    # core projects the inlet again after reporting the post-bleed vessel.
+    # That different composition must not replace the achieved inventory used
+    # as next tick's initial condition for regulator makeup.
+    achieved_inventory = dict(model._stream_carrier_inventory)
+    model.flowing_stream_mol_hr(
+        {"Fe": 2.0}, melt, model.estimate_transport_state(flux, melt),
+    )
+    assert model._stream_carrier_inventory == achieved_inventory
+    melt.hour += 1
+    model.flowing_stream_mol_hr(
+        {"Fe": 2.0}, melt, model.estimate_transport_state(flux, melt),
+    )
+    assert model._stream_inventory_start == achieved_inventory
 
 
-def test_finite_headspace_report_closes_when_n2_command_is_unfilled():
+@pytest.mark.parametrize("retained_species", ["O2", "N2"])
+def test_finite_headspace_report_closes_when_n2_command_is_unfilled(retained_species):
     from simulator.state import CondensationTrain, EvaporationFlux, MeltState
     from simulator.overhead import OverheadGasModel
 
@@ -1989,14 +2011,14 @@ def test_finite_headspace_report_closes_when_n2_command_is_unfilled():
     model = OverheadGasModel({"enabled": True, "volume_m3": 1.0})
     gas = model.update(
         EvaporationFlux(), melt, CondensationTrain.create_default(),
-        overhead_holdup_mol={"O2": 1.0},
+        overhead_holdup_mol={retained_species: 1.0},
     )
 
     # Ideal-gas probe: 1 mol × 8.314462618 J/(mol K) × 1773.15 K / 1 m³
     # = 14742.784749 Pa = 147.42784749 mbar. The N₂ command is a target,
     # not inventory.
     assert gas.pressure_mbar == pytest.approx(147.42784749, rel=1e-8)
-    assert gas.composition == pytest.approx({"O2": 147.42784749}, rel=1e-8)
+    assert gas.composition == pytest.approx({retained_species: 147.42784749}, rel=1e-8)
     assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar, abs=1e-12)
     notice = next(
         notice for notice in model.stream_physics_notices
@@ -2004,8 +2026,8 @@ def test_finite_headspace_report_closes_when_n2_command_is_unfilled():
     )
     assert notice["target_total_pressure_mbar"] == pytest.approx(10.0)
     assert notice["achieved_total_pressure_mbar"] == pytest.approx(gas.pressure_mbar)
-    assert notice["target_partial_pressures_mbar"] == {"N2": 10.0}
-    assert notice["achieved_partial_pressures_mbar"] == {"N2": 0.0}
+    assert notice["target_partial_pressures_mbar"] == {}
+    assert notice["achieved_partial_pressures_mbar"] == {}
     model.flowing_stream_mol_hr(
         {}, melt, model.estimate_transport_state(EvaporationFlux(), melt),
     )
@@ -2078,18 +2100,9 @@ def test_argon_flow_writes_inert_carrier_boundary(headspace_enabled):
         CondensationTrain.create_default(),
     )
 
-    if headspace_enabled:
-        assert gas.pressure_mbar == pytest.approx(0.0)
-        assert gas.composition == {}
-        notice = next(
-            notice for notice in model.stream_physics_notices
-            if notice["reason"] == "finite_headspace_command_unmet"
-        )
-        assert notice["target_total_pressure_mbar"] == pytest.approx(10.0)
-        assert notice["target_partial_pressures_mbar"] == {"Ar": 8.5}
-    else:
-        assert gas.pressure_mbar >= 10.0
-        assert gas.composition["Ar"] == pytest.approx(10.0)
+    assert gas.pressure_mbar == pytest.approx(10.0)
+    assert gas.composition["Ar"] == pytest.approx(10.0)
+    assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar)
     assert gas.composition.get("O2", 0.0) < 1.5
 
 
