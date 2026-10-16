@@ -4368,6 +4368,62 @@ def test_richet_bottinga_1986_review_fixes_migrate_and_pin_table4() -> None:
         "rb86_1986_mgsio3_heat_of_fusion_table4": Decimal("73.2"),
         "rb86_1986_mgsio3_entropy_of_fusion_table4": Decimal("39.9"),
     }
+    # Table 4 prints Tf on both fusion quantities for the first three rows.
+    # The second MgSiO3 line has no Tf; neither quantity may inherit the
+    # adjacent Stebbins temperature.
+    expected_printed_fusion_temperatures = {
+        "rb86_1986_na2si2o5_heat_of_fusion_table4": ("Na2Si2O5", 1147),
+        "rb86_1986_na2si2o5_entropy_of_fusion_table4": ("Na2Si2O5", 1147),
+        "rb86_1986_k2si2o5_heat_of_fusion_table4": ("K2Si2O5", 1318),
+        "rb86_1986_k2si2o5_entropy_of_fusion_table4": ("K2Si2O5", 1318),
+        "rb86_1986_k2sio3_heat_of_fusion_table4": ("K2SiO3", 1249),
+        "rb86_1986_k2sio3_entropy_of_fusion_table4": ("K2SiO3", 1249),
+    }
+    expected_unknown_fusion_temperatures = (
+        "rb86_1986_mgsio3_heat_of_fusion_table4",
+        "rb86_1986_mgsio3_entropy_of_fusion_table4",
+    )
+    unknown_fusion_temperature_reason = (
+        "Table 4 does not print Tf for the second MgSiO3 row (This work, appendix)"
+    )
+
+    def assert_fusion_temperatures(migrated, extract):
+        migrated_rows = {
+            observation.observation_id.split("::")[-1]: observation
+            for observation in migrated.observations.values()
+        }
+        source_rows = {
+            row["observation_id"]: (formula, row)
+            for formula, payload in extract["species"].items()
+            for row in payload.get("observations", [])
+        }
+        for obs_id, (formula, printed_tf) in expected_printed_fusion_temperatures.items():
+            source_formula, row = source_rows[obs_id]
+            assert "T_fus_K" in row["values"]
+            tf = row["values"]["T_fus_K"]
+            assert source_formula == formula
+            assert tf["value"] == printed_tf
+            assert tf["units"] == "K"
+            assert tf["locator"]["table"] == "4"
+            assert tf["locator"]["row"] == formula
+            assert tf["locator"]["column"] == "T_f (K)"
+            assert migrated_rows[obs_id].identity.temperature_K.value == Decimal(printed_tf)
+
+        # No Tf was printed for either quantity on the second MgSiO3 line, so
+        # neither identity may inherit the adjacent 1834 K Stebbins row.
+        for obs_id in expected_unknown_fusion_temperatures:
+            source_formula, row = source_rows[obs_id]
+            assert source_formula == "MgSiO3"
+            mg_tf = row["values"]["T_fus_K"]
+            assert mg_tf["value"] is None
+            assert mg_tf["reason"] == unknown_fusion_temperature_reason
+            assert mg_tf["units"] == "K"
+            assert mg_tf["locator"]["table"] == "4"
+            assert mg_tf["locator"]["row"] == "MgSiO3"
+            assert mg_tf["locator"]["column"] == "T_f (K)"
+            assert migrated_rows[obs_id].identity.temperature_K.is_unknown
+
+    assert_fusion_temperatures(result, source)
 
     def assert_widths(migrated):
         rows = {
@@ -4393,9 +4449,10 @@ def test_richet_bottinga_1986_review_fixes_migrate_and_pin_table4() -> None:
             "rb86_1986_k2sio3_heat_of_fusion_table4",
             "rb86_1986_k2sio3_transition_table4",
         ),
+        # The second MgSiO3 Table 4 line prints no Tf, so its temperature
+        # lineage must not include the preceding Stebbins transition row.
         "rb86_1986_mgsio3_entropy_of_fusion_table4": (
             "rb86_1986_mgsio3_heat_of_fusion_table4",
-            "rb86_1986_mgsio3_transition_table4",
         ),
     }
     for obs_id, (expected_class, input_quantity) in {
