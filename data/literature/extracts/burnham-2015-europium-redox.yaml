@@ -1,7 +1,7 @@
 schema_version: literature_extract.v1
 source_id: burnham-2015-europium-redox
 source:
-  citation: 'Burnham, A. D., Berry, A. J., Halse, H. R., Schofield, P. F., Cressey, G. & O''Neill, H. St. C. (2015). The oxidation state of europium in silicate melts. Chemical Geology 411, 248-259.'
+  citation: 'Burnham, A. D., Berry, A. J., Halse, H. R., Schofield, P. F., Cibin, G. & Mosselmans, J. F. W. (2015). The oxidation state of europium in silicate melts as a function of oxygen fugacity, composition and temperature. Chemical Geology 411, 248-259. doi: 10.1016/j.chemgeo.2015.07.002.'
   year: 2015
 extraction:
   method: manual_from_draft
@@ -16,6 +16,8 @@ notes:
     because VALENCE_RATIO has no measurement-variant identity axis; it is
     recorded for a separate schema task. The extracted observations use the
     Eu3+-peak column.
+  - >-
+    The paper reports agreement between glass and melt Eu3+/SumEu for Fe-free systems, but says the high-temperature ratio is not preserved in Fe-bearing melts because Eu2+ + Fe3+ reacts during quenching.
 fidelity_samples:
   - species: Eu
     observable: concentration_series
@@ -45,8 +47,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1300 °C; printed log fO2 0.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1300 °C; printed log fO2 0.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -95,8 +97,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1300 °C; printed log fO2 -7.1'
-      phase: l
+        note: 'Table 2 glasses AD at 1300 °C; printed log fO2 -7.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -145,8 +147,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1300 °C; printed log fO2 -10.1'
-      phase: l
+        note: 'Table 2 glasses AD at 1300 °C; printed log fO2 -10.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -195,8 +197,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1300 °C; printed log fO2 -12.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1300 °C; printed log fO2 -12.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -245,8 +247,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1300 °C; printed log fO2 -13.1'
-      phase: l
+        note: 'Table 2 glasses AD at 1300 °C; printed log fO2 -13.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -295,8 +297,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 0.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 0.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. Parenthetical replicate σ as printed: (1); Table 2 says σ is from replicate measurements.'
@@ -345,8 +347,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -2.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -2.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -395,8 +397,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -3.1'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -3.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -445,8 +447,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -4.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -4.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -495,8 +497,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -6.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -6.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -545,8 +547,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -7.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -7.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. Parenthetical replicate σ as printed: (3); Table 2 says σ is from replicate measurements.'
@@ -595,8 +597,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -8.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -8.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -645,8 +647,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -695,8 +697,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -9.5'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -9.5. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -745,8 +747,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -10.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -10.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. Parenthetical replicate σ as printed: (6); Table 2 says σ is from replicate measurements.'
@@ -795,8 +797,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -10.5'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -10.5. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -845,8 +847,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -11.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -11.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -895,8 +897,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -12.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -12.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -945,8 +947,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -13.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -13.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -995,8 +997,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -14.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -14.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. Parenthetical replicate σ as printed: (1); Table 2 says σ is from replicate measurements.'
@@ -1045,8 +1047,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -16.1'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -16.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. Parenthetical replicate σ as printed: (4); Table 2 says σ is from replicate measurements.'
@@ -1095,8 +1097,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -18.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -18.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1145,8 +1147,8 @@ species:
         published_page: 255
         pdf_page_index: 33
         table: '2'
-        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -20.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1400 °C; printed log fO2 -20.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1195,8 +1197,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD at 1500 °C; printed log fO2 0.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1500 °C; printed log fO2 0.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1245,8 +1247,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD at 1500 °C; printed log fO2 -5.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1500 °C; printed log fO2 -5.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1295,8 +1297,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD at 1500 °C; printed log fO2 -8.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1500 °C; printed log fO2 -8.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1345,8 +1347,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD at 1500 °C; printed log fO2 -11.0'
-      phase: l
+        note: 'Table 2 glasses AD at 1500 °C; printed log fO2 -11.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1395,8 +1397,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -4.0'
-      phase: l
+        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -4.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1416,10 +1418,10 @@ species:
         reported_value_as_published: '0.95'
         composition_Eu2O3_wt_percent_as_published: '0.49'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '48.62'
+          Al2O3: '13.18'
+          MgO: '16.49'
+          CaO: '20.77'
         points:
           - value: '0.95'
             T_C: '1400'
@@ -1445,8 +1447,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -7.0'
-      phase: l
+        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -7.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1466,10 +1468,10 @@ species:
         reported_value_as_published: '0.87'
         composition_Eu2O3_wt_percent_as_published: '0.49'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '48.62'
+          Al2O3: '13.18'
+          MgO: '16.49'
+          CaO: '20.77'
         points:
           - value: '0.87'
             T_C: '1400'
@@ -1495,8 +1497,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1516,10 +1518,10 @@ species:
         reported_value_as_published: '0.60'
         composition_Eu2O3_wt_percent_as_published: '0.49'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '48.62'
+          Al2O3: '13.18'
+          MgO: '16.49'
+          CaO: '20.77'
         points:
           - value: '0.60'
             T_C: '1400'
@@ -1545,8 +1547,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -10.0'
-      phase: l
+        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -10.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1566,10 +1568,10 @@ species:
         reported_value_as_published: '0.52'
         composition_Eu2O3_wt_percent_as_published: '0.49'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '48.62'
+          Al2O3: '13.18'
+          MgO: '16.49'
+          CaO: '20.77'
         points:
           - value: '0.52'
             T_C: '1400'
@@ -1595,8 +1597,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -12.0'
-      phase: l
+        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -12.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1616,10 +1618,10 @@ species:
         reported_value_as_published: '0.20'
         composition_Eu2O3_wt_percent_as_published: '0.49'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '48.62'
+          Al2O3: '13.18'
+          MgO: '16.49'
+          CaO: '20.77'
         points:
           - value: '0.20'
             T_C: '1400'
@@ -1645,8 +1647,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -14.0'
-      phase: l
+        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -14.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1666,10 +1668,10 @@ species:
         reported_value_as_published: '0.07'
         composition_Eu2O3_wt_percent_as_published: '0.49'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '48.62'
+          Al2O3: '13.18'
+          MgO: '16.49'
+          CaO: '20.77'
         points:
           - value: '0.07'
             T_C: '1400'
@@ -1695,8 +1697,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -18.0'
-      phase: l
+        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -18.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1716,10 +1718,10 @@ species:
         reported_value_as_published: '0.02'
         composition_Eu2O3_wt_percent_as_published: '0.49'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '48.62'
+          Al2O3: '13.18'
+          MgO: '16.49'
+          CaO: '20.77'
         points:
           - value: '0.02'
             T_C: '1400'
@@ -1745,8 +1747,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -20.0'
-      phase: l
+        note: 'Table 2 glasses AD+fo at 1400 °C; printed log fO2 -20.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. Parenthetical replicate σ as printed: (0); Table 2 says σ is from replicate measurements.'
@@ -1766,10 +1768,10 @@ species:
         reported_value_as_published: '0.02(0)'
         composition_Eu2O3_wt_percent_as_published: '0.49'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '48.62'
+          Al2O3: '13.18'
+          MgO: '16.49'
+          CaO: '20.77'
         points:
           - value: '0.02'
             T_C: '1400'
@@ -1795,8 +1797,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 0.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 0.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. Parenthetical replicate σ as printed: (1); Table 2 says σ is from replicate measurements.'
@@ -1816,10 +1818,10 @@ species:
         reported_value_as_published: '1.01(1)'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '1.01'
             T_C: '1400'
@@ -1845,8 +1847,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -2.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -2.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1866,10 +1868,10 @@ species:
         reported_value_as_published: '0.99'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.99'
             T_C: '1400'
@@ -1895,8 +1897,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -3.1'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -3.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1916,10 +1918,10 @@ species:
         reported_value_as_published: '0.98'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.98'
             T_C: '1400'
@@ -1945,8 +1947,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -4.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -4.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -1966,10 +1968,10 @@ species:
         reported_value_as_published: '1.00'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '1.00'
             T_C: '1400'
@@ -1995,8 +1997,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -5.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -5.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2016,10 +2018,10 @@ species:
         reported_value_as_published: '0.95'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.95'
             T_C: '1400'
@@ -2045,8 +2047,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -6.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -6.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2066,10 +2068,10 @@ species:
         reported_value_as_published: '0.92'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.92'
             T_C: '1400'
@@ -2095,8 +2097,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -7.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -7.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2116,10 +2118,10 @@ species:
         reported_value_as_published: '0.85'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.85'
             T_C: '1400'
@@ -2145,8 +2147,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -8.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -8.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2166,10 +2168,10 @@ species:
         reported_value_as_published: '0.83'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.83'
             T_C: '1400'
@@ -2195,8 +2197,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2216,10 +2218,10 @@ species:
         reported_value_as_published: '0.74'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.74'
             T_C: '1400'
@@ -2245,8 +2247,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -9.5'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -9.5. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2266,10 +2268,10 @@ species:
         reported_value_as_published: '0.67'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.67'
             T_C: '1400'
@@ -2295,8 +2297,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -10.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -10.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2316,10 +2318,10 @@ species:
         reported_value_as_published: '0.59'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.59'
             T_C: '1400'
@@ -2345,8 +2347,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -10.5'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -10.5. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2366,10 +2368,10 @@ species:
         reported_value_as_published: '0.53'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.53'
             T_C: '1400'
@@ -2395,8 +2397,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -11.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -11.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2416,10 +2418,10 @@ species:
         reported_value_as_published: '0.44'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.44'
             T_C: '1400'
@@ -2445,8 +2447,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -12.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -12.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2466,10 +2468,10 @@ species:
         reported_value_as_published: '0.27'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.27'
             T_C: '1400'
@@ -2495,8 +2497,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -13.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -13.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2516,10 +2518,10 @@ species:
         reported_value_as_published: '0.15'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.15'
             T_C: '1400'
@@ -2545,8 +2547,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -16.1'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -16.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2566,10 +2568,10 @@ species:
         reported_value_as_published: '0.02'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.02'
             T_C: '1400'
@@ -2595,8 +2597,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -18.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -18.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2616,10 +2618,10 @@ species:
         reported_value_as_published: '0.05'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.05'
             T_C: '1400'
@@ -2645,8 +2647,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -20.0'
-      phase: l
+        note: 'Table 2 glasses AD+wo at 1400 °C; printed log fO2 -20.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2666,10 +2668,10 @@ species:
         reported_value_as_published: '0.02'
         composition_Eu2O3_wt_percent_as_published: '0.63'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '49.95'
+          Al2O3: '9.58'
+          MgO: '6.55'
+          CaO: '33.35'
         points:
           - value: '0.02'
             T_C: '1400'
@@ -2695,8 +2697,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -4.0'
-      phase: l
+        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -4.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2716,10 +2718,10 @@ species:
         reported_value_as_published: '0.96'
         composition_Eu2O3_wt_percent_as_published: '0.52'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '52.85'
+          Al2O3: '10.85'
+          MgO: '18.81'
+          CaO: '17.17'
         points:
           - value: '0.96'
             T_C: '1400'
@@ -2745,8 +2747,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -7.0'
-      phase: l
+        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -7.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2766,10 +2768,10 @@ species:
         reported_value_as_published: '0.79'
         composition_Eu2O3_wt_percent_as_published: '0.52'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '52.85'
+          Al2O3: '10.85'
+          MgO: '18.81'
+          CaO: '17.17'
         points:
           - value: '0.79'
             T_C: '1400'
@@ -2795,8 +2797,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2816,10 +2818,10 @@ species:
         reported_value_as_published: '0.56'
         composition_Eu2O3_wt_percent_as_published: '0.52'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '52.85'
+          Al2O3: '10.85'
+          MgO: '18.81'
+          CaO: '17.17'
         points:
           - value: '0.56'
             T_C: '1400'
@@ -2845,8 +2847,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -10.0'
-      phase: l
+        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -10.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2866,10 +2868,10 @@ species:
         reported_value_as_published: '0.42'
         composition_Eu2O3_wt_percent_as_published: '0.52'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '52.85'
+          Al2O3: '10.85'
+          MgO: '18.81'
+          CaO: '17.17'
         points:
           - value: '0.42'
             T_C: '1400'
@@ -2895,8 +2897,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -12.0'
-      phase: l
+        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -12.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2916,10 +2918,10 @@ species:
         reported_value_as_published: '0.19'
         composition_Eu2O3_wt_percent_as_published: '0.52'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '52.85'
+          Al2O3: '10.85'
+          MgO: '18.81'
+          CaO: '17.17'
         points:
           - value: '0.19'
             T_C: '1400'
@@ -2945,8 +2947,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -13.0'
-      phase: l
+        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -13.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -2966,10 +2968,10 @@ species:
         reported_value_as_published: '0.07'
         composition_Eu2O3_wt_percent_as_published: '0.52'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '52.85'
+          Al2O3: '10.85'
+          MgO: '18.81'
+          CaO: '17.17'
         points:
           - value: '0.07'
             T_C: '1400'
@@ -2995,8 +2997,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -14.0'
-      phase: l
+        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -14.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3016,10 +3018,10 @@ species:
         reported_value_as_published: '0.08'
         composition_Eu2O3_wt_percent_as_published: '0.52'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '52.85'
+          Al2O3: '10.85'
+          MgO: '18.81'
+          CaO: '17.17'
         points:
           - value: '0.08'
             T_C: '1400'
@@ -3045,8 +3047,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -18.0'
-      phase: l
+        note: 'Table 2 glasses AD+en at 1400 °C; printed log fO2 -18.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3066,10 +3068,10 @@ species:
         reported_value_as_published: '0.02'
         composition_Eu2O3_wt_percent_as_published: '0.52'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '52.85'
+          Al2O3: '10.85'
+          MgO: '18.81'
+          CaO: '17.17'
         points:
           - value: '0.02'
             T_C: '1400'
@@ -3095,8 +3097,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 0.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 0.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3116,10 +3118,10 @@ species:
         reported_value_as_published: '0.98'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.98'
             T_C: '1400'
@@ -3145,8 +3147,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -3.1'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -3.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3166,10 +3168,10 @@ species:
         reported_value_as_published: '0.95'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.95'
             T_C: '1400'
@@ -3195,8 +3197,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -4.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -4.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3216,10 +3218,10 @@ species:
         reported_value_as_published: '0.97'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.97'
             T_C: '1400'
@@ -3245,8 +3247,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -5.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -5.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3266,10 +3268,10 @@ species:
         reported_value_as_published: '0.87'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.87'
             T_C: '1400'
@@ -3295,8 +3297,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -6.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -6.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3316,10 +3318,10 @@ species:
         reported_value_as_published: '0.80'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.80'
             T_C: '1400'
@@ -3345,8 +3347,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -7.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -7.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3366,10 +3368,10 @@ species:
         reported_value_as_published: '0.71'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.71'
             T_C: '1400'
@@ -3395,8 +3397,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -8.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -8.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3416,10 +3418,10 @@ species:
         reported_value_as_published: '0.58'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.58'
             T_C: '1400'
@@ -3445,8 +3447,8 @@ species:
         published_page: 256
         pdf_page_index: 34
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. Parenthetical replicate σ as printed: (1); Table 2 says σ is from replicate measurements.'
@@ -3466,10 +3468,10 @@ species:
         reported_value_as_published: '0.45(1)'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.45'
             T_C: '1400'
@@ -3495,8 +3497,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -9.5'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -9.5. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3516,10 +3518,10 @@ species:
         reported_value_as_published: '0.37'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.37'
             T_C: '1400'
@@ -3545,8 +3547,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -10.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -10.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3566,10 +3568,10 @@ species:
         reported_value_as_published: '0.30'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.30'
             T_C: '1400'
@@ -3595,8 +3597,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -10.5'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -10.5. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3616,10 +3618,10 @@ species:
         reported_value_as_published: '0.25'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.25'
             T_C: '1400'
@@ -3645,8 +3647,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -11.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -11.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3666,10 +3668,10 @@ species:
         reported_value_as_published: '0.19'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.19'
             T_C: '1400'
@@ -3695,8 +3697,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -12.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -12.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3716,10 +3718,10 @@ species:
         reported_value_as_published: '0.12'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.12'
             T_C: '1400'
@@ -3745,8 +3747,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -13.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -13.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3766,10 +3768,10 @@ species:
         reported_value_as_published: '0.03'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.03'
             T_C: '1400'
@@ -3795,8 +3797,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -16.1'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -16.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3816,10 +3818,10 @@ species:
         reported_value_as_published: '0.01'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.01'
             T_C: '1400'
@@ -3845,8 +3847,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -18.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -18.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3866,10 +3868,10 @@ species:
         reported_value_as_published: '0.02'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.02'
             T_C: '1400'
@@ -3895,8 +3897,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -20.0'
-      phase: l
+        note: 'Table 2 glasses AD+qz at 1400 °C; printed log fO2 -20.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3916,10 +3918,10 @@ species:
         reported_value_as_published: '0.02'
         composition_Eu2O3_wt_percent_as_published: '0.53'
         composition_mass_percent:
-          SiO2: '51.21'
-          Al2O3: '15.41'
-          MgO: '10.41'
-          CaO: '23.90'
+          SiO2: '63.21'
+          Al2O3: '11.11'
+          MgO: '7.79'
+          CaO: '17.18'
         points:
           - value: '0.02'
             T_C: '1400'
@@ -3945,8 +3947,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 0.0'
-      phase: l
+        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 0.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -3998,8 +4000,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -2.0'
-      phase: l
+        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -2.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4051,8 +4053,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -3.1'
-      phase: l
+        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -3.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4104,8 +4106,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -4.0'
-      phase: l
+        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -4.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4157,8 +4159,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -5.0'
-      phase: l
+        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -5.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4210,8 +4212,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -6.0'
-      phase: l
+        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -6.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4263,8 +4265,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -7.0'
-      phase: l
+        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -7.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4316,8 +4318,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -8.0'
-      phase: l
+        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -8.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4369,8 +4371,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4422,8 +4424,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -10.0'
-      phase: l
+        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -10.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4475,8 +4477,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -11.0'
-      phase: l
+        note: 'Table 2 glasses MORB at 1400 °C; printed log fO2 -11.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4528,8 +4530,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses CAS-4 at 1400 °C; printed log fO2 -3.1'
-      phase: l
+        note: 'Table 2 glasses CAS-4 at 1400 °C; printed log fO2 -3.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4576,8 +4578,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses CAS-4 at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses CAS-4 at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4624,8 +4626,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: "Table 2 glasses CAS-4 at 1400 °C; printed log fO2 -13.0; printed fraction below the physical bound 0; consistent with ~0 within the method's precision"
-      phase: l
+        note: "Table 2 glasses CAS-4 at 1400 °C; printed log fO2 -13.0; printed fraction below the physical bound 0; consistent with ~0 within the method's precision. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights."
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4672,8 +4674,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses CAS-4 at 1400 °C; printed log fO2 -16.1'
-      phase: l
+        note: 'Table 2 glasses CAS-4 at 1400 °C; printed log fO2 -16.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4720,8 +4722,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MAS-1 at 1400 °C; printed log fO2 -3.1'
-      phase: l
+        note: 'Table 2 glasses MAS-1 at 1400 °C; printed log fO2 -3.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4770,8 +4772,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MAS-1 at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses MAS-1 at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4820,8 +4822,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: "Table 2 glasses MAS-1 at 1400 °C; printed log fO2 -13.0; printed fraction below the physical bound 0; consistent with ~0 within the method's precision"
-      phase: l
+        note: "Table 2 glasses MAS-1 at 1400 °C; printed log fO2 -13.0; printed fraction below the physical bound 0; consistent with ~0 within the method's precision. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights."
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4870,8 +4872,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses MAS-1 at 1400 °C; printed log fO2 -16.1'
-      phase: l
+        note: 'Table 2 glasses MAS-1 at 1400 °C; printed log fO2 -16.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4920,8 +4922,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Longhi1 at 1400 °C; printed log fO2 -3.1'
-      phase: l
+        note: 'Table 2 glasses Longhi1 at 1400 °C; printed log fO2 -3.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -4970,8 +4972,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Longhi1 at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses Longhi1 at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5020,8 +5022,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Longhi2 at 1400 °C; printed log fO2 -3.1'
-      phase: l
+        note: 'Table 2 glasses Longhi2 at 1400 °C; printed log fO2 -3.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5070,8 +5072,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Longhi2 at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses Longhi2 at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5120,8 +5122,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Longhi2 at 1400 °C; printed log fO2 -13.0'
-      phase: l
+        note: 'Table 2 glasses Longhi2 at 1400 °C; printed log fO2 -13.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5170,8 +5172,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Longhi2 at 1400 °C; printed log fO2 -16.1'
-      phase: l
+        note: 'Table 2 glasses Longhi2 at 1400 °C; printed log fO2 -16.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5220,8 +5222,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Longhi5 at 1400 °C; printed log fO2 -3.1'
-      phase: l
+        note: 'Table 2 glasses Longhi5 at 1400 °C; printed log fO2 -3.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5270,8 +5272,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Longhi5 at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses Longhi5 at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5320,8 +5322,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Longhi5 at 1400 °C; printed log fO2 -13.0'
-      phase: l
+        note: 'Table 2 glasses Longhi5 at 1400 °C; printed log fO2 -13.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5370,8 +5372,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Longhi5 at 1400 °C; printed log fO2 -16.1'
-      phase: l
+        note: 'Table 2 glasses Longhi5 at 1400 °C; printed log fO2 -16.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5420,8 +5422,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Osborn4 at 1400 °C; printed log fO2 -3.1'
-      phase: l
+        note: 'Table 2 glasses Osborn4 at 1400 °C; printed log fO2 -3.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5470,8 +5472,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Osborn4 at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses Osborn4 at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5520,8 +5522,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Osborn4 at 1400 °C; printed log fO2 -13.0'
-      phase: l
+        note: 'Table 2 glasses Osborn4 at 1400 °C; printed log fO2 -13.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5570,8 +5572,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Osborn4 at 1400 °C; printed log fO2 -16.1'
-      phase: l
+        note: 'Table 2 glasses Osborn4 at 1400 °C; printed log fO2 -16.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5620,8 +5622,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Zr-glass at 1400 °C; printed log fO2 0.0'
-      phase: l
+        note: 'Table 2 glasses Zr-glass at 1400 °C; printed log fO2 0.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5672,8 +5674,8 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 glasses Zr-glass at 1400 °C; printed log fO2 -9.0'
-      phase: l
+        note: 'Table 2 glasses Zr-glass at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
+      phase: glass
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
         note: 'Eu3+/SumEu fit uncertainty ±0.02 as stated in the Table 2 caption. No parenthetical replicate σ on this value.'
@@ -5724,7 +5726,7 @@ species:
         published_page: 257
         pdf_page_index: 35
         table: '2'
-        note: 'Table 2 melts AD at 1300 °C; printed log fO2 -3.4'
+        note: 'Table 2 melts AD at 1300 °C; printed log fO2 -3.4. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -5774,7 +5776,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1300 °C; printed log fO2 -9.1'
+        note: 'Table 2 melts AD at 1300 °C; printed log fO2 -9.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -5824,7 +5826,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1300 °C; printed log fO2 -12.1'
+        note: 'Table 2 melts AD at 1300 °C; printed log fO2 -12.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -5874,7 +5876,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1350 °C; printed log fO2 -11.5'
+        note: 'Table 2 melts AD at 1350 °C; printed log fO2 -11.5. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -5924,7 +5926,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -3.1'
+        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -3.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -5974,7 +5976,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -4.0'
+        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -4.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6024,7 +6026,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -5.0'
+        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -5.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6074,7 +6076,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -6.0'
+        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -6.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6124,7 +6126,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -7.0'
+        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -7.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6174,7 +6176,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -8.0'
+        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -8.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6224,7 +6226,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -9.0'
+        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6274,7 +6276,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -10.0'
+        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -10.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6324,7 +6326,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -11.0'
+        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -11.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6374,7 +6376,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -12.0'
+        note: 'Table 2 melts AD at 1400 °C; printed log fO2 -12.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6424,7 +6426,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts AD at 1450 °C; printed log fO2 -10.5'
+        note: 'Table 2 melts AD at 1450 °C; printed log fO2 -10.5. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6474,7 +6476,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -3.6'
+        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -3.6. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6526,7 +6528,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -5.7'
+        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -5.7. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6578,7 +6580,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -6.7'
+        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -6.7. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6630,7 +6632,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -7.7'
+        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -7.7. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6682,7 +6684,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -8.7'
+        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -8.7. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6734,7 +6736,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -9.7'
+        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -9.7. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6786,7 +6788,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -10.7'
+        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -10.7. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6838,7 +6840,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -11.7'
+        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -11.7. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6890,7 +6892,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -12.7'
+        note: 'Table 2 melts MORB at 1250 °C; printed log fO2 -12.7. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6942,7 +6944,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1300 °C; printed log fO2 -11.1'
+        note: 'Table 2 melts MORB at 1300 °C; printed log fO2 -11.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -6994,7 +6996,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1350 °C; printed log fO2 -3.2'
+        note: 'Table 2 melts MORB at 1350 °C; printed log fO2 -3.2. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -7046,7 +7048,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1350 °C; printed log fO2 -10.5'
+        note: 'Table 2 melts MORB at 1350 °C; printed log fO2 -10.5. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -7098,7 +7100,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -3.1'
+        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -3.1. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -7150,7 +7152,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -4.0'
+        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -4.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -7202,7 +7204,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -5.0'
+        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -5.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -7254,7 +7256,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -6.0'
+        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -6.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -7306,7 +7308,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -7.0'
+        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -7.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -7358,7 +7360,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -8.0'
+        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -8.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -7410,7 +7412,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -9.0'
+        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -9.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -7462,7 +7464,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -10.0'
+        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -10.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -7514,7 +7516,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -11.0'
+        note: 'Table 2 melts MORB at 1400 °C; printed log fO2 -11.0. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -7566,7 +7568,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1450 °C; printed log fO2 -2.9'
+        note: 'Table 2 melts MORB at 1450 °C; printed log fO2 -2.9. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
@@ -7618,7 +7620,7 @@ species:
         published_page: 258
         pdf_page_index: 36
         table: '2'
-        note: 'Table 2 melts MORB at 1450 °C; printed log fO2 -9.5'
+        note: 'Table 2 melts MORB at 1450 °C; printed log fO2 -9.5. Stored value is from the Eu3+ peak column only; Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights.'
       phase: l
       units: dimensionless Eu3+/SumEu fraction
       uncertainty:
