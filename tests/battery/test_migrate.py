@@ -7654,7 +7654,6 @@ def test_l01_map_quantity_direct_witnesses() -> None:
         ("stable_isotope_delta", Quantity.ISOTOPE_DELTA),
         ("delta_53Cr_average", Quantity.ISOTOPE_DELTA),
         ("delta_53Cr_reference_material", Quantity.ISOTOPE_DELTA),
-        ("free_evap_residue_composition_vs_time", Quantity.RESIDUE_COMPONENT_COMPOSITION),
     ],
 )
 def test_l02_empirical_quantity_aliases_are_closed(alias: str, expected: Quantity) -> None:
@@ -7707,15 +7706,6 @@ def test_l02_empirical_quantity_aliases_map_numeric_witnesses() -> None:
             },
             "wt_pct_mass_loss",
             Quantity.MASS_LOSS_FRACTION,
-        ),
-        (
-            "free_evap_residue_composition_vs_time",
-            {
-                "quantity": "free_evap_residue_composition_vs_time",
-                "series": [{"T_C": 1700, "FeO_wt_pct": 27.92}],
-            },
-            "wt_pct",
-            Quantity.RESIDUE_COMPONENT_COMPOSITION,
         ),
         (
             "ion_count_rate",

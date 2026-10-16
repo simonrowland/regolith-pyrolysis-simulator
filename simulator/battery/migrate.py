@@ -483,7 +483,6 @@ QUANTITY_ALIASES = {
     "stable_isotope_delta": Quantity.ISOTOPE_DELTA,
     "delta_53Cr_average": Quantity.ISOTOPE_DELTA,
     "delta_53Cr_reference_material": Quantity.ISOTOPE_DELTA,
-    "free_evap_residue_composition_vs_time": Quantity.RESIDUE_COMPONENT_COMPOSITION,
     "open_furnace_residue_composition_vs_time": Quantity.RESIDUE_COMPONENT_COMPOSITION,
     "residue_composition_vs_time": Quantity.RESIDUE_COMPONENT_COMPOSITION,
 }

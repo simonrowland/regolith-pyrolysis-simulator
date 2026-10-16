@@ -166,6 +166,24 @@ def test_demaria_table4_points_keep_printed_values_and_temperatures(migrated_tar
     )
 
 
+def test_hashimoto_geometry_is_not_residue_composition(migrated_targets) -> None:
+    geometry = [
+        observation
+        for observation in _source_observations(
+            migrated_targets, "kems-015-hashimoto-1983"
+        )
+        if observation.observation_id.endswith(
+            "hashimoto_1983_fe_fcmas_free_evap_geometry"
+        )
+    ]
+    assert len(geometry) == 1
+    quantity = geometry[0].identity.quantity
+    assert (
+        not quantity.is_value
+        or quantity.value is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+
+
 def test_nakano_numeric_runs_emit_stable_mass_loss_points(migrated_targets) -> None:
     observations = _source_observations(
         migrated_targets, "nakano-hashimoto-2020-bubbles-to-chondrites-i"
