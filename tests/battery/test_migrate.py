@@ -1189,7 +1189,7 @@ def test_darken_gurry_equilibrium_compositions_migrate_with_conditions() -> None
         for observation in migrator.result.observations.values()
         if observation.source_id == "darken-gurry-1946-iron-oxygen-ii"
     }
-    assert len(observations) == 88
+    assert len(observations) == 92
     assert not migrator.result.validation.hard_issues
     assert all(
         observation.identity.temperature_K.is_value
@@ -1213,6 +1213,39 @@ def test_darken_gurry_equilibrium_compositions_migrate_with_conditions() -> None
     table_iii_a = observations["dg46_t3a_1390_fe2o3"]
     assert table_iii_a.value.point == Decimal("1.081")
     assert "equilibrium_boundary" in table_iii_a.point_conditions
+    assert observations["dg46_t3a_1455_iron"].value.point == Decimal("1.067")
+
+    assert [
+        observations[row_id].value.point
+        for row_id in (
+            "dg46_t1_j_1605_fe2o3_a",
+            "dg46_t1_j_1605_fe2o3_b",
+        )
+    ] == [Decimal("2.824"), Decimal("2.850")]
+
+    for row_id, temperature, value, starting_material in (
+        ("dg46_t1_l_1615_fe2o3", "1615", "3.881", "Fe2O3"),
+        ("dg46_t1_l_1632_fe2o3", "1632", "4.033", "Fe2O3"),
+        ("dg46_t1_l_1632_wustite", "1632", "3.958", "Wustite"),
+        ("dg46_t1_l_1636_fe2o3", "1636", "3.998", "Fe2O3"),
+    ):
+        observation = observations[row_id]
+        assert observation.identity.temperature_K.value == (
+            Decimal(temperature) + Decimal("273.15")
+        )
+        assert observation.value.point == Decimal(value)
+        assert (
+            observation.point_conditions["starting_material"].state.value
+            == starting_material
+        )
+
+    condensed_rows = [
+        observation
+        for observation in observations.values()
+        if observation.identity.species.formula == "FeO"
+    ]
+    assert len(condensed_rows) == 89
+    assert all(row.identity.species.phase.value is Phase.L for row in condensed_rows)
 
     table_iii_b = observations["dg46_t3b_1436"]
     assert (

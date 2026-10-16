@@ -13,19 +13,19 @@ extraction:
   worker: dg46-1016
 review_status: draft
 fidelity_samples:
-  - species: FeO_liquid
+  - species: FeO
     observable: equilibrium_phase_composition
     observation_id: dg46_t1_a_1383_wustite
     field: r_as_printed
     value: 1.096
     locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'A, 1383 C'}
-  - species: FeO_liquid
+  - species: FeO
     observable: equilibrium_phase_composition
     observation_id: dg46_t1_l_1589_fe2o3
     field: r_as_printed
     value: 4.237
     locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1589 C, Fe2O3'}
-  - species: FeO_liquid
+  - species: FeO
     observable: equilibrium_phase_composition
     observation_id: dg46_t3a_1390_fe2o3
     field: r_as_printed
@@ -141,7 +141,7 @@ experiments:
         state: {tag: value, value: 'Oxygen, 1 atmosphere'}
         locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'L'}
 species:
-  FeO_liquid:
+  FeO:
     observations:
       - observation_id: dg46_t1_a_1383_wustite
         experiment: dg46_t1_a
@@ -567,7 +567,7 @@ species:
         point_conditions:
           starting_material: {state: {tag: value, value: Fe}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1455 C, Fe'}}
           equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
-        values: {quantity: equilibrium_phase_composition, basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed', method_class: measured_direct, T_C: 1455, r_as_printed: 1.007}
+        values: {quantity: equilibrium_phase_composition, basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed', method_class: measured_direct, T_C: 1455, r_as_printed: 1.067}
       - observation_id: dg46_t1_g_1485_wustite
         experiment: dg46_t1_g
         type: equilibrium_phase_composition
@@ -832,21 +832,21 @@ species:
       - observation_id: dg46_t1_j_1605_fe2o3_a
         experiment: dg46_t1_j
         type: equilibrium_phase_composition
-        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'J, 1605 C, first printed r'}
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'J, 1605 C, first printed r', note: 'Printed brace pairs these determinations; separate crucibles.'}
         phase: liquid iron oxide
         units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
         point_conditions:
           starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'J, 1605 C'}}
-        values: {quantity: equilibrium_phase_composition, basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed', method_class: measured_direct, T_C: 1605, r_as_printed: '<2.824'}
+        values: {quantity: equilibrium_phase_composition, basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed', method_class: measured_direct, T_C: 1605, r_as_printed: 2.824}
       - observation_id: dg46_t1_j_1605_fe2o3_b
         experiment: dg46_t1_j
         type: equilibrium_phase_composition
-        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'J, 1605 C, second printed r'}
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'J, 1605 C, second printed r', note: 'Printed brace pairs these determinations; separate crucibles.'}
         phase: liquid iron oxide
         units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
         point_conditions:
           starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'J, 1605 C'}}
-        values: {quantity: equilibrium_phase_composition, basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed', method_class: measured_direct, T_C: 1605, r_as_printed: '[2.850]'}
+        values: {quantity: equilibrium_phase_composition, basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed', method_class: measured_direct, T_C: 1605, r_as_printed: 2.850}
       - observation_id: dg46_t1_j_1606_fe2o3
         experiment: dg46_t1_j
         type: equilibrium_phase_composition
@@ -910,6 +910,42 @@ species:
         point_conditions:
           starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1607 C'}}
         values: {quantity: equilibrium_phase_composition, basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed', method_class: measured_direct, T_C: 1607, r_as_printed: 4.007}
+      - observation_id: dg46_t1_l_1615_fe2o3
+        experiment: dg46_t1_l
+        type: equilibrium_phase_composition
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1615 C, Fe2O3'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1615 C'}}
+        values: {quantity: equilibrium_phase_composition, basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed', method_class: measured_direct, T_C: 1615, r_as_printed: 3.881}
+      - observation_id: dg46_t1_l_1632_fe2o3
+        experiment: dg46_t1_l
+        type: equilibrium_phase_composition
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1632 C, Fe2O3'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1632 C'}}
+        values: {quantity: equilibrium_phase_composition, basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed', method_class: measured_direct, T_C: 1632, r_as_printed: 4.033}
+      - observation_id: dg46_t1_l_1632_wustite
+        experiment: dg46_t1_l
+        type: equilibrium_phase_composition
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1632 C, Wustite'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1632 C'}}
+        values: {quantity: equilibrium_phase_composition, basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed', method_class: measured_direct, T_C: 1632, r_as_printed: 3.958}
+      - observation_id: dg46_t1_l_1636_fe2o3
+        experiment: dg46_t1_l
+        type: equilibrium_phase_composition
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1636 C, Fe2O3'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1636 C'}}
+        values: {quantity: equilibrium_phase_composition, basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed', method_class: measured_direct, T_C: 1636, r_as_printed: 3.998}
   CO2:
     observations:
       - observation_id: dg46_t3b_1376

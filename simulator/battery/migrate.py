@@ -367,6 +367,8 @@ PHASE_MAP: dict[str, Phase] = {
     "l": Phase.L,
     "liquid_sodium": Phase.L,
     "liquid sodium": Phase.L,
+    "liquid iron oxide": Phase.L,
+    "liquid iron oxide in equilibrium with iron": Phase.L,
     "aq": Phase.AQ,
     "glass": Phase.GLASS,
     "supercooled_l": Phase.SUPERCOOLED_L,
@@ -14313,7 +14315,10 @@ class Migrator:
                 )
             }
         raw_point_conditions = obs.get("point_conditions")
-        if isinstance(raw_point_conditions, Mapping):
+        if (
+            q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and isinstance(raw_point_conditions, Mapping)
+        ):
             point_conditions = {
                 **(point_conditions or {}),
                 **{
