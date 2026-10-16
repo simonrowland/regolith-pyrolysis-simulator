@@ -48,8 +48,8 @@ def _species_formula_registry() -> dict[str, Any]:
     """Return formulas for every species in the full catalog (cached).
 
     This deliberately uses the unfiltered catalog. The simulator's base registry
-    drops rows with ``direct_vapour_flux: false``, which would refuse known
-    species in these diagnostics.
+    drops ``_gas`` rows marked ``direct_vapour_flux: false`` (e.g. FeO_gas,
+    P2O5_gas), which would refuse those known species in these diagnostics.
     """
 
     return load_species_formulas(_SPECIES_CATALOG_PATH)
