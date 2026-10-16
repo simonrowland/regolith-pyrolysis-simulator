@@ -1148,6 +1148,146 @@ def test_registry_composition_accepts_existing_mapping_inference_inputs() -> Non
     )
 
 
+def test_fo2_gas_ratio_round_trips_as_a_located_printed_value() -> None:
+    from simulator.battery.migrate import _experiment_from_plain, to_plain
+
+    extract_path = Path(__file__).parents[2] / "data/literature/extracts/ta-badro-2021.yaml"
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    raw = extract["experiments"][0]
+    raw["fO2_control"] = {
+        "channel": {"tag": "value", "value": "gas_mix"},
+        "gas_ratio": {
+            "numerator_species": "CO2",
+            "denominator_species": "CO",
+            "value": {
+                "state": {"tag": "value", "value": 1.4},
+                "locator": {"published_page": 800, "table": "I"},
+            },
+            "basis": "partial_pressure",
+        },
+    }
+
+    experiment = _experiment_from_plain(raw, registry_issues=[])
+    serialized = to_plain(experiment)
+
+    ratio = serialized["fO2_control"]["gas_ratio"]
+    assert ratio["numerator_species"] == "CO2"
+    assert ratio["denominator_species"] == "CO"
+    assert ratio["basis"] == "partial_pressure"
+    assert ratio["value"]["state"]["value"]["point"] == "1.4"
+    assert ratio["value"]["locator"] == {"published_page": 800, "table": "I"}
+
+
+def test_darken_gurry_equilibrium_compositions_migrate_with_conditions() -> None:
+    extract = REPO_ROOT / "data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml"
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    observations = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "darken-gurry-1946-iron-oxygen-ii"
+    }
+    assert len(observations) == 92
+    assert not migrator.result.validation.hard_issues
+    assert all(
+        observation.identity.temperature_K.is_value
+        for observation in observations.values()
+    )
+    assert all(observation.point_conditions for observation in observations.values())
+
+    table_i = observations["dg46_t1_a_1383_wustite"]
+    assert table_i.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    assert table_i.identity.subtype.value == "r=(Fe++ + Fe+++)/Fe++ as printed"
+    assert table_i.value.point == Decimal("1.096")
+    assert table_i.identity.temperature_K.value == Decimal("1656.15")
+    assert "starting_material" in table_i.point_conditions
+    control = migrator.result.experiments[table_i.experiment_id].fO2_control
+    assert control is not None and control.gas_ratio is not None
+    assert control.gas_ratio.numerator_species == "CO2"
+    assert control.gas_ratio.denominator_species == "CO"
+    assert control.gas_ratio.basis == "partial_pressure"
+    assert control.gas_ratio.value.state.value.point == Decimal("0.376")
+
+    table_iii_a = observations["dg46_t3a_1390_fe2o3"]
+    assert table_iii_a.value.point == Decimal("1.081")
+    assert "equilibrium_boundary" in table_iii_a.point_conditions
+    assert observations["dg46_t3a_1455_iron"].value.point == Decimal("1.067")
+
+    assert [
+        observations[row_id].value.point
+        for row_id in (
+            "dg46_t1_j_1605_fe2o3_a",
+            "dg46_t1_j_1605_fe2o3_b",
+        )
+    ] == [Decimal("2.824"), Decimal("2.850")]
+
+    for row_id, temperature, value, starting_material in (
+        ("dg46_t1_l_1596_fe2o3", "1596", "4.067", "Fe2O3"),
+        ("dg46_t1_l_1615_fe2o3", "1615", "3.881", "Fe2O3"),
+        ("dg46_t1_l_1632_fe2o3", "1632", "4.033", "Fe2O3"),
+        ("dg46_t1_l_1632_wustite", "1632", "3.958", "Wustite"),
+        ("dg46_t1_l_1636_fe2o3", "1636", "3.998", "Fe2O3"),
+    ):
+        observation = observations[row_id]
+        assert observation.identity.temperature_K.value == (
+            Decimal(temperature) + Decimal("273.15")
+        )
+        assert observation.value.point == Decimal(value)
+        assert (
+            observation.point_conditions["starting_material"].state.value
+            == starting_material
+        )
+
+    condensed_rows = [
+        observation
+        for observation in observations.values()
+        if observation.identity.species.formula == "Fe(1-x)O"
+    ]
+    assert len(condensed_rows) == 89
+    assert Counter(
+        (
+            row.identity.species.formula,
+            row.identity.species.phase.value.value,
+            row.identity.species.charge.value,
+        )
+        for row in condensed_rows
+    ) == {("Fe(1-x)O", "l", 0): 89}
+    assert all(
+        row.identity.subtype.value == "r=(Fe++ + Fe+++)/Fe++ as printed"
+        for row in condensed_rows
+    )
+
+    table_iii_b = observations["dg46_t3b_1436"]
+    assert (
+        table_iii_b.identity.quantity.value
+        is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+    assert table_iii_b.identity.species.phase.value is Phase.G
+    assert table_iii_b.identity.subtype.value == "pCO2/pCO"
+    assert table_iii_b.value.point == Decimal("0.233")
+    assert "equilibrium_boundary" in table_iii_b.point_conditions
+
+    oxygen_run = observations["dg46_t1_l_1589_fe2o3"]
+    oxygen_control = migrator.result.experiments[
+        oxygen_run.experiment_id
+    ].fO2_control
+    assert oxygen_control is not None
+    assert oxygen_control.oxygen_partial_pressure_Pa is not None
+    assert oxygen_control.oxygen_partial_pressure_Pa.state.value.point == Decimal(
+        "101325"
+    )
+    for row_id, observation in observations.items():
+        if row_id.startswith("dg46_t1_l_"):
+            assert observation.experiment_id == oxygen_run.experiment_id
+            assert migrator.result.experiments[
+                observation.experiment_id
+            ].fO2_control.oxygen_partial_pressure_Pa.state.value.point == Decimal(
+                "101325"
+            )
+
+
 def test_malformed_registry_inference_records_issue_without_dropping_value() -> None:
     from simulator.battery.migrate import _experiment_from_plain
 

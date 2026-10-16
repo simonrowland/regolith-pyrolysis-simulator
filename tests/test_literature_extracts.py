@@ -1363,6 +1363,41 @@ def test_minimal_extract_valid():
     assert errs == []
 
 
+@pytest.mark.parametrize(
+    ("numerator", "denominator", "basis"),
+    [
+        ("CO2", "CO", "unknown"),
+        ("CO", "CO", "mole"),
+        ("", "CO", "volume"),
+    ],
+)
+def test_gas_ratio_validation_rejects_invalid_basis_or_species(
+    numerator: str, denominator: str, basis: str
+) -> None:
+    doc = _minimal_extract()
+    doc["experiments"] = [
+        {
+            "experiment_id": "run-1",
+            "fO2_control": {
+                "channel": {"tag": "value", "value": "gas_mix"},
+                "gas_ratio": {
+                    "numerator_species": numerator,
+                    "denominator_species": denominator,
+                    "basis": basis,
+                    "value": {
+                        "state": {"tag": "value", "value": 0.5},
+                        "locator": {"page": 1},
+                    },
+                },
+            },
+        }
+    ]
+
+    errors = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+
+    assert any("invalid gas ratio" in error for error in errors), errors
+
+
 def test_refuses_context_container_outside_species_block():
     doc = _minimal_extract()
     row = {

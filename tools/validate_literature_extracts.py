@@ -94,6 +94,7 @@ OBSERVATION_TYPES = frozenset(
         "gas_speciation",
         "sulfur_solubility_and_sulfate_capacity_series",
         "composition_series",
+        "equilibrium_phase_composition",
     }
 )
 
@@ -1544,6 +1545,43 @@ def _check_sweep_gases(doc: Mapping[str, Any], label: str, errors: list[str]) ->
             errors.append(f"{path}: invalid sweep gas: {exc}")
 
 
+def _check_gas_ratios(doc: Mapping[str, Any], label: str, errors: list[str]) -> None:
+    from simulator.battery.migrate import _located_from_plain, _value_or_point_from_plain
+    from simulator.battery.records import GasRatio
+
+    experiments = doc.get("experiments", ())
+    if isinstance(experiments, Mapping):
+        experiments = experiments.values()
+    elif not isinstance(experiments, (list, tuple)):
+        return
+    for i, experiment in enumerate(experiments):
+        if not isinstance(experiment, Mapping):
+            continue
+        control = experiment.get("fO2_control")
+        if not isinstance(control, Mapping) or control.get("gas_ratio") is None:
+            continue
+        path = f"{label}:experiments[{i}].fO2_control.gas_ratio"
+        ratio = control["gas_ratio"]
+        try:
+            if not isinstance(ratio, Mapping):
+                raise ValueError("must be a mapping")
+            numerator = ratio.get("numerator_species")
+            denominator = ratio.get("denominator_species")
+            if not isinstance(numerator, str) or not isinstance(denominator, str):
+                raise ValueError("ratio species must be text")
+            located = _located_from_plain(ratio["value"], _value_or_point_from_plain)
+            GasRatio(
+                numerator_species=numerator,
+                denominator_species=denominator,
+                value=located,
+                basis=ratio.get("basis"),
+            )
+            if located.state.is_value and located.locator is None:
+                errors.append(f"{path}.value: empirical Located value requires a locator")
+        except (KeyError, TypeError, ValueError, ArithmeticError) as exc:
+            errors.append(f"{path}: invalid gas ratio: {exc}")
+
+
 def validate_extract_document(
     doc: Any,
     *,
@@ -1666,6 +1704,7 @@ def validate_extract_document(
                         _check_context_row(row, f"{spath}.context[{i}]", errors, seen)
 
     _check_sweep_gases(doc, label, errors)
+    _check_gas_ratios(doc, label, errors)
 
     # ENFORCED_FOR_NEW: require samples unless source_id is pre-policy allowlisted.
     is_pre_policy = False

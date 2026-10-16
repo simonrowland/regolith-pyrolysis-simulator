@@ -125,6 +125,7 @@ from simulator.battery.records import (
     Experiment,
     FlowRegime,
     FO2Control,
+    GasRatio,
     Located,
     Locator,
     Notice,
@@ -366,6 +367,8 @@ PHASE_MAP: dict[str, Phase] = {
     "l": Phase.L,
     "liquid_sodium": Phase.L,
     "liquid sodium": Phase.L,
+    "liquid iron oxide": Phase.L,
+    "liquid iron oxide in equilibrium with iron": Phase.L,
     "aq": Phase.AQ,
     "glass": Phase.GLASS,
     "supercooled_l": Phase.SUPERCOOLED_L,
@@ -1151,7 +1154,7 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
 def _point_condition_from_plain(
     payload: object, *, key: str | None = None
 ) -> Located[Any]:
-    """Decimal lab axes, or a printed/derived composition map."""
+    """Located lab axes, printed condition text, or a printed composition map."""
 
     if isinstance(payload, Located):
         return payload
@@ -1160,6 +1163,10 @@ def _point_condition_from_plain(
             payload,
             lambda value: value if isinstance(value, str) else as_decimal(value),
         )
+    if isinstance(payload, Mapping) and isinstance(payload.get("state"), Mapping):
+        state = payload["state"]
+        if state.get("tag") == "value" and isinstance(state.get("value"), str):
+            return _located_from_plain(payload, lambda value: value)
     if key == "pressure_on_throw_Torr":
         return _located_from_plain(
             payload,
@@ -2253,6 +2260,16 @@ def _experiment_from_plain(
             if fo2.get("oxygen_partial_pressure_Pa") is None
             else _located_from_plain(
                 fo2["oxygen_partial_pressure_Pa"], _value_or_point_from_plain
+            ),
+            gas_ratio=None
+            if fo2.get("gas_ratio") is None
+            else GasRatio(
+                numerator_species=str(fo2["gas_ratio"]["numerator_species"]),
+                denominator_species=str(fo2["gas_ratio"]["denominator_species"]),
+                value=_located_from_plain(
+                    fo2["gas_ratio"]["value"], _value_or_point_from_plain
+                ),
+                basis=str(fo2["gas_ratio"]["basis"]),
             ),
         )
     return Experiment(
@@ -8099,6 +8116,11 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "FeO_wt_pct",
         "MgO_wt_pct",
         "CaO_wt_pct",
+    ),
+    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: (
+        "r_as_printed",
+        "pCO2_over_pCO_as_printed",
+        "value",
     ),
 }
 
@@ -14187,6 +14209,14 @@ class Migrator:
                             source=source_key,
                             observation_id=obs_id,
                         )
+        if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+            basis = values.get("basis_as_published")
+            if isinstance(basis, str) and basis.strip():
+                ident_kwargs["subtype"] = State.of(basis)
+            else:
+                ident_kwargs["subtype"] = State.unknown(
+                    "source does not state equilibrium composition basis"
+                )
         if q_token in FUSION_QUANTITIES:
             ident_kwargs["subtype"] = State.of("solid_to_liquid")
         if q_token is Quantity.TRANSITION_TEMPERATURE and (
@@ -14283,6 +14313,18 @@ class Migrator:
                     _temperature_field_raw(t_payload, t_sel.field_name),
                     temperature_locator,
                 )
+            }
+        raw_point_conditions = obs.get("point_conditions")
+        if (
+            q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and isinstance(raw_point_conditions, Mapping)
+        ):
+            point_conditions = {
+                **(point_conditions or {}),
+                **{
+                    str(key): _point_condition_from_plain(value, key=str(key))
+                    for key, value in raw_point_conditions.items()
+                },
             }
         if composition_located is not None:
             point_conditions = {

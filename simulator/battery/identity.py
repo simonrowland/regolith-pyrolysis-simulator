@@ -727,6 +727,13 @@ def profile_for(identity: Identity) -> QuantityProfile:
         # Here area only scales the integrator: experiment_id pins the run, so
         # assumed geometry remains prediction provenance rather than identity.
         na("fO2_Pa")
+    elif q is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+        req("temperature_K", "subtype")
+        na(
+            "per", "standard_pressure_Pa", "reaction", "formation_elements",
+            "reference_state", "composition", "fO2_Pa", "total_pressure_Pa",
+            "sweep_gas", "exposure", "sample_mass_kg", "wall", "reservoir",
+        )
     elif q in {
         Quantity.VISCOSITY,
         Quantity.DENSITY,
