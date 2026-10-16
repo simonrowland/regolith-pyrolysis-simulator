@@ -408,6 +408,59 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     assert "cached_interpolated_linear_estimate" in payload["equilibrium_result"]["warnings"]
 
 
+def test_cached_interpolation_uses_query_fo2_and_drops_neighbor_echo(
+    tmp_path: Path,
+) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    query["controls"]["log_fO2"] = -9.0
+    low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1499.0)
+    low["controls"]["log_fO2"] = -9.0001
+    high = _interpolation_key("high", feo_fraction=0.20, temperature_K=1501.0)
+    high["controls"]["log_fO2"] = -8.9999
+
+    low_payload = _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0)
+    low_payload["equilibrium_result"].update(
+        requested_fO2_log=-9.0001,
+        printed_fO2_echo_log=-9.0,
+    )
+    high_payload = _interpolation_payload(liquid_fraction=0.71, sio_pa=7.05)
+    high_payload["equilibrium_result"].update(
+        requested_fO2_log=-8.9999,
+        printed_fO2_echo_log=-9.0,
+    )
+
+    attempt = rci.attempt_cached_interpolation(
+        query,
+        [_candidate(low, low_payload), _candidate(high, high_payload)],
+    )
+
+    assert attempt is not None
+    assert attempt["weight_info"]["weights"] == pytest.approx([0.5, 0.5])
+    interpolated_result = attempt["payload"]["equilibrium_result"]
+    assert interpolated_result["fO2_log"] == pytest.approx(-9.0)
+    assert interpolated_result["requested_fO2_log"] == pytest.approx(-9.0)
+    assert interpolated_result["printed_fO2_echo_log"] is None
+
+    store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / "interpolated-requested-fo2.sqlite",
+    )
+    store.last_cache_state = "cached_interpolated"
+    sim = SimpleNamespace(
+        melt=SimpleNamespace(
+            fO2_log=-8.0,
+            melt_fO2_log=-8.0,
+        ),
+    )
+    replayed = store._equilibrium_from_payload(sim, attempt["payload"])
+
+    assert replayed.fO2_log == pytest.approx(-9.0)
+    assert replayed.requested_fO2_log == pytest.approx(-9.0)
+    assert replayed.printed_fO2_echo_log is None
+    assert sim.melt.fO2_log == pytest.approx(-9.0)
+    assert sim.melt.melt_fO2_log == pytest.approx(-9.0)
+
+
 def test_interpolation_reemits_union_from_every_used_neighbor(tmp_path: Path) -> None:
     query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
     low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1490.0)
