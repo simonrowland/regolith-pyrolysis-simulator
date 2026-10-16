@@ -5745,6 +5745,36 @@ def predict_with_engine(
             requested_composition=requested,
             version=engine_version,
         )
+    if (
+        engine is Engine.THERMOENGINE
+        and quantity is Quantity.ACTIVITY
+        and qualification
+    ):
+        # The shared MELTS commissioning gate owns the 1073.15-1700 K /
+        # 30-80 wt% SiO2 band. A numeric ThermoEngine gamma outside it is
+        # retained as extrapolated, with the gamma-domain notice used by this
+        # activity rail rather than the generic commissioning notice.
+        qualification_notice = qualification_battery_notice(
+            quantity, engine, gate
+        )
+        notices = tuple(
+            notice
+            for notice in notices
+            if not (
+                notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                and notice.origin == f"engine:{engine.value}"
+            )
+        )
+        notices = union_notices(
+            notices,
+            (
+                replace(
+                    qualification_notice,
+                    kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                    authority=Authority.EXTRAPOLATED,
+                ),
+            ),
+        )
     expanded = expand_coefficient_sources(sources)
     return EnginePrediction(
         engine=engine,
