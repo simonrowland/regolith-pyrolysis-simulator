@@ -20,6 +20,7 @@ from __future__ import annotations
 import math
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Final, Literal
 
@@ -39,6 +40,16 @@ from simulator.yaml_cache import load_cached_safe_yaml
 _REPO_ROOT: Final[Path] = Path(__file__).resolve().parents[1]
 _EXTRACTS_DIR: Final[Path] = _REPO_ROOT / "data" / "literature" / "extracts"
 _VAPOR_PRESSURES_PATH: Final[Path] = _REPO_ROOT / "data" / "vapor_pressures.yaml"
+
+
+@lru_cache(maxsize=1)
+def _species_formula_registry() -> dict[str, Any]:
+    """Return the simulator's cached base catalog formula registry."""
+
+    from simulator.core import PyrolysisSimulator
+
+    return PyrolysisSimulator._load_species_formula_registry()
+
 
 # ---------------------------------------------------------------------------
 # Comparability gate (mirror of rps-evid si-comparability / rail_system_class)
@@ -1206,7 +1217,9 @@ def report_species_class_diagnostics(
         M = (
             float(molar_mass_kg_mol)
             if molar_mass_kg_mol is not None
-            else resolve_species_formula(species).molar_mass_kg_per_mol()
+            else resolve_species_formula(
+                species, _species_formula_registry()
+            ).molar_mass_kg_per_mol()
         )
         series = interface_resistance_share(
             species=species,

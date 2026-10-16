@@ -175,45 +175,72 @@ def test_report_species_class_diagnostics_class_alpha_fallback_unchanged():
 
 
 @pytest.mark.parametrize(
-    "species",
+    ("species", "formula"),
     [
-        "Al2",
-        "Al2O",
-        "Al2O2",
-        "Al2O3_gas",
-        "AlO",
-        "AlO2",
-        "Ca2",
-        "CrO",
-        "CrO2",
-        "CrO3",
-        "TiO",
-        "TiO2_gas",
+        ("Al2", "Al2"),
+        ("Al2O", "Al2O"),
+        ("Al2O2", "Al2O2"),
+        ("Al2O3_gas", "Al2O3"),
+        ("AlO", "AlO"),
+        ("AlO2", "AlO2"),
+        ("Ca2", "Ca2"),
+        ("CrO", "CrO"),
+        ("CrO2", "CrO2"),
+        ("CrO3", "CrO3"),
+        ("TiO", "TiO"),
+        ("TiO2_gas", "TiO2"),
+        ("SiO", "SiO"),
+        ("Na", "Na"),
+        ("Na2", "Na2"),
+        ("Si", "Si"),
+        ("Si2", "Si2"),
+        ("Al", "Al"),
+        ("Cr", "Cr"),
+        ("Mn", "Mn"),
+        ("MgO_gas", "MgO"),
+        ("Na2O_gas", "Na2O"),
+        ("K2O_gas", "K2O"),
+        ("SiO2_gas", "SiO2"),
+        ("CaO_gas", "CaO"),
     ],
 )
-def test_report_species_class_diagnostics_default_mass_uses_formula_owner(species):
-    kwargs = dict(
+def test_report_species_class_diagnostics_default_mass_uses_formula_owner(
+    species, formula, monkeypatch
+):
+    formula_mass = resolve_species_formula(formula).molar_mass_kg_per_mol()
+    observed_masses = []
+    original_share = evaporation_classes.interface_resistance_share
+
+    def capture_mass(**kwargs):
+        observed_masses.append(kwargs["molar_mass_kg_mol"])
+        # Some formula-covered species have no diagnostic transport proxy;
+        # use Fe downstream while preserving the mass handed to the owner.
+        return original_share(**{**kwargs, "species": "Fe"})
+
+    monkeypatch.setattr(
+        evaporation_classes, "interface_resistance_share", capture_mass
+    )
+    diag = report_species_class_diagnostics(
+        species,
         T_K=2000.0,
         overhead_pressure_pa=1000.0,
         alpha_override=0.1,
         vapor_pressure_data={},
     )
-    try:
-        formula_mass = resolve_species_formula(species).molar_mass_kg_per_mol()
-    except UnknownSpeciesError:
-        with pytest.raises(UnknownSpeciesError):
-            report_species_class_diagnostics(species, **kwargs)
-        return
 
-    assert formula_mass != 0.050
-    default_mass = report_species_class_diagnostics(species, **kwargs)
-    formula_mass_result = report_species_class_diagnostics(
-        species,
-        **kwargs,
-        molar_mass_kg_mol=formula_mass,
-    )
-    assert default_mass.series is not None
-    assert default_mass == formula_mass_result
+    assert diag.series is not None
+    assert observed_masses == [formula_mass]
+
+
+def test_report_species_class_diagnostics_unknown_species_refuses_typed():
+    with pytest.raises(UnknownSpeciesError, match="unknown species"):
+        report_species_class_diagnostics(
+            "not_a_catalog_species",
+            T_K=2000.0,
+            overhead_pressure_pa=1000.0,
+            alpha_override=0.1,
+            vapor_pressure_data={},
+        )
 
 
 def test_costa_redox_grounding_uses_owner_figure_series_once():
