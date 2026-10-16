@@ -1,0 +1,578 @@
+schema_version: literature_extract.v1
+source_id: kroger-fingas-1935-alkali-silicate-equilibria
+source:
+  citation: >-
+    Kröger C. and Fingas E. (1935), Über die Systeme Alkalioxyd-CaO-Al2O3-SiO2-CO2.
+    V. Die stabilen Gleichgewichte im System Na2O-SiO2-CO2 und die CO2-Drucke der
+    Einwirkung von K2CO3 auf K2SiO3, Zeitschrift für anorganische und allgemeine
+    Chemie 225(1), 1-23.
+  doi: 10.1002/zaac.19352250102
+  url: https://doi.org/10.1002/zaac.19352250102
+  year: 1935
+  sha256: b4006abf77d40ca9396844cece78d1bf3dd85ee03e8791c451c56d13ba55252f
+extraction:
+  method: >-
+    Manual transcription from the 23-page article scan. Every numeric pressure
+    in the potassium tables was checked against its rendered table image; OCR
+    text was used only to locate candidate rows. Provenance identifies the
+    source scan recorded in SOURCE.md.
+  date: '2026-10-16'
+  worker: alkortho-1016
+  provenance_path: ../../../../../../regolith-sources/d001-fetch-2026-10-16/kroger-fingas-1935-alkali-silicate-equilibria/SOURCE.md
+review_status: draft
+fidelity_samples:
+  - path: species.CO2.observations[kroger_fingas_1935_k2si2o5_k2co3_table7].values.points[0].p
+    value: 55
+    locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}
+  - path: species.CO2.observations[kroger_fingas_1935_k2si2o5_k2co3_table7].values.points[4].p
+    value: 650
+    locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}
+  - path: species.CO2.observations[kroger_fingas_1935_k2sio3_k2co3_table8_trial1].values.points[0].p
+    value: 59
+    locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}
+  - path: species.CO2.observations[kroger_fingas_1935_k2sio3_k2co3_table8_trial2].values.points[0].T_C
+    value: 910
+    locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}
+  - path: species.CO2.observations[kroger_fingas_1935_k2co3_decomposition_table9].values.points[10].p
+    value: 4
+    locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}
+species:
+  CO2:
+    observations:
+      - observation_id: kroger_fingas_1935_k2si2o5_k2co3_table7
+        type: partial_pressure
+        locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}
+        phase: gas
+        standard_state: >-
+          CO2 pressure measured over 0.6429 g crystalline K2Si2O5 + 0.8292 g
+          K2CO3 (molar ratio 1:2); pressure reported in mm. Point-specific
+          carbonate conversion is printed only for selected measurements.
+        units: mmHg
+        uncertainty: {reported_status: not_reported}
+        values:
+          quantity: partial_pressure
+          gas_species: CO2
+          method_class: measured_direct
+          reaction: K2Si2O5(s) + K2CO3(s) = 2K2SiO3(s) + CO2(g)
+          composition_as_printed: '0.6429 g K2Si2O5 + 0.8292 g K2CO3; molar ratio 1:2'
+          observation_note: >-
+            Authors say pressures were obtained after pumping 28 mm at 400°C;
+            table points establish within 1-20 h. Stable bivariant behavior
+            occurs after conversion; at 20% conversion pressure was withdrawn.
+          points:
+            - {T_C: 721, p: 55, point_conditions: {T_C: {state: {tag: value, value: 721}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 791, p: 97, point_conditions: {T_C: {state: {tag: value, value: 791}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 896, p: 401, point_conditions: {T_C: {state: {tag: value, value: 896}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 915, p: 578, point_conditions: {T_C: {state: {tag: value, value: 915}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 964, p: 650, carbonate_conversion_pct: 20, note: Druck abgezogen, point_conditions: {T_C: {state: {tag: value, value: 964}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 816, p: 73, point_conditions: {T_C: {state: {tag: value, value: 816}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 903, p: 133, point_conditions: {T_C: {state: {tag: value, value: 903}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 871, p: 116, note: Reversibel, point_conditions: {T_C: {state: {tag: value, value: 871}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 991, p: 340, point_conditions: {T_C: {state: {tag: value, value: 991}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 1008, p: 425, point_conditions: {T_C: {state: {tag: value, value: 1008}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 1046, p: 485, point_conditions: {T_C: {state: {tag: value, value: 1046}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 1056, p: 504, carbonate_conversion_pct: 18.5, note: Druck abgezogen, point_conditions: {T_C: {state: {tag: value, value: 1056}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 862, p: 20, point_conditions: {T_C: {state: {tag: value, value: 862}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 984, p: 94, carbonate_conversion_pct: 5.3, note: Druck abgezogen, point_conditions: {T_C: {state: {tag: value, value: 984}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 903, p: 38, point_conditions: {T_C: {state: {tag: value, value: 903}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 947, p: 51, carbonate_conversion_pct: 1.7, note: Druck abgezogen, point_conditions: {T_C: {state: {tag: value, value: 947}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 934, p: 25, point_conditions: {T_C: {state: {tag: value, value: 934}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 1031, p: 52, carbonate_conversion_pct: 2.3, note: Druck abgezogen, point_conditions: {T_C: {state: {tag: value, value: 1031}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+            - {T_C: 836, p: 19, point_conditions: {T_C: {state: {tag: value, value: 836}, locator: {page: 18, published_page: 18, pdf_page_index: 17, table: '7'}}}}
+      - observation_id: kroger_fingas_1935_k2sio3_k2co3_table8_trial1
+        type: partial_pressure
+        locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}
+        phase: gas
+        standard_state: >-
+          CO2 pressure over 0.3857 g K2SiO3 + 0.3460 g K2CO3 (molar ratio
+          1:1), temperature in °C and pressure in mm. The authors identify
+          K4SiO4 as the K2O-rich product required by these data but say the
+          system is bi- or trivariant and pressures are not reproducible.
+        units: mmHg
+        uncertainty: {reported_status: not_reported}
+        values:
+          quantity: partial_pressure
+          gas_species: CO2
+          method_class: measured_direct
+          heading_as_printed: 'Die Einwirkung von K₂CO₃ auf kristallines K₂SiO₃'
+          reaction: K2SiO3(s) + K2CO3(s) = K4SiO4(s) + CO2(g)
+          composition_as_printed: '0.3857 g K2SiO3 + 0.3460 g K2CO3; molar ratio 1:1'
+          metastability_and_reproducibility: >-
+            The reported points are measured, but the authors say the
+            crystalline metasilicate pressures are not reproducible; at
+            1030°C pressure falls to 7 mm at constant temperature.
+          points:
+            - {T_C: 800, p: 59, carbonate_conversion_pct: 8.8, point_conditions: {T_C: {state: {tag: value, value: 800}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 920, p: 107, point_conditions: {T_C: {state: {tag: value, value: 920}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1000, p: 330, point_conditions: {T_C: {state: {tag: value, value: 1000}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1040, p: 398, carbonate_conversion_pct: 32.4, note: Druck abgezogen, point_conditions: {T_C: {state: {tag: value, value: 1040}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1015, p: 146, carbonate_conversion_pct: 11.4, note: Druck abgezogen, point_conditions: {T_C: {state: {tag: value, value: 1015}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1030, p: 78, note: falls bei konstanter Temperatur auf 7 mm, point_conditions: {T_C: {state: {tag: value, value: 1030}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1100, p: 9, note: 5 minutes pumped, point_conditions: {T_C: {state: {tag: value, value: 1100}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1100, p: 4, note: repeated temperature after pumping, point_conditions: {T_C: {state: {tag: value, value: 1100}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1200, p: 11, point_conditions: {T_C: {state: {tag: value, value: 1200}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1285, p: 12, note: 10 minutes pumped, point_conditions: {T_C: {state: {tag: value, value: 1285}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1300, p: 9, point_conditions: {T_C: {state: {tag: value, value: 1300}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+      - observation_id: kroger_fingas_1935_k2sio3_k2co3_table8_trial2
+        type: partial_pressure
+        locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}
+        phase: gas
+        standard_state: >-
+          CO2 pressure over 0.4628 g K2SiO3 + 0.8292 g K2CO3 (molar ratio
+          1:2), temperature in °C and pressure in mm; conversion and pressure
+          withdrawal are only reported at selected points.
+        units: mmHg
+        uncertainty: {reported_status: not_reported}
+        values:
+          quantity: partial_pressure
+          gas_species: CO2
+          method_class: measured_direct
+          reaction: K2SiO3(s) + K2CO3(s) = K4SiO4(s) + CO2(g)
+          composition_as_printed: '0.4628 g K2SiO3 + 0.8292 g K2CO3; molar ratio 1:2'
+          points:
+            - {T_C: 910, p: 82, carbonate_conversion_pct: 9, point_conditions: {T_C: {state: {tag: value, value: 910}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 990, p: 143, point_conditions: {T_C: {state: {tag: value, value: 990}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1030, p: 172, point_conditions: {T_C: {state: {tag: value, value: 1030}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1055, p: 203, carbonate_conversion_pct: 8.9, note: Druck abgezogen, point_conditions: {T_C: {state: {tag: value, value: 1055}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 885, p: 43, point_conditions: {T_C: {state: {tag: value, value: 885}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 940, p: 66, point_conditions: {T_C: {state: {tag: value, value: 940}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 985, p: 86, point_conditions: {T_C: {state: {tag: value, value: 985}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1050, p: 122, point_conditions: {T_C: {state: {tag: value, value: 1050}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1155, p: 184, carbonate_conversion_pct: 8.8, note: Druck abgezogen, point_conditions: {T_C: {state: {tag: value, value: 1155}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 890, p: 4, point_conditions: {T_C: {state: {tag: value, value: 890}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1100, p: 41, point_conditions: {T_C: {state: {tag: value, value: 1100}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1145, p: 61, carbonate_conversion_pct: 3.8, note: Druck abgezogen, point_conditions: {T_C: {state: {tag: value, value: 1145}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+            - {T_C: 1150, p: 7, point_conditions: {T_C: {state: {tag: value, value: 1150}, locator: {page: 19, published_page: 19, pdf_page_index: 18, table: '8'}}}}
+      - observation_id: kroger_fingas_1935_k2co3_decomposition_table9
+        type: partial_pressure
+        locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}
+        phase: gas
+        standard_state: >-
+          Dissociation pressures of 1 g K2CO3 sealed and dried in vacuo in a
+          platinum insert tube; pressure in mm, temperature in °C. A plus
+          appended to temperature means pressure was withdrawn.
+        units: mmHg
+        uncertainty: {reported_status: not_reported}
+        values:
+          quantity: partial_pressure
+          gas_species: CO2
+          method_class: measured_direct
+          reaction: K2CO3(s or l) = K2O(s or l) + CO2(g)
+          points:
+            - {T_C: 664, p: 2, point_conditions: {T_C: {state: {tag: value, value: 664}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+            - {T_C: 648, p: 1, point_conditions: {T_C: {state: {tag: value, value: 648}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+            - {T_C: 710, p: 6, point_conditions: {T_C: {state: {tag: value, value: 710}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+            - {T_C: 757, p: 7, point_conditions: {T_C: {state: {tag: value, value: 757}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+            - {T_C: 897, p: 12, point_conditions: {T_C: {state: {tag: value, value: 897}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+            - {T_C: 1009, p: 18, point_conditions: {T_C: {state: {tag: value, value: 1009}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+            - {T_C: 1100, p: 24, point_conditions: {T_C: {state: {tag: value, value: 1100}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+            - {T_C: 940, p: 18, pressure_withdrawn: true, point_conditions: {T_C: {state: {tag: value, value: 940}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+            - {T_C: 937, p: 13, point_conditions: {T_C: {state: {tag: value, value: 937}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+            - {T_C: 1072, p: 18, pressure_withdrawn: true, point_conditions: {T_C: {state: {tag: value, value: 1072}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+            - {T_C: 1072, p: 4, point_conditions: {T_C: {state: {tag: value, value: 1072}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+            - {T_C: 1245, p: 22, pressure_withdrawn: true, point_conditions: {T_C: {state: {tag: value, value: 1245}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+            - {T_C: 1245, p: 10, point_conditions: {T_C: {state: {tag: value, value: 1245}, locator: {page: 20, published_page: 20, pdf_page_index: 19, table: '9'}}}}
+      - observation_id: kroger_fingas_1935_na2si2o5_naco3_table1
+        type: partial_pressure
+        locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}
+        phase: gas
+        standard_state: CO2 pressure in mm over 1.37 g Na2Si2O5 and Na2CO3 at molar ratio 1:1.
+        units: mmHg
+        uncertainty: {reported_status: not_reported}
+        values:
+          quantity: partial_pressure
+          gas_species: CO2
+          method_class: measured_direct
+          reaction: Na2Si2O5(s) + Na2CO3(s) = 2Na2SiO3(s) + CO2(g)
+          composition_as_printed: 1.37 g crystalline Na2Si2O5 + Na2CO3 at molar ratio 1:1
+          reversibility: CO2 was not fully reabsorbed on cooling.
+          points:
+            - {T_C: 398, p: 3, point_conditions: {T_C: {state: {tag: value, value: 398}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+            - {T_C: 433, p: 12, point_conditions: {T_C: {state: {tag: value, value: 433}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+            - {T_C: 470, p: 24, point_conditions: {T_C: {state: {tag: value, value: 470}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+            - {T_C: 515, p: 50, point_conditions: {T_C: {state: {tag: value, value: 515}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+            - {T_C: 533, p: 84, point_conditions: {T_C: {state: {tag: value, value: 533}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+            - {T_C: 573, p: 194, point_conditions: {T_C: {state: {tag: value, value: 573}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+            - {T_C: 609, p: 371, point_conditions: {T_C: {state: {tag: value, value: 609}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+            - {T_C: 635, p: 540, point_conditions: {T_C: {state: {tag: value, value: 635}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+            - {T_C: 575, p: 538, note: pressure withdrawn and sample ground, point_conditions: {T_C: {state: {tag: value, value: 575}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+            - {T_C: 573, p: 112, point_conditions: {T_C: {state: {tag: value, value: 573}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+            - {T_C: 650, p: 450, note: pressure withdrawn and sample reground, point_conditions: {T_C: {state: {tag: value, value: 650}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+            - {T_C: 665, p: 755, note: pressure withdrawn, point_conditions: {T_C: {state: {tag: value, value: 665}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+            - {T_C: 593, p: 263, point_conditions: {T_C: {state: {tag: value, value: 593}, locator: {page: 2, published_page: 2, pdf_page_index: 1, table: '1'}}}}
+      - observation_id: kroger_fingas_1935_na_disilicate_metasilicate_naco3_table2
+        type: partial_pressure
+        locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}
+        phase: gas
+        standard_state: >-
+          CO2 pressure over 0.761 g crystalline disilicate-metasilicate mixture
+          + 0.265 g Na2CO3; pressure in mm. Point CO2 depletion is printed as
+          a percent for selected rows only.
+        units: mmHg
+        uncertainty: {reported_status: not_reported}
+        values:
+          quantity: partial_pressure
+          gas_species: CO2
+          method_class: measured_direct
+          reaction: Na2Si2O5(s) + Na2CO3(s) = 2Na2SiO3(s) + CO2(g)
+          composition_as_printed: 0.761 g crystalline disilicate-metasilicate mix + 0.265 g Na2CO3
+          points:
+            - {T_C: 368, p: 27, point_conditions: {T_C: {state: {tag: value, value: 368}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 550, p: 142, carbonate_conversion_pct: 4.7, point_conditions: {T_C: {state: {tag: value, value: 550}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 641, p: 232, point_conditions: {T_C: {state: {tag: value, value: 641}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 658, p: 324, point_conditions: {T_C: {state: {tag: value, value: 658}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 734, p: 436, carbonate_conversion_pct: 27.0, point_conditions: {T_C: {state: {tag: value, value: 734}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 668, p: 392, carbonate_conversion_pct: 48.0, point_conditions: {T_C: {state: {tag: value, value: 668}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 710, p: 308, point_conditions: {T_C: {state: {tag: value, value: 710}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 775, p: 318, carbonate_conversion_pct: 63.2, point_conditions: {T_C: {state: {tag: value, value: 775}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 740, p: 74, point_conditions: {T_C: {state: {tag: value, value: 740}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 815, p: 460, point_conditions: {T_C: {state: {tag: value, value: 815}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 870, p: 460, carbonate_conversion_pct: 93.5, point_conditions: {T_C: {state: {tag: value, value: 870}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 850, p: 70, point_conditions: {T_C: {state: {tag: value, value: 850}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 920, p: 95, point_conditions: {T_C: {state: {tag: value, value: 920}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+            - {T_C: 980, p: 103, point_conditions: {T_C: {state: {tag: value, value: 980}, locator: {page: 4, published_page: 4, pdf_page_index: 3, table: '2'}}}}
+      - observation_id: kroger_fingas_1935_na2co3_na2sio3_table2_continuation
+        type: partial_pressure
+        locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}
+        phase: gas
+        standard_state: CO2 pressure in mm over a mixture reported as 0.25 Na2CO3 + 0.75 Na2SiO3 after addition of 0.265 g Na2CO3.
+        units: mmHg
+        uncertainty: {reported_status: not_reported}
+        values:
+          quantity: partial_pressure
+          gas_species: CO2
+          method_class: measured_direct
+          reaction: Na2CO3(s) + Na2SiO3(s) = sodium-rich silicate(s) + CO2(g)
+          composition_as_printed: 0.25 Na2CO3 + 0.75 Na2SiO3 after added carbonate
+          points:
+            - {T_C: 740, p: 83, point_conditions: {T_C: {state: {tag: value, value: 740}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 860, p: 117, point_conditions: {T_C: {state: {tag: value, value: 860}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 896, p: 187, point_conditions: {T_C: {state: {tag: value, value: 896}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 965, p: 326, point_conditions: {T_C: {state: {tag: value, value: 965}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 1015, p: 688, note: temperature decreased, point_conditions: {T_C: {state: {tag: value, value: 1015}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 920, p: 587, note: slowly reversible and pressure withdrawn, point_conditions: {T_C: {state: {tag: value, value: 920}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 934, p: 138, point_conditions: {T_C: {state: {tag: value, value: 934}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 918, p: 93, point_conditions: {T_C: {state: {tag: value, value: 918}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 989, p: 231, point_conditions: {T_C: {state: {tag: value, value: 989}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 1034, p: 368, point_conditions: {T_C: {state: {tag: value, value: 1034}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 1067, p: 458, point_conditions: {T_C: {state: {tag: value, value: 1067}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 895, p: 20, point_conditions: {T_C: {state: {tag: value, value: 895}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 984, p: 81, point_conditions: {T_C: {state: {tag: value, value: 984}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 1068, p: 280, point_conditions: {T_C: {state: {tag: value, value: 1068}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 1094, p: 319, point_conditions: {T_C: {state: {tag: value, value: 1094}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+            - {T_C: 1054, p: 273, point_conditions: {T_C: {state: {tag: value, value: 1054}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '2 (Fortsetzung)'}}}}
+      - observation_id: kroger_fingas_1935_na2si2o5_na2co3_table3
+        type: partial_pressure
+        locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}
+        phase: gas
+        standard_state: >-
+          CO2 pressure in mm over a composition after addition of 0.81 g Na2CO3:
+          approximately 0.33 Na2SiO3 + 0.50 Na2CO3 + 0.17 Na2Si2O5.
+        units: mmHg
+        uncertainty: {reported_status: not_reported}
+        values:
+          quantity: partial_pressure
+          gas_species: CO2
+          method_class: measured_direct
+          reaction: Na2Si2O5(s) + Na2CO3(s) = 2Na2SiO3(s) + CO2(g)
+          composition_as_printed: approximately 0.33 Na2SiO3 + 0.50 Na2CO3 + 0.17 Na2Si2O5
+          points:
+            - {T_C: 692, p: 30, point_conditions: {T_C: {state: {tag: value, value: 692}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 770, p: 310, point_conditions: {T_C: {state: {tag: value, value: 770}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 625, p: 290, point_conditions: {T_C: {state: {tag: value, value: 625}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 620, p: 108, point_conditions: {T_C: {state: {tag: value, value: 620}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 680, p: 142, point_conditions: {T_C: {state: {tag: value, value: 680}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 723, p: 167, point_conditions: {T_C: {state: {tag: value, value: 723}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 850, p: 690, point_conditions: {T_C: {state: {tag: value, value: 850}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 800, p: 672, point_conditions: {T_C: {state: {tag: value, value: 800}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 801, p: 200, point_conditions: {T_C: {state: {tag: value, value: 801}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 845, p: 220, point_conditions: {T_C: {state: {tag: value, value: 845}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 755, p: 110, point_conditions: {T_C: {state: {tag: value, value: 755}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 692, p: 48, point_conditions: {T_C: {state: {tag: value, value: 692}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 610, p: 16, point_conditions: {T_C: {state: {tag: value, value: 610}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 820, p: 95, point_conditions: {T_C: {state: {tag: value, value: 820}, locator: {page: 5, published_page: 5, pdf_page_index: 4, table: '3'}}}}
+            - {T_C: 834, p: 68, point_conditions: {T_C: {state: {tag: value, value: 834}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 817, p: 46, point_conditions: {T_C: {state: {tag: value, value: 817}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 850, p: 90, point_conditions: {T_C: {state: {tag: value, value: 850}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 785, p: 47, point_conditions: {T_C: {state: {tag: value, value: 785}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 863, p: 113, point_conditions: {T_C: {state: {tag: value, value: 863}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 880, p: 156, point_conditions: {T_C: {state: {tag: value, value: 880}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 940, p: 322, point_conditions: {T_C: {state: {tag: value, value: 940}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 915, p: 277, point_conditions: {T_C: {state: {tag: value, value: 915}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 1010, p: 710, point_conditions: {T_C: {state: {tag: value, value: 1010}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 950, p: 482, point_conditions: {T_C: {state: {tag: value, value: 950}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 878, p: 142, point_conditions: {T_C: {state: {tag: value, value: 878}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 868, p: 120, point_conditions: {T_C: {state: {tag: value, value: 868}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 945, p: 357, point_conditions: {T_C: {state: {tag: value, value: 945}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 970, p: 566, point_conditions: {T_C: {state: {tag: value, value: 970}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 985, p: 644, point_conditions: {T_C: {state: {tag: value, value: 985}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 978, p: 360, point_conditions: {T_C: {state: {tag: value, value: 978}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 980, p: 270, point_conditions: {T_C: {state: {tag: value, value: 980}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 978, p: 209, point_conditions: {T_C: {state: {tag: value, value: 978}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 892, p: 34, point_conditions: {T_C: {state: {tag: value, value: 892}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+            - {T_C: 1070, p: 619, point_conditions: {T_C: {state: {tag: value, value: 1070}, locator: {page: 6, published_page: 6, pdf_page_index: 5, table: '3 (Fortsetzung)'}}}}
+      - observation_id: kroger_fingas_1935_na2si3o7_naco3_table4
+        type: partial_pressure
+        locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}
+        phase: gas
+        standard_state: >-
+          CO2 pressure in mm over 0.53 g Na2Si3O7 with 2 Na2CO3; starting
+          silicate composition prepared from 2.65 g Na2CO3 and 4.52 g quartz.
+        units: mmHg
+        uncertainty: {reported_status: not_reported}
+        values:
+          quantity: partial_pressure
+          gas_species: CO2
+          method_class: measured_direct
+          reaction: Na2Si3O7(s) + 2Na2CO3(s) = 3Na2SiO3(s) + 2CO2(g)
+          composition_as_printed: 0.53 g Na2Si3O7 + 2 Na2CO3
+          observation_note: >-
+            The authors report more than one solid phase in the mixture; the
+            pressure should not be treated as a uniquely assigned invariant
+            equilibrium.
+          points:
+            - {T_C: 570, p: 626, point_conditions: {T_C: {state: {tag: value, value: 570}, locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}}}}
+            - {T_C: 615, p: 513, point_conditions: {T_C: {state: {tag: value, value: 615}, locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}}}}
+            - {T_C: 573, p: 723, point_conditions: {T_C: {state: {tag: value, value: 573}, locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}}}}
+            - {T_C: 480, p: 40, point_conditions: {T_C: {state: {tag: value, value: 480}, locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}}}}
+            - {T_C: 655, p: 123, point_conditions: {T_C: {state: {tag: value, value: 655}, locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}}}}
+            - {T_C: 760, p: 560, point_conditions: {T_C: {state: {tag: value, value: 760}, locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}}}}
+            - {T_C: 775, p: 878, point_conditions: {T_C: {state: {tag: value, value: 775}, locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}}}}
+            - {T_C: 775, p: 344, point_conditions: {T_C: {state: {tag: value, value: 775}, locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}}}}
+            - {T_C: 780, p: 359, point_conditions: {T_C: {state: {tag: value, value: 780}, locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}}}}
+            - {T_C: 770, p: 373, point_conditions: {T_C: {state: {tag: value, value: 770}, locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}}}}
+            - {T_C: 790, p: 529, point_conditions: {T_C: {state: {tag: value, value: 790}, locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}}}}
+            - {T_C: 785, p: 450, point_conditions: {T_C: {state: {tag: value, value: 785}, locator: {page: 7, published_page: 7, pdf_page_index: 6, table: '4'}}}}
+      - observation_id: kroger_fingas_1935_na6si2o7_naco3_table5
+        type: partial_pressure
+        locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}
+        phase: gas
+        standard_state: >-
+          CO2 pressure in mm over a sodium silicate/carbonate composition in
+          the Na2O-SiO2-CO2 system; composition changes with carbonate
+          conversion as reported in the table notes.
+        units: mmHg
+        uncertainty: {reported_status: not_reported}
+        values:
+          quantity: partial_pressure
+          gas_species: CO2
+          method_class: measured_direct
+          reaction: Na6Si2O7(s) + Na2CO3(s) = 2Na4SiO4(s) + CO2(g)
+          composition_as_printed: carbonate and sodium silicate mixture; Table 5
+          points:
+            - {T_C: 980, p: 22, note: pressure withdrawn, point_conditions: {T_C: {state: {tag: value, value: 980}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 980, p: 22, point_conditions: {T_C: {state: {tag: value, value: 980}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1040, p: 78, point_conditions: {T_C: {state: {tag: value, value: 1040}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1108, p: 179, point_conditions: {T_C: {state: {tag: value, value: 1108}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1090, p: 141, point_conditions: {T_C: {state: {tag: value, value: 1090}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1100, p: 157, note: pressure reversible, point_conditions: {T_C: {state: {tag: value, value: 1100}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1095, p: 154, point_conditions: {T_C: {state: {tag: value, value: 1095}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1145, p: 275, carbonate_conversion_pct: 3.1, note: pressure withdrawn, point_conditions: {T_C: {state: {tag: value, value: 1145}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1060, p: 190, point_conditions: {T_C: {state: {tag: value, value: 1060}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1020, p: 90, point_conditions: {T_C: {state: {tag: value, value: 1020}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1040, p: 105, point_conditions: {T_C: {state: {tag: value, value: 1040}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1137, p: 256, carbonate_conversion_pct: 7.9, note: pressure withdrawn, point_conditions: {T_C: {state: {tag: value, value: 1137}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1145, p: 209, carbonate_conversion_pct: 7.3, note: pressure withdrawn, point_conditions: {T_C: {state: {tag: value, value: 1145}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1150, p: 179, point_conditions: {T_C: {state: {tag: value, value: 1150}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1045, p: 108, carbonate_conversion_pct: 2.4, note: pressure reversible, point_conditions: {T_C: {state: {tag: value, value: 1045}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1040, p: 100, point_conditions: {T_C: {state: {tag: value, value: 1040}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1115, p: 182, point_conditions: {T_C: {state: {tag: value, value: 1115}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 925, p: 17, carbonate_conversion_pct: 0.6, note: reversible and pressure withdrawn, point_conditions: {T_C: {state: {tag: value, value: 925}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 937, p: 22, point_conditions: {T_C: {state: {tag: value, value: 937}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1000, p: 55, point_conditions: {T_C: {state: {tag: value, value: 1000}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1055, p: 97, point_conditions: {T_C: {state: {tag: value, value: 1055}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1090, p: 153, point_conditions: {T_C: {state: {tag: value, value: 1090}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1145, p: 240, carbonate_conversion_pct: 58, note: corresponding system CO2 removed, point_conditions: {T_C: {state: {tag: value, value: 1145}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1080, p: 168, point_conditions: {T_C: {state: {tag: value, value: 1080}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1160, p: 87, point_conditions: {T_C: {state: {tag: value, value: 1160}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1080, p: 49, note: pressure reversible, point_conditions: {T_C: {state: {tag: value, value: 1080}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1010, p: 16, carbonate_conversion_pct: 0.5, note: pressure withdrawn, point_conditions: {T_C: {state: {tag: value, value: 1010}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1113, p: 73, point_conditions: {T_C: {state: {tag: value, value: 1113}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+            - {T_C: 1185, p: 167, point_conditions: {T_C: {state: {tag: value, value: 1185}, locator: {page: 12, published_page: 12, pdf_page_index: 11, table: '5'}}}}
+      - observation_id: kroger_fingas_1935_na2co3_decomposition_table6_trial1
+        type: partial_pressure
+        locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}
+        phase: gas
+        standard_state: CO2 pressure in mm over 1 g Na2CO3; the platinum insert tube was extended to 16 cm.
+        units: mmHg
+        uncertainty: {reported_status: not_reported}
+        values:
+          quantity: partial_pressure
+          gas_species: CO2
+          method_class: measured_direct
+          reaction: Na2CO3(l) = Na2O(l) + CO2(g)
+          composition_as_printed: 1 g Na2CO3, Pt insert tube extended to 16 cm
+          points:
+            - {T_C: 1031, p: 6, point_conditions: {T_C: {state: {tag: value, value: 1031}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 1096, p: 9, point_conditions: {T_C: {state: {tag: value, value: 1096}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 1104, p: 11, note: pressure withdrawn, point_conditions: {T_C: {state: {tag: value, value: 1104}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 1146, p: 9, point_conditions: {T_C: {state: {tag: value, value: 1146}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 1175, p: 13, point_conditions: {T_C: {state: {tag: value, value: 1175}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 1263, p: 28, point_conditions: {T_C: {state: {tag: value, value: 1263}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+      - observation_id: kroger_fingas_1935_na2co3_decomposition_table6_trial2
+        type: partial_pressure
+        locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}
+        phase: gas
+        standard_state: CO2 pressure in mm over 1 g Na2CO3; the platinum insert tube was extended to 16 cm.
+        units: mmHg
+        uncertainty: {reported_status: not_reported}
+        values:
+          quantity: partial_pressure
+          gas_species: CO2
+          method_class: measured_direct
+          reaction: Na2CO3(l) = Na2O(l) + CO2(g)
+          composition_as_printed: 1 g Na2CO3, Pt insert tube extended to 16 cm
+          points:
+            - {T_C: 650, p: 0, point_conditions: {T_C: {state: {tag: value, value: 650}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 834, p: 2, point_conditions: {T_C: {state: {tag: value, value: 834}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 994, p: 7, point_conditions: {T_C: {state: {tag: value, value: 994}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 1227, p: 29, point_conditions: {T_C: {state: {tag: value, value: 1227}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 1340, p: 53, note: pressure withdrawn, point_conditions: {T_C: {state: {tag: value, value: 1340}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 1335, p: 16, note: pressure withdrawn, point_conditions: {T_C: {state: {tag: value, value: 1335}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 1348, p: 14, point_conditions: {T_C: {state: {tag: value, value: 1348}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 1358, p: 16, point_conditions: {T_C: {state: {tag: value, value: 1358}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+            - {T_C: 1365, p: 19, point_conditions: {T_C: {state: {tag: value, value: 1365}, locator: {page: 13, published_page: 13, pdf_page_index: 12, table: '6'}}}}
+  Na2Si2O5:
+    observations:
+      - observation_id: kroger_fingas_1935_sodium_disilicate_formation_enthalpy
+        type: gibbs_table
+        locator: {page: 23, published_page: 23, pdf_page_index: 22, section: Thermochemie der Natriumsilikate}
+        phase: condensed_solid
+        standard_state: >-
+          Formation from Na2O(s) and quartz SiO2(s); the paper gives +67.0 kcal
+          for the formation reaction written Na2O + 2SiO2 = Na2Si2O5 + 67.0 kcal.
+        units: kcal/mol
+        derived_from:
+          - kroger_fingas_1935_na2si2o5_naco3_table1
+          - kroger_fingas_1935_na_disilicate_metasilicate_naco3_table2
+          - kroger_fingas_1935_na2co3_na2sio3_table2_continuation
+          - kroger_fingas_1935_na2si2o5_na2co3_table3
+        derivation:
+          relation: >-
+            The authors derive the reaction heat from the temperature
+            coefficient of equilibrium CO2 pressure for reaction b, then
+            combine it with the oxide formation cycle printed on page 23.
+          inputs:
+            - kroger_fingas_1935_na2si2o5_naco3_table1
+            - kroger_fingas_1935_na_disilicate_metasilicate_naco3_table2
+            - kroger_fingas_1935_na2co3_na2sio3_table2_continuation
+            - kroger_fingas_1935_na2si2o5_na2co3_table3
+        values:
+          method_class: model_derived
+          quantity: deltafH
+          delta_f_H: -67.0
+          formation_heat_evolved_kcal_as_printed: 67.0
+          reaction: Na2O(s) + 2SiO2(quartz) = Na2Si2O5(s) + 67.0 kcal
+  Na2SiO3:
+    observations:
+      - observation_id: kroger_fingas_1935_sodium_metasilicate_formation_enthalpy
+        type: gibbs_table
+        locator: {page: 23, published_page: 23, pdf_page_index: 22, section: Thermochemie der Natriumsilikate}
+        phase: condensed_solid
+        standard_state: >-
+          Formation quantities are given by the reactions printed on page 23;
+          the paper states them as heat evolved in kcal.
+        units: kcal/mol
+        derived_from:
+          - kroger_fingas_1935_na2si2o5_naco3_table1
+          - kroger_fingas_1935_na_disilicate_metasilicate_naco3_table2
+          - kroger_fingas_1935_na2co3_na2sio3_table2_continuation
+          - kroger_fingas_1935_na2si2o5_na2co3_table3
+          - kroger_fingas_1935_na2si3o7_naco3_table4
+        derivation:
+          relation: >-
+            Heats are calculated from temperature coefficients of measured
+            CO2 equilibrium pressures and reaction cycles; the page 22
+            Nernst-approximation means are reported separately.
+          inputs:
+            - kroger_fingas_1935_na2si2o5_naco3_table1
+            - kroger_fingas_1935_na_disilicate_metasilicate_naco3_table2
+            - kroger_fingas_1935_na2co3_na2sio3_table2_continuation
+            - kroger_fingas_1935_na2si2o5_na2co3_table3
+            - kroger_fingas_1935_na2si3o7_naco3_table4
+        values:
+          method_class: model_derived
+          quantity: deltafH
+          delta_f_H: -54.6
+          formation_heat_evolved_kcal_as_printed: 54.6
+          reaction_heats_kcal_as_printed:
+            - {reaction: 'Na2CO3 + SiO2(quartz) = Na2SiO3 + CO2', heat_kcal: -22.3}
+            - {reaction: 'Na2O + SiO2(quartz) = Na2SiO3', heat_kcal: 54.6}
+            - {reaction: 'Na2SiO3 + SiO2(quartz) = Na2Si2O5', heat_kcal: 12.4}
+          pressure_slope_heat_values_kcal_as_printed:
+            - {reaction_label: b1 as in Fig. 1, heat_kcal: -29.4, temperature_range_C: '788-908'}
+            - {reaction_label: b as in Fig. 1, heat_kcal: -34.7, temperature_range_C: '914-948'}
+            - {reaction_label: b3 as in Fig. 1, heat_kcal: -45.7, temperature_range_C: '1090-1223'}
+          nernst_approximation_values_kcal_as_printed:
+            - {reaction_label: b1 as in Fig. 1, range_kcal: '34.0-35.4', mean_kcal: -34.5, n: 7}
+            - {reaction_label: b3 as in Fig. 1, range_kcal: '48.4-49.8', mean_kcal: -49.0, n: 13}
+            - {reaction_label: b as in Fig. 1, mean_kcal: -37.3, uncertainty_kcal: 0.1, n: 3}
+            - {reaction_label: b2 as in Fig. 1, mean_kcal: -42.5, uncertainty_kcal: 0.2, n: 4}
+          method: Derived from slopes of log pressure versus 1/T and reaction cycles; approximate Nernst values are reported alongside.
+          reported_temperature_ranges_C: ['788-908', '914-948', '1090-1223']
+  Na2Si3O7:
+    observations:
+      - observation_id: kroger_fingas_1935_na2si3o7_congruent_melting_temperature
+        type: transition_point
+        locator: {page: 7, published_page: 7, pdf_page_index: 6, section: Na2O-SiO2 binary phase discussion}
+        phase: condensed_solid
+        standard_state: Congruent melting point of Na2Si3O7 as cited by the authors.
+        units: °C
+        uncertainty: {reported_status: not_reported}
+        values:
+          method_class: quoted_attributed
+          quantity: transition_temperature
+          T_C: 1115
+          transition: congruent melting
+          attribution: D'Ans and Löffler, as cited by Kröger and Fingas (1935)
+  K2CO3:
+    observations:
+      - observation_id: kroger_fingas_1935_k2co3_melting_temperature
+        type: transition_point
+        locator: {page: 20, published_page: 20, pdf_page_index: 19, section: potassium carbonate decomposition discussion}
+        phase: condensed_solid
+        standard_state: K2CO3 melting point stated in the discussion of CO2 dissociation pressure.
+        units: °C
+        uncertainty: {reported_status: not_reported}
+        values:
+          method_class: quoted_attributed
+          quantity: transition_temperature
+          T_C: 900
+          transition: melting point
+          attribution: Kröger and Fingas (1935), stated without separate citation
+  Na4SiO4:
+    observations:
+      - observation_id: kroger_fingas_1935_na6si2o7_to_na4sio4_reaction_heats
+        type: gibbs_table
+        locator: {page: 23, published_page: 23, pdf_page_index: 22, section: Thermochemie der Natriumsilikate}
+        phase: condensed_solid
+        standard_state: >-
+          Reaction heat for Na6Si2O7(s) + Na2CO3(s) = 2Na4SiO4(s) + CO2(g);
+          the article reports heat evolved in kcal and declines to calculate
+          Na4SiO4 formation heat because melt and mixed-crystal effects are
+          not specified.
+        units: kcal as printed
+        derived_from: [kroger_fingas_1935_na6si2o7_naco3_table5]
+        derivation:
+          relation: >-
+            Reaction heat from temperature coefficients of measured pressure
+            curves e and e1; Nernst approximations are calculated from the
+            respective pressure points.
+          inputs: [kroger_fingas_1935_na6si2o7_naco3_table5]
+        values:
+          method_class: model_derived
+          quantity: reaction_enthalpies
+          reaction: Na6Si2O7(s) + Na2CO3(s) = 2Na4SiO4(s) + CO2(g)
+          temperature_coefficient_heat_kcal_as_printed:
+            - {curve: e, heat_kcal: -54.5}
+            - {curve: e1, heat_kcal: -53.5}
+          nernst_heat_kcal_as_printed:
+            - {curve: e, range_kcal: '57.8-59.5', mean_kcal: -58.6, n: 12}
+            - {curve: e1, range_kcal: '56.1-57.6', mean_kcal: -56.8, n: 9}
+metadata:
+  experimental_status: direct_CO2_pressure_measurements_and_sodium_thermochemistry
+  source_note: >-
+    Table 8 potassium pressures are not reproducible equilibrium values; the
+    authors describe multi- or trivariant behavior. No uncertainty is stated
+    for the pressure measurements. The paper gives no K4SiO4 formation heat
+    or fusion data and explicitly declines to calculate Na4SiO4 formation heat.
