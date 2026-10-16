@@ -1824,7 +1824,10 @@ def _solve_cell_oxygen_balance(
 
 def _gas_formula_for_oxygen_balance(species: Any) -> str:
     try:
-        from simulator.melt_backend.vaporock import _GAS_NAMESPACE_SUFFIX
+        from simulator.melt_backend.vaporock import (
+            _GAS_NAMESPACE_SUFFIX,
+            _parent_oxide_for_vaporock_gas,
+        )
     except Exception as exc:  # noqa: BLE001 - keep adapter metadata failures typed
         raise _OxygenBalanceRefusal(
             "oxygen_balance_species_metadata_failed", str(exc)
@@ -1832,7 +1835,14 @@ def _gas_formula_for_oxygen_balance(species: Any) -> str:
 
     name = str(species).strip()
     if name.endswith(_GAS_NAMESPACE_SUFFIX):
-        return name[: -len(_GAS_NAMESPACE_SUFFIX)]
+        formula = name[: -len(_GAS_NAMESPACE_SUFFIX)]
+        if "_" in formula:
+            # Catalog channel IDs can carry a chemical formula plus a name
+            # suffix; use their declared parent when that ID is mapped.
+            parent = _parent_oxide_for_vaporock_gas(name)
+            if parent is not None:
+                return parent
+        return formula
     return name
 
 
