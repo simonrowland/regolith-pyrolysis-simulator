@@ -600,7 +600,8 @@ def load_adopted_observations(
     raw_observations = {
         (str(entry.get("source_id") or ""), str(species), str(row.get("observation_id") or "")): row
         for entry in extracts
-        for species, block in (entry.get("species") or {}).items()
+        if isinstance(entry.get("species"), Mapping)
+        for species, block in entry["species"].items()
         for row in block.get("observations") or []
     }
     # IDs are source-wide: replacement edges can cross species. Removing

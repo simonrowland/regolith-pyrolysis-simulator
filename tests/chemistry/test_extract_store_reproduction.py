@@ -104,6 +104,17 @@ def adopted_observations() -> list[AdoptedObservation]:
     return load_adopted_observations()
 
 
+def test_legacy_table_species_scalar_is_ignored_by_raw_observation_index(monkeypatch) -> None:
+    import extract_merge
+
+    monkeypatch.setattr(
+        extract_merge,
+        "load_extracts",
+        lambda _directory: [{"source_id": "legacy-table", "species": "K"}],
+    )
+    assert load_adopted_observations() == []
+
+
 @pytest.fixture(scope="module")
 def battery_evaluations(adopted_observations, vapor_pressure_data):
     return [
