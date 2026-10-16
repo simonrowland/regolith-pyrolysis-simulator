@@ -685,12 +685,16 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     #     changes shape here because the cache-sensitive engagement block
     #     moved out of the hashed payload (b-238, above).
     #     Recomputed on the CI machine class (mac-studio-256-1, ci-jobs tree).
+    # Derived from the committed lunar_mare_low_ti_C0_24h runner fixture after
+    # dropping melt_redox_gate_floor_fallback_engagement and applying this
+    # test's JSON normalization. The fixture was regenerated after d-145 by
+    # 83b88925c and 50c6eb700; this pin matches its current committed content.
     # Rebaselined after 644fac1a changed out-of-domain C0/C0b transport from
     # broad refusal to compute-and-mark. The C2A/C4 Knudsen safety gate is
     # retained; this digest still excludes only the cache-sensitive block
     # above.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "a1cab1a260b1d0c2c4925cf15c4bd884a363cb82866dd90654c0954d59823900"
+        "8e6bbe10d8b5dc6c41b1dcaf752a163630fb0bde489f55adb5244e0285b94638"
     )
 
 
