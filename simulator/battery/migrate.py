@@ -670,6 +670,21 @@ def _as_dec_or_none(value: object) -> Decimal | None:
         return None
 
 
+def _printed_composition_amount(value: object) -> Decimal | None:
+    """Read a printed central composition amount, dropping its stated ± value."""
+
+    if isinstance(value, str):
+        value = re.split(r"\s*(?:±|\+/-)\s*", value, maxsplit=1)[0].strip()
+    return _as_dec_or_none(value)
+
+
+def _canonical_printed_oxide_name(name: str) -> str:
+    """Normalize source spellings of total iron to the converter's FeOT key."""
+
+    token = name.strip()
+    return "FeOT" if token in {"FeO_T", "FeO*"} else token
+
+
 def parse_declared_amount(value: object) -> Decimal:
     """Single owner for source-declared numeric amounts.
 
@@ -3087,6 +3102,7 @@ _COMPOSITION_COMPONENTS: dict[str, tuple[str, str, bool]] = {
     },
     "Rb2O": ("Rb2O", "Rb2O", False),
     "SO3": ("SO3", "SO3", False),
+    "SO2": ("SO2", "SO2", False),
     "S": ("S", "S", False),
     "B2O3": ("B2O3", "B2O3", False),
     "Li2O": ("Li2O", "Li2O", False),
@@ -3112,6 +3128,8 @@ _PRINTED_COMPOSITION_MAP_KEYS = (
     "sample_oxide_composition_wt_pct",
     "starting_glass_wt_pct",
     "glass_initial_wt_pct",
+    "glass_composition_wt_pct",
+    "oxide_wt_percent",
     "printed_composition",
 )
 _PRINTED_COMPOSITION_TOTAL_KEYS = frozenset(
@@ -3309,7 +3327,7 @@ def _oxide_map_from_mapping(
             if key == "composition_mass_percent":
                 comps: dict[str, Decimal] = {}
                 for name, value in nested.items():
-                    token = str(name).strip()
+                    token = _canonical_printed_oxide_name(str(name))
                     if (
                         token in _COMPOSITION_CONDITION_KEYS
                         or token.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
@@ -3333,18 +3351,29 @@ def _oxide_map_from_mapping(
                         return None
                     return comps
                 continue
+            nested_for_parse = nested
+            if key == "oxide_wt_percent":
+                nested_for_parse = {
+                    name: parsed
+                    for name, value in nested.items()
+                    if (parsed := _printed_composition_amount(value)) is not None
+                }
             got = _oxide_map_from_mapping(
-                nested, refusal_reason=refusal_reason, declared_map=True
+                nested_for_parse, refusal_reason=refusal_reason, declared_map=True
             )
             if got:
                 for name, value in nested.items():
-                    token = str(name).strip()
+                    token = _canonical_printed_oxide_name(str(name))
                     if (
                         token in _COMPOSITION_CONDITION_KEYS
                         or token.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
                     ):
                         continue
-                    amount = _as_dec_or_none(value)
+                    amount = (
+                        _printed_composition_amount(value)
+                        if key == "oxide_wt_percent"
+                        else _as_dec_or_none(value)
+                    )
                     if amount is not None and token not in got:
                         equivalent = _kume_formula_unit_oxide(token)
                         if equivalent is not None and token != "FeOT":
@@ -3373,7 +3402,7 @@ def _oxide_map_from_mapping(
             or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
         ):
             continue
-        comps[name] = amount
+        comps[_canonical_printed_oxide_name(name)] = amount
     if len(comps) < 2:
         return None
     try:
@@ -13125,6 +13154,27 @@ class Migrator:
         rows = list(iter_extract_observations(doc))
         fusion_transition_rows = self._fusion_transition_rows_by_table_row(rows)
         pressure_identity_context = _pressure_identity_context(doc, rows)
+        sample_compositions: dict[str, tuple[dict[str, Decimal], Locator | None]] = {}
+        ambiguous_sample_compositions: set[str] = set()
+        for _formula, row in rows:
+            row_values = row.get("values")
+            if not isinstance(row_values, Mapping):
+                continue
+            sample_id = row_values.get("sample_id")
+            if not isinstance(sample_id, str) or not sample_id:
+                continue
+            oxide_map = _oxide_map_from_mapping(row_values)
+            if not oxide_map:
+                continue
+            candidate = (oxide_map, locator_from_mapping(row.get("locator")))
+            previous = sample_compositions.get(sample_id)
+            if previous is not None and previous[0] != oxide_map:
+                ambiguous_sample_compositions.add(sample_id)
+                sample_compositions.pop(sample_id)
+            elif sample_id not in ambiguous_sample_compositions:
+                sample_compositions[sample_id] = candidate
+        source_context = dict(pressure_identity_context or {})
+        source_context["sample_compositions"] = sample_compositions
         records = phase_field_records(doc)
         self._phase_field_records[source_id] = records
         for problem in () if records is None else records.problems:
@@ -13183,7 +13233,7 @@ class Migrator:
                 extraction=extraction or {},
                 local_ids=local_ids,
                 declared_experiment_id=declared_experiment_id,
-                source_context=pressure_identity_context,
+                source_context=source_context,
                 provenance=extract_provenance,
                 fusion_transition_rows=fusion_transition_rows,
             )
@@ -13354,6 +13404,27 @@ class Migrator:
             values = dict(raw_values)
         else:
             values = {}
+        context = source_context or {}
+        sample_id = values.get("sample_id")
+        sample_composition = (
+            context.get("sample_compositions", {}).get(sample_id)
+            if isinstance(sample_id, str)
+            and isinstance(context.get("sample_compositions"), Mapping)
+            else None
+        )
+        row_oxide_map = _oxide_map_from_mapping(values)
+        projected_oxide_map = row_oxide_map or (
+            sample_composition[0]
+            if isinstance(sample_composition, tuple)
+            else None
+        )
+        projected_oxide_locator = (
+            locator_from_mapping(obs.get("locator"))
+            if row_oxide_map
+            else sample_composition[1]
+            if isinstance(sample_composition, tuple)
+            else None
+        )
         t_for_rekey = None
         if isinstance(values, Mapping):
             t_sel_rekey = select_declared_source(AXIS_TEMPERATURE_K, None, values)
@@ -14031,6 +14102,10 @@ class Migrator:
                         initial_composition, proxy_flag=composition_role
                     )
             ident_kwargs["composition"] = State.of(initial_composition)
+        elif isinstance(sample_composition, tuple):
+            ident_kwargs["composition"] = State.of(
+                wt_pct_to_mole_fraction(sample_composition[0])
+            )
         elif composition_refusal or q_token in _BULK_PROPERTY_QUANTITIES:
             ident_kwargs["composition"] = State.unknown(
                 composition_unknown_reason(composition_refusal)
@@ -14309,6 +14384,17 @@ class Migrator:
             point_conditions = {
                 **(point_conditions or {}),
                 "composition": catalogue_composition,
+            }
+        elif projected_oxide_map:
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": Located(
+                    State.of(wt_pct_to_mole_fraction(projected_oxide_map)),
+                    locator=projected_oxide_locator or locator,
+                    inference=wt_pct_to_mole_fraction_derivation(
+                        projected_oxide_map, projected_oxide_locator or locator
+                    ),
+                ),
             }
         if malformed_composition_amount is not None:
             point_conditions = {
