@@ -181,7 +181,7 @@ def test_kress91_ceiling_emits_typed_notice_without_clamping(temperature_C):
         T_K=T_K, pressure_bar=.01, exchange_fO2_log=-9.)
     assert state['fO2_log'] == pytest.approx(-9., abs=2e-14)
     notices = state['notices']
-    assert split['notices'] == notices
+    assert split.get('notices', []) == notices
     if temperature_C > 1630.:
         assert notices[0]['flag'] == 'KRESS91_OUT_OF_CALIBRATION_BAND'
         assert notices[0]['max_temperature_C'] == 1630.
@@ -189,6 +189,7 @@ def test_kress91_ceiling_emits_typed_notice_without_clamping(temperature_C):
         assert notices[0]['authority'] == 'extrapolated'
     else:
         assert notices == []
+        assert 'notices' not in split
 
 
 @pytest.mark.parametrize('feo_mol, fe2o3_mol', [(1.0, 0.0), (0.0, 1.0)])

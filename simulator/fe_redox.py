@@ -1875,6 +1875,7 @@ def kress91_split(
     x_fe2o3 = ratio * mol_fractions['FeOt'] / (2.0 * ratio + 1.0)
     x_feo = max(0.0, mol_fractions['FeOt'] - 2.0 * x_fe2o3)
     temperature_band = kress91_temperature_band_case(float(T_K) - 273.15)
+    notices = _kress91_temperature_notices(float(T_K) - 273.15)
     return {
         'fe3': fe3,
         'ratio': ratio,
@@ -1883,7 +1884,7 @@ def kress91_split(
         'temperature_band_case': temperature_band['case'],
         'temperature_band_status': temperature_band['status'],
         'temperature_band_source': temperature_band['source'],
-        'notices': _kress91_temperature_notices(float(T_K) - 273.15),
+        **({'notices': notices} if notices else {}),
         'authoritative': temperature_band['authoritative'],
         'extrapolation': temperature_band['extrapolation'],
         'high_uncertainty': temperature_band['high_uncertainty'],
