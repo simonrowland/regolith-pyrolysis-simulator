@@ -466,6 +466,8 @@ class OverheadGasModel:
             degraded_path_engagement_recorder
         )
         self.species_formula_registry = species_formula_registry or {}
+        # The finite report can emit a target notice before any stream projection.
+        self.stream_physics_notices = []
         self.configure_condenser_geometry(condenser_geometry_config or {})
         self.configure_headspace(headspace_config or {})
 
@@ -1204,7 +1206,14 @@ class OverheadGasModel:
         headspace_volume_m3: Optional[float] = None,
     ) -> dict[str, float]:
         """Resolve the existing outlet boundary; no source flux or ledger edits."""
-        self.stream_physics_notices = []
+        current_hour = getattr(melt, 'hour', None)
+        # Preserve the finite report's same-tick notice for the final
+        # stream diagnostics.
+        self.stream_physics_notices = [
+            notice for notice in self.stream_physics_notices
+            if notice.get('reason') == 'finite_headspace_command_unmet'
+            and notice.get('hour') == current_hour
+        ]
         pressure_mbar = float(transport['pressure_mbar'])
         temperature_K = float(transport['conductance_temperature_C']) + CELSIUS_TO_KELVIN_OFFSET
         flows = {str(s): float(q) for s, q in source_mol_hr.items()}
@@ -1392,9 +1401,10 @@ class OverheadGasModel:
             self.last_stream_boundary['pressure_mbar'] = 0.0
             self.last_stream_boundary['status'] = 'zero_flow_no_composition'
         for notice in self.stream_physics_notices:
-            notice.update(hour=getattr(melt, 'hour', None), campaign=getattr(melt.campaign, 'name', ''),
-                          location='melt_to_train', pressure_mbar=pressure_mbar,
-                          flows_mol_hr=dict(flows))
+            if notice.get('reason') != 'finite_headspace_command_unmet':
+                notice.update(hour=getattr(melt, 'hour', None), campaign=getattr(melt.campaign, 'name', ''),
+                              location='melt_to_train', pressure_mbar=pressure_mbar,
+                              flows_mol_hr=dict(flows))
         return flows
 
     def _update_finite_headspace(self, gas: OverheadGas, melt: MeltState,
@@ -1416,60 +1426,77 @@ class OverheadGasModel:
         })
 
         atmosphere_name = getattr(melt.atmosphere, 'name', '')
+        # nRT/V is achieved inventory state; controller commands cannot create
+        # unledgered gas.
+        command_total_pressure_mbar = None
+        command_partial_pressures_mbar: dict[str, float] = {}
         if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
-            gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — CO2 total pressure floor
-            gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
-                gas.composition.get('CO2', 0.0), melt.p_total_mbar * 0.96)  # mbar — CO2 partial pressure; 0.96 mole fraction
+            command_total_pressure_mbar = melt.p_total_mbar
+            command_partial_pressures_mbar['CO2'] = melt.p_total_mbar * 0.96
         elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
-            gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — sweep total pressure floor
-            # Kr audit 2026-07-25: same stamped-carrier fix as the
-            # no-headspace branch above.
             _sweep_key = (
                 getattr(melt, 'background_gas_species', '')
                 or ('Ar' if atmosphere_name == 'ARGON_FLOW' else 'N2')
             )
-            gas.composition[_sweep_key] = max(
-                gas.composition.get(_sweep_key, 0.0),
-                max(0.0, melt.p_total_mbar - melt.pO2_mbar))  # mbar — sweep balance partial pressure
+            command_total_pressure_mbar = melt.p_total_mbar
+            sweep_target = max(0.0, melt.p_total_mbar - melt.pO2_mbar)
+            if sweep_target > 0.0:
+                command_partial_pressures_mbar[_sweep_key] = sweep_target
 
-        # 0.5.3 Phase A1 (2026-05-28): commanded-pO2 floor mirror. The legacy
-        # no-headspace branch (above) writes `gas.composition['O2'] = max(...,
-        # melt.pO2_mbar)` so a recipe pO2 setpoint always survives. Without the
-        # mirror here, the holdup-derived O2 partial would override the setpoint
-        # for actively-controlled atmospheres. Only apply in O2-controlled modes:
-        # an uncontrolled HARD_VACUUM / PN2_SWEEP run must NOT get a synthetic
-        # O2 floor (matches the design intent at equilibrium.py:9-12).
-        #
-        # Phase A chunk-review P1 (codex 2026-05-28): also raise the reported
-        # total pressure to at least the commanded pO2 floor. Pre-fix the
-        # holdup-derived total could be 0.0 mbar while the O2 partial was
-        # forced to e.g. 1.5 mbar — an impossible gas state (P_total < pO2).
-        # The runner fixture ``ci_carbonaceous_chondrite_C2B_12h.json`` carried
-        # ``P_total_bar=0`` with ``pO2_bar=0.0015`` as visible evidence. Fix
-        # mirrors the CO2_BACKPRESSURE / PN2_SWEEP branches above: when the
-        # commanded atmosphere demands a non-zero pO2, the reported total
-        # must accommodate it.
         if atmosphere_name in {
             'CONTROLLED_O2',
             'CONTROLLED_O2_FLOW',
             'O2_BACKPRESSURE',
         }:
+            command_total_pressure_mbar = max(
+                melt.pO2_mbar, melt.p_total_mbar)
             if melt.pO2_mbar > 0.0:
-                gas.composition['O2'] = max(  # mbar — controlled O2 partial pressure floor
-                    gas.composition.get('O2', 0.0), melt.pO2_mbar)  # mbar — controlled O2 partial pressure floor
-            gas.pressure_mbar = max(  # mbar — controlled total pressure floor
-                gas.pressure_mbar, melt.pO2_mbar, melt.p_total_mbar)  # mbar — controlled total pressure floor
+                command_partial_pressures_mbar['O2'] = melt.pO2_mbar
             background_species = str(
                 getattr(melt, 'background_gas_species', '') or '').strip()
             if background_species and background_species.upper() != 'O2':
                 background_fraction = float(  # dimensionless — background gas mole fraction
                     getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
                 background_fraction = min(1.0, max(0.0, background_fraction))  # dimensionless — clamped mole fraction
-                gas.composition[background_species] = max(  # mbar — background gas partial pressure
-                    gas.composition.get(background_species, 0.0),
+                background_target = (
                     max(0.0, melt.p_total_mbar - melt.pO2_mbar)
-                    * background_fraction,  # mbar — background gas partial pressure share
+                    * background_fraction
                 )
+                if background_target > 0.0:
+                    command_partial_pressures_mbar[background_species] = background_target
+
+        self.stream_physics_notices = [
+            notice for notice in self.stream_physics_notices
+            if notice.get('reason') != 'finite_headspace_command_unmet'
+        ]
+        target_unmet = (
+            command_total_pressure_mbar is not None
+            and not math.isclose(
+                command_total_pressure_mbar, gas.pressure_mbar,
+                rel_tol=1e-9, abs_tol=1e-12,
+            )
+        ) or any(
+            not math.isclose(
+                target, gas.composition.get(species, 0.0),
+                rel_tol=1e-9, abs_tol=1e-12,
+            )
+            for species, target in command_partial_pressures_mbar.items()
+        )
+        if target_unmet:
+            self.stream_physics_notices.append({
+                'reason': 'finite_headspace_command_unmet', 'status': 'extrapolated',
+                'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                'hour': getattr(melt, 'hour', None),
+                'campaign': getattr(melt.campaign, 'name', ''),
+                'location': 'finite_headspace',
+                'target_total_pressure_mbar': command_total_pressure_mbar,
+                'achieved_total_pressure_mbar': gas.pressure_mbar,
+                'target_partial_pressures_mbar': command_partial_pressures_mbar,
+                'achieved_partial_pressures_mbar': {
+                    species: gas.composition.get(species, 0.0)
+                    for species in command_partial_pressures_mbar
+                },
+            })
 
     @staticmethod
     def _reset_gas(gas: OverheadGas) -> None:

@@ -1909,14 +1909,8 @@ def test_commanded_po2_numerical_floor_when_all_inputs_zero():
 
 
 @pytest.mark.parametrize("atmosphere", _O2_FLOORED)
-def test_overhead_writer_raises_p_total_to_setpoint_in_o2_modes(atmosphere):
-    """Phase A chunk-review P1 invariant (commit 03c1c45): under
-    finite-headspace ON + O₂-controlled atmosphere + non-trivial
-    setpoint, ``gas.pressure_mbar`` must be at least ``melt.pO2_mbar``
-    so the reported total pressure never falls below the O₂ partial
-    pressure (impossible gas state otherwise). Drives the existing
-    ``OverheadGasModel`` via the canonical positional signature
-    ``update(evap_flux, melt, train, ...)``."""
+def test_finite_headspace_reports_o2_command_targets_separately(atmosphere):
+    """An O₂ command is a target; finite-headspace partials remain holdup-derived."""
     from simulator.state import (
         CondensationTrain,
         EvaporationFlux,
@@ -1934,17 +1928,55 @@ def test_overhead_writer_raises_p_total_to_setpoint_in_o2_modes(atmosphere):
     model = OverheadGasModel({"enabled": True, "volume_m3": 1.0})
     gas = model.update(flux, melt, train)
 
-    # Under the documented invariant, both O2 partial and total must
-    # be at the setpoint (or higher). P_total < pO2 is impossible.
-    assert gas.composition.get("O2", 0.0) >= 1.5, (
-        f"O2 floor not applied for {atmosphere}: "
-        f"got {gas.composition.get('O2', 0.0)}"
+    assert gas.pressure_mbar == pytest.approx(sum(gas.composition.values()))
+    notice = next(
+        notice for notice in model.stream_physics_notices
+        if notice["reason"] == "finite_headspace_command_unmet"
     )
-    assert gas.pressure_mbar >= 1.5, (
-        f"P_total fell below pO2 floor for {atmosphere}: "
-        f"P_total={gas.pressure_mbar} < pO2=1.5"
+    assert notice["target_total_pressure_mbar"] == pytest.approx(1.5)
+    assert notice["achieved_total_pressure_mbar"] == pytest.approx(gas.pressure_mbar)
+    assert notice["target_partial_pressures_mbar"] == {"O2": 1.5}
+    assert notice["achieved_partial_pressures_mbar"] == {
+        "O2": gas.composition.get("O2", 0.0)
+    }
+
+
+def test_finite_headspace_report_closes_when_n2_command_is_unfilled():
+    from simulator.state import CondensationTrain, EvaporationFlux, MeltState
+    from simulator.overhead import OverheadGasModel
+
+    melt = MeltState(
+        atmosphere=Atmosphere.PN2_SWEEP,
+        p_total_mbar=10.0,
+        temperature_C=1500.0,
     )
-    assert gas.pressure_mbar >= gas.composition["O2"]
+    model = OverheadGasModel({"enabled": True, "volume_m3": 1.0})
+    gas = model.update(
+        EvaporationFlux(), melt, CondensationTrain.create_default(),
+        overhead_holdup_mol={"O2": 1.0},
+    )
+
+    # Ideal-gas probe: 1 mol × 8.314462618 J/(mol K) × 1773.15 K / 1 m³
+    # = 14742.784749 Pa = 147.42784749 mbar. The N₂ command is a target,
+    # not inventory.
+    assert gas.pressure_mbar == pytest.approx(147.42784749, rel=1e-8)
+    assert gas.composition == pytest.approx({"O2": 147.42784749}, rel=1e-8)
+    assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar, abs=1e-12)
+    notice = next(
+        notice for notice in model.stream_physics_notices
+        if notice["reason"] == "finite_headspace_command_unmet"
+    )
+    assert notice["target_total_pressure_mbar"] == pytest.approx(10.0)
+    assert notice["achieved_total_pressure_mbar"] == pytest.approx(gas.pressure_mbar)
+    assert notice["target_partial_pressures_mbar"] == {"N2": 10.0}
+    assert notice["achieved_partial_pressures_mbar"] == {"N2": 0.0}
+    model.flowing_stream_mol_hr(
+        {}, melt, model.estimate_transport_state(EvaporationFlux(), melt),
+    )
+    assert any(
+        notice["reason"] == "finite_headspace_command_unmet"
+        for notice in model.stream_physics_notices
+    )
 
 
 @pytest.mark.parametrize("atmosphere", _O2_NOT_FLOORED)
@@ -2001,19 +2033,27 @@ def test_argon_flow_writes_inert_carrier_boundary(headspace_enabled):
         p_total_mbar=10.0,
         temperature_C=1500.0,
     )
-    gas = OverheadGasModel(
+    model = OverheadGasModel(
         {"enabled": headspace_enabled, "volume_m3": 1.0}
-    ).update(
+    )
+    gas = model.update(
         EvaporationFlux(),
         melt,
         CondensationTrain.create_default(),
     )
 
-    assert gas.pressure_mbar >= 10.0
-    # The flowing zero-evaporation stream is pure carrier: the irrelevant
-    # pO2 command supplies no O2 molar flow. Finite inventory reporting keeps
-    # its separate legacy boundary until the finite-vessel chunk.
-    assert gas.composition["Ar"] == pytest.approx(8.5 if headspace_enabled else 10.0)
+    if headspace_enabled:
+        assert gas.pressure_mbar == pytest.approx(0.0)
+        assert gas.composition == {}
+        notice = next(
+            notice for notice in model.stream_physics_notices
+            if notice["reason"] == "finite_headspace_command_unmet"
+        )
+        assert notice["target_total_pressure_mbar"] == pytest.approx(10.0)
+        assert notice["target_partial_pressures_mbar"] == {"Ar": 8.5}
+    else:
+        assert gas.pressure_mbar >= 10.0
+        assert gas.composition["Ar"] == pytest.approx(10.0)
     assert gas.composition.get("O2", 0.0) < 1.5
 
 
