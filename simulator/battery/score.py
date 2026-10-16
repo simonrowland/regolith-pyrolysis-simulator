@@ -4866,6 +4866,30 @@ def predict_with_engine(
         from simulator.battery.enums import AmountBasis
         from simulator.battery.generators.bench import activity_request_for_engine
         from simulator.battery.records import Composition as OxideComposition
+        from simulator.chemistry.melt_activity import (
+            MELT_OXIDE_CATIONS_PER_FORMULA,
+        )
+
+        if (
+            engine is Engine.INTERNAL_ANALYTICAL
+            and quantity is Quantity.ACTIVITY
+            and formula not in MELT_OXIDE_CATIONS_PER_FORMULA
+        ):
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                authority=Authority.REFUSED,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+                refusal_detail={
+                    "reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value,
+                    "formula": formula,
+                    "model": "simulator.chemistry.melt_activity.melt_oxide_activity",
+                },
+                identity=identity,
+            )
 
         if experiment is None:
             return EnginePrediction(
@@ -4900,6 +4924,27 @@ def predict_with_engine(
         )
         requested = identity.composition if identity.composition is not None and identity.composition.is_value else State.of(built)
         composition_value = built
+        if engine is Engine.INTERNAL_ANALYTICAL and quantity is Quantity.ACTIVITY:
+            unsupported_components = sorted(
+                set(moles) - set(MELT_OXIDE_CATIONS_PER_FORMULA)
+            )
+            if unsupported_components:
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.UNSUPPORTED),
+                    authority=Authority.REFUSED,
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+                    refusal_detail={
+                        "reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value,
+                        "unsupported_composition_components": unsupported_components,
+                        "model": "simulator.chemistry.melt_activity.melt_oxide_activity",
+                    },
+                    identity=identity,
+                    requested_composition=requested,
+                )
         wt = composition_wt_pct(built)
         if wt is None:
             return EnginePrediction(
@@ -4912,6 +4957,98 @@ def predict_with_engine(
                 refusal_detail={"reason": "composition_unparsed"},
                 identity=identity,
                 requested_composition=requested,
+            )
+        if engine is Engine.INTERNAL_ANALYTICAL and quantity is Quantity.ACTIVITY:
+            from simulator.chemistry.melt_activity import melt_oxide_activity
+
+            activity = melt_oxide_activity(
+                formula,
+                moles,
+                temperature_K=float(T),
+            )
+            if activity is None:
+                return _input_refusal(
+                    engine=engine,
+                    channel=channel,
+                    sources=sources,
+                    identity=identity,
+                    requested=requested,
+                    reason=RefusalReason.IDENTITY_INCOMPLETE,
+                    detail={
+                        "reason": "melt_activity_missing_composition",
+                        "formula": formula,
+                    },
+                    notices=tuple(input_notices),
+                )
+
+            # melt_oxide_activity returns single-cation a(MO_x) on its
+            # Raoultian pure-liquid reference. Battery activity identities
+            # name the parent oxide; mu(MO_x)=mu(parent)/c therefore gives
+            # a(parent)=a(MO_x)^c via the production result's conversion.
+            parent_activity = activity.thermodynamic_parent_activity()
+            authority = Authority.BRIDGE
+            notices: list[Notice] = list(input_notices)
+            certified_band = None
+            if activity.valid_range_K is not None:
+                low, high = (float(activity.valid_range_K[0]), float(activity.valid_range_K[1]))
+                certified_band = {
+                    "temperature_K": (Decimal(str(low)), Decimal(str(high)))
+                }
+                if activity.authority_status == (
+                    "out_of_gamma_domain_status_bearing_non_authoritative"
+                ):
+                    authority = Authority.EXTRAPOLATED
+                    notices.append(
+                        Notice(
+                            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                            affected_quantities=(Quantity.ACTIVITY,),
+                            reason=(activity.warning or "melt oxide activity extrapolated"),
+                            origin=(
+                                "simulator.chemistry.melt_activity.melt_oxide_activity"
+                            ),
+                            band=f"[{low:g}, {high:g}] K",
+                            authority=Authority.EXTRAPOLATED,
+                        )
+                    )
+            elif activity.evidence_tier == "UNCERTIFIED" or activity.warning:
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            activity.warning
+                            or "melt_oxide_activity has no certified evidence tier"
+                        ),
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    )
+                )
+            activity_sources = tuple(
+                dict.fromkeys((*sources, activity.citation))
+            )
+            activity_lineage_complete = lineage_complete_for(activity_sources)
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.PRODUCED,
+                    call_evidence=(
+                        "simulator.chemistry.melt_activity.melt_oxide_activity:"
+                        f"{formula}"
+                    ),
+                ),
+                value=as_decimal(str(parent_activity)),
+                unit="dimensionless",
+                authority=authority,
+                notices=tuple(notices),
+                coefficient_sources=activity_sources,
+                lineage_complete=activity_lineage_complete,
+                certified_band=certified_band,
+                identity=identity,
+                requested_composition=requested,
+                version=activity.activity_model,
             )
     elif identity.composition is not None and identity.composition.is_value:
         requested = identity.composition

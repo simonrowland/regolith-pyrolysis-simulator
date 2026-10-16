@@ -466,12 +466,12 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
     """Activity and activity-coefficient requests for engines that report activities.
 
     Required: a normalized composition, a point temperature, and a reference
-    state whose endmember formula is the activity that engine reports. An
-    oxygen point is required when the composition or the measured species
-    holds a multivalent element. Pressure and the gas boundary are not inputs.
-    A missing required input is a typed gap. A missing oxygen point is not
-    filled: the scorer must not substitute PO2_ENGINE_DEFAULT for an activity
-    comparison.
+    state whose endmember formula is the activity that engine reports. Engines
+    that model redox require an oxygen point when the composition or measured
+    species holds a multivalent element; the internal-analytical built-in
+    activity function consumes the oxide composition directly. Pressure and
+    the gas boundary are not inputs. A missing required input is a typed gap,
+    and a missing oxygen point is never filled from the engine default.
     """
     provenance = _provenance(inputs)
     if inputs.pure_substance_reference:
@@ -529,14 +529,24 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
             point_gap = _point_gap("oxygen_condition", oxygen.selected)
             if point_gap is not None:
                 gaps.append(point_gap)
-    status = ReadinessStatus.GAP if gaps else ReadinessStatus.READY
     gap_tuple = tuple(dict.fromkeys(gaps))
     results = []
     for engine in MELT_ACTIVITY_ENGINES:
         if engine == "internal-analytical" and inputs.activity_quantity != "activity":
             results.append(_not_applicable(provenance, engine))
             continue
-        readiness = ConsumerReadiness("melt_activity", status, gap_tuple, engine)
+        engine_gaps = tuple(
+            gap
+            for gap in gap_tuple
+            if not (
+                engine == "internal-analytical"
+                and gap.waypoint == "oxygen_condition"
+            )
+        )
+        engine_status = (
+            ReadinessStatus.GAP if engine_gaps else ReadinessStatus.READY
+        )
+        readiness = ConsumerReadiness("melt_activity", engine_status, engine_gaps, engine)
         reported_activity = _ENGINE_REPORTED_ACTIVITY[engine]
         single_cation = (
             inputs.activity_quantity == "activity_coefficient"
@@ -556,22 +566,7 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
             engine_side = reported_activity.reported
         else:
             matches, engine_side = _reference_matches(state, reported_activity, engine)
-        # A missing internal-analytical oxygen input is terminal and precedes
-        # this known solid/liquid reference mismatch. Leave fO2 out of the
-        # payload so predict_with_engine's shared oxygen gate returns it.
-        internal_analytical_missing_oxygen = (
-            engine == "internal-analytical"
-            and inputs.waypoints["oxygen_condition"].selected is None
-            and not matches
-            and composition.selected is not None
-            and temperature.selected is not None
-            and all(gap.waypoint == "oxygen_condition" for gap in gap_tuple)
-            and state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
-            and phase_token(state.endmember) is Phase.CR
-            and state.component_basis == state.endmember.formula
-            and inputs.measured_species == state.endmember.formula
-        )
-        if not matches and not internal_analytical_missing_oxygen:
+        if not matches:
             # Henrian, 1 wt%, a pure solid, a gas endmember, an unadmitted
             # single-cation basis, or an endmember formula this engine does not report.
             # Name both sides. Do not convert.
@@ -581,12 +576,11 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
                 (_reference_gap(state, engine_side),),
             ))
             continue
-        if status is not ReadinessStatus.READY and not internal_analytical_missing_oxygen:
+        if engine_status is not ReadinessStatus.READY:
             results.append(GeneratedInput(readiness, None, provenance))
             continue
         if (
-            not internal_analytical_missing_oxygen
-            and inputs.measured_species != state.endmember.formula
+            inputs.measured_species != state.endmember.formula
         ):
             gap = ReadinessGap(
                 "reference_state",
