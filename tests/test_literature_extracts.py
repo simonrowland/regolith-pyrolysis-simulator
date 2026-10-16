@@ -2014,6 +2014,17 @@ def test_richter_2007_table1_residues_link_to_their_runs() -> None:
         if "richter_2007_residue_table1_" in issue.path
     ]
 
+    mass_loss_pins = {"r2-21": "11.1", "r3-2": "0.0"}
+    for sample, value in mass_loss_pins.items():
+        observation = _repo_observation(
+            "kems-010-richter-2007.yaml",
+            f"richter_2007_residue_table1_{sample}",
+        )
+        assert observation["point_conditions"]["mass_loss_pct"]["state"] == {
+            "tag": "value",
+            "value": value,
+        }
+
     pins = {
         "r3-10": ("9.13", "cai-r3-10", "2173.15", "15"),
         "r3-12": ("11.37", "cai-r3-12", "2173.15", "0"),
