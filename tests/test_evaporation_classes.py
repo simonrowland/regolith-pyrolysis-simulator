@@ -9,6 +9,8 @@ import yaml
 
 import pytest
 
+from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.evaporation_classes import (
     EVAPORATION_CLASSES,
     e_down_from_s,
@@ -170,6 +172,48 @@ def test_report_species_class_diagnostics_class_alpha_fallback_unchanged():
         3.7199138950185795e-06,
         0.03631724814709421,
     )
+
+
+@pytest.mark.parametrize(
+    "species",
+    [
+        "Al2",
+        "Al2O",
+        "Al2O2",
+        "Al2O3_gas",
+        "AlO",
+        "AlO2",
+        "Ca2",
+        "CrO",
+        "CrO2",
+        "CrO3",
+        "TiO",
+        "TiO2_gas",
+    ],
+)
+def test_report_species_class_diagnostics_default_mass_uses_formula_owner(species):
+    kwargs = dict(
+        T_K=2000.0,
+        overhead_pressure_pa=1000.0,
+        alpha_override=0.1,
+        vapor_pressure_data={},
+    )
+    try:
+        formula_mass = resolve_species_formula(species).molar_mass_kg_per_mol()
+    except UnknownSpeciesError:
+        with pytest.raises(UnknownSpeciesError):
+            report_species_class_diagnostics(species, **kwargs)
+        return
+
+    assert formula_mass != 0.050
+    default_mass = report_species_class_diagnostics(species, **kwargs)
+    formula_mass_result = report_species_class_diagnostics(
+        species,
+        **kwargs,
+        molar_mass_kg_mol=formula_mass,
+    )
+    assert default_mass.series is not None
+    assert default_mass == formula_mass_result
 
 
 def test_costa_redox_grounding_uses_owner_figure_series_once():

@@ -27,6 +27,7 @@ from engines.builtin.evaporation_flux import (
     SeriesEvaporationFlux,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.evaporation import _load_evaporation_alpha_by_species
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -1131,52 +1132,6 @@ def _scalar_runtime_alpha(raw: Any) -> tuple[float | None, str]:
     return None, f"unparsed_type:{type(raw).__name__}"
 
 
-def _default_molar_mass_kg_mol(species: str) -> float:
-    """Default molar mass for diagnostic share in this module.
-
-    Used on the path in :func:`report_species_class_diagnostics` when
-    ``molar_mass_kg_mol`` is omitted.
-    """
-
-    # Partial local table of diagnostic molar masses (kg/mol) for species
-    # this function is commonly called with. It is not a complete match of
-    # the LJ proxy masses in engines/builtin/evaporation_flux.py
-    # (_EVAPORATION_LJ_PROXY_PARAMS). Mapped production species that have
-    # an LJ proxy mass there but are omitted here, and therefore take the
-    # 0.050 kg/mol fallback: Al2, Al2O, Al2O2, Al2O3_gas, AlO, AlO2, Ca2,
-    # CrO, CrO2, CrO3, TiO, TiO2_gas.
-    table = {
-        "Fe": 0.055845,
-        "Mg": 0.024305,
-        "MgO_gas": 0.040304,
-        "Mg2": 0.048610,
-        "Na": 0.022989769,
-        "Na2": 0.045979538,
-        "Na2O_gas": 0.0619785,
-        "K": 0.0390983,
-        "K2": 0.0781966,
-        "K2O_gas": 0.0941956,
-        "SiO": 0.044085,
-        "Si": 0.028085,
-        "Si2": 0.056170,
-        "Si3": 0.084255,
-        "SiO2_gas": 0.060083,
-        "Ca": 0.040078,
-        "CaO_gas": 0.056077,
-        "Al": 0.0269815,
-        "Ti": 0.047867,
-        "Cr": 0.051996,
-        "Mn": 0.054938,
-    }
-    if species in table:
-        return table[species]
-    # Fallback: 0.050 kg/mol — diagnostic only. k_HKL ∝ √M and k_g ∝ M, so
-    # s = r_i/(r_i+r_g) is mass-dependent. Substituting the omitted LJ
-    # proxies at 2000 K / 1000 Pa moved interface share by ~7–42 % relative
-    # for those twelve species (largest on Al2O3_gas and CrO3).
-    return 0.050
-
-
 def report_species_class_diagnostics(
     species: str,
     *,
@@ -1251,7 +1206,7 @@ def report_species_class_diagnostics(
         M = (
             float(molar_mass_kg_mol)
             if molar_mass_kg_mol is not None
-            else _default_molar_mass_kg_mol(species)
+            else resolve_species_formula(species).molar_mass_kg_per_mol()
         )
         series = interface_resistance_share(
             species=species,
