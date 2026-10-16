@@ -3522,10 +3522,10 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                 )
             )
-        elif kind == "openimcc_notice":
+        elif kind in {"openimcc_flag", "openimcc_notice"}:
             notices.append(
                 Notice(
-                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                     affected_quantities=(quantity,),
                     reason=str(row.get("reason") or kind),
                     origin=f"engine:{engine.value}",
@@ -3540,7 +3540,8 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                 )
             )
-        elif kind in {"openimcc_flag", "openimcc_gas_unavailable"}:
+        elif kind == "openimcc_gas_unavailable":
+            # No existing kind represents an unavailable engine channel.
             notices.append(
                 Notice(
                     kind=NoticeKind.SOURCE_DISAGREEMENT,
@@ -4289,7 +4290,7 @@ def _predict_fe_redox(
             )
         notices += tuple(
             Notice(
-                kind=NoticeKind.SOURCE_DISAGREEMENT,
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                 affected_quantities=(Quantity.FE3_FE2_RATIO,),
                 reason=str(flag),
                 origin="openimcc.evaluate_redox",
