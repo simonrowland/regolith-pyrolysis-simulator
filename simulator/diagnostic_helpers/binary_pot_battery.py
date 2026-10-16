@@ -2413,11 +2413,15 @@ def _internal_analytical_vapor_pressure_adapter(
         liquid_fraction=None,
     )
     if include_diagnostic_shadows:
-        core._refresh_vapor_pressures_from_kernel(equilibrium)
+        core._refresh_vapor_pressures_from_kernel(
+            equilibrium,
+            intrinsic_fO2_log_override=fO2_log_used,
+        )
     else:
         core._refresh_vapor_pressures_from_kernel(
             equilibrium,
             include_diagnostic_shadows=False,
+            intrinsic_fO2_log_override=fO2_log_used,
         )
     core_diagnostic = dict(core._last_vapor_pressure_diagnostic)
     core_flags: list[dict[str, Any]] = []
