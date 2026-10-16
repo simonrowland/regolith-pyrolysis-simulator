@@ -492,13 +492,13 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
 
 def test_pack_digest_preserves_the_published_binding_value() -> None:
     _openimcc_or_skip()
-    expected = "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+    expected = "ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c"
     assert _pack_digest(_load_pack("published-core")) == expected
 
 
 def test_pack_digest_uses_ext_binding_digest() -> None:
     _openimcc_or_skip()
-    expected = "4cbec2ee85cd95314a5f62f5ce4e00cbe660935bde12df3a7e5daa425612ad03"
+    expected = "de51a9bcf52724fd4b06e9cb639779f31189d86ecf304073fd72fc3019f29770"
     assert _pack_digest(_load_pack("published-ext")) == expected
 
 
