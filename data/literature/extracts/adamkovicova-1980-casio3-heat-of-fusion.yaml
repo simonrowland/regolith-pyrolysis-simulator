@@ -37,11 +37,13 @@ benches:
       state: {tag: unknown, reason: in_cited_source}
       locator: {published_page: 194, section: Experimental, note: 'The authors refer to [10] for calorimeter description and procedure; container material is not stated here.'}
     temperature_measurement:
-      state: {tag: unknown, reason: in_cited_source}
-      locator: {published_page: 194, section: Experimental, note: 'The authors refer to [10] for apparatus and procedure; temperature instrument and uncertainty are not stated here.'}
+      sensor:
+        state: {tag: unknown, reason: in_cited_source}
+        locator: {published_page: 194, section: Experimental, note: 'The authors refer to [10] for apparatus and procedure; temperature instrument and uncertainty are not stated here.'}
     temperature_calibration:
-      state: {tag: unknown, reason: in_cited_source}
-      locator: {published_page: 194, section: Experimental, note: 'No temperature-calibration details are given here; the authors refer to [10].'}
+      method:
+        state: {tag: unknown, reason: in_cited_source}
+        locator: {published_page: 194, section: Experimental, note: 'No temperature-calibration details are given here; the authors refer to [10].'}
     other_facts:
       - name: reference_temperature_K
         unit: K
@@ -65,11 +67,13 @@ benches:
       state: {tag: unknown, reason: in_cited_source}
       locator: {published_page: 194, section: Experimental, note: 'The authors refer to [11] for calorimeter description and procedure; container material is not stated here.'}
     temperature_measurement:
-      state: {tag: unknown, reason: in_cited_source}
-      locator: {published_page: 194, section: Experimental, note: 'The authors refer to [11] for apparatus and procedure; temperature instrument and uncertainty are not stated here.'}
+      sensor:
+        state: {tag: unknown, reason: in_cited_source}
+        locator: {published_page: 194, section: Experimental, note: 'The authors refer to [11] for apparatus and procedure; temperature instrument and uncertainty are not stated here.'}
     temperature_calibration:
-      state: {tag: unknown, reason: in_cited_source}
-      locator: {published_page: 194, section: Experimental, note: 'No temperature-calibration details are given here; the authors refer to [11].'}
+      method:
+        state: {tag: unknown, reason: in_cited_source}
+        locator: {published_page: 194, section: Experimental, note: 'No temperature-calibration details are given here; the authors refer to [11].'}
     other_facts:
       - name: calorimeter_medium_as_printed
         unit: as_published
@@ -224,12 +228,12 @@ species:
           table_csv: tables/adamkovicova-1980-casio3-heat-of-fusion/t1.csv
           sign_convention: 'Table I prints ΔHcool without a leading minus; the discussion and Eq. (3) use −ΔHcool and positive magnitudes.'
           points:
-            - {T_K: 1506, delta_Hcool_kJ_mol-1_as_printed: 139.6, point_uncertainty_status: not_reported_individually}
-            - {T_K: 1576, delta_Hcool_kJ_mol-1_as_printed: 150.6, point_uncertainty_status: not_reported_individually}
-            - {T_K: 1630, delta_Hcool_kJ_mol-1_as_printed: 157.1, point_uncertainty_status: not_reported_individually}
-            - {T_K: 1678, delta_Hcool_kJ_mol-1_as_printed: 165.0, point_uncertainty_status: not_reported_individually}
-            - {T_K: 1730, delta_Hcool_kJ_mol-1_as_printed: 173.9, point_uncertainty_status: not_reported_individually}
-            - {T_K: 1780, delta_Hcool_kJ_mol-1_as_printed: 183.3, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1506, minus_delta_H_cool_kJ_mol-1: 139.6, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1576, minus_delta_H_cool_kJ_mol-1: 150.6, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1630, minus_delta_H_cool_kJ_mol-1: 157.1, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1678, minus_delta_H_cool_kJ_mol-1: 165.0, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1730, minus_delta_H_cool_kJ_mol-1: 173.9, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1780, minus_delta_H_cool_kJ_mol-1: 183.3, point_uncertainty_status: not_reported_individually}
         uncertainty: {reported_status: not_reported_for_individual_points, note: 'The paper reports 1.1 kJ mol−1 as the regression error for Eq. (3), not as a per-point uncertainty.'}
 
       - observation_id: adamkovicova_1980_table2_solid_solution_heats_measured
@@ -300,12 +304,12 @@ species:
           fit_error_kJ_mol-1: 1.1
           fit_error_note: 'Eq. (2) error definition: half-width of the 95% reliability interval, approximately twice the Gaussian standard deviation.'
           fit_points:
-            - {T_K: 1506, minus_delta_Hcool_kJ_mol-1: 139.2}
-            - {T_K: 1576, minus_delta_Hcool_kJ_mol-1: 149.8}
-            - {T_K: 1630, minus_delta_Hcool_kJ_mol-1: 158.2}
-            - {T_K: 1678, minus_delta_Hcool_kJ_mol-1: 165.8}
-            - {T_K: 1730, minus_delta_Hcool_kJ_mol-1: 174.2}
-            - {T_K: 1780, minus_delta_Hcool_kJ_mol-1: 182.4}
+            - {T_K: 1506, minus_delta_H_cool_kJ_mol-1: 139.2}
+            - {T_K: 1576, minus_delta_H_cool_kJ_mol-1: 149.8}
+            - {T_K: 1630, minus_delta_H_cool_kJ_mol-1: 158.2}
+            - {T_K: 1678, minus_delta_H_cool_kJ_mol-1: 165.8}
+            - {T_K: 1730, minus_delta_H_cool_kJ_mol-1: 174.2}
+            - {T_K: 1780, minus_delta_H_cool_kJ_mol-1: 182.4}
           derivation:
             relation: 'Least-squares regression of measured pseudowollastonite cooling enthalpies, with ΔHcool = 0 at 298 K, Eq. (3).'
             inputs: [adamkovicova_1980_table1_solid_cooling_measured]
@@ -370,11 +374,11 @@ species:
           table_csv: tables/adamkovicova-1980-casio3-heat-of-fusion/t3.csv
           sign_convention: 'Table III explicitly prints −ΔHcool as positive values.'
           points:
-            - {T_K: 1829, minus_delta_Hcool_kJ_mol-1: 217.1, point_uncertainty_status: not_reported_individually}
-            - {T_K: 1848, minus_delta_Hcool_kJ_mol-1: 219.9, point_uncertainty_status: not_reported_individually}
-            - {T_K: 1859, minus_delta_Hcool_kJ_mol-1: 222.2, point_uncertainty_status: not_reported_individually}
-            - {T_K: 1915, minus_delta_Hcool_kJ_mol-1: 230.5, point_uncertainty_status: not_reported_individually}
-            - {T_K: 1961, minus_delta_Hcool_kJ_mol-1: 238.9, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1829, minus_delta_H_cool_kJ_mol-1: 217.1, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1848, minus_delta_H_cool_kJ_mol-1: 219.9, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1859, minus_delta_H_cool_kJ_mol-1: 222.2, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1915, minus_delta_H_cool_kJ_mol-1: 230.5, point_uncertainty_status: not_reported_individually}
+            - {T_K: 1961, minus_delta_H_cool_kJ_mol-1: 238.9, point_uncertainty_status: not_reported_individually}
         uncertainty: {reported_status: not_reported_for_individual_points, note: 'The authors state that individual ΔHcool errors for melt cannot be determined separately.'}
 
       - observation_id: adamkovicova_1980_table3_melt_solution_means_measured
@@ -470,7 +474,7 @@ species:
         phase: pseudowollastonite_to_CaSiO3_melt
         polymorph_notes: 'The authors state congruent melting of CaSiO3 at 1817 K and identify the crystalline phase as pseudowollastonite (α-wollastonite).'
         standard_state: 'Heat of fusion per mole of CaSiO3 at the equilibrium fusion temperature stated by the authors.'
-        units: 'kJ mol−1 CaSiO3; K'
+        units: 'kJ mol−1; K'
         values:
           quantity: heat_of_fusion
           method_class: measured_reduced
@@ -497,7 +501,7 @@ species:
           quantity: heat_of_fusion
           method_class: quoted_attributed
           attribution: 'Tables [3]–[6]; the authors say table [6] reports Kelley’s calculation from Allen and White data for the CaSiO3–MgSiO3 system.'
-          value_kJ_mol-1: 56.1
+          delta_H_fus_kJ_mol-1: 56.1
           note: 'Prior tabulated value quoted for comparison; not measured in the present work.'
         uncertainty: {reported_status: not_reported}
 
@@ -510,7 +514,7 @@ species:
           quantity: heat_of_fusion
           method_class: quoted_attributed
           attribution: 'Adams and Cohen (1966), derived from the decrease of the CaSiO3 solidification point in the CaSiO3–BaSiO3 system.'
-          value_kJ_mol-1: 50.1
+          delta_H_fus_kJ_mol-1: 50.1
           note: 'Earlier-worker value quoted for comparison; not measured in the present work.'
         uncertainty: {reported_status: not_reported}
 
@@ -523,7 +527,7 @@ species:
           quantity: heat_of_fusion
           method_class: quoted_attributed
           attribution: 'Bottinga and Richet (1978), calculated from the CaSiO3 heat of devitrification at 298 K and heat-capacity data.'
-          value_kJ_mol-1: 59.0
+          delta_H_fus_kJ_mol-1: 59.0
           note: 'Earlier-worker calculated value quoted for comparison; not measured in the present work.'
         uncertainty: {reported_status: not_reported}
 
@@ -536,7 +540,7 @@ species:
           quantity: heat_of_fusion
           method_class: quoted_attributed
           attribution: 'Bottinga and Richet (1978), calculated using the Clapeyron equation.'
-          value_kJ_mol-1: 68.2
+          delta_H_fus_kJ_mol-1: 68.2
           note: 'Earlier-worker calculated value quoted for comparison; not measured in the present work.'
         uncertainty: {reported_status: not_reported}
 
@@ -549,7 +553,7 @@ species:
           quantity: heat_of_fusion
           method_class: quoted_attributed
           attribution: 'Bottinga and Richet (1978), one of the two CaSiO3 heat-of-fusion values reported in their survey.'
-          value_kJ_mol-1: 27.6
+          delta_H_fus_kJ_mol-1: 27.6
           note: 'Earlier-worker value quoted for comparison; not measured in the present work.'
         uncertainty: {reported_status: not_reported}
 
@@ -562,7 +566,7 @@ species:
           quantity: heat_of_fusion
           method_class: quoted_attributed
           attribution: 'Bottinga and Richet (1978), the other CaSiO3 heat-of-fusion value reported in their survey.'
-          value_kJ_mol-1: 82.9
+          delta_H_fus_kJ_mol-1: 82.9
           note: 'Earlier-worker value quoted for comparison; not measured in the present work.'
         uncertainty: {reported_status: not_reported}
 
@@ -593,13 +597,13 @@ species:
         uncertainty: {reported_status: not_reported}
 
 fidelity_samples:
-  - path: species.CaSiO3.observations[adamkovicova_1980_table1_solid_cooling_measured].values.points[0].delta_Hcool_kJ_mol-1_as_printed
+  - path: species.CaSiO3.observations[adamkovicova_1980_table1_solid_cooling_measured].values.points[0].minus_delta_H_cool_kJ_mol-1
     value: 139.6
     locator: {page: 195, table: I, note: PDF page 3 image}
   - path: species.CaSiO3.observations[adamkovicova_1980_table2_solid_solution_heats_measured].values.points[0].delta_Hsol_kJ_mol-1_as_printed
     value: 311.1
     locator: {page: 196, table: II, note: PDF page 4 image}
-  - path: species.CaSiO3.observations[adamkovicova_1980_table3_melt_cooling_measured].values.points[0].minus_delta_Hcool_kJ_mol-1
+  - path: species.CaSiO3.observations[adamkovicova_1980_table3_melt_cooling_measured].values.points[0].minus_delta_H_cool_kJ_mol-1
     value: 217.1
     locator: {page: 196, table: III, note: PDF page 4 image}
   - path: species.CaSiO3.observations[adamkovicova_1980_melt_relative_enthalpy_fit_eq7].values.equation_as_printed
@@ -608,6 +612,6 @@ fidelity_samples:
   - path: species.CaSiO3.observations[adamkovicova_1980_heat_of_fusion_at_1817K].values.delta_H_fus_kJ_mol-1
     value: 57.3
     locator: {page: 197, equation: '8', note: PDF page 5 image}
-  - path: species.CaSiO3.observations[adamkovicova_1980_prior_heat_fusion_82_9_quote].values.value_kJ_mol-1
+  - path: species.CaSiO3.observations[adamkovicova_1980_prior_heat_fusion_82_9_quote].values.delta_H_fus_kJ_mol-1
     value: 82.9
     locator: {page: 199, section: Discussion, note: PDF page 7 image}

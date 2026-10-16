@@ -145,17 +145,16 @@ def test_shornikov_2013_migrates_printed_gibbs_energies() -> None:
 
 def test_adamkovicova_1980_ingested_count_and_pdf_cells() -> None:
     result = _migrate("adamkovicova-1980-casio3-heat-of-fusion.yaml")
-    assert len(result.observations) == 42
-    document = yaml.safe_load(
-        (EXTRACTS / "adamkovicova-1980-casio3-heat-of-fusion.yaml").read_text(
-            encoding="utf-8"
-        )
+    assert len(result.observations) == 47
+    assert result.validation.hard_issues == ()
+    assert _point(result, "adamkovicova_1980_heat_of_fusion_at_1817K") == Decimal(
+        "57.3"
     )
-    table1, table2 = document["species"]["CaSiO3"]["observations"][:2]
-    # Values are unavailable in the current reader; these cells are pinned
-    # independently from Table I, p. 195 and Table II, p. 196.
-    assert table1["values"]["points"][0]["delta_Hcool_kJ_mol-1_as_printed"] == 139.6
-    assert table2["values"]["points"][0]["delta_Hsol_kJ_mol-1_as_printed"] == 311.1
+    assert any(
+        "adamkovicova_1980_table1_solid_cooling_measured" in row.observation_id
+        and row.value.point == Decimal("139.6")
+        for row in result.observations.values()
+    )
 
 
 def test_shornikov_2000_migrates_printed_transition_temperatures() -> None:
