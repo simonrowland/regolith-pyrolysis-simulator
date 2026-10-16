@@ -28,6 +28,7 @@ from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
 )
+from simulator.accounting.ledger import _merge_species_amounts_from_accounts
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.vapour_rail.instrumentation import (
     FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL,
@@ -455,9 +456,14 @@ class AccountingQueries:
         self,
         accounts: tuple[str, ...] | list[str],
     ) -> dict[str, float]:
-        species_kg: dict[str, float] = {}
-        for account in accounts:
-            _merge_masses(species_kg, self.ledger.project_account_kg(str(account)))
+        account_names = tuple(str(account) for account in accounts)
+        balances = {
+            account: self.ledger.project_account_kg(account)
+            for account in account_names
+        }
+        species_kg = _merge_species_amounts_from_accounts(
+            balances, account_names,
+        )
         return {
             species: kg
             for species, kg in sorted(species_kg.items())
