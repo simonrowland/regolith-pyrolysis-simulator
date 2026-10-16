@@ -1941,6 +1941,42 @@ def test_finite_headspace_reports_o2_command_targets_separately(atmosphere):
     }
 
 
+@pytest.mark.parametrize("evap_kg_hr", [0.0, 1.0e-6])
+def test_pn2_sweep_finite_headspace_retains_regulated_carrier(evap_kg_hr):
+    from simulator.state import CondensationTrain, EvaporationFlux, MeltState
+    from simulator.overhead import OverheadGasModel
+
+    melt = MeltState(
+        atmosphere=Atmosphere.PN2_SWEEP,
+        p_total_mbar=10.0,
+        temperature_C=1500.0,
+    )
+    model = OverheadGasModel({"enabled": True, "volume_m3": 1.0})
+    flux = EvaporationFlux(species_kg_hr={"Fe": evap_kg_hr})
+    flux.update_totals()
+    # A small retained gas inventory accompanies the small source. The pure
+    # carrier limit has neither evaporation nor retained noncarrier gas.
+    holdup = {"Fe": 1.0e-9} if evap_kg_hr else {}
+    gas = model.update(
+        flux, melt, CondensationTrain.create_default(),
+        overhead_holdup_mol=holdup,
+    )
+
+    assert gas.pressure_mbar / 1000.0 == pytest.approx(0.01)
+    assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar)
+    assert gas.composition["N2"] > 0.0
+    assert model.last_stream_mol_hr["N2"] > 0.0
+    assert model.last_stream_boundary["provenance"] == "ideal_regulator_open_duct"
+    # The carrier inventory is real finite-vessel makeup, not an additive
+    # partial divorced from nRT/V. The existing ideal-gas owner closes both.
+    inventory = {**holdup, **model._stream_carrier_inventory}
+    assert gas.composition == pytest.approx({
+        s: p * 1000.0 for s, p in model._compute_partial_pressures(
+            inventory, gas.headspace_volume_m3, gas.headspace_temperature_K,
+        ).items()
+    })
+
+
 def test_finite_headspace_report_closes_when_n2_command_is_unfilled():
     from simulator.state import CondensationTrain, EvaporationFlux, MeltState
     from simulator.overhead import OverheadGasModel

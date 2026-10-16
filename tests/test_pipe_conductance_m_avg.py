@@ -208,6 +208,9 @@ def test_regulator_makeup_includes_finite_vessel_fill_and_is_idempotent():
     transport = model.estimate_transport_state(EvaporationFlux(), melt)
     flows = model.flowing_stream_mol_hr({}, melt, transport)
     boundary = dict(model.last_stream_boundary)
+    # Bit-identical balance pin before extracting its shared inventory owner.
+    assert boundary['carrier_inlet_makeup_mol_hr'].hex() == '0x1.37078c897adefp+13'
+    assert boundary['carrier_inventory_change_mol'].hex() == '0x1.266fa2b57da12p-4'
     # Ideal-gas definition in a 1 m3 vessel, initially empty: n=PV/(RT).
     expected_fill_mol = 1000.0 / (GAS_CONSTANT * (1773.15 - 100.0))
     assert boundary['carrier_inventory_change_mol'] == pytest.approx(expected_fill_mol)
