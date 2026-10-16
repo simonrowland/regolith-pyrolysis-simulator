@@ -2434,6 +2434,7 @@ def _mapping_uncertainty_value(
                 if scalar is not None:
                     unit = "%" if re.search(r"%|percent", value, re.IGNORECASE) else None
                     return scalar, unit
+            return None, None
         else:
             return value, None
     for key, value in mapping.items():

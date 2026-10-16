@@ -1014,7 +1014,7 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     )
     uncertainty = Uncertainty(
         kind=UncertaintyKind.PRINTED,
-        verbatim={"Fe3_over_FeT": "±0.02"},
+        verbatim={"Fe3_over_FeT": "±0.02", "sigma": "±0.90"},
     )
 
     printed = _printed_uncertainty_band(
@@ -1027,6 +1027,20 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     assert printed.refusal is None
     assert printed.band is not None
     assert printed.band.band_basis == "row_printed"
+    assert printed.band.value == Decimal("0.01223445641701162951905623210")
+
+    unparseable = _printed_uncertainty_band(
+        Quantity.FE3_FE2_RATIO,
+        replace(
+            uncertainty,
+            verbatim={"Fe3_over_FeT": "not stated", "sigma": "±0.05"},
+        ),
+        Decimal("0.72"),
+        source_observation=observation,
+    )
+    assert unparseable.band is None
+    assert unparseable.refusal is not None
+    assert unparseable.refusal["reason"] == "unparseable_printed_uncertainty"
 
 
 def test_source_method_uncertainty_supplies_a_source_method_band() -> None:
