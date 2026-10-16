@@ -208,6 +208,12 @@ def test_native_fe_authoritative_extent_ignores_diagnostic_payload(
     sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
     _seed_redox_liquidus_curve(sim)
     _seed_melt_redox(sim, -10.0)
+    # The corrected coexistence bound lies below the normal 1e-9 bar floor.
+    # Give this authority-vs-diagnostic test a favorable gas receiver explicitly;
+    # finite-gas blocking is covered by test_native_fe_equilibrium.
+    monkeypatch.setattr(sim, '_vacuum_floor_bar', lambda: 1e-20)
+    monkeypatch.setattr(sim, '_headspace_transport_pO2_bar_from_ledger',
+                        lambda *args, **kwargs: 1e-20)
     expected_native_fe_mol = sim._compute_native_fe_saturation_extent()['native_fe_mol']
     assert expected_native_fe_mol > 0.0
 
