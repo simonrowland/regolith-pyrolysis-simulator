@@ -1668,6 +1668,19 @@ def test_first_row_mapping_propagates_table_access_key_error():
         AlphaMELTSBackend()._first_row_mapping(BrokenTable())
 
 
+def test_activity_from_coefficients_pins_mixed_oxide_projection():
+    activities, gammas = AlphaMELTSBackend()._activities_from_coefficients(
+        {'SiO2': 1.0, 'FeO': 1.0},
+        {'SiO2': 70.0, 'FeO': 30.0},
+    )
+
+    assert activities == {
+        'SiO2': 0.736152890184833,
+        'FeO': 0.26384710981516696,
+    }
+    assert gammas == {'SiO2': 1.0, 'FeO': 1.0}
+
+
 def test_oxide_mole_fractions_propagates_formula_resolution_key_error(
     monkeypatch,
 ):
