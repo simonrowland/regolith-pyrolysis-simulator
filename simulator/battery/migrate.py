@@ -3020,6 +3020,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "kJ_per_declared_mol_basis",
         "kcal/mol",
     ),
+    "thermochemical_cal_to_kJ_exact": (
+        Decimal("0.004184"),
+        "H_kJ_per_declared_mol_basis = H_cal_per_mol × 0.004184",
+        "kJ_per_declared_mol_basis",
+        "cal/mol",
+    ),
     "J_to_kJ_exact": (
         Decimal("1000"),
         "H_kJ_per_declared_mol_basis = H_J_per_mol / 1000",
@@ -8304,6 +8310,8 @@ def _convert_compilation_amount(
             "kcalgfw-1",
         }:
             return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
+        if energy and token in {"cal/mol", "cal/mole", "calgfw^-1", "calgfw-1"}:
+            return amount * Decimal("0.004184"), "thermochemical_cal_to_kJ_exact"
         if energy and token in {"j/mol", "j/mole"}:
             return amount / Decimal("1000"), "J_to_kJ_exact"
         if energy and token in {
