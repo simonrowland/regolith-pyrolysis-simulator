@@ -1334,6 +1334,23 @@ def test_equilibrium_replay_restores_requested_fo2_not_printed_echo(
     assert sim.melt.melt_fO2_log == requested_fO2_log
 
 
+def test_unset_alphamelts_fo2_fields_do_not_change_other_cache_payloads():
+    result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1.0e-6,
+        liquid_fraction=0.5,
+    )
+    sim = SimpleNamespace(
+        _last_vapor_pressures_source={},
+        _last_vapor_pressure_diagnostic={},
+    )
+
+    payload = rrd.equilibrium_payload(sim, result)
+
+    assert "requested_fO2_log" not in payload["equilibrium_result"]
+    assert "printed_fO2_echo_log" not in payload["equilibrium_result"]
+
+
 def test_equilibrium_envelope_is_cache_inert_and_attached_on_legacy_replay(
     tmp_path: Path,
 ):
