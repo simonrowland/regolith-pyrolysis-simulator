@@ -8,20 +8,19 @@ import pytest
 
 from scripts.battery_hero_plot import (
     draw_panel,
+    element_tier,
     element_view_series,
+    load_element_abundance,
     read_scores,
     render_plots,
     species_tier,
     stamp_text,
     style_for_tier,
-)
-import matplotlib.pyplot as plt
-from simulator.diagnostic_helpers.species_rail import (
     TIER_MAJOR,
     TIER_MINOR,
     TIER_TRACE,
-    derive_species_rail,
 )
+import matplotlib.pyplot as plt
 
 
 def _record(
@@ -90,7 +89,7 @@ def _score_file(path: Path) -> None:
         ),
         _record(engine="openimcc", experiment="ea9", formula="SiO2", temperature_K=1260, residual=1.2, rail="melt_activity"),
         _record(
-            engine="magemin",
+            engine="openimcc",
             experiment="e9",
             formula="P2O5",
             temperature_K=1200,
@@ -99,14 +98,14 @@ def _score_file(path: Path) -> None:
             source_relation="quoted_overlap",
         ),
         _record(
-            engine="magemin",
+            engine="openimcc",
             experiment="e10",
             formula="Ag",
             temperature_K=1220,
             residual=0.6,
         ),
         _record(
-            engine="openimcc",
+            engine="magemin",
             experiment="e-refused",
             formula="SiO2",
             temperature_K=1000,
@@ -132,10 +131,12 @@ def test_binning_averages_same_experiment_duplicates_and_excludes_refusals(tmp_p
     assert points[11].n == 3
     assert points[12].residual_dex == pytest.approx(1.0)
     assert points[12].n == 3
-    assert data.summaries["openimcc"].scored_rows == 17
-    assert data.summaries["openimcc"].unique_points == 15
-    assert data.summaries["openimcc"].refusals == {"unsupported_species": 1}
-    assert data.summaries["magemin"].source_relations == {"independent": 1, "quoted_overlap": 1}
+    assert data.summaries["openimcc"].scored_rows == 19
+    assert data.summaries["openimcc"].unique_points == 17
+    assert data.summaries["openimcc"].refusals == {}
+    assert data.summaries["magemin"].scored_rows == 0
+    assert data.summaries["magemin"].refusals == {"unsupported_species": 1}
+    assert data.summaries["openimcc"].source_relations["quoted_overlap"] == 1
     activity_bin = {
         point.bin_index: point
         for point in data.series[("openimcc", "SiO2", "melt_activity")]
@@ -143,7 +144,7 @@ def test_binning_averages_same_experiment_duplicates_and_excludes_refusals(tmp_p
     assert activity_bin.residual_dex == pytest.approx(0.85)
     assert activity_bin.n == 4
     assert activity_bin.flagged
-    element_series = element_view_series(data, derive_species_rail())
+    element_series = element_view_series(data)
     element_points = {point.bin_index: point for point in element_series[("openimcc", "Si")]}
     assert element_points[10].residual_dex == pytest.approx(0.3)
     assert element_points[10].n == 2
@@ -158,10 +159,10 @@ def test_low_count_bins_are_markers_and_flagged_rows_are_hollow(tmp_path: Path) 
     residuals = tmp_path / "residuals.jsonl"
     _score_file(residuals)
     data = read_scores(residuals)
-    species_rail = derive_species_rail()
+    abundance = load_element_abundance("lunar_mare_low_ti")
     figure, axis = plt.subplots()
     try:
-        right_axis = draw_panel(axis, data, "openimcc", species_rail)
+        right_axis = draw_panel(axis, data, "openimcc", abundance)
         series_gid = "series:openimcc:SiO2:vapour"
         series_lines = [line for line in axis.lines if line.get_gid() == series_gid]
         assert len(series_lines) == 1
@@ -189,7 +190,7 @@ def test_low_count_bins_are_markers_and_flagged_rows_are_hollow(tmp_path: Path) 
 
     element_figure, element_axis = plt.subplots()
     try:
-        draw_panel(element_axis, data, "openimcc", species_rail, view="element")
+        draw_panel(element_axis, data, "openimcc", abundance, view="element")
         si_gid = "series:openimcc:Si:pooled:element"
         si_lines = [line for line in element_axis.lines if line.get_gid() == si_gid]
         assert len(si_lines) == 1
@@ -206,12 +207,19 @@ def test_low_count_bins_are_markers_and_flagged_rows_are_hollow(tmp_path: Path) 
         plt.close(element_figure)
 
 
-def test_existing_element_tiers_drive_plot_styling() -> None:
-    species_rail = derive_species_rail()
+def test_lunar_feedstock_abundance_drives_plot_styling() -> None:
+    abundance = load_element_abundance("lunar_mare_low_ti")
 
-    assert species_tier("SiO2", species_rail) == TIER_MAJOR
-    assert species_tier("P2O5", species_rail) == TIER_MINOR
-    assert species_tier("Ag", species_rail) == TIER_TRACE
+    assert abundance.oxide_wt_pct["Si"] == pytest.approx(44.5)
+    assert abundance.oxide_wt_pct["Ti"] == pytest.approx(1.5)
+    for element in ("Si", "Fe", "Mg", "Ca", "Al", "Ti"):
+        assert element_tier(element, abundance) == TIER_MAJOR
+    assert element_tier("O", abundance) == TIER_MAJOR
+    for element in ("Na", "K", "Cr", "Mn", "P"):
+        assert element_tier(element, abundance) == TIER_MINOR
+    assert species_tier("Na2O", abundance) == TIER_MINOR
+    assert species_tier("P2O5", abundance) == TIER_MINOR
+    assert species_tier("Ag", abundance) == TIER_TRACE
     assert style_for_tier(TIER_MAJOR)["color"] == "#111111"
     assert style_for_tier(TIER_MAJOR)["linewidth"] == 2.0
     assert style_for_tier(TIER_MINOR)["color"] == "#777777"
@@ -276,14 +284,15 @@ def test_stamp_contents_and_png_output(tmp_path: Path) -> None:
         simulator_commit="sim-test",
         openimcc_commit="openimcc-test",
         render_date="2026-10-15",
-        species_rail=derive_species_rail(),
     )
     assert files["species:tile_png"].is_file()
     assert files["species:tile_svg"].is_file()
     assert files["species:engine:openimcc"].is_file()
+    assert files["species:engine:magemin"].is_file()
     assert files["element:tile_png"].is_file()
     assert files["element:tile_svg"].is_file()
     assert files["element:engine:openimcc"].is_file()
     assert files["species:tile_png"].read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
     assert "test-store-2026-10-15-species" in files["species:tile_png"].name
     assert "test-store-2026-10-15-element" in files["element:tile_png"].name
+    assert "no scored rows: magemin (unsupported_species ×1)" in files["species:tile_svg"].read_text(encoding="utf-8")

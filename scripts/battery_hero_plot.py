@@ -25,6 +25,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -41,13 +42,9 @@ from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 
 from simulator.battery.enums import Authority, NoticeKind, Rail  # noqa: E402
-from simulator.diagnostic_helpers.species_rail import (
-    TIER_MAJOR,
-    TIER_MINOR,
-    TIER_TRACE,
-    SpeciesRail,
-    derive_species_rail,
-)
+from simulator.config import load_config_bundle  # noqa: E402
+from simulator.diagnostic_helpers.species_rail import parse_formula_elements  # noqa: E402
+from simulator.feedstock_composition import resolve_feedstock_composition  # noqa: E402
 
 
 DEFAULT_BIN_WIDTH_K = 100.0
@@ -58,7 +55,12 @@ DEFAULT_RAILS = (
     Rail.SIO_EVOLUTION.value,
 )
 DEFAULT_GROUP_BY = ("species", "element")
+DEFAULT_ABUNDANCE_FEEDSTOCK = "lunar_mare_low_ti"
 Y_LIMITS = (-3.0, 3.0)
+TIER_MAJOR = "major"
+TIER_MINOR = "minor"
+TIER_TRACE = "trace"
+TIER_RANK = {TIER_MAJOR: 0, TIER_MINOR: 1, TIER_TRACE: 2}
 TIER_STYLES: dict[str, dict[str, Any]] = {
     TIER_MAJOR: {"color": "#111111", "linewidth": 2.0, "markersize": 3.5},
     TIER_MINOR: {"color": "#777777", "linewidth": 1.2, "markersize": 3.0},
@@ -122,6 +124,13 @@ class ScorePlotData:
     series: Mapping[tuple[str, str, str], tuple[BinPoint, ...]]
     x_limits: tuple[float, float]
     bin_width_K: float
+
+
+@dataclass(frozen=True)
+class ElementAbundance:
+    feedstock_id: str
+    oxide_wt_pct: Mapping[str, float]
+    feedstock_elements: frozenset[str]
 
 
 @dataclass
@@ -222,6 +231,82 @@ def _requested_rails(values: Sequence[str] | None) -> tuple[str, ...]:
     if not rails:
         raise ValueError("at least one non-empty --rail value is required")
     return tuple(sorted(rails))
+
+
+@lru_cache(maxsize=8)
+def load_element_abundance(
+    feedstock_id: str = DEFAULT_ABUNDANCE_FEEDSTOCK,
+) -> ElementAbundance:
+    """Load cation oxide wt% for one feedstock using the simulator's loaders."""
+
+    feedstocks = load_config_bundle(ROOT / "data").feedstocks
+    try:
+        feedstock = feedstocks[feedstock_id]
+    except KeyError as exc:
+        raise ValueError(f"unknown abundance feedstock {feedstock_id!r}") from exc
+    resolved = resolve_feedstock_composition(feedstock)
+    oxide_wt_pct: dict[str, float] = defaultdict(float)
+    feedstock_elements: set[str] = set()
+    for component, raw_amount in resolved.canonical_wt_pct.items():
+        amount = _finite_float(raw_amount)
+        elements = set(parse_formula_elements(str(component)) or ())
+        feedstock_elements.update(elements)
+        cations = elements - {"O"}
+        # The feedstock entries are already oxide wt%; only a binary oxide has
+        # one unambiguous cation oxide basis. Oxygen is major by definition.
+        if (
+            amount is not None
+            and amount > 0.0
+            and "O" in elements
+            and len(cations) == 1
+        ):
+            oxide_wt_pct[next(iter(cations))] += amount
+    return ElementAbundance(
+        feedstock_id=feedstock_id,
+        oxide_wt_pct=dict(oxide_wt_pct),
+        feedstock_elements=frozenset(feedstock_elements),
+    )
+
+
+def element_tier(element: str, abundance: ElementAbundance) -> str:
+    # Oxygen is major by definition, independent of the feedstock's oxide totals.
+    if element == "O":
+        return TIER_MAJOR
+    oxide_wt_pct = abundance.oxide_wt_pct.get(element, 0.0)
+    if oxide_wt_pct >= 1.0:
+        return TIER_MAJOR
+    if oxide_wt_pct >= 0.1:
+        return TIER_MINOR
+    return TIER_TRACE
+
+
+def abundance_class_table(
+    data: ScorePlotData,
+    abundance: ElementAbundance,
+) -> list[dict[str, object]]:
+    elements = set(abundance.feedstock_elements) | {"O"}
+    for _engine, formula, _rail in data.series:
+        elements.update(parse_formula_elements(formula) or ())
+    rows: list[dict[str, object]] = []
+    for element in sorted(elements):
+        oxide_wt_pct = abundance.oxide_wt_pct.get(element)
+        if element == "O":
+            basis = "major by definition"
+        elif oxide_wt_pct is not None:
+            basis = "simple oxide wt%"
+        elif element in abundance.feedstock_elements:
+            basis = "no binary oxide wt% declared"
+        else:
+            basis = "absent from feedstock"
+        rows.append(
+            {
+                "element": element,
+                "oxide_wt_pct": oxide_wt_pct,
+                "class": element_tier(element, abundance),
+                "basis": basis,
+            }
+        )
+    return rows
 
 
 def read_scores(
@@ -463,10 +548,16 @@ def read_scores(
     )
 
 
-def species_tier(formula: str, species_rail: SpeciesRail) -> str:
-    """Use the shared feedstock-occupancy classifier; unknown formulas are trace."""
+def species_tier(formula: str, abundance: ElementAbundance) -> str:
+    """Classify by the least abundant element carried by the formula."""
 
-    return species_rail.formula_tier(formula) or TIER_TRACE
+    elements = parse_formula_elements(formula) or ()
+    if not elements:
+        return TIER_TRACE
+    return max(
+        (element_tier(element, abundance) for element in elements),
+        key=TIER_RANK.get,
+    )
 
 
 def style_for_tier(tier: str) -> dict[str, Any]:
@@ -512,13 +603,12 @@ class _ElementAccumulator:
 
 def element_view_series(
     data: ScorePlotData,
-    species_rail: SpeciesRail,
 ) -> dict[tuple[str, str], tuple[BinPoint, ...]]:
     """Pool deduplicated species observations by each element they carry."""
 
     bins: dict[tuple[str, str, int], _ElementAccumulator] = {}
     for (engine, formula, _rail), points in data.series.items():
-        elements = species_rail.formula_elements(formula) or ()
+        elements = parse_formula_elements(formula) or ()
         for element in set(elements):
             for point in points:
                 accumulator = bins.setdefault(
@@ -546,11 +636,11 @@ def element_view_series(
     }
 
 
-def _major_elements(formula: str, species_rail: SpeciesRail) -> tuple[str, ...]:
+def _major_elements(formula: str, abundance: ElementAbundance) -> tuple[str, ...]:
     return tuple(
         element
-        for element in species_rail.formula_elements(formula) or ()
-        if species_rail.element_tier(element) == TIER_MAJOR
+        for element in parse_formula_elements(formula) or ()
+        if element_tier(element, abundance) == TIER_MAJOR
     )
 
 
@@ -558,7 +648,7 @@ def _panel_series(
     data: ScorePlotData,
     engine: str,
     view: str,
-    species_rail: SpeciesRail,
+    abundance: ElementAbundance,
 ) -> list[PanelSeries]:
     items: list[PanelSeries] = []
     if view == "species":
@@ -571,13 +661,13 @@ def _panel_series(
                     subject=formula,
                     rail=rail,
                     points=points,
-                    tier=species_tier(formula, species_rail),
+                    tier=species_tier(formula, abundance),
                     gid=f"series:{engine}:{formula}:{rail}",
-                    major_elements=_major_elements(formula, species_rail),
+                    major_elements=_major_elements(formula, abundance),
                 )
             )
     elif view == "element":
-        for (series_engine, element), points in element_view_series(data, species_rail).items():
+        for (series_engine, element), points in element_view_series(data).items():
             if series_engine != engine:
                 continue
             items.append(
@@ -585,11 +675,11 @@ def _panel_series(
                     subject=element,
                     rail="pooled",
                     points=points,
-                    tier=species_rail.element_tier(element) or TIER_TRACE,
+                    tier=element_tier(element, abundance),
                     gid=f"series:{engine}:{element}:pooled:element",
                     major_elements=(
                         (element,)
-                        if species_rail.element_tier(element) == TIER_MAJOR
+                        if element_tier(element, abundance) == TIER_MAJOR
                         else ()
                     ),
                 )
@@ -622,12 +712,12 @@ def draw_panel(
     axis: Axes,
     data: ScorePlotData,
     engine: str,
-    species_rail: SpeciesRail,
+    abundance: ElementAbundance,
     *,
     view: str = "species",
 ) -> Axes:
     summary = data.summaries[engine]
-    items = _panel_series(data, engine, view, species_rail)
+    items = _panel_series(data, engine, view, abundance)
     label_candidates: dict[str, tuple[float, float]] = {}
 
     for item in items:
@@ -815,6 +905,29 @@ def _revision_slug(revision: object) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "-", str(revision or "unknown"))
 
 
+def _empty_engine_names(data: ScorePlotData) -> tuple[str, ...]:
+    return tuple(
+        engine for engine in data.engines if data.summaries[engine].scored_rows == 0
+    )
+
+
+def _no_scored_rows_note(data: ScorePlotData, engines: Sequence[str]) -> str:
+    if not engines:
+        return ""
+    entries: list[str] = []
+    for engine in engines:
+        refusals = data.summaries[engine].refusals
+        if refusals:
+            reason, count = sorted(
+                refusals.items(), key=lambda item: (-item[1], item[0])
+            )[0]
+            detail = f"{reason} ×{count:,}"
+        else:
+            detail = "no refusal reason recorded"
+        entries.append(f"{engine} ({detail})")
+    return "no scored rows: " + ", ".join(entries)
+
+
 def render_plots(
     data: ScorePlotData,
     output_dir: Path,
@@ -823,7 +936,8 @@ def render_plots(
     openimcc_commit: str,
     render_date: str | None = None,
     group_by: Sequence[str] = DEFAULT_GROUP_BY,
-    species_rail: SpeciesRail | None = None,
+    abundance_feedstock: str = DEFAULT_ABUNDANCE_FEEDSTOCK,
+    omit_empty_engines: bool | None = None,
 ) -> dict[str, Path]:
     """Write shared-scale species/element tiles and one PNG per engine/view."""
 
@@ -833,7 +947,7 @@ def render_plots(
     if not views or any(view not in {"species", "element"} for view in views):
         raise ValueError("group_by must contain species, element, or both")
     render_date = render_date or datetime.now(timezone.utc).date().isoformat()
-    species_rail = species_rail or derive_species_rail()
+    abundance = load_element_abundance(abundance_feedstock)
     output_dir.mkdir(parents=True, exist_ok=True)
     revision = _revision_slug(data.stamp.get("revision"))
     stem = f"battery-hero-{revision}-{render_date}"
@@ -844,9 +958,26 @@ def render_plots(
         render_date=render_date,
     )
     files: dict[str, Path] = {}
+    empty_engines = _empty_engine_names(data)
+    tile_engines = (
+        data.engines
+        if omit_empty_engines is False
+        else tuple(engine for engine in data.engines if engine not in empty_engines)
+    )
+    engine_image_engines = (
+        tuple(engine for engine in data.engines if engine not in empty_engines)
+        if omit_empty_engines is True
+        else data.engines
+    )
+    if not tile_engines:
+        raise ValueError("no engines with scored dex rows for tile")
+    omitted_note = _no_scored_rows_note(
+        data,
+        empty_engines if omit_empty_engines is not False else (),
+    )
     for view in views:
-        columns = min(2, len(data.engines))
-        rows = math.ceil(len(data.engines) / columns)
+        columns = min(2, len(tile_engines))
+        rows = math.ceil(len(tile_engines) / columns)
         figure, axes_grid = plt.subplots(
             rows,
             columns,
@@ -856,11 +987,15 @@ def render_plots(
             sharey=True,
         )
         axes = list(axes_grid.flat)
-        for axis, engine in zip(axes, data.engines):
-            draw_panel(axis, data, engine, species_rail, view=view)
-        for axis in axes[len(data.engines) :]:
+        for axis, engine in zip(axes, tile_engines):
+            draw_panel(axis, data, engine, abundance, view=view)
+        for axis in axes[len(tile_engines) :]:
             axis.set_visible(False)
-        figure.suptitle(f"Battery score · {view} view · binned signed residuals", fontsize=11, y=0.995)
+        figure.suptitle(
+            f"Battery score · {view} view · binned signed residuals",
+            fontsize=11,
+            y=0.995,
+        )
         view_note = (
             "Element lines pool pressure and activity residuals; both are log10(predicted / measured), in dex."
             if view == "element"
@@ -875,8 +1010,17 @@ def render_plots(
             frameon=False,
             fontsize=7,
         )
+        if omitted_note:
+            figure.text(0.5, 0.026, omitted_note, ha="center", va="bottom", fontsize=5.5)
         figure.text(0.5, 0.008, footer, ha="center", va="bottom", fontsize=6)
-        figure.subplots_adjust(left=0.06, right=0.96, top=0.86, bottom=0.08, hspace=0.58, wspace=0.32)
+        figure.subplots_adjust(
+            left=0.06,
+            right=0.96,
+            top=0.80,
+            bottom=0.10,
+            hspace=0.58,
+            wspace=0.32,
+        )
 
         tile_png = output_dir / f"{stem}-{view}-tile.png"
         tile_svg = output_dir / f"{stem}-{view}-tile.svg"
@@ -886,9 +1030,9 @@ def render_plots(
         files[f"{view}:tile_png"] = tile_png
         files[f"{view}:tile_svg"] = tile_svg
 
-        for engine in data.engines:
+        for engine in engine_image_engines:
             figure, axis = plt.subplots(figsize=(12.0, 4.8))
-            draw_panel(axis, data, engine, species_rail, view=view)
+            draw_panel(axis, data, engine, abundance, view=view)
             figure.suptitle(f"Battery score · {view} view", fontsize=11, y=0.995)
             view_note = (
                 "Element lines pool pressure and activity residuals; both are log10(predicted / measured), in dex."
@@ -913,7 +1057,13 @@ def render_plots(
     return files
 
 
-def _summary_payload(data: ScorePlotData, files: Mapping[str, Path]) -> dict[str, Any]:
+def _summary_payload(
+    data: ScorePlotData,
+    files: Mapping[str, Path],
+    abundance: ElementAbundance,
+    *,
+    omitted_engines: Sequence[str] = (),
+) -> dict[str, Any]:
     engines: dict[str, Any] = {}
     for engine in data.engines:
         summary = data.summaries[engine]
@@ -936,6 +1086,10 @@ def _summary_payload(data: ScorePlotData, files: Mapping[str, Path]) -> dict[str
         "selected_rails": list(data.selected_rails),
         "bin_width_K": data.bin_width_K,
         "x_limits_K": list(data.x_limits),
+        "abundance_feedstock": abundance.feedstock_id,
+        "element_abundance_classes": abundance_class_table(data, abundance),
+        "omitted_empty_engines": list(omitted_engines),
+        "no_scored_rows_footer": _no_scored_rows_note(data, omitted_engines),
         "files": {name: str(path) for name, path in files.items()},
     }
 
@@ -950,6 +1104,23 @@ def _parser() -> argparse.ArgumentParser:
         help="directory for generated images (default: private research directory)",
     )
     parser.add_argument("--bin-width-k", type=float, default=DEFAULT_BIN_WIDTH_K)
+    parser.add_argument(
+        "--abundance-feedstock",
+        default=DEFAULT_ABUNDANCE_FEEDSTOCK,
+        help=(
+            "feedstock whose oxide abundance sets line classes "
+            f"(default: {DEFAULT_ABUNDANCE_FEEDSTOCK})"
+        ),
+    )
+    parser.add_argument(
+        "--omit-empty-engines",
+        action="store_true",
+        default=None,
+        help=(
+            "omit engines without scored rows from the tile (default); "
+            "per-engine images include them unless enabled"
+        ),
+    )
     parser.add_argument(
         "--rail",
         action="append",
@@ -976,6 +1147,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         bin_width_K=args.bin_width_k,
         rails=args.rail,
     )
+    abundance = load_element_abundance(args.abundance_feedstock)
     files = render_plots(
         data,
         args.output_dir,
@@ -983,8 +1155,21 @@ def main(argv: Sequence[str] | None = None) -> int:
         openimcc_commit=args.openimcc_commit,
         render_date=args.render_date,
         group_by=args.group_by,
+        abundance_feedstock=args.abundance_feedstock,
+        omit_empty_engines=args.omit_empty_engines,
     )
-    print(json.dumps(_summary_payload(data, files), indent=2, sort_keys=True))
+    omitted_engines = (
+        _empty_engine_names(data)
+        if args.omit_empty_engines is not False
+        else ()
+    )
+    print(
+        json.dumps(
+            _summary_payload(data, files, abundance, omitted_engines=omitted_engines),
+            indent=2,
+            sort_keys=True,
+        )
+    )
     return 0
 
 
