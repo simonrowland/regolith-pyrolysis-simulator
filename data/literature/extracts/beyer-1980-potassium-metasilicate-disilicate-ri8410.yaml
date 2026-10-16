@@ -11,6 +11,24 @@ extraction:
   date: '2026-10-16'
   worker: beyer80-1016
 review_status: draft
+notes:
+- text: >-
+    Table 4's -(G-H298)/T column is documented but not stored as an observation:
+    at each temperature it is derivable from the stored S and H_T-H_298 columns.
+  locator: {pdf_page_index: 12, page: 13, published_page: 9, table: '4', row: K2SiO3 crystal, column: '-(G-H298)/T'}
+- text: >-
+    Printed smooth-enthalpy equations and validity ranges (T in K, H in kcal/mole):
+    K2SiO3 crystal: H-H298 = 28.418e-3 T + 5.833e-6 T^2 + 3.383e2/T - 10.126
+    (298-1249 K; 0.2%); K2Si2O5 alpha: 45.855e-3 T + 4.372e-6 T^2 + 8.883e2/T
+    - 17.040 (298-510 K; <0.01%); beta: 37.764e-3 T + 10.854e-6 T^2 +
+    2.387e3/T - 13.035 (510-867 K; 0.1%); gamma: 53.591e-3 T + 0.528e-6 T^2
+    - 18.340 (867-1318 K; <0.1%); liquid with crystal at 298.15 K as base:
+    65.800e-3 T - 25.094 (1318-1600 K; <0.1%); K2Si2O5 glass:
+    43.807e-3 T + 7.268e-6 T^2 + 8.649e2/T - 16.608 (298-900 K; <0.1%).
+    The separately stated liquid equation relative to glass at 298.15 K is
+    H-H298 = 65.800e-3 T - 29.564 over 1318-1600 K (<0.1%).
+  locator: {pdf_page_index: 14, page: 15, published_page: 11}
+  secondary_locator: {pdf_page_index: 20, page: 21, published_page: 17}
 species:
   K2Si2O5:
     observations:
