@@ -723,6 +723,11 @@ def draw_panel(
     summary = data.summaries[engine]
     items = _panel_series(data, engine, view, abundance)
     label_candidates: dict[str, tuple[float, float]] = {}
+    species_label_candidates: dict[str, tuple[float, float]] = {}
+    species_label_items: dict[str, PanelSeries] = {}
+    major_formula_counts = Counter(
+        item.subject for item in items if item.tier == TIER_MAJOR
+    )
 
     for item in items:
         style = style_for_tier(item.tier)
@@ -791,7 +796,14 @@ def draw_panel(
             )
             artist.set_gid(marker_gid)
 
-        if item.major_elements and item.points:
+        if view == "species" and item.tier == TIER_MAJOR and item.points:
+            endpoint = item.points[-1]
+            species_label_candidates[item.gid] = (
+                endpoint.temperature_K,
+                endpoint.residual_dex,
+            )
+            species_label_items[item.gid] = item
+        elif view == "element" and item.major_elements and item.points:
             endpoint = item.points[-1]
             for element in item.major_elements:
                 current = label_candidates.get(element)
@@ -803,12 +815,58 @@ def draw_panel(
 
     right_axis = axis.twinx()
     right_axis.set_ylim(*Y_LIMITS)
-    label_positions, label_names = _spaced_axis_labels(label_candidates)
-    right_axis.set_yticks(label_positions)
-    right_axis.set_yticklabels(label_names)
-    right_axis.tick_params(axis="y", labelsize=7, length=0, pad=2)
-    if label_names:
-        right_axis.set_ylabel("Major element", fontsize=7, labelpad=5)
+    if view == "element":
+        label_positions, label_names = _spaced_axis_labels(label_candidates)
+        right_axis.set_yticks(label_positions)
+        right_axis.set_yticklabels(label_names)
+        right_axis.tick_params(axis="y", labelsize=7, length=0, pad=2)
+        if label_names:
+            right_axis.set_ylabel("Major element", fontsize=7, labelpad=5)
+    else:
+        right_axis.set_yticks([])
+        right_axis.spines["right"].set_visible(False)
+        label_positions, label_gids = _spaced_axis_labels(species_label_candidates)
+        x_low, x_high = data.x_limits
+        x_offset = max(1.0, data.bin_width_K * 0.18)
+        for label_y, gid in zip(label_positions, label_gids):
+            item = species_label_items[gid]
+            endpoint = item.points[-1]
+            if item.rail == Rail.MELT_ACTIVITY.value:
+                label = f"{item.subject} activity"
+            elif item.rail == Rail.SIO_EVOLUTION.value:
+                label = f"{item.subject} pressure"
+            elif major_formula_counts[item.subject] > 1:
+                label = f"{item.subject} vapour"
+            else:
+                label = item.subject
+            put_to_right = endpoint.temperature_K + x_offset <= x_high
+            label_x = (
+                endpoint.temperature_K + x_offset
+                if put_to_right
+                else max(x_low, endpoint.temperature_K - x_offset)
+            )
+            style = style_for_tier(item.tier)
+            annotation = axis.annotate(
+                label,
+                xy=(endpoint.temperature_K, _plot_y(endpoint.residual_dex)),
+                xytext=(label_x, label_y),
+                xycoords="data",
+                textcoords="data",
+                ha="left" if put_to_right else "right",
+                va="center",
+                fontsize=6.5,
+                color=style["color"],
+                arrowprops={
+                    "arrowstyle": "-",
+                    "color": style["color"],
+                    "linewidth": 0.55,
+                    "shrinkA": 0,
+                    "shrinkB": 0,
+                },
+                annotation_clip=False,
+                zorder=7,
+            )
+            annotation.set_gid(f"major-label:{gid}")
 
     axis.axhspan(-0.3, 0.3, color="#718096", alpha=0.08, zorder=0)
     axis.axhline(0.0, color="#4b5563", linewidth=0.7, zorder=1)

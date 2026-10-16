@@ -201,7 +201,7 @@ def test_low_count_bins_are_markers_and_flagged_rows_are_hollow(tmp_path: Path) 
         activity_lines = [line for line in axis.lines if line.get_gid() == activity_gid]
         assert len(activity_lines) == 1
         assert activity_lines[0].get_linestyle() == "--"
-        assert {label.get_text() for label in right_axis.get_yticklabels()} == {"O", "Si"}
+        assert not right_axis.get_yticklabels()
         assert any(
             artist.get_gid() == f"low-count-marker:{series_gid}"
             for artist in axis.collections
@@ -282,6 +282,79 @@ def test_clipped_flagged_points_keep_a_hollow_marker(tmp_path: Path, view: str) 
         assert all(len(marker.get_facecolors()) == 0 for marker in flagged_markers)
     finally:
         plt.close(figure)
+
+
+def test_species_view_labels_major_curves_and_element_view_labels_elements(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "test-store"}
+    ]
+    for index, (formula, rail, residual) in enumerate(
+        (
+            ("Al", "vapour", -1.5),
+            ("Al2O", "vapour", -1.0),
+            ("SiO", "vapour", 0.5),
+            ("MgO", "melt_activity", 1.5),
+        )
+    ):
+        rows.append(
+            _record(
+                engine="openimcc",
+                experiment=f"major-{index}",
+                formula=formula,
+                temperature_K=1000 + index * 100,
+                residual=residual,
+                rail=rail,
+            )
+        )
+    residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+    data = read_scores(residuals)
+    abundance = load_element_abundance()
+
+    species_figure, species_axis = plt.subplots()
+    try:
+        species_right_axis = draw_panel(
+            species_axis, data, "openimcc", abundance, view="species"
+        )
+        labels = [
+            artist
+            for artist in species_axis.texts
+            if (artist.get_gid() or "").startswith("major-label:")
+        ]
+        assert {artist.get_text() for artist in labels} == {
+            "Al",
+            "Al2O",
+            "SiO",
+            "MgO activity",
+        }
+        assert all(artist.arrow_patch is not None for artist in labels)
+        positions = sorted(float(artist.get_position()[1]) for artist in labels)
+        assert all(right - left >= 0.35 for left, right in zip(positions, positions[1:]))
+        assert not species_right_axis.get_yticklabels()
+    finally:
+        plt.close(species_figure)
+
+    element_figure, element_axis = plt.subplots()
+    try:
+        element_right_axis = draw_panel(
+            element_axis, data, "openimcc", abundance, view="element"
+        )
+        assert {label.get_text() for label in element_right_axis.get_yticklabels()} == {
+            "Al",
+            "Mg",
+            "O",
+            "Si",
+        }
+        assert not any(
+            (artist.get_gid() or "").startswith("major-label:")
+            for artist in element_axis.texts
+        )
+    finally:
+        plt.close(element_figure)
 
 
 def test_lunar_feedstock_abundance_drives_plot_styling() -> None:
