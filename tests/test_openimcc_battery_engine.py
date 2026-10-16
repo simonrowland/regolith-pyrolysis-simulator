@@ -1547,6 +1547,106 @@ def test_openimcc_below_floor_real_melt_activity_has_extrapolation_flag(
     assert notice.reason != "; ".join(package_result.labels.notices)
 
 
+def test_openimcc_below_floor_vapour_residual_has_temperature_flag() -> None:
+    _require_openimcc()
+
+    observation_id = (
+        "kems-042-plante-1979::"
+        "plante1979_table2_s1104_r001_quoted"
+    )
+    context = _plante_score_context()
+    reference = context.observations[observation_id]
+    focused_context = replace(context, observations={observation_id: reference})
+    floor, ceiling = _openimcc_pack_temperature_band()
+
+    residuals, _candidates = score_store(
+        focused_context,
+        engines=(Engine.OPENIMCC,),
+        work_id="kems-042-plante-1979",
+        rail=Rail.VAPOUR,
+    )
+    residual = next(row for row in residuals if row.reference == observation_id)
+    assert residual.numeric is not None
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.origin == "engine:openimcc"
+    )
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.band == f"[{floor:g}, {ceiling:g}] K"
+    assert "T outside openimcc datapack" in notice.reason
+
+
+def test_openimcc_in_domain_score_store_row_has_no_temperature_flag() -> None:
+    observation_id = (
+        "shornikov-1997-diopside-vaporization::"
+        "shornikov_1997_mgo_activity_table3::T=1743:h=8812a850c056"
+    )
+    context = load_score_context(
+        sources=("shornikov-1997-diopside-vaporization",)
+    )
+    reference = context.observations[observation_id]
+    floor, ceiling = _openimcc_pack_temperature_band()
+    temperature_K = float(reference.identity.temperature_K.value)
+    assert floor <= temperature_K <= ceiling
+
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.MELT_ACTIVITY,
+    )
+    residual = next(row for row in residuals if row.reference == observation_id)
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.origin == "engine:openimcc"
+        for notice in residual.notices
+    )
+
+
+def test_openimcc_empty_package_notices_keep_score_store_temperature_flag(
+    monkeypatch,
+) -> None:
+    _require_openimcc()
+    from simulator.melt_backend import openimcc_bridge
+
+    observation_id = (
+        "kems-ms2000-044::"
+        "ms2000_044_sio2_activity_k_system_xsio2_0543_t1473_class_quote_r2"
+    )
+    context = load_score_context(sources=("kems-ms2000-044",))
+    reference = context.observations[observation_id]
+    focused_context = replace(context, observations={observation_id: reference})
+    floor, ceiling = _openimcc_pack_temperature_band()
+    evaluate = openimcc_bridge.evaluate
+
+    def evaluate_without_notices(**kwargs):
+        result = evaluate(**kwargs)
+        return replace(
+            result,
+            labels=replace(result.labels, notices=()),
+            notices=(),
+        )
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", evaluate_without_notices)
+    residuals, _candidates = score_store(
+        focused_context,
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.MELT_ACTIVITY,
+    )
+    residual = next(row for row in residuals if row.reference == observation_id)
+    assert residual.numeric is not None
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.origin == "engine:openimcc"
+    )
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.band == f"[{floor:g}, {ceiling:g}] K"
+    assert "T outside openimcc datapack" in notice.reason
+
+
 def test_openimcc_temperature_reason_keeps_package_notice_separate(monkeypatch) -> None:
     _require_openimcc()
     from simulator.diagnostic_helpers.binary_pot_battery import (
