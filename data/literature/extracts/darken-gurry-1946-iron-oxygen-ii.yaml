@@ -1,0 +1,835 @@
+schema_version: literature_extract.v1
+source_id: darken-gurry-1946-iron-oxygen-ii
+source:
+  citation: 'Darken, L. S. & Gurry, R. W. (1946), "The System Iron-Oxygen. II. Equilibrium and Thermodynamics of Liquid Oxide and Other Phases", Journal of the American Chemical Society 68, 798-816. DOI: 10.1021/ja01209a030.'
+  doi: 10.1021/ja01209a030
+  year: 1946
+  sha256: 14c215ac23b71a5cdfdea2a87f6c08f2446e58d45e512328510a28d19cb72ae1
+  version: original published journal PDF; 19 pages
+  provenance: 'Downloaded 2026-10-16 from the Wayback capture of the public third-party electronicsandbooks.com journal mirror (capture 2025-07-29); the hosting license was not established. Original printed title/authors and article bounds checked on pp. 798 and 816.'
+extraction:
+  method: manual transcription from layout text and rendered pages of the original PDF; printed values retained without unit conversions
+  date: '2026-10-16'
+  worker: dg46-1016
+review_status: draft
+fidelity_samples:
+  - species: FeO_liquid
+    observable: composition_series
+    observation_id: dg46_t1_a_1383_wustite
+    field: r_as_printed
+    value: 1.096
+    locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'A, 1383 C'}
+  - species: FeO_liquid
+    observable: composition_series
+    observation_id: dg46_t1_l_1589_fe2o3
+    field: r_as_printed
+    value: 4.237
+    locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1589 C, Fe2O3'}
+  - species: FeO_liquid
+    observable: composition_series
+    observation_id: dg46_t3a_1390_fe2o3
+    field: r_as_printed
+    value: 1.081
+    locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1390 C, Fe2O3'}
+  - species: FeO_liquid
+    observable: composition_series
+    observation_id: dg46_t3b_1436
+    field: pCO2_over_pCO_as_printed
+    value: 0.233
+    locator: {published_page: 803, pdf_page: 6, table: 'III B', row: '1436 C'}
+species:
+  FeO_liquid:
+    observations:
+      - observation_id: dg46_t1_a_1383_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'A, 1383 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material:
+            state: {tag: value, value: Wustite}
+            locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'A, 1383 C'}
+          atmosphere:
+            state: {tag: value, value: 'CO2-CO, pCO2/pCO=0.376'}
+            locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'A'}
+        values: {method_class: measured_direct, T_C: 1383, r_as_printed: 1.096}
+      - observation_id: dg46_t1_a_1395_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'A, 1395 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'A, 1395 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-CO, pCO2/pCO=0.376'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'A'}}
+        values: {method_class: measured_direct, T_C: 1395, r_as_printed: 1.097}
+      - observation_id: dg46_t1_a_1445_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'A, 1445 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'A, 1445 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-CO, pCO2/pCO=0.376'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'A'}}
+        values: {method_class: measured_direct, T_C: 1445, r_as_printed: 1.091}
+      - observation_id: dg46_t1_a_1479_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'A, 1479 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'A, 1479 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-CO, pCO2/pCO=0.376'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'A'}}
+        values: {method_class: measured_direct, T_C: 1479, r_as_printed: 1.088}
+      - observation_id: dg46_t1_a_1500_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'A, 1500 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'A, 1500 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-CO, pCO2/pCO=0.376'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'A'}}
+        values: {method_class: measured_direct, T_C: 1500, r_as_printed: 1.086}
+      - observation_id: dg46_t1_b_1403_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'B, 1403 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'B, 1403 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-CO, pCO2/pCO=1.00'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'B'}}
+        values: {method_class: measured_direct, T_C: 1403, r_as_printed: 1.183}
+      - observation_id: dg46_t1_b_1450_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'B, 1450 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'B, 1450 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-CO, pCO2/pCO=1.00'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'B'}}
+        values: {method_class: measured_direct, T_C: 1450, r_as_printed: 1.178}
+      - observation_id: dg46_t1_b_1575_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'B, 1575 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'B, 1575 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-CO, pCO2/pCO=1.00'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'B'}}
+        values: {method_class: measured_direct, T_C: 1575, r_as_printed: 1.169}
+      - observation_id: dg46_t1_b_1575_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'B, 1575 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'B, 1575 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-CO, pCO2/pCO=1.00'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'B'}}
+        values: {method_class: measured_direct, T_C: 1575, r_as_printed: 1.169}
+      - observation_id: dg46_t1_c_1395_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'C, 1395 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'C, 1395 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=2.23'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'C'}}
+        values: {method_class: measured_direct, T_C: 1395, r_as_printed: 1.241}
+      - observation_id: dg46_t1_c_1395_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'C, 1395 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'C, 1395 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=2.23'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'C'}}
+        values: {method_class: measured_direct, T_C: 1395, r_as_printed: 1.238}
+      - observation_id: dg46_t1_c_1500_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'C, 1500 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'C, 1500 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=2.23'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'C'}}
+        values: {method_class: measured_direct, T_C: 1500, r_as_printed: 1.230}
+      - observation_id: dg46_t1_c_1500_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'C, 1500 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'C, 1500 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=2.23'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'C'}}
+        values: {method_class: measured_direct, T_C: 1500, r_as_printed: 1.227}
+      - observation_id: dg46_t1_c_1600_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'C, 1600 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'C, 1600 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=2.23'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'C'}}
+        values: {method_class: measured_direct, T_C: 1600, r_as_printed: 1.227}
+      - observation_id: dg46_t1_c_1600_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'C, 1600 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'C, 1600 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=2.23'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'C'}}
+        values: {method_class: measured_direct, T_C: 1600, r_as_printed: 1.227}
+      - observation_id: dg46_t1_d_1428_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'D, 1428 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'D, 1428 C'}}
+          atmosphere: {state: {tag: value, value: 'H2O-H2, pH2O/pH2=7.10'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'D'}}
+        values: {method_class: measured_direct, T_C: 1428, r_as_printed: 1.273}
+      - observation_id: dg46_t1_d_1428_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'D, 1428 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'D, 1428 C'}}
+          atmosphere: {state: {tag: value, value: 'H2O-H2, pH2O/pH2=7.10'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'D'}}
+        values: {method_class: measured_direct, T_C: 1428, r_as_printed: 1.267}
+      - observation_id: dg46_t1_d_1605_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'D, 1605 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'D, 1605 C'}}
+          atmosphere: {state: {tag: value, value: 'H2O-H2, pH2O/pH2=7.10'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'D'}}
+        values: {method_class: measured_direct, T_C: 1605, r_as_printed: 1.250}
+      - observation_id: dg46_t1_d_1605_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'D, 1605 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'D, 1605 C'}}
+          atmosphere: {state: {tag: value, value: 'H2O-H2, pH2O/pH2=7.10'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'D'}}
+        values: {method_class: measured_direct, T_C: 1605, r_as_printed: 1.245}
+      - observation_id: dg46_t1_e_1598_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'E, 1598 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'E, 1598 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-CO-H2O, initial pCO2/pCO/pH2O=1:1:14.1'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'E'}}
+        values: {method_class: measured_direct, T_C: 1598, r_as_printed: 1.386}
+      - observation_id: dg46_t1_e_1598_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'E, 1598 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'E, 1598 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-CO-H2O, initial pCO2/pCO/pH2O=1:1:14.1'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'E'}}
+        values: {method_class: measured_direct, T_C: 1598, r_as_printed: 1.382}
+      - observation_id: dg46_t1_e_1633_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'E, 1633 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'E, 1633 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-CO-H2O, initial pCO2/pCO/pH2O=1:1:14.1'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'E'}}
+        values: {method_class: measured_direct, T_C: 1633, r_as_printed: 1.392}
+      - observation_id: dg46_t1_e_1633_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'E, 1633 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'E, 1633 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-CO-H2O, initial pCO2/pCO/pH2O=1:1:14.1'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'E'}}
+        values: {method_class: measured_direct, T_C: 1633, r_as_printed: 1.392}
+      - observation_id: dg46_t1_f_1444_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1444 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1444 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=7.13'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}}
+        values: {method_class: measured_direct, T_C: 1444, r_as_printed: 1.428}
+      - observation_id: dg46_t1_f_1444_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1444 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1444 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=7.13'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}}
+        values: {method_class: measured_direct, T_C: 1444, r_as_printed: 1.427}
+      - observation_id: dg46_t1_f_1469_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1469 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1469 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=7.13'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}}
+        values: {method_class: measured_direct, T_C: 1469, r_as_printed: 1.426}
+      - observation_id: dg46_t1_f_1469_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1469 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1469 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=7.13'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}}
+        values: {method_class: measured_direct, T_C: 1469, r_as_printed: 1.425}
+      - observation_id: dg46_t1_f_1472_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1472 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1472 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=7.13'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}}
+        values: {method_class: measured_direct, T_C: 1472, r_as_printed: 1.426}
+      - observation_id: dg46_t1_f_1535_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1535 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1535 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=7.13'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}}
+        values: {method_class: measured_direct, T_C: 1535, r_as_printed: 1.430}
+      - observation_id: dg46_t1_f_1535_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1535 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1535 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=7.13'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}}
+        values: {method_class: measured_direct, T_C: 1535, r_as_printed: 1.427}
+      - observation_id: dg46_t1_f_1601_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1601 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1601 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=7.13'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}}
+        values: {method_class: measured_direct, T_C: 1601, r_as_printed: 1.429}
+      - observation_id: dg46_t1_f_1601_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1601 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1601 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=7.13'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}}
+        values: {method_class: measured_direct, T_C: 1601, r_as_printed: 1.427}
+      - observation_id: dg46_t1_f_1610_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1610 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1610 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=7.13'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}}
+        values: {method_class: measured_direct, T_C: 1610, r_as_printed: 1.431}
+      - observation_id: dg46_t1_f_1610_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1610 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'F, 1610 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=7.13'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}}
+        values: {method_class: measured_direct, T_C: 1610, r_as_printed: 1.427}
+      - observation_id: dg46_t3a_1390_fe2o3
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1390 C, Fe2O3'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1390 C, Fe2O3'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1390, r_as_printed: 1.081}
+      - observation_id: dg46_t3a_1390_fe3o4
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1390 C, Fe3O4'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe3O4}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1390 C, Fe3O4'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1390, r_as_printed: 1.076}
+      - observation_id: dg46_t3a_1392_wustite_low
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1392 C, Wustite, first determination'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1392 C'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1392, r_as_printed: 1.052}
+      - observation_id: dg46_t3a_1392_wustite_high
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1392 C, Wustite, second determination'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1392 C'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1392, r_as_printed: 1.056}
+      - observation_id: dg46_t3a_1393_fe3o4
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1393 C, Fe3O4'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe3O4}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1393 C, Fe3O4'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1393, r_as_printed: 1.077}
+      - observation_id: dg46_t3a_1397_wustite_magnetite
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1397 C, Wustite + magnetite'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite + magnetite}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1397 C'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1397, r_as_printed: 1.069}
+      - observation_id: dg46_t3a_1454_fe2o3
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1454 C, Fe2O3'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1454 C'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1454, r_as_printed: 1.057}
+      - observation_id: dg46_t3a_1461_fe2o3
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1461 C, Fe2O3'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1461 C'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1461, r_as_printed: 1.055}
+      - observation_id: dg46_t3a_1495_fe2o3
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1495 C, Fe2O3'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1495 C'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1495, r_as_printed: 1.056}
+      - observation_id: dg46_t3a_1501_fe2o3
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1501 C, Fe2O3'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1501 C'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1501, r_as_printed: 1.051}
+      - observation_id: dg46_t3a_1502_fe2o3_a
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1502 C, first Fe2O3 determination'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1502 C'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1502, r_as_printed: 1.045}
+      - observation_id: dg46_t3a_1502_fe2o3_b
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1502 C, second Fe2O3 determination'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1502 C'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1502, r_as_printed: 1.049}
+      - observation_id: dg46_t3a_1455_iron
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1455 C, Fe'}
+        phase: liquid iron oxide in equilibrium with iron
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe}, locator: {published_page: 803, pdf_page: 6, table: 'III A', row: '1455 C, Fe'}}
+          equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {published_page: 803, pdf_page: 6, table: 'III A'}}
+        values: {method_class: measured_direct, T_C: 1455, r_as_printed: 1.007}
+      - observation_id: dg46_t3b_1376
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III B', row: '1376 C'}
+        phase: CO-CO2 mixture in equilibrium with iron and liquid oxide
+        units: pCO2/pCO as printed; temperature in C as printed
+        point_conditions:
+          equilibrium_boundary: {state: {tag: value, value: iron and liquid oxide}, locator: {published_page: 803, pdf_page: 6, table: 'III B'}}
+        values: {method_class: measured_direct, T_C: 1376, pCO2_over_pCO_as_printed: 0.268}
+      - observation_id: dg46_t3b_1436
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III B', row: '1436 C'}
+        phase: CO-CO2 mixture in equilibrium with iron and liquid oxide
+        units: pCO2/pCO as printed; temperature in C as printed
+        point_conditions:
+          equilibrium_boundary: {state: {tag: value, value: iron and liquid oxide}, locator: {published_page: 803, pdf_page: 6, table: 'III B'}}
+        values: {method_class: measured_direct, T_C: 1436, pCO2_over_pCO_as_printed: 0.233}
+      - observation_id: dg46_t3b_1493
+        type: composition_series
+        locator: {published_page: 803, pdf_page: 6, table: 'III B', row: '1493 C'}
+        phase: CO-CO2 mixture in equilibrium with iron and liquid oxide
+        units: pCO2/pCO as printed; temperature in C as printed
+        point_conditions:
+          equilibrium_boundary: {state: {tag: value, value: iron and liquid oxide}, locator: {published_page: 803, pdf_page: 6, table: 'III B'}}
+        values: {method_class: measured_direct, T_C: 1493, pCO2_over_pCO_as_printed: 0.199}
+      - observation_id: dg46_t1_g_1485_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1485 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1485 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+        values: {method_class: measured_direct, T_C: 1485, r_as_printed: 1.698}
+      - observation_id: dg46_t1_g_1491_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1491 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1491 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+        values: {method_class: measured_direct, T_C: 1491, r_as_printed: 1.710}
+      - observation_id: dg46_t1_g_1496_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1496 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1496 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+        values: {method_class: measured_direct, T_C: 1496, r_as_printed: 1.708}
+      - observation_id: dg46_t1_g_1496_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1496 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1496 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+        values: {method_class: measured_direct, T_C: 1496, r_as_printed: 1.719}
+      - observation_id: dg46_t1_g_1535_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1535 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1535 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+        values: {method_class: measured_direct, T_C: 1535, r_as_printed: 1.720}
+      - observation_id: dg46_t1_g_1535_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1535 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1535 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+        values: {method_class: measured_direct, T_C: 1535, r_as_printed: 1.710}
+      - observation_id: dg46_t1_g_1594_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1594 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1594 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+        values: {method_class: measured_direct, T_C: 1594, r_as_printed: 1.732}
+      - observation_id: dg46_t1_g_1594_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1594 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1594 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+        values: {method_class: measured_direct, T_C: 1594, r_as_printed: 1.707}
+      - observation_id: dg46_t1_g_1598_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1598 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1598 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+        values: {method_class: measured_direct, T_C: 1598, r_as_printed: 1.752}
+      - observation_id: dg46_t1_g_1598_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1598 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1598 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+        values: {method_class: measured_direct, T_C: 1598, r_as_printed: 1.758}
+      - observation_id: dg46_t1_g_1603_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1603 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1603 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+        values: {method_class: measured_direct, T_C: 1603, r_as_printed: 1.766}
+      - observation_id: dg46_t1_g_1603_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1603 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'G, 1603 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+        values: {method_class: measured_direct, T_C: 1603, r_as_printed: 1.777}
+      - observation_id: dg46_t1_h_1594_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'H, 1594 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'H, 1594 C'}}
+          atmosphere: {state: {tag: value, value: 'Steam, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'H'}}
+        values: {method_class: measured_direct, T_C: 1594, r_as_printed: 2.074}
+      - observation_id: dg46_t1_h_1594_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'H, 1594 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'H, 1594 C'}}
+          atmosphere: {state: {tag: value, value: 'Steam, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'H'}}
+        values: {method_class: measured_direct, T_C: 1594, r_as_printed: 2.080}
+      - observation_id: dg46_t1_h_1601_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'H, 1601 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'H, 1601 C'}}
+          atmosphere: {state: {tag: value, value: 'Steam, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'H'}}
+        values: {method_class: measured_direct, T_C: 1601, r_as_printed: 2.045}
+      - observation_id: dg46_t1_h_1601_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'H, 1601 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'H, 1601 C'}}
+          atmosphere: {state: {tag: value, value: 'Steam, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'H'}}
+        values: {method_class: measured_direct, T_C: 1601, r_as_printed: 2.055}
+      - observation_id: dg46_t1_i_1577_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'I, 1577 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'I, 1577 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'I'}}
+        values: {method_class: measured_direct, T_C: 1577, r_as_printed: 2.304}
+      - observation_id: dg46_t1_i_1578_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'I, 1578 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'I, 1578 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'I'}}
+        values: {method_class: measured_direct, T_C: 1578, r_as_printed: 2.309}
+      - observation_id: dg46_t1_i_1590_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'I, 1590 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'I, 1590 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'I'}}
+        values: {method_class: measured_direct, T_C: 1590, r_as_printed: 2.302}
+      - observation_id: dg46_t1_i_1591_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'I, 1591 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'I, 1591 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'I'}}
+        values: {method_class: measured_direct, T_C: 1591, r_as_printed: 2.291}
+      - observation_id: dg46_t1_i_1592_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'I, 1592 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'I, 1592 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'I'}}
+        values: {method_class: measured_direct, T_C: 1592, r_as_printed: 2.286}
+      - observation_id: dg46_t1_i_1634_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'I, 1634 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'I, 1634 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'I'}}
+        values: {method_class: measured_direct, T_C: 1634, r_as_printed: 2.256}
+      - observation_id: dg46_t1_k_1595_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1595 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1595 C'}}
+          atmosphere: {state: {tag: value, value: 'Air, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'K'}}
+        values: {method_class: measured_direct, T_C: 1595, r_as_printed: 3.529}
+      - observation_id: dg46_t1_k_1602_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1602 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1602 C'}}
+          atmosphere: {state: {tag: value, value: 'Air, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'K'}}
+        values: {method_class: measured_direct, T_C: 1602, r_as_printed: 3.492}
+      - observation_id: dg46_t1_k_1619_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1619 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1619 C'}}
+          atmosphere: {state: {tag: value, value: 'Air, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'K'}}
+        values: {method_class: measured_direct, T_C: 1619, r_as_printed: 3.439}
+      - observation_id: dg46_t1_k_1630_fe2o3_a
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1630 C, first'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1630 C'}}
+          atmosphere: {state: {tag: value, value: 'Air, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'K'}}
+        values: {method_class: measured_direct, T_C: 1630, r_as_printed: 3.348}
+      - observation_id: dg46_t1_k_1630_fe2o3_b
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1630 C, second'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1630 C'}}
+          atmosphere: {state: {tag: value, value: 'Air, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'K'}}
+        values: {method_class: measured_direct, T_C: 1630, r_as_printed: 3.308}
+      - observation_id: dg46_t1_k_1635_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1635 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1635 C'}}
+          atmosphere: {state: {tag: value, value: 'Air, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'K'}}
+        values: {method_class: measured_direct, T_C: 1635, r_as_printed: 3.301}
+      - observation_id: dg46_t1_k_1635_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1635 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'K, 1635 C'}}
+          atmosphere: {state: {tag: value, value: 'Air, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'K'}}
+        values: {method_class: measured_direct, T_C: 1635, r_as_printed: 3.281}
+      - observation_id: dg46_t1_j_1605_fe2o3_a
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'J, 1605 C, first printed r'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'J, 1605 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-O2, 3.91% oxygen'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'J'}}
+        values: {method_class: measured_direct, T_C: 1605, r_as_printed: '<2.824'}
+      - observation_id: dg46_t1_j_1605_fe2o3_b
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'J, 1605 C, second printed r'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'J, 1605 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-O2, 3.91% oxygen'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'J'}}
+        values: {method_class: measured_direct, T_C: 1605, r_as_printed: '[2.850]'}
+      - observation_id: dg46_t1_j_1606_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'J, 1606 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'J, 1606 C'}}
+          atmosphere: {state: {tag: value, value: 'CO2-O2, 3.91% oxygen'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'J'}}
+        values: {method_class: measured_direct, T_C: 1606, r_as_printed: 2.838}
+      - observation_id: dg46_t1_l_1589_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1589 C, Fe2O3'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1589 C'}}
+          atmosphere: {state: {tag: value, value: 'Oxygen, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'L'}}
+        values: {method_class: measured_direct, T_C: 1589, r_as_printed: 4.237}
+      - observation_id: dg46_t1_l_1589_fe3o4
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1589 C, Fe3O4'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe3O4}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1589 C'}}
+          atmosphere: {state: {tag: value, value: 'Oxygen, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'L'}}
+        values: {method_class: measured_direct, T_C: 1589, r_as_printed: 4.216}
+      - observation_id: dg46_t1_l_1590_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1590 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1590 C'}}
+          atmosphere: {state: {tag: value, value: 'Oxygen, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'L'}}
+        values: {method_class: measured_direct, T_C: 1590, r_as_printed: 4.067}
+      - observation_id: dg46_t1_l_1603_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1603 C'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1603 C'}}
+          atmosphere: {state: {tag: value, value: 'Oxygen, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'L'}}
+        values: {method_class: measured_direct, T_C: 1603, r_as_printed: 4.053}
+      - observation_id: dg46_t1_l_1607_fe2o3
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1607 C, Fe2O3'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Fe2O3}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1607 C'}}
+          atmosphere: {state: {tag: value, value: 'Oxygen, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'L'}}
+        values: {method_class: measured_direct, T_C: 1607, r_as_printed: 4.023}
+      - observation_id: dg46_t1_l_1607_wustite
+        type: composition_series
+        locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1607 C, Wustite'}
+        phase: liquid iron oxide
+        units: r=(Fe++ + Fe+++)/Fe++ as printed; temperature in C as printed
+        point_conditions:
+          starting_material: {state: {tag: value, value: Wustite}, locator: {published_page: 800, pdf_page: 3, table: 'I', row: 'L, 1607 C'}}
+          atmosphere: {state: {tag: value, value: 'Oxygen, 1 atmosphere'}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'L'}}
+        values: {method_class: measured_direct, T_C: 1607, r_as_printed: 4.007}
