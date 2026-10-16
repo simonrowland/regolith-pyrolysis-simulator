@@ -1458,40 +1458,7 @@ class OverheadGasModel:
             if p_bar > 0.0
         })
 
-        atmosphere_name = getattr(melt.atmosphere, 'name', '')
-        # nRT/V is achieved inventory state; controller commands cannot create
-        # unledgered gas.
-        command_total_pressure_mbar = None
-        command_partial_pressures_mbar: dict[str, float] = {}
-        if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
-            command_total_pressure_mbar = melt.p_total_mbar
-            command_partial_pressures_mbar['CO2'] = melt.p_total_mbar * 0.96
-        elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
-            # Sweep regulates total P; its carrier partial is the remainder
-            # after all actual noncarrier gas, not a second pressure command.
-            command_total_pressure_mbar = melt.p_total_mbar
-
-        if atmosphere_name in {
-            'CONTROLLED_O2',
-            'CONTROLLED_O2_FLOW',
-            'O2_BACKPRESSURE',
-        }:
-            command_total_pressure_mbar = max(
-                melt.pO2_mbar, melt.p_total_mbar)
-            if melt.pO2_mbar > 0.0:
-                command_partial_pressures_mbar['O2'] = melt.pO2_mbar
-            background_species = str(
-                getattr(melt, 'background_gas_species', '') or '').strip()
-            if background_species and background_species.upper() != 'O2':
-                background_fraction = float(  # dimensionless — background gas mole fraction
-                    getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                background_fraction = min(1.0, max(0.0, background_fraction))  # dimensionless — clamped mole fraction
-                background_target = (
-                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
-                    * background_fraction
-                )
-                if background_target > 0.0:
-                    command_partial_pressures_mbar[background_species] = background_target
+        command_total_pressure_mbar, command_partial_pressures_mbar = self._pressure_commands(melt)
 
         self.stream_physics_notices = [
             notice for notice in self.stream_physics_notices
@@ -1525,6 +1492,43 @@ class OverheadGasModel:
                     for species in command_partial_pressures_mbar
                 },
             })
+
+    @staticmethod
+    def _pressure_commands(melt: MeltState) -> tuple[Optional[float], dict[str, float]]:
+        atmosphere_name = getattr(melt.atmosphere, 'name', '')
+        command_total_pressure_mbar = None
+        command_partial_pressures_mbar: dict[str, float] = {}
+        if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
+            command_total_pressure_mbar = melt.p_total_mbar
+            command_partial_pressures_mbar['CO2'] = melt.p_total_mbar * 0.96
+        elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
+            # Sweep regulates total P; its carrier partial is the remainder
+            # after all actual noncarrier gas, not a second pressure command.
+            command_total_pressure_mbar = melt.p_total_mbar
+
+        if atmosphere_name in {
+            'CONTROLLED_O2',
+            'CONTROLLED_O2_FLOW',
+            'O2_BACKPRESSURE',
+        }:
+            command_total_pressure_mbar = max(
+                melt.pO2_mbar, melt.p_total_mbar)
+            if melt.pO2_mbar > 0.0:
+                command_partial_pressures_mbar['O2'] = melt.pO2_mbar
+            background_species = str(
+                getattr(melt, 'background_gas_species', '') or '').strip()
+            if background_species and background_species.upper() != 'O2':
+                background_fraction = float(  # dimensionless — background gas mole fraction
+                    getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
+                background_fraction = min(1.0, max(0.0, background_fraction))  # dimensionless — clamped mole fraction
+                background_target = (
+                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
+                    * background_fraction
+                )
+                if background_target > 0.0:
+                    command_partial_pressures_mbar[background_species] = background_target
+
+        return command_total_pressure_mbar, command_partial_pressures_mbar
 
     @staticmethod
     def _reset_gas(gas: OverheadGas) -> None:
