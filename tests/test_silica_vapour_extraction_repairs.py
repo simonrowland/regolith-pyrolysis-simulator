@@ -4,7 +4,12 @@ from decimal import Decimal
 import yaml
 
 from simulator.battery.enums import EvidenceClass, StateTag
-from simulator.battery.migrate import Migrator, REPO_ROOT, convert_pressure_to_pa
+from simulator.battery.migrate import (
+    Migrator,
+    REPO_ROOT,
+    _mole_fraction_composition_from_values,
+    convert_pressure_to_pa,
+)
 from simulator.battery.validate import validate_corpus
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -35,6 +40,7 @@ def test_steurer_table_1_sio2_and_table_2_o2_values_migrate_as_models():
         (EXTRACTS / "steurer-1985-vapor-phase-pyrolysis.yaml").read_text()
     )
     table1 = extract["species"]["SiO2"]["observations"][0]
+    sio_table1 = extract["species"]["SiO"]["observations"][0]
     table2 = extract["species"]["O2"]["observations"][0]
     assert [point["P"] for point in table1["values"]["points"]] == [
         1.92e-04,
@@ -46,6 +52,11 @@ def test_steurer_table_1_sio2_and_table_2_o2_values_migrate_as_models():
         1.5e-03,
         8.1e-02,
     ]
+    assert [point["P"] for point in sio_table1["values"]["points"]] == [
+        7.13e-03,
+        3.26,
+        1.80e02,
+    ]
     assert check_all_fidelity_samples_match(extract) == []
     mutated = deepcopy(extract)
     mutated["species"]["SiO2"]["observations"][0]["values"]["points"][2]["P"] += 1
@@ -56,10 +67,46 @@ def test_steurer_table_1_sio2_and_table_2_o2_values_migrate_as_models():
         row
         for row in result.observations.values()
         if "steurer_1985_table1_single_oxide_psat::T=" in row.observation_id
+        or "steurer_1985_table1_sio_psat::T=" in row.observation_id
         or "steurer_1985_table2_mixture_psat::T=" in row.observation_id
     ]
-    assert len(observations) == 6
+    assert len(observations) == 9
     _validate_rows(result, observations)
+    table1_rows = [
+        row
+        for row in observations
+        if "table1_single_oxide" in row.observation_id
+        or "table1_sio_psat" in row.observation_id
+    ]
+    assert len(table1_rows) == 6
+    for row in table1_rows:
+        composition = row.identity.composition
+        assert composition is not None and composition.is_value
+        assert composition.value.components == (("SiO2", Decimal("1")),)
+        assert composition.value.basis == "pure_oxide_system"
+        assert row.locator is not None
+        assert row.locator.table == "1"
+        assert row.locator.published_page == 126
+    assert _mole_fraction_composition_from_values(
+        {"composition_mol": {"SiO2": 1.0}}
+    )[0] is None
+    sio_rows = [row for row in table1_rows if row.identity.species.formula == "SiO"]
+    assert len(sio_rows) == 3
+    assert [row.value.point for row in sio_rows] == [
+        convert_pressure_to_pa(Decimal(str(value)), "torr")[0]
+        for value in (7.13e-03, 3.26, 1.80e02)
+    ]
+    assert all(row.evidence.class_.value is EvidenceClass.MODEL_DERIVED for row in sio_rows)
+    assert [row.identity.temperature_K.value for row in sio_rows] == [
+        Decimal("2000.0"),
+        Decimal("2500.0"),
+        Decimal("3000.0"),
+    ]
+    for row in sio_rows:
+        condition = row.point_conditions["temperature_K"]
+        assert condition.state.value == row.identity.temperature_K.value
+        assert condition.locator is not None
+        assert condition.locator.table == "1"
     table1_row = next(
         row for row in observations if "table1_single_oxide" in row.observation_id and "T=3000" in row.observation_id
     )
