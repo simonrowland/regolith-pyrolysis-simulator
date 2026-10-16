@@ -880,10 +880,12 @@ def test_vapor_engine_reports_domain_when_no_admitted_bracket_exists() -> None:
     assert "no sign-changing bracket was found in the admitted pO2 window" in detail
     assert "reachable from the chosen start" in detail
     assert "start_pO2_bar=1e-06" in detail
-    assert "searched_window_pO2_bar=[" in detail
+    assert "searched_window_pO2_bar=[1e-28, 1]" in detail
+    assert "does not establish whether a root exists in another admitted window" in detail
     assert "lower_stop=" in detail and "lower_stop=None" not in detail
     assert "upper_stop=" in detail and "upper_stop=None" not in detail
-    assert "sum_pressure_sanity" in detail
+    assert "lower_stop=pO2=1e-29 bar; guard=sum_pressure_sanity" in detail
+    assert "upper_stop=OpenIMCC Knudsen molecular-flow limit pO2=1 bar" in detail
 
 
 def test_vapor_engine_finds_admitted_start_away_from_seed() -> None:
