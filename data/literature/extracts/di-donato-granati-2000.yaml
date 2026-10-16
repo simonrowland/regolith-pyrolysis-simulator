@@ -1,0 +1,407 @@
+schema_version: literature_extract.v1
+source_id: di-donato-granati-2000
+source:
+  citation: >-
+    Di Donato, A. and Granati, P. (2000), “Experimental Determination of
+    Activity of FeO, MnO and Cr2O3 in Slags”, Centro Sviluppo Materiali
+    research manuscript.
+  year: 2000
+  corpus_asset: raw/di-donato-granati-2000/di-donato-granati-2000.pdf
+  corpus_sha256: 78dd1d4d3b37bbbe4306527130db925d48c7fa1e004cba52c4644b08fb28d825
+extraction:
+  method: >-
+    All 17 PDF pages rendered at 250 dpi and visually read. Tables 1–5 were
+    transcribed first into the five CSVs and each numeric table cell checked
+    against the page image. Figure curves were retained as figure-only context
+    and were not digitized. Activities are transcribed as tabulated; mass
+    percent and activity values are not re-derived.
+  date: '2026-10-05'
+  worker: x-di-donato-granati-2000-c2
+review_status: draft
+fidelity_samples:
+- species: FeO
+  observation_id: di_donato_2000_t2_slag3_r1
+  observable: activity_coefficient
+  field: activity
+  value: 0.013
+  locator: {page: 14, table: '2', row: '3'}
+- species: MnO
+  observation_id: di_donato_2000_t4_slag1_r1
+  observable: activity_coefficient
+  field: activity
+  value: 3.4e-2
+  locator: {page: 15, table: '4', row: '1'}
+- species: Cr2O3
+  observation_id: di_donato_2000_t5_slag3_r6
+  observable: activity_coefficient
+  field: activity
+  value: 9.65e-1
+  locator: {page: 16, table: '5', row: '15'}
+experiments:
+- experiment_id: sta409-equilibrium-1600c
+  method: tga
+  locator: {page: 3, paragraph: experimental procedure}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: 1873.15}
+      locator: {page: 3, paragraph: experimental procedure, note: '1600 °C; converted using T_K = T_C + 273.15'}
+  sample:
+    characterization:
+      state: {tag: value, value: analytical-grade pure oxides and metals}
+      locator: {page: 3, paragraph: experimental procedure}
+  bench_id: sta409-tga
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 3, paragraph: experimental procedure, note: Flowing-gas thermobalance; chamber pressure is not reported.}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 3, paragraph: experimental procedure, note: 'CO2/H2 composition and individual run flow setpoints are not stated numerically; the published maximum flow for equilibrium is 0.5 cm3/s.'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+benches:
+- id: sta409-tga
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Netzsch STA 409 thermobalance}
+    locator: {page: 3, paragraph: experimental procedure}
+  method:
+    state: {tag: value, value: thermogravimetry}
+    locator: {page: 3, paragraph: experimental procedure}
+  cell_material_and_liner:
+    state: {tag: unknown, reason: not_applicable}
+    locator: {page: 3, paragraph: experimental procedure, note: Thermobalance and platinum crucible are described; no effusion cell or liner is used.}
+  geometry:
+    orifice_diameter_m:
+      state: {tag: unknown, reason: not_applicable}
+      locator: {page: 3, paragraph: experimental procedure, note: No effusion orifice is used in this thermogravimetry method.}
+    orifice_channel_length_m:
+      state: {tag: unknown, reason: not_applicable}
+      locator: {page: 3, paragraph: experimental procedure, note: No effusion orifice is used in this thermogravimetry method.}
+  ionization:
+    method:
+      state: {tag: unknown, reason: not_applicable}
+      locator: {page: 3, paragraph: experimental procedure, note: No mass spectrometry is used.}
+    ionization_energy_eV:
+      state: {tag: unknown, reason: not_applicable}
+      locator: {page: 3, paragraph: experimental procedure, note: No mass spectrometry is used.}
+    cross_sections:
+      state: {tag: unknown, reason: not_applicable}
+      locator: {page: 3, paragraph: experimental procedure, note: No mass spectrometry is used.}
+  temperature_measurement:
+    sensor:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 3, paragraph: experimental procedure, note: Temperature sensor is not identified.}
+  temperature_calibration:
+    calibration:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 3, paragraph: experimental procedure, note: Temperature calibration is not described.}
+  detector:
+    state: {tag: value, value: thermogravimetric balance}
+    locator: {page: 3, paragraph: experimental procedure}
+  other_facts:
+  - name: crucible_material
+    unit: categorical
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: platinum}}
+      locator: {page: 3, paragraph: experimental procedure}
+  - name: starting_materials
+    unit: categorical
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: analytical-grade pure oxides and metals}}
+      locator: {page: 3, paragraph: experimental procedure}
+  - name: oxygen_potential_sensor
+    unit: categorical
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: yttria-stabilized zirconia electrochemical sensor}}
+      locator: {page: 4, paragraph: experimental procedure, note: 'references [2, 3]'}
+  - name: intensity_to_pressure_calibration
+    unit: categorical
+    value:
+      state: {tag: unknown, reason: not_applicable}
+      locator: {page: 3, paragraph: experimental procedure, note: Activities are determined by equilibrium and thermogravimetry; no ion-current to pressure conversion is used.}
+  - name: maximum_gas_flow_for_equilibrium
+    unit: cm3/s
+    value:
+      state: {tag: value, value: {kind: point, point: '0.5'}}
+      locator: {page: 3, paragraph: experimental procedure, note: Maximum flow used to achieve equilibrium.}
+  - name: multiplier_and_isotope_corrections
+    unit: categorical
+    value:
+      state: {tag: unknown, reason: not_applicable}
+      locator: {page: 3, paragraph: experimental procedure, note: No mass spectrometry is used.}
+species:
+  FeO:
+    observations:
+    - {observation_id: di_donato_2000_t2_slag1_r1, type: activity_coefficient, locator: {page: 14, table: '2', row: '1'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.015, FeO_mass_percent: 1.04, base_slag_id: 1}}
+    - {observation_id: di_donato_2000_t2_slag2_r1, type: activity_coefficient, locator: {page: 14, table: '2', row: '2'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.014, FeO_mass_percent: 1.04, base_slag_id: 2}}
+    - {observation_id: di_donato_2000_t2_slag3_r1, type: activity_coefficient, locator: {page: 14, table: '2', row: '3'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.013, FeO_mass_percent: 1.02, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t2_slag4_r1, type: activity_coefficient, locator: {page: 14, table: '2', row: '4'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.015, FeO_mass_percent: 1.00, base_slag_id: 4}}
+    - {observation_id: di_donato_2000_t2_slag4_r2, type: activity_coefficient, locator: {page: 14, table: '2', row: '4'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.063, FeO_mass_percent: 3.66, base_slag_id: 4}}
+    - {observation_id: di_donato_2000_t2_slag5_r1, type: activity_coefficient, locator: {page: 14, table: '2', row: '5'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.015, FeO_mass_percent: 1.00, base_slag_id: 5}}
+    - {observation_id: di_donato_2000_t2_slag5_r2, type: activity_coefficient, locator: {page: 14, table: '2', row: '5'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.122, FeO_mass_percent: 2.24, base_slag_id: 5}}
+    - {observation_id: di_donato_2000_t2_slag6_r1, type: activity_coefficient, locator: {page: 14, table: '2', row: '6'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.019, FeO_mass_percent: 0.98, base_slag_id: 6}}
+    - {observation_id: di_donato_2000_t2_slag6_r2, type: activity_coefficient, locator: {page: 14, table: '2', row: '6'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.067, FeO_mass_percent: 3.70, base_slag_id: 6}}
+    - {observation_id: di_donato_2000_t2_slag7_r1, type: activity_coefficient, locator: {page: 14, table: '2', row: '7'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.020, FeO_mass_percent: 1.10, base_slag_id: 7}}
+    - {observation_id: di_donato_2000_t2_slag8_r1, type: activity_coefficient, locator: {page: 14, table: '2', row: '8'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.029, FeO_mass_percent: 1.07, base_slag_id: 8}}
+    - {observation_id: di_donato_2000_t3_slag3_r1, type: activity_coefficient, locator: {page: 14, table: '3', row: '1'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.010, FeO_mass_percent: 0.9, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t3_slag3_r2, type: activity_coefficient, locator: {page: 14, table: '3', row: '2'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.011, FeO_mass_percent: 1.0, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t3_slag3_r3, type: activity_coefficient, locator: {page: 14, table: '3', row: '3'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.013, FeO_mass_percent: 1.0, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t3_slag3_r4, type: activity_coefficient, locator: {page: 14, table: '3', row: '4'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.012, FeO_mass_percent: 1.1, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t3_slag3_r5, type: activity_coefficient, locator: {page: 14, table: '3', row: '5'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.013, FeO_mass_percent: 1.3, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t3_slag3_r6, type: activity_coefficient, locator: {page: 14, table: '3', row: '6'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.026, FeO_mass_percent: 2.1, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t3_slag3_r7, type: activity_coefficient, locator: {page: 14, table: '3', row: '7'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.022, FeO_mass_percent: 2.2, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t3_slag3_r8, type: activity_coefficient, locator: {page: 14, table: '3', row: '8'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.024, FeO_mass_percent: 3.0, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t3_slag3_r9, type: activity_coefficient, locator: {page: 14, table: '3', row: '9'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.025, FeO_mass_percent: 3.7, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t3_slag3_r10, type: activity_coefficient, locator: {page: 14, table: '3', row: '10'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.030, FeO_mass_percent: 4.0, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t3_slag3_r11, type: activity_coefficient, locator: {page: 14, table: '3', row: '11'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.026, FeO_mass_percent: 4.1, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t3_slag3_r12, type: activity_coefficient, locator: {page: 14, table: '3', row: '12'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure FeO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 0.027, FeO_mass_percent: 4.5, base_slag_id: 3}}
+    context:
+    - observation_id: di_donato_2000_sta409_method_and_absences
+      type: apparatus
+      locator: {page: 3, paragraph: experimental procedure}
+      units: as printed
+      experiment: sta409-equilibrium-1600c
+      values:
+        quantity: experiment_and_method_facts
+        method_class: quoted_unattributed
+        apparatus: Netzsch STA 409 thermobalance equipped with gas flow meters
+        crucible: platinum
+        cell_material: not an effusion cell; platinum crucible is the printed container
+        orifice_diameter: absent; not applicable to the thermobalance method
+        channel_length: absent; not applicable to the thermobalance method
+        pressure_calibration: absent; no vapor pressure conversion is described
+        ionization_cross_sections: absent; no mass spectrometry is used
+        ionization_energy_eV: absent; no mass spectrometry is used
+        multiplier_or_isotope_corrections: absent; no mass spectrometry is used
+        chamber_background_pressure: absent; not reported for the flowing-gas thermobalance
+        temperature_measurement: absent; not reported
+        temperature_calibration: absent; not reported
+        starting_materials: analytical-grade pure oxides and metals
+        master_slag_preparation: master slag melted in a platinum crucible with pure oxide and pure metal
+        atmosphere: directly mixed CO2/H2 in appropriate proportions; gas reaction produces CO, CO2, H2 and H2O
+        oxygen_potential_check: yttria-stabilized zirconia electrochemical sensor; references [2, 3]
+        oxygen_potential_check_locator: {page: 4, paragraph: experimental procedure}
+        gas_flow_cm3_s: 0.5
+        gas_flow_qualifier: maximum used for achieving equilibrium
+        reported_temperature_C: 1600
+        activity_reference_states: FeO pure oxide; MnO pure oxide; Cr2O3 pure oxide
+    - observation_id: di_donato_2000_equilibrium_method
+      type: laboratory_conditions
+      locator: {page: 3, paragraph: Steps 1 and 2, equation: '1'}
+      units: as printed
+      experiment: sta409-equilibrium-1600c
+      values:
+        method_class: quoted_unattributed
+        dissociation_reaction: 'X_mO_n (activity 1) → mX (in X/Pt alloy; activity to be calculated) + n/2 O2 (fixed activity)'
+        equilibrium_relation: 'K = (a_X)^m * (P_O2)^(n/2) / a_XmOn'
+        step_2_reduction: 'The concentration of X in X/Pt gives its activity using the relationship obtained in Step 1; knowing this activity and gas oxygen activity (defined by gas composition and temperature), the equilibrium constant gives the oxide activity in slag.'
+    - observation_id: di_donato_2000_method_references
+      type: laboratory_conditions
+      locator: {page: 6, section: References}
+      units: bibliographic context as printed
+      values:
+        method_class: quoted_unattributed
+        references:
+          - reference: '1'
+            entry: 'J. Elliot, M. Gleiser, V. Ramakrishna, Thermochemistry for steelmaking - Addison Wesley publishing company inc. 1963'
+            role: source of the ternary diagram in Figure 1
+          - reference: '2'
+            entry: 'B. Krafthefer et al.; “Life and performance of ZrO2-Based Oxygen sensors” Proceedings of the Second International Conference on the Science and Technology of Zirconia (Zirconi ‘83) Stuttgard, Germany, June 21–23 (1983) pp. 607–617'
+            role: oxygen-sensor background
+          - reference: '3'
+            entry: 'J. Fouletier, E. Siebert and A. Caneiro; “Accurate Monitoring of Low Oxygen Activity in Gses with Conventional Oxygen Gauges and Pumps” Proceedings of the Second International Conference on the Science and Technology of Zirconia (Zirconi ‘83) Stuttgard, Germany, June 21–23 (1983) pp. 618–626'
+            role: oxygen-sensor background
+        note: Source spellings Gses and Stuttgard retained as printed.
+    - observation_id: di_donato_2000_t1_master_slag_1
+      type: composition
+      locator: {page: 14, table: '1', row: '1'}
+      units: mass percent
+      values: {method_class: measured_tabulated, slag_id: 1, CaO: 62, SiO2: 3, Al2O3: 35}
+    - observation_id: di_donato_2000_t1_master_slag_2
+      type: composition
+      locator: {page: 14, table: '1', row: '2'}
+      units: mass percent
+      values: {method_class: measured_tabulated, slag_id: 2, CaO: 62, SiO2: 5, Al2O3: 33}
+    - observation_id: di_donato_2000_t1_master_slag_3
+      type: composition
+      locator: {page: 14, table: '1', row: '3'}
+      units: mass percent
+      values: {method_class: measured_tabulated, slag_id: 3, CaO: 59, SiO2: 1, Al2O3: 40}
+    - observation_id: di_donato_2000_t1_master_slag_4
+      type: composition
+      locator: {page: 14, table: '1', row: '4'}
+      units: mass percent
+      values: {method_class: measured_tabulated, slag_id: 4, CaO: 62, SiO2: 9, Al2O3: 29}
+    - observation_id: di_donato_2000_t1_master_slag_5
+      type: composition
+      locator: {page: 14, table: '1', row: '5'}
+      units: mass percent
+      values: {method_class: measured_tabulated, slag_id: 5, CaO: 58, SiO2: 5, Al2O3: 37}
+    - observation_id: di_donato_2000_t1_master_slag_6
+      type: composition
+      locator: {page: 14, table: '1', row: '6'}
+      units: mass percent
+      values: {method_class: measured_tabulated, slag_id: 6, CaO: 59, SiO2: 7, Al2O3: 34}
+    - observation_id: di_donato_2000_t1_master_slag_7
+      type: composition
+      locator: {page: 14, table: '1', row: '7'}
+      units: mass percent
+      values: {method_class: measured_tabulated, slag_id: 7, CaO: 60, SiO2: 9, Al2O3: 31}
+    - observation_id: di_donato_2000_t1_master_slag_8
+      type: composition
+      locator: {page: 14, table: '1', row: '8'}
+      units: mass percent
+      values: {method_class: measured_tabulated, slag_id: 8, CaO: 60, SiO2: 15, Al2O3: 25}
+    - observation_id: di_donato_2000_qualifying_statements_and_directional_claims
+      type: laboratory_conditions
+      locator: {page: 1, paragraph: Abstract}
+      units: verbatim statements and located context
+      values:
+        method_class: quoted_unattributed
+        abstract_findings:
+          - quote: 'The results show a clear difference in the behaviour of the different oxides: FeO, MnO and Cr2O3.'
+            locator: {page: 1, paragraph: Abstract}
+          - quote: 'In the range of composition studied it is found that the MnO activity increases nearly linearly with MnO concentration and is not significantly affected by base slag composition.'
+            locator: {page: 1, paragraph: Abstract}
+          - quote: 'FeO and Cr2O3 activities does not vary linearly with concentration and the dependence is different for different base slag composition and SiO2 content affects activity of FeO and Cr2O3 in a different way for the different base slags.'
+            locator: {page: 1, paragraph: Abstract}
+        method_qualifiers:
+          - quote: 'Activity measurements were performed by an equilibration method, the equilibrium was realised between the reducible oxides FeO, MnO and Cr2O3 (pure or in slag phase) with the corresponding metal in solid platinum under fixed oxygen potential.'
+            locator: {page: 2, section: 3.1}
+          - quote: 'the X concentration in X/Pt alloy is determined by the mass loss of the sample, during the experiment, under the assumption that oxygen only is lost; this assumption is reasonable being in general the vapour pressure of X at 1600 °C negligible.'
+            locator: {page: 3, paragraph: Step 1}
+          - quote: 'Chemical analysis of both platinum crucible and material contained in it after the experiments confirmed that the mass loss is consistent with amount of metal dissolved in platinum and that no separate metal remains in the crucible.'
+            locator: {page: 3, paragraph: Step 1}
+          - quote: 'experimental determination of activity of X in platinum was performed only when data were not available in literature.'
+            locator: {page: 3, paragraph: Step 1}
+          - quote: 'A set of trials, with different gas flow rates, permitted to define a flow rate of 0.5 cm3/s as the maximum value to be used for achieving the equilibrium.'
+            locator: {page: 3, paragraph: experimental procedure}
+          - quote: 'The equilibrium gas/metal/oxide/platinum at the furnace temperature is reached if the gas is allowed to remain inside the furnace for the necessary time.'
+            locator: {page: 3, paragraph: experimental procedure}
+          - quote: 'The residence time depends on the gas flow rate.'
+            locator: {page: 3, paragraph: experimental procedure}
+          - quote: 'From the initial masses of slag, X and XmOn, and the mass variation during the experiment, the X content in X/Pt and XmOn concentration in slag are determined.'
+            locator: {page: 3, paragraph: Step 2}
+          - quote: 'Also in this case, chemical analysis of slag and platinum confirmed the concentration values obtained by the mass losses.'
+            locator: {page: 3, paragraph: Step 2}
+          - quote: 'On line monitoring of the O2 activity in the gas in contact with the sample has been performed during the experiments is possible.'
+            locator: {page: 4, paragraph: experimental procedure}
+            note: Source grammar reproduced as printed.
+        numeric_results_context:
+          - quote: 'FeO activity was measured in master slags with FeO concentration ranging up to about 5% by mass.'
+            locator: {page: 4, section: 4.1}
+          - quote: 'The reason for choosing this low concentration range is twofold: the data are relevant for secondary metallurgy treatments using synthetic slags and are scarce in this range.'
+            locator: {page: 4, section: 4.1}
+          - quote: 'In Table 10 activity of FeO at about 1% by mass is reported, measured for all the eight master slags, showing the effect of master slag composition on FeO activity.'
+            locator: {page: 4, section: 4.1}
+            note: Manuscript cross-reference is printed “Table 10”; the corresponding eight-slag measurements are in Table 2. Preserved as printed rather than silently corrected.
+          - quote: 'In this figure (and in similarly in what follows) polynomial least square fitting of experimental data has been used to emphasise the trend.'
+            locator: {page: 4, section: 4.1}
+          - quote: 'Master slag 3 is representative of target slag to be used in carbon steel secondary refining.'
+            locator: {page: 4, section: 4.1}
+          - quote: 'The influence of slag composition on Cr2O3 activity for concentration of 5%, 10%, and 15% is shown in Figure 7; the values at the exact concentration 5%, 10%, and 15% have been obtained interpolating the experimental values of Table 5.'
+            locator: {page: 4, section: 4.3}
+        conclusion_claims:
+          - quote: 'MnO activity increases nearly linearly with MnO concentration'
+            locator: {page: 5, section: "Conclusions, bullet 1"}
+          - quote: 'activity of MnO is not significantly affected by base slag composition'
+            locator: {page: 5, section: "Conclusions, bullet 2"}
+          - quote: 'FeO and Cr2O3 activities does not vary linearly with concentration and the dependence is different for different base slag composition and'
+            locator: {page: 5, section: "Conclusions, bullet 3"}
+          - quote: 'SiO2 content affects activity of FeO and Cr2O3 in a different way for the different base slags'
+            locator: {page: 5, section: "Conclusions, bullet 4"}
+    - observation_id: di_donato_2000_figures_1_to_10_figure_only
+      type: experiment_series
+      locator: {page: 7, figure: '1'}
+      units: figure-only context; curves not digitized
+      values:
+        method_class: figure_only
+        semantics: qualitative_and_graphical_context_only
+    figures:
+      - {figure: '1', pdf_page_index: 7, caption: 'Composition of master slags reported on ternary diagram CaO-Al2O3-SiO2 [1].'}
+      - {figure: '2', pdf_page_index: 8, caption: 'Experimental activity of FeO in synthetic slags at different compositions (FeO concentration is in all the slags near 1% in mass. Temperature 1600 °C; standard state pure FeO).'}
+      - {figure: '3', pdf_page_index: 9, caption: 'FeO activity as a function of CaO/SiO2, CaO/(SiO2+Al2O3), and CaO/Al2O3 ratios. Temperature 1600 °C; standard state pure FeO.'}
+      - {figure: '4', pdf_page_index: 10, caption: 'FeO activity as a function of FeO concentration (master slag number 3). Temperature 1600 °C; standard state pure FeO.'}
+      - {figure: '5', pdf_page_index: 10, caption: 'MnO activity as a function of MnO concentration measured along the whole set of master slags. Temperature: 1600 °C; MnO standard state: pure MnO.'}
+      - {figure: '6', pdf_page_index: 11, caption: 'Cr2O3 activity as a function of Cr2O3 concentration measured in the whole set of master slags. Temperature: 1600 °C; Cr2O3 standard state: pure Cr2O3.'}
+      - {figure: '7', pdf_page_index: 12, caption: 'Cr2O3 activity measured in synthetic slags at different Cr2O3 concentration reported together with the concentration of master slags (see Table 1) from which the slags are obtained. Temperature: 1600 °C; Cr2O3 standard state: pure Cr2O3.'}
+      - {figure: '8', pdf_page_index: 12, caption: 'Cr2O3 activity as a function of CaO/SiO2 mass ratio in slags at different Cr2O3 concentration. Temperature: 1600 °C; Cr2O3 standard state: pure Cr2O3.'}
+      - {figure: '9', pdf_page_index: 13, caption: 'Cr2O3 activity as a function of Al2O3/SiO2 mass ratio in slags at different Cr2O3 concentration. Temperature: 1600 °C; Cr2O3 standard state: pure Cr2O3.'}
+      - {figure: '10', pdf_page_index: 13, caption: 'Cr2O3 activity as a function of CaO/(Al2O3+SiO2) mass ratio in slags at different Cr2O3 concentration. Temperature: 1600 °C; Cr2O3 standard state: pure Cr2O3.'}
+  MnO:
+    observations:
+    - {observation_id: di_donato_2000_t4_slag1_r1, type: activity_coefficient, locator: {page: 15, table: '4', row: '1'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 3.4e-2, MnO_mass_percent: 1.0, base_slag_id: 1}}
+    - {observation_id: di_donato_2000_t4_slag1_r2, type: activity_coefficient, locator: {page: 15, table: '4', row: '2'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 7.8e-2, MnO_mass_percent: 2.4, base_slag_id: 1}}
+    - {observation_id: di_donato_2000_t4_slag1_r3, type: activity_coefficient, locator: {page: 15, table: '4', row: '3'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.6e-1, MnO_mass_percent: 5.4, base_slag_id: 1}}
+    - {observation_id: di_donato_2000_t4_slag1_r4, type: activity_coefficient, locator: {page: 15, table: '4', row: '4'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 3.4e-1, MnO_mass_percent: 12.5, base_slag_id: 1}}
+    - {observation_id: di_donato_2000_t4_slag1_r5, type: activity_coefficient, locator: {page: 15, table: '4', row: '5'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 5.8e-2, MnO_mass_percent: 1.8, base_slag_id: 1}}
+    - {observation_id: di_donato_2000_t4_slag1_r6, type: activity_coefficient, locator: {page: 15, table: '4', row: '6'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 9.0e-2, MnO_mass_percent: 2.8, base_slag_id: 1}}
+    - {observation_id: di_donato_2000_t4_slag2_r1, type: activity_coefficient, locator: {page: 15, table: '4', row: '7'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 6.0e-2, MnO_mass_percent: 1.8, base_slag_id: 2}}
+    - {observation_id: di_donato_2000_t4_slag2_r2, type: activity_coefficient, locator: {page: 15, table: '4', row: '8'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 5.9e-2, MnO_mass_percent: 1.8, base_slag_id: 2}}
+    - {observation_id: di_donato_2000_t4_slag2_r3, type: activity_coefficient, locator: {page: 15, table: '4', row: '9'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 5.9e-2, MnO_mass_percent: 1.7, base_slag_id: 2}}
+    - {observation_id: di_donato_2000_t4_slag3_r1, type: activity_coefficient, locator: {page: 15, table: '4', row: '10'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 5.4e-2, MnO_mass_percent: 1.7, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t4_slag4_r1, type: activity_coefficient, locator: {page: 15, table: '4', row: '11'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 6.1e-2, MnO_mass_percent: 1.7, base_slag_id: 4}}
+    - {observation_id: di_donato_2000_t4_slag4_r2, type: activity_coefficient, locator: {page: 15, table: '4', row: '12'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 6.2e-2, MnO_mass_percent: 1.7, base_slag_id: 4}}
+    - {observation_id: di_donato_2000_t4_slag4_r3, type: activity_coefficient, locator: {page: 15, table: '4', row: '13'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 6.3e-2, MnO_mass_percent: 1.7, base_slag_id: 4}}
+    - {observation_id: di_donato_2000_t4_slag5_r1, type: activity_coefficient, locator: {page: 15, table: '4', row: '14'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.7e-2, MnO_mass_percent: 0.7, base_slag_id: 5}}
+    - {observation_id: di_donato_2000_t4_slag5_r2, type: activity_coefficient, locator: {page: 15, table: '4', row: '15'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 5.8e-2, MnO_mass_percent: 1.6, base_slag_id: 5}}
+    - {observation_id: di_donato_2000_t4_slag5_r3, type: activity_coefficient, locator: {page: 15, table: '4', row: '16'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.7e-1, MnO_mass_percent: 5.1, base_slag_id: 5}}
+    - {observation_id: di_donato_2000_t4_slag5_r4, type: activity_coefficient, locator: {page: 15, table: '4', row: '17'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 3.5e-1, MnO_mass_percent: 12.3, base_slag_id: 5}}
+    - {observation_id: di_donato_2000_t4_slag6_r1, type: activity_coefficient, locator: {page: 15, table: '4', row: '18'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.8e-2, MnO_mass_percent: 0.7, base_slag_id: 6}}
+    - {observation_id: di_donato_2000_t4_slag6_r2, type: activity_coefficient, locator: {page: 15, table: '4', row: '19'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 3.4e-2, MnO_mass_percent: 0.9, base_slag_id: 6}}
+    - {observation_id: di_donato_2000_t4_slag6_r3, type: activity_coefficient, locator: {page: 15, table: '4', row: '20'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.6e-1, MnO_mass_percent: 4.6, base_slag_id: 6}}
+    - {observation_id: di_donato_2000_t4_slag7_r1, type: activity_coefficient, locator: {page: 15, table: '4', row: '21'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 3.5e-2, MnO_mass_percent: 0.9, base_slag_id: 7}}
+    - {observation_id: di_donato_2000_t4_slag7_r2, type: activity_coefficient, locator: {page: 15, table: '4', row: '22'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.1e-1, MnO_mass_percent: 3.0, base_slag_id: 7}}
+    - {observation_id: di_donato_2000_t4_slag7_r3, type: activity_coefficient, locator: {page: 15, table: '4', row: '23'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.0e-1, MnO_mass_percent: 5.7, base_slag_id: 7}}
+    - {observation_id: di_donato_2000_t4_slag7_r4, type: activity_coefficient, locator: {page: 15, table: '4', row: '24'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.7e-1, MnO_mass_percent: 8.3, base_slag_id: 7}}
+    - {observation_id: di_donato_2000_t4_slag7_r5, type: activity_coefficient, locator: {page: 15, table: '4', row: '25'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 4.2e-1, MnO_mass_percent: 14.5, base_slag_id: 7}}
+    - {observation_id: di_donato_2000_t4_slag8_r1, type: activity_coefficient, locator: {page: 15, table: '4', row: '26'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 3.7e-2, MnO_mass_percent: 0.9, base_slag_id: 8}}
+    - {observation_id: di_donato_2000_t4_slag8_r2, type: activity_coefficient, locator: {page: 15, table: '4', row: '27'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.0e-1, MnO_mass_percent: 2.8, base_slag_id: 8}}
+    - {observation_id: di_donato_2000_t4_slag8_r3, type: activity_coefficient, locator: {page: 15, table: '4', row: '28'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.5e-1, MnO_mass_percent: 7.2, base_slag_id: 8}}
+    - {observation_id: di_donato_2000_t4_slag8_r4, type: activity_coefficient, locator: {page: 15, table: '4', row: '29'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure MnO, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 4.1e-1, MnO_mass_percent: 13.5, base_slag_id: 8}}
+  Cr2O3:
+    observations:
+    - {observation_id: di_donato_2000_t5_slag1_r1, type: activity_coefficient, locator: {page: 16, table: '5', row: '1'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 4.69e-4, Cr2O3_mass_percent: 1.41, base_slag_id: 1}}
+    - {observation_id: di_donato_2000_t5_slag1_r2, type: activity_coefficient, locator: {page: 16, table: '5', row: '2'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.56e-2, Cr2O3_mass_percent: 4.64, base_slag_id: 1}}
+    - {observation_id: di_donato_2000_t5_slag1_r3, type: activity_coefficient, locator: {page: 16, table: '5', row: '3'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 7.11e-2, Cr2O3_mass_percent: 7.81, base_slag_id: 1}}
+    - {observation_id: di_donato_2000_t5_slag1_r4, type: activity_coefficient, locator: {page: 16, table: '5', row: '4'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.92e-1, Cr2O3_mass_percent: 12.99, base_slag_id: 1}}
+    - {observation_id: di_donato_2000_t5_slag1_r5, type: activity_coefficient, locator: {page: 16, table: '5', row: '5'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 6.20e-1, Cr2O3_mass_percent: 17.68, base_slag_id: 1}}
+    - {observation_id: di_donato_2000_t5_slag2_r1, type: activity_coefficient, locator: {page: 16, table: '5', row: '6'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 5.81e-4, Cr2O3_mass_percent: 1.41, base_slag_id: 2}}
+    - {observation_id: di_donato_2000_t5_slag2_r2, type: activity_coefficient, locator: {page: 16, table: '5', row: '7'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.65e-2, Cr2O3_mass_percent: 5.21, base_slag_id: 2}}
+    - {observation_id: di_donato_2000_t5_slag2_r3, type: activity_coefficient, locator: {page: 16, table: '5', row: '8'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.66e-1, Cr2O3_mass_percent: 9.87, base_slag_id: 2}}
+    - {observation_id: di_donato_2000_t5_slag2_r4, type: activity_coefficient, locator: {page: 16, table: '5', row: '9'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 5.38e-1, Cr2O3_mass_percent: 15.54, base_slag_id: 2}}
+    - {observation_id: di_donato_2000_t5_slag3_r1, type: activity_coefficient, locator: {page: 16, table: '5', row: '10'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.99e-4, Cr2O3_mass_percent: 1.01, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t5_slag3_r2, type: activity_coefficient, locator: {page: 16, table: '5', row: '11'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.39e-2, Cr2O3_mass_percent: 5.02, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t5_slag3_r3, type: activity_coefficient, locator: {page: 16, table: '5', row: '12'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.22e-1, Cr2O3_mass_percent: 8.92, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t5_slag3_r4, type: activity_coefficient, locator: {page: 16, table: '5', row: '13'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.99e-1, Cr2O3_mass_percent: 12.59, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t5_slag3_r5, type: activity_coefficient, locator: {page: 16, table: '5', row: '14'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 6.70e-1, Cr2O3_mass_percent: 17.95, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t5_slag3_r6, type: activity_coefficient, locator: {page: 16, table: '5', row: '15'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 9.65e-1, Cr2O3_mass_percent: 21.00, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t5_slag3_r7, type: activity_coefficient, locator: {page: 16, table: '5', row: '16'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.0, Cr2O3_mass_percent: 22.11, base_slag_id: 3}}
+    - {observation_id: di_donato_2000_t5_slag4_r1, type: activity_coefficient, locator: {page: 16, table: '5', row: '17'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 3.07e-4, Cr2O3_mass_percent: 0.85, base_slag_id: 4}}
+    - {observation_id: di_donato_2000_t5_slag4_r2, type: activity_coefficient, locator: {page: 16, table: '5', row: '18'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.33e-3, Cr2O3_mass_percent: 1.39, base_slag_id: 4}}
+    - {observation_id: di_donato_2000_t5_slag4_r3, type: activity_coefficient, locator: {page: 16, table: '5', row: '19'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.08e-1, Cr2O3_mass_percent: 6.46, base_slag_id: 4}}
+    - {observation_id: di_donato_2000_t5_slag4_r4, type: activity_coefficient, locator: {page: 16, table: '5', row: '20'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.46e-1, Cr2O3_mass_percent: 8.79, base_slag_id: 4}}
+    - {observation_id: di_donato_2000_t5_slag4_r5, type: activity_coefficient, locator: {page: 16, table: '5', row: '21'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 8.05e-1, Cr2O3_mass_percent: 14.60, base_slag_id: 4}}
+    - {observation_id: di_donato_2000_t5_slag5_r1, type: activity_coefficient, locator: {page: 16, table: '5', row: '22'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.27e-3, Cr2O3_mass_percent: 1.38, base_slag_id: 5}}
+    - {observation_id: di_donato_2000_t5_slag5_r2, type: activity_coefficient, locator: {page: 16, table: '5', row: '23'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.50e-2, Cr2O3_mass_percent: 3.78, base_slag_id: 5}}
+    - {observation_id: di_donato_2000_t5_slag5_r3, type: activity_coefficient, locator: {page: 16, table: '5', row: '24'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.34e-1, Cr2O3_mass_percent: 6.96, base_slag_id: 5}}
+    - {observation_id: di_donato_2000_t5_slag5_r4, type: activity_coefficient, locator: {page: 16, table: '5', row: '25'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 4.53e-1, Cr2O3_mass_percent: 11.49, base_slag_id: 5}}
+    - {observation_id: di_donato_2000_t5_slag5_r5, type: activity_coefficient, locator: {page: 16, table: '5', row: '26'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 8.47e-1, Cr2O3_mass_percent: 15.67, base_slag_id: 5}}
+    - {observation_id: di_donato_2000_t5_slag6_r1, type: activity_coefficient, locator: {page: 16, table: '5', row: '27'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 5.88e-4, Cr2O3_mass_percent: 1.00, base_slag_id: 6}}
+    - {observation_id: di_donato_2000_t5_slag6_r2, type: activity_coefficient, locator: {page: 16, table: '5', row: '28'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.60e-3, Cr2O3_mass_percent: 1.38, base_slag_id: 6}}
+    - {observation_id: di_donato_2000_t5_slag6_r3, type: activity_coefficient, locator: {page: 16, table: '5', row: '29'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.23e-2, Cr2O3_mass_percent: 3.37, base_slag_id: 6}}
+    - {observation_id: di_donato_2000_t5_slag6_r4, type: activity_coefficient, locator: {page: 16, table: '5', row: '30'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 9.94e-2, Cr2O3_mass_percent: 5.78, base_slag_id: 6}}
+    - {observation_id: di_donato_2000_t5_slag6_r5, type: activity_coefficient, locator: {page: 16, table: '5', row: '31'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 7.19e-1, Cr2O3_mass_percent: 13.29, base_slag_id: 6}}
+    - {observation_id: di_donato_2000_t5_slag6_r6, type: activity_coefficient, locator: {page: 16, table: '5', row: '32'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 8.69e-1, Cr2O3_mass_percent: 14.68, base_slag_id: 6}}
+    - {observation_id: di_donato_2000_t5_slag6_r7, type: activity_coefficient, locator: {page: 16, table: '5', row: '33'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.0, Cr2O3_mass_percent: 15.87, base_slag_id: 6}}
+    - {observation_id: di_donato_2000_t5_slag7_r1, type: activity_coefficient, locator: {page: 16, table: '5', row: '34'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 4.53e-4, Cr2O3_mass_percent: 0.84, base_slag_id: 7}}
+    - {observation_id: di_donato_2000_t5_slag7_r2, type: activity_coefficient, locator: {page: 16, table: '5', row: '35'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 2.02e-3, Cr2O3_mass_percent: 1.38, base_slag_id: 7}}
+    - {observation_id: di_donato_2000_t5_slag7_r3, type: activity_coefficient, locator: {page: 16, table: '5', row: '36'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.12e-1, Cr2O3_mass_percent: 5.62, base_slag_id: 7}}
+    - {observation_id: di_donato_2000_t5_slag7_r4, type: activity_coefficient, locator: {page: 16, table: '5', row: '37'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 4.15e-1, Cr2O3_mass_percent: 9.51, base_slag_id: 7}}
+    - {observation_id: di_donato_2000_t5_slag7_r5, type: activity_coefficient, locator: {page: 16, table: '5', row: '38'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 7.40e-1, Cr2O3_mass_percent: 12.45, base_slag_id: 7}}
+    - {observation_id: di_donato_2000_t5_slag8_r1, type: activity_coefficient, locator: {page: 16, table: '5', row: '39'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 1.62e-3, Cr2O3_mass_percent: 0.81, base_slag_id: 8}}
+    - {observation_id: di_donato_2000_t5_slag8_r2, type: activity_coefficient, locator: {page: 16, table: '5', row: '40'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 7.15e-3, Cr2O3_mass_percent: 1.33, base_slag_id: 8}}
+    - {observation_id: di_donato_2000_t5_slag8_r3, type: activity_coefficient, locator: {page: 16, table: '5', row: '41'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 7.84e-2, Cr2O3_mass_percent: 3.15, base_slag_id: 8}}
+    - {observation_id: di_donato_2000_t5_slag8_r4, type: activity_coefficient, locator: {page: 16, table: '5', row: '42'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 5.60e-1, Cr2O3_mass_percent: 7.15, base_slag_id: 8}}
+    - {observation_id: di_donato_2000_t5_slag8_r5, type: activity_coefficient, locator: {page: 16, table: '5', row: '43'}, T_range_K: [1873.15, 1873.15], experiment: sta409-equilibrium-1600c, phase: l, standard_state: pure Cr2O3, units: dimensionless, values: {method_class: measured_tabulated, quantity: activity, activity: 9.72e-1, Cr2O3_mass_percent: 9.47, base_slag_id: 8}}
