@@ -10,10 +10,15 @@ import tempfile
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / "simulator/battery/migrate.py"
-TARGET = '''        if isinstance(raw, str) and "plus_over_" in raw:
-            return State.of(Quantity.VALENCE_RATIO), None
-'''
+SOURCE = ROOT / "simulator/battery/identity.py"
+TARGET = r'''_PRINTED_VALENCE_QUANTITY = re.compile(
+    r"(?P<log10>log10_)?(?P<element>[A-Z][a-z]?)(?P<numerator>\d+)"
+    r"(?P<numerator_sign>plus|minus)_over_"
+    r"(?:(?P<total_kind>total|sum)_(?P<total_element>[A-Z][a-z]?)|"
+    r"(?P<denominator_element>[A-Z][a-z]?)(?P<denominator>\d+)"
+    r"(?P<denominator_sign>plus|minus))"
+)'''
+MUTANT = '_PRINTED_VALENCE_QUANTITY = re.compile(r"(?!)")'
 TEST = (
     "tests/battery/test_valence_ratio.py::"
     "test_sossi_2018_quoted_cr_rows_migrate_as_numeric_valence_fractions"
@@ -23,9 +28,9 @@ TEST = (
 def main() -> int:
     original = SOURCE.read_text(encoding="utf-8")
     if original.count(TARGET) != 1:
-        raise RuntimeError("could not identify printed valence quantity parsing")
+        raise RuntimeError("could not identify the printed valence parser regex")
     try:
-        SOURCE.write_text(original.replace(TARGET, "", 1), encoding="utf-8")
+        SOURCE.write_text(original.replace(TARGET, MUTANT, 1), encoding="utf-8")
         env = dict(os.environ)
         env.setdefault(
             "MPLCONFIGDIR",

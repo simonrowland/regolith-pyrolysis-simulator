@@ -16198,6 +16198,24 @@ class Migrator:
                     identity = replace(
                         identity, fO2_Pa=State.of(pressure.point)
                     )
+            if q_token_point is Quantity.VALENCE_RATIO:
+                total_pressure = (point_conditions or {}).get("total_pressure_Pa")
+                if (
+                    isinstance(total_pressure, Located)
+                    and total_pressure.state.is_value
+                ):
+                    pressure_value = total_pressure.state.value
+                    if isinstance(pressure_value, Value):
+                        pressure_value = (
+                            pressure_value.point
+                            if pressure_value.kind is ValueKind.POINT
+                            else None
+                        )
+                    pressure_pa = _as_dec_or_none(pressure_value)
+                    if pressure_pa is not None:
+                        identity = replace(
+                            identity, total_pressure_Pa=State.of(pressure_pa)
+                        )
         if point_composition_refusal:
             child_printed_map = next(
                 (
