@@ -8714,6 +8714,32 @@ def test_guo_mgo_periclase_reference_matches_magemin_native_basis() -> None:
     ) == (True, "raoultian_native_crystal_activity")
 
 
+def _raw_janaf_formation_gibbs_at(table_id: str, temperature_K: Decimal) -> Decimal:
+    """Interpolate checked-in JANAF rows without the scorer's converter."""
+    table_path = (
+        Path(__file__).resolve().parents[2]
+        / "data/literature/compilations/janaf/tables"
+        / f"{table_id}.yaml"
+    )
+    table = yaml.safe_load(table_path.read_text(encoding="utf-8"))["table"]
+    points = tuple(
+        (
+            Decimal(str(row["temperature"]["value"])),
+            Decimal(str(row["formation_gibbs_energy"]["value"])),
+        )
+        for row in table["values"]
+        if row.get("formation_gibbs_energy", {}).get("value") is not None
+    )
+    left, right = next(
+        (a, b)
+        for a, b in zip(points, points[1:])
+        if a[0] <= temperature_K <= b[0]
+    )
+    return left[1] + (right[1] - left[1]) * (temperature_K - left[0]) / (
+        right[0] - left[0]
+    )
+
+
 def test_silica_observation_polymorph_converts_to_magemin_quartz() -> None:
     from simulator.battery.score import fusion_comparison_reference
 
@@ -8747,6 +8773,17 @@ def test_silica_observation_polymorph_converts_to_magemin_quartz() -> None:
     )
     assert "source_reference=cristobalite_high" in notice.reason
     assert "target_polymorph=quartz" in notice.reason
+    temperature = Decimal("1823")
+    independent_value = Decimal("0.4") * (
+        (
+            _raw_janaf_formation_gibbs_at("O-035", temperature)
+            - _raw_janaf_formation_gibbs_at("O-037", temperature)
+        )
+        * Decimal(1000)
+        / (Decimal("8.31441") * temperature)
+    ).exp()
+    assert independent_value == Decimal("0.3658848311154413382374911057")
+    assert converted.value.point == independent_value
 
 
 def test_liquid_silica_reference_converts_to_magemin_quartz_standard() -> None:
@@ -8772,7 +8809,17 @@ def test_liquid_silica_reference_converts_to_magemin_quartz_standard() -> None:
     standard = converted.identity.reference_state.value
     assert standard.endmember.phase.value is Phase.CR
     assert standard.endmember.polymorph.value is Polymorph.QUARTZ
-    assert converted.value.point != Decimal("1")
+    temperature = Decimal("1823")
+    independent_value = (
+        (
+            _raw_janaf_formation_gibbs_at("O-038", temperature)
+            - _raw_janaf_formation_gibbs_at("O-037", temperature)
+        )
+        * Decimal(1000)
+        / (Decimal("8.31441") * temperature)
+    ).exp()
+    assert independent_value == Decimal("0.9597711225379085591688714995")
+    assert converted.value.point == independent_value
 
 
 def test_pure_liquid_silica_activity_converts_to_one_on_liquid_basis() -> None:
