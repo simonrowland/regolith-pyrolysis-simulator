@@ -438,6 +438,7 @@ from simulator.fe_redox import (
     kress91_split,
     melt_mol_fractions_for_kress91,
     normalize_redox_state,
+    native_fe_saturation_state,
 )
 from simulator.melt_regime import (
     MeltRegime,
@@ -7239,67 +7240,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pressure_bar: float,
         fO2_log: float,
     ) -> Dict[str, Any]:
-        fe3 = float(fe3_over_sigma_fe)
-        if not math.isfinite(fe3) or not 0.0 <= fe3 <= 1.0:
-            raise ValueError(
-                'fe3_over_sigma_fe must be finite and within [0, 1]'
-            )
-        ferrous_available = max(0.0, 1.0 - fe3)
-        if ferrous_available <= 0.0 or self._feot_equivalent_wt_pct(comp) <= 0.0:
-            return {
-                'native_fe_saturation': False,
-                'native_fe_threshold': 'FeO_activity_saturation',
-                'native_fe_frac': 0.0,
-            }
-        try:
-            activity = calphad_ferrous_feo_activity_diagnostic(
-                comp_wt=comp,
-                fO2_log=fO2_log,
-                T_K=T_K,
-                pressure_bar=pressure_bar,
-                fe3_over_sigma_fe=fe3,
-            )
-            a_feo = float(activity.get('a_FeO_authoritative', 0.0) or 0.0)
-            pure_feo_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
-        except Exception as exc:
-            raise AccountingError(
-                'native Fe saturation split requires grounded FeO activity; '
-                'CALPHAD/Holzheid FeO activity diagnostic failed'
-            ) from exc
-        if a_feo <= 0.0 or not math.isfinite(a_feo):
-            return {
-                'native_fe_saturation': False,
-                'native_fe_threshold': 'FeO_activity_saturation',
-                'native_fe_frac': 0.0,
-                'native_fe_activity_source': 'unavailable:no_positive_a_FeO',
-            }
-        # FeO(l) = Fe(metal) + 1/2 O2; Holzheid et al. 1997
-        # doi:10.1016/S0009-2541(97)00030-2 grounds FeO(l) DeltaG in
-        # feo_iw_log10_fO2_bar(), so a_FeO,sat = 10^((log fO2 - IW)/2).
-        saturation_log10 = (float(fO2_log) - pure_feo_iw) / 2.0
-        if saturation_log10 > 300.0:
-            a_feo_saturation = float('inf')
-        elif saturation_log10 < -300.0:
-            a_feo_saturation = 0.0
-        else:
-            a_feo_saturation = 10.0 ** saturation_log10
-        if a_feo_saturation >= a_feo:
-            native = 0.0
-        else:
-            native = ferrous_available * (1.0 - a_feo_saturation / a_feo)
-        native = min(ferrous_available, max(0.0, native))
-        return {
-            'native_fe_saturation': native > 0.0,
-            'native_fe_threshold': 'FeO_activity_saturation',
-            'native_fe_frac': native,
-            'native_fe_activity': a_feo,
-            'native_fe_saturation_activity': a_feo_saturation,
-            'native_fe_pure_feo_iw_log': pure_feo_iw,
-            'native_fe_activity_source': (
-                'Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 '
-                'FeO(l)=Fe+0.5O2 saturation'
-            ),
-        }
+        return native_fe_saturation_state(
+            comp, fe3_over_sigma_fe=fe3_over_sigma_fe, T_K=T_K,
+            pressure_bar=pressure_bar, fO2_log=fO2_log,
+        )
 
     def _compute_native_fe_saturation_extent(
         self,
