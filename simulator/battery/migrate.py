@@ -5537,8 +5537,13 @@ def map_quantity(
             if contradiction:
                 return State.unknown(contradiction), contradiction
             return State.of(inferred), None
-        if isinstance(raw, str) and "plus_over_" in raw:
-            return State.of(Quantity.VALENCE_RATIO), None
+        if isinstance(raw, str) and raw:
+            try:
+                parse_valence_basis(raw)
+            except IdentityRefusal:
+                pass
+            else:
+                return State.of(Quantity.VALENCE_RATIO), None
         if isinstance(raw, str) and raw:
             qualified, _suffix = split_qualified_quantity(raw)
             if qualified is not None and _co_present_quantity_field(qualified, values):
@@ -13996,10 +14001,9 @@ class Migrator:
         if q_token is Quantity.VALENCE_RATIO:
             raw_valence_quantity = values.get("quantity")
             try:
-                if isinstance(raw_valence_quantity, str) and (
-                    "plus_over_" in raw_valence_quantity
-                    or raw_valence_quantity
-                    == ValenceValueForm.AVERAGE_OXIDATION_STATE.value
+                if (
+                    isinstance(raw_valence_quantity, str)
+                    and raw_valence_quantity != Quantity.VALENCE_RATIO.value
                 ):
                     valence_basis = parse_valence_basis(
                         raw_valence_quantity, species_formula=formula

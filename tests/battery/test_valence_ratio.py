@@ -152,6 +152,69 @@ def test_sulfide_to_sulfate_printed_ratio_accepts_negative_state():
     assert sulfate_fraction.value_form is ValenceValueForm.FRACTION
 
 
+def test_sulfur_valence_forms_are_recognized_and_migrated_as_printed(tmp_path: Path):
+    printed_values = (
+        ("S2minus_over_S6plus", "0.32"),
+        ("S2minus_over_total_S", "0.50"),
+        ("log10_S2minus_over_S6plus", "-2.0"),
+    )
+    for printed, _value in printed_values:
+        quantity, reason = map_quantity(
+            "concentration_series", {"quantity": printed}
+        )
+        assert quantity.is_value and quantity.value is Quantity.VALENCE_RATIO
+        assert reason is None
+
+    doc = yaml.safe_load(SOSSI_CR.read_text(encoding="utf-8"))
+    observations = []
+    for index, (printed, value) in enumerate(printed_values):
+        observations.append(
+            {
+                "observation_id": f"fixture_sulfur_valence_{index}",
+                "type": "concentration_series",
+                "locator": {"page": 1, "table": "1"},
+                "phase": "liquid",
+                "units": "fraction",
+                "values": {
+                    "method_class": "measured_direct",
+                    "quantity": printed,
+                    "admission_status": "admitted",
+                    "value": value,
+                },
+            }
+        )
+    doc["species"] = {"S": {"observations": observations}}
+    extract = tmp_path / SOSSI_CR.name
+    extract.write_text(
+        yaml.safe_dump(doc, sort_keys=False, allow_unicode=True), encoding="utf-8"
+    )
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    rows = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrator.result.observations.values()
+        if "fixture_sulfur_valence_" in row.observation_id
+    }
+
+    assert set(rows) == {
+        "fixture_sulfur_valence_0",
+        "fixture_sulfur_valence_1",
+        "fixture_sulfur_valence_2",
+    }
+    assert [rows[f"fixture_sulfur_valence_{i}"].value.point for i in range(3)] == [
+        Decimal("0.32"),
+        Decimal("0.50"),
+        Decimal("-2.0"),
+    ]
+    assert all(
+        rows[f"fixture_sulfur_valence_{i}"].identity.quantity.value
+        is Quantity.VALENCE_RATIO
+        for i in range(3)
+    )
+
+
 def test_fe_plus_spelling_stays_on_existing_fe_ratio_quantity():
     quantity, reason = map_quantity(
         "ratio", {"quantity": "Fe3plus_over_Fe2plus"}
