@@ -69,6 +69,8 @@ def test_stage0_mars_feedstock_uses_surface_co2_backpressure():
     assert sim.melt.pO2_mbar == 0.0
     assert snapshot.overhead.pressure_mbar == 6.0
     assert snapshot.overhead.composition["CO2"] == 5.76
+    assert snapshot.overhead.composition["ambient_other"] == 0.24
+    assert sum(snapshot.overhead.composition.values()) == 6.0
 
 
 def test_all_builtin_mars_feedstocks_define_co2_environment():

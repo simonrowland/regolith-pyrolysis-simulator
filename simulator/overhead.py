@@ -1132,7 +1132,7 @@ class OverheadGasModel:
         if has_live_inlet:
             carrier = self.last_stream_boundary.get('carrier_species', '')
             for species, rate in upstream_flows.items():
-                if species in {'O2', carrier}:
+                if species in {'O2', carrier, 'ambient_other'}:
                     flows[species] = rate
         if O2_flow_mol_hr > 0.0:
             flows['O2'] = (
@@ -1299,6 +1299,12 @@ class OverheadGasModel:
                  for s, q in flows.items()}
         atmosphere = getattr(melt.atmosphere, 'name', '')
         command_total, supplied_partials = self._pressure_commands(melt)
+        if 'ambient_other' in supplied_partials:
+            self.stream_physics_notices.append({
+                'reason': 'ambient_other_identity_unspecified', 'status': 'extrapolated',
+                'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                'species': 'ambient_other',
+            })
         controlled = atmosphere in {'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE'}
         carrier = str(getattr(melt, 'background_gas_species', '') or '')
         if atmosphere in {'PN2_SWEEP', 'ARGON_FLOW', 'CO2_BACKPRESSURE'}:
@@ -1492,7 +1498,7 @@ class OverheadGasModel:
         carrier = self.last_stream_boundary.get('carrier_species', '')
         _, supplied_partials = self._pressure_commands(melt)
         mol_per_mbar = 100.0 * gas.headspace_volume_m3 / (GAS_CONSTANT * gas.headspace_temperature_K)
-        if getattr(melt.atmosphere, 'name', '') in {'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE'}:
+        if supplied_partials:
             # Supplied gas is actual regulator stock. n=pV/RT [mol]; adding
             # makeup cannot remove an evolved inventory already above target.
             for species, target in supplied_partials.items():
@@ -1580,6 +1586,11 @@ class OverheadGasModel:
         if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
             command_total_pressure_mbar = melt.p_total_mbar
             command_partial_pressures_mbar['CO2'] = melt.p_total_mbar * 0.96
+            # The feedstock declares 96 mol% CO2 at the total ambient P.
+            # Dalton: p_other=(1-.96)P=.04P [mbar]; at P=0 both vanish.
+            # Identity and molar mass are unspecified: retain molar supply and
+            # ideal-gas stock, never invent an N2/Ar mass or ledger species.
+            command_partial_pressures_mbar['ambient_other'] = melt.p_total_mbar * 0.04
         elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
             # Sweep regulates total P; its carrier partial is the remainder
             # after all actual noncarrier gas, not a second pressure command.

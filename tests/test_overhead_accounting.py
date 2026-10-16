@@ -2024,16 +2024,19 @@ def test_controlled_stream_retains_source_and_supplies_feasible_o2(atmosphere, e
 
 
 @pytest.mark.parametrize("enabled", [False, True])
-def test_declared_co2_fraction_does_not_supply_unspecified_atmosphere(enabled):
+def test_declared_co2_fraction_retains_unspecified_ambient_minority(enabled):
     from simulator.overhead import OverheadGasModel
     from simulator.state import CondensationTrain, MeltState
 
     melt = MeltState(atmosphere=Atmosphere.CO2_BACKPRESSURE, p_total_mbar=6.0)
     model = OverheadGasModel({"enabled": enabled, "volume_m3": 1.0})
     gas = model.update(EvaporationFlux(), melt, CondensationTrain.create_default())
-    assert gas.composition == pytest.approx({"CO2": 5.76})
-    assert gas.pressure_mbar == pytest.approx(5.76)
-    assert any(n["reason"] == "stream_pressure_command_unmet"
+    assert gas.composition == pytest.approx({"CO2": 5.76, "ambient_other": 0.24})
+    assert gas.pressure_mbar == pytest.approx(6.0)
+    flows = model.last_stream_mol_hr
+    assert flows["ambient_other"] > 0.0
+    assert flows["CO2"] / flows["ambient_other"] == pytest.approx(24.0)
+    assert any(n["reason"] == "ambient_other_identity_unspecified"
                for n in model.stream_physics_notices)
 
 
@@ -2123,7 +2126,40 @@ def test_declared_co2_fraction_survives_positive_source(enabled):
         flux, model.last_stream_boundary["pressure_mbar"],
         molar_flow_by_species=model.last_stream_mol_hr,
     )
-    assert partials == pytest.approx({"CO2": 9.6, "Fe": 0.4})
+    # The 4% ambient minority cannot be replaced by emitted iron. Preserve
+    # all source mol; a full ambient command plus source exceeds the declared
+    # fractions and must retain the existing infeasible-supply notice.
+    assert partials["CO2"] / partials["ambient_other"] == pytest.approx(24.0)
+    assert partials["Fe"] > 0.0
+    assert model.last_stream_mol_hr["Fe"] == pytest.approx(
+        1.0e-6 / (MOLAR_MASS["Fe"] / 1000.0)
+    )
+    assert sum(partials.values()) == pytest.approx(10.0)
+    assert any(n["reason"] == "stream_pressure_command_unmet"
+               for n in model.stream_physics_notices)
+
+
+@pytest.mark.parametrize("enabled", [False, True])
+def test_ambient_minority_survives_downstream_condensable_capture(enabled):
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, MeltState
+
+    melt = MeltState(atmosphere=Atmosphere.CO2_BACKPRESSURE, p_total_mbar=6.0)
+    model = OverheadGasModel({"enabled": enabled, "volume_m3": 1.0})
+    inlet = EvaporationFlux(species_kg_hr={"Fe": 1.0e-6})
+    inlet.update_totals()
+    flows = model.flowing_stream_mol_hr(
+        {"Fe": 1.0e-6 / (MOLAR_MASS["Fe"] / 1000.0)}, melt,
+        model.estimate_transport_state(inlet, melt),
+    )
+    gas = model.update(
+        EvaporationFlux(), melt, CondensationTrain.create_default(),
+        transport_inlet_flux=inlet,
+    )
+    assert model.last_stream_mol_hr["ambient_other"] == flows["ambient_other"]
+    assert gas.composition["CO2"] / gas.composition["ambient_other"] == pytest.approx(24.0)
+    assert "Fe" not in gas.composition
+    assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar)
 
 
 @pytest.mark.parametrize("accessor", ["core", "evaporation"])
@@ -2221,12 +2257,10 @@ def test_pn2_sweep_finite_headspace_retains_regulated_carrier(evap_kg_hr, atmosp
         overhead_holdup_mol=holdup,
     )
 
-    expected_pressure_mbar = 9.6 if atmosphere is Atmosphere.CO2_BACKPRESSURE else 10.0
-    if atmosphere is Atmosphere.CO2_BACKPRESSURE and holdup:
-        expected_pressure_mbar += model._compute_partial_pressures(
-            holdup, gas.headspace_volume_m3, gas.headspace_temperature_K,
-        )["Fe"] * 1000.0
-    assert gas.pressure_mbar == pytest.approx(expected_pressure_mbar)
+    assert gas.pressure_mbar == pytest.approx(10.0)
+    if atmosphere is Atmosphere.CO2_BACKPRESSURE:
+        assert gas.composition["ambient_other"] == pytest.approx(0.4)
+        assert model._stream_carrier_inventory["ambient_other"] > 0.0
     assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar)
     assert gas.composition[carrier] > 0.0
     assert model.last_stream_mol_hr[carrier] > 0.0
