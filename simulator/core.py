@@ -1565,7 +1565,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         self._apply_stage0_carbon_reductant_reactions(fs, ledger_additives)
         self._apply_stage0_perchlorate_reactions(fs)
-        # Seeding records Stage 0 SulfSat notices against the new batch clock.
+        # Stage 0 reads these conditions and reservoir while seeding the ledger.
+        self._install_upstream_projection({})
+        self.melt.temperature_C = 25.0
+        self.melt.atmosphere = Atmosphere.HARD_VACUUM
+        environment = fs.get('environment', {}) or {}
+        self.melt.ambient_pressure_mbar = _feedstock_surface_pressure_mbar(fs)
+        self.melt.ambient_atmosphere = str(
+            fs.get('atmosphere')
+            or environment.get('atmosphere')
+            or '')
+        self.melt.body = feedstock_body(fs)
+        self.melt.p_total_mbar = self.melt.ambient_pressure_mbar
+        self.melt.pO2_mbar = 0.0
+        base_intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
+        self.melt.fO2_log = base_intrinsic_fO2_log
+        self.melt.melt_fO2_log = base_intrinsic_fO2_log
+        self._refresh_oxygen_reservoir_without_exchange(
+            melt_intrinsic_fO2_log=base_intrinsic_fO2_log,
+            reference_T_K=None,
+        )
         self.melt.hour = 0
         self._sulfur_saturation_steps = []
         self._seed_atom_ledger(feedstock_key, fs, ledger_additives)
@@ -1585,20 +1604,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._engine_commissioning_steps = []
         self._backend_failed = False
 
-        self.melt.temperature_C = 25.0
-        self.melt.atmosphere = Atmosphere.HARD_VACUUM
-        environment = fs.get('environment', {}) or {}
-        self.melt.ambient_pressure_mbar = _feedstock_surface_pressure_mbar(fs)
-        self.melt.ambient_atmosphere = str(
-            fs.get('atmosphere')
-            or environment.get('atmosphere')
-            or '')
-        self.melt.body = feedstock_body(fs)
-        self.melt.p_total_mbar = self.melt.ambient_pressure_mbar
-        self.melt.pO2_mbar = 0.0
-        base_intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
-        self.melt.fO2_log = base_intrinsic_fO2_log
-        self.melt.melt_fO2_log = base_intrinsic_fO2_log
         self.melt.campaign = CampaignPhase.IDLE
         self.melt.campaign_hour = 0
         self.melt.update_total_mass()
@@ -1606,7 +1611,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Reset condensation train
         self.train = CondensationTrain.create_default()
         self.overhead = OverheadGas()
-        self._install_upstream_projection({})
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
         self._last_vapour_batch = None
@@ -1638,10 +1642,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._equipment = None
         self._configure_overhead_headspace()
         self._configure_freeze_gate()
-        self._refresh_oxygen_reservoir_without_exchange(
-            melt_intrinsic_fO2_log=base_intrinsic_fO2_log,
-            reference_T_K=None,
-        )
 
         # Record
         self.record = BatchRecord(

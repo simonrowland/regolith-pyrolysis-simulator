@@ -564,6 +564,64 @@ def test_stage0_pressure_resolution_notice_survives_load_and_reaches_runner():
     assert reloaded_notice['first_hour'] == reloaded_notice['last_hour'] == 1
 
 
+def test_load_batch_resets_stage0_inputs_after_real_step(monkeypatch):
+    from tests.test_overhead_accounting import (
+        _bypass_analytic_depletion,
+        _gas_train_sim,
+    )
+    from simulator.state import Atmosphere, EvaporationFlux
+
+    sim = _gas_train_sim()
+    flux = EvaporationFlux(total_kg_hr=1.0, species_kg_hr={"Fe": 1.0})
+    sim.melt.campaign = CampaignPhase.C2A
+    monkeypatch.setattr(sim, '_update_temperature', lambda: None)
+    monkeypatch.setattr(sim, '_get_equilibrium', lambda: object())
+    monkeypatch.setattr(sim, '_calculate_evaporation', lambda _equilibrium: flux)
+    _bypass_analytic_depletion(sim)
+    sim.step()
+    assert sim._melt_headspace_total_pressure_bar() > 0.0
+
+    fresh = _sim_with_sulfur_feedstock()
+    sim.feedstocks['mixed'] = fresh.feedstocks['mixed']
+    fresh.load_batch('mixed', mass_kg=1000.0)
+    sim.melt.hour = 20
+    sim.melt.temperature_C = 1700.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 10.0
+    sim.melt.p_total_mbar = 10.0
+    sim._refresh_oxygen_reservoir_without_exchange(
+        melt_intrinsic_fO2_log=-2.0, reference_T_K=1973.15,
+    )
+    requests = []
+    compute = sim._sulfsat_gate.compute_sulfur_saturation
+
+    def capture_request(**kwargs):
+        requests.append({
+            **kwargs,
+            'batch_temperature_C': sim.melt.temperature_C,
+            'batch_pressure_mbar': sim.melt.p_total_mbar,
+        })
+        return compute(**kwargs)
+
+    monkeypatch.setattr(sim._sulfsat_gate, 'compute_sulfur_saturation', capture_request)
+    sim.load_batch('mixed', mass_kg=1000.0)
+
+    assert len(requests) == 1
+    assert requests[0]['P_bar'] == 0.0
+    assert requests[0]['fO2_log'] == fresh._current_melt_redox_fO2_log()
+    assert requests[0]['batch_temperature_C'] == fresh.melt.temperature_C
+    assert requests[0]['batch_pressure_mbar'] == fresh.melt.p_total_mbar
+    notice = sim.sulfur_saturation_run_notice()
+    assert notice is not None
+    assert notice['count'] == 1
+    assert notice['first_hour'] == notice['last_hour'] == 1
+    assert any(
+        'sulfsat_pressure_resolution_applied' in warning
+        for item in notice['notices']
+        for warning in item['warnings']
+    )
+
+
 def test_stage0_fallback_records_warning_when_gate_unavailable(monkeypatch):
     """
     When ``SulfSatGate.is_available()`` is False at Stage 0, builtin
