@@ -3488,6 +3488,7 @@ def equilibrate_cell(
     arm: str | None = None,
     simulate_crash: str | None = None,
     physical_pressure_bar: float | None = None,
+    native_activity_formula: str | None = None,
 ) -> EquilibrateCell:
     """One pot × engine × T × pO2 call. Refusals are rows, never exceptions."""
 
@@ -3546,6 +3547,11 @@ def equilibrate_cell(
             simulate_crash
             or (qualification and handle.name in MELTS_FAMILY_ENGINES)
         )
+    # MAGEMin's native-activity fields are carried by its existing bounded
+    # binary call. Keep that request on this process so it does not need a
+    # second private-worker payload shape.
+    if handle.name == "magemin" and native_activity_formula is not None:
+        use_isolated = False
     if use_isolated:
         return _run_cell_in_subprocess(
             handle,
@@ -3604,12 +3610,16 @@ def equilibrate_cell(
         parameters = signature.parameters
     except (TypeError, ValueError):
         parameters = {}
-    if "fO2_log" in parameters:
+    if "fO2_log" in parameters and not (
+        handle.name == "magemin" and fo2_log is None
+    ):
         kwargs["fO2_log"] = fo2_log
     if "po2_request" in parameters:
         kwargs["po2_request"] = po2
     if "call_timeout_s" in parameters:
         kwargs["call_timeout_s"] = timeout
+    if "native_activity_formula" in parameters:
+        kwargs["native_activity_formula"] = native_activity_formula
     if handle.name == "alphamelts" or "subprocess_run_mode" in parameters:
         kwargs["subprocess_run_mode"] = "isothermal"
 

@@ -46,7 +46,7 @@ def main() -> int:
     root = Path(__file__).resolve().parents[2]
     score_path = root / "simulator" / "battery" / "score.py"
     committed = git_file(root, "HEAD")
-    reverted = git_file(root, "HEAD^")
+    reverted = git_file(root, "HEAD^^")
     if score_path.read_bytes() != committed:
         raise SystemExit("score.py differs from HEAD; refusing to overwrite work")
 

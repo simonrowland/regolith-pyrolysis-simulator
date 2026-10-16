@@ -6,7 +6,12 @@ from collections.abc import Mapping
 
 from simulator.battery.consumer_inputs import ConsumerInputs, REQUIREMENTS
 from simulator.battery.enums import Phase, ReferenceStateConvention, ValueKind
-from simulator.battery.records import StandardState, Value, phase_token
+from simulator.battery.records import (
+    StandardState,
+    Value,
+    phase_token,
+    polymorph_token,
+)
 from simulator.battery.migrate import to_plain
 from simulator.battery.waypoints import (
     ConsumerReadiness, ReadinessStatus, ReadinessGap, GapReason,
@@ -182,6 +187,12 @@ _ENGINE_REPORTED_ACTIVITY["internal-analytical"] = EngineReportedActivity(
     Phase.L,
     _PARENT_OXIDE_COMPONENT_BASES,
 )
+_ENGINE_REPORTED_ACTIVITY["magemin"] = EngineReportedActivity(
+    "raoultian_native_crystal_activity",
+    ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+    Phase.CR,
+    _PARENT_OXIDE_COMPONENT_BASES,
+)
 
 
 def _oxide_lookup_key(name: str) -> str:
@@ -284,6 +295,12 @@ def _imcc_reports_parent_oxide(formula: str) -> tuple[bool, str]:
 
 
 def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
+    if engine == "magemin":
+        from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+        if formula in MAGEMIN_NATIVE_MELT_ACTIVITIES:
+            return True, "raoultian_native_crystal_activity"
+        return False, f"typed-refusal:magemin_no_native_activity:{formula}"
     if engine in ("alphamelts", "thermoengine"):
         return _melts_reports_oxide_endmember(formula)
     if engine == "openimcc":
@@ -318,6 +335,15 @@ def _reference_matches(
     )
     if not structural:
         return False, reported.reported
+    if engine == "magemin":
+        from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+        native = MAGEMIN_NATIVE_MELT_ACTIVITIES.get(state.endmember.formula)
+        polymorph = polymorph_token(state.endmember)
+        if native is None or polymorph is None:
+            return False, reported.reported
+        if polymorph.value != native[1]:
+            return False, reported.reported
     return _engine_reports_formula(engine, state.endmember.formula)
 
 
@@ -532,6 +558,9 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
     gap_tuple = tuple(dict.fromkeys(gaps))
     results = []
     for engine in MELT_ACTIVITY_ENGINES:
+        if engine == "magemin" and inputs.activity_quantity != "activity":
+            results.append(_not_applicable(provenance, engine))
+            continue
         if engine == "internal-analytical" and inputs.activity_quantity != "activity":
             results.append(_not_applicable(provenance, engine))
             continue
