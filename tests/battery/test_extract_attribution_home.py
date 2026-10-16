@@ -24,7 +24,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
+from simulator.battery.enums import EvidenceClass, NoticeKind, Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT
 from tests.battery.test_migrate import _extract_observations, _migrate_real_extract
 
@@ -294,11 +294,12 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
             assert observation.value.kind is ValueKind.UNAVAILABLE
 
 
-def test_lange_quoted_cp_points_do_not_enter_scorer_selection(tmp_path: Path) -> None:
-    from simulator.battery.enums import Engine
+def test_lange_quoted_cp_points_reach_scorer_with_notice(tmp_path: Path) -> None:
     from simulator.battery.score import (
+        SCORE_ENGINE_SET,
         ScoreContext,
         comparison_candidates,
+        headline_rows,
         score_store,
     )
 
@@ -328,15 +329,28 @@ def test_lange_quoted_cp_points_do_not_enter_scorer_selection(tmp_path: Path) ->
         and observation.value.kind is ValueKind.POINT
     ]
     assert sorted(observation.value.point for observation in available_cp) == [334, 353]
-    assert comparison_candidates(context) == ()
+    assert {row.observation_id for row in comparison_candidates(context)} == quote_ids
 
-    def unexpected_prediction(*args, **kwargs):
-        raise AssertionError("quoted references must be filtered before prediction")
-
-    residuals, selected = score_store(
+    residuals, _ = score_store(
         context,
-        engines=(Engine.INTERNAL_ANALYTICAL,),
-        predict=unexpected_prediction,
+        engines=SCORE_ENGINE_SET,
     )
-    assert selected == {}
-    assert residuals == ()
+    assert len(residuals) == len(quote_ids) * len(SCORE_ENGINE_SET)
+    assert all(row.numeric is not None or row.refusal is not None for row in residuals)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FIGURE_ONLY
+            and notice.reason == "evidence_class:quoted_attributed"
+            for notice in row.notices
+        )
+        for row in residuals
+    )
+    assert all(
+        row["n"] == 0
+        for row in headline_rows(
+            residuals,
+            context=context,
+            tier="measured",
+            engines=SCORE_ENGINE_SET,
+        )
+    )

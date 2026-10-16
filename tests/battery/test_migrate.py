@@ -8494,7 +8494,7 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         "None": 6,
         "SiO_evolution": 45,
         "melt_activity": 137,
-        "vapour": 63,
+        "vapour": 118,
     }
 
 
@@ -8990,7 +8990,7 @@ def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None
         )
     )
     candidate_ids = {obs.observation_id for obs in candidates}
-    assert r2_ids.isdisjoint(candidate_ids)
+    assert r2_ids <= candidate_ids
     assert {obs.observation_id for obs in superseded}.isdisjoint(candidate_ids)
     residuals, _ = score_store(
         ScoreContext(
@@ -9007,6 +9007,14 @@ def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None
     assert all(row.status is ResidualStatus.NO_BAND for row in silica_residuals)
     assert all(row.numeric is not None for row in silica_residuals)
     assert all(row.numeric.value.is_finite() for row in silica_residuals if row.numeric)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FIGURE_ONLY
+            and notice.reason == "evidence_class:model_derived"
+            for notice in row.notices
+        )
+        for row in silica_residuals
+    )
 
 
 def test_unprinted_temperature_envelopes_are_not_loaded(tmp_path: Path) -> None:
@@ -14499,8 +14507,13 @@ def test_stolyarova_1995_printed_compositions_reach_migrated_observations(
         )
         for obs in candidates
     )
-    assert len(candidates) == 24
-    assert rails == {"vapour": 24}
+    assert len(candidates) == 50
+    assert rails == {"vapour": 50}
+    assert sum(
+        obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        for obs in candidates
+    ) == 26
 
 
 def test_stolyarova_1995_composition_mutation_removes_identity_map(
