@@ -187,7 +187,9 @@ def _solve_vacuum_oxygen_balance(
 
     residual, pressures, oxygen_flux, parent_flux = evaluate(root)
     if bracket_boundary != "lower":
-        lower_pressures = evaluate(root - 0.1)[1]
+        probe_low = max(low, root - 0.1)
+        probe_high = root + 0.1
+        lower_pressures = evaluate(probe_low)[1]
         upper_pressures = evaluate(root + 0.1)[1]
         for channel in active_channels:
             pressure = pressures[channel.species]
@@ -201,7 +203,7 @@ def _solve_vacuum_oxygen_balance(
                 )
             observed_exponent = (
                 math.log10(upper_pressure) - math.log10(lower_pressure)
-            ) / 0.2
+            ) / (probe_high - probe_low)
             if abs(observed_exponent - channel.pO2_exponent) > 1.0e-6:
                 raise ValueError(
                     f"pressure law exponent mismatch for {channel.species!r}: "

@@ -401,6 +401,23 @@ def test_vacuum_oxygen_balance_accepts_clamped_lower_pressure_model() -> None:
     assert result.pO2_bar == pytest.approx(1.0e-30)
 
 
+def test_vacuum_oxygen_balance_accepts_clamped_root_near_lower_bracket() -> None:
+    unclamped = _boundary_test_pressure_model(-29.95)
+
+    def clamped(logp: float) -> dict[str, float]:
+        return unclamped(max(-30.0, logp))
+
+    result = _solve_vacuum_oxygen_balance(
+        clamped,
+        _boundary_test_channels(),
+        temperature_K=1500.0,
+        bracket_log10_pO2_bar=(-30.0, 0.0),
+    )
+
+    assert result.bracket_boundary is None
+    assert result.pO2_bar == pytest.approx(10.0**-29.95, rel=1.0e-10)
+
+
 def test_vacuum_oxygen_balance_leaves_an_interior_root_unmarked() -> None:
     result = _solve_vacuum_oxygen_balance(
         _boundary_test_pressure_model(-12.5),
