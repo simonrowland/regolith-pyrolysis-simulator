@@ -1929,6 +1929,8 @@ def test_finite_headspace_reports_o2_command_targets_separately(atmosphere):
     model = OverheadGasModel({"enabled": True, "volume_m3": 1.0})
     gas = model.update(flux, melt, train, overhead_holdup_mol={"O2": 1.0})
 
+    # Bit-identical finite-inventory projection before consolidating commands.
+    assert gas.pressure_mbar.hex() == "0x1.26db0ed382739p+7"
     assert gas.pressure_mbar == pytest.approx(sum(gas.composition.values()))
     notice = next(
         notice for notice in model.stream_physics_notices
