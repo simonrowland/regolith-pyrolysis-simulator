@@ -2168,7 +2168,12 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
     }
     schema = RecipeSchema()
     actual = {
-        ".".join(spec.path): (spec.low, spec.high)
+        ".".join(spec.path): (
+            type(spec.low),
+            spec.low,
+            type(spec.high),
+            spec.high,
+        )
         for spec in schema.allowlist
         if spec.bounds_source.startswith("setpoints:")
         or spec.bounds_source.startswith(
@@ -2177,7 +2182,10 @@ def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
     }
 
     assert len(actual) == 43
-    assert actual == expected
+    assert actual == {
+        path: (type(low), low, type(high), high)
+        for path, (low, high) in expected.items()
+    }
 
 
 def test_recipe_schema_uses_supplied_setpoints_for_derived_bounds() -> None:
