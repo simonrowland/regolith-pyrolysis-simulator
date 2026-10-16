@@ -14,6 +14,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 _TARGET_SIDS = (
     "kems-015-hashimoto-1983",
     "kems-022-demaria-1971",
+    "kems-027-plante-hastie-1983",
     "wimpenny-2019-zn-isotope-evaporation-extreme-t",
     "nakano-hashimoto-2020-bubbles-to-chondrites-i",
     "kems-031-halwax-2024",
@@ -182,6 +183,25 @@ def test_hashimoto_geometry_is_not_residue_composition(migrated_targets) -> None
         not quantity.is_value
         or quantity.value is not Quantity.RESIDUE_COMPONENT_COMPOSITION
     )
+
+
+def test_plante_hastie_exact_aliases_keep_printed_gas_species(migrated_targets) -> None:
+    points = [
+        observation
+        for observation in _source_observations(
+            migrated_targets, "kems-027-plante-hastie-1983"
+        )
+        if "plante_hastie_1983_fig19_" in observation.observation_id
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.P_PARTIAL
+        and observation.value.kind is ValueKind.POINT
+    ]
+    assert len(points) == 25
+    assert {point.identity.species.formula for point in points} == {
+        "CsBO2",
+        "LiBO2",
+        "NaBO2",
+    }
 
 
 def test_nakano_numeric_runs_emit_stable_mass_loss_points(migrated_targets) -> None:

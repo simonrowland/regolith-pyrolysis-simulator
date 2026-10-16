@@ -13513,8 +13513,17 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        species_formula = measured_tabulated_gas_formula or str(
-            values.get("formula") or formula
+        raw_quantity = values.get("quantity") if isinstance(values, Mapping) else None
+        exact_alias_gas_formula = (
+            _extract_formula_token(values.get("gas_species"))
+            if isinstance(raw_quantity, str)
+            and raw_quantity in QUANTITY_ALIASES
+            else None
+        )
+        species_formula = (
+            measured_tabulated_gas_formula
+            or exact_alias_gas_formula
+            or str(values.get("formula") or formula)
         )
         if values.get("formula"):
             measured.formulas += 1
@@ -13527,7 +13536,6 @@ class Migrator:
             species_formula, phase, polymorph=species_polymorph
         )
         suffix_formula, suffix_derivation, suffix_reference = (None, None, None)
-        raw_quantity = values.get("quantity") if isinstance(values, Mapping) else None
         if isinstance(raw_quantity, str):
             _qualified, suffix = split_qualified_quantity(raw_quantity)
             suffix_formula, suffix_derivation, suffix_reference = parse_quantity_suffix(
@@ -15213,7 +15221,8 @@ class Migrator:
                 material = raw_item.get("material")
                 species_formula = (
                     str(material)
-                    if q_for_species is Quantity.MASS_LOSS_FRACTION
+                    if source_id == "nakano-hashimoto-2020-bubbles-to-chondrites-i"
+                    and q_for_species is Quantity.MASS_LOSS_FRACTION
                     and isinstance(material, str)
                     else bulk_property_species_formula(
                         quantity=q_for_species,
