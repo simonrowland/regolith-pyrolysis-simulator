@@ -13,8 +13,8 @@ provenance:
   input_counts:
     inventory: 242
     gas_closure: 137
-    refractory_registry: 24
-    union_before_dedup_sum: 403
+    refractory_registry: 25
+    union_before_dedup_sum: 404
 membership_sets:
   vaporock_42:
   - Al
@@ -125,6 +125,7 @@ membership_sets:
   - Al2
   - Al2O
   - Al2O2
+  - Al2O3
   - AlO
   - AlO2
   - Ca
@@ -150,6 +151,7 @@ membership_sets:
   - Al2
   - Al2O
   - Al2O2
+  - Al2O3_gas
   - AlO
   - AlO2
   - Ca
@@ -464,7 +466,7 @@ species:
   sources:
     inventory: true
     gas_closure: false
-    refractory_registry: false
+    refractory_registry: true
   regime:
     millibar:
       applicable: true
@@ -476,7 +478,9 @@ species:
       outcome: as_disposition
   flags:
   - collision_gas
+  - refractory_registry
   - vaporock_42
+  notes: refractory_registry
 - id: AlO
   formula: AlO
   atoms:

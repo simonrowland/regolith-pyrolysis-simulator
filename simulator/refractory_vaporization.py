@@ -124,7 +124,7 @@ def refractory_log10_kf(
     *,
     condensed: bool = False,
 ) -> tuple[float, ThermoRangeUse]:
-    """Interpolate JANAF log10(Kf); extend in 1/T with typed t-406 bounds."""
+    """Interpolate compiled log10(Kf); extend in 1/T with typed t-406 bounds."""
     temperature = _positive_temperature(temperature_K)
     section = "condensed_phases" if condensed else "gas_species"
     try:

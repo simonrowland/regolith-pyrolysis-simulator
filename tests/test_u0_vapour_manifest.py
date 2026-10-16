@@ -350,9 +350,9 @@ def test_membership_feedstock_delta_33(manifest: dict) -> None:
     assert missing == [], f"feedstock DELTA rows missing: {missing}"
 
 
-def test_membership_refractory_24(manifest: dict) -> None:
+def test_membership_refractory_25(manifest: dict) -> None:
     ids = _ids(manifest)
-    assert len(REFRACTORY_GAS_IDS_RAW) == 24
+    assert len(REFRACTORY_GAS_IDS_RAW) == 25
     for raw in REFRACTORY_GAS_IDS_RAW:
         canon = refractory_canonical_id(raw)
         assert canon in ids, f"refractory {raw!r} -> {canon!r} absent"

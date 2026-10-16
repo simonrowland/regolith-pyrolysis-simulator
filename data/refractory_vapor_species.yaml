@@ -19,11 +19,12 @@ kinetic_model:
 
     '
 provenance:
-  database: NIST-JANAF Thermochemical Tables, Fourth Edition, SRD 13
+  database: NIST-JANAF Thermochemical Tables, Fourth Edition, SRD 13; NASA Glenn / CEA thermo.inp
   doi: 10.18434/T42S31
-  note: Every gas and condensed log10(Kf) value is copied from a compiled JANAF as_published cell on the 100 K grid
-    from 1500 through 3500 K. The crystalline-only MgAl2O4 row stops below its 2408 K transition; its typed out-of-band
-    notice records the missing liquid table.
+  note: JANAF rows copy compiled as_published log10(Kf) cells; Al2O3(g) is derived from NASA Glenn NASA-9 G/RT values
+    against Al(l) and O2(g) elemental reference states. All rows use the 100 K grid from 1500 through 3500 K. The
+    crystalline-only MgAl2O4 row stops below its 2408 K transition; its typed out-of-band notice records the missing
+    liquid table.
 overlay_provenance:
   type: project_curated_nonthermochemical_metadata
   citation: Material applicability, carrier selection, and species-gap notes are project-curated; each literature-backed
@@ -39,6 +40,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: O-001
       source_temperature_range_K:
       - 100.0
@@ -77,6 +79,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: O-029
       source_temperature_range_K:
       - 0.0
@@ -115,6 +118,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Al-005
       source_temperature_range_K:
       - 100.0
@@ -153,6 +157,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Al-080
       source_temperature_range_K:
       - 100.0
@@ -191,6 +196,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Al-074
       source_temperature_range_K:
       - 100.0
@@ -229,6 +235,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Al-077
       source_temperature_range_K:
       - 100.0
@@ -267,6 +274,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Al-092
       source_temperature_range_K:
       - 100.0
@@ -305,6 +313,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Al-094
       source_temperature_range_K:
       - 100.0
@@ -343,6 +352,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Ca-006
       source_temperature_range_K:
       - 100.0
@@ -381,6 +391,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Ca-030
       source_temperature_range_K:
       - 100.0
@@ -419,6 +430,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Ca-033
       source_temperature_range_K:
       - 100.0
@@ -457,6 +469,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Mg-005
       source_temperature_range_K:
       - 100.0
@@ -495,6 +508,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Mg-011
       source_temperature_range_K:
       - 100.0
@@ -533,6 +547,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Mg-027
       source_temperature_range_K:
       - 100.0
@@ -571,6 +586,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Si-005
       source_temperature_range_K:
       - 100.0
@@ -609,6 +625,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Si-008
       source_temperature_range_K:
       - 100.0
@@ -647,6 +664,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Si-009
       source_temperature_range_K:
       - 100.0
@@ -685,6 +703,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: O-012
       source_temperature_range_K:
       - 100.0
@@ -723,6 +742,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: O-040
       source_temperature_range_K:
       - 100.0
@@ -761,6 +781,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Ti-006
       source_temperature_range_K:
       - 100.0
@@ -799,6 +820,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: O-022
       source_temperature_range_K:
       - 100.0
@@ -837,6 +859,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: O-046
       source_temperature_range_K:
       - 100.0
@@ -875,6 +898,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Na-008
       source_temperature_range_K:
       - 100.0
@@ -913,6 +937,7 @@ gas_species:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: K-008
       source_temperature_range_K:
       - 100.0
@@ -943,6 +968,70 @@ gas_species:
       3300: -0.996
       3400: -1.006
       3500: -1.015
+  Al2O3:
+    formula: Al2O3
+    source: NASA Glenn NG-0071, AL2O3 (NASA-9)
+    source_url: https://www.grc.nasa.gov/www/CEAWeb/
+    valid_temperature_K:
+    - 1500.0
+    - 3500.0
+    provenance:
+      source_tag: nasa_glenn
+      record_id: NG-0071
+      species_as_published: AL2O3
+      coefficient_set: NASA-9
+      coefficient_intervals_K:
+      - - 300.0
+        - 1000.0
+      - - 1000.0
+        - 6000.0
+      source_temperature_range_K:
+      - 300.0
+      - 6000.0
+      phase: gas
+      element_reference_states:
+        Al:
+          record_id: NG-1273
+          species_as_published: AL(L)
+          phase: L
+          coefficient_set: NASA-9
+          source_temperature_range_K:
+          - 933.61
+          - 6000.0
+        O2:
+          record_id: NG-0937
+          species_as_published: O2
+          phase: gas
+          coefficient_set: NASA-9
+          source_temperature_range_K:
+          - 200.0
+          - 20000.0
+      derivation: For 2 Al(l) + 3/2 O2(g) -> Al2O3(g), evaluate the NASA-9 dimensionless G/RT for NG-0071, NG-1273
+        and NG-0937. Form ΔG°/(RT) = G°(Al2O3,g)/(RT) - 2 G°(Al,l)/(RT) - 3/2 G°(O2,g)/(RT), then log10(Kf) = -ΔG°/(RT
+        ln 10). All ratios and log10(Kf) are dimensionless; T is in K. The Al(l)+O2(g) reference phases match JANAF's
+        elemental states.
+    log10_kf:
+      1500: 15.920440144263916
+      1600: 14.666586012486528
+      1700: 13.558658175310757
+      1800: 12.572393795267065
+      1900: 11.688628092011477
+      2000: 10.892021939049833
+      2100: 10.170152547897924
+      2200: 9.512851810203179
+      2300: 8.911716997707412
+      2400: 8.359743603890394
+      2500: 7.851046168042874
+      2600: 7.380643423926574
+      2700: 6.944291118187791
+      2800: 6.538350597284913
+      2900: 6.15968454117517
+      3000: 5.805573518484829
+      3100: 5.473648668256653
+      3200: 5.161836985644352
+      3300: 4.868316541815586
+      3400: 4.591479595691272
+      3500: 4.329902021370456
 condensed_phases:
   Al2O3:
     formula: Al2O3
@@ -952,6 +1041,7 @@ condensed_phases:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Al-101
       source_temperature_range_K:
       - 100.0
@@ -992,6 +1082,7 @@ condensed_phases:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Ca-029
       source_temperature_range_K:
       - 100.0
@@ -1032,6 +1123,7 @@ condensed_phases:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: Mg-010
       source_temperature_range_K:
       - 100.0
@@ -1072,6 +1164,7 @@ condensed_phases:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: O-039
       source_temperature_range_K:
       - 100.0
@@ -1114,6 +1207,7 @@ condensed_phases:
     - 1500.0
     - 3500.0
     provenance:
+      source_tag: nist_janaf
       table_id: O-045
       source_temperature_range_K:
       - 100.0
@@ -1154,6 +1248,7 @@ condensed_phases:
     - 1500.0
     - 2400.0
     provenance:
+      source_tag: nist_janaf
       table_id: Al-089
       source_temperature_range_K:
       - 100.0
@@ -1185,7 +1280,7 @@ materials:
   Al2O3:
     formula: Al2O3
     execution_model: pure_oxide
-    certification_status: provisional_incomplete_species
+    certification_status: provisional_species_screen
     gas_species:
     - Al
     - Al2
@@ -1193,12 +1288,9 @@ materials:
     - AlO2
     - Al2O
     - Al2O2
+    - Al2O3
     - O
     - O2
-    unmodeled_species:
-      Al2O3:
-        reason: NASA identifies Al2O3(g), but no NIST-JANAF log10(Kf) table exists
-        evidence: NASA/TM-2005-213625 Figure 8
     screening_candidates:
       O3_O4:
         status: missing_quantitative_oxygen_closure_screen
@@ -1289,15 +1381,13 @@ materials:
     - AlO2
     - Al2O
     - Al2O2
+    - Al2O3
     - O
     - O2
     unmodeled_species:
       MgAlO:
         reason: observed as a trace spinel vapor but no sourced coefficient set was found
         evidence: Shornikov 2017, DOI 10.1134/S0036024417010241
-      Al2O3:
-        reason: NASA identifies Al2O3(g), but no NIST-JANAF log10(Kf) table exists
-        evidence: NASA/TM-2005-213625 Figure 8
   CaAl2O4:
     formula: CaAl2O4
     execution_model: refused_missing_phase_model
@@ -1313,15 +1403,13 @@ materials:
     - AlO2
     - Al2O
     - Al2O2
+    - Al2O3
     - O
     - O2
     unmodeled_species: &id001
       CaAlO:
         reason: observed over CaO-Al2O3 melts but no sourced coefficient set was found
         evidence: Shornikov et al. 1997, Russian Journal of Physical Chemistry 71, 19-22
-      Al2O3:
-        reason: NASA identifies Al2O3(g), but no NIST-JANAF log10(Kf) table exists
-        evidence: NASA/TM-2005-213625 Figure 8
   CaAl4O7:
     formula: CaAl4O7
     execution_model: refused_missing_phase_model
@@ -1337,6 +1425,7 @@ materials:
     - AlO2
     - Al2O
     - Al2O2
+    - Al2O3
     - O
     - O2
     unmodeled_species: *id001
@@ -1355,6 +1444,7 @@ materials:
     - AlO2
     - Al2O
     - Al2O2
+    - Al2O3
     - O
     - O2
     unmodeled_species: *id001
@@ -1373,6 +1463,7 @@ materials:
     - AlO2
     - Al2O
     - Al2O2
+    - Al2O3
     - O
     - O2
     unmodeled_species: *id001
@@ -1391,6 +1482,7 @@ materials:
     - AlO2
     - Al2O
     - Al2O2
+    - Al2O3
     - O
     - O2
     unmodeled_species: *id001

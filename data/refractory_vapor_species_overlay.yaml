@@ -37,12 +37,8 @@ materials:
   Al2O3:
     formula: Al2O3
     execution_model: pure_oxide
-    certification_status: provisional_incomplete_species
-    gas_species: [Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
-    unmodeled_species:
-      Al2O3:
-        reason: NASA identifies Al2O3(g), but no NIST-JANAF log10(Kf) table exists
-        evidence: NASA/TM-2005-213625 Figure 8
+    certification_status: provisional_species_screen
+    gas_species: [Al, Al2, AlO, AlO2, Al2O, Al2O2, Al2O3, O, O2]
     screening_candidates:
       O3_O4:
         status: missing_quantitative_oxygen_closure_screen
@@ -100,52 +96,46 @@ materials:
     refusal_reason: >
       Shornikov 2017 KEMS finds preferential Mg loss and an Al-rich residual;
       a forced 1:2 Mg:Al vapor flux is experimentally false.
-    gas_species: [Mg, Mg2, MgO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    gas_species: [Mg, Mg2, MgO, Al, Al2, AlO, AlO2, Al2O, Al2O2, Al2O3, O, O2]
     unmodeled_species:
       MgAlO:
         reason: observed as a trace spinel vapor but no sourced coefficient set was found
         evidence: Shornikov 2017, DOI 10.1134/S0036024417010241
-      Al2O3:
-        reason: NASA identifies Al2O3(g), but no NIST-JANAF log10(Kf) table exists
-        evidence: NASA/TM-2005-213625 Figure 8
   CaAl2O4:
     formula: CaAl2O4
     execution_model: refused_missing_phase_model
     certification_status: refused_missing_phase_model
     refusal_reason: no sourced high-temperature solid activity model
-    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, Al2O3, O, O2]
     unmodeled_species: &caalo_gap
       CaAlO:
         reason: observed over CaO-Al2O3 melts but no sourced coefficient set was found
         evidence: Shornikov et al. 1997, Russian Journal of Physical Chemistry 71, 19-22
-      Al2O3:
-        reason: NASA identifies Al2O3(g), but no NIST-JANAF log10(Kf) table exists
-        evidence: NASA/TM-2005-213625 Figure 8
   CaAl4O7:
     formula: CaAl4O7
     execution_model: refused_missing_phase_model
     certification_status: refused_missing_phase_model
     refusal_reason: solid EMF data end at 1200 K; no sourced high-temperature activity model
-    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, Al2O3, O, O2]
     unmodeled_species: *caalo_gap
   CaAl12O19:
     formula: CaAl12O19
     execution_model: refused_missing_phase_model
     certification_status: refused_missing_phase_model
     refusal_reason: solid EMF data end at 1200 K; no sourced high-temperature activity model
-    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, Al2O3, O, O2]
     unmodeled_species: *caalo_gap
   Ca3Al2O6:
     formula: Ca3Al2O6
     execution_model: refused_missing_phase_model
     certification_status: refused_missing_phase_model
     refusal_reason: solid EMF data end at 1200 K; no sourced high-temperature activity model
-    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, Al2O3, O, O2]
     unmodeled_species: *caalo_gap
   Ca12Al14O33:
     formula: Ca12Al14O33
     execution_model: refused_missing_phase_model
     certification_status: refused_missing_phase_model
     refusal_reason: no sourced high-temperature solid thermodynamics or activity model
-    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, O, O2]
+    gas_species: [Ca, Ca2, CaO, Al, Al2, AlO, AlO2, Al2O, Al2O2, Al2O3, O, O2]
     unmodeled_species: *caalo_gap

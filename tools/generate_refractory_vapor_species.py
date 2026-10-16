@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the refractory-vapor registry from the held JANAF tables."""
+"""Generate the refractory-vapor registry from held thermochemical compilations."""
 
 from __future__ import annotations
 
@@ -17,11 +17,14 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from simulator.reference_data.janaf import load_table_document  # noqa: E402
+from simulator.reference_data.nasa_glenn import load_record_document  # noqa: E402
+from simulator.vapour_rail.nasa_cea import Nasa9Segment  # noqa: E402
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 
 OUTPUT_PATH = ROOT / "data" / "refractory_vapor_species.yaml"
 OVERLAY_PATH = ROOT / "data" / "refractory_vapor_species_overlay.yaml"
 TABLES_DIR = ROOT / "data" / "literature" / "compilations" / "janaf" / "tables"
+NASA_RECORDS_DIR = ROOT / "data" / "literature" / "compilations" / "nasa-glenn" / "records"
 TEMPERATURE_GRID_K = tuple(range(1500, 3501, 100))
 
 GAS_TABLES = {
@@ -63,10 +66,9 @@ CONDENSED_TABLES = {
 CONDENSED_FORMULAS = {"MgAl2O4": "MgAl2O4"}
 LIQUID_TABLES = {"Al2O3": "Al-101", "CaO": "Ca-029", "MgO": "Mg-010"}
 
-# The requested numerical carrier set is the existing JANAF-backed set plus
-# NaO and KO. Al2O3(g) remains an explicitly unmodeled carrier in the metadata
-# overlay: its NASA citation identifies the species but it is outside this
-# registry's compiled JANAF log-Kf rows.
+# JANAF has no Al2O3(g) formation table. Its numeric carrier is derived from
+# NASA Glenn record NG-0071, using the same elemental reference phases as the
+# JANAF rows. No other JANAF-missing species is included as a numeric carrier.
 
 # Premise -> algebra -> units -> sanity check:
 # JANAF's log Kf column is for formation from the table's elemental reference
@@ -76,6 +78,18 @@ LIQUID_TABLES = {"Al2O3": "Al-101", "CaO": "Ca-029", "MgO": "Mg-010"}
 # is the source's printed log Kf token, not a recomputation or fitted value.
 # The freshness test compares every selected JANAF species' printed values at
 # both 2000 K and 2500 K; those checks are the per-species source sanity anchors.
+
+# NASA fallback derivation (premise -> algebra -> units -> sanity check):
+# Premise: NG-0071 is Al2O3(g); NG-1273 is Al(l), and NG-0937 is O2(g). These
+# are the same elemental reference phases used by JANAF for Al(g) formation
+# above Al's melting point and O2(g). Check that alignment independently with
+# NG-0005 (Al(g)): its NASA-9 log10(Kf) from Al(l) is -2.225958 at
+# 2000 K and -0.657470 at 2500 K, versus JANAF Al-005's printed -2.211 and
+# -0.644. Algebra: ΔG°/(RT) = G°(Al2O3,g)/(RT) - 2 G°(Al,l)/(RT)
+#   - 3/2 G°(O2,g)/(RT); log10(Kf) = -ΔG°/(RT ln(10)). Units: each NASA-9
+# G/RT and the resulting log10(Kf) are dimensionless; T is in K, so R and T
+# cancel in the formation ratio. Sanity: source-derived Al2O3(g) log10(Kf) is
+# 10.892022 at 2000 K.
 
 
 class RefractoryGenerationError(ValueError):
@@ -100,6 +114,137 @@ def _load_janaf_table(table_id: str) -> dict[str, Any]:
     if not isinstance(table, Mapping) or table.get("table_id") != table_id:
         raise RefractoryGenerationError(f"{path}: table id does not match {table_id}")
     return dict(table)
+
+
+def _load_nasa9_record(
+    record_id: str,
+) -> tuple[dict[str, Any], tuple[Nasa9Segment, ...]]:
+    path = NASA_RECORDS_DIR / f"{record_id}.json"
+    if not path.is_file():
+        raise RefractoryGenerationError(f"missing NASA Glenn record {record_id}: {path}")
+    document = load_record_document(path)
+    if (
+        document.get("source_id") != "nasa-glenn"
+        or document.get("record_id") != record_id
+    ):
+        raise RefractoryGenerationError(f"{path}: NASA Glenn record identity mismatch")
+    intervals = document.get("intervals") or []
+    if not intervals or any(
+        interval.get("coefficient_count") != 9 for interval in intervals
+    ):
+        raise RefractoryGenerationError(f"{path}: expected NASA-9 coefficients")
+    if document.get("phase") not in {"gas", "L", "l", "liquid"}:
+        raise RefractoryGenerationError(f"{path}: unsupported NASA reference phase")
+    segments: list[Nasa9Segment] = []
+    for interval in intervals:
+        try:
+            segments.append(
+                Nasa9Segment(
+                    float(interval["T_min_K"]["value"]),
+                    float(interval["T_max_K"]["value"]),
+                    tuple(float(item["value"]) for item in interval["a_coefficients"]),
+                    float(interval["b1"]["value"]),
+                    float(interval["b2"]["value"]),
+                )
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            raise RefractoryGenerationError(
+                f"{path}: invalid NASA-9 interval: {exc}"
+            ) from exc
+    if not segments:
+        raise RefractoryGenerationError(f"{path}: no NASA-9 intervals")
+    return dict(document), tuple(segments)
+
+
+def _source_temperature_range(document: Mapping[str, Any]) -> list[float]:
+    intervals = document.get("intervals") or []
+    if not intervals:
+        raise RefractoryGenerationError(
+            f"{document.get('record_id', 'NASA record')}: no source intervals"
+        )
+    return [
+        min(float(interval["T_min_K"]["value"]) for interval in intervals),
+        max(float(interval["T_max_K"]["value"]) for interval in intervals),
+    ]
+
+
+def _nasa9_g_over_rt(
+    segments: tuple[Nasa9Segment, ...], temperature_K: int
+) -> float:
+    matching = [
+        segment
+        for segment in segments
+        if segment.T_min_K <= temperature_K <= segment.T_max_K
+    ]
+    if len(matching) != 1:
+        raise RefractoryGenerationError(
+            f"NASA-9 intervals cover {temperature_K} K {len(matching)} times"
+        )
+    return matching[0].evaluate_ratios(float(temperature_K))[3]
+
+
+def _nasa_al2o3_gas_row() -> dict[str, Any]:
+    product_doc, product_segments = _load_nasa9_record("NG-0071")
+    aluminum_doc, aluminum_segments = _load_nasa9_record("NG-1273")
+    oxygen_doc, oxygen_segments = _load_nasa9_record("NG-0937")
+    log_kf = {
+        temperature: -(
+            _nasa9_g_over_rt(product_segments, temperature)
+            - 2.0 * _nasa9_g_over_rt(aluminum_segments, temperature)
+            - 1.5 * _nasa9_g_over_rt(oxygen_segments, temperature)
+        ) / math.log(10.0)
+        for temperature in TEMPERATURE_GRID_K
+    }
+    intervals = product_doc["intervals"]
+    return {
+        "formula": str(product_doc["formula"]),
+        "source": "NASA Glenn NG-0071, AL2O3 (NASA-9)",
+        "source_url": str(product_doc["source"]["official_url"]),
+        "valid_temperature_K": [
+            float(TEMPERATURE_GRID_K[0]),
+            float(TEMPERATURE_GRID_K[-1]),
+        ],
+        "provenance": {
+            "source_tag": "nasa_glenn",
+            "record_id": str(product_doc["record_id"]),
+            "species_as_published": str(product_doc["name_as_published"]),
+            "coefficient_set": "NASA-9",
+            "coefficient_intervals_K": [
+                [
+                    float(interval["T_min_K"]["value"]),
+                    float(interval["T_max_K"]["value"]),
+                ]
+                for interval in intervals
+            ],
+            "source_temperature_range_K": _source_temperature_range(product_doc),
+            "phase": str(product_doc["phase"]),
+            "element_reference_states": {
+                "Al": {
+                    "record_id": str(aluminum_doc["record_id"]),
+                    "species_as_published": str(aluminum_doc["name_as_published"]),
+                    "phase": str(aluminum_doc["phase"]),
+                    "coefficient_set": "NASA-9",
+                    "source_temperature_range_K": _source_temperature_range(aluminum_doc),
+                },
+                "O2": {
+                    "record_id": str(oxygen_doc["record_id"]),
+                    "species_as_published": str(oxygen_doc["name_as_published"]),
+                    "phase": str(oxygen_doc["phase"]),
+                    "coefficient_set": "NASA-9",
+                    "source_temperature_range_K": _source_temperature_range(oxygen_doc),
+                },
+            },
+            "derivation": (
+                "For 2 Al(l) + 3/2 O2(g) -> Al2O3(g), evaluate the NASA-9 "
+                "dimensionless G/RT for NG-0071, NG-1273 and NG-0937. Form "
+                "ΔG°/(RT) = G°(Al2O3,g)/(RT) - 2 G°(Al,l)/(RT) - "
+                "3/2 G°(O2,g)/(RT), then log10(Kf) = -ΔG°/(RT ln 10). "
+                "All ratios and log10(Kf) are dimensionless; T is in K. The "
+                "Al(l)+O2(g) reference phases match JANAF's elemental states."
+            ),
+        },
+        "log10_kf": log_kf,
+    }
 
 
 def _printed_log_kf(table: Mapping[str, Any]) -> tuple[dict[int, float], list[float]]:
@@ -206,6 +351,7 @@ def _registry_row(
         "source_url": source_url,
         "valid_temperature_K": [float(grid[0]), float(grid[-1])],
         "provenance": {
+            "source_tag": "nist_janaf",
             "table_id": table_id,
             "source_temperature_range_K": [
                 float(min(used_source_temperatures)),
@@ -242,19 +388,27 @@ def render_registry() -> str:
         "extension_policy": overlay["extension_policy"],
         "kinetic_model": overlay["kinetic_model"],
         "provenance": {
-            "database": "NIST-JANAF Thermochemical Tables, Fourth Edition, SRD 13",
+            "database": (
+                "NIST-JANAF Thermochemical Tables, Fourth Edition, SRD 13; "
+                "NASA Glenn / CEA thermo.inp"
+            ),
             "doi": "10.18434/T42S31",
             "note": (
-                "Every gas and condensed log10(Kf) value is copied from a compiled "
-                "JANAF as_published cell on the 100 K grid from 1500 through 3500 K. "
+                "JANAF rows copy compiled as_published log10(Kf) cells; Al2O3(g) "
+                "is derived from NASA Glenn NASA-9 G/RT values against Al(l) and "
+                "O2(g) elemental reference states. All rows use the 100 K grid "
+                "from 1500 through 3500 K. "
                 "The crystalline-only MgAl2O4 row stops below its 2408 K transition; "
                 "its typed out-of-band notice records the missing liquid table."
             ),
         },
         "overlay_provenance": overlay["overlay_citation"],
         "gas_species": {
-            species: _registry_row(species, table_id, condensed=False)
-            for species, table_id in GAS_TABLES.items()
+            **{
+                species: _registry_row(species, table_id, condensed=False)
+                for species, table_id in GAS_TABLES.items()
+            },
+            "Al2O3": _nasa_al2o3_gas_row(),
         },
         "condensed_phases": {
             species: _registry_row(
@@ -290,7 +444,7 @@ def render_change_report(previous_text: str, generated_text: str) -> str:
     lines = [
         "# Refractory vapor species generation report",
         "",
-        "The generated values below come from compiled JANAF printed log Kf cells.",
+        "JANAF rows use printed log Kf cells; NASA Glenn rows use the tagged source derivation in their provenance.",
         "No row was selected or adjusted by residual score.",
         "",
     ]
@@ -314,16 +468,25 @@ def render_change_report(previous_text: str, generated_text: str) -> str:
             changed_row_count += 1
             changed_cell_count += len(changes)
             old_source_match = re.search(r"JANAF ([A-Z][a-z]?-[0-9]+)", str(old_entry.get("source", "")))
-            old_table_id = old_source_match.group(1) if old_source_match else "none"
+            old_source = old_source_match.group(1) if old_source_match else "none"
+            old_provenance = old_entry.get("provenance") or {}
+            old_source_tag = old_provenance.get("source_tag", "none")
             provenance = new_entry["provenance"]
-            new_table_id = provenance["table_id"]
+            new_source_tag = provenance["source_tag"]
+            new_source = provenance.get("table_id", provenance.get("record_id", "unknown"))
             if old_entry:
-                reason = f"source {old_table_id} → {new_table_id}; source-grounded grid coverage and phase handling"
+                reason = (
+                    f"source {old_source_tag} {old_source} → "
+                    f"{new_source_tag} {new_source}; source-grounded grid coverage and phase handling"
+                )
             else:
-                reason = f"new JANAF carrier from {new_table_id}, required by the registry coverage ruling"
+                reason = (
+                    f"new {new_source_tag} carrier from {new_source}, "
+                    "required by the registry coverage ruling"
+                )
             if section == "condensed_phases" and species in LIQUID_TABLES:
                 reason = (
-                    f"use the ruled crystal/liquid table {new_table_id} across Tm; "
+                    f"use the ruled crystal/liquid table {new_source} across Tm; "
                     "the previous row was crystalline-only"
                 )
             if species == "MgAl2O4":
@@ -339,7 +502,8 @@ def render_change_report(previous_text: str, generated_text: str) -> str:
             )
             valid = new_entry["valid_temperature_K"]
             lines.append(
-                f"- **{species}**: {old_table_id} → {new_table_id}; "
+                f"- **{species}** ({old_source_tag} → {new_source_tag}): "
+                f"{old_source} → {new_source}; "
                 f"{old_entry.get('valid_temperature_K', 'absent')} → {valid} K. "
                 f"{reason}. Values: {deltas}."
             )
@@ -349,7 +513,7 @@ def render_change_report(previous_text: str, generated_text: str) -> str:
             "## Summary",
             "",
             f"Changed species rows: {changed_row_count}; changed/new temperature cells: {changed_cell_count}.",
-            "Any changed shared-grid cells are listed with their old and new values above. NaO and KO were added from Na-008 and K-008. The Al2O3(g) gap remains an explicitly unmodeled, cited carrier; no NASA-only numeric row was in the requested registry set.",
+            "Any changed shared-grid cells are listed with their old and new values above. NaO and KO were added from JANAF Na-008 and K-008. Al2O3(g) was added from NASA Glenn NG-0071 because JANAF has no species table; no other JANAF-missing species was needed as a numeric row. Other material metadata gaps remain CaAlO, MgAlO and Si2O2, for which no coefficient source is currently included in this registry.",
             "",
         ]
     )

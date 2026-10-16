@@ -112,7 +112,8 @@ def test_alumina_Al_bearing_vapor_crosses_nasa_screen(
         anchor["crossing_temperature_K"],
         abs=anchor["plotted_temperature_tolerance_K"],
     )
-    assert anchor["known_missing_species"] in refractory_vapor_species_gaps("Al2O3")
+    assert anchor["known_missing_species"] in refractory_vapor_species("Al2O3")
+    assert anchor["known_missing_species"] not in refractory_vapor_species_gaps("Al2O3")
 
 
 def test_cao_kems_raw_points_are_preserved_and_fit_within_reported_uncertainty(
@@ -263,7 +264,7 @@ def test_compiled_grid_is_used_and_far_extrapolation_is_typed() -> None:
     assert range_use.within_t406_input_distance_bounds
     assert range_use.source_temperature_max_K == 3500.0
     projected = solve_congruent_vaporization("Al2O3", 2400.0)
-    assert projected.certification_blockers == ("provisional_incomplete_species",)
+    assert projected.certification_blockers == ("provisional_species_screen",)
 
     _, far_use = refractory_log10_kf("AlO", 1000.0)
     assert far_use.status == "extrapolated_model_limited"
@@ -292,17 +293,17 @@ def test_self_buffered_root_is_unique_finite_and_physical_across_grid(
 @pytest.mark.parametrize(
     ("material", "minimum_species"),
     [
-        ("Al2O3", {"Al", "AlO", "Al2O", "O", "O2"}),
+        ("Al2O3", {"Al", "AlO", "Al2O", "Al2O3", "O", "O2"}),
         ("CaO", {"Ca", "CaO", "O", "O2"}),
         ("MgO", {"Mg", "MgO", "O", "O2"}),
         ("SiO2", {"Si", "Si2", "Si3", "SiO", "SiO2", "O", "O2"}),
         ("TiO2", {"Ti", "TiO", "TiO2", "O", "O2"}),
-        ("MgAl2O4", {"Mg", "MgO", "Al", "AlO", "Al2O", "O", "O2"}),
-        ("CaAl2O4", {"Ca", "CaO", "Al", "AlO", "Al2O", "O", "O2"}),
-        ("CaAl4O7", {"Ca", "CaO", "Al", "AlO", "Al2O", "O", "O2"}),
-        ("CaAl12O19", {"Ca", "CaO", "Al", "AlO", "Al2O", "O", "O2"}),
-        ("Ca3Al2O6", {"Ca", "CaO", "Al", "AlO", "Al2O", "O", "O2"}),
-        ("Ca12Al14O33", {"Ca", "CaO", "Al", "AlO", "Al2O", "O", "O2"}),
+        ("MgAl2O4", {"Mg", "MgO", "Al", "AlO", "Al2O", "Al2O3", "O", "O2"}),
+        ("CaAl2O4", {"Ca", "CaO", "Al", "AlO", "Al2O", "Al2O3", "O", "O2"}),
+        ("CaAl4O7", {"Ca", "CaO", "Al", "AlO", "Al2O", "Al2O3", "O", "O2"}),
+        ("CaAl12O19", {"Ca", "CaO", "Al", "AlO", "Al2O", "Al2O3", "O", "O2"}),
+        ("Ca3Al2O6", {"Ca", "CaO", "Al", "AlO", "Al2O", "Al2O3", "O", "O2"}),
+        ("Ca12Al14O33", {"Ca", "CaO", "Al", "AlO", "Al2O", "Al2O3", "O", "O2"}),
     ],
 )
 def test_refractory_phase_species_registry_covers_required_carriers(
@@ -324,26 +325,26 @@ def test_unresolved_multication_phases_refuse_instead_of_inventing_activities(
 
 
 def test_unavailable_complex_species_are_exposed_not_silently_dropped() -> None:
-    assert refractory_vapor_species_gaps("Al2O3") == ("Al2O3",)
+    assert refractory_vapor_species_gaps("Al2O3") == ()
     assert refractory_vapor_species_gaps("SiO2") == ("Si2O2",)
-    assert refractory_vapor_species_gaps("MgAl2O4") == ("Al2O3", "MgAlO")
-    assert refractory_vapor_species_gaps("CaAl2O4") == ("Al2O3", "CaAlO")
+    assert refractory_vapor_species_gaps("MgAl2O4") == ("MgAlO",)
+    assert refractory_vapor_species_gaps("CaAl2O4") == ("CaAlO",)
 
 
 def test_results_are_typed_as_included_carrier_sum_not_total_bound() -> None:
     alumina = solve_congruent_vaporization("Al2O3", 1800.0)
     assert alumina.evaporation_coefficient == 1.0
-    # alpha=1 bounds only included carriers; Al2O3(g) is deliberately omitted.
+    # alpha=1 bounds only included carriers, and omitted species can still shift pO2.
     assert alumina.flux_classification == "included_carrier_equilibrium_effusion_sum"
-    assert "Al2O3" in alumina.unmodeled_species
-    assert alumina.certification_status == "provisional_incomplete_species"
+    assert "Al2O3" not in alumina.unmodeled_species
+    assert alumina.certification_status == "provisional_species_screen"
     assert alumina.transport_applicability == "requires_external_Knudsen_number"
     silica = solve_congruent_vaporization("SiO2", 1800.0)
     assert silica.certification_status == "provisional_incomplete_species_and_source_conflict"
     assert silica.source_conflicts
     assert "Si2O2" in silica.unmodeled_species
     extrapolated = solve_congruent_vaporization("Al2O3", 2400.0)
-    assert extrapolated.certification_blockers == ("provisional_incomplete_species",)
+    assert extrapolated.certification_blockers == ("provisional_species_screen",)
 
 
 def test_brentq_nonconvergence_raises_typed_congruent_error(monkeypatch) -> None:

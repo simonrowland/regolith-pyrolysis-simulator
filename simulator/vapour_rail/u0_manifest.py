@@ -4,7 +4,7 @@ Freezes:
 
   species-inventory.md
     UNION species-inventory-gas-closure.md (binding coverage delta)
-    UNION data/refractory_vapor_species.yaml gas_species (24 IDs)
+    UNION data/refractory_vapor_species.yaml gas_species (25 IDs)
 
 after collision-only ``_gas`` canonicalization and de-duplication.
 
@@ -151,6 +151,7 @@ REFRACTORY_GAS_IDS_RAW: frozenset[str] = frozenset(
         "AlO2",
         "Al2O",
         "Al2O2",
+        "Al2O3",
         "Ca",
         "Ca2",
         "CaO",
@@ -791,7 +792,7 @@ def _gas_closure_contribution_rows() -> list[dict[str, Any]]:
 
 
 def parse_refractory_rows(path: Path) -> list[dict[str, Any]]:
-    """Load the 24 refractory gas IDs and emit collision-canonicalized rows."""
+    """Load the 25 refractory gas IDs and emit collision-canonicalized rows."""
 
     payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     gas_species = payload.get("gas_species")
@@ -832,8 +833,8 @@ def parse_refractory_rows(path: Path) -> list[dict[str, Any]]:
                 ),
             )
         )
-    if len(rows) != 24:
-        raise ValueError(f"expected 24 refractory gas rows, got {len(rows)}")
+    if len(rows) != 25:
+        raise ValueError(f"expected 25 refractory gas rows, got {len(rows)}")
     return rows
 
 
