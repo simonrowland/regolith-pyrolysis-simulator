@@ -59,6 +59,33 @@ def test_inverse_notice_bound_uses_actual_ferric_inventory(probe):
     assert state['a_feo'] == comparison['native_fe_activity']
 
 
+@pytest.mark.parametrize('q, lower, upper', [
+    (0.039, 0.679, 0.529), (0.02, 1.558, 0.921),
+    (0.01, math.inf, 1.558),
+])
+def test_saturation_band_matches_jayasuriya_method_precision(q, lower, upper):
+    # Jayasuriya et al. 2004 method precision propagated in t-1293 Table 1.
+    band = fe_redox._native_fe_saturation_band(q)
+    assert band[0] == pytest.approx(lower, abs=0.001)
+    assert band[1] == pytest.approx(upper, abs=0.001)
+
+
+@pytest.mark.parametrize('margin, status', [
+    (-0.8, 'BELOW'), (-0.031, 'INDETERMINATE'), (0.6, 'ABOVE'),
+])
+def test_three_way_saturation_uses_propagated_band(monkeypatch, margin, status):
+    monkeypatch.setattr(fe_redox, 'calphad_ferrous_feo_activity_diagnostic',
+                        lambda **kw: {'a_FeO_authoritative': 0.3})
+    bound = fe_redox._feo_activity_saturation_log10_fO2_bar(2023.15, a_feo=0.3)
+    result = fe_redox._native_fe_saturation_comparison(
+        {'FeO': 10., 'SiO2': 90.}, fe3_over_sigma_fe=0.039,
+        T_K=2023.15, pressure_bar=0.01, fO2_log=bound+margin)
+    assert result['saturation_status'] == status
+    assert result['native_fe_saturation'] == (status == 'BELOW')
+    if status == 'INDETERMINATE':
+        assert result['saturation_notice']['flag'] == 'REDOX_FE_FEO_SATURATION_INDETERMINATE'
+
+
 def _post_removal(probe, n):
     sim, controls, _ = probe
     inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
@@ -93,19 +120,22 @@ def _solve(probe, gas=lambda n: -300.):
         pressure_bar=controls['pressure_bar'], gas_fO2_log=gas)
 
 
-@pytest.mark.parametrize('ferric_factor', [1., 0.1])
-def test_melt_root_matches_independent_bisection_and_stops_at_bound(probe, ferric_factor):
-    # The corrected standard-state pairing moves the historical probes above
-    # saturation. Retain those no-op cases, and reduce their ferric inventory
-    # explicitly to exercise actual precipitation against the corrected bound.
-    probe[0].atom_ledger.mol_by_account('process.cleaned_melt')['Fe2O3'] *= ferric_factor
-    probe[1]['comp']['Fe2O3'] *= ferric_factor
+@pytest.fixture
+def reducing_probe(probe):
+    # Synthetic alkali-rich melt: q=.039 has finite precision, while K2O
+    # drives the inverse genuinely below saturation. Not a lunar seed change.
+    inventory = probe[0].atom_ledger.mol_by_account('process.cleaned_melt')
+    ferric = inventory['FeO'] * 0.039 / (2 * (1 - 0.039))
+    probe[1]['comp']['Fe2O3'] *= ferric / inventory['Fe2O3']
+    inventory['Fe2O3'] = ferric
+    probe[1]['comp']['K2O'] = 80.
+    return probe
+
+
+def test_melt_root_matches_independent_bisection_and_stops_at_bound(reducing_probe):
+    probe = reducing_probe
     result = _solve(probe)
-    assert fe_redox.melt_mol_fractions_for_kress91(probe[1]['comp'])['FeOt'] <= 0.2
-    if result['native_fe_mol'] == 0.:
-        value, bound = _post_removal(probe, 0.)
-        assert value >= bound
-        return
+    assert result['native_fe_mol'] > 0.
     feo = probe[0].atom_ledger.mol_by_account('process.cleaned_melt')['FeO']
     lo, hi = 0., math.nextafter(feo, 0.)
     for _ in range(80):
@@ -127,9 +157,8 @@ def test_gas_unfavourable_boundary_prevents_precipitation(probe):
     assert _solve(probe, gas=lambda n: 0.)['native_fe_mol'] == 0.
 
 
-def test_finite_gas_capacity_stops_at_gas_root(probe):
-    probe[0].atom_ledger.mol_by_account('process.cleaned_melt')['Fe2O3'] *= 0.1
-    probe[1]['comp']['Fe2O3'] *= 0.1
+def test_finite_gas_capacity_stops_at_gas_root(reducing_probe):
+    probe = reducing_probe
     # Receiver RT/(V*1e5)=1 bar/mol O2; n/2 mol O2 therefore adds n/2 bar.
     gas = lambda n: math.log10(1e-12 + n/2)
     result = _solve(probe, gas=gas)
@@ -140,6 +169,15 @@ def test_finite_gas_capacity_stops_at_gas_root(probe):
     value, bound = _post_removal(probe, n)
     assert value < bound
     assert abs(gas(n)-bound) <= fe_redox.NATIVE_FE_ROOT_TOLERANCE_DEX
+
+
+def test_unbounded_low_ferric_band_prevents_precipitation(probe):
+    probe[0].atom_ledger.mol_by_account('process.cleaned_melt')['Fe2O3'] *= 0.1
+    probe[1]['comp']['Fe2O3'] *= 0.1
+    result = _solve(probe)
+    assert result['native_fe_state']['saturation_status'] == 'INDETERMINATE'
+    assert result['native_fe_state']['band_lower_dex'] == math.inf
+    assert result['native_fe_mol'] == 0.
 
 
 def test_no_precipitation_above_melt_bound(probe):
@@ -154,16 +192,15 @@ def test_no_precipitation_above_melt_bound(probe):
 
 @pytest.mark.parametrize('finite_gas', [False, True])
 def test_provider_split_closes_atoms_and_records_committed_event(monkeypatch, finite_gas):
-    from tests.test_fe_redox_split_diagnostic import _make_sim, _seed_redox_liquidus_curve
-    from tests.chemistry.conftest import _seed_melt_redox
+    sim = _reducing_sim()
+    expected_state = sim._compute_native_fe_saturation_extent()['native_fe_state']
+    assert expected_state['saturation_status'] == 'BELOW'
 
-    sim = _make_sim('lunar_mare_low_ti', temperature_C=1750.)
-    _seed_redox_liquidus_curve(sim)
-    _seed_melt_redox(sim, -10.)
     # Ideal oxygen-free boundary; finite gas retains its actual nRT/V owner.
-    monkeypatch.setattr(sim, '_vacuum_floor_bar', lambda: 1e-20)
+    receiver_floor = 1e-20 if finite_gas else 1e-300
+    monkeypatch.setattr(sim, '_vacuum_floor_bar', lambda: receiver_floor)
     monkeypatch.setattr(sim, '_headspace_transport_pO2_bar_from_ledger',
-                        lambda *a, **kw: 1e-20)
+                        lambda *a, **kw: receiver_floor)
     if not finite_gas:
         monkeypatch.setattr(sim, '_headspace_ledger_pO2_bar_from_o2_mol', lambda n: 0.)
     before = dict(sim.atom_ledger.mol_by_account('process.cleaned_melt'))
@@ -192,3 +229,23 @@ def test_provider_split_closes_atoms_and_records_committed_event(monkeypatch, fi
     assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5e-12
     assert any(n['flag'] == 'REDOX_BELOW_FE_FEO_SATURATION'
                for n in sim._redox_bound_notices_this_hr)
+
+
+def _reducing_sim():
+    from tests.test_fe_redox_split_diagnostic import _seed_redox_liquidus_curve
+    from tests.chemistry.conftest import _build_sim, _load_yaml
+
+    feeds = _load_yaml('feedstocks.yaml')
+    feeds['lunar_mare_low_ti']['composition_wt_pct'] = {
+        'FeO': 60., 'K2O': 80., 'SiO2': 40.,
+        'Fe2O3': 60. / MOLAR_MASS['FeO'] * 0.039 / (2 * (1 - 0.039)) * MOLAR_MASS['Fe2O3'],
+    }
+    feeds['lunar_mare_low_ti']['composition_basis'] = {
+        oxide: {'method': 'synthetic test split', 'source': 'test fixture'}
+        for oxide in ('FeO', 'Fe2O3')
+    }
+    sim = _build_sim('lunar_mare_low_ti', _load_yaml('vapor_pressures.yaml'),
+                     feeds, _load_yaml('setpoints.yaml'))
+    sim.melt.temperature_C = 1750.
+    _seed_redox_liquidus_curve(sim)
+    return sim

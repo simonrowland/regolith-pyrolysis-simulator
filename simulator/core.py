@@ -4373,19 +4373,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'ceiling': ceiling,
                     'reason': 'degassing_pending',
                 })
-            a_feo = state.get('a_feo')
-            iw_bound = state.get('iw_bound')
-            if (
-                a_feo is not None
-                and iw_bound is not None
-                and melt_potential < float(iw_bound)
-            ):
-                pending_notices.append({
-                    'flag': 'REDOX_BELOW_FE_FEO_SATURATION',
-                    'melt_potential': melt_potential,
-                    'iw_bound': float(iw_bound),
-                    'a_feo': float(a_feo),
-                })
+            if state.get('saturation_notice') is not None:
+                pending_notices.append(state['saturation_notice'])
         if pending_notices:
             notices = list(
                 getattr(self, '_redox_bound_notices_this_hr', [])

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from types import MappingProxyType
 from typing import Literal
 
@@ -950,6 +950,37 @@ def kress91_fe3_over_sigma_fe(
     return 2.0 * ratio / (2.0 * ratio + 1.0)
 
 
+def _native_fe_saturation_band(q: float) -> tuple[float, float]:
+    # Jayasuriya et al. (2004), Am Mineral 89, 1597, abstract:
+    # doi:10.2138/am-2004-11-1203, Mossbauer q=Fe3+/SumFe precision
+    # +/-0.01 (1 sigma). This is method precision, not a lunar calibration.
+    # R=q/(1-q); log10 R=a*log10 fO2+const, a=0.196 (Kress91).
+    # Thus each finite interval endpoint shifts log fO2 by log(R_end/R)/a.
+    # Ratios are dimensionless, output is dex; q=.039 gives -0.679/+0.529.
+    # q-.01<=0 leaves the reducing end unbounded, rather than clipping it.
+    if q <= 0.0 or q >= 1.0:
+        return math.inf, math.inf
+    log_r = math.log10(q / (1.0 - q))
+    low, high = q - 0.01, q + 0.01
+    lower = (math.inf if low <= 0.0 else
+             (log_r - math.log10(low / (1.0 - low))) / KRESS91_LN_FO2_COEFFICIENT)
+    upper = (math.inf if high >= 1.0 else
+             (math.log10(high / (1.0 - high)) - log_r) / KRESS91_LN_FO2_COEFFICIENT)
+    return lower, upper
+
+
+@dataclass(frozen=True)
+class NativeFeSaturationNotice:
+    flag: str
+    melt_potential: float
+    iw_bound: float
+    a_feo: float
+    saturation_gap_dex: float
+    band_lower_dex: float
+    band_upper_dex: float
+    status: str
+
+
 def _native_fe_saturation_comparison(
     comp: Mapping[str, float],
     *,
@@ -1007,10 +1038,22 @@ def _native_fe_saturation_comparison(
     else:
         a_feo_saturation = 10.0 ** saturation_log10
     bound = _feo_activity_saturation_log10_fO2_bar(T_K, a_feo=a_feo)
-    # Exact trigger; no uncertainty/tolerance band (t-1293 remains open).
     gap = float(fO2_log) - bound
+    lower, upper = _native_fe_saturation_band(fe3)
+    status = ('BELOW' if gap < -lower else
+              'ABOVE' if gap > upper else 'INDETERMINATE')
+    notice = (None if status == 'ABOVE' else asdict(NativeFeSaturationNotice(
+        flag=('REDOX_BELOW_FE_FEO_SATURATION' if status == 'BELOW' else
+              'REDOX_FE_FEO_SATURATION_INDETERMINATE'),
+        melt_potential=float(fO2_log), iw_bound=bound, a_feo=a_feo,
+        saturation_gap_dex=gap, band_lower_dex=lower, band_upper_dex=upper,
+        status=status,
+    )))
     return {
-        'native_fe_saturation': gap < 0.0,
+        'native_fe_saturation': status == 'BELOW',
+        'saturation_status': status,
+        'saturation_notice': notice,
+        'band_lower_dex': lower, 'band_upper_dex': upper,
         'native_fe_threshold': 'FeO_activity_saturation',
         'iw_bound_log': bound,
         'saturation_gap_dex': gap,
@@ -1238,6 +1281,7 @@ def kress91_intrinsic_state(
             state.update(
                 a_feo=comparison['native_fe_activity'],
                 iw_bound=comparison['iw_bound_log'],
+                saturation_notice=comparison['saturation_notice'],
             )
     return state
 
