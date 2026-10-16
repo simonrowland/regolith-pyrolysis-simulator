@@ -1,0 +1,247 @@
+schema_version: literature_extract.v1
+source_id: mendybaev-2018-cmas-evaporation
+source:
+  citation: "Mendybaev, R. A., and Shornikov, S. I. (2018). Evaporation of CaO-MgO-Al2O3-SiO2 Melts: Experiments and Thermodynamic Modeling. 81st Annual Meeting of The Meteoritical Society, LPI Contribution No. 2067, abstract 6061."
+  year: 2018
+  corpus_asset: raw/mendybaev-2018-cmas-evaporation/mendybaev-2018-cmas-evaporation.pdf
+  corpus_sha256: 01fad2e988ee1fbe9c0fcf055badf2b7320dde1b4f13fed234fff6dc2cf20b5f
+extraction:
+  method: "Manual transcription checked digit by digit against the 300 dpi render of the one-page abstract. It contains no tables or figures. The reported magnesium rates are attributed to Richter et al. (2007), reference [1]; model comparisons are carried as located context because no supported numeric model-table home is printed here."
+  date: '2026-10-05'
+  worker: x-mendybaev-2018-cmas-evaporation
+review_status: draft
+fidelity_samples:
+- species: Mg
+  observable: rate_series
+  observation_id: mendybaev_2018_richter_caib_mg_evaporation_rates
+  field: points
+  value:
+  - temperature_C_as_printed: 1600
+    T_C: 1600
+    composition_as_printed: CAIB
+    evaporation_rate: 2.0e-9
+    rate_as_printed: "~2×10^-9"
+  - temperature_C_as_printed: 1700
+    T_C: 1700
+    composition_as_printed: CAIB
+    evaporation_rate: 1.0e-8
+    rate_as_printed: "~1×10^-8"
+  - temperature_C_as_printed: 1800
+    T_C: 1800
+    composition_as_printed: CAIB
+    range: [2.0e-8, 6.0e-8]
+    rate_as_printed: "(2–6)×10^-8"
+  - temperature_C_as_printed: 1900
+    T_C: 1900
+    composition_as_printed: CAIB
+    range: [2.0e-7, 3.0e-7]
+    rate_as_printed: "(2–3)×10^-7"
+  locator:
+    published_page: 1
+    pdf_page_index: 0
+    section: Results and Discussion
+    note: "The image prints the four magnesium rates in parentheses with temperatures 1600, 1700, 1800, and 1900 degrees C, respectively."
+species:
+  Mg:
+    observations:
+    - observation_id: mendybaev_2018_richter_caib_mg_evaporation_rates
+      type: rate_series
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+        note: "Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007); they are not new measurements in this abstract."
+      phase: Type B CAI-like (CAIB) melt
+      units: mol cm^-2 s^-1
+      values:
+        quantity: evaporation_rate
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Richter et al. (2007), reference [1]
+        points:
+        - temperature_C_as_printed: 1600
+          T_C: 1600
+          composition_as_printed: CAIB
+          evaporation_rate: 2.0e-9
+          rate_as_printed: "~2×10^-9"
+        - temperature_C_as_printed: 1700
+          T_C: 1700
+          composition_as_printed: CAIB
+          evaporation_rate: 1.0e-8
+          rate_as_printed: "~1×10^-8"
+        - temperature_C_as_printed: 1800
+          T_C: 1800
+          composition_as_printed: CAIB
+          range: [2.0e-8, 6.0e-8]
+          rate_as_printed: "(2–6)×10^-8"
+        - temperature_C_as_printed: 1900
+          T_C: 1900
+          composition_as_printed: CAIB
+          range: [2.0e-7, 3.0e-7]
+          rate_as_printed: "(2–3)×10^-7"
+        temperature_conversion_note: "Temperatures are retained as printed in degrees C in the extract; the reader derives Kelvin using the standard Celsius offset."
+      uncertainty:
+        note: "The source uses approximate signs for the first two rates and ranges for the latter two; it gives no separate measurement uncertainty."
+    context:
+    - observation_id: mendybaev_2018_mg_si_early_and_later_evaporation_relation
+      type: experiment_series
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+      units: qualitative comparison
+      values:
+        statement_as_printed: "evaporation starts with a much faster loss of Si over Mg followed by their evaporation at about the same rates as evaporation proceeds."
+        attribution: Type B CAI-like melt experiments, reference [1]
+  Si:
+    observations: []
+    context:
+    - observation_id: mendybaev_2018_si_temperature_trajectory_qualification
+      type: experiment_series
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+      units: qualitative comparison
+      values:
+        statement_as_printed: "The experiments also showed that despite a strong temperature effect on evaporation kinetics of Mg and Si (evaporation rates of Mg are ~2×10^-9, ~1×10^-8, (2–6)×10^-8 and (2–3) ×10^-7 moles/cm2/s at 1600°, 1700°, 1800° and 1900°C, respectively), the temperature had only a small effect on evaporation trajectories."
+        attribution: Type B CAI-like melt experiments, reference [1]
+  CMAS_melts:
+    observations: []
+    context:
+    - observation_id: mendybaev_2018_background_experimental_scope
+      type: method
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        scope: "The abstract summarizes earlier laboratory evaporation experiments on CMAS melts in a vacuum, at 1600 to 1900 degrees C, citing references [1–3]; it does not specify the evaporation method or apparatus for those runs."
+        temperature_C:
+          lower: 1600
+          upper: 1900
+        method:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        cell_material_and_liner:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        pressure_calibration_substance:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        pressure_calibration_method:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        ionisation_cross_sections:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        ionisation_cross_sections_source:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        ionisation_energy_eV:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        multiplier_or_isotope_corrections:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        temperature_measurement:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        temperature_calibration:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        temperature_uncertainty:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        chamber_background_pressure:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        sample_preparation:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        starting_materials:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        starting_material_purity:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        sample_composition_as_prepared:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        sample_composition_as_analysed_after_runs:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        CAIB_and_CMS1_composition_as_prepared_or_analysed:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        activity_defining_ions:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        activity_standard_states:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        note: "The source says vacuum and gives the broad temperature span only. It does not name an apparatus, run-level conditions, measured activity values, defining ions, or activity standard states."
+    - observation_id: mendybaev_2018_stoichiometric_margules_model_comparison
+      type: thermodynamic_example
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Introduction; Results and Discussion
+      units: qualitative and dimensionless coefficient ratios as printed
+      values:
+        model: Berman CMAS stoichiometric-Margules solution model, reference [7]
+        referenced_calculation: reference [1] for CAIB and reference [3] for CMS-1
+        CAIB_gamma_Mg_over_gamma_Si_at_1600_C: 1.0
+        CAIB_gamma_Mg_over_gamma_Si_at_1900_C: 0.5
+        CMS1_gamma_Mg_over_gamma_Si_at_1900_C: 2.0
+        uncertainty: "Ratios are approximate as printed; no uncertainty is stated."
+        qualification_as_printed: "The reason why γMg and γSi should strongly depend on the temperature and melt composition is unclear."
+        note: "These ratios are described as coefficients needed for model trends to match experiments, not as measured evaporation coefficients."
+    - observation_id: mendybaev_2018_stated_model_and_experiment_qualifications
+      type: thermodynamic_example
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Introduction; Results and Discussion
+      units: qualitative statements as printed
+      values:
+        statements_as_printed:
+        - "The coarse-grained texture of igneous Ca-, Al-rich Inclusions (CAIs) indicate that their precursors have experienced a high-temperature melting event followed by slow cooling."
+        - "The melting under low-pressure solar nebula conditions could have resulted in chemical and isotopic fractionations which are now recorded in CAIs."
+        - "To understand the evaporation kinetics and thus to place quantitative constraints on conditions at which the CAIs were formed, a large number of laboratory experiments were conducted in which CaO-MgO-Al2O3-SiO2 (CMAS) melts were evaporated in a vacuum at 1600º to 1900ºC (e.g., [1–3] and references therein)."
+        - "These experiments successfully reproduced the major chemical and isotopic features of CAIs."
+        - "The evaporation process could also be modeled by using a thermodynamic approach as it was applied in [4–6], for example."
+        - "Here we compare experimental results on evaporation of two CAI-like melts with the ones calculated using the stoichiometric-Margules solution model for CMAS system [7] and using the ideal associated-solution model [8]."
+        - "The evaporation process could also be modeled by using a thermodynamic approach as it was applied in [4–6], for example."
+        - "Here we compare experimental results on evaporation of two CAI-like melts with the ones calculated using the stoichiometric-Margules solution model for CMAS system [7] and using the ideal associated-solution model [8]."
+        - "The evaporation of CAI-like melts could also be modeled thermodynamically using an approach of [4] in which the equilibrium gas composition above a melt was calculated first, then the amount of Ca, Mg, Al and Si in the gas phase was subtracted from their amounts in the starting melt, and the resulting new composition melt was considered as a new starting material and the procedure continued."
+        - "Such an approach using Berman’s CMAS model [7] was used in [1] to model evaporation of CAIB melt. The calculations have reproduced the major chemical features observed in experiments, but have showed that temperature would strongly effect the evaporation trajectory which contradicts the experimental observations."
+        - "The calculated trends can match the experimental ones if evaporation coefficients of Mg (γMg) and Si (γSi) of the model vary such that γMg/γSi should be ~1 to match the experiments at 1600° and ~0.5 at 1900°C."
+        - "In other words, the evaporation coefficients during evaporation of the same composition melt should strongly depend on temperature."
+        - "In addition, in order to match the experimental data on evaporation of CMS-1 FUN CAI-like (CMS-1) melt that was evaporated at 1900°C [3], the γMg/γSi ~2 is required, which is very different from γMg/γSi~0.5 for CAIB melt at the same temperature."
+        - "The reason why γMg and γSi should strongly depend on the temperature and melt composition is unclear."
+        - "To model evaporation of CAIB and CMS-1melt here, we used a thermodynamic model [9] in a framework of the ideal associated-solution theory [8]."
+        - "The major advantage of such a model is that it utilizes activities of components in high-temperature melts directly measured by Knudsen effusion mass spectrometry (KEMS) rather than being obtained indirectly."
+        - "The model also allows calculating thermodynamic properties of a melt within a wide range of composition in the system of interest using available data for the most important melt components."
+        - "Using such a model and thermodynamic properties of melt components determined by KEMS at 1300 to 2200°C, we calculated evolution of chemical composition and activities of components for CAIB and CMS-1 melts."
+        - "It was found that in agreement with the experimental results, the calculated trends for CAIB melt shows very weak temperature dependence of the evaporation trajectory and fit the experimental ones quite nicely without changing evaporation coefficients of Mg and Si."
+        - "It should be mentioned that in these calculations we used evaporation coefficients equal to 1, which are typical for molten oxides (see [10] for experiments on molten SiO2 and [11] on molten Al2O3), as well as for liquids with spherically symmetrical molecules and atomic liquids [12]."
+        translation_note: "The printed English has 'strongly effect' and 'CMS-1melt'; retained verbatim rather than silently corrected."
+    - observation_id: mendybaev_2018_ideal_associated_solution_model_scope_and_results
+      type: thermodynamic_example
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+      units: as printed
+      values:
+        model: ideal associated-solution theory, reference [8], thermodynamic model [9]
+        thermodynamic_properties_temperature_C:
+          lower: 1300
+          upper: 2200
+        activity_measurement_method: Knudsen effusion mass spectrometry (KEMS)
+        activity_measurement_approach_as_printed: "activities of components in high-temperature melts directly measured by Knudsen effusion mass spectrometry (KEMS) rather than being obtained indirectly."
+        calculated_melt_compositions: [CAIB, CMS-1]
+        evaporation_coefficients_used: 1.0
+        claim_as_printed: "in agreement with the experimental results, the calculated trends for CAIB melt shows very weak temperature dependence of the evaporation trajectory and fit the experimental ones quite nicely without changing evaporation coefficients of Mg and Si."
+        coefficient_context_as_printed: "evaporation coefficients equal to 1, which are typical for molten oxides ... as well as for liquids with spherically symmetrical molecules and atomic liquids."
+        note: "No individual component activity, activity coefficient, thermodynamic property, or model trajectory values are tabulated in this abstract."
+    - observation_id: mendybaev_2018_activity_standard_state_and_defining_ion
+      type: method
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+      units: as printed
+      values:
+        activities_referred_to: components in high-temperature CMAS melts
+        defining_ions:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        standard_states:
+          state: {tag: unknown, reason: not_stated_in_this_source}
+        note: "The abstract says the model uses activities measured by KEMS, but does not name the components, ions, or standard states for the individual activities."
