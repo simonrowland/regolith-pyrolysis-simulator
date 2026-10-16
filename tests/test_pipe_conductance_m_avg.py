@@ -49,6 +49,7 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
     configured = {}
     overhead = SimpleNamespace(
         pipe_diameter_m=0.4,
+        last_stream_boundary={'pressure_mbar': 2.0},
         estimate_transport_state=lambda _flux, _melt: {
             "pipe_temperature_C": 900.0,
             "conductance_temperature_C": 1450.0,
@@ -77,6 +78,8 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
             campaign_hour=0.0,
         ),
         _resolve_condensation_carrier_gas=lambda: "N2",
+        _overhead_holdup_mol=lambda: {},
+        _flowing_stream_partial_pressures=lambda flux, transport, **kwargs: {"SiO": transport['pressure_mbar']},
     )
 
     PyrolysisSimulator._configure_condensation_operating_conditions(
@@ -172,6 +175,45 @@ def test_ideal_regulated_sweep_uses_open_duct_and_flags_inertial_domain():
     )
     assert sum(flows.values()) == pytest.approx(
         capacity * 3600.0 / (MOLAR_MASS["N2"] / 1000.0))
+
+
+def test_prior_discharge_cannot_spend_fresh_source_outlet_capacity():
+    from engines.builtin.overhead_bleed import controlled_flow_capacity
+    model = OverheadGasModel({'enabled': True, 'volume_m3': 1.0})
+    melt = MeltState()
+    melt.atmosphere = Atmosphere.CONTROLLED_O2
+    melt.temperature_C = 1500.0
+    melt.p_total_mbar = 1.0
+    fe = 1.0 / (MOLAR_MASS['Fe'] / 1000.0)
+    oxygen_stock = 1.0 / (MOLAR_MASS['O2'] / 1000.0)
+    transport = model.estimate_transport_state(EvaporationFlux(), melt)
+    capacity = controlled_flow_capacity(
+        pipe_capacity_kg_hr=2.0, equipment_capacity_kg_hr=1.0,
+        evolved_flux_kg_hr=1.0, retained_holdup_kg=1.0, upstream_pressure_bar=0.001,
+    )
+    flows = model.flowing_stream_mol_hr(
+        {'Fe': fe}, melt, transport, holdup_mol={'O2': oxygen_stock},
+        effective_transport_capacity=capacity,
+    )
+    assert flows['Fe'] == fe
+    assert flows.get('O2', 0.0) == 0.0
+
+
+def test_regulator_makeup_includes_finite_vessel_fill_and_is_idempotent():
+    model = OverheadGasModel({'enabled': True, 'volume_m3': 1.0, 'temperature_model': 'lumped'})
+    melt = MeltState()
+    melt.atmosphere = Atmosphere.PN2_SWEEP
+    melt.temperature_C = 1500.0
+    melt.p_total_mbar = 10.0
+    transport = model.estimate_transport_state(EvaporationFlux(), melt)
+    flows = model.flowing_stream_mol_hr({}, melt, transport)
+    boundary = dict(model.last_stream_boundary)
+    # Ideal-gas definition in a 1 m3 vessel, initially empty: n=PV/(RT).
+    expected_fill_mol = 1000.0 / (GAS_CONSTANT * (1773.15 - 100.0))
+    assert boundary['carrier_inventory_change_mol'] == pytest.approx(expected_fill_mol)
+    assert boundary['carrier_inlet_makeup_mol_hr'] - flows['N2'] == pytest.approx(expected_fill_mol)
+    model.flowing_stream_mol_hr({}, melt, transport)
+    assert model.last_stream_boundary['carrier_inlet_makeup_mol_hr'] == boundary['carrier_inlet_makeup_mol_hr']
 
 
 def test_pure_sio_returns_sio_molar_mass():

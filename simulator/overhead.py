@@ -50,7 +50,7 @@ populate; turbine speed/capacity is not an input to this model.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Mapping, Optional
 
 from simulator.state import (
@@ -65,6 +65,7 @@ from simulator.state import (
 # pipe-defaults home; cycle-safe — condensation doesn't import overhead) [BUG-052].
 from simulator.condensation import DEFAULT_PIPE_TEMPERATURE_C  # °C — default pipe/liner temperature
 from engines.builtin.overhead_bleed import (
+    BuiltinOverheadBleedProvider,
     EffectiveTransportCapacity,
     controlled_flow_capacity,
 )
@@ -1039,9 +1040,6 @@ class OverheadGasModel:
         gas.melt_offgas_O2_mol_hr = O2_flow_mol_hr
         gas.mre_anode_O2_mol_hr = max(0.0, float(mre_anode_O2_mol_hr))
 
-        # Total evaporation rate → pressure buildup
-        total_evap_kg_hr = evap_flux.total_kg_hr  # kg/hr — total evaporation mass flow
-
         # ── Pipe conductance limit ──────────────────────── [PIPE-1]
         upstream_flux = (
             transport_inlet_flux
@@ -1133,122 +1131,271 @@ class OverheadGasModel:
                 effective_transport_capacity=effective_transport_capacity,
             )
         )
-        vapor_pressure_mbar = report_transport_state['vapor_pressure_mbar']  # mbar (nominal) — downstream proxy pressure
         gas.pressure_mbar = report_transport_state['pressure_mbar']  # mbar — reported downstream total pressure
-
-        # ── Product partial pressures (proportional to molar flow) ──
-        # Premise: ideal-gas partial pressure follows mole fraction. Algebra:
-        # ṅ_i=ṁ_i/M_i, y_i=ṅ_i/Σṅ, and p_i=y_i*P_vapor. Unit check:
-        # (kg/hr)/(kg/mol)=mol/hr and y_i is dimensionless. Sanity: equal
-        # 1 kg/hr Fe and O2 flows give p_Fe/p_O2=M_O2/M_Fe≈0.573, not 1.
-        if total_evap_kg_hr > 0:
-            gas.composition.update(self.species_partial_pressures(
-                evap_flux,
-                vapor_pressure_mbar,
-                self.species_formula_registry,
-            ))
-
-        # Controlled/background atmosphere partial pressures.
-        atmosphere_name = getattr(melt.atmosphere, 'name', '')
-        if atmosphere_name in {
-            'CONTROLLED_O2',
-            'CONTROLLED_O2_FLOW',
-            'O2_BACKPRESSURE',
-        } and melt.pO2_mbar > 0.0:
-            gas.composition['O2'] = max(  # mbar — controlled O2 partial pressure floor
-                gas.composition.get('O2', 0.0), melt.pO2_mbar)  # mbar — controlled O2 partial pressure floor
-
-        if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
-            gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
-                gas.composition.get('CO2', 0.0), melt.p_total_mbar * 0.96)  # mbar — CO2 partial pressure; 0.96 mole fraction
-        elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
-            gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — inert-sweep total pressure floor
-            # Kr audit 2026-07-25: key the sweep balance partial off the
-            # STAMPED carrier, not literal 'N2' — a Kr carrier previously
-            # got a phantom full-magnitude N2 partial alongside its real
-            # Kr partial (double-counted buffer in flue partials and the
-            # thermal-train Kn mixture).
-            _sweep_key = (
-                getattr(melt, 'background_gas_species', '')
-                or ('Ar' if atmosphere_name == 'ARGON_FLOW' else 'N2')
-            )
-            gas.composition[_sweep_key] = max(
-                gas.composition.get(_sweep_key, 0.0),
-                max(0.0, melt.p_total_mbar - melt.pO2_mbar))  # mbar — sweep balance partial pressure
-        elif atmosphere_name in {
-            'CONTROLLED_O2',
-            'CONTROLLED_O2_FLOW',
-            'O2_BACKPRESSURE',
-        } and melt.p_total_mbar > 0:
-            gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — controlled total pressure floor
-            background_species = str(
-                getattr(melt, 'background_gas_species', '') or '').strip()
-            if background_species and background_species.upper() != 'O2':
-                background_fraction = float(  # dimensionless — background gas mole fraction
-                    getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                background_fraction = min(1.0, max(0.0, background_fraction))  # dimensionless — clamped mole fraction
-                gas.composition[background_species] = max(  # mbar — background gas partial pressure
-                    gas.composition.get(background_species, 0.0),
-                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
-                    * background_fraction,  # mbar — background gas partial pressure share
-                )
-
-        partial_pressure_sum_mbar = sum(  # mbar — sum of nonnegative reported partial pressures
-            max(0.0, float(partial_pressure))
-            for partial_pressure in gas.composition.values()
-        )
-        # F-113 derivation:
-        # premise: after controlled/background floors are added, reported
-        # partial pressures are additive components of the same gas state.
-        # algebra: P_total >= Σ_i p_i.
-        # unit check: every p_i and P_total here is mbar.
-        # sanity: when floors add nothing, this is a no-op; when floors would
-        # exceed the prior max-floor total, the total rises instead of
-        # advertising an impossible sum(partials) > total state.
-        gas.pressure_mbar = max(gas.pressure_mbar, partial_pressure_sum_mbar)
-
+        flows = self._molar_stream_from_mass_rates(evap_flux.species_kg_hr, self.species_formula_registry)
+        # Downstream capture removes condensables, not upstream carrier flow.
+        # Actual O2 telemetry already includes coproduct/dose/discharge here;
+        # adding the reaction projector again would count production twice.
+        upstream_flows = getattr(self, 'last_stream_mol_hr', {})
+        has_live_inlet = bool(upstream_flows) and upstream_flux.total_kg_hr > 0.0
+        if has_live_inlet:
+            carrier = self.last_stream_boundary.get('carrier_species', '')
+            for species, rate in upstream_flows.items():
+                if species in {'O2', carrier}:
+                    flows[species] = rate
+        if O2_flow_mol_hr > 0.0:
+            flows['O2'] = O2_flow_mol_hr
+        if not has_live_inlet or not self.last_stream_boundary.get('carrier_species'):
+            flows = self.flowing_stream_mol_hr(flows, melt, report_transport_state)
+            gas.pressure_mbar = self.last_stream_boundary['pressure_mbar']
+        gas.composition.update(self.species_partial_pressures(
+            evap_flux, gas.pressure_mbar, self.species_formula_registry,
+            molar_flow_by_species=flows,
+        ))
+        if not flows or sum(flows.values()) == 0.0:
+            gas.pressure_mbar = 0.0
         return gas
+
+    @staticmethod
+    def _molar_stream_from_mass_rates(
+        species_kg_hr: Mapping[str, float],
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+    ) -> dict[str, float]:
+        flows = {}
+        for species, rate in species_kg_hr.items():
+            mass = _species_molar_mass_g_mol(species, species_formula_registry)
+            if mass is None or mass <= 0.0:
+                raise OverheadConfigurationError(f'stream molar mass unavailable for {species!r}')
+            # q=m_dot/M: (kg/hr)/(g/mol /1000)=mol/hr; zero mass gives zero q.
+            flows[species] = _required_finite_nonnegative_float(rate, f'stream.{species}.kg_hr') / (mass / 1000.0)
+        return flows
 
     @staticmethod
     def species_partial_pressures(
         evap_flux: EvaporationFlux,
         vapor_pressure_mbar: float,
         species_formula_registry: Optional[Mapping[str, Any]] = None,
+        *,
+        molar_flow_by_species: Optional[Mapping[str, float]] = None,
     ) -> dict[str, float]:
-        """Project a species mass-flow mixture onto mole-fraction partials."""
-        total_evap_kg_hr = max(0.0, float(evap_flux.total_kg_hr))
-        if total_evap_kg_hr <= 0.0:
-            return {}
-        molar_flow_by_species: dict[str, float] = {}
-        for species, rate in evap_flux.species_kg_hr.items():
-            # Premise: gas mole fraction is n_i/sum(n), with
-            # n_dot_i=m_dot_i/M_i.  Catalog-generated carrier ids therefore
-            # must resolve M_i through the same formula registry as the ledger,
-            # not disappear when absent from the legacy constant. Units:
-            # (kg/hr)/(kg/mol)=mol/hr; p_i=y_i*P remains mbar. Sanity: legacy
-            # species still resolve from MOLAR_MASS, while pure TiO gives y=1.
-            molar_mass_g_mol = _species_molar_mass_g_mol(
-                species, species_formula_registry
-            )
-            if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
-                continue
-            molar_flow_by_species[species] = max(0.0, float(rate)) / (
-                molar_mass_g_mol / 1000.0
-            )
-        total_molar_flow = sum(molar_flow_by_species.values())
-        # F-316: y_i = n_dot_i / sum(n_dot), p_i = y_i P_vapor. Mass rates
-        # become mol/hr through kg/(kg/mol); unknown-only mixtures retain the
-        # legacy mass-fraction fallback instead of losing pressure entirely.
+        """Dalton projection of the complete local molar stream, in mbar."""
+        pressure = _required_finite_nonnegative_float(vapor_pressure_mbar, 'stream.pressure_mbar')
+        flows = (dict(molar_flow_by_species) if molar_flow_by_species is not None else
+                 OverheadGasModel._molar_stream_from_mass_rates(evap_flux.species_kg_hr, species_formula_registry))
+        flows = {str(s): _required_finite_nonnegative_float(q, f'stream.{s}.mol_hr')
+                 for s, q in flows.items()}
+        total_molar_flow = sum(flows.values())
+        # Premise: q includes emitted, carrier and dosed gas at this location.
+        # Dalton: y_i=q_i/Q, p_i=y_i*P; (mol/hr)/(mol/hr)*mbar=mbar.
+        # Sum(p)=P; adding carrier at fixed P lowers every unchanged partial.
+        # A zero-flow vector has no composition, including at nonzero command.
         if total_molar_flow > 0.0:
             return {
-                species: molar_flow / total_molar_flow * vapor_pressure_mbar
-                for species, molar_flow in molar_flow_by_species.items()
+                species: molar_flow / total_molar_flow * pressure
+                for species, molar_flow in flows.items()
             }
-        return {
-            species: max(0.0, float(rate)) / total_evap_kg_hr
-            * vapor_pressure_mbar
-            for species, rate in evap_flux.species_kg_hr.items()
+        return {}
+
+    def flowing_stream_mol_hr(
+        self, source_mol_hr: Mapping[str, float], melt: MeltState,
+        transport: Mapping[str, Any], *,
+        holdup_mol: Optional[Mapping[str, float]] = None,
+        effective_transport_capacity: Optional[EffectiveTransportCapacity] = None,
+        headspace_volume_m3: Optional[float] = None,
+    ) -> dict[str, float]:
+        """Resolve the existing outlet boundary; no source flux or ledger edits."""
+        self.stream_physics_notices = []
+        pressure_mbar = float(transport['pressure_mbar'])
+        temperature_K = float(transport['conductance_temperature_C']) + CELSIUS_TO_KELVIN_OFFSET
+        flows = {str(s): float(q) for s, q in source_mol_hr.items()}
+        inventory = dict(holdup_mol or {})
+        if not inventory and effective_transport_capacity is not None and effective_transport_capacity.saturation > 1.0:
+            self.stream_physics_notices.append({
+                'reason': 'stream_source_exceeds_outlet_capacity', 'status': 'extrapolated',
+                'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                'boundary_saturation': effective_transport_capacity.saturation,
+            })
+        # A consuming reaction draws from the vessel before discharge. It is
+        # not a negative outward gas flow. mol/hr * the one-hour tick = mol.
+        for species, rate in list(flows.items()):
+            if rate < 0.0:
+                available = inventory.get(species, 0.0) + rate * 1.0
+                if available < 0.0:
+                    # The pre-commit source proposal can exceed available
+                    # reactant (including proposals the ledger later rejects
+                    # at its numerical floor). Preserve source flux and expose
+                    # the deficit; an absent outward reactant is not negative
+                    # gas. The source solve/commit still owns its disposition.
+                    self.stream_physics_notices.append({
+                        'reason': 'stream_reactant_supply_inconsistent', 'status': 'extrapolated',
+                        'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                        'species': species, 'signed_source_mol_hr': rate,
+                        'available_inventory_mol': inventory.get(species, 0.0),
+                        'reactant_deficit_mol': -available,
+                    })
+                inventory[species] = max(0.0, available)
+                flows[species] = 0.0
+        if inventory:
+            # The existing bleed owner determines the part of prior inventory
+            # discharged during this one-hour tick. Do not treat stored mol as
+            # fresh mol/hr or add bubbler/redox counters already in that stock.
+            masses = {s: _species_molar_mass_g_mol(s, self.species_formula_registry)
+                      for s in inventory}
+            if any(m is None or m <= 0 for m in masses.values()):
+                raise OverheadConfigurationError('stream holdup molar mass unavailable')
+            total_mol = sum(inventory.values())
+            total_kg = sum(n * masses[s] / 1000.0 for s, n in inventory.items())
+            source_kg_hr = 0.0
+            for species, mol_hr in flows.items():
+                mass = _species_molar_mass_g_mol(species, self.species_formula_registry)
+                if mass is None or mass <= 0.0:
+                    raise OverheadConfigurationError(f'stream molar mass unavailable for {species!r}')
+                source_kg_hr += mol_hr * mass / 1000.0
+            boundary = effective_transport_capacity or controlled_flow_capacity(
+                pipe_capacity_kg_hr=transport['pipe_conductance_kg_hr'],
+                equipment_capacity_kg_hr=None, equipment_capacity_required=False,
+                evolved_flux_kg_hr=source_kg_hr, retained_holdup_kg=total_kg,
+                upstream_pressure_bar=pressure_mbar / 1000.0,
+            )
+            # One outlet capacity serves fresh source plus prior discharge.
+            # Preserve source flux (the coupled source solve is a later chunk)
+            # and reserve it first: spare=max(0, swallowed-source) [kg/hr].
+            # The existing bleed owner allocates that spare over prior stock.
+            # Its effective-capacity branch also avoids applying P2 derating
+            # twice to transport's already finite-downstream PIPE-1 capacity.
+            prior_boundary = replace(boundary, swallowed_flux_kg_hr=max(
+                0.0, boundary.swallowed_flux_kg_hr - source_kg_hr))
+            if source_kg_hr > boundary.effective_capacity_kg_hr:
+                self.stream_physics_notices.append({
+                    'reason': 'stream_source_exceeds_outlet_capacity', 'status': 'extrapolated',
+                    'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                    'source_kg_hr': source_kg_hr, 'outlet_capacity_kg_hr': boundary.effective_capacity_kg_hr,
+                })
+            discharged = BuiltinOverheadBleedProvider._bled_species_mol(
+                inventory, total_mol=total_mol, total_kg=total_kg,
+                controls={'dt_hr': 1.0,
+                          'bleed_conductance_kg_s': transport['conductance_kg_s'],
+                          'p_total_bar': pressure_mbar / 1000.0,
+                          'p_downstream_bar': transport['p_downstream_bar'],
+                          'effective_transport_capacity': prior_boundary,
+                          'force_drain_all': not self._finite_headspace_enabled},
+            )
+            for species, mol in discharged.items():
+                flows[species] = flows.get(species, 0.0) + mol / 1.0  # mol / one-hour tick -> mol/hr
+        flows = {s: _required_finite_nonnegative_float(q, f'stream.{s}.mol_hr')
+                 for s, q in flows.items()}
+        atmosphere = getattr(melt.atmosphere, 'name', '')
+        carrier = str(getattr(melt, 'background_gas_species', '') or '')
+        if atmosphere in {'PN2_SWEEP', 'ARGON_FLOW', 'CO2_BACKPRESSURE'}:
+            carrier = carrier or {'PN2_SWEEP': 'N2', 'ARGON_FLOW': 'Ar',
+                                  'CO2_BACKPRESSURE': 'CO2'}[atmosphere]
+        else:
+            carrier = ''
+        self.last_stream_boundary = {
+            'pressure_mbar': pressure_mbar, 'location': 'melt_to_train',
+            'pressure_command_mbar': float(melt.p_total_mbar),
+            'carrier_species': carrier,
+            'provenance': 'emitted_plus_existing_bleed',
+            'prior_inventory_discharge_dt_hr': 1.0,
         }
+        if carrier:
+            # Existing PIPE-1 gives mass capacity M_bar*Q. Divide by the same
+            # M_bar: composition-independent viscosity cancels M_bar exactly.
+            # (kg/s)*3600/(kg/mol)=mol/hr; equal endpoint pressures give Q=0.
+            mixture = {s: q * _species_molar_mass_g_mol(s, self.species_formula_registry) / 1000.0
+                       for s, q in flows.items() if q > 0.0}
+            if not mixture:
+                mixture = {carrier: _species_molar_mass_g_mol(carrier, self.species_formula_registry) / 1000.0}
+            mean_mass = _mean_molar_mass_kg_mol(mixture, species_formula_registry=self.species_formula_registry)
+            capacity = self._pipe_conductance(
+                pressure_mbar * 100.0, temperature_K - CELSIUS_TO_KELVIN_OFFSET,
+                p_downstream_Pa=float(transport['p_downstream_bar']) * 1.0e5,
+                species_kg_for_M_avg=mixture,
+            )
+            throughput = capacity * 3600.0 / mean_mass
+            # Steady outlet balance: q_carrier = Q_out - sum(q_noncarrier).
+            # mol/hr throughout. At zero emitted flow the pure sweep survives.
+            required_carrier = throughput - sum(q for s, q in flows.items() if s != carrier)
+            self.last_stream_boundary.update(provenance='ideal_regulator_open_duct',
+                                             required_carrier_out_mol_hr=required_carrier)
+            if required_carrier >= 0.0:
+                flows[carrier] = required_carrier
+            else:
+                flows[carrier] = 0.0
+                self.stream_physics_notices.append({
+                    'reason': 'stream_carrier_boundary_infeasible', 'status': 'extrapolated',
+                    'required_carrier_out_mol_hr': required_carrier,
+                    'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                })
+            if pressure_mbar > 0.0 and throughput > 0.0:
+                # Diagnostic only, not a new choking/transport law. Continuity
+                # gives u=(Q/3600)RT/(P A) [m/s]. For ideal diatomic N2 use
+                # gamma=1.4 as an explicitly approximate property: a=sqrt(gamma RT/M).
+                # Molar sonic ceiling follows isentropic continuity at Mach=1;
+                # A P sqrt(gamma/(MRT))*[2/(gamma+1)]^((gamma+1)/(2(gamma-1)))
+                # has mol/s units, tends to zero with P, and only flags PIPE-1.
+                area = math.pi * self.pipe_diameter_m**2 / 4.0
+                mass = _species_molar_mass_g_mol(carrier, self.species_formula_registry) / 1000.0
+                gamma = 1.4
+                speed = throughput / 3600.0 * GAS_CONSTANT * temperature_K / (pressure_mbar * 100.0 * area)
+                sound = math.sqrt(gamma * GAS_CONSTANT * temperature_K / mass)
+                sonic = (area * pressure_mbar * 100.0 * math.sqrt(gamma / (mass * GAS_CONSTANT * temperature_K))
+                         * (2.0 / (gamma + 1.0))**((gamma + 1.0) / (2.0 * (gamma - 1.0))) * 3600.0)
+                if speed > sound or throughput > sonic:
+                    self.stream_physics_notices.append({
+                        'reason': 'stream_throughput_out_of_domain', 'status': 'extrapolated',
+                        'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                        'provenance': 'ideal_regulator_open_duct',
+                        'throughput_mol_hr': throughput, 'sonic_ceiling_mol_hr': sonic,
+                        'mach': speed / sound, 'gamma_approximation': gamma, 'property_basis': carrier,
+                    })
+            # Finite-vessel makeup differs from outlet flow: n=pV/(RT),
+            # q_in=q_out+(n_now-n_prev)/1hr [mol/hr]. This is an internal
+            # regulator inventory, not a second AtomLedger material account.
+            if self._finite_headspace_enabled:
+                total = sum(flows.values())
+                n_now = (flows[carrier] / total * pressure_mbar * 100.0
+                         * self._resolve_headspace_volume(headspace_volume_m3)
+                         / (GAS_CONSTANT * self._headspace_temperature_K(melt))) if total else 0.0
+                tick = getattr(melt, 'hour', None)
+                if getattr(self, '_stream_inventory_tick', None) != tick:
+                    self._stream_inventory_start = dict(getattr(self, '_stream_carrier_inventory', {}))
+                    self._stream_inventory_tick = tick
+                previous = getattr(self, '_stream_inventory_start', {}).get(
+                    carrier, float((holdup_mol or {}).get(carrier, 0.0)))
+                makeup = flows[carrier] + (n_now - previous) / 1.0
+                self.last_stream_boundary['carrier_inlet_makeup_mol_hr'] = makeup
+                self.last_stream_boundary['carrier_inventory_change_mol'] = n_now - previous
+                self._stream_carrier_inventory = {carrier: n_now}
+                if makeup < 0.0:
+                    self.stream_physics_notices.append({
+                        'reason': 'stream_carrier_makeup_infeasible', 'status': 'extrapolated',
+                        'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                        'required_makeup_mol_hr': makeup,
+                    })
+        if not carrier and atmosphere not in {'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE'}:
+            # With no supplied carrier, a pressure command is a ceiling rather
+            # than extra gas. Invert the existing outlet law using the complete
+            # gas load: q_i*M_i is kg/hr, sum/3600 is kg/s. This determines
+            # pressure for the given source; it does not recompute evaporation.
+            mass_rates = {s: q * _species_molar_mass_g_mol(s, self.species_formula_registry) / 1000.0
+                          for s, q in flows.items() if q > 0.0}
+            pressure_mbar = self._vapor_pressure_mbar_from_flux(
+                sum(mass_rates.values()) / 3600.0,
+                temperature_K - CELSIUS_TO_KELVIN_OFFSET,
+                p_downstream_bar=transport['p_downstream_bar'],
+                species_kg_for_M_avg=mass_rates,
+            )
+            self.last_stream_boundary['pressure_mbar'] = pressure_mbar
+        self.last_stream_mol_hr = dict(flows)
+        if sum(flows.values()) == 0.0:
+            self.last_stream_boundary['pressure_mbar'] = 0.0
+            self.last_stream_boundary['status'] = 'zero_flow_no_composition'
+        for notice in self.stream_physics_notices:
+            notice.update(hour=getattr(melt, 'hour', None), campaign=getattr(melt.campaign, 'name', ''),
+                          location='melt_to_train', pressure_mbar=pressure_mbar,
+                          flows_mol_hr=dict(flows))
+        return flows
 
     def _update_finite_headspace(self, gas: OverheadGas, melt: MeltState,
                                  overhead_holdup_mol: Mapping[str, float],

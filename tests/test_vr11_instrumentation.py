@@ -276,7 +276,11 @@ def test_finite_live_pressure_map_refuses_nonfinite_silent_drop() -> None:
 
 
 def _efficiency_model() -> CondensationModel:
-    return CondensationModel(CondensationTrain.create_default())
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0, species_partial_pressures_mbar={'SiO': 1.0},
+    )
+    return model
 
 
 def test_b112_zero_residence_mints_typed_pass_through_outcome() -> None:
@@ -314,6 +318,7 @@ def test_b112_nonpositive_local_pressure_mints_typed_outcome(monkeypatch) -> Non
     outcomes: list[dict[str, Any]] = []
     eta = model._condensation_efficiency(
         stage=stage,
+        flowing_pressure_pa=0.0,
         species="SiO",
         T_cond_C=1050.0,
         residence_s=1.0,

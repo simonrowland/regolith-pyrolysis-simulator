@@ -888,6 +888,7 @@ class EvaporationMixin:
             temperature_K=T_K,
         )
         batch_report = serialize_vapour_batch(vapour_batch)
+        self._stream_source_pressures_Pa = dict(vapor_pressures)
         if isinstance(batch_report, Mapping):
             channels = batch_report.get('channels_by_species')
             if isinstance(channels, Mapping):
@@ -3543,11 +3544,9 @@ class EvaporationMixin:
             vapor_oxygen_atoms = float(
                 formula.elements.get('O', 0.0) or 0.0
             )
-            if (
-                o2_kg_hr < 0.0
-                or vapor_oxygen_atoms > 0.0
-                or oxygen_destination == 'process.overhead_gas'
-            ):
+            if reaction_oxygen_destination(
+                o2_kg_hr, vapor_oxygen_atoms, oxygen_destination,
+            ) == 'process.overhead_gas':
                 source_mol_hr['O2'] = (
                     source_mol_hr.get('O2', 0.0)
                     + o2_kg_hr / o2_molar_mass
@@ -3768,15 +3767,10 @@ class EvaporationMixin:
                 evap_flux,
                 self.melt,
             )
+            stream_partials = self._flowing_stream_partial_pressures(evap_flux, transport)
             self.condensation_model.configure_operating_conditions(
-                overhead_pressure_mbar=transport['pressure_mbar'],
-                species_partial_pressures_mbar=(
-                    self.overhead_model.species_partial_pressures(
-                        evap_flux,
-                        transport['vapor_pressure_mbar'],
-                        self.species_formula_registry,
-                    )
-                ),
+                overhead_pressure_mbar=self.overhead_model.last_stream_boundary['pressure_mbar'],
+                species_partial_pressures_mbar=stream_partials,
                 pipe_diameter_m=self.overhead_model.pipe_diameter_m,
                 # Chapman-Enskog diffusion uses bulk-gas temperature; the
                 # separate pipe temperature is a wall/liner condition.
@@ -4043,7 +4037,12 @@ class EvaporationMixin:
         rate_kg_hr = native_fe_vapor_mol * fe_molar_mass
         evap_flux = EvaporationFlux(species_kg_hr={'Fe': rate_kg_hr})
         evap_flux.update_totals()
-        self._configure_condensation_operating_conditions(evap_flux)
+        self._configure_condensation_operating_conditions(
+            evap_flux,
+            **({'source_mol_hr': {'Fe': native_fe_vapor_mol},
+                'already_credited_mol': {'Fe': native_fe_vapor_mol}}
+               if source_account == 'process.metal_phase' else {}),
+        )
         if sample_time_h is not None:
             self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
         route_result = self.condensation_model.route(evap_flux, self.melt)

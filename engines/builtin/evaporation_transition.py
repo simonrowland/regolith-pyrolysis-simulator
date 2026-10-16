@@ -182,17 +182,18 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         sp_data = dict(controls.get("sp_data") or {})
         available_kg = float(controls.get("available_kg") or 0.0)
         oxygen_destination = str(sp_data.get("oxygen_destination") or "")
-        if oxygen_destination and oxygen_destination not in {
-            "process.overhead_gas",
-            "reservoir.fo2_buffer",
-        }:
+        from simulator.accounting import AccountingError
+        from simulator.evaporation import reaction_oxygen_destination
+        try:
+            reaction_oxygen_destination(0.0, 0.0, oxygen_destination)
+        except AccountingError as exc:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="unsupported",
                 control_audit=control_audit,
                 diagnostic={
                     "reason": (
-                        f"unsupported oxygen_destination {oxygen_destination!r}"
+                        str(exc)
                     ),
                 },
             )
@@ -335,7 +336,6 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         if O2_kg > 0.0:
             o2_formula = resolve_species_formula("O2", registry)
             o2_mol = O2_kg / o2_formula.molar_mass_kg_per_mol()
-            from simulator.evaporation import reaction_oxygen_destination
             if reaction_oxygen_destination(
                 O2_kg, vapor_oxygen_atoms, oxygen_destination,
             ) == "reservoir.fo2_buffer":

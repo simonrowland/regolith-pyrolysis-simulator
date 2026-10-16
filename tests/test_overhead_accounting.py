@@ -73,6 +73,7 @@ def test_native_metal_feed_projection_does_not_reconstruct_oxide_oxygen(monkeypa
     with pytest.raises(LookupError, match='feed captured'):
         sim._route_native_fe_vapor_to_condensation(2.0, source_account='process.metal_phase')
     assert captured['source_mol_hr'] == {'Fe': 2.0}
+    assert captured['already_credited_mol'] == {'Fe': 2.0}
 
 
 def _gas_train_sim(mass_kg=100.0):
@@ -1781,12 +1782,14 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
         projected_flux,
         vapor_pressure_mbar,
         species_formula_registry=None,
+        **kwargs,
     ):
         partial_pressure_registries.append(species_formula_registry)
         return real_species_partial_pressures(
             projected_flux,
             vapor_pressure_mbar,
             species_formula_registry,
+            **kwargs,
         )
 
     monkeypatch.setattr(
@@ -2007,7 +2010,10 @@ def test_argon_flow_writes_inert_carrier_boundary(headspace_enabled):
     )
 
     assert gas.pressure_mbar >= 10.0
-    assert gas.composition["Ar"] == pytest.approx(8.5)
+    # The flowing zero-evaporation stream is pure carrier: the irrelevant
+    # pO2 command supplies no O2 molar flow. Finite inventory reporting keeps
+    # its separate legacy boundary until the finite-vessel chunk.
+    assert gas.composition["Ar"] == pytest.approx(8.5 if headspace_enabled else 10.0)
     assert gas.composition.get("O2", 0.0) < 1.5
 
 

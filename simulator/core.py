@@ -3569,6 +3569,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _configure_condensation_operating_conditions(
         self,
         evap_flux: EvaporationFlux,
+        *,
+        source_mol_hr: Mapping[str, float] | None = None,
+        already_credited_mol: Mapping[str, float] | None = None,
     ) -> None:
         effective_transport_capacity = getattr(
             self,
@@ -3585,20 +3588,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.melt,
             **transport_kwargs,
         )
-        species_formula_registry = getattr(
-            self, "species_formula_registry", {}
-        )
-        partial_pressure_args = (
-            (evap_flux, transport['vapor_pressure_mbar'], species_formula_registry)
-            if species_formula_registry
-            else (evap_flux, transport['vapor_pressure_mbar'])
+        prior_holdup = self._overhead_holdup_mol()
+        for species, mol in (already_credited_mol or {}).items():
+            prior_holdup[species] = max(0.0, prior_holdup.get(species, 0.0) - mol)
+        partials = self._flowing_stream_partial_pressures(
+            evap_flux, transport, source_mol_hr=source_mol_hr, holdup_mol=prior_holdup,
         )
         self.condensation_model.configure_operating_conditions(
             wall_temperature_C=transport['pipe_temperature_C'],
-            overhead_pressure_mbar=transport['pressure_mbar'],
-            species_partial_pressures_mbar=(
-                self.overhead_model.species_partial_pressures(*partial_pressure_args)
-            ),
+            overhead_pressure_mbar=self.overhead_model.last_stream_boundary['pressure_mbar'],
+            species_partial_pressures_mbar=partials,
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
             # The upstream vapor is evaluated at the melt-side temperature used
             # by the conductance model; the independently scheduled pipe and
@@ -3658,6 +3657,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             campaign_name=getattr(self.melt.campaign, 'name', ''),
             campaign_hour=float(self.melt.campaign_hour),
         )
+
+    def _flowing_stream_partial_pressures(
+        self, evap_flux: EvaporationFlux, transport: Mapping[str, Any], *,
+        source_mol_hr: Mapping[str, float] | None = None,
+        holdup_mol: Mapping[str, float] | None = None,
+    ) -> dict[str, float]:
+        source = (dict(source_mol_hr) if source_mol_hr is not None else
+                  self._project_evaporation_overhead_source_mol_hr(evap_flux.species_kg_hr, {}))
+        flows = self.overhead_model.flowing_stream_mol_hr(
+            source, self.melt, transport,
+            holdup_mol=self._overhead_holdup_mol() if holdup_mol is None else holdup_mol,
+            effective_transport_capacity=getattr(self, '_effective_transport_capacity_this_tick', None),
+            headspace_volume_m3=self._headspace_volume_m3(),
+        )
+        partials = self.overhead_model.species_partial_pressures(
+            evap_flux, self.overhead_model.last_stream_boundary['pressure_mbar'], self.species_formula_registry,
+            molar_flow_by_species=flows,
+        )
+        self._last_backend_diagnostics['stream_pressure'] = {
+            'boundary': dict(self.overhead_model.last_stream_boundary),
+            'flows_mol_hr': dict(flows), 'partials_mbar': dict(partials),
+            'notices': list(self.overhead_model.stream_physics_notices),
+        }
+        from simulator.wall_deposition import _record_wall_pressure_notice
+        for notice in self.overhead_model.stream_physics_notices:
+            for species in evap_flux.species_kg_hr:
+                _record_wall_pressure_notice(
+                    self.condensation_model, 'evaporation_transport_notices_by_species',
+                    species, 'melt_to_train_stream', notice,
+                )
+        return partials
 
     def _apply_c2a_knudsen_pressure_adjustment(self) -> None:
         if self.melt.campaign not in (
@@ -13698,6 +13728,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_native_fe_saturation_event = {}
         self._native_fe_vapor_residual_capacity_mol_this_hr = None
         self._last_partial_melt_offgassing_diagnostic = {}
+        self._stream_source_pressures_Pa = {}
         self._silent_zero_notes = []
         self._last_extraction_completeness_diagnostic = {}
         self._last_target_inventory_diagnostic = {}
@@ -13888,6 +13919,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._effective_transport_capacity_this_tick = (
             effective_transport_capacity
         )
+        self._stream_inlet_holdup_this_tick = self._overhead_holdup_mol()
 
         # --- 5. Condensation routing ---
         # Send evaporated species through the 8-stage train.
@@ -14007,12 +14039,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             effective_transport_capacity=effective_transport_capacity,
         )
         self._melt_headspace_composition_mbar = (
-            self.overhead_model.species_partial_pressures(
-                evap_flux,
-                upstream_transport['vapor_pressure_mbar'],
-                self.species_formula_registry,
+            self._flowing_stream_partial_pressures(
+                evap_flux, upstream_transport,
+                holdup_mol=self._stream_inlet_holdup_this_tick,
             )
         )
+        # This chunk diagnoses the uncoupled source bound; no clamp or flux
+        # change. The same-tick source/backpressure solve belongs to chunk 2.
+        source_pressures = getattr(self, '_stream_source_pressures_Pa', {})
+        for species, partial_mbar in self._melt_headspace_composition_mbar.items():
+            source_pa = source_pressures.get(species)
+            if source_pa is not None and partial_mbar * 100.0 > float(source_pa):
+                self.overhead_model.stream_physics_notices.append({
+                    'reason': 'source_backpressure_inconsistent', 'status': 'extrapolated',
+                    'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                    'species': species, 'hour': self.melt.hour,
+                    'campaign': self.melt.campaign.name, 'location': 'melt_to_train',
+                    'source_equilibrium_pressure_pa': float(source_pa),
+                    'source_identity': 'vapour_batch_flux_pressures_Pa',
+                    'candidate_partial_pa': partial_mbar * 100.0,
+                    'pressure_command_mbar': self.melt.p_total_mbar,
+                    'flows_mol_hr': dict(self.overhead_model.last_stream_mol_hr),
+                })
+                from simulator.wall_deposition import _record_wall_pressure_notice
+                _record_wall_pressure_notice(
+                    self.condensation_model, 'evaporation_transport_notices_by_species',
+                    species, 'melt_to_train_stream', self.overhead_model.stream_physics_notices[-1],
+                )
+        self._last_backend_diagnostics['stream_pressure']['notices'] = list(
+            self.overhead_model.stream_physics_notices)
         if capacity_result is not None and effective_transport_capacity is None:
             self.overhead.transport_saturation_pct = (
                 capacity_result.saturation.combined * 100.0
