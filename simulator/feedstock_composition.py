@@ -287,6 +287,13 @@ def normalized_feedstock_component_masses_kg(
     mass_kg: float,
 ) -> dict[str, float]:
     """Return ledger-normalized raw feedstock component masses."""
+    # Use the same single iron-preparation owner as load_batch before applying
+    # the complete-feed normalization. fe_redox calls this helper while
+    # reporting the prepared scale; that already-split input is an idempotent
+    # no-op for initialize_feedstock_iron.
+    from simulator.fe_redox import initialize_feedstock_iron
+
+    feedstock, _ = initialize_feedstock_iron(feedstock)
     batch_mass_kg = float(mass_kg)
     raw_masses: dict[str, float] = {}
     composition = feedstock.get("composition_wt_pct", {}) or {}
