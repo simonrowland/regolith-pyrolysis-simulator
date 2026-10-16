@@ -1366,22 +1366,9 @@ class OverheadGasModel:
                 n_now = (flows[carrier] / total * pressure_mbar * 100.0
                          * self._resolve_headspace_volume(headspace_volume_m3)
                          / (GAS_CONSTANT * self._headspace_temperature_K(melt))) if total else 0.0
-                tick = getattr(melt, 'hour', None)
-                if getattr(self, '_stream_inventory_tick', None) != tick:
-                    self._stream_inventory_start = dict(getattr(self, '_stream_carrier_inventory', {}))
-                    self._stream_inventory_tick = tick
-                previous = getattr(self, '_stream_inventory_start', {}).get(
-                    carrier, float((holdup_mol or {}).get(carrier, 0.0)))
-                makeup = flows[carrier] + (n_now - previous) / 1.0
-                self.last_stream_boundary['carrier_inlet_makeup_mol_hr'] = makeup
-                self.last_stream_boundary['carrier_inventory_change_mol'] = n_now - previous
-                self._stream_carrier_inventory = {carrier: n_now}
-                if makeup < 0.0:
-                    self.stream_physics_notices.append({
-                        'reason': 'stream_carrier_makeup_infeasible', 'status': 'extrapolated',
-                        'authority_level': 'extrapolated', 'output_status': 'status_bearing',
-                        'required_makeup_mol_hr': makeup,
-                    })
+                self._update_stream_carrier_inventory(
+                    carrier, n_now, flows[carrier], melt, holdup_mol or {},
+                )
         if not carrier and atmosphere not in {'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE'}:
             # With no supplied carrier, a pressure command is a ceiling rather
             # than extra gas. Invert the existing outlet law using the complete
@@ -1406,6 +1393,28 @@ class OverheadGasModel:
                               location='melt_to_train', pressure_mbar=pressure_mbar,
                               flows_mol_hr=dict(flows))
         return flows
+
+    def _update_stream_carrier_inventory(
+        self, carrier: str, n_now: float, outlet_mol_hr: float,
+        melt: MeltState, holdup_mol: Mapping[str, float],
+    ) -> None:
+        """One-hour regulator balance, idempotent across projections in a tick."""
+        tick = getattr(melt, 'hour', None)
+        if getattr(self, '_stream_inventory_tick', None) != tick:
+            self._stream_inventory_start = dict(getattr(self, '_stream_carrier_inventory', {}))
+            self._stream_inventory_tick = tick
+        previous = getattr(self, '_stream_inventory_start', {}).get(
+            carrier, float(holdup_mol.get(carrier, 0.0)))
+        makeup = outlet_mol_hr + (n_now - previous) / 1.0
+        self.last_stream_boundary['carrier_inlet_makeup_mol_hr'] = makeup
+        self.last_stream_boundary['carrier_inventory_change_mol'] = n_now - previous
+        self._stream_carrier_inventory = {carrier: n_now}
+        if makeup < 0.0:
+            self.stream_physics_notices.append({
+                'reason': 'stream_carrier_makeup_infeasible', 'status': 'extrapolated',
+                'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                'required_makeup_mol_hr': makeup,
+            })
 
     def _update_finite_headspace(self, gas: OverheadGas, melt: MeltState,
                                  overhead_holdup_mol: Mapping[str, float],
