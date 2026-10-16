@@ -1,0 +1,943 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2001-mgalumina-silica-vaporization
+source:
+  citation: 'Shornikov, S. I., and Archakov, I. Yu. (2001). High Temperature Mass Spectrometric Study of Vaporization Processes and Thermodynamic Properties in the MgAl2O4–SiO2 System. High Temperature Corrosion and Materials Chemistry III, Electrochemical Society Proceedings 2001-12, 322–329.'
+  year: 2001
+  doi: null
+  corpus_asset: raw/shornikov-2001-mgalumina-silica-vaporization/shornikov-2001-mgalumina-silica-vaporization.pdf
+  corpus_sha256: 671ead334c0ec0771c1bf429a5d1b90732c115f0f5d9ea33f0ac742c66702214
+extraction:
+  date: '2026-10-05'
+  worker: codex
+  dispatch_id: x-2001-mas-vap
+  method: 'All 8 pages rendered with pdftoppm at 250 dpi and read from the page images. The paper has no numeric data tables. Figures 1–3 are retained as figure-only; no curves were digitized. OCR-produced graph grids were not treated as data.'
+review_status: draft
+fidelity_samples:
+- species: MgO
+  observation_id: shornikov_2001_f2_mgo_ma_s_2050k
+  observable: activity_coefficient
+  field: curve_as_printed
+  value: '1'
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: 'Figure 2 caption identifies curve 1 as MgO in MA–S at 2050 K.'
+- species: SiO2
+  observation_id: shornikov_2001_f3_ma_s_2050k
+  observable: gibbs_table
+  field: curve_as_printed
+  value: '1'
+  locator:
+    published_page: 328
+    pdf_page_index: 6
+    figure: '3'
+    note: 'Figure 3 caption identifies curve 1 as this study at 2050 K.'
+benches:
+- id: shornikov-2001-mi1201-mo-kems
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MI 1201 mass spectrometer modified for high-temperature investigations
+    locator:
+      published_page: 323
+      pdf_page_index: 1
+      section: Experimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum effusion cells; liner not stated
+    locator:
+      published_page: 323
+      pdf_page_index: 1
+      section: Experimental
+      note: 'The paper says “molybdenum effusion cells”; no liner is described.'
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 323
+      pdf_page_index: 1
+      section: Experimental
+  geometry:
+    orifice_to_sample_area_ratio:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '<'
+          bound_value: '0.005'
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+        note: 'Printed as “vaporization / effusion squares ratio more then 200”; interpreted as sample vaporization area / effusion opening area >200 and inverted to orifice / sample area <1/200.'
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+        note: The opening diameter is not stated.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+        note: The effusion channel length is not stated.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: AOP-66 optical pyrometer
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+    observation_glass_correction:
+      state:
+        tag: value
+        value: Temperature measurement took observation glass losses into account
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+  temperature_calibration:
+    procedure:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+        note: A calibration procedure or calibration standard is not reported.
+  ionization:
+    electron_energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20'
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Results and Discussion
+    ionization_cross_sections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Results and Discussion
+        note: No ionization cross-sections are stated.
+    ionization_cross_section_source:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Results and Discussion
+        note: No source for ionization cross-sections is stated.
+    multiplier_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Results and Discussion
+        note: Multiplier correction is not stated.
+    isotope_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Results and Discussion
+        note: Isotope correction is not stated.
+  heating_method:
+    state:
+      tag: value
+      value: Electric current through the cell body
+    locator:
+      published_page: 323
+      pdf_page_index: 1
+      section: Experimental
+  other_facts:
+  - name: temperature_determination_uncertainty_at_2400_K
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '<'
+          bound_value: '10'
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+        note: Printed as less than 10 K at 2400 K; this is the stated temperature-determination uncertainty, not a calibration uncertainty.
+experiments:
+- experiment_id: shornikov-2001-mo-kems-1623-2523k
+  bench_id: shornikov-2001-mi1201-mo-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 323
+    pdf_page_index: 1
+    section: Experimental
+    note: 'High-temperature mass-spectrometric Knudsen effusion study of MgAl2O4–SiO2 melts.'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1623'
+          interval_high: '2523'
+      locator:
+        published_page: 322
+        pdf_page_index: 0
+        section: Abstract
+        note: Study-wide range; individual run temperatures are not tabulated.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          system_as_printed: MgAl2O4–SiO2 pseudobinary
+          SiO2_mole_percent_as_prepared:
+          - 0.00
+          - 18.18
+          - 52.21
+          - 55.56
+          - 64.89
+          - 74.69
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+        note: SiO2 mole percent values are transcribed as printed.
+    pretreatment:
+      state:
+        tag: value
+        value: Samples synthesized by the solid-phase reactions method described in reference (5)
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+    characterization:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+        note: Starting-material identities and purities are not given here; no post-run chemical analysis is reported.
+  apparatus:
+    calibration:
+      intensity_to_pressure_method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 323
+          pdf_page_index: 1
+          section: Experimental
+          note: No absolute ion-intensity-to-partial-pressure calibration is described.
+      calibration_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 323
+          pdf_page_index: 1
+          section: Experimental
+          note: No calibration substance or vapor-pressure standard is named.
+      activity_reduction_method:
+        state:
+          tag: value
+          value: Ion-current intensity ratios with the Belton–Fruehan method modifying the Gibbs–Duhem equation
+        locator:
+          published_page: 325
+          pdf_page_index: 3
+          section: Results and Discussion
+          equation: '10–14'
+          note: This is the stated activity-reduction method; the paper does not state an absolute pressure calibration.
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 323
+          pdf_page_index: 1
+          section: Experimental
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 323
+          pdf_page_index: 1
+          section: Experimental
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '<'
+          bound_value: '1.01325e-5'
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+        note: 'Background gases in the mass spectrometer, effusion-cell area throughout the temperature region: printed <10^-10 atm; converted with 1 atm = 101325 Pa. This is chamber background, not sample vapor pressure.'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+        note: No sweep gas is stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Experimental
+        note: The paper does not state an effusion-flow regime class.
+species:
+  MgO:
+    observations:
+    - observation_id: shornikov_2001_f2_mgo_ma_s_2050k
+      type: activity_coefficient
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: 'Curve 1; MA-S activity in this study.'
+      T_range_K: [2050.0, 2050.0]
+      phase: MgAl2O4-SiO2 melt
+      experiment: shornikov-2001-mo-kems-1623-2523k
+      standard_state: 'The paper defines a*(i) as the activity of component i in the MA compound crystallized from MA-S melt at x*(i); it does not name a separate pure solid or liquid oxide standard state.'
+      regime: kems_effusion
+      units: logarithmic activity as plotted; curve not digitized
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity_component: MgO
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '1'
+        system_as_printed: MA-S
+        temperature_as_printed_K: 2050
+        source_attribution_as_printed: present study
+        data_scope: Curve inspected and retained as figure-only; no data points digitized.
+    context:
+    - observation_id: shornikov_2001_abstract_scope_and_comparison
+      type: interpretation
+      locator:
+        published_page: 322
+        pdf_page_index: 0
+        section: Abstract
+      units: as printed
+      values:
+        statement_as_printed: '“The regularities of the MgAl2O4-SiO2 system melts evaporation were studied at 1623-2523 K using the high-temperature mass spectrometric Knudsen effusion method. The obtained thermodynamic data on the MgAl2O4-SiO2 system melts were compares with the similar data previously determined for the CaAl2O4-SiO2 and CaTiO3-SiO2 system melts. The increase of the deviations from the ideal behavior in the following order MgAl2O4-SiO2 → CaAl2O4-SiO2 → CaTiO3-SiO2 was shown.”'
+        temperature_range_K:
+        - 1623
+        - 2523
+        systems_compared:
+        - MgAl2O4-SiO2
+        - CaAl2O4-SiO2
+        - CaTiO3-SiO2
+    - observation_id: shornikov_2001_background_thermodynamic_evidence
+      type: interpretation
+      locator:
+        published_page: 322
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        statements_as_printed:
+        - '“The wide usage of the refractory materials on the base of spinel ceramics causes a proper interest to the investigations of physicochemical properties and phase relations in the MgO-Al2O3-SiO2 system at high temperatures.”'
+        - '“The study of this system is a point of particular interest due to the problems connected with the development of new materials with exceptionally low or even negative values of the thermal extension coefficients (1).”'
+        - '“The phase relations in the MgO-Al2O3-SiO2 system and in the corresponding binary systems (MgO-Al2O3, MgO-SiO2, and Al2O3-SiO2) were studied several times. However it should be noted that these data shows substantial contradictions (1-5).”'
+        - '“The thermodynamic data on MgO-Al2O3-SiO2 system are limited by the properties of ternary compounds at rather low temperatures (~1000 K) obtained by the various calorimetric methods (6-10).”'
+        - '“The results of the heterogeneous equilibria studies of slags with Fe-Si-C alloys saturated with graphite or silicon carbide at 1873 K (11, 12) did not correlate to the calorimetric data.”'
+        - '“The authors of (5, 13-15) consider the data (11, 12) to be rather doubtful.”'
+        temperatures_K:
+        - 1000
+        - 1873
+        translation_note: 'The translation prints “thermal extension coefficients”; retained verbatim.'
+    - observation_id: shornikov_2001_system_and_prior_comparators
+      type: interpretation
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Introduction
+      units: as printed
+      values:
+        statements_as_printed:
+        - '“In accordance with the phase diagram of this pseudobinary system shown in Fig. 1a (4) the phase relations are determined by the thermodynamic properties of the following compounds - MA, A3S2, M4A5S2 and M2A2S5 (here and further M = MgO, A = Al2O3, S = SiO2, L = liquid).”'
+        - '“It was instructive to compare the data presented in this work with the same data previously obtained for some similar systems - CA-S (14) and CT-S (16, 17).”'
+        variables_as_printed: M=MgO; A=Al2O3; S=SiO2; L=liquid; C=CaO; T=TiO2
+    - observation_id: shornikov_2001_ions_and_gas_reaction_context
+      type: method
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Results and Discussion
+      units: as printed
+      values:
+        ionization_energy_eV: 20
+        molecular_ions_as_printed:
+        - SiO+
+        - Mg+
+        - SiO2+
+        - O+
+        - MgO+
+        - O2+
+        - AlO+
+        - Al+
+        - Al2O+
+        - AlSiO+
+        fragment_ion_as_printed: Si+
+        statements_as_printed:
+        - '“The (SiO)+, (Mg)+, (SiO2)+, (O)+, (MgO)+, (O2)+, (AlO)+, (Al)+, (Al2O)+ and (AlSiO)+ molecular and the (Si)+ fragmentary ions were determined in the mass spectra of vapor over the studied melts at 20 eV.”'
+        - '“It was shown that the above mentioned molecular ions were the result of the ionization of the corresponding vapor species formed according to the reactions similar to the evaporation reactions of individual oxides.”'
+        - '“[MgO] = (Mg) + (O)” (1); “[MgO] = (MgO)” (2); “[Al2O3] = 2(Al) + 3(O)” (3); “[Al2O3] = 2(AlO) + (O)” (4); “[Al2O3] = (Al2O) + 2(O)” (5); “[SiO2] = (SiO) + (O)” (6); “[SiO2] = (SiO2)” (7).'
+        notation_as_printed: Square brackets denote condensed phase; round brackets denote gas phase.
+    - observation_id: shornikov_2001_al_sio_and_mo_cell_ion_reactions
+      type: method
+      locator:
+        published_page: 325
+        pdf_page_index: 3
+        section: Results and Discussion
+        equation: '8–9'
+      units: as printed
+      values:
+        statements_as_printed:
+        - '“As it was discussed in (19) the (AlSiO) molecules were the result of the following reaction.”'
+        - '“The (MoO)+, (MoO2)+ and (MoO3)+ observed molecular ions corresponded to the processes of the interaction of gas phase over the studied melts with the molybdenum effusion cell.”'
+        reactions_as_printed:
+        - '(Al) + (SiO) = (AlSiO) (8)'
+        - '(MoOᵢ₊₁) = (MoOᵢ) + (O) (9)'
+        cell_interaction_ions_as_printed:
+        - MoO+
+        - MoO2+
+        - MoO3+
+        qualification: The reported MoO ions are attributed to gas interaction with the Mo effusion cell, not simply to sample vapor species.
+    - observation_id: shornikov_2001_associated_molecules_not_reliably_detected
+      type: interpretation
+      locator:
+        published_page: 323
+        pdf_page_index: 1
+        section: Results and Discussion
+      units: as printed
+      values:
+        statement_as_printed: '“The special search showed the absence of the ions corresponding to the probable associated molecules (MgAl_iO_j) and (MgSiO_k) (i = 1, 2; j = 1, 2, 3, 4; k = 1, 2, 3) in the amounts sufficient for the reliable determination.”'
+        absent_species_families:
+        - MgAl_iO_j
+        - MgSiO_k
+        qualification: They were not detected in quantities sufficient for reliable determination; this is not a claim of absolute absence.
+    - observation_id: shornikov_2001_phase_diagrams_figure_1
+      type: phase_diagram
+      locator:
+        published_page: 324
+        pdf_page_index: 2
+        figure: '1'
+      units: figure-only context
+      values:
+        method_class: figure_only
+        systems_as_printed:
+        - MA-S
+        - CA-S
+        - CT-S
+        cited_sources_as_printed: '(4, 13, 18)'
+        note: Phase-diagram fields and curves were inspected on the page image and retained as figure-only context; no curves or OCR graph grids were digitized.
+    - observation_id: shornikov_2001_phase_diagrams_differ_but_evaporation_regularities_match
+      type: interpretation
+      locator:
+        published_page: 325
+        pdf_page_index: 3
+        section: Results and Discussion
+      units: as printed
+      values:
+        statement_as_printed: '“One can see from Fig.1 that the phase diagrams of the silicate systems under consideration are essentially different. Nevertheless the evaporation of the MA-S system, as well as CA-S and CT-S systems shows the same regularities.”'
+    - observation_id: shornikov_2001_evaporation_sequence_and_noncongruent_change
+      type: interpretation
+      locator:
+        published_page: 325
+        pdf_page_index: 3
+        section: Results and Discussion
+      units: as printed
+      values:
+        statements_as_printed:
+        - '“The first stage of this evaporation was the predominant silica vaporization from the melt placed in the effusion cell.”'
+        - '“This process went so far that the composition of the condensed phase reached the point of magnesium aluminate (or CA, or CT, correspondingly) in the crystallization line.”'
+        - '“The vaporization rate of the obtained crystallized solid phase is lower in comparison with the one of the melt evaporation.”'
+        - '“At the next stage the dominant process for the obtained phase compositions is the vaporization of magnesium oxide (or CaO) at the further temperature increase.”'
+        - '“The composition of the samples was changed in the line of corundum (or rutile) field having a minor volatility.”'
+        qualification: The reported vaporization changes sample composition; no post-run composition assay is tabulated.
+    - observation_id: shornikov_2001_constant_current_ratios_and_activity_reduction
+      type: method
+      locator:
+        published_page: 325
+        pdf_page_index: 3
+        section: Results and Discussion
+        equation: '10–14'
+      units: as printed
+      values:
+        statements_as_printed:
+        - '“Another interesting characteristic of the MA-S system vaporization (as well as CA-S and CT-S system melts) is practically constant relations of the ion current intensities (I(i)+) over a wide concentration range.”'
+        - '“It should be mentioned that these relations determine the oxygen partial pressure.”'
+        - '“The above mentioned regularities allowed to determine the values of MgO, Al2O3 and SiO2 activities in the MA-S melts using the Belton-Fruehan method (20) modifying the Gibbs-Duhem equation.”'
+        ion_current_ratios_as_printed:
+        - I(MgO)+ / I(Mg)+
+        - I(AlO)+ / I(Al)+
+        - I(SiO2)+ / I(SiO)+
+        - I(MoO3)+ / I(MoO2)+
+        activity_ion_current_ratios_as_printed:
+        - I(Mg)+ / I(SiO)+
+        - I(Al)+ / I(SiO)+
+        - I(SiO)+ / I(Mg)+
+        - I(Al)+ / I(Mg)+
+        activity_ions_by_component:
+          SiO2:
+            current_ratios:
+            - I(Mg)+ / I(SiO)+
+            - I(Al)+ / I(SiO)+
+            equation: '12'
+            integration_reference: x(SiO2)=1
+          MgO:
+            current_ratios:
+            - I(SiO)+ / I(Mg)+
+            - I(Al)+ / I(Mg)+
+            equation: '13'
+            anchor: a*(MgO)
+          Al2O3:
+            inputs:
+            - a(MgO)
+            - a(SiO2)
+            - a*(Al2O3)
+            equation: '14'
+        derivation_as_printed: |
+          (11), printed p. 325 / PDF page index 3:
+          ln a(i) = −∫ x(j) d ln[a(j)/a(i)] − ∫ x(k) d ln[a(k)/a(i)].
+          (12), printed p. 326 / PDF page index 4:
+          ln a(SiO2) = −∫_[x(SiO2)=1]^[x(SiO2)] [x(MgO)/(1+x(Al2O3))] d ln[I(Mg)+/I(SiO)+] − 2∫_[x(SiO2)=1]^[x(SiO2)] [x(Al2O3)/(1+x(Al2O3))] d ln[I(Al)+/I(SiO)+].
+          (13), printed p. 326 / PDF page index 4:
+          ln a(MgO) = ln a*(MgO) − ∫_[x*(SiO2)]^[x(SiO2)] [x(SiO2)/(1+x(Al2O3))] d ln[I(SiO)+/I(Mg)+] − 2∫_[x*(SiO2)]^[x(SiO2)] [x(Al2O3)/(1+x(Al2O3))] d ln[I(Al)+/I(Mg)+].
+          (14), printed p. 326 / PDF page index 4:
+          ln a(Al2O3) = ln a*(Al2O3) − ∫_[x*(SiO2)]^[x(SiO2)] [x(MgO)/x(Al2O3)] d ln a(MgO) − ∫_[x*(SiO2)]^[x(SiO2)] [x(SiO2)/x(Al2O3)] d ln a(SiO2).
+          Integral bounds are written as ∫_[lower]^[upper]; + after an ion denotes its printed positive charge, and * denotes the printed anchor superscript.
+    - observation_id: shornikov_2001_activity_reference_anchor
+      type: method
+      locator:
+        published_page: 326
+        pdf_page_index: 4
+        section: Results and Discussion
+        equation: '12–14'
+      units: as printed
+      values:
+        statement_as_printed: '“where a*(i) - is the activity of the i component of the MA compound crystallized from the MA-S melt at the concentration equal to x*(i). The values of x*(i) were determined according to the experimental data on the melts vaporization as well as in (5) and this value equal to 34.08 ± 0.18 mole % SiO2 at 2050 K.”'
+        x_star_SiO2_mole_percent: 34.08
+        x_star_uncertainty_mole_percent: 0.18
+        temperature_K: 2050
+        standard_state_note: 'Equations (13) and (14) anchor the MgO and Al2O3 activities to those oxide components in crystallized MA at x*(SiO2)=34.08 ± 0.18 mole % SiO2 and 2050 K. Equation (12) instead integrates SiO2 activity from x(SiO2)=1; the equation does not explicitly state a solid or liquid phase for that endpoint.'
+        activity_reference_states_by_component:
+          MgO: Activity of the MgO component in MA crystal at x*(SiO2)=34.08 ± 0.18 mole % and 2050 K.
+          Al2O3: Activity of the Al2O3 component in MA crystal at x*(SiO2)=34.08 ± 0.18 mole % and 2050 K.
+          SiO2: Equation (12) integration reference x(SiO2)=1; pure-endpoint phase is not explicitly stated.
+    - observation_id: shornikov_2001_activity_comparisons_and_ideality
+      type: interpretation
+      locator:
+        published_page: 326
+        pdf_page_index: 4
+        section: Results and Discussion
+      units: as printed
+      values:
+        statements_as_printed:
+        - '“According to Fig 2a the maximal value of the alkaline-earth oxide (MgO or CaO) activity in the ternary silicate systems under investigation was determined for the MA-S system.”'
+        - '“It should be mentioned that due to nearly the same values of the activities of aluminum oxide (or titanium dioxide) and silicon dioxide (Figs. 2b and c), the alkaline-earth activities values determine the deviations from ideality (Fig. 3).”'
+        - '“The activity values vs concentration dependencies maxima of aluminum oxide (or titanium dioxide) for the CA-S (or CT-S) melts are caused to all appearance by the closeness of A + L (or CTS + L) fields.”'
+        - "“For the MA-S melts such closeness of the A3S2 + L field doesn't effect a(Al2O3) due to the value of the melting enthalpies of these compositions.”"
+        translation_note: 'The sentence beginning “The activity values vs concentration dependencies maxima” and the printed “doesn’t effect” are retained as translated; the first sentence is grammatically unclear.'
+    - observation_id: shornikov_2001_alumina_activity_disagreement
+      type: interpretation
+      locator:
+        published_page: 326
+        pdf_page_index: 4
+        section: Results and Discussion
+      units: as printed
+      values:
+        statements_as_printed:
+        - '“A point that should be mentioned is that the values of the aluminum oxide activities obtained in the present work are nearly ten times lower that the ones reported in (11).”'
+        - '“The reason of such discrepancies could be explained by the rough approximations done in (11) by the Schuhmann method (21).”'
+        - '“The effect of such approximations was previously discussed for mullite (5, 15, 19).”'
+        - '“Notice that for the ternary MA-S system the thermodynamic data on spinel MA reported in (11) also contradict the most of reference data.”'
+        attribution: 'The comparison and criticism concern reference (11), identified in the references as Rein and Chipman (1965).'
+        translation_note: 'The source prints “lower that” and “contradict the most”; wording retained.'
+    - observation_id: shornikov_2001_gibbs_and_silica_activity_comparisons
+      type: interpretation
+      locator:
+        published_page: 328
+        pdf_page_index: 6
+        section: Results and Discussion
+      units: as printed
+      values:
+        statements_as_printed:
+        - '“The values of the silica activities in the ternary system under study are close, the deviations were identified for the compositions of the SiO2 mole fraction less then 30 mole % (Fig. 2c).”'
+        - '“The determined values of the Gibbs energies of melt formation (ΔfG) for the MA-S system are close to ideality.”'
+        - '“These data correlate with the phase relationships and the structure of MgO-Al2O3-SiO2 melts (1, 4).”'
+        - '“The observed minimums for ΔfG concentration dependencies in CA-S and CT-S (Fig. 3) correspond to the concentrations close to gehlenite C2AS and sphene CTS (Figs. 1b and 1c).”'
+        - '“The deviations from ideality in the studied systems increase in the following order: MA-S → CA-S → CT-S.”'
+        translation_note: 'The source prints “less then 30”; retained.'
+    - observation_id: shornikov_2001_conclusion_evaporation_order
+      type: interpretation
+      locator:
+        published_page: 328
+        pdf_page_index: 6
+        section: Conclusions
+      units: as printed
+      values:
+        statement_as_printed: '“The consideration of the evaporation processes in the melts under study have demonstrated that the initial stages of the evaporation are characterized by the predominant evaporation of SiO2, the next stages are the MgO evaporation and, finally, the Al2O3 evaporation. The same rules are also characteristic for the previously studied CaO-Al2O3-SiO2 and CaO-TiO2-SiO2 system melts.”'
+    - observation_id: shornikov_2001_conclusion_ideality_order
+      type: interpretation
+      locator:
+        published_page: 328
+        pdf_page_index: 6
+        section: Conclusions
+      units: as printed
+      values:
+        statements_as_printed:
+        - '“The activity values of the components and the Gibbs energies of melt formation determined in the present study have showed the negligible negative deviations from ideality.”'
+        - '“This fact is in agreement with the modern considerations on the phase equilibria and the structure of the MgO-Al2O3-SiO2 melts.”'
+        - '“The deviations from ideality in the studied systems increase in the following order: MgAl2O4-SiO2 → CaAl2O4-SiO2 → CaTiO3-SiO2.”'
+  Al2O3:
+    observations:
+    - observation_id: shornikov_2001_f2_al2o3_ma_s_2050k
+      type: activity_coefficient
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: 'Curve 4; MA-S activity in this study.'
+      T_range_K: [2050.0, 2050.0]
+      phase: MgAl2O4-SiO2 melt
+      experiment: shornikov-2001-mo-kems-1623-2523k
+      standard_state: 'Equation (14) anchors a(Al2O3) to a*(Al2O3), the activity of the Al2O3 component in crystallized MA at x*(SiO2)=34.08 ± 0.18 mole % SiO2 and 2050 K; the paper does not name a separate pure solid or liquid oxide standard state.'
+      regime: kems_effusion
+      units: logarithmic activity as plotted; curve not digitized
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity_component: Al2O3
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '4'
+        system_as_printed: MA-S
+        temperature_as_printed_K: 2050
+        source_attribution_as_printed: present study
+        data_scope: Curve inspected and retained as figure-only; no data points digitized.
+    - observation_id: shornikov_2001_f2_al2o3_ca_s_1933k
+      type: activity_coefficient
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: 'Curve 5; CA-S comparative activity attributed by the caption to prior work.'
+      T_range_K: [1933.0, 1933.0]
+      phase: CaO-Al2O3-SiO2 melt
+      standard_state: Not stated in this article; curve reproduced from cited prior work.
+      regime: kems_effusion
+      units: logarithmic activity as plotted; curve not digitized
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity_component: Al2O3
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '5'
+        system_as_printed: CA-S
+        temperature_as_printed_K: 1933
+        source_attribution_as_printed: reference (14)
+        data_scope: Comparative curve inspected and retained as figure-only; no data points digitized.
+  CaO:
+    observations:
+    - observation_id: shornikov_2001_f2_cao_ca_s_1933k
+      type: activity_coefficient
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: 'Curve 2; CA-S comparative activity attributed by the caption to prior work.'
+      T_range_K: [1933.0, 1933.0]
+      phase: CaO-Al2O3-SiO2 melt
+      standard_state: Not stated in this article; curve reproduced from cited prior work.
+      regime: kems_effusion
+      units: logarithmic activity as plotted; curve not digitized
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity_component: CaO
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '2'
+        system_as_printed: CA-S
+        temperature_as_printed_K: 1933
+        source_attribution_as_printed: reference (14)
+        data_scope: Comparative curve inspected and retained as figure-only; no data points digitized.
+    - observation_id: shornikov_2001_f2_cao_ct_s_2100k
+      type: activity_coefficient
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: 'Curve 3; CT-S comparative activity attributed by the caption to prior work.'
+      T_range_K: [2100.0, 2100.0]
+      phase: CaO-TiO2-SiO2 melt
+      standard_state: Not stated in this article; curve reproduced from cited prior work.
+      regime: kems_effusion
+      units: logarithmic activity as plotted; curve not digitized
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity_component: CaO
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '3'
+        system_as_printed: CT-S
+        temperature_as_printed_K: 2100
+        source_attribution_as_printed: reference (17)
+        data_scope: Comparative curve inspected and retained as figure-only; no data points digitized.
+  TiO2:
+    observations:
+    - observation_id: shornikov_2001_f2_tio2_ct_s_2100k
+      type: activity_coefficient
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: 'Curve 6; CT-S comparative activity attributed by the caption to prior work.'
+      T_range_K: [2100.0, 2100.0]
+      phase: CaO-TiO2-SiO2 melt
+      standard_state: Not stated in this article; curve reproduced from cited prior work.
+      regime: kems_effusion
+      units: logarithmic activity as plotted; curve not digitized
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity_component: TiO2
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '6'
+        system_as_printed: CT-S
+        temperature_as_printed_K: 2100
+        source_attribution_as_printed: reference (17)
+        data_scope: Comparative curve inspected and retained as figure-only; no data points digitized.
+  SiO2:
+    observations:
+    - observation_id: shornikov_2001_f2_sio2_ma_s_2050k
+      type: activity_coefficient
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: 'Curve 7; MA-S activity in this study.'
+      T_range_K: [2050.0, 2050.0]
+      phase: MgAl2O4-SiO2 melt
+      experiment: shornikov-2001-mo-kems-1623-2523k
+      standard_state: 'Equation (12) integrates SiO2 activity from x(SiO2)=1; the equation does not explicitly state a solid or liquid phase for that pure-composition endpoint.'
+      regime: kems_effusion
+      units: logarithmic activity as plotted; curve not digitized
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity_component: SiO2
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '7'
+        system_as_printed: MA-S
+        temperature_as_printed_K: 2050
+        source_attribution_as_printed: present study
+        data_scope: Curve inspected and retained as figure-only; no data points digitized.
+    - observation_id: shornikov_2001_f2_sio2_ca_s_1933k
+      type: activity_coefficient
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: 'Curve 8; CA-S comparative activity attributed by the caption to prior work.'
+      T_range_K: [1933.0, 1933.0]
+      phase: CaO-Al2O3-SiO2 melt
+      standard_state: Not stated in this article; curve reproduced from cited prior work.
+      regime: kems_effusion
+      units: logarithmic activity as plotted; curve not digitized
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity_component: SiO2
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '8'
+        system_as_printed: CA-S
+        temperature_as_printed_K: 1933
+        source_attribution_as_printed: reference (14)
+        data_scope: Comparative curve inspected and retained as figure-only; no data points digitized.
+    - observation_id: shornikov_2001_f2_sio2_ct_s_2100k
+      type: activity_coefficient
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: 'Curve 9; CT-S comparative activity attributed by the caption to prior work.'
+      T_range_K: [2100.0, 2100.0]
+      phase: CaO-TiO2-SiO2 melt
+      standard_state: Not stated in this article; curve reproduced from cited prior work.
+      regime: kems_effusion
+      units: logarithmic activity as plotted; curve not digitized
+      values:
+        quantity: activity
+        method_class: figure_only
+        activity_component: SiO2
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '9'
+        system_as_printed: CT-S
+        temperature_as_printed_K: 2100
+        source_attribution_as_printed: reference (17)
+        data_scope: Comparative curve inspected and retained as figure-only; no data points digitized.
+    - observation_id: shornikov_2001_f3_ma_s_2050k
+      type: gibbs_table
+      locator:
+        published_page: 328
+        pdf_page_index: 6
+        figure: '3'
+        note: 'Curve 1; MA-S melt formation Gibbs energy from this study.'
+      T_range_K: [2050.0, 2050.0]
+      phase: MgAl2O4-SiO2 melt
+      experiment: shornikov-2001-mo-kems-1623-2523k
+      units: ΔfG/RT as plotted; curve not digitized
+      values:
+        quantity: Gibbs energy of melt formation
+        method_class: figure_only
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '1'
+        system_as_printed: MA-S
+        temperature_as_printed_K: 2050
+        source_attribution_as_printed: present study
+        data_scope: Curve inspected and retained as figure-only; no data points digitized.
+    - observation_id: shornikov_2001_f3_ma_s_ref11_1873k
+      type: gibbs_table
+      locator:
+        published_page: 328
+        pdf_page_index: 6
+        figure: '3'
+        note: 'Curve 2; comparative MA-S melt formation Gibbs energy.'
+      T_range_K: [1873.0, 1873.0]
+      phase: MgAl2O4-SiO2 melt
+      standard_state: Not further specified in this article; comparative curve cited to reference (11).
+      units: ΔfG/RT as plotted; curve not digitized
+      values:
+        quantity: Gibbs energy of melt formation
+        method_class: figure_only
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '2'
+        system_as_printed: MA-S
+        temperature_as_printed_K: 1873
+        source_attribution_as_printed: reference (11)
+        data_scope: Comparative curve inspected and retained as figure-only; no data points digitized.
+    - observation_id: shornikov_2001_f3_ca_s_ref14_1933k
+      type: gibbs_table
+      locator:
+        published_page: 328
+        pdf_page_index: 6
+        figure: '3'
+        note: 'Curve 3; CA-S melt formation Gibbs energy.'
+      T_range_K: [1933.0, 1933.0]
+      phase: CaO-Al2O3-SiO2 melt
+      standard_state: Not further specified in this article; comparative curve cited to reference (14).
+      units: ΔfG/RT as plotted; curve not digitized
+      values:
+        quantity: Gibbs energy of melt formation
+        method_class: figure_only
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '3'
+        system_as_printed: CA-S
+        temperature_as_printed_K: 1933
+        source_attribution_as_printed: reference (14)
+        data_scope: Comparative curve inspected and retained as figure-only; no data points digitized.
+    - observation_id: shornikov_2001_f3_ct_s_ref17_2100k
+      type: gibbs_table
+      locator:
+        published_page: 328
+        pdf_page_index: 6
+        figure: '3'
+        note: 'Curve 4; CT-S melt formation Gibbs energy.'
+      T_range_K: [2100.0, 2100.0]
+      phase: CaO-TiO2-SiO2 melt
+      standard_state: Not further specified in this article; comparative curve cited to reference (17).
+      units: ΔfG/RT as plotted; curve not digitized
+      values:
+        quantity: Gibbs energy of melt formation
+        method_class: figure_only
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '4'
+        system_as_printed: CT-S
+        temperature_as_printed_K: 2100
+        source_attribution_as_printed: reference (17)
+        data_scope: Comparative curve inspected and retained as figure-only; no data points digitized.
+    - observation_id: shornikov_2001_f3_ideal_melt_reference
+      type: gibbs_table
+      locator:
+        published_page: 328
+        pdf_page_index: 6
+        figure: '3'
+      units: ΔfG/RT as plotted; curve not digitized
+      values:
+        quantity: Gibbs energy of ideal melt formation reference
+        method_class: figure_only
+        composition_component: SiO2
+        composition_basis: mole percent as plotted
+        composition_axis_range_mole_percent: [0, 100]
+        curve_as_printed: '5'
+        system_as_printed: ideal melt
+        source_attribution_as_printed: Ideal comparison curve named in the Figure 3 caption; no temperature stated for this curve.
+        data_scope: Curve inspected and retained as figure-only; no data points digitized.
