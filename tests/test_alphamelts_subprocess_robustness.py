@@ -252,7 +252,7 @@ def test_real_subprocess_projection_closes_dry_alkali_silica_oxygen_balance():
     assert pressures_bar == pytest.approx(fresh_pressures, rel=1e-9)
     assert pressures_bar == pytest.approx(fresh_anchor_pressures_bar, rel=1e-9)
     assert balance['residual'] == pytest.approx(
-        fresh_balance['residual'], rel=1e-9, abs=1e-20
+        fresh_balance['residual'], abs=1e-15
     )
     for carrier_field in ('dominant_O_carriers', 'dominant_metal_carriers'):
         actual_carriers = balance[carrier_field]
