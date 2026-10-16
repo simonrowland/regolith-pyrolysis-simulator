@@ -773,8 +773,8 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             assert catalog_pa < pure_component_probe_pa[species_id]
             # Physical OOR can land near the pre-rg seam; pin the live value
             # so a future regression that re-inflates heating OOR is visible.
-            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-            assert catalog_pa == pytest.approx(0.7794158568001917, rel=1.0e-9)
+            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+            assert catalog_pa == pytest.approx(0.7154959534800683, rel=1.0e-9)
         else:
             assert not answer.extra.get("out_of_range", False)
             assert within_probe_band(species_id, catalog_pa, probe_pa)
@@ -982,8 +982,8 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     ceiling_flux_species = {"Ca", "CaO_gas", "Ti", "TiO", "TiO2_gas"}
     p_flux = sum(snapshot.evap_flux.species_kg_hr[species] for species in ("PO", "PO2", "P2"))
     # b-850: alkali composite vapour rows now use the parent-oxide activity.
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    assert snapshot.evap_flux.total_kg_hr - p_flux == pytest.approx(3.0570622523638167, rel=1e-12, abs=1e-12)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    assert snapshot.evap_flux.total_kg_hr - p_flux == pytest.approx(3.2669372940625867, rel=1e-12, abs=1e-12)
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
     )
@@ -1185,12 +1185,12 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         (
             1,
             1550.0,
-            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-            3.059928980711095,
-            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-            1384877.4936408466,
-            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-            958.325508444881,
+            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+            3.275639473221877,
+            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+            1446815.731994968,
+            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+            992.6325735831597,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -1233,8 +1233,8 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # ledger-commit floor, so evaporate_Al2O commits again. Not a refusal
     # drop: no channel is withdrawn.
     # t-766: three admitted P evaporations and nine flagged capture transitions.
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    assert len(sim.atom_ledger.transitions) == 52
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    assert len(sim.atom_ledger.transitions) == 51
     ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
@@ -1267,12 +1267,13 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (
-        "evaporate_TiO2_gas",
         "condense_TiO2_gas",
         "fe_redox_respeciation",
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
         "oxygen_reservoir_exchange",
         "overhead_bleed",
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "metal_phase_stratification_diagnostic",
     )
     # Admitted P source evidence authorizes cleanup offgas, not condensation.
     for p_species in ("PO", "PO2", "P2"):

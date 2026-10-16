@@ -112,8 +112,8 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # (-1.103% on the C2A SiO ledger). Kept equal to BASELINE_SIO_EVOLVED_KG.
 # 2026-10-13 b-850 round 2: same CLI regenerated pin after corrected alkali
 # dimer source activity; kept equal to BASELINE_SIO_EVOLVED_KG.
-# d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-PHASE3BIS_SIO_EVOLVED_KG = 1.04103925406e-05
+# d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+PHASE3BIS_SIO_EVOLVED_KG = 1.04324626941e-05
 
 
 @lru_cache(maxsize=None)

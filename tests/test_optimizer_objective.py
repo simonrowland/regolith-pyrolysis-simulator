@@ -1865,7 +1865,7 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
         "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
         "permitted_species": ["CrO2"],
         "engaged_species": ["CrO2"],
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
         "total_engagement_count": 8,
     }
     report = _markdown_report(evidence, execution)
@@ -1874,7 +1874,7 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert "status=`engaged`" in report
     assert "permitted_species=`CrO2`" in report
     assert "engaged_species=`CrO2`" in report
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert "engagement_count=`8`" in report
 
     # Refusal direction of the same b-314 pin: with the fallback control at

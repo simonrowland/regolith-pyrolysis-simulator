@@ -132,6 +132,7 @@ def test_quenched_redox_reference_survives_pressure_cycle() -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 10.0
+    sim._apply_feedstock_iron_comproportionation()
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas", {"O2": 1000.0},
         source="test funded last liquid reference", material_origin="feedstock",
@@ -1537,6 +1538,7 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
+    sim._apply_feedstock_iron_comproportionation()
     _seed_melt_redox(sim, -8.0)
     sim._sync_oxygen_reservoir_mirror()
     sim.atom_ledger.load_external_mol(
@@ -2288,6 +2290,7 @@ def test_elemental_evaporation_metal_loss_oxidizes_from_committed_oxide_debit(
     sim = _make_sim()
     sim.melt.p_total_mbar = 10.0  # Unsaturated source case; routing has its own regression.
     sim.melt.temperature_C = 1600.0
+    sim._apply_feedstock_iron_comproportionation()
     _seed_melt_redox(sim, -8.0)
     sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
@@ -2531,6 +2534,7 @@ def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(buffer_o2_mol
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
     sim.melt.pO2_mbar = sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
+    sim._apply_feedstock_iron_comproportionation()
     _seed_melt_redox(sim, -1.0)
     if buffer_o2_mol:
         sim.atom_ledger.load_external_mol("reservoir.fo2_buffer",
@@ -2581,6 +2585,7 @@ def test_headspace_exchange_cannot_instantly_erase_reductant_dose() -> None:
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
+    sim._apply_feedstock_iron_comproportionation()
     _seed_melt_redox(sim, -8.0)
     sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
@@ -2765,6 +2770,7 @@ def test_fe_redox_respeciation_commits_funded_ferric_equilibrium() -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 10.0
+    sim._apply_feedstock_iron_comproportionation()
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas",
         {"O2": 10_000.0},
@@ -3227,8 +3233,8 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     # from the bar form used with P[atm] to 0.0018583*sqrt(2). The resulting
     # finite-series-resistance escape fraction moved with D_AB.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        0.001975776438377251,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        0.09838642054227477,
         rel=0.0,
         abs=1.0e-15,
     )

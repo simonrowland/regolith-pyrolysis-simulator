@@ -166,16 +166,16 @@ def test_internal_analytical_backend_receives_mol_kernel_payload():
     call = backend.calls[0]
     assert call["temperature_C"] == pytest.approx(25.0)
     assert call["composition_mol"]["SiO2"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
         9979.380817954894)
     assert call["composition_mol"]["FeO"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
         5478.639774019004)
     assert call["fO2_log"] == pytest.approx(sim.melt.fO2_log)
     assert call["pressure_bar"] == pytest.approx(0.0)
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert sim.melt.composition_kg["SiO2"] == pytest.approx(599.5911376851839)
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert sim.melt.composition_kg["FeO"] == pytest.approx(393.6073959246213)
 
 
@@ -190,10 +190,10 @@ def test_backend_payload_ignores_stale_mutated_meltstate_kg():
 
     call = backend.calls[0]
     assert call["composition_mol"]["SiO2"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
         9979.380817954894)
     assert call["composition_mol"]["FeO"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
         5478.639774019004)
 
 
@@ -207,7 +207,7 @@ def test_backend_result_applies_as_atom_delta():
     sim.step()
 
     sim.atom_ledger.assert_balanced()
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     expected_feo_remaining_kg = 321.7633959246213
     expected_o2_kg = 0.5 * MOLAR_MASS["O2"]
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt")[
@@ -221,7 +221,7 @@ def test_backend_result_applies_as_atom_delta():
     assert (
         oxygen_partition["stored"] + oxygen_partition["vented"]
     ) == pytest.approx(expected_o2_kg)
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert sim.melt.composition_kg["SiO2"] == pytest.approx(599.5911376851839)
     assert sim.melt.composition_kg["FeO"] == pytest.approx(
         expected_feo_remaining_kg

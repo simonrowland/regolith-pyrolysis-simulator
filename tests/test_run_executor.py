@@ -1094,46 +1094,44 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     # B582_RUNTIME_ENFORCEMENT=0 ... b582_identity_probe.py.
     # b-850: alkali composite vapour rows use parent-oxide activity; K2O_gas is below the existing 1e-12 kg/hr cutoff.
     expected_rates = {
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "Al": 6.410846278752868e-11,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "AlO": 1.8268509019708562e-10,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "Ca": 3.008327893156961e-09,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "CaO_gas": 2.0009576590876284e-11,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "Cr": 1.572181695754233e-05,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "CrO": 6.366998411687415e-06,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "CrO2": 4.268903101115147e-06,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "CrO3": 2.413955295886528e-09,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "K": 0.00012854040984917306,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "K2": 8.182836636603785e-12,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "Mg": 3.625621650655776e-05,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "MgO_gas": 9.974698120627915e-08,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "Mn": 1.1325300668598706e-05,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "Na": 0.0036808560626836653,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "Na2": 1.5022956225390422e-08,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "Na2O_gas": 2.8901499099663358e-11,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "SiO": 1.1483851931342351e-08,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "SiO2_gas": 4.450368556946961e-06,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "TiO": 1.4353977152642117e-09,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "TiO2_gas": 4.633537627626559e-08,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Al": 1.8047141607961757e-10,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "AlO": 2.540685649795589e-10,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Ca": 5.952448086338516e-09,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "CaO_gas": 1.9559741587945753e-11,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Cr": 4.423178973141203e-05,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "CrO": 8.849552014462838e-06,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Fe": 1.626699189513901e-05,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "K": 0.00017823983764866006,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "K2": 1.5780356462387398e-11,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Mg": 7.173632410874324e-05,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "MgO_gas": 9.750147059656497e-08,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Mn": 2.2401082666529808e-05,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Na": 0.004995445300343266,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Na2": 2.8354931689670004e-08,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Na2O_gas": 2.694935289591681e-11,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "SiO": 4.172385519540252e-06,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "SiO2_gas": 4.35031724424131e-06,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "TiO": 2.840159278946394e-09,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "TiO2_gas": 4.529371133152258e-08,
     }
     actual_rates = {
         str(species): float(rate)

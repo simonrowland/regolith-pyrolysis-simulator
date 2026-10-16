@@ -340,12 +340,12 @@ def test_na2co3_without_sio2_stays_salt_phase_not_calcined():
     sim = _sim({"na2co3_no_sio2": feedstock})
     sim.load_batch("na2co3_no_sio2", mass_kg=1000.0)
 
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert sim.inventory.salt_phase_kg["Na2CO3"] == pytest.approx(49.974704524361094, abs=1e-9)
     assert sim.inventory.melt_oxide_kg.get("Na2O", 0.0) == pytest.approx(0.0, abs=1e-12)
 
     ledger_salt = sim.atom_ledger.kg_by_account("terminal.stage0_salt_phase")
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert ledger_salt["Na2CO3"] == pytest.approx(49.974704524361094, abs=1e-9)
     ledger_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
     assert ledger_offgas.get("CO2", 0.0) == pytest.approx(0.0, abs=1e-12)

@@ -10,6 +10,7 @@ them, so the kernel test files (which do not request them) are unaffected.
 from __future__ import annotations
 
 from collections import defaultdict
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -17,11 +18,32 @@ import yaml
 
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.state import CampaignPhase, DecisionType
+from simulator.state import CampaignPhase, DecisionType, MOLAR_MASS
 from simulator.vapour_rail.catalog import vapor_pressure_compatibility_view
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+
+
+def _native_fe_saturating_feedstocks(feedstocks, feedstock_id):
+    """Existing synthetic alkali-rich split with a finite saturation band."""
+    feeds = deepcopy(feedstocks)
+    feed = feeds[feedstock_id]
+    feed.pop('iron_speciation', None)
+    feed.pop('fe_redox_split_unknown', None)
+    # q = 2*n(Fe2O3)/(n(FeO)+2*n(Fe2O3)); hence n(Fe2O3) =
+    # n(FeO)*q/(2*(1-q)). Multiplying the FeO mass weight by
+    # M(Fe2O3)/M(FeO) is dimensionless (both g/mol), retaining its mass basis.
+    # q=.039 keeps the propagated precision band finite; q->0 gives no ferric.
+    feed['composition_wt_pct'].update({
+        'FeO': 60., 'K2O': 80., 'SiO2': 40.,
+        'Fe2O3': 60. / MOLAR_MASS['FeO'] * 0.039 / (2 * (1 - 0.039)) * MOLAR_MASS['Fe2O3'],
+    })
+    feed['composition_basis'] = {
+        oxide: {'method': 'synthetic test split', 'source': 'test fixture'}
+        for oxide in ('FeO', 'Fe2O3')
+    }
+    return feeds
 
 
 def _seed_melt_redox(sim, fO2_log: float) -> None:

@@ -320,8 +320,8 @@ def test_shipped_row_reaches_source_term_via_declared_mode(
             )
             or 0.0
         )
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        assert char == pytest.approx(1304.0917213254336)
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        assert char == pytest.approx(1303.9765202893107)
 
 
 def test_ci_hydrocarbons_vacuum_pyrolysis_reaches_source_term_when_mass_present() -> None:

@@ -147,11 +147,22 @@ def test_intrinsic_melt_fo2_inverse_reports_saturation_via_owner(
     expected_inverse: float,
 ) -> None:
     from simulator.fe_redox import (
+        FE_FEO_BUFFER_STANDARD,
         _native_fe_saturation_comparison,
         floor_vacuum_pressure_bar,
     )
 
-    sim = _sim()
+    feedstocks = _load_yaml("feedstocks.yaml")
+    # Preserve this fixture's liquid-wustite reference, independent of the
+    # catalog's conventional solid-IW formation seed.
+    feedstocks["lunar_mare_low_ti"]["intrinsic_redox"].update(
+        buffer=FE_FEO_BUFFER_STANDARD,
+        buffer_source={
+            "reference": "Holzheid et al. 1997 Eq.9, wustite-liquid FeO reference",
+            "page": 30,
+        },
+    )
+    sim = _sim(feedstocks)
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
 
     pressure_bar = floor_vacuum_pressure_bar(

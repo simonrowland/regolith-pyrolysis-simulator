@@ -272,6 +272,7 @@ def _configure_tick_authority_retry_sim(
     sim.melt.target_temperature_C = 1600.0
     sim.melt.p_total_mbar = 10.0
     sim.melt.temperature_C = 1500.0
+    sim._apply_feedstock_iron_comproportionation()
     _seed_melt_redox(sim, -10.0)
     sim.melt.temperature_C = 1600.0
     sim.atom_ledger.load_external_mol(
@@ -461,8 +462,11 @@ def test_native_fe_vapor_only_route_survives_no_tap_proposal(
     )
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
+    sim._apply_feedstock_iron_comproportionation()
     sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
+    native_state = sim._compute_native_fe_saturation_extent()
     sim._compute_native_fe_saturation_extent = lambda **_kwargs: {
+        **native_state,
         'native_fe_frac': 0.5,
         'native_fe_mol': 1.0,
     }
@@ -2652,16 +2656,21 @@ def test_freeze_gate_pre_curve_tick_builds_curve_before_native_split(
     feedstocks_data,
     setpoints_data,
 ):
+    from tests.chemistry.conftest import _native_fe_saturating_feedstocks
+
+    feedstocks_data = deepcopy(feedstocks_data)
+    feedstocks_data['lunar_mare_low_ti']['composition_wt_pct'] = {}
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
-        feedstocks_data,
+        _native_fe_saturating_feedstocks(feedstocks_data, 'lunar_mare_low_ti'),
         setpoints_data,
         enabled=True,
     )
     sim.start_campaign(CampaignPhase.C2A)
     sim.melt.temperature_C = sim.campaign_mgr.furnace_max_T_C
     sim.melt.target_temperature_C = sim.campaign_mgr.furnace_max_T_C
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim._vacuum_floor_bar = lambda: 1e-20
+    sim._headspace_transport_pO2_bar_from_ledger = lambda *args, **kwargs: 1e-20
     sim.melt.oxygen_reservoir.reference_T_K = None
     sim._sync_oxygen_reservoir_mirror()
     original_dispatch = sim._dispatch_only
@@ -2725,6 +2734,8 @@ def test_temperature_rereference_noop_skips_liquid_guard(
     feedstocks_data,
     setpoints_data,
 ):
+    feedstocks_data = deepcopy(feedstocks_data)
+    feedstocks_data['lunar_mare_low_ti'].pop('iron_speciation')
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
         feedstocks_data,
@@ -3640,6 +3651,7 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 10.0
     sim.melt.temperature_C = 1500.0
+    sim._apply_feedstock_iron_comproportionation()
     _seed_melt_redox(sim, -3.0)
     sim.melt.temperature_C = 1600.0
     sim.atom_ledger.load_external_mol(
@@ -3821,7 +3833,10 @@ def test_full_tick_pins_failed_authority_and_poisoned_retry(
     )
     monkeypatch.setattr(tick_sim, '_get_equilibrium', lambda: _equilibrium())
     monkeypatch.setattr(tick_sim, '_update_temperature', lambda: None)
-    monkeypatch.setattr(tick_sim, '_apply_oxygen_reservoir_exchange', lambda: None)
+    # Drive the same funded oxidation as the per-operation probe above, so
+    # the interrupted tick has a real commit before its retry is refused.
+    monkeypatch.setattr(tick_sim, '_apply_oxygen_reservoir_exchange',
+                        lambda: tick_sim._apply_fe_redox_respeciation(fO2_log_override=-3.0))
 
     transition_count_before_attempt = len(tick_sim.atom_ledger.transitions)
     with pytest.raises(
@@ -6390,6 +6405,7 @@ def test_fallback_authorized_redox_transition_is_balanced_and_provenanced(
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 10.0
     sim.melt.temperature_C = 1500.0
+    sim._apply_feedstock_iron_comproportionation()
     _seed_melt_redox(sim, -10.0)
     sim.melt.temperature_C = 1600.0
     sim.atom_ledger.load_external_mol(

@@ -114,8 +114,8 @@ def test_ci_commits_refractory_char_account_from_sephton_partition() -> None:
     # Magnitude pin: Alexander 0.5075 nascent + tar coke − Boudouard at
     # Stage-0 1050 C. Self-parity above is necessary; this catches a
     # silent class-constant move (B4).
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    assert char_mol == pytest.approx(1304.0917213254336)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    assert char_mol == pytest.approx(1303.9765202893107)
     assert char_mol > f_ref * resolve_species_formula(
         "carbonaceous_organic", sim.species_formula_registry
     ).atom_moles(
@@ -404,6 +404,9 @@ def test_c0_diagnostic_does_not_resurrect_consumed_char() -> None:
 
 def test_lunar_mare_has_zero_solid_char_account() -> None:
     sim = _build_sim("lunar_mare_low_ti")
+    # Isolate the organics-free char control from declared feedstock Fe metal.
+    sim.feedstocks["lunar_mare_low_ti"].pop("iron_speciation")
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     assert _committed_char_mol(sim) == pytest.approx(0.0)
     assert SOLID_CHAR_CARBON_ACCOUNT not in {
         acc

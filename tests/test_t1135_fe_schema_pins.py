@@ -57,58 +57,58 @@ def _digest(value: Any) -> str:
 
 # Captured by running the production normalizers on base 257a87a0bbd25ec8190443f47e3215f476c5d727.
 _NORMALIZED_KG_PINS = {
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "lunar_mare_low_ti": "a2389f28ca1d9cf97f5623338791e167590a585d6958c591c7f611562780ff6c",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "lunar_mare_high_ti": "111def02f83c0c5049e02a07b8a82a413c491c2566544434c76219d6a9b7ba74",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "lunar_highland": "d7e6b3cada40aba6171d2274ec7f132702482e3a4feca9393a439255df181358",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "lunar_pkt_kreep_average": "f4cbb98e0ecf008e54c4c3ba88de30868f54995ec530703f3cc5766727b69704",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "lunar_spa_kreep_influenced": "e1c19a7ffc7c49cdb69450b091107f15816aba2a6b322954e96aeec3081023a1",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "targeted_super_kreep_ore": "e8d68db1dcf88b29631b68b4daa8b2ca830ad2694dc17f42246494693cbd041f",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "lunar_highlands_lhs1": "d1b38be2f71bb2ea3a293c26dfff76cb4ff9eb6a3f7724eb32f3836d95667660",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "lunar_highlands_lhs1_yu_2025_reference": "e217b10f17692a3145a416c0bc1e6445ed3d11222927727c90ee8ff2de3d5cc2",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "lunar_mare_lms1": "d21761ba5b083f45670fc675499bb525f4ca4f47520edfe879ee44cd79d9aaad",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "lunar_mare_oprl2n": "272a8659a2283373bb800a0f3f3a55d79824b8cb1c28f68ae15910daca9589e4",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "lunar_highlands_nuw_lht_5m": "f4ca17359e48251e492f039c50b7e6363dcabd1750e106f1d625019040cdd2ee",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "lunar_eac_1a": "98e1804496c776ff03291ec13ce388d6f930b7c17983c4427b36d41937287ed1",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "lunar_mls_1a": "e0486481a0d26d89a3a580b0605cdb7e73adab8412314f60c92935e314c14653",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "s_type_asteroid_silicate": "a2096c4b01482f3bf48e7ded086cc3cf893b4628c1569e8c35a00ec2fc2d1de8",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "m_type_silicate_phase": "966a20de2d8f959caf10152b585c03dba0cb87112451cf0d95cd568f2e3f91d5",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "v_type_vesta_hed": "ef8cbead9e2ce6405dfdaab1e53f89b8e723bfe6abdbc0b1b9787454d0bf18ef",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "e_type_enstatite_aubrite": "32b3f8acd8da34465c8e9fd129550f6abff3d239fd4b509e7e93bf0d88b342bf",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "ci_carbonaceous_chondrite": "1a0466cb2a702b1b57f458551c9fce6b844e7951aefb1fdb47f9f361cd9655bd",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "cm_carbonaceous_chondrite": "defb913476fa12eaedc10582c0062f37fcda790e15842a5729d7c5569bbbc8c1",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "ceres_regolith": "e1698a3d8bd4899f0c517dc702d782687280932dcafdcdd2b0a16581b0b56366",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "comet_nucleus": "fc231d2e98984c6654380b89f08f0fc9760eec57f69f0ade3b78054f06f9692a",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "mars_global_mgs1": "c4674910d7bb139e5b72ba5e246718625b937bb17fcb0523c08e484decf73399",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "mars_basalt": "c2712ca2b31c4ba1de4a0a8f6313608e17943b5ea26a1fec324dc0d22c08ffe8",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "mars_sulfate_rich": "8d2a06cf2d33eb796a0c45ef9e853b646b73f82febecc67d6b89a4244d1b6050",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "mars_phyllosilicate_clay": "2f6d1e99c30ae0c8a2696e65e8f6f78b59a693f898d443e449d9ebf44c1c0c00",
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-    "mars_perchlorate_rich": "b7f45907723d3a1b58542170e5ab97c7c95ba3b15c61eaac81c24ef30bf3f074",
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "lunar_mare_low_ti": '81b620a9ad5646e39376b2e5d700e49e7463ef1f09c025fd5964cd5ad2121c67',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "lunar_mare_high_ti": '8d6f871db1de3bfafee32b5c41bc6151334b188adccaa692c679ddf480d7cd08',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "lunar_highland": '9107990c8b86d7241f483d1f5ce1827a0f60e9116b6518ccda32ca30de024eb5',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "lunar_pkt_kreep_average": '844c54c02d33fc4ff2ff6bd48c70362bcbaa5d9eb386b26b0cb93e82e58879fd',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "lunar_spa_kreep_influenced": '3e1f9256b9399109cc5a16f5e19030a205f49f3f0b945be8492410157e803657',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "targeted_super_kreep_ore": '04cb49b154af28c4f6d0cf8216af3349859f08fc9e0904651a5eb89a918f4c6f',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "lunar_highlands_lhs1": '2393208df434fe05ee3c6a92f9d236d8435ba23f936fd874c5fe70d225a9a227',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "lunar_highlands_lhs1_yu_2025_reference": 'd44f705fab738b2a6ff9dd32229eebf4d43ba572d21a694506aa39bb399d2d76',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "lunar_mare_lms1": '9140773d1a2d3b1013e3e5bbe0dc654d36a9868777ff0cbc147f280afe21fcd7',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "lunar_mare_oprl2n": '4ffe3604e66cdc008b1c87dfdccfe695ac576160ac60935f3598cb08cabe5e68',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "lunar_highlands_nuw_lht_5m": '01ac1027d010006969a5c20e22f373c57dc905be3a98e1946609931ae9333427',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "lunar_eac_1a": '2f2b6c6c697022c0225b0c2513fe95e14e0cd086d2e7b2a85ce393bad9797b43',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "lunar_mls_1a": '5f7aac8fffe8d3bb947e9ee30667d6863cfc56b5d2f4578558b7aae5af30d27e',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "s_type_asteroid_silicate": 'da4c5d581949149dd1530ebdd3e14a0091daef28088e997ba21bee1132269c25',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "m_type_silicate_phase": '21db441dc036089fd065ea0eed4edf148d391f7f68885d6509c480061df67f5e',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "v_type_vesta_hed": '0ce482a31fc3dc976e783a59e65e2c11604b0c5fceba3570198bf82ccb71ae66',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "e_type_enstatite_aubrite": '0f8950d8fd4502f01ffbb237099d773d40c4dcf4a9fc9e0f07cfefff8b0644ad',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "ci_carbonaceous_chondrite": '291be508ef4c896defe22ef24ffffc9479425a90ef2f7ec39dced6417fb9251d',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "cm_carbonaceous_chondrite": '21836105c3881f28e9128dbd023ce671cac9350a1402b5519c759fb921310788',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "ceres_regolith": '246169660ce61e5b36fd745a7614a1a8928be94dda0fbc1258cdc0c412d2170a',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "comet_nucleus": '9da496020f25238a36a3c60af36585706dcaca9a83776717ba34a9c36fae14bb',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "mars_global_mgs1": '41a92bc32db33dce065b290d839b871695c65a9c70340d3492f8b256f5d6e8bc',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "mars_basalt": 'cfe12a612314bdc62476b825a9bff57971fd4f1fa21c296f32deaf9ddc320bd6',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "mars_sulfate_rich": '841fae6ca6ad5235a2de763cba8c833aa4d6d41c88bc55b95f5a0ca73f513369',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "mars_phyllosilicate_clay": '22d54bf1db1f746fd88a448a00476c05f5c5f0af765dfbdcd2319d3e1d5f2b1c',
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    "mars_perchlorate_rich": '35c293cbb3f4ce33b10322da270eedf8aa16f1a82ff2f5920d4081457e2e11f5',
 }
 
 _CORE_COMPOSITION_KG_PINS = {
@@ -226,6 +226,6 @@ def test_base_intrinsic_fO2_is_pinned_for_every_fe_oxide_entry() -> None:
 
     assert len(outputs) == 26
     assert _digest(outputs) == (
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "8f2a1bd922788067624c01c30e087debf7c394ccfe5314d2d35483f991ba1f12"
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        'c85437a1d5e0d6db6a12c20dec17d6655eb483737f601cce581b96eecc41d631'
     )

@@ -228,20 +228,20 @@ def test_load_batch_creates_atom_ledger_and_melt_projection():
         "PyrolysisSimulator.load_batch must create sim.atom_ledger"
     )
     ledger_melt_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt")
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert ledger_melt_kg["SiO2"] == pytest.approx(599.5911376851839)
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert ledger_melt_kg["FeO"] == pytest.approx(393.6073959246213)
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert sim.melt.composition_kg["SiO2"] == pytest.approx(599.5911376851839)
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert sim.melt.composition_kg["FeO"] == pytest.approx(393.6073959246213)
 
     snapshot = sim._make_snapshot()
     assert snapshot.melt_mass_kg == pytest.approx(1000.0)
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert snapshot.composition_wt_pct["SiO2"] == pytest.approx(59.95911376851839)
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert snapshot.composition_wt_pct["FeO"] == pytest.approx(39.36073959246214)
 
 

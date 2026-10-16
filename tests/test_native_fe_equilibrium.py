@@ -450,18 +450,11 @@ def test_empty_open_inventory_still_exposes_unmodelled_removal():
 
 def _reducing_sim():
     from tests.test_fe_redox_split_diagnostic import _seed_redox_liquidus_curve
-    from tests.chemistry.conftest import _build_sim, _load_yaml
+    from tests.chemistry.conftest import _build_sim, _load_yaml, _native_fe_saturating_feedstocks
 
     feeds = _load_yaml('feedstocks.yaml')
-    feeds['lunar_mare_low_ti'].pop('iron_speciation', None)
-    feeds['lunar_mare_low_ti']['composition_wt_pct'] = {
-        'FeO': 60., 'K2O': 80., 'SiO2': 40.,
-        'Fe2O3': 60. / MOLAR_MASS['FeO'] * 0.039 / (2 * (1 - 0.039)) * MOLAR_MASS['Fe2O3'],
-    }
-    feeds['lunar_mare_low_ti']['composition_basis'] = {
-        oxide: {'method': 'synthetic test split', 'source': 'test fixture'}
-        for oxide in ('FeO', 'Fe2O3')
-    }
+    feeds['lunar_mare_low_ti']['composition_wt_pct'] = {}
+    feeds = _native_fe_saturating_feedstocks(feeds, 'lunar_mare_low_ti')
     sim = _build_sim('lunar_mare_low_ti', _load_yaml('vapor_pressures.yaml'),
                      feeds, _load_yaml('setpoints.yaml'))
     sim.melt.temperature_C = 1750.

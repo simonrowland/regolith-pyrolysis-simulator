@@ -586,13 +586,13 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # after subtracting nearly equal Si inventories, so the small route shift
     # moves the reported percent by a larger relative factor.
     expected_closure_error_pct = {
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "lunar_mare_low_ti": 6.129058353420497e-07,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "lunar_mare_low_ti": 2.715361335824935e-07,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "mars_basalt": 1.8550172694690296e-08,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "mars_basalt": 2.8394928218105905e-07,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15

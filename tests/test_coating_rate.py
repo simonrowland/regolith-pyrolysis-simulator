@@ -602,7 +602,7 @@ def test_lunar_payload_preserves_extrapolated_mg_wall_pressure(
     pareto = payload["run_metadata"]["pressure_coating_pareto_diagnostic"]
     magnesium = pareto["by_species"]["Mg"]
     assert magnesium["status"] == "unavailable"
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert magnesium["reason"] == "current_wall_deposition_quantity_unavailable"
     assert magnesium["authority_level"] == "extrapolated"
     records = magnesium["wall_saturation_pressure_extrapolations"]

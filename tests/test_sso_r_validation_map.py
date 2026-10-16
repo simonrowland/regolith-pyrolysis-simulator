@@ -503,35 +503,35 @@ def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):
     assertions = {a["name"]: a for a in smoke_payload["assertions"]}
 
     assert owner["native_fe_pool_mol"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        771.7846000093335, rel=0.0, abs=1.0e-9
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        785.5636564861113, rel=0.0, abs=1.0e-9
     )
     assert owner["native_fe_tap_mol"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        769.6892089309141, rel=0.0, abs=1.0e-9
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        783.4682654076919, rel=0.0, abs=1.0e-9
     )
     assert owner["native_fe_vapor_mol"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
         2.095391078419451, rel=0.0, abs=1.0e-12
     )
     assert owner["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        0.002714994673894906, rel=0.0, abs=1.0e-15
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        0.0026673727343654134, rel=0.0, abs=1.0e-15
     )
     # t-523 restores nonzero OOD inventory debits while retaining the
     # equilibrium-backend pressure seam. That changes the downstream stage-3
     # composition denominator; the native Fe pool/tap/vapour pins above remain
     # unchanged, so this is not a redox-authority or value-source cutover.
     assert owner["stage_3_Fe_wt_pct"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        34.45293490952912, rel=0.0, abs=1.0e-15
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        34.36736221703737, rel=0.0, abs=1.0e-15
     )
     assert owner["ferric_divergence_material"] is False
     assert abs(owner["mass_balance_error_pct"]) <= 5e-12
     assert owner["SiO_provider_pO2_bar"] == pytest.approx(1.0e-9)
     assert owner["SiO_flux_kg_hr"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        0.023123885242454335, rel=0.0, abs=1.0e-15
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        0.023174330062609043, rel=0.0, abs=1.0e-15
     )
     requested_pO2_assertion = assertions[
         "owner_pN2_recipe_point_requested_pO2_semantics"
@@ -641,7 +641,7 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     assert smoke_payload["live_owner_probe"]["native_split_observed"] is True
     assert parity["passed"] is True
     assert window["passed"] is False
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
     assert "first_passing_T_C=None" in window["detail"]
     assert "window under PN2 sweep transport semantics" in window["detail"]
     assert "live parity=confirmed" in window["detail"]

@@ -124,11 +124,16 @@ def test_fe_redox_split_reads_oxygen_reservoir_not_stale_mirror() -> None:
 
 
 def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
-    sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
+    from tests.chemistry.conftest import _native_fe_saturating_feedstocks
+
+    sim = _make_sim("lunar_mare_low_ti")
+    sim.feedstocks = _native_fe_saturating_feedstocks(
+        sim.feedstocks, "lunar_mare_low_ti")
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.melt.temperature_C = 1750.0
     _seed_redox_liquidus_curve(sim)
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim.melt.fO2_log = -10.0
-    sim.melt.melt_fO2_log = -10.0
+    sim._vacuum_floor_bar = lambda: 1e-20
+    sim._headspace_transport_pO2_bar_from_ledger = lambda *args, **kwargs: 1e-20
 
     before_feo_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt")["FeO"]
     before_tap = dict(sim.atom_ledger.kg_by_account("terminal.drain_tap_material"))
@@ -139,10 +144,10 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
     # 2026-08-05 MC-1 trace wiring d1b4f5d: feedstock-native Co/Ni are already
     # in the drain tap before the Fe split; the migration contract is no Fe yet.
     assert before_tap == pytest.approx({
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "Co": 0.0359382837480853,
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        "Ni": 0.20536162141763029,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Co": 0.01598451769137197,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "Ni": 0.09134010109355412,
     })
     assert "Fe" not in before_tap
 

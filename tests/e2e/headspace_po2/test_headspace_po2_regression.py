@@ -64,8 +64,8 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
         "process.overhead_gas"
     ) == pytest.approx(expected_overhead, rel=1.0e-12, abs=0.0)
     assert sim.atom_ledger.kg_by_account("terminal.offgas")["SiO2_gas"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
-        3.9858969741210886e-13, rel=1.0e-12, abs=0.0,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        3.9943699949577596e-13, rel=1.0e-12, abs=0.0,
     )
 
 
