@@ -49,7 +49,7 @@ import inspect
 import copy
 import gc
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 import logging
 import math
 from pathlib import Path
@@ -438,7 +438,8 @@ from simulator.fe_redox import (
     kress91_split,
     melt_mol_fractions_for_kress91,
     normalize_redox_state,
-    native_fe_saturation_state,
+    native_fe_equilibrium_extent,
+    NativeFePrecipitationNotice,
 )
 from simulator.melt_regime import (
     MeltRegime,
@@ -7175,13 +7176,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         fO2_log: float,
     ) -> Dict[str, Any]:
         fe3 = min(1.0, max(0.0, float(split.get('fe3_over_sigma_fe', 0.0))))
-        native_extent = self._compute_native_fe_saturation_extent(
-            comp,
-            fe3_over_sigma_fe=fe3,
-            T_K=T_K,
-            pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
-        )
+        native_extent = self._compute_native_fe_saturation_extent()
         native_state = dict(native_extent['native_fe_state'])
         native = min(1.0, max(0.0, float(
             native_extent.get('native_fe_frac', 0.0) or 0.0,
@@ -7231,127 +7226,42 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
         }
 
-    def _native_fe_saturation_state(
-        self,
-        comp: Mapping[str, float],
-        *,
-        fe3_over_sigma_fe: float,
-        T_K: float,
-        pressure_bar: float,
-        fO2_log: float,
-    ) -> Dict[str, Any]:
-        return native_fe_saturation_state(
-            comp, fe3_over_sigma_fe=fe3_over_sigma_fe, T_K=T_K,
-            pressure_bar=pressure_bar, fO2_log=fO2_log,
+    def _compute_native_fe_saturation_extent(self) -> Dict[str, Any]:
+        """Size the sole native-Fe provider from the current ledger and gas."""
+        inventory = self.atom_ledger.mol_by_account('process.cleaned_melt')
+        feo = max(0.0, float(inventory.get('FeO', 0.0)))
+        ferric = max(0.0, float(inventory.get('Fe2O3', 0.0)))
+        head_o2 = max(0.0, float(self.atom_ledger.mol_by_account(
+            'process.overhead_gas').get(OXYGEN_SPECIES, 0.0)))
+        selected_pO2 = self._headspace_transport_pO2_bar_from_ledger(
+            self._headspace_ledger_pO2_bar_from_o2_mol(head_o2),
+            head_o2_mol=head_o2,
         )
 
-    def _compute_native_fe_saturation_extent(
-        self,
-        comp: Optional[Mapping[str, float]] = None,
-        *,
-        fe3_over_sigma_fe: Optional[float] = None,
-        T_K: Optional[float] = None,
-        pressure_bar: Optional[float] = None,
-        fO2_log: Optional[float] = None,
-    ) -> Dict[str, Any]:
-        """Authoritative native-Fe saturation extent for provider controls.
+        def gas_fO2_log(n):
+            # Instantaneous precipitation into finite gas holdup: no credit
+            # for a FUTURE hourly bleed. No precipitation rate is established.
+            # FeO -> Fe + 0.5 O2 gives delta p=n*R*T/(2*V*1e5) bar.
+            # n is mol Fe, R*T/V is Pa/mol; n=0 recovers the gas boundary.
+            # The selected transport/control boundary is also a lower bound;
+            # incoming oxidizing gas cannot be evaded by an empty ledger.
+            return math.log10(max(
+                selected_pO2, self._vacuum_floor_bar(),
+                self._headspace_ledger_pO2_bar_from_o2_mol(head_o2 + 0.5*n),
+            ))
 
-        The redox diagnostic may copy these fields into its snapshot, but the
-        ledger move must be sized here, not from a diagnostic-only payload.
-        """
-        temperature_K = (
-            float(T_K)
-            if T_K is not None
-            else float(self.melt.temperature_C) + 273.15
-        )
-        comp_wt = dict(comp) if comp is not None else self._melt_oxide_wt_pct()
-        melt_fO2_log = (
-            float(fO2_log)
-            if fO2_log is not None
-            else float(
-                getattr(
-                    self.melt.oxygen_reservoir,
-                    'melt_intrinsic_fO2_log',
-                    getattr(self.melt, 'melt_fO2_log', -9.0),
-                )
-            )
-        )
-        pressure = (
-            float(pressure_bar)
-            if pressure_bar is not None
-            else floor_vacuum_pressure_bar(
-                self._melt_headspace_total_pressure_bar(),
+        result = native_fe_equilibrium_extent(
+            comp_wt=self._melt_oxide_wt_pct(), feo_mol=feo,
+            fe2o3_mol=ferric, T_K=float(self.melt.temperature_C) + 273.15,
+            # Same pressure owner/control as _current_melt_redox_fO2_log.
+            pressure_bar=floor_vacuum_pressure_bar(
+                float(self.melt.p_total_mbar) / 1000.0,
                 floor_bar=self._vacuum_floor_bar(),
-            )
+            ),
+            gas_fO2_log=gas_fO2_log,
         )
-        feot_wt = self._feot_equivalent_wt_pct(comp_wt)
-        if temperature_K <= 0.0 or feot_wt <= 0.0:
-            native_state = {
-                'native_fe_saturation': False,
-                'native_fe_threshold': 'FeO_activity_saturation',
-                'native_fe_frac': 0.0,
-            }
-        else:
-            if fe3_over_sigma_fe is None:
-                split = self._fe_redox_split_inline_kress91(
-                    comp_wt,
-                    T_K=temperature_K,
-                    pressure_bar=pressure,
-                    fO2_log=melt_fO2_log,
-                )
-                fe3 = float(split.get('fe3_over_sigma_fe', 0.0) or 0.0)
-            else:
-                fe3 = float(fe3_over_sigma_fe)
-            native_state = self._native_fe_saturation_state(
-                comp_wt,
-                fe3_over_sigma_fe=fe3,
-                T_K=temperature_K,
-                pressure_bar=pressure,
-                fO2_log=melt_fO2_log,
-            )
-        native_frac = min(1.0, max(0.0, float(
-            native_state.get('native_fe_frac', 0.0) or 0.0,
-        )))
-        cleaned_melt_mol = self.atom_ledger.mol_by_account(
-            'process.cleaned_melt')
-        feo_mol = max(0.0, float(cleaned_melt_mol.get('FeO', 0.0) or 0.0))
-        total_fe_mol = self._cleaned_melt_fe_atom_mol()
-        native_fe_mol = min(feo_mol, total_fe_mol * native_frac)
-        return {
-            'native_fe_state': {**native_state, 'native_fe_frac': native_frac},
-            'native_fe_frac': native_frac,
-            'native_fe_mol': native_fe_mol,
-            'feo_available_mol': feo_mol,
-            'total_fe_mol': total_fe_mol,
-        }
-
-    def _native_fe_frac_for_trial_fO2(self, fO2_log: float) -> float:
-        extent = self._compute_native_fe_saturation_extent(fO2_log=fO2_log)
-        return max(0.0, float(extent.get('native_fe_frac', 0.0) or 0.0))
-
-    def _native_fe_saturation_target_fO2_log(
-        self,
-        base_fO2_log: float,
-        *,
-        tolerance: float = 1.0e-12,
-    ) -> float:
-        if self._native_fe_frac_for_trial_fO2(base_fO2_log) <= tolerance:
-            return float(base_fO2_log)
-        low = float(base_fO2_log)
-        high = low
-        for _ in range(64):
-            high += 0.25
-            if self._native_fe_frac_for_trial_fO2(high) <= tolerance:
-                break
-        else:
-            return high
-        for _ in range(48):
-            mid = 0.5 * (low + high)
-            if self._native_fe_frac_for_trial_fO2(mid) > tolerance:
-                low = mid
-            else:
-                high = mid
-        return high
+        return {**result, 'feo_available_mol': feo,
+                'total_fe_mol': feo + 2.0*ferric}
 
     def _stage3_fe_wt_pct_diagnostic(self) -> Dict[str, float]:
         if len(self.train.stages) <= 3:
@@ -7845,19 +7755,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
         })
         self._last_native_fe_partition_diagnostic = dict(partition)
-        base_fO2_log = self._current_melt_redox_fO2_log()
-        target_fO2_log = self._native_fe_saturation_target_fO2_log(base_fO2_log)
-        inventory = self.atom_ledger.mol_by_account('process.cleaned_melt')
-        needed_o2_equiv_mol = max(0.0, kress91_oxygen_demand_mol(
-            feo_mol=float(inventory.get('FeO', 0.0)),
-            fe2o3_mol=float(inventory.get('Fe2O3', 0.0)),
-            fO2_log=target_fO2_log,
-            mol_fractions=melt_mol_fractions_for_kress91(self._melt_oxide_wt_pct()),
-            T_K=max(1.0, float(self.melt.temperature_C) + 273.15),
-            pressure_bar=floor_vacuum_pressure_bar(
-                self.melt.p_total_mbar / 1000.0, floor_bar=self._vacuum_floor_bar(),
-            ),
-        ))
         emitted_o2_mol = (
             self._transition_species_mol(
                 transition,
@@ -7871,10 +7768,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             vapor_route.get('native_fe_overhead_o2_mol', 0.0) or 0.0
         )
         self._apply_oxygen_reservoir_redox_source_terms(
-            {'redox_source:native_fe_saturation_split': min(
-                emitted_o2_mol,
-                needed_o2_equiv_mol,
-            )},
+            {'redox_source:native_fe_saturation_split': emitted_o2_mol},
             exchange_direction='redox_source:native_fe_saturation_split',
             gate_authority=gate_authority,
         )
@@ -7905,6 +7799,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'native_fe_event_reason': 'native_fe_saturation_split_applied',
                 'native_fe_event_status': 'ok',
             }
+        if (native_fe_source_account == 'process.cleaned_melt'
+                and committed_pool_mol > 1.0e-12):
+            after = self._compute_native_fe_saturation_extent()
+            notice = asdict(NativeFePrecipitationNotice(
+                n_fe_mol=committed_pool_mol,
+                fO2_before_log=float(native_extent['fO2_before_log']),
+                fO2_after_log=self._current_melt_redox_fO2_log(),
+                iw_bound_after_log=float(after['native_fe_state']['iw_bound_log']),
+                limit=native_extent['limit'],
+            ))
+            self._redox_bound_notices_this_hr = list(getattr(
+                self, '_redox_bound_notices_this_hr', [])) + [notice]
+            event['precipitation_notice'] = notice
         self._last_native_fe_saturation_event = dict(event)
         return {**split, 'native_fe_partition': dict(partition), **event}
 

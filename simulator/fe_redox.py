@@ -937,14 +937,14 @@ def kress91_fe3_over_sigma_fe(
     return 2.0 * ratio / (2.0 * ratio + 1.0)
 
 
-def native_fe_saturation_state(
+def _native_fe_saturation_comparison(
     comp: Mapping[str, float],
     *,
     fe3_over_sigma_fe: float,
     T_K: float,
     pressure_bar: float,
     fO2_log: float,
-) -> Dict[str, Any]:
+) -> dict[str, object]:
     from simulator.accounting.exceptions import AccountingError
 
     fe3 = float(fe3_over_sigma_fe)
@@ -967,6 +967,8 @@ def native_fe_saturation_state(
             pressure_bar=pressure_bar,
             fe3_over_sigma_fe=fe3,
         )
+        # The ONE native-saturation basis selection inherits t-1293's open
+        # X versus gamma X question. Preserve the existing activity owner.
         a_feo = float(activity.get('a_FeO_authoritative', 0.0) or 0.0)
         pure_feo_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
     except Exception as exc:
@@ -991,15 +993,14 @@ def native_fe_saturation_state(
         a_feo_saturation = 0.0
     else:
         a_feo_saturation = 10.0 ** saturation_log10
-    if a_feo_saturation >= a_feo:
-        native = 0.0
-    else:
-        native = ferrous_available * (1.0 - a_feo_saturation / a_feo)
-    native = min(ferrous_available, max(0.0, native))
+    bound = feo_iw_log10_fO2_bar(T_K, a_feo=a_feo)
+    # Exact trigger; no uncertainty/tolerance band (t-1293 remains open).
+    gap = float(fO2_log) - bound
     return {
-        'native_fe_saturation': native > 0.0,
+        'native_fe_saturation': gap < 0.0,
         'native_fe_threshold': 'FeO_activity_saturation',
-        'native_fe_frac': native,
+        'iw_bound_log': bound,
+        'saturation_gap_dex': gap,
         'native_fe_activity': a_feo,
         'native_fe_saturation_activity': a_feo_saturation,
         'native_fe_pure_feo_iw_log': pure_feo_iw,
@@ -1007,6 +1008,110 @@ def native_fe_saturation_state(
             'Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 '
             'FeO(l)=Fe+0.5O2 saturation'
         ),
+    }
+
+
+NATIVE_FE_ROOT_TOLERANCE_DEX = 1.0e-10
+
+
+@dataclass(frozen=True)
+class NativeFePrecipitationNotice:
+    n_fe_mol: float
+    fO2_before_log: float
+    fO2_after_log: float
+    iw_bound_after_log: float
+    limit: Literal['melt', 'gas', 'both']
+    flag: str = 'NATIVE_FE_PRECIPITATION'
+
+
+def native_fe_equilibrium_extent(
+    *, comp_wt: Mapping[str, float], feo_mol: float, fe2o3_mol: float,
+    T_K: float, pressure_bar: float,
+    gas_fO2_log: Callable[[float], float],
+) -> dict[str, object]:
+    """Instantaneous FeO -> Fe + 0.5 O2 extent at the supplied gas boundary."""
+    from scipy.optimize import brentq
+
+    if feo_mol <= 0.0:
+        return {'native_fe_mol': 0.0, 'native_fe_frac': 0.0,
+                'native_fe_state': {'native_fe_saturation': False,
+                                    'native_fe_frac': 0.0}}
+    total_fe = feo_mol + 2.0 * fe2o3_mol
+
+    def state(n):
+        # Premise: ferric inventory stays fixed while n mol FeO leaves.
+        # Debit w_FeO*n/F on the original weight basis, then renormalize.
+        # n/F is dimensionless; at zero extent the composition is unchanged,
+        # and n -> F removes all FeO. No kg inventory is introduced.
+        comp = dict(comp_wt)
+        comp['FeO'] = float(comp['FeO']) * ((feo_mol - n) / feo_mol)
+        total = sum(comp.values())
+        comp = {s: 100.0*w/total for s, w in comp.items()}
+        potential = float(kress91_intrinsic_state(
+            feo_mol=feo_mol-n, fe2o3_mol=fe2o3_mol,
+            mol_fractions=melt_mol_fractions_for_kress91(comp),
+            T_K=T_K, pressure_bar=pressure_bar,
+            exchange_fO2_log=gas_fO2_log(n), composition_wt_pct=comp,
+        )['fO2_log'])
+        comparison = _native_fe_saturation_comparison(
+            comp, fe3_over_sigma_fe=2.0*fe2o3_mol/(total_fe-n), T_K=T_K,
+            pressure_bar=pressure_bar, fO2_log=potential,
+        )
+        return potential, comparison
+
+    before, initial = state(0.0)
+    # F'=F-n, S'=N+F'+2C on the Kress FeOt molar basis. For the fitted
+    # composition term B, dB/dn=D/S'^2, D=sum_i(c_i+1.828)*N_i.
+    # On this reducing limb a_FeO=gamma(T)*F'/S', hence
+    # g'=[(1+2*a_K)/F' - D/S'^2 - 2*a_K/S']/(a_K*ln(10)), in dex/mol.
+    # For both b-899 basalts y=F'/S' <= 0.2 throughout the root bracket.
+    # Since c_i+1.828 <= 8.043, g' is bounded below by
+    # [1.392/y - 0.392 - 8.043*(1-y)]/(0.196*ln(10)*S'). The numerator
+    # decreases up to y=0.2, where it is 0.1336 > 0: g is strictly increasing.
+    # At the root f_inv=IW(a)<=IW(1), so this bracket stays on the gamma X
+    # limb. Beyond it the owner's gamma-to-X blend lowers activity further.
+    # Also g -> +infinity as F' -> 0. Activity decreases, so
+    # h=log(pO2_gas(n))-IW(a(n)) also increases for a nondecreasing gas
+    # boundary. Reduction requires BOTH g<0 and h<0, giving the minimum
+    # of their roots. Equal initial potentials give zero extent.
+    def melt_gap(n):
+        potential, comparison = state(n)
+        return potential - float(comparison['iw_bound_log'])
+
+    def gas_gap(n):
+        _, comparison = state(n)
+        return gas_fO2_log(n) - float(comparison['iw_bound_log'])
+
+    hi = math.nextafter(feo_mol, 0.0)
+
+    def root(gap):
+        if gap(0.0) >= 0.0:
+            return 0.0
+        if gap(hi) <= 0.0:
+            return feo_mol
+        n = brentq(gap, 0.0, hi, xtol=1e-300, rtol=1e-14, maxiter=200)
+        if abs(gap(n)) > NATIVE_FE_ROOT_TOLERANCE_DEX:
+            raise Kress91InvalidControls('native Fe root failed its dex tolerance')
+        return n
+
+    if not initial['native_fe_saturation']:
+        melt_root = gas_root = n = 0.0
+        limit = 'melt'
+    else:
+        melt_root = root(melt_gap)
+        gas_root = root(gas_gap)
+        n = min(melt_root, gas_root)
+        limit = ('both' if melt_root == gas_root else
+                 'melt' if melt_root < gas_root else 'gas')
+    after, final = state(n)
+    fraction = n / total_fe
+    return {
+        'native_fe_mol': n, 'native_fe_frac': fraction,
+        'native_fe_state': {**initial, 'native_fe_frac': fraction,
+                            'native_fe_saturation': n > 0.0},
+        'fO2_before_log': before, 'fO2_after_log': after,
+        'iw_bound_after_log': final['iw_bound_log'], 'limit': limit,
+        'melt_root_mol': melt_root, 'gas_root_mol': gas_root,
     }
 
 

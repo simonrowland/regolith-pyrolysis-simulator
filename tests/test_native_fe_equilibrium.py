@@ -1,10 +1,13 @@
 """b-899 pre-split inventories; historical pins precede the b-917 change."""
 
 from types import SimpleNamespace
+import math
 
 import pytest
 
 from simulator.core import PyrolysisSimulator
+from simulator import fe_redox
+from simulator.state import MOLAR_MASS
 
 
 @pytest.fixture(params=[
@@ -38,7 +41,120 @@ def probe(request):
                      fO2_log=potential), historical_extent
 
 
-def test_b899_frozen_potential_extent_pin(probe):
-    sim, controls, expected = probe
-    result = sim._compute_native_fe_saturation_extent(**controls)
-    assert result['native_fe_mol'] == expected
+def test_b899_extent_is_reduced_from_historical_frozen_potential_pin(probe):
+    assert _solve(probe)['native_fe_mol'] < probe[2]
+
+
+def _post_removal(probe, n):
+    sim, controls, _ = probe
+    inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    feo = inventory['FeO']
+    ferric = inventory['Fe2O3']
+    # Independent mass-basis construction, rather than the solver's fraction
+    # update: reconstruct oxide moles, debit FeO, and reweigh all components.
+    basis = feo * MOLAR_MASS['FeO'] / controls['comp']['FeO']
+    mol = {s: w * basis / MOLAR_MASS[s] for s, w in controls['comp'].items()}
+    mol['FeO'] -= n
+    weights = {s: m * MOLAR_MASS[s] for s, m in mol.items()}
+    comp = {s: w / sum(weights.values()) * 100 for s, w in weights.items()}
+    value = fe_redox.kress91_intrinsic_state(
+        feo_mol=feo-n, fe2o3_mol=ferric,
+        mol_fractions=fe_redox.melt_mol_fractions_for_kress91(comp),
+        T_K=controls['T_K'], pressure_bar=controls['pressure_bar'],
+        exchange_fO2_log=-300., composition_wt_pct=comp)['fO2_log']
+    activity = fe_redox.calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=comp, T_K=controls['T_K'],
+        pressure_bar=controls['pressure_bar'], fO2_log=value,
+        fe3_over_sigma_fe=2*ferric/(feo-n+2*ferric))['a_FeO_authoritative']
+    bound = fe_redox.feo_iw_log10_fO2_bar(controls['T_K'], a_feo=activity)
+    return value, bound
+
+
+def _solve(probe, gas=lambda n: -300.):
+    sim, controls, _ = probe
+    inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    return fe_redox.native_fe_equilibrium_extent(
+        comp_wt=controls['comp'], feo_mol=inventory['FeO'],
+        fe2o3_mol=inventory['Fe2O3'], T_K=controls['T_K'],
+        pressure_bar=controls['pressure_bar'], gas_fO2_log=gas)
+
+
+def test_melt_root_matches_independent_bisection_and_stops_at_bound(probe):
+    result = _solve(probe)
+    assert fe_redox.melt_mol_fractions_for_kress91(probe[1]['comp'])['FeOt'] <= 0.2
+    feo = probe[0].atom_ledger.mol_by_account('process.cleaned_melt')['FeO']
+    lo, hi = 0., math.nextafter(feo, 0.)
+    for _ in range(80):
+        mid = (lo+hi)/2
+        value, bound = _post_removal(probe, mid)
+        if value < bound:
+            lo = mid
+        else:
+            hi = mid
+    assert result['native_fe_mol'] == pytest.approx((lo+hi)/2, abs=1e-9)
+    value, bound = _post_removal(probe, result['native_fe_mol'])
+    assert abs(value-bound) <= fe_redox.NATIVE_FE_ROOT_TOLERANCE_DEX
+    assert result['limit'] == 'melt'
+    gaps = [v-b for v, b in (_post_removal(probe, lo*i/100) for i in range(101))]
+    assert all(a < b for a, b in zip(gaps, gaps[1:]))
+
+
+def test_gas_unfavourable_boundary_prevents_precipitation(probe):
+    assert _solve(probe, gas=lambda n: 0.)['native_fe_mol'] == 0.
+
+
+def test_finite_gas_capacity_stops_at_gas_root(probe):
+    gas = lambda n: math.log10(1e-12 + n/2)
+    result = _solve(probe, gas=gas)
+    n = result['native_fe_mol']
+    assert n > 0.
+    assert result['limit'] == 'gas'
+    assert n < result['melt_root_mol']
+    value, bound = _post_removal(probe, n)
+    assert value < bound
+    assert abs(gas(n)-bound) <= fe_redox.NATIVE_FE_ROOT_TOLERANCE_DEX
+
+
+def test_no_precipitation_above_melt_bound(probe):
+    sim, controls, _ = probe
+    inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    inventory['Fe2O3'] *= 10
+    controls['comp']['Fe2O3'] *= 10
+    result = _solve(probe)
+    assert result['fO2_before_log'] >= result['iw_bound_after_log']
+    assert result['native_fe_mol'] == 0.
+
+
+@pytest.mark.parametrize('finite_gas', [False, True])
+def test_provider_split_closes_atoms_and_records_committed_event(monkeypatch, finite_gas):
+    from tests.test_fe_redox_split_diagnostic import _make_sim, _seed_redox_liquidus_curve
+    from tests.chemistry.conftest import _seed_melt_redox
+
+    sim = _make_sim('lunar_mare_low_ti', temperature_C=1750.)
+    _seed_redox_liquidus_curve(sim)
+    _seed_melt_redox(sim, -10.)
+    # Ideal oxygen-free boundary; finite gas retains its actual nRT/V owner.
+    monkeypatch.setattr(sim, '_vacuum_floor_bar', lambda: 1e-20)
+    monkeypatch.setattr(sim, '_headspace_transport_pO2_bar_from_ledger',
+                        lambda *a, **kw: 1e-20)
+    if not finite_gas:
+        monkeypatch.setattr(sim, '_headspace_ledger_pO2_bar_from_o2_mol', lambda n: 0.)
+    before = dict(sim.atom_ledger.mol_by_account('process.cleaned_melt'))
+    expected = sim._compute_native_fe_saturation_extent()
+    assert expected['native_fe_mol'] > 0.
+    sim._apply_native_fe_saturation_split()
+    after = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    notice = sim._last_native_fe_saturation_event['precipitation_notice']
+    assert before['FeO'] - after['FeO'] == pytest.approx(notice['n_fe_mol'], abs=1e-9)
+    assert notice['n_fe_mol'] == pytest.approx(expected['native_fe_mol'], abs=1e-9)
+    assert notice['flag'] == 'NATIVE_FE_PRECIPITATION'
+    assert notice['limit'] == ('gas' if finite_gas else 'melt')
+    assert after['Fe2O3'] == before['Fe2O3']
+    if finite_gas:
+        head = sim.atom_ledger.mol_by_account('process.overhead_gas').get('O2', 0.)
+        assert sim._headspace_ledger_pO2_bar_from_o2_mol(head) < 1e-6
+    else:
+        assert abs(notice['fO2_after_log'] - notice['iw_bound_after_log']) <= 1e-10
+    assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5e-12
+    assert any(n['flag'] == 'REDOX_BELOW_FE_FEO_SATURATION'
+               for n in sim._redox_bound_notices_this_hr)
