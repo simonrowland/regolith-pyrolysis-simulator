@@ -205,9 +205,9 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
 def test_native_fe_authoritative_extent_ignores_diagnostic_payload(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
-    _seed_redox_liquidus_curve(sim)
-    _seed_melt_redox(sim, -10.0)
+    from tests.test_native_fe_equilibrium import _reducing_sim
+
+    sim = _reducing_sim()
     # The corrected coexistence bound lies below the normal 1e-9 bar floor.
     # Give this authority-vs-diagnostic test a favorable gas receiver explicitly;
     # finite-gas blocking is covered by test_native_fe_equilibrium.
