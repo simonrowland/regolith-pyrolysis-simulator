@@ -236,6 +236,54 @@ def test_low_count_bins_are_markers_and_flagged_rows_are_hollow(tmp_path: Path) 
         plt.close(element_figure)
 
 
+@pytest.mark.parametrize("view", ("species", "element"))
+def test_clipped_flagged_points_keep_a_hollow_marker(tmp_path: Path, view: str) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "test-store"}
+    ]
+    for index, (authority, residual) in enumerate(
+        (
+            ("certified", 4.5),
+            ("extrapolated", 4.5),
+            ("certified", -4.5),
+            ("extrapolated", -4.5),
+        )
+    ):
+        rows.append(
+            _record(
+                engine="openimcc",
+                experiment=f"clipped-{index}",
+                formula="SiO2",
+                temperature_K=1000 + index * 100,
+                residual=residual,
+                authority=authority,
+            )
+        )
+    residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+    data = read_scores(residuals)
+    figure, axis = plt.subplots()
+    try:
+        draw_panel(axis, data, "openimcc", load_element_abundance(), view=view)
+        clipped_arrows = [
+            artist
+            for artist in axis.texts
+            if (artist.get_gid() or "").startswith("clipped-arrow:")
+        ]
+        flagged_markers = [
+            artist
+            for artist in axis.collections
+            if (artist.get_gid() or "").startswith("clipped-flag-marker:")
+        ]
+        assert len(clipped_arrows) == (4 if view == "species" else 8)
+        assert len(flagged_markers) == (2 if view == "species" else 4)
+        assert all(len(marker.get_facecolors()) == 0 for marker in flagged_markers)
+    finally:
+        plt.close(figure)
+
+
 def test_lunar_feedstock_abundance_drives_plot_styling() -> None:
     abundance = load_element_abundance("lunar_mare_low_ti")
 

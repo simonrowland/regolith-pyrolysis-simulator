@@ -762,6 +762,18 @@ def draw_panel(
                     annotation_clip=False,
                 )
                 arrow.set_gid(f"clipped-arrow:{item.gid}")
+                if point.flagged:
+                    marker = axis.scatter(
+                        [point.temperature_K],
+                        [y_visible],
+                        s=style["markersize"] ** 2 * 2.0,
+                        marker="o",
+                        facecolors="none",
+                        edgecolors=style["color"],
+                        linewidths=max(0.45, style["linewidth"] * 0.55),
+                        zorder=7,
+                    )
+                    marker.set_gid(f"clipped-flag-marker:{item.gid}")
                 continue
             if point.n < 3:
                 marker_gid = f"low-count-marker:{item.gid}"
