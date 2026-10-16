@@ -307,7 +307,7 @@ def test_internal_analytical_observation_uses_core_vapor_pressure_intent() -> No
         },
         fO2_log=-9.0,
     ).diagnostic["vapor_pressures_Pa"]["Fe"]
-    assert prediction.value == pytest.approx(Decimal(str(expected)), rel=1e-12)
+    assert float(prediction.value) == pytest.approx(expected, rel=1e-12)
 
 
 def test_internal_analytical_refuses_missing_composition() -> None:
