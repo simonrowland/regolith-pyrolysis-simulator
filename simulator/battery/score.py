@@ -7116,9 +7116,7 @@ def compile_residual(
         band_preserving_kinds.add(NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG)
     has_no_band_flag = any(
         notice.kind not in band_preserving_kinds for notice in flagged_notices
-    ) or fusion_band_refusal is not None or (
-        band_basis == "source_method" and printed.refusal is not None
-    )
+    ) or fusion_band_refusal is not None
     if has_no_band_flag:
         numeric = replace(numeric, decision_band=None)
     if implied_alpha:
