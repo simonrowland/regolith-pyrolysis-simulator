@@ -82,6 +82,21 @@ def _require_openimcc() -> None:
     pytest.importorskip("openimcc", reason="openimcc is not importable")
 
 
+def _openimcc_pack_temperature_band() -> tuple[float, float]:
+    _require_openimcc()
+    from simulator.melt_backend import openimcc_bridge
+
+    pack = openimcc_bridge._load_pack(openimcc_bridge.DEFAULT_BACKEND_PACK_NAME)
+    domains = tuple(
+        tuple(map(float, domain)) for domain in pack.kernel_datapack.domains
+    )
+    assert domains
+    # The scorer publishes one pack-wide interval, so mixed complex domains
+    # require an explicit policy change rather than a silently wrong band.
+    assert len(set(domains)) == 1
+    return domains[0]
+
+
 def _require_ti_gas() -> None:
     _require_openimcc()
     from openimcc import load_gas_datapack
@@ -1414,6 +1429,53 @@ def test_openimcc_domain_policy_flags_extrapolation() -> None:
     )
 
 
+def test_openimcc_pack_complexes_share_temperature_domain() -> None:
+    floor, ceiling = _openimcc_pack_temperature_band()
+    assert floor < ceiling
+
+
+@pytest.mark.parametrize(
+    "composition_mol",
+    ({"SiO2": 1.0}, {"SiO2": 0.5, "TiO2": 0.5}),
+)
+@pytest.mark.parametrize("outside_side", ("below", "above"))
+def test_openimcc_pack_domain_flags_even_without_active_complex(
+    composition_mol, outside_side, monkeypatch
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+    from simulator.melt_backend import openimcc_bridge
+
+    floor, ceiling = _openimcc_pack_temperature_band()
+    temperature_K = floor - 100.0 if outside_side == "below" else ceiling + 100.0
+    package_results = []
+    evaluate = openimcc_bridge.evaluate
+
+    def capture_result(**kwargs):
+        result = evaluate(**kwargs)
+        package_results.append(result)
+        return result
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", capture_result)
+    backend = _OpenImccBatteryBackend("openimcc")
+    cell = backend.equilibrate(
+        temperature_C=temperature_K - 273.15,
+        composition_mol=composition_mol,
+    )
+
+    assert package_results and package_results[-1].extrapolated is False
+    notice = next(
+        row
+        for row in cell.diagnostics["imcc_notices"]
+        if row["kind"] == "openimcc_temperature_extrapolated"
+    )
+    assert notice["authority"] == "extrapolated"
+    assert notice["certified_band"]["temperature_K"] == [floor, ceiling]
+    assert f"[{floor:g}, {ceiling:g}] K" in notice["reason"]
+    assert "extrapolated: Delta_r Cp = 0 continuation" in notice["reason"]
+
+
 def test_openimcc_below_floor_real_melt_activity_has_extrapolation_flag(
     monkeypatch,
 ) -> None:
@@ -1428,6 +1490,7 @@ def test_openimcc_below_floor_real_melt_activity_has_extrapolation_flag(
     context = load_score_context(sources=("kems-ms2000-044",))
     reference = context.observations[observation_id]
     focused_context = replace(context, observations={observation_id: reference})
+    floor, ceiling = _openimcc_pack_temperature_band()
     bridge_calls = []
     package_bridge_evaluate = openimcc_bridge.evaluate
 
@@ -1452,15 +1515,15 @@ def test_openimcc_below_floor_real_melt_activity_has_extrapolation_flag(
         and notice.origin == "engine:openimcc"
     )
     assert notice.authority is Authority.EXTRAPOLATED
-    assert notice.band == "[1700, 3000] K"
+    assert notice.band == f"[{floor:g}, {ceiling:g}] K"
     assert candidate.authority is Authority.EXTRAPOLATED
     assert candidate.certified_band == {
-        "temperature_K": (Decimal("1700.0"), Decimal("3000.0"))
+        "temperature_K": (Decimal(str(floor)), Decimal(str(ceiling)))
     }
 
     assert len(bridge_calls) == 1
     call = bridge_calls[0]
-    assert call["temperature_K"] < 1700.0
+    assert call["temperature_K"] < floor
     assert call["allow_extrapolation"] is True
     package_result = openimcc.evaluate(
         call["composition_mol"],

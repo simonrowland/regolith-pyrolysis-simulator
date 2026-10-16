@@ -1830,6 +1830,15 @@ class _OpenImccBatteryBackend:
                 openimcc_bridge.imported_openimcc_commit() or "unverified"
             ),
         }
+        domains = self._pack.kernel_datapack.domains
+        self._certified_temperature_domain = (
+            (
+                max(float(domain[0]) for domain in domains),
+                min(float(domain[1]) for domain in domains),
+            )
+            if domains
+            else None
+        )
         self._load_gas()
 
     def _load_gas(self) -> None:
@@ -1906,16 +1915,12 @@ class _OpenImccBatteryBackend:
                 result.parent_oxide_x_star_ratios,
             )
         )
-        if result.extrapolated:
-            domains = self._pack.kernel_datapack.domains
-            certified_domain = (
-                (
-                    max(float(domain[0]) for domain in domains),
-                    min(float(domain[1]) for domain in domains),
-                )
-                if domains
-                else None
-            )
+        certified_domain = self._certified_temperature_domain
+        outside_certified_domain = bool(
+            certified_domain is not None
+            and not certified_domain[0] <= temperature_K <= certified_domain[1]
+        )
+        if result.extrapolated or outside_certified_domain:
             certified_band_text = (
                 "unavailable"
                 if certified_domain is None
