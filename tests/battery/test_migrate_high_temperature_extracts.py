@@ -65,6 +65,20 @@ def _assert_printed_point(
     assert temperature.locator is not None
 
 
+def test_yield_table_items_recognizes_numeric_mass_loss_runs() -> None:
+    runs = [
+        {"Tmax_C": 2183, "mass_loss_wt_pct": 97.4},
+        {"Tmax_C": 2928, "mass_loss_wt_pct": "?"},
+    ]
+    assert migrate_module._yield_table_items({"runs": runs}) == ("runs", runs)
+    assert migrate_module._yield_table_items(
+        {"runs": [{"Tmax_C": 2183, "mass_loss_wt_pct": "?"}]}
+    ) == (None, None)
+    assert migrate_module._yield_table_items(
+        {"runs": [{"T_C": 1700, "FeO_wt_pct": 27.92}]}
+    ) == (None, None)
+
+
 @pytest.mark.parametrize(
     ("source_id", "id_fragment", "temperature_K", "value"),
     [
@@ -145,21 +159,31 @@ def test_demaria_table4_points_keep_printed_values_and_temperatures(migrated_tar
     )
 
 
-def test_nakano_run_quantity_is_recognized_before_range_fix(migrated_targets) -> None:
+def test_nakano_numeric_runs_emit_stable_mass_loss_points(migrated_targets) -> None:
     observations = _source_observations(
         migrated_targets, "nakano-hashimoto-2020-bubbles-to-chondrites-i"
     )
-    parent = next(
+    points = [
         observation
         for observation in observations
-        if observation.observation_id.endswith("::nakano_2020_mass_loss_selected_runs")
-    )
-    assert parent.identity.quantity.is_value
-    assert parent.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
-    assert not any(
-        "nakano_2020_mass_loss_selected_runs" in observation.observation_id
+        if "nakano_2020_mass_loss_selected_runs::T=" in observation.observation_id
         and observation.value.kind is ValueKind.POINT
-        for observation in observations
+    ]
+    assert len(points) == 8
+    assert len({observation.observation_id for observation in points}) == 8
+    for observation in points:
+        assert observation.identity.quantity.is_value
+        assert observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        temperature = observation.point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == observation.identity.temperature_K.value
+        assert temperature.locator is not None
+    _assert_printed_point(
+        migrated_targets,
+        source_id="nakano-hashimoto-2020-bubbles-to-chondrites-i",
+        id_fragment="nakano_2020_mass_loss_selected_runs::T=2456.15",
+        temperature_K="2456.15",
+        value="0.974",
     )
 
 

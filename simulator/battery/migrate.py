@@ -5336,7 +5336,7 @@ def _item_mass_loss_field(item: Mapping[str, Any]) -> str | None:
 def _yield_table_items(
     values: Mapping[str, Any],
 ) -> tuple[str, list[Any]] | tuple[None, None]:
-    for key in ("points", "tests"):
+    for key in ("points", "tests", "runs"):
         items = values.get(key)
         if not isinstance(items, list) or not items:
             continue
