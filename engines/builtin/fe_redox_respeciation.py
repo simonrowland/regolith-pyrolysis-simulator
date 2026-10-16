@@ -8,6 +8,7 @@ from engines.builtin._common import (
     build_atom_balance_proof,
     composition_wt_pct_from_account_view,
     diagnostic_control_audit,
+    merge_species_amounts_from_accounts,
     reject_wrong_intent,
     unpack_controls,
 )
@@ -170,13 +171,11 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                 },
             )
 
-        from simulator.accounting.ledger import _merge_species_amounts_from_accounts
-
         # Provenance-isolated spent oxide is physically in the same melt.
         # Only this thermodynamic basis is combined; Fe/O2 funding and
         # transition accounts continue to use the original account view.
         basis_view = ProviderAccountView(
-            accounts={CLEANED_MELT_ACCOUNT: _merge_species_amounts_from_accounts(
+            accounts={CLEANED_MELT_ACCOUNT: merge_species_amounts_from_accounts(
                 accounts, MELT_RESIDENT_ACCOUNTS)},
             species_formula_registry=request.account_view.species_formula_registry)
         comp_wt = composition_wt_pct_from_account_view(
