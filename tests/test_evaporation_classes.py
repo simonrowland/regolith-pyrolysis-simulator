@@ -148,7 +148,28 @@ def test_report_species_class_diagnostics_class_alpha_fallback_unchanged():
     assert diag.alpha_runtime is None
     assert diag.alpha_runtime_note.endswith("+class_alpha_fallback_for_s")
     assert diag.series is not None
-    assert diag.series.alpha_intrinsic == pytest.approx(0.083)
+    assert diag.series.alpha_intrinsic == 0.083
+    assert diag.interface_share_s == 0.057762384084735774
+    assert diag.r_interface == 16479.794223102974
+    assert diag.r_gas == 268823.42662262224
+    assert diag.r_melt == 0.0
+    assert diag.flux_band_factor_high == 1.087402437000731
+    assert diag.flux_band_factor_low == 0.9196227320937371
+    assert (
+        diag.series.flux_kg_s_m2,
+        diag.series.alpha_effective,
+        diag.series.k_hk_kg_s_m2_pa,
+        diag.series.knudsen_number,
+        diag.series.k_mt_kg_s_m2_pa,
+        diag.series.d_ab_m2_s,
+    ) == (
+        3.5050427998523708e-06,
+        0.004794277879033069,
+        0.0007310887871520878,
+        0.0003590519097018557,
+        3.7199138950185795e-06,
+        0.03631724814709421,
+    )
 
 
 def test_costa_redox_grounding_uses_owner_figure_series_once():
