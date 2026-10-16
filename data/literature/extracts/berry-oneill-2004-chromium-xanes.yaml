@@ -49,10 +49,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.005'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -0.68*; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -167,10 +168,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.009'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -0.68*; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -285,10 +287,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.008'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -0.68*; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -403,10 +406,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.008'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -0.68*; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -521,10 +525,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.007'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -0.68*; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -639,10 +644,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.014'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -0.68*; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -762,10 +768,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.029'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.0†; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -868,10 +875,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.024'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.0†; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -974,10 +982,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.016'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.0†; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -1080,10 +1089,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.026'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.0†; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -1186,10 +1196,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.031'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.0†; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -1292,10 +1303,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.020'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.0†; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -1415,10 +1427,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.034'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.5†; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -1521,10 +1534,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.033'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.5†; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -1627,10 +1641,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.024'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.5†; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -1733,10 +1748,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.034'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.5†; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -1839,10 +1855,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.028'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.5†; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -1945,10 +1962,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.029'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -1.5†; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -2053,10 +2071,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.024'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -2.0†; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -2159,10 +2178,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.020'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -2.0†; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -2265,10 +2285,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.020'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -2.0†; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -2371,10 +2392,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.021'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -2.0†; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -2477,10 +2499,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.022'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -2.0†; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -2583,10 +2606,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.023'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -2.0†; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -2691,10 +2715,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.028'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃† (second measurement); AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -2799,10 +2824,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.017'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -3.0‡; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -2903,10 +2929,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.026'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -3.0‡; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -3009,10 +3036,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.018'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -3.0‡; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -3113,10 +3141,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.024'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -3.0‡; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -3217,10 +3246,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.029'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -3.0‡; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -3321,10 +3351,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.031'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -3.0‡; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -3427,10 +3458,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.039'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -4.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -3533,10 +3565,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.034'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -4.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -3639,10 +3672,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.026'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -4.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -3743,10 +3777,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.050'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -4.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -3847,10 +3882,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.065'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -4.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -3951,10 +3987,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.049'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -4.0; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -4057,10 +4094,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.060'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -5.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -4163,10 +4201,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.044'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -5.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -4267,10 +4306,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.063'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -5.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -4373,10 +4413,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.058'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -5.0; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -4479,10 +4520,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.118'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -4583,10 +4625,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.089'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -4689,10 +4732,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.085'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -4793,10 +4837,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.138'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -4897,10 +4942,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.173'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -5001,10 +5047,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.080'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.0; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -5107,10 +5154,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.140'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.5; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -5211,10 +5259,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.116'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.5; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -5317,10 +5366,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.099'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.5; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -5421,10 +5471,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.163'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.5; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -5525,10 +5576,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.199'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.5; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -5629,10 +5681,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.098'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -6.5; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -5735,10 +5788,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.244'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -5840,10 +5894,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.151'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -5944,10 +5999,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.123'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -6048,10 +6104,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.190'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -6152,10 +6209,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.081'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -6258,10 +6316,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.114'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.0; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -6364,10 +6423,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.207'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.5; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -6468,10 +6528,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.196'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.5; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -6572,10 +6633,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.156'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.5; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -6676,10 +6738,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.232'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.5; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -6780,10 +6843,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.263'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.5; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -6884,10 +6948,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.127'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -7.5; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -6990,10 +7055,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.231'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -7094,10 +7160,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.233'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -7198,10 +7265,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.174'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -7302,10 +7370,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.249'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -7406,10 +7475,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.294'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -7510,10 +7580,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.271'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.5; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -7614,10 +7685,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.264'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.5; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -7718,10 +7790,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.209'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.5; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -7822,10 +7895,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.293'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.5; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -7926,10 +8000,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.333'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.5; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -8030,10 +8105,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.174'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -8.5; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -8136,10 +8212,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.296'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -9.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -8240,10 +8317,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.297'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -9.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -8344,10 +8422,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.234'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -9.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -8448,10 +8527,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.328'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -9.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -8552,10 +8632,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.348'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -9.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -8656,10 +8737,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.210'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -9.0; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -8762,10 +8844,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.347'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -10.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -8866,10 +8949,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.293'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -10.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -8970,10 +9054,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.374'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -10.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -9074,10 +9159,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.390'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -10.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -9178,10 +9264,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.235'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -10.0; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -9284,10 +9371,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.382'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -11.0 (replicate 1); AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -9388,10 +9476,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.385'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -11.0 (replicate 1); AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -9492,10 +9581,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.325'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -11.0 (replicate 1); AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -9596,10 +9686,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.391'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -11.0 (replicate 1); AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -9700,10 +9791,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.411'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -11.0 (replicate 1); AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -9804,10 +9896,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.315'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -11.0 (replicate 1); AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -9910,10 +10003,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.386'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 2); AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -10014,10 +10108,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.381'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 2); AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -10118,10 +10213,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.329'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 2); AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -10222,10 +10318,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.394'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 2); AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -10326,10 +10423,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.412'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 2); AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -10430,10 +10528,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.304'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 2); AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -10536,10 +10635,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.379'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 3); AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -10640,10 +10740,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.387'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 3); AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -10744,10 +10845,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.329'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 3); AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -10848,10 +10950,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.392'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 3); AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -10952,10 +11055,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.412'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃 (replicate 3); AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -11056,10 +11160,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.384'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.0; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -11160,10 +11265,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.388'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.0; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -11264,10 +11370,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.333'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.0; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -11368,10 +11475,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.408'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.0; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -11472,10 +11580,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.388'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.0; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -11577,10 +11686,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.331'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.0; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -11683,10 +11793,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.396'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.7#; intermediate between AD and AD + 15% Mg2SiO4; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -11774,10 +11885,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.396'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.7#; intermediate between AD and AD + 15% Mg2SiO4; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -11865,10 +11977,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.357'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.7#; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -11969,10 +12082,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.440'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.7#; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -12073,10 +12187,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.415'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.7#; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -12177,10 +12292,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.369'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -12.7#; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -12283,10 +12399,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.417'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃#; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -12387,10 +12504,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt10]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt10]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.368'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row 〃#; AD + Rt (10%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -12493,10 +12611,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.417'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -13.75#; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -12597,10 +12716,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.420'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -13.75#; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -12701,10 +12821,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.382'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -13.75#; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -12805,10 +12926,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.445'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -13.75#; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -12909,10 +13031,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.437'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -13.75#; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -13013,10 +13136,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.375'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -13.75#; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -13119,10 +13243,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.394'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -14.5§; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -13225,10 +13350,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.357'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -14.5§; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -13331,10 +13457,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.411'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -14.5§; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -13437,10 +13564,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_rt20]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_rt20]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.382'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -14.5§; AD + Rt (20%); A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -13546,10 +13674,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.423'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -16.13||; AD; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -13659,10 +13788,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_fo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_fo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.431'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -16.13||; AD + Fo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -13772,10 +13902,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_wo]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_wo]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.385'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -16.13||; AD + Wo; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -13885,10 +14016,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_en]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_en]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.446'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -16.13||; AD + En; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"
@@ -13998,10 +14130,11 @@ species:
       phase: condensed_liquid
       regime: Cr K-edge XANES silicate glass redox
       units: Cr2+/SumCr fraction as printed
-      derived_from: [berry_2004_table4_logkprime_ad_qz]
       derivation:
         relation: "Eq. 6 converts the printed A(1s/4s) to Cr2+/SumCr using the Table 4 a0 and a1 calibration for this table column."
-        inputs: [berry_2004_table4_logkprime_ad_qz]
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {table: '4', published_page: 795, pdf_page_index: 6, record: "Table 4 calibration coefficients a0 and a1"}
         parameters:
         - [A(1s/4s), {state: {tag: value, value: '0.441'}, locator: {table: '3', published_page: 794, pdf_page_index: 5, record: "Table 3 row -16.13||; AD + Qz; A(1s/4s) cell"}}]
         output_unit: "Cr2+/SumCr fraction as printed"

@@ -36,6 +36,7 @@ from simulator.battery.records import Species, State
 from simulator.battery.score import (
     SCORE_ENGINE_SET,
     ScoreContext,
+    selected_lineage_level,
     score_store,
 )
 
@@ -371,10 +372,6 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
         assert point_pressure.state.is_value
         assert point_pressure.state.value == Decimal("100000")
 
-    intermediate_calibration = {
-        Decimal("0.936"): "berry_2004_table4_logkprime_ad",
-        Decimal("0.919"): "berry_2004_table4_logkprime_ad_fo",
-    }
     for row in fractions:
         assert row.derivation is not None
         assert len(row.derivation.parameters) == 1
@@ -384,20 +381,14 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
         assert area.locator is not None
         assert area.locator.published_page == 794
         assert "A(1s/4s)" in area.locator.record
-        assert len(row.derived_from) == 1
-        assert row.derivation.inputs == row.derived_from
-        assert all(not parent.startswith("pdf:") for parent in row.derived_from)
-        parent = result.observations[row.derived_from[0]]
-        assert parent in log_ratios
-        local_parent = parent.observation_id.split("::", 1)[1].split("::", 1)[0]
-        row_composition = row.point_conditions["composition"].state
-        if row_composition.is_value:
-            assert (
-                parent.point_conditions["composition"].state.value
-                == row_composition.value
-            )
-        else:
-            assert local_parent == intermediate_calibration[row.value.point]
+        assert not row.derived_from
+        assert not row.derivation.inputs
+        assert row.derivation.raw_inputs is not None
+        assert row.derivation.raw_inputs.state.is_value
+        assert row.derivation.raw_inputs.state.value == "not_printed"
+        assert row.derivation.raw_inputs.locator is not None
+        assert row.derivation.raw_inputs.locator.table == "4"
+        assert selected_lineage_level(row, set(result.observations))
 
     area_pins = {
         "berry_2004_table3_ad_r01": Decimal("0.005"),

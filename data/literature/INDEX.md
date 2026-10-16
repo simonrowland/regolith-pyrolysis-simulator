@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 316
-- Extracts (`literature_extract.v1`): 314
+- Sources: 315
+- Extracts (`literature_extract.v1`): 313
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 314
+- Extracts with no PDF: 313
 - Alias groups needing owner/controller resolution: 38
 - Extracts with private/non-public row locators: 61
 
@@ -47,7 +47,6 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `bencze-yazhenskikh-2016` | Bencze, L., Rys-Matejczuk, M., Yazhenskikh, E., Ziegner, M. & Muller, M. (2016), Investigation of Vaporization of Alkali Metals from Solidified Gasifier Slags by Knudsen Effusion Mass Spectrometry, Energy & Fuels, DOI 10.1021/acs.energyfuels.5b01620 | 10.1021/acs.energyfuels.5b01620 | ABSENT, `` | `raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf` (present, c91031c4); `text/bencze-yazhenskikh-2016/` (15 files, exists); `tables/bencze-yazhenskikh-2016/` (0 files, ABSENT) | `data/literature/extracts/bencze-yazhenskikh-2016.yaml` (4 rows, draft, private_path) | `ledger/bencze-yazhenskikh-2016.yaml`: decoded (2026-09-06) |
 | `bennour-1996-ternary-cs-na-silicate` | Bennour F., Chastel R., Mathieu J.-C., Coutures J.-P., and Bergman C. (1996). Determination of the Excess Thermodynamic Functions in Ternary Cs2O–SiO2–Na2O Melts by Knudsen Effusion Mass Spectrometry. Physics and Chemistry of Liquids33(4):229–248. | 10.1080/00319109608039824 | ABSENT, `` | `raw/bennour-1996-ternary-cs-na-silicate/bennour-1996-ternary-cs-na-silicate.pdf` (ABSENT, ); `text/bennour-1996-ternary-cs-na-silicate/` (0 files, ABSENT); `tables/bennour-1996-ternary-cs-na-silicate/` (0 files, ABSENT) | `data/literature/extracts/bennour-1996-ternary-cs-na-silicate.yaml` (8 rows, draft) | `ledger/bennour-1996-ternary-cs-na-silicate.yaml`: — (—) |
 | `berkowitz-chupka-inghram-1957` | Berkowitz, Chupka & Inghram, J. Chem. Phys. 27 (1957) 87–90 |  | ABSENT, `` | `raw/berkowitz-chupka-inghram-1957/berkowitz-chupka-inghram-1957.pdf` (ABSENT, ); `text/berkowitz-chupka-inghram-1957/` (0 files, ABSENT); `tables/berkowitz-chupka-inghram-1957/` (0 files, ABSENT) | `data/literature/extracts/berkowitz-chupka-inghram-1957.yaml` (1 rows, draft) | `ledger/berkowitz-chupka-inghram-1957.yaml`: extracted (2026-09-06) |
-| `berry-oneill-2004-chromium-xanes` | Berry, A. J. and O’Neill, H. St. C. (2004), “A XANES determination of the oxidation state of chromium in silicate glasses”, American Mineralogist 89:790-798. |  | ABSENT, `` | `raw/berry-oneill-2004-chromium-xanes/berry-oneill-2004-chromium-xanes.pdf` (present, a05f33cc); `text/berry-oneill-2004-chromium-xanes/` (0 files, ABSENT); `tables/berry-oneill-2004-chromium-xanes/` (0 files, ABSENT) | `data/literature/extracts/berry-oneill-2004-chromium-xanes.yaml` (145 rows, draft) | `ledger/berry-oneill-2004-chromium-xanes.yaml`: — (—) |
 | `borisov-2018-compilation` | Borisov, A., Behrens, H. & Holtz, F. (2018), Ferric/ferrous ratio in silicate melts: a new model for 1 atm data with special emphasis on the effects of melt composition, Contributions to Mineralogy and Petrology 173, 98, Electronic Supplementary Material 1, Supplementary Table 2. | 10.1007/s00410-018-1524-8 | ABSENT, `` | `raw/borisov-2018-compilation/borisov-2018-compilation.pdf` (ABSENT, ); `text/borisov-2018-compilation/` (0 files, ABSENT); `tables/borisov-2018-compilation/` (0 files, ABSENT) | `data/literature/extracts/borisov-2018-compilation.yaml` (435 rows, draft) | `ledger/borisov-2018-compilation.yaml`: — (—) |
 | `boulliung-2025-mercury-volatile-metals-magmatic` | Boulliung, J., Wood, B. J. & Mather, T. A. (2025), "Volatility of mercury and related volatile metals at magmatic temperatures", Chemical Geology, DOI 10.1016/j.chemgeo.2025.123018 | 10.1016/j.chemgeo.2025.123018 | ABSENT, `` | `raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf` (present, bba5f0dd); `text/boulliung-2025-mercury-volatile-metals-magmatic/` (24 files, exists); `tables/boulliung-2025-mercury-volatile-metals-magmatic/` (0 files, ABSENT) | `data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml` (9 rows, draft, private_path) | `ledger/boulliung-2025-mercury-volatile-metals-magmatic.yaml`: decoded (2026-09-06) |
 | `boulliung-wood-2022-so2-solubility-silicate-melts` | Boulliung, J. & Wood, B. J. (2022), "SO2 solubility and degassing behavior in silicate melts", Geochimica et Cosmochimica Acta 336:150-164, DOI 10.1016/j.gca.2022.08.032 | 10.1016/j.gca.2022.08.032 | ABSENT, `` | `raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf` (present, fce48fc9); `text/boulliung-wood-2022-so2-solubility-silicate-melts/` (50 files, exists); `tables/boulliung-wood-2022-so2-solubility-silicate-melts/` (0 files, ABSENT) | `data/literature/extracts/boulliung-wood-2022-so2-solubility-silicate-melts.yaml` (3 rows, draft, private_path) | `ledger/boulliung-wood-2022-so2-solubility-silicate-melts.yaml`: decoded (2026-09-06) |
@@ -370,7 +369,6 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `bencze-yazhenskikh-2016`
 - `bennour-1996-ternary-cs-na-silicate`
 - `berkowitz-chupka-inghram-1957`
-- `berry-oneill-2004-chromium-xanes`
 - `borisov-2018-compilation`
 - `boulliung-2025-mercury-volatile-metals-magmatic`
 - `boulliung-wood-2022-so2-solubility-silicate-melts`
