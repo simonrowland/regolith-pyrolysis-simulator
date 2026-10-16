@@ -450,6 +450,12 @@ def test_knudsen_classifier_domain_contract(knudsen_number, expected):
             "missing_carrier_state",
         ),
         (
+            lambda: tr.carrier_mixture_mean_free_path(
+                "N2", None, 1300.0, HOT_TEMPERATURE_K, DIAMETER_M,
+            ),
+            "missing_carrier_state",
+        ),
+        (
             lambda: tr.molecular_aperture_conductance_m3_s(
                 AREA_M2,
                 HOT_TEMPERATURE_K,

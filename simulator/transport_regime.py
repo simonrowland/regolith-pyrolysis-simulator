@@ -997,7 +997,7 @@ def carrier_mixture_mean_free_path(
     excluded = tuple(
         species for species in carrier_mole_fractions
         if species not in COLLISION_DIAMETERS_M or species not in MOLAR_MASSES_KG_PER_MOL
-    )
+    ) if carrier_mole_fractions else ()
     excluded_fraction = 0.0
     if excluded:
         fractions = {
