@@ -46,6 +46,10 @@ DURATION_HINTS_PATH = Path(__file__).with_name("xdist_loadgroup_durations.json")
 
 # Shrink-only debt roster: (file, test-function name), parameters stripped.
 HEAVY_ROSTER = frozenset({
+    # Owner-ratified b-894 follow-up (2026-10-15): the full C0 -> C6
+    # trajectory and 5e-12 % mass closure require the complete campaign.
+    # Measured 1283 s; nightly-only, in the file's existing serial chain.
+    ("tests/test_sso_r_r20_state.py", "test_default_lunar_redox_runaway_acceptance"),
     ("tests/chemistry/test_builtin_condensation_route_provider.py",
      "test_full_run_mass_balance_holds_with_kernel_committed_condensation"),
     ("tests/chemistry/test_builtin_condensation_route_provider.py",
