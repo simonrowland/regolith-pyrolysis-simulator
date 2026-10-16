@@ -362,6 +362,35 @@ def test_vacuum_oxygen_balance_marks_a_root_on_the_lower_bracket() -> None:
     assert result.bracket_boundary == "lower"
 
 
+def test_vacuum_oxygen_balance_holds_lower_bracket_when_root_is_below_it() -> None:
+    result = _solve_vacuum_oxygen_balance(
+        _boundary_test_pressure_model(-40.0),
+        _boundary_test_channels(),
+        temperature_K=1500.0,
+        bracket_log10_pO2_bar=(-30.0, 0.0),
+    )
+
+    assert result.bracket_boundary == "lower"
+    assert result.pO2_bar == pytest.approx(1.0e-30)
+
+
+def test_vacuum_oxygen_balance_accepts_clamped_lower_pressure_model() -> None:
+    unclamped = _boundary_test_pressure_model(-30.0)
+
+    def clamped(logp: float) -> dict[str, float]:
+        return unclamped(max(-30.0, logp))
+
+    result = _solve_vacuum_oxygen_balance(
+        clamped,
+        _boundary_test_channels(),
+        temperature_K=1500.0,
+        bracket_log10_pO2_bar=(-30.0, 0.0),
+    )
+
+    assert result.bracket_boundary == "lower"
+    assert result.pO2_bar == pytest.approx(1.0e-30)
+
+
 def test_vacuum_oxygen_balance_leaves_an_interior_root_unmarked() -> None:
     result = _solve_vacuum_oxygen_balance(
         _boundary_test_pressure_model(-12.5),
@@ -557,27 +586,14 @@ def test_residue_two_channel_hkl_and_parent_stoichiometric_anchors() -> None:
     )
 
 
-def test_residue_integrator_retains_floor_steps_and_time_fraction(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_residue_integrator_retains_floor_steps_and_time_fraction() -> None:
     import simulator.battery.residue as residue
-
-    original_solve = residue._solve_vacuum_oxygen_balance
-    calls = 0
-
-    def mark_middle_step(*args, **kwargs):
-        nonlocal calls
-        result = original_solve(*args, **kwargs)
-        calls += 1
-        return replace(result, bracket_boundary="lower" if calls == 2 else None)
-
-    monkeypatch.setattr(residue, "_solve_vacuum_oxygen_balance", mark_middle_step)
 
     def pressure_model(inventory: dict[str, float], log10_pO2_bar: float):
         pO2_bar = 10.0**log10_pO2_bar
         return {
             "Fe": 1.0e-3 * inventory.get("FeO", 0.0) / math.sqrt(pO2_bar),
-            "O2": 1.0e5 * pO2_bar,
+            "O2": 1.0e50 * pO2_bar,
         }
 
     result = residue.integrate_residue_inventory(
@@ -589,12 +605,12 @@ def test_residue_integrator_retains_floor_steps_and_time_fraction(
         area_evolution_m2=(1.0e-4, 1.0e-4, 1.0e-4),
     )
 
-    assert result.pO2_balance_bracket_boundary_by_step == (None, "lower", None)
+    assert result.pO2_balance_bracket_boundary_by_step == ("lower", None, None)
     assert result.pO2_balance_floor_steps == 1
-    assert result.pO2_balance_floor_first_step == 2
+    assert result.pO2_balance_floor_first_step == 1
     assert result.pO2_balance_floor_time_fraction == pytest.approx(1.0 / 3.0)
     assert result.pO2_balance_floor_time_s == pytest.approx(30.0)
-    assert result.pO2_balance_floor_pO2_bar == result.pO2_bar_by_step[1]
+    assert result.pO2_balance_floor_pO2_bar == pytest.approx(1.0e-30)
 
 
 def test_buffered_residue_keeps_printed_fo2_and_accounts_reservoir_exchange() -> None:
