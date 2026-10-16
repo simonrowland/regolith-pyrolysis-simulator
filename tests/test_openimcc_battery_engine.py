@@ -679,8 +679,10 @@ def test_reactive_cell_wo3_dominated_balance_matches_analytic_root(monkeypatch) 
     )
     species = openimcc.oxygen_balance_species_metadata({"Si": "SiO2"})
 
-    def pressure_model(logp: float) -> dict[str, float]:
-        return {"Si": si_o_pressure_scale * 10.0 ** (-logp)}
+    def pressure_model(po2_bar: float) -> dict[str, float]:
+        return {
+            "Si": si_o_pressure_scale * 10.0 ** (-math.log10(po2_bar))
+        }
 
     solved, pressures, _balance, fraction, info = battery._solve_cell_oxygen_balance(
         pressure_model,
@@ -711,8 +713,8 @@ def test_reactive_cell_buffer_pins_at_selected_buffer(monkeypatch) -> None:
     )
     species = openimcc.oxygen_balance_species_metadata({"Si": "SiO2"})
 
-    def pressure_model(logp: float) -> dict[str, float]:
-        return {"Si": 1e-12 * 10.0 ** (-logp)}
+    def pressure_model(po2_bar: float) -> dict[str, float]:
+        return {"Si": 1e-12 * 10.0 ** (-math.log10(po2_bar))}
 
     solved, _pressures, _balance, _fraction, info = battery._solve_cell_oxygen_balance(
         pressure_model,
@@ -742,8 +744,8 @@ def test_openimcc_cell_balance_pre_generalization_golden(monkeypatch) -> None:
     )
     species = openimcc.oxygen_balance_species_metadata({"Si": "SiO2"})
 
-    def pressure_model(logp: float) -> dict[str, float]:
-        return {"Si": 1e-12 * 10.0 ** (-logp)}
+    def pressure_model(po2_bar: float) -> dict[str, float]:
+        return {"Si": 1e-12 * 10.0 ** (-math.log10(po2_bar))}
 
     solved, pressures, balance, fraction, info = battery._solve_cell_oxygen_balance(
         pressure_model,

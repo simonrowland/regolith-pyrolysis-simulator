@@ -1647,19 +1647,29 @@ def _solve_cell_oxygen_balance(
     species_metadata: Mapping[str, Any],
     *,
     temperature_K: float,
-    cell_material: str,
-    oxygen_balance_from_pressure_model: Callable[..., Any],
+    cell_material: str | None,
+    oxygen_balance_from_pressure_model: Callable[..., Any] | None = None,
 ) -> tuple[float, Mapping[str, float], Mapping[str, Any], float, dict[str, Any]]:
-    """Add shared JANAF wall gases to one engine's pressure model and solve."""
+    """Add shared JANAF wall gases to an engine's commanded-pO2 pressure model.
 
-    if cell_material not in _CELL_OXIDE_GAS_TABLES:
+    Knudsen effusion gives J_i = p_i / sqrt(2*pi*M_i*k*T). Balancing oxygen
+    atoms over every effusing species, including cell oxides, leaves
+    sum((nu_O,i - parent_demand_i) * p_i / sqrt(M_i)) = 0 because the common
+    sqrt(2*pi*k*T) cancels. For a pure MO evaporating congruently as M + O,
+    the solved p_O*sqrt(M_M)/(p_M*sqrt(M_O)) is 1.
+    """
+
+    if cell_material not in {None, *_CELL_OXIDE_GAS_TABLES}:
         raise _OxygenBalanceRefusal(
             "oxygen_balance_cell_material_invalid",
             f"unknown cell_material {cell_material!r}; expected None, 'W', or 'Mo'",
         )
-    gas_data, buffer_log10_bar, sources = _cell_oxide_thermodynamics(
-        cell_material, temperature_K
-    )
+    if cell_material is None:
+        gas_data, buffer_log10_bar, sources = {}, None, {}
+    else:
+        gas_data, buffer_log10_bar, sources = _cell_oxide_thermodynamics(
+            cell_material, temperature_K
+        )
     if not species_metadata:
         raise _OxygenBalanceRefusal(
             "imcc_gas_oxygen_balance_failed",
@@ -1692,7 +1702,7 @@ def _solve_cell_oxygen_balance(
     all_metadata = {**species_metadata, **cell_metadata}
 
     def combined_pressure_model(logp: float) -> dict[str, float]:
-        pressures = dict(pressure_model(logp))
+        pressures = dict(pressure_model(10.0**logp))
         for species, (gibbs_j, _oxygen_atoms) in gas_data.items():
             log_pressure = (
                 -gibbs_j / (_CELL_GAS_CONSTANT_J_MOL_K * temperature_K)
@@ -1705,7 +1715,13 @@ def _solve_cell_oxygen_balance(
         return pressures
 
     try:
-        pO2_bar, pressures, balance = oxygen_balance_from_pressure_model(
+        if oxygen_balance_from_pressure_model is None:
+            from openimcc import (
+                oxygen_balance_from_pressure_model as oxygen_balance_solver,
+            )
+        else:
+            oxygen_balance_solver = oxygen_balance_from_pressure_model
+        pO2_bar, pressures, balance = oxygen_balance_solver(
             combined_pressure_model, all_metadata, bracket=(-30.0, 0.0)
         )
     except Exception as exc:  # noqa: BLE001 - preserve engine refusal as typed
@@ -1714,8 +1730,12 @@ def _solve_cell_oxygen_balance(
             str(exc),
         ) from exc
 
-    buffer_pinned = math.log10(float(pO2_bar)) > buffer_log10_bar
+    buffer_pinned = (
+        buffer_log10_bar is not None
+        and math.log10(float(pO2_bar)) > buffer_log10_bar
+    )
     if buffer_pinned:
+        assert buffer_log10_bar is not None
         pO2_bar = 10.0**buffer_log10_bar
         pressures = combined_pressure_model(buffer_log10_bar)
         oxygen_flux = math.fsum(
@@ -1778,7 +1798,9 @@ def _solve_cell_oxygen_balance(
         "cell_material": cell_material,
         "cell_oxide_flux_fraction": fraction,
         "buffer_pinned": buffer_pinned,
-        "buffer_pO2_bar": 10.0**buffer_log10_bar,
+        "buffer_pO2_bar": (
+            None if buffer_log10_bar is None else 10.0**buffer_log10_bar
+        ),
         "cell_oxide_janaf_sources": sources,
     }
     return float(pO2_bar), pressures, balance, fraction, info
@@ -1999,11 +2021,11 @@ class _OpenImccBatteryBackend:
                             "does not match formula metadata",
                         )
 
-                def pressure_model(logp: float) -> Mapping[str, float]:
+                def pressure_model(pO2_bar: float) -> Mapping[str, float]:
                     return evaluate_gas(
                         result.parent_oxide_activities,
                         temperature_K,
-                        10.0**logp,
+                        pO2_bar,
                         self._gas,
                         parent_oxides=result.parent_oxides,
                         allow_extrapolation=True,
