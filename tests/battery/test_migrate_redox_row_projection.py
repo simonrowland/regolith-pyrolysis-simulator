@@ -72,7 +72,26 @@ def test_sossi_redox_row_projects_its_printed_glass_analysis() -> None:
     assert all(
         row.point_conditions["temperature_K"].state.is_value for row in redox_rows
     )
-    assert all("fO2_log" in (row.point_conditions or {}) for row in redox_rows)
+    printed_logs = {
+        "sossi_2020_per_f_o2_1_xanes": Decimal("0.00"),
+        "sossi_2020_per_f_o2_2_xanes": Decimal("-2.49"),
+        "sossi_2020_per_f_o2_3_xanes": Decimal("-2.53"),
+        "sossi_2020_per_f_o2_6_xanes": Decimal("-2.58"),
+        "sossi_2020_per_ts1_xanes": Decimal("-2.72"),
+        "sossi_2020_per_f_o2_7_xanes": Decimal("-2.72"),
+        "sossi_2020_per_ts2_xanes": Decimal("-2.72"),
+        "sossi_2020_per_f_o2_8_xanes": Decimal("-3.00"),
+        "sossi_2020_per_f_o2_9_xanes": Decimal("-3.92"),
+        "sossi_2020_per_f_o2_10_xanes": Decimal("-5.32"),
+        "sossi_2020_per_f_o2_11_xanes": Decimal("-6.74"),
+        "sossi_2020_per_f_o2_12_xanes": Decimal("-7.86"),
+    }
+    assert len(printed_logs) == len(redox_rows) == 12
+    for row in redox_rows:
+        row_id = row.observation_id.rsplit("::", 1)[-1]
+        f_o2 = row.point_conditions["fO2_log"]
+        assert f_o2.state.is_value
+        assert f_o2.state.value == printed_logs[row_id]
 
 
 def test_aithala_redox_row_projects_experiment_glass_analysis_and_f_o2() -> None:
