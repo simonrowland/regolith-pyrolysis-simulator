@@ -1921,6 +1921,8 @@ def _solve_vapor_engine_cell_oxygen_balance(
     cell_material: str | None,
     fixed_point_activities: bool = False,
 ) -> tuple[float, Mapping[str, float], Mapping[str, Any], float, dict[str, Any]]:
+    from simulator.accounting.formulas import resolve_species_formula
+
     cells_by_po2: dict[float, Any] = {}
     last_admitted_po2_bar: float | None = None
     last_refused_trial: tuple[float, _OxygenBalanceEngineTrialRefusal] | None = None
@@ -1933,6 +1935,28 @@ def _solve_vapor_engine_cell_oxygen_balance(
                 refusal = _OxygenBalanceEngineTrialRefusal(cell)
                 last_refused_trial = (pO2_bar, refusal)
                 raise refusal
+            for channel, raw_pressure in (
+                getattr(cell, "gas_partial_pressures_Pa", None) or {}
+            ).items():
+                formula = _gas_formula_for_oxygen_balance(channel)
+                try:
+                    contains_hydrogen = (
+                        "H" in resolve_species_formula(formula).elements
+                    )
+                except ValueError:
+                    continue
+                if not contains_hydrogen:
+                    continue
+                try:
+                    pressure_pa = float(raw_pressure)
+                except (TypeError, ValueError, OverflowError):
+                    continue
+                if math.isfinite(pressure_pa) and pressure_pa > 0.0:
+                    raise _OxygenBalanceRefusal(
+                        "h_bearing_channel_in_dry_cell_balance",
+                        "positive H-bearing gas cannot be balanced against a dry "
+                        f"cell: channel={channel!r}; pressure_Pa={pressure_pa:g}",
+                    )
             cells_by_po2[pO2_bar] = cell
         last_admitted_po2_bar = pO2_bar
         return cells_by_po2[pO2_bar]
