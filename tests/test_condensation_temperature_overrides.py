@@ -32,6 +32,10 @@ import pytest
 import yaml
 
 from simulator import condensation as condensation_module
+from simulator.config import (
+    Stage0DesignBandUnavailableError,
+    stage0_design_band_min_C_from_setpoints,
+)
 from simulator.condensation import (
     CONDENSATION_TEMPS_C,
     CondensationModel,
@@ -316,13 +320,13 @@ def test_stage0_hot_wall_diagnostic_is_sibling_and_route_neutral():
     custom_route = custom.route(flux, melt)
 
     assert not base.last_cold_spot_diagnostic[
-        'has_upstream_hot_wall_violation'
+        'has_upstream_design_band_notice'
     ]
-    assert custom.last_cold_spot_diagnostic['upstream_hot_wall_min_C'] == 1425.0
+    assert custom.last_cold_spot_diagnostic['stage0_design_band_min_C'] == 1425.0
     assert custom.last_cold_spot_diagnostic[
-        'has_upstream_hot_wall_violation'
+        'has_upstream_design_band_notice'
     ]
-    assert custom.last_cold_spot_diagnostic['upstream_hot_wall_findings'][0][
+    assert custom.last_cold_spot_diagnostic['upstream_design_band_notices'][0][
         'segment'
     ] == 'stage_0_to_stage_1'
     assert base_route.cold_spot_warnings == ()
@@ -337,6 +341,11 @@ def test_stage0_hot_wall_diagnostic_is_sibling_and_route_neutral():
         custom_route.wall_deposit_by_segment_species
         == base_route.wall_deposit_by_segment_species
     )
+
+
+def test_missing_stage0_design_band_is_a_typed_refusal():
+    with pytest.raises(Stage0DesignBandUnavailableError):
+        stage0_design_band_min_C_from_setpoints({})
 
 
 def test_operating_conditions_preserve_valid_subzero_wall_temperature():

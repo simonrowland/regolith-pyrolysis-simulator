@@ -21,7 +21,7 @@ NAMES = tuple(f"stage_{number}_to_stage_{number + 1}" for number in range(7))
 def test_default_upstream_wall_tracks_each_melt_temperature(setpoints_data, campaign):
     model = OverheadGasModel(setpoints_data["overhead_headspace"])
     melt = MeltState(campaign=campaign, campaign_hour=3.0)
-    for temperature in (1500.0, 2100.0, 2200.0):
+    for temperature in (1225.0, 1500.0, 2100.0, 2200.0):
         melt.temperature_C = temperature
         assert model.resolve_pipe_temperature_C(melt) == temperature
         assert model.resolve_pipe_segment_temperatures_C(NAMES, melt)[NAMES[0]] == temperature

@@ -2089,7 +2089,7 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
             assert yaml_value[0] <= spec.low <= spec.high <= yaml_value[1]
             range_sourced += 1
         elif spec.bounds_source.startswith(
-            ("hot_wall_invariant:", "condensation_train ")
+            ("search_envelope_policy:", "condensation_train ")
         ):
             assert spec.low is not None
             assert spec.high is not None

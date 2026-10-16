@@ -12,7 +12,7 @@ from types import MappingProxyType
 from typing import Any, Literal, Mapping, Sequence
 import warnings
 
-from simulator.config import DEFAULT_DATA_DIR
+from simulator.config import DEFAULT_DATA_DIR, default_stage0_design_band_min_C
 from simulator.chemistry.kernel.config import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
@@ -30,54 +30,38 @@ O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v12"
 O2_BUBBLER_DEFAULT_ETA_ABSORB = 0.75
 _RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"})
 
-# Hot-wall bounds: the mandate invariant keeps ducts upstream of the designated
-# condenser above ~1400 C. The CEILING is not an independent number -- the hot
-# duct is built of the same refractory as the furnace, so its service ceiling IS
-# the furnace envelope ceiling, and it is INHERITED rather than restated here.
+# Search-envelope policy for explicit optimizer wall-temperature points. The
+# melt-following runtime default is resolved separately and can remain below
+# this search bound. The upper bound is inherited from the furnace material.
 #
-# Premise: FURNACE_MAX_T_BOUNDS_C[1] is the highest max_service_T_C among enabled
-#   rows of data/furnace_materials.yaml (zirconia_ysz, 2200 C at time of writing).
-# Why inherited, not literal: this was the literal 1750.0 (Doloma-REE), correct
-#   only while the furnace itself was capped near dense-alumina. Once the furnace
-#   ceiling began inheriting from `furnace_material` (c5434d19), a fixed 1750 left
-#   the FIRST COMPONENT DOWNSTREAM of the melt rated 450 C below the vapour it
-#   receives, with nothing refusing -- the cross-layer disagreement BUG-076 exists
-#   to prevent, reintroduced one layer out (b-329).
-# Unit check: both sides are absolute temperatures in C.
-# Sanity: ceiling >= floor, so the band is non-empty for any catalog whose best
-#   enabled material is rated above 1400 C.
-# Boundary -- what this does NOT assert: this is an ENVELOPE (what the optimizer
-#   may explore), not a per-run setpoint, and NOT a claim that any real duct holds
-#   2200 C. A run's actual ceiling is capped down from the campaign's named
-#   `furnace_material` in campaigns.py; this bound only says no recipe may ask for
-#   more than the best enabled material in the catalog is rated to hold.
-OVERHEAD_HOT_WALL_MIN_C = 1400.0
+# Premise: explicit wall knobs use the lower end of the Stage-0 design band;
+#   runtime null defaults follow the melt and are not optimizer search points.
+# The ceiling is inherited from the enabled furnace-material service envelope,
+# so a recipe cannot ask a wall point to exceed the best enabled material rating.
+OVERHEAD_HOT_WALL_MIN_C = default_stage0_design_band_min_C()
 OVERHEAD_HOT_WALL_MAX_C = float(FURNACE_MAX_T_BOUNDS_C[1])
 # Offset window derivation: the offset knob is liner-relative-to-melt (K).
-# Premise: at the melt ceiling the liner must still be able to sit at the hot-wall
-#   floor, so offset_min = HOT_WALL_MIN - melt_ceiling.
-# Algebra: 1400 - OVERHEAD_HOT_WALL_MAX_C, evaluated rather than pinned. The old
-#   literal -443.0 was 1400 - 1843 (the dense-alumina ceiling) and went stale the
-#   moment that ceiling moved: a pinned difference between two moving numbers is a
-#   value that can contradict its own derivation.
+# Premise: at the melt ceiling the liner must still reach the Stage-0 band
+#   minimum, so offset_min = design-band minimum - melt ceiling.
+# Algebra: OVERHEAD_HOT_WALL_MIN_C - OVERHEAD_HOT_WALL_MAX_C, evaluated rather
+#   than pinned. A pinned difference between two moving values can go stale.
 # Unit check: a difference in C equals a difference in K.
-# Sanity: melt at the ceiling + offset_min -> liner exactly 1400 C, the floor.
-# Boundary -- what this does NOT assert: offset_max = 0 because the gas is never
-#   hotter than the melt WITHOUT AN EXPLICIT WALL-HEAT MODEL. That is a modelling
-#   limit, not a claim that an actively heated duct is physically impossible.
+# Sanity: melt at the ceiling plus offset_min puts the liner at the design-band
+#   minimum.
+# Boundary: offset_max = 0 because no explicit wall-heat model can make the gas
+#   hotter than the melt; it does not claim an actively heated duct is impossible.
 OVERHEAD_HEADSPACE_OFFSET_MIN_K = OVERHEAD_HOT_WALL_MIN_C - OVERHEAD_HOT_WALL_MAX_C
 OVERHEAD_HEADSPACE_OFFSET_MAX_K = 0.0
 OVERHEAD_HOT_WALL_BOUNDS_SOURCE = (
-    "hot_wall_invariant: docs/concepts.md Hot walls section; floor 1400 C from "
-    "data/setpoints.yaml condensation_train.metals_train.stage_0_hot_duct "
-    "temp_range_C=[1400,1600]; ceiling INHERITED from the furnace-material "
-    "envelope FURNACE_MAX_T_BOUNDS_C[1] (highest enabled max_service_T_C in "
-    "data/furnace_materials.yaml), not restated here (b-329)"
+    "search_envelope_policy: explicit overhead wall bounds use the lower end "
+    "of data/setpoints.yaml condensation_train.metals_train.stage_0_hot_duct."
+    "temp_range_C; ceiling is inherited from the furnace-material envelope "
+    "FURNACE_MAX_T_BOUNDS_C[1] (highest enabled max_service_T_C in "
+    "data/furnace_materials.yaml)"
 )
 OVERHEAD_HEADSPACE_OFFSET_BOUNDS_SOURCE = (
-    "hot_wall_invariant: melt ceiling = furnace-material envelope "
-    "(FURNACE_MAX_T_BOUNDS_C[1], data/furnace_materials.yaml) minus Stage 0 "
-    "hot-wall floor 1400 C => offset_min = 1400 - ceiling, derived not pinned; "
+    "search_envelope_policy: offset_min = Stage-0 design-band minimum minus "
+    "the furnace-material envelope ceiling (FURNACE_MAX_T_BOUNDS_C[1]); "
     "gas not hotter than melt without an explicit wall-heat model"
 )
 DOWNSTREAM_CONDENSATION_STAGE_PAIRS: tuple[tuple[str, int, int], ...] = (

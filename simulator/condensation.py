@@ -120,7 +120,11 @@ from simulator.accounting.queries import (
     wall_deposit_candidate_kg as query_wall_deposit_candidate_kg,
     wall_deposit_candidates_by_segment_kg as query_wall_deposit_candidates_by_segment_kg,
 )
-from simulator.config import load_config_bundle
+from simulator.config import (
+    default_stage0_design_band_min_C,
+    load_config_bundle,
+    stage0_design_band_min_C_from_setpoints,
+)
 from simulator.coating_rate import continuous_wall_deposition_flux
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -172,7 +176,8 @@ KNUDSEN_REFUSAL_REASON = 'knudsen_outside_viscous_flow'
 KNUDSEN_TRANSITION_REASON = 'knudsen_transitional_flow'
 INVALID_PIPE_DIAMETER_REASON = 'invalid_pipe_diameter'
 COLD_SPOT_MARGIN_C = 25.0
-DEFAULT_UPSTREAM_HOT_WALL_MIN_C = 1400.0
+# The Stage-0 setpoint is required; a missing design band raises a typed refusal.
+DEFAULT_UPSTREAM_HOT_WALL_MIN_C = default_stage0_design_band_min_C()
 STABLE_CONDENSATION_PRODUCT_BACKSTOP_STATUS = (
     "stable_condensation_product_backstop"
 )
@@ -2149,10 +2154,10 @@ class CondensationModel:
             'warnings': [],
             'findings': [],
             'dew_point_unavailable': [],
-            'has_upstream_hot_wall_violation': False,
-            'upstream_hot_wall_warnings': [],
-            'upstream_hot_wall_findings': [],
-            'upstream_hot_wall_min_C': DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
+            'has_upstream_design_band_notice': False,
+            'upstream_design_band_notice_warnings': [],
+            'upstream_design_band_notices': [],
+            'stage0_design_band_min_C': DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
         }
         self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
         self.last_knudsen_pressure_adjustment: dict[str, Any] = {}
@@ -2587,10 +2592,14 @@ class CondensationModel:
              if zone.get('zone') == 'Stage 0 hot duct'),
             {},
         )
-        self.upstream_hot_wall_min_C = _stage0_hot_wall_min_C_from_setpoints(
-            setpoints,
-            default_C=self.upstream_hot_wall_min_C,
-        )
+        condensation_setpoints = setpoints.get('condensation_train', {})
+        if (
+            isinstance(condensation_setpoints, Mapping)
+            and 'metals_train' in condensation_setpoints
+        ):
+            self.upstream_hot_wall_min_C = (
+                stage0_design_band_min_C_from_setpoints(setpoints)
+            )
         block = (
             (setpoints.get('condensation_train', {}) or {})
             .get('condensation_temperatures_C', {}) or {}
@@ -7620,34 +7629,6 @@ def _finite_or_none(value: float) -> float | None:
     return value if math.isfinite(value) else None
 
 
-def _stage0_hot_wall_min_C_from_setpoints(
-    setpoints: Mapping[str, Any] | None,
-    *,
-    default_C: float = DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
-) -> float:
-    if not setpoints:
-        return float(default_C)
-    block = (
-        (setpoints.get('condensation_train', {}) or {})
-        .get('metals_train', {}) or {}
-    )
-    if not isinstance(block, Mapping):
-        return float(default_C)
-    stage0 = block.get('stage_0_hot_duct', {}) or {}
-    if not isinstance(stage0, Mapping):
-        return float(default_C)
-    band = stage0.get('temp_range_C')
-    if not isinstance(band, (list, tuple)) or not band:
-        return float(default_C)
-    try:
-        low = float(band[0])
-    except (TypeError, ValueError):
-        return float(default_C)
-    if not math.isfinite(low):
-        return float(default_C)
-    return low
-
-
 def _campaign_requires_viscous_flow(campaign_name: str | None) -> bool:
     if campaign_name is None:
         return True
@@ -7865,8 +7846,8 @@ def cold_spot_diagnostic(
     margin_C = _finite_nonnegative_value(margin_C, label='margin_C')
     findings: list[dict[str, Any]] = []
     dew_point_unavailable: list[dict[str, Any]] = []
-    upstream_hot_wall_findings: list[dict[str, Any]] = []
-    hot_wall_threshold_C = (
+    upstream_design_band_notices: list[dict[str, Any]] = []
+    design_band_min_C = (
         None
         if upstream_hot_wall_min_C is None
         else float(upstream_hot_wall_min_C)
@@ -7906,27 +7887,30 @@ def cold_spot_diagnostic(
             wall_T_C = float(segment.wall_temperature_C)
             upstream_threshold_replaced = False
             if (
-                hot_wall_threshold_C is not None
-                and math.isfinite(hot_wall_threshold_C)
-                and wall_T_C < hot_wall_threshold_C
+                design_band_min_C is not None
+                and math.isfinite(design_band_min_C)
+                and wall_T_C < design_band_min_C
             ):
-                upstream_hot_wall_findings.append({
+                upstream_design_band_notices.append({
+                    'type': 'engineering_policy_notice',
+                    'reason': 'upstream_wall_below_stage0_design_band',
                     'segment': segment.name,
                     'account': segment.wall_deposit_account,
                     'species': str(species),
                     'kg_hr': kg_hr,
                     'wall_temperature_C': wall_T_C,
-                    'upstream_hot_wall_min_C': hot_wall_threshold_C,
+                    'stage0_design_band_min_C': design_band_min_C,
                     'target_stage_number': target_stage_number,
                     'warning': (
-                        f'upstream hot-wall violation {segment.name}: '
-                        f'{wall_T_C:.1f} C below {hot_wall_threshold_C:.1f} C '
+                        f'upstream wall below the Stage-0 design band: '
+                        f'{segment.name} at {wall_T_C:.1f} C is below '
+                        f'{design_band_min_C:.1f} C '
                         f'before stage {target_stage_number}'
                     ),
                 })
             if p_local_pa is not None:
                 # Premise: fouling requires p_i > P_sat(T_wall) (mandate
-                # hot-wall invariant). Algebra: supersaturation iff
+                # dew-point criterion). Algebra: supersaturation iff
                 # p_local_Pa - P_sat_Pa > 0. Units: both pressures are Pa.
                 # Sanity: Fe P_sat(1673.15 K) ≈ 1.14 Pa, so a 100 Pa
                 # (1 mbar) Fe stream is ~88-fold supersaturated; Na
@@ -7944,48 +7928,31 @@ def cold_spot_diagnostic(
                     and P_sat_pa is not None
                     and math.isfinite(P_sat_pa)
                 ):
+                    upstream_threshold_replaced = True
                     supersaturated = p_local_pa > P_sat_pa
-                    if segment.name == UPSTREAM_PIPE_SEGMENT_NAME:
-                        upstream_threshold_replaced = True
-                        if supersaturated:
-                            # For a melt-following upstream wall, condensation
-                            # requires p_i > P_sat(T_wall): both are Pa, and
-                            # equality has zero driving pressure. With source
-                            # activity a_i <= 1, p_i <= a_i*P_sat(T_melt); the
-                            # monotone P_sat curve therefore gives no condensation
-                            # at T_wall == T_melt. Fixed landing temperatures are
-                            # not a dew-point test. SiO's refused pure-component
-                            # curve keeps its separate reactive-product fallback.
-                            findings.append({
-                                'segment': segment.name,
-                                'account': segment.wall_deposit_account,
-                                'species': str(species),
-                                'kg_hr': kg_hr,
-                                'wall_temperature_C': wall_T_C,
-                                'partial_pressure_pa': p_local_pa,
-                                'wall_saturation_pressure_pa': P_sat_pa,
-                                'target_stage_number': target_stage_number,
-                                'warning': (
-                                    f'cold spot {segment.name}: {species} '
-                                    f'local pressure {p_local_pa:.6g} Pa exceeds '
-                                    f'wall saturation {P_sat_pa:.6g} Pa at '
-                                    f'{wall_T_C:.1f} C before stage '
-                                    f'{target_stage_number}'
-                                ),
-                            })
                     if supersaturated:
-                        upstream_hot_wall_findings.append({
+                        # For a melt-following wall, condensation requires
+                        # p_i > P_sat(T_wall): both are Pa, and equality has
+                        # zero driving pressure. With source activity a_i <= 1,
+                        # p_i <= a_i*P_sat(T_melt); monotone P_sat therefore
+                        # gives no condensation at T_wall == T_melt. Fixed
+                        # landing temperatures are not a dew-point test. SiO's
+                        # refused pure-component curve keeps its separate
+                        # reactive-product fallback.
+                        findings.append({
                             'segment': segment.name,
                             'account': segment.wall_deposit_account,
                             'species': str(species),
                             'kg_hr': kg_hr,
                             'wall_temperature_C': wall_T_C,
-                            'upstream_hot_wall_min_C': hot_wall_threshold_C,
+                            'partial_pressure_pa': p_local_pa,
+                            'wall_saturation_pressure_pa': P_sat_pa,
                             'target_stage_number': target_stage_number,
                             'warning': (
-                                f'upstream hot-wall violation {segment.name}: '
-                                f'{species} local pressure exceeds wall '
-                                f'saturation at {wall_T_C:.1f} C before stage '
+                                f'cold spot {segment.name}: {species} '
+                                f'local pressure {p_local_pa:.6g} Pa exceeds '
+                                f'wall saturation {P_sat_pa:.6g} Pa at '
+                                f'{wall_T_C:.1f} C before stage '
                                 f'{target_stage_number}'
                             ),
                         })
@@ -8040,9 +8007,9 @@ def cold_spot_diagnostic(
             })
 
     warnings = [str(finding['warning']) for finding in findings]
-    upstream_hot_wall_warnings = [
+    upstream_design_band_notice_warnings = [
         str(finding['warning'])
-        for finding in upstream_hot_wall_findings
+        for finding in upstream_design_band_notices
     ]
     return {
         'has_cold_spot': bool(findings),
@@ -8050,10 +8017,12 @@ def cold_spot_diagnostic(
         'warnings': warnings,
         'findings': findings,
         'dew_point_unavailable': dew_point_unavailable,
-        'has_upstream_hot_wall_violation': bool(upstream_hot_wall_findings),
-        'upstream_hot_wall_min_C': hot_wall_threshold_C,
-        'upstream_hot_wall_warnings': upstream_hot_wall_warnings,
-        'upstream_hot_wall_findings': upstream_hot_wall_findings,
+        'has_upstream_design_band_notice': bool(upstream_design_band_notices),
+        'stage0_design_band_min_C': design_band_min_C,
+        'upstream_design_band_notice_warnings': (
+            upstream_design_band_notice_warnings
+        ),
+        'upstream_design_band_notices': upstream_design_band_notices,
     }
 
 

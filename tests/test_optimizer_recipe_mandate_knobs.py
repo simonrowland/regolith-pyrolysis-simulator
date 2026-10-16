@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.config import stage0_design_band_min_C_from_setpoints
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.campaigns import CampaignManager
 from simulator.core import CampaignPhase
@@ -111,6 +112,9 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
     hot_duct = metals_train["stage_0_hot_duct"]
     c2a_continuous = setpoints["campaigns"]["C2A_continuous"]
 
+    assert OVERHEAD_HOT_WALL_MIN_C == stage0_design_band_min_C_from_setpoints(
+        setpoints
+    )
     assert hot_duct["temp_range_C"][0] == OVERHEAD_HOT_WALL_MIN_C
     # SINGLE SOURCE OF TRUTH: the duct is built of the furnace material, so its
     # service ceiling is that material's rating and the YAML row must NOT restate
@@ -152,7 +156,7 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
         spec = schema.spec_for(_path(dotted))
         assert spec.low == OVERHEAD_HOT_WALL_MIN_C
         assert spec.high == OVERHEAD_HOT_WALL_MAX_C
-        assert "hot_wall_invariant" in spec.bounds_source
+        assert "search_envelope_policy" in spec.bounds_source
 
     offset_spec = schema.spec_for(
         _path("overhead_headspace.temperature_offset_K")
@@ -164,7 +168,7 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
     # a provenance string that quotes a value is one more copy to go stale, and
     # this one had (b-329).
     assert "furnace-material envelope" in offset_spec.bounds_source
-    assert "hot_wall_invariant" in offset_spec.bounds_source
+    assert "search_envelope_policy" in offset_spec.bounds_source
 
     default_train = CondensationTrain.create_default()
     stage_ranges = {

@@ -9,7 +9,7 @@ stream exceeds it ~88-fold.
 
 Successful-value controls named by the verifiers: adequately hot or
 diluted Fe stays clear; a wall below the SiO engineering landing T
-still sets has_cold_spot; the 1300 C uniform-minimum warning remains;
+still sets has_cold_spot; the Stage-0 design-band policy notice remains;
 SiO reactive P_sat ~= 0 deposition policy is untouched (M30 / D04).
 """
 
@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import pytest
 
+from simulator.config import default_stage0_design_band_min_C
 from simulator.condensation import (
     CELSIUS_TO_KELVIN_OFFSET,
     CONDENSATION_TEMPS_C,
@@ -54,10 +55,10 @@ def _fe_sio_segments(wall_temperature_C: float) -> list[PipeSegment]:
     ]
 
 
-def test_millibar_fe_sio_at_1400_c_is_hot_wall_violation():
-    """Verifier CONFIRM probe: 1400 C millibar Fe/SiO must not all-clear."""
+def test_millibar_fe_sio_at_1400_c_reports_dew_point_finding():
+    """A supersaturated Fe wall is a physical dew-point finding."""
 
-    assert DEFAULT_UPSTREAM_HOT_WALL_MIN_C == 1400.0
+    assert DEFAULT_UPSTREAM_HOT_WALL_MIN_C == default_stage0_design_band_min_C()
     assert CONDENSATION_TEMPS_C["Fe"] == 1250
     assert CONDENSATION_TEMPS_C["SiO"] == 1050
 
@@ -75,10 +76,11 @@ def test_millibar_fe_sio_at_1400_c_is_hot_wall_violation():
         },
     )
 
-    assert diagnostic["has_upstream_hot_wall_violation"] is True
+    assert diagnostic["has_cold_spot"] is True
+    assert diagnostic["has_upstream_design_band_notice"] is False
     assert any(
         finding["species"] == "Fe"
-        for finding in diagnostic["upstream_hot_wall_findings"]
+        for finding in diagnostic["findings"]
     )
 
 
@@ -96,9 +98,9 @@ def test_dilute_or_hot_fe_at_valid_wall_stays_clear():
         species_partial_pressures_pa={"Fe": MILLIBAR_BAKEOFF_PA},
     )
 
-    assert dilute["has_upstream_hot_wall_violation"] is False
+    assert dilute["has_upstream_design_band_notice"] is False
     assert dilute["has_cold_spot"] is False
-    assert hot["has_upstream_hot_wall_violation"] is False
+    assert hot["has_upstream_design_band_notice"] is False
     assert hot["has_cold_spot"] is False
 
 
@@ -123,9 +125,40 @@ def test_species_change_and_low_wall_uniform_minimum():
         },
     )
 
-    assert na["has_upstream_hot_wall_violation"] is False
+    assert na["has_upstream_design_band_notice"] is False
     assert na["has_cold_spot"] is False
-    assert low_wall["has_upstream_hot_wall_violation"] is True
+    assert low_wall["has_upstream_design_band_notice"] is True
+
+
+def test_undersaturated_melt_following_wall_is_labeled_as_policy_notice():
+    wall_C = 1225.0
+    wall_K = wall_C + CELSIUS_TO_KELVIN_OFFSET
+    psat_pa, refused = _try_antoine_psat_pa("Cr", wall_K)
+    assert refused is False
+    assert psat_pa is not None and psat_pa > 0.0
+
+    diagnostic = cold_spot_diagnostic(
+        [PipeSegment(
+            name=UPSTREAM_PIPE_SEGMENT_NAME,
+            upstream_stage="stage_0",
+            downstream_stage="stage_1",
+            wall_temperature_C=wall_C,
+            length_m=1.0,
+            inner_diameter_m=0.12,
+        )],
+        {"Cr": 1.0},
+        species_partial_pressures_pa={"Cr": psat_pa / 2.0},
+    )
+
+    assert diagnostic["has_cold_spot"] is False
+    assert diagnostic["findings"] == []
+    assert diagnostic["has_upstream_design_band_notice"] is True
+    notice = diagnostic["upstream_design_band_notices"][0]
+    assert notice["type"] == "engineering_policy_notice"
+    assert notice["reason"] == "upstream_wall_below_stage0_design_band"
+    assert "upstream wall below the Stage-0 design band" in notice["warning"]
+    assert "hot-wall violation" not in notice["warning"]
+    assert "has_upstream_hot_wall_violation" not in diagnostic
 
 
 def test_melt_following_upstream_wall_uses_local_dew_point():
@@ -245,7 +278,7 @@ def test_sio_reactive_wall_saturation_backstop_unchanged():
         {"SiO": 1.0},
         species_partial_pressures_pa={"SiO": MILLIBAR_BAKEOFF_PA},
     )
-    assert sio_only["has_upstream_hot_wall_violation"] is False
+    assert sio_only["has_upstream_design_band_notice"] is False
 
 
 def test_route_millibar_fe_at_1400_c_uses_wall_partial_pressure():
@@ -279,6 +312,6 @@ def test_route_millibar_fe_at_1400_c_uses_wall_partial_pressure():
     dilute = _route(1400.0, DILUTE_QUIESCENT_PA / MBAR_TO_PA)
     hot = _route(1800.0, 1.0)
 
-    assert millibar["has_upstream_hot_wall_violation"] is True
-    assert dilute["has_upstream_hot_wall_violation"] is False
-    assert hot["has_upstream_hot_wall_violation"] is False
+    assert millibar["has_cold_spot"] is True
+    assert dilute["has_upstream_design_band_notice"] is False
+    assert hot["has_upstream_design_band_notice"] is False

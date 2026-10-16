@@ -218,6 +218,60 @@ def _load_required_yaml(
     return deepcopy(loaded), digest
 
 
+class Stage0DesignBandUnavailableError(ValueError):
+    """The required Stage-0 hot-duct design-band minimum is unavailable."""
+
+    code = "stage0_design_band_unavailable"
+
+
+def stage0_design_band_min_C_from_setpoints(
+    setpoints: Mapping[str, Any],
+) -> float:
+    node: Any = setpoints
+    path: list[str] = []
+    for key in (
+        "condensation_train",
+        "metals_train",
+        "stage_0_hot_duct",
+    ):
+        if not isinstance(node, Mapping) or key not in node:
+            raise Stage0DesignBandUnavailableError(
+                f"missing setpoints path {'.'.join((*path, key))}"
+            )
+        node = node[key]
+        path.append(key)
+    band = node.get("temp_range_C") if isinstance(node, Mapping) else None
+    if not isinstance(band, (list, tuple)) or len(band) < 2:
+        raise Stage0DesignBandUnavailableError(
+            "missing or invalid Stage-0 temp_range_C"
+        )
+    try:
+        minimum_C = float(band[0])
+        maximum_C = float(band[1])
+    except (TypeError, ValueError) as exc:
+        raise Stage0DesignBandUnavailableError(
+            "invalid Stage-0 temp_range_C endpoints"
+        ) from exc
+    if (
+        not math.isfinite(minimum_C)
+        or not math.isfinite(maximum_C)
+        or maximum_C <= minimum_C
+    ):
+        raise Stage0DesignBandUnavailableError(
+            "invalid Stage-0 temp_range_C endpoints"
+        )
+    return minimum_C
+
+
+@lru_cache(maxsize=1)
+def default_stage0_design_band_min_C() -> float:
+    setpoints, _ = _load_required_yaml(
+        DEFAULT_DATA_DIR / "setpoints.yaml",
+        functional_digest=True,
+    )
+    return stage0_design_band_min_C_from_setpoints(setpoints)
+
+
 def load_config_bundle(
     data_dir: Path | None = None,
     *,
