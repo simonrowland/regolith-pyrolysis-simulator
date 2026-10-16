@@ -2,7 +2,7 @@
 """Prove the Guo, Cho, and extrapolation tests fail without activity wiring.
 
 Run after committing the implementation, with the seat's venv Python and
-MPLCONFIGDIR exported. The previous commit supplies the pre-wiring scorer;
+MPLCONFIGDIR exported. The pinned pre-wiring scorer blob supplies the defect;
 this runner restores the committed scorer even when a mutation check errors.
 """
 
@@ -35,6 +35,16 @@ def git_file(root: Path, revision: str) -> bytes:
     return result.stdout
 
 
+def git_blob(root: Path, blob: str) -> bytes:
+    result = subprocess.run(
+        ["git", "cat-file", "blob", blob],
+        cwd=root,
+        check=True,
+        capture_output=True,
+    )
+    return result.stdout
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--report", type=Path, required=True)
@@ -46,7 +56,7 @@ def main() -> int:
     root = Path(__file__).resolve().parents[2]
     score_path = root / "simulator" / "battery" / "score.py"
     committed = git_file(root, "HEAD")
-    reverted = git_file(root, "HEAD^^")
+    reverted = git_blob(root, "996f896afed1daad125202d067eb39fd61e63879")
     if score_path.read_bytes() != committed:
         raise SystemExit("score.py differs from HEAD; refusing to overwrite work")
 
@@ -58,7 +68,8 @@ def main() -> int:
         else str(root) + os.pathsep + old_pythonpath
     )
     report = [
-        "Mutation: simulator/battery/score.py restored from HEAD^ for each test.",
+        "Mutation: simulator/battery/score.py restored from pinned pre-wiring blob "
+        "996f896afed1daad125202d067eb39fd61e63879 for each test.",
         "Expected result: each focused test is RED because melt_oxide_activity is unwired.",
         "",
     ]
