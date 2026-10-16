@@ -21,6 +21,7 @@ from engines.builtin.cco_redox_buffer import (
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MODULE_PATH = REPO_ROOT / "engines" / "builtin" / "cco_redox_buffer.py"
+QFM_OWNER_PATH = REPO_ROOT / "simulator" / "chemistry" / "qfm_oneill.py"
 
 
 def _imported_modules(path: Path) -> set[str]:
@@ -130,9 +131,12 @@ def test_purity_no_ledger_provider_or_melt_imports() -> None:
         "dataclasses",
         "dataclasses.dataclass",
         "math",
+        "simulator.chemistry.qfm_oneill",
+        "simulator.chemistry.qfm_oneill.oneill_qfm_log10_fO2_bar",
         "simulator.scalar_boundary",
         "simulator.scalar_boundary.is_declared_real_scalar",
     }
+    assert _imported_modules(QFM_OWNER_PATH) == set()
     assert all("melt_backend" not in module for module in modules)
     assert all("inventory" not in module for module in modules)
     assert all("ledger" not in module for module in modules)

@@ -23,6 +23,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
 from simulator.scalar_boundary import is_declared_real_scalar
 
 CCO_FORMULATION = "JakobssonOskarsson1994_CCO_via_LEPR_graphite_CO_CO2"
@@ -36,8 +37,6 @@ QFM_REFERENCE_SOURCE = "O'Neill 1987 QFM fit used by MAGEMin adapter"
 _CCO_A = -21_803.0
 _CCO_B = 4.325
 _CCO_C = 0.171
-_QFM_A = -25_050.0
-_QFM_B = 8.58
 
 
 @dataclass(frozen=True)
@@ -83,7 +82,7 @@ def _validity_for_temperature(temperature_K: float) -> str:
 def qfm_log10_fO2_bar(temperature_K: float) -> float:
     """Return O'Neill-style QFM log10(fO2/bar) used for buffer offsets."""
     temperature = _require_finite_positive(temperature_K, "temperature_K")
-    return _QFM_B + _QFM_A / temperature
+    return oneill_qfm_log10_fO2_bar(temperature)
 
 
 def cco_log10_fO2_bar(temperature_K: float, pressure_bar: float = 1.0) -> float:

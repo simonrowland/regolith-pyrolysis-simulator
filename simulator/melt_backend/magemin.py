@@ -109,6 +109,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Tuple
 
 from engines.domain_reason import OutOfDomainReason
+from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
@@ -2666,11 +2667,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
     @staticmethod
     def _qfm_logfo2_oneill(temperature_C: float) -> float:
-        """Convert Celsius to Kelvin and delegate to the shared QFM owner."""
-        from engines.builtin.cco_redox_buffer import qfm_log10_fO2_bar
-
+        """Convert Celsius to Kelvin and evaluate the O'Neill QFM fit."""
         T_K = float(temperature_C) + 273.15
-        return qfm_log10_fO2_bar(T_K)
+        return oneill_qfm_log10_fO2_bar(T_K)
 
     def _resolve_buffer(
         self, *, temperature_C: float, fO2_log: float,

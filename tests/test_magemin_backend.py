@@ -3253,9 +3253,9 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
     buffer_n_args = [a for a in buffer_args if a.startswith("--buffer_n=")]
     assert len(buffer_n_args) == 1, buffer_args
     buffer_n = float(buffer_n_args[0].split("=", 1)[1])
-    # The owner supplies the QFM reference for this absolute-to-offset path.
-    qfm_at_1450C = MAGEMinBackend._qfm_logfo2_oneill(1450.0)
-    expected_offset = -12.0 - qfm_at_1450C
+    # Independent O'Neill QFM value at 1723.15 K and its expected offset.
+    qfm_at_1450C = -5.957329890026985
+    expected_offset = -6.042670109973015
     assert buffer_n == pytest.approx(expected_offset, abs=0.05), (
         f"buffer_n={buffer_n} should approximate {expected_offset}"
     )
@@ -3404,6 +3404,13 @@ def test_magemin_qfm_buffer_offsets_are_bit_pinned():
         assert offset.hex() == pinned_hex
 
 
+def test_magemin_qfm_nonpositive_kelvin_behavior_is_bit_pinned():
+    assert MAGEMinBackend._qfm_logfo2_oneill(-200.0).hex() == "-0x1.4dddf57582f36p+8"
+    assert MAGEMinBackend._qfm_logfo2_oneill(-274.0).hex() == "0x1.cc9cac45df6b9p+14"
+    with pytest.raises(ZeroDivisionError):
+        MAGEMinBackend._qfm_logfo2_oneill(-273.15)
+
+
 def test_oneill_qfm_coefficient_has_one_production_owner():
     repo_root = Path(__file__).resolve().parents[1]
     tracked = subprocess.run(
@@ -3424,4 +3431,4 @@ def test_oneill_qfm_coefficient_has_one_production_owner():
             if coefficient.search(line):
                 occurrences.append(relative_path)
 
-    assert occurrences == ["engines/builtin/cco_redox_buffer.py"]
+    assert occurrences == ["simulator/chemistry/qfm_oneill.py"]
