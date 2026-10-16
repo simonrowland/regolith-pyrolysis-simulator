@@ -13518,6 +13518,7 @@ class Migrator:
             _extract_formula_token(values.get("gas_species"))
             if isinstance(raw_quantity, str)
             and raw_quantity in QUANTITY_ALIASES
+            and q_token is Quantity.P_PARTIAL
             else None
         )
         species_formula = (
@@ -16050,6 +16051,18 @@ class Migrator:
                     point_conditions = {
                         **(point_conditions or {}),
                         "VF_wt_pct": Located(State.of(vf), locator=point_locator),
+                    }
+            if source_id == "nakano-hashimoto-2020-bubbles-to-chondrites-i":
+                heating_duration = _as_dec_or_none(
+                    raw_item.get("heating_duration_s")
+                )
+                if heating_duration is not None:
+                    point_conditions = {
+                        **(point_conditions or {}),
+                        "heating_duration_s": Located(
+                            State.of(as_decimal(heating_duration)),
+                            locator=point_locator,
+                        ),
                     }
         partial_total_condition = _partial_pressure_point_condition(
             ident_kwargs, point_locator

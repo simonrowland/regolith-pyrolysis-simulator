@@ -222,111 +222,15 @@ species:
           quantity: assembly_mass_loss_relative_to_initial_mass
           note: 'Mass loss includes sample, Re wire, and graphite disk; ? and >100 are retained as printed.'
           runs:
-            - run: 114
-              group: L200
-              material: Lsil
-              laser_power_W: 200
-              ambient_gas: '0.3Ar + 0.01H2 bar'
-              Tmax_C: 2603
-              heating_duration_s: 14
-              sample_initial_weight_g: 0.01480
-              mass_loss_wt_pct: 9.3
-              point_conditions:
-                heating_duration_s:
-                  state: {tag: value, value: 14}
-                  locator: {page: 6, table: '2'}
+            - {run: 114, group: L200, material: Lsil, laser_power_W: 200, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2603, heating_duration_s: 14, sample_initial_weight_g: 0.01480, mass_loss_wt_pct: 9.3}
             - {run: 115, group: L200, material: Lsil, laser_power_W: 200, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2928, heating_duration_s: 20, sample_initial_weight_g: 0.01407, mass_loss_wt_pct: '?'}
-            - run: 132
-              group: L200
-              material: Lsil
-              laser_power_W: 200
-              ambient_gas: '0.3Ar + 0.01H2 bar'
-              Tmax_C: 2183
-              heating_duration_s: 8
-              sample_initial_weight_g: 0.01497
-              mass_loss_wt_pct: 97.4
-              point_conditions:
-                heating_duration_s:
-                  state: {tag: value, value: 8}
-                  locator: {page: 6, table: '2'}
-            - run: 138
-              group: L200
-              material: Lsil
-              laser_power_W: 200
-              ambient_gas: '0.3Ar bar'
-              Tmax_C: 2799
-              heating_duration_s: 24
-              sample_initial_weight_g: 0.01501
-              mass_loss_wt_pct: 104.0
-              point_conditions:
-                heating_duration_s:
-                  state: {tag: value, value: 24}
-                  locator: {page: 6, table: '2'}
-            - run: 117
-              group: L50
-              material: Lsil
-              laser_power_W: 50
-              ambient_gas: '0.3Ar + 0.01H2 bar'
-              Tmax_C: 2613
-              heating_duration_s: 31
-              sample_initial_weight_g: 0.01508
-              mass_loss_wt_pct: 32.7
-              point_conditions:
-                heating_duration_s:
-                  state: {tag: value, value: 31}
-                  locator: {page: 6, table: '2'}
-            - run: 123
-              group: L50
-              material: Lsil
-              laser_power_W: 50
-              ambient_gas: '0.3Ar + 0.01H2 bar'
-              Tmax_C: 2695
-              heating_duration_s: 140
-              sample_initial_weight_g: 0.01481
-              mass_loss_wt_pct: 41.9
-              point_conditions:
-                heating_duration_s:
-                  state: {tag: value, value: 140}
-                  locator: {page: 6, table: '2'}
-            - run: 91
-              group: A200
-              material: Allende
-              laser_power_W: 200
-              ambient_gas: '0.3Ar + 0.01H2 bar'
-              Tmax_C: 2608
-              heating_duration_s: 8
-              sample_initial_weight_g: 0.01437
-              mass_loss_wt_pct: 117.0
-              point_conditions:
-                heating_duration_s:
-                  state: {tag: value, value: 8}
-                  locator: {page: 6, table: '2'}
-            - run: 103
-              group: A50
-              material: Allende
-              laser_power_W: 50
-              ambient_gas: '0.3Ar + 0.01H2 bar'
-              Tmax_C: 2177
-              heating_duration_s: 34
-              sample_initial_weight_g: 0.01429
-              mass_loss_wt_pct: 23.1
-              point_conditions:
-                heating_duration_s:
-                  state: {tag: value, value: 34}
-                  locator: {page: 6, table: '2'}
-            - run: 109
-              group: A50
-              material: Allende
-              laser_power_W: 50
-              ambient_gas: '0.3Ar + 0.01H2 bar'
-              Tmax_C: 2559
-              heating_duration_s: 417
-              sample_initial_weight_g: 0.01419
-              mass_loss_wt_pct: 53.1
-              point_conditions:
-                heating_duration_s:
-                  state: {tag: value, value: 417}
-                  locator: {page: 6, table: '2'}
+            - {run: 132, group: L200, material: Lsil, laser_power_W: 200, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2183, heating_duration_s: 8, sample_initial_weight_g: 0.01497, mass_loss_wt_pct: 97.4}
+            - {run: 138, group: L200, material: Lsil, laser_power_W: 200, ambient_gas: '0.3Ar bar', Tmax_C: 2799, heating_duration_s: 24, sample_initial_weight_g: 0.01501, mass_loss_wt_pct: 104.0}
+            - {run: 117, group: L50, material: Lsil, laser_power_W: 50, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2613, heating_duration_s: 31, sample_initial_weight_g: 0.01508, mass_loss_wt_pct: 32.7}
+            - {run: 123, group: L50, material: Lsil, laser_power_W: 50, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2695, heating_duration_s: 140, sample_initial_weight_g: 0.01481, mass_loss_wt_pct: 41.9}
+            - {run: 91, group: A200, material: Allende, laser_power_W: 200, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2608, heating_duration_s: 8, sample_initial_weight_g: 0.01437, mass_loss_wt_pct: 117.0}
+            - {run: 103, group: A50, material: Allende, laser_power_W: 50, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2177, heating_duration_s: 34, sample_initial_weight_g: 0.01429, mass_loss_wt_pct: 23.1}
+            - {run: 109, group: A50, material: Allende, laser_power_W: 50, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2559, heating_duration_s: 417, sample_initial_weight_g: 0.01419, mass_loss_wt_pct: 53.1}
       - observation_id: nakano_2020_corrected_temperature_groups
         experiment: laser-boiling-series
         type: transition_point
