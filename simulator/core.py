@@ -11679,18 +11679,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return max(0.0, min(1.0, thermal_extent * sio2_gate))
 
     @classmethod
-    def _melt_from_composition(
-        cls, comp: Mapping[str, Any], mass_kg: float
-    ) -> Dict[str, float]:
-        for component, raw_value in comp.items():
-            cls._declared_nonnegative_number(
-                raw_value, f'composition_wt_pct.{component}')
-        return {
-            oxide: cls._mass_from_wt_pct(comp.get(oxide, 0.0), mass_kg) or 0.0
-            for oxide in OXIDE_SPECIES
-        }
-
-    @classmethod
     def _melt_from_raw_inventory(
         cls, raw: Mapping[str, float]
     ) -> Dict[str, float]:
