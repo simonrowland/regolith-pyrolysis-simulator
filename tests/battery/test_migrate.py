@@ -7595,6 +7595,8 @@ def test_l01_map_quantity_direct_witnesses() -> None:
     [
         ("pure_vapor_pressure", Quantity.P_SAT),
         ("partial_pressure_overlay_figure_only", Quantity.P_PARTIAL),
+        ("partial_pressure_BC_12065", Quantity.P_PARTIAL),
+        ("partial_pressure_intermediate_range_reliable", Quantity.P_PARTIAL),
         ("partial_pressure_O2", Quantity.P_PARTIAL),
         ("partial_pressure_CsBO2", Quantity.P_PARTIAL),
         ("partial_pressure_LiBO2", Quantity.P_PARTIAL),
@@ -7613,6 +7615,7 @@ def test_l01_map_quantity_direct_witnesses() -> None:
         ("henrian_activity_coefficient", Quantity.ACTIVITY_COEFFICIENT),
         ("evaporation_coefficient_gamma_Si", Quantity.EVAPORATION_COEFFICIENT_ALPHA),
         ("mass_loss", Quantity.MASS_LOSS_FRACTION),
+        ("assembly_mass_loss_relative_to_initial_mass", Quantity.MASS_LOSS_FRACTION),
         ("total_integrated_mass_loss", Quantity.MASS_LOSS_FRACTION),
         ("total_gas_evolution_mass_loss", Quantity.MASS_LOSS_FRACTION),
         ("isothermal_hold_mass_loss", Quantity.MASS_LOSS_FRACTION),
@@ -7651,6 +7654,7 @@ def test_l01_map_quantity_direct_witnesses() -> None:
         ("stable_isotope_delta", Quantity.ISOTOPE_DELTA),
         ("delta_53Cr_average", Quantity.ISOTOPE_DELTA),
         ("delta_53Cr_reference_material", Quantity.ISOTOPE_DELTA),
+        ("free_evap_residue_composition_vs_time", Quantity.RESIDUE_COMPONENT_COMPOSITION),
     ],
 )
 def test_l02_empirical_quantity_aliases_are_closed(alias: str, expected: Quantity) -> None:
@@ -7676,6 +7680,42 @@ def test_l02_empirical_quantity_aliases_map_numeric_witnesses() -> None:
             {"quantity": "solidus", "T_K": 2050},
             "K",
             Quantity.TRANSITION_TEMPERATURE,
+        ),
+        (
+            "partial_pressure_intermediate_range_reliable",
+            {
+                "quantity": "partial_pressure_intermediate_range_reliable",
+                "points": [{"T_K": 2060, "p_Pa": 0.0005137178}],
+            },
+            "atm as published",
+            Quantity.P_PARTIAL,
+        ),
+        (
+            "partial_pressure_BC_12065",
+            {
+                "quantity": "partial_pressure_BC_12065",
+                "points": [{"T_K": 2320, "p_Pa": 0.0001}],
+            },
+            "atm as published",
+            Quantity.P_PARTIAL,
+        ),
+        (
+            "assembly_mass_loss_relative_to_initial_mass",
+            {
+                "quantity": "assembly_mass_loss_relative_to_initial_mass",
+                "runs": [{"Tmax_C": 2183, "mass_loss_wt_pct": 97.4}],
+            },
+            "wt_pct_mass_loss",
+            Quantity.MASS_LOSS_FRACTION,
+        ),
+        (
+            "free_evap_residue_composition_vs_time",
+            {
+                "quantity": "free_evap_residue_composition_vs_time",
+                "series": [{"T_C": 1700, "FeO_wt_pct": 27.92}],
+            },
+            "wt_pct",
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
         ),
         (
             "ion_count_rate",

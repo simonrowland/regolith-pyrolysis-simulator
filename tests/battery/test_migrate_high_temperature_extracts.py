@@ -118,20 +118,44 @@ def test_existing_high_temperature_points_keep_printed_value_and_temperature(
     )
 
 
-def test_demaria_table4_points_are_not_emitted_before_aliases(migrated_targets) -> None:
+def test_demaria_table4_points_keep_printed_values_and_temperatures(migrated_targets) -> None:
     observations = _source_observations(migrated_targets, "kems-022-demaria-1971")
-    assert not any(
-        "demaria_1971_al2o_psat_table4" in observation.observation_id
-        or "demaria_1971_alo_psat_table4" in observation.observation_id
+    table4 = [
+        observation
         for observation in observations
-        if observation.value.kind is ValueKind.POINT
+        if (
+            "demaria_1971_al2o_psat_table4" in observation.observation_id
+            or "demaria_1971_alo_psat_table4" in observation.observation_id
+        )
+        and observation.value.kind is ValueKind.POINT
+    ]
+    assert len(table4) == 20
+    for observation in table4:
+        assert observation.identity.quantity.is_value
+        assert observation.identity.quantity.value is Quantity.P_PARTIAL
+        temperature = observation.point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.locator is not None
+    _assert_printed_point(
+        migrated_targets,
+        source_id="kems-022-demaria-1971",
+        id_fragment="demaria_1971_al2o_psat_table4::T=2060.0",
+        temperature_K="2060.0",
+        value="0.00051371775",
     )
 
 
-def test_nakano_run_mass_loss_is_not_emitted_before_range_fix(migrated_targets) -> None:
+def test_nakano_run_quantity_is_recognized_before_range_fix(migrated_targets) -> None:
     observations = _source_observations(
         migrated_targets, "nakano-hashimoto-2020-bubbles-to-chondrites-i"
     )
+    parent = next(
+        observation
+        for observation in observations
+        if observation.observation_id.endswith("::nakano_2020_mass_loss_selected_runs")
+    )
+    assert parent.identity.quantity.is_value
+    assert parent.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
     assert not any(
         "nakano_2020_mass_loss_selected_runs" in observation.observation_id
         and observation.value.kind is ValueKind.POINT
