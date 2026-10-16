@@ -83,6 +83,15 @@ def _make_sim(
     return sim
 
 
+def _set_actual_n2_headspace(sim: PyrolysisSimulator, pressure_mbar: float) -> None:
+    # Supply the actual pure-N2 probe through the owner's Dalton projection.
+    # The simulator has no public setter for this carried-in upstream vector.
+    sim._melt_headspace_composition_mbar = sim.overhead_model.species_partial_pressures(
+        EvaporationFlux(), pressure_mbar,
+        molar_flow_by_species={"N2": 1.0},
+    )
+
+
 def _cleaned_melt_debit_mol(sim: PyrolysisSimulator, transition, species: str) -> float:
     formula = resolve_species_formula(species, sim.species_formula_registry)
     return sum(
@@ -3090,6 +3099,7 @@ def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> No
     sim.overhead.pressure_mbar = 10.0
     sim.overhead.composition = {"N2": 10.0, "Fe": 0.0}
     sim.melt.background_gas_species = "N2"
+    _set_actual_n2_headspace(sim, 10.0)
     pn2_pool = sim._native_fe_partition_diagnostic(100.0)
 
     assert vacuum_small["native_fe_vapor_mol"] == pytest.approx(0.5)
@@ -3248,6 +3258,7 @@ def test_c7_and_native_fe_suppress_ledger_yields_at_transitional_kn_probe() -> N
     sim.melt.p_total_mbar = 0.03632  # 3.632 Pa
     sim.overhead_model.pipe_diameter_m = 0.12
     sim.overhead.headspace_temperature_K = 2023.15
+    _set_actual_n2_headspace(sim, 0.03632)
 
     cfg = dict(sim._c7_campaign_config())
     cfg.update(
@@ -3296,6 +3307,7 @@ def test_c7_and_native_fe_suppress_ledger_yields_at_transitional_kn_probe() -> N
 
     # --- viscous floor: P=100 Pa, Kn≈0.0036 — normal behavior ---
     sim.melt.p_total_mbar = 1.0  # 100 Pa
+    _set_actual_n2_headspace(sim, 1.0)
     cfg_viscous = dict(cfg)
     cfg_viscous["p_total_mbar"] = 1.0
     extent_v, c7_v = sim._c7_transport_extent_mol(cfg_viscous, ca_per_extent=3.0)
