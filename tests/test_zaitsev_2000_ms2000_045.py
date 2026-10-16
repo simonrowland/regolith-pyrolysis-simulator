@@ -31,11 +31,20 @@ def test_zaitsev_2000_table_1_activities_migrate_and_pin_printed_values():
     points = row["values"]["points"]
     assert (points[0]["x_SiO2_as_printed"], points[0]["activity_eqn5_as_printed"]) == ("0.515", "0.137")
     assert (points[3]["x_SiO2_as_printed"], points[3]["activity_eqn5_as_printed"]) == ("0.405", "0.254")
-    migrated_row = next(
-        observation
-        for observation in migrator.result.observations.values()
-        if observation.observation_id.startswith(
-            "zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::"
-        )
+    condensed_liquid_series = (
+        "zaitsev_2000_table1_mno_activities_eqn5",
+        "zaitsev_2000_table1_mno_activities_eqn11",
+        "zaitsev_2000_table1_sio2_activities_eqn5",
+        "zaitsev_2000_table1_sio2_activities_eqn11",
     )
-    assert migrated_row.identity.species.phase.value is Phase.L
+    for parent_id in condensed_liquid_series:
+        migrated_rows = [
+            observation
+            for observation in migrator.result.observations.values()
+            if f"::{parent_id}::" in observation.observation_id
+        ]
+        assert migrated_rows
+        assert all(
+            observation.identity.species.phase.value is Phase.L
+            for observation in migrated_rows
+        ), parent_id
