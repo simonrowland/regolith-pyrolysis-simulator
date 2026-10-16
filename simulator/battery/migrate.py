@@ -13983,24 +13983,6 @@ class Migrator:
         if obs.get("equipment"):
             measured.equipment_payloads += 1
 
-        value, exploded, value_sel = empty_value_from_payload(
-            values, obs_type, obs.get("units"), quantity=quantity
-        )
-        if (
-            admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX)
-            and not _value_has_numeric_value(value)
-        ):
-            raw_source_admission = (
-                raw_adm
-                if raw_adm is not None
-                else obs.get("admission_status")
-            )
-            reason = (
-                _NO_ADMISSION_STATUS_REASON
-                if raw_source_admission in (None, "")
-                else f"source admission_status={raw_source_admission}"
-            )
-            admission = Admission(status=AdmissionStatus.PENDING, reason=reason)
         hold_reason = str(values.get("reason") or obs.get("reason") or "").strip()
         if isinstance(values.get("series"), list) and values.get("series"):
             measured.series += 1
@@ -14045,6 +14027,24 @@ class Migrator:
                 q_token = None
             else:
                 ident_kwargs["valence_basis"] = State.of(valence_basis)
+        value, exploded, value_sel = empty_value_from_payload(
+            values, obs_type, obs.get("units"), quantity=quantity
+        )
+        if (
+            admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX)
+            and not _value_has_numeric_value(value)
+        ):
+            raw_source_admission = (
+                raw_adm
+                if raw_adm is not None
+                else obs.get("admission_status")
+            )
+            reason = (
+                _NO_ADMISSION_STATUS_REASON
+                if raw_source_admission in (None, "")
+                else f"source admission_status={raw_source_admission}"
+            )
+            admission = Admission(status=AdmissionStatus.PENDING, reason=reason)
         value_derivation = source_derivation
         value_conversion: Derivation | None = None
         if (

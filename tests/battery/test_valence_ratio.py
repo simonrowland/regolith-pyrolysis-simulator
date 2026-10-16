@@ -1,7 +1,9 @@
+import copy
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.battery.enums import (
     AdmissionStatus,
@@ -204,6 +206,51 @@ def _migrate_sossi_cr():
     migrator._migrate_extract(SOSSI_CR)
     migrator.finalize()
     return migrator.result
+
+
+def test_refused_printed_valence_forms_do_not_select_scalar(tmp_path: Path):
+    doc = yaml.safe_load(SOSSI_CR.read_text(encoding="utf-8"))
+    template = doc["species"]["Cr"]["observations"][0]
+    printed_forms = (
+        "log10_Cr2plus_over_total_Cr",
+        "not_a_plus_over_real",
+    )
+    observations = []
+    for index, printed in enumerate(printed_forms):
+        row = copy.deepcopy(template)
+        row.update(
+            {
+                "observation_id": f"fixture_refused_valence_{index}",
+                "phase": "liquid",
+                "values": {
+                    "method_class": "measured_direct",
+                    "quantity": printed,
+                    "admission_status": "admitted",
+                    "value": "0.32",
+                },
+            }
+        )
+        observations.append(row)
+    doc["species"]["Cr"]["observations"] = observations
+    extract = tmp_path / SOSSI_CR.name
+    extract.write_text(
+        yaml.safe_dump(doc, sort_keys=False, allow_unicode=True), encoding="utf-8"
+    )
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    rows = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrator.result.observations.values()
+        if "fixture_refused_valence_" in row.observation_id
+    }
+
+    assert set(rows) == {
+        "fixture_refused_valence_0",
+        "fixture_refused_valence_1",
+    }
+    assert all(row.value.kind is ValueKind.UNAVAILABLE for row in rows.values())
 
 
 def test_sossi_2018_quoted_cr_rows_migrate_as_numeric_valence_fractions():
