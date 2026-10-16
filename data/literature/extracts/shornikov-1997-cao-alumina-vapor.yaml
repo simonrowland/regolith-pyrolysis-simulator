@@ -1456,8 +1456,8 @@ species:
         note: 'Table 2 calculated oxygen pressure column at 1933 K.'
       T_range_K: [1933.0, 1933.0]
       phase: gas
-      reaction: '2 O(g) = O2(g)'
-      reaction_as_printed: '2 O = O2'
+      reaction: 'O2(g) = 2 O(g)'
+      reaction_as_printed: '(O2) = 2(O)'
       standard_state: {tag: unknown, reason: 'not printed in this paper: gas reference pressure/state'}
       reservoir: {tag: unknown, reason: 'not printed in this paper'}
       experiment: shornikov-1997-mo-cell-kems
@@ -1556,7 +1556,7 @@ species:
           T_C: '1659.85'
           T_K: 1933.0
           P_O2_times_10^11_atm_as_printed: '4.09'
-          pressure_atm: '4.0899999999999996e-11'
+          pressure_atm: '4.09e-11'
           point_conditions:
             composition:
               state:
@@ -1626,7 +1626,7 @@ species:
           T_C: '1659.85'
           T_K: 1933.0
           P_O2_times_10^11_atm_as_printed: '5.47'
-          pressure_atm: '5.4699999999999996e-11'
+          pressure_atm: '5.47e-11'
           point_conditions:
             composition:
               state:
@@ -1661,7 +1661,7 @@ species:
           T_C: '1659.85'
           T_K: 1933.0
           P_O2_times_10^11_atm_as_printed: '6.01'
-          pressure_atm: '6.009999999999999e-11'
+          pressure_atm: '6.01e-11'
           point_conditions:
             composition:
               state:
@@ -1731,7 +1731,7 @@ species:
           T_C: '1659.85'
           T_K: 1933.0
           P_O2_times_10^11_atm_as_printed: '6.92'
-          pressure_atm: '6.919999999999999e-11'
+          pressure_atm: '6.92e-11'
           point_conditions:
             composition:
               state:
