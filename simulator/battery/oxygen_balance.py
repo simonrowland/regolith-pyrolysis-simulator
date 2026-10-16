@@ -166,9 +166,15 @@ def _solve_vacuum_oxygen_balance(
     elif f_high == 0.0:
         root = high
         bracket_boundary = "upper"
-    elif f_low * f_high > 0.0:
+    elif f_low > 0.0 and f_high > 0.0:
+        # The residual is oxygen flux minus parent-oxygen demand and increases
+        # with pO2. Positive values at both endpoints put the root below the
+        # bracket (for example, a root at -40 gives positive residuals at -30
+        # and 0), so only this same-sign case holds the lower floor.
         root = low
         bracket_boundary = "lower"
+    elif f_low < 0.0 and f_high < 0.0:
+        raise ValueError("vacuum oxygen balance has no root in the declared pO2 bracket")
     else:
         root = brentq(
             lambda value: evaluate(value)[0],

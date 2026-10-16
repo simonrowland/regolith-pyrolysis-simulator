@@ -374,6 +374,16 @@ def test_vacuum_oxygen_balance_holds_lower_bracket_when_root_is_below_it() -> No
     assert result.pO2_bar == pytest.approx(1.0e-30)
 
 
+def test_vacuum_oxygen_balance_refuses_root_above_bracket() -> None:
+    with pytest.raises(ValueError, match="no root in the declared pO2 bracket"):
+        _solve_vacuum_oxygen_balance(
+            _boundary_test_pressure_model(10.0),
+            _boundary_test_channels(),
+            temperature_K=1500.0,
+            bracket_log10_pO2_bar=(-30.0, 0.0),
+        )
+
+
 def test_vacuum_oxygen_balance_accepts_clamped_lower_pressure_model() -> None:
     unclamped = _boundary_test_pressure_model(-30.0)
 
@@ -584,6 +594,38 @@ def test_residue_two_channel_hkl_and_parent_stoichiometric_anchors() -> None:
     _assert_residue_atoms_close(
         starting, dict(result.residue_mol), dict(result.evaporated_mol)
     )
+
+
+def test_residue_integrator_refuses_root_above_bracket_without_floor_evaporation() -> None:
+    from simulator.battery.residue import ResidueInventoryRefusal, integrate_residue_inventory
+
+    starting = {"FeO": 1.0e-3}
+    fe_channel, _, oxygen_channel = _residue_channels()
+    fe_molar_mass = parse_formula("Fe").molar_mass_kg_per_mol()
+    oxygen_scale = fe_channel.alpha / (
+        oxygen_channel.alpha * math.sqrt(fe_molar_mass)
+    )
+
+    def pressure_model(inventory: dict[str, float], logp: float):
+        displacement = logp - 10.0
+        return {
+            "Fe": 2.0 * inventory.get("FeO", 0.0) / starting["FeO"]
+            * 10.0 ** (-0.5 * displacement),
+            "O2": oxygen_scale * 10.0**displacement,
+        }
+
+    with pytest.raises(ResidueInventoryRefusal) as refused:
+        integrate_residue_inventory(
+            starting,
+            (fe_channel, oxygen_channel),
+            pressure_model,
+            temperature_K=2073.0,
+            duration_s=30.0,
+            area_evolution_m2=(1.0e-18,),
+        )
+
+    assert refused.value.reason == "residue_oxygen_balance_failed"
+    assert "no root in the declared pO2 bracket" in refused.value.detail
 
 
 def test_residue_integrator_retains_floor_steps_and_time_fraction() -> None:
