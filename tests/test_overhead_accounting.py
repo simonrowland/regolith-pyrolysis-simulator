@@ -1975,13 +1975,48 @@ def test_controlled_stream_supplies_commanded_gases_without_evaporation(
         background_gas_species=carrier, background_gas_mole_fraction=1.0,
     )
     model = OverheadGasModel({"enabled": enabled, "volume_m3": 1.0})
-    gas = model.update(EvaporationFlux(), melt, CondensationTrain.create_default())
+    gas = model.update(
+        EvaporationFlux(), melt, CondensationTrain.create_default(),
+        p_downstream_bar=0.0,
+    )
     assert gas.composition["O2"] == pytest.approx(2.0)
     assert model.last_stream_mol_hr["O2"] > 0.0
     if carrier:
         assert gas.composition[carrier] == pytest.approx(8.0)
         assert model.last_stream_mol_hr[carrier] > 0.0
     assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar)
+
+
+@pytest.mark.parametrize("atmosphere", _O2_FLOORED)
+@pytest.mark.parametrize("enabled", [False, True])
+def test_controlled_stream_retains_source_and_supplies_feasible_o2(atmosphere, enabled):
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, MeltState
+
+    melt = MeltState(atmosphere=atmosphere, pO2_mbar=2.0, p_total_mbar=10.0)
+    flux = EvaporationFlux(species_kg_hr={"Fe": 1.0e-6})
+    flux.update_totals()
+    model = OverheadGasModel({"enabled": enabled, "volume_m3": 1.0})
+    gas = model.update(
+        flux, melt, CondensationTrain.create_default(),
+        overhead_holdup_mol={"Fe": 1.0e-9}, p_downstream_bar=0.0,
+    )
+    assert gas.composition["O2"] == pytest.approx(2.0)
+    assert gas.composition["Fe"] > 0.0
+    assert model.last_stream_mol_hr["Fe"] > 0.0
+    assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar)
+
+
+@pytest.mark.parametrize("enabled", [False, True])
+def test_declared_co2_fraction_does_not_supply_unspecified_atmosphere(enabled):
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, MeltState
+
+    melt = MeltState(atmosphere=Atmosphere.CO2_BACKPRESSURE, p_total_mbar=6.0)
+    model = OverheadGasModel({"enabled": enabled, "volume_m3": 1.0})
+    gas = model.update(EvaporationFlux(), melt, CondensationTrain.create_default())
+    assert gas.composition == pytest.approx({"CO2": 5.76})
+    assert gas.pressure_mbar == pytest.approx(5.76)
 
 
 @pytest.mark.parametrize("atmosphere,carrier", [
@@ -2010,7 +2045,12 @@ def test_pn2_sweep_finite_headspace_retains_regulated_carrier(evap_kg_hr, atmosp
         overhead_holdup_mol=holdup,
     )
 
-    assert gas.pressure_mbar / 1000.0 == pytest.approx(0.01)
+    expected_pressure_mbar = 9.6 if atmosphere is Atmosphere.CO2_BACKPRESSURE else 10.0
+    if atmosphere is Atmosphere.CO2_BACKPRESSURE and holdup:
+        expected_pressure_mbar += model._compute_partial_pressures(
+            holdup, gas.headspace_volume_m3, gas.headspace_temperature_K,
+        )["Fe"] * 1000.0
+    assert gas.pressure_mbar == pytest.approx(expected_pressure_mbar)
     assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar)
     assert gas.composition[carrier] > 0.0
     assert model.last_stream_mol_hr[carrier] > 0.0
