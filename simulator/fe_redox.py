@@ -940,50 +940,6 @@ def kress91_fe3_over_sigma_fe(
     return 2.0 * ratio / (2.0 * ratio + 1.0)
 
 
-def _kress91_ferrous_feo_activity_raw(
-    *,
-    comp_wt: Mapping[str, float],
-    fO2_log: float,
-    T_K: float,
-    pressure_bar: float,
-    floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
-) -> float:
-    feot = feot_equivalent_wt_pct(comp_wt)
-    if feot <= 0.0:
-        return 0.0
-    mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
-    if not mol_fractions:
-        return 0.0
-    # Vacuum tolerance — intentional, NOT a missing guard. Direct activity
-    # callers may pass pressure_bar == 0.0 at furnace vacuum. Kress91's pressure
-    # terms are a high-pressure (GPa) petrologic correction, negligible at
-    # furnace mbar pressures, so a non-positive pressure is floored here rather
-    # than refused. Vapor-equilibrium providers use
-    # kress91_furnace_activity_pressure_bar so neutral overhead p_total never
-    # enters this path. NON-FINITE pressure is deliberately left unfloored
-    # (isfinite gate) so NaN/inf still raises through the
-    # _validate_kress91_controls chokepoint.
-    # kress91_split, by contrast, serves the redox-split path where pressure is a
-    # real melt pressure > 0 and a non-positive value IS invalid — the two entry
-    # points have DIFFERENT valid-input domains, so this asymmetry is correct, not
-    # a class-incompleteness. (A prior fold removed this clamp on that mistaken
-    # premise and broke every vacuum evaporation golden — see test
-    # test_kress91_ferrous_feo_activity_vacuum_pressure_is_floored_not_refused.)
-    pressure_control = floor_vacuum_pressure_bar(
-        pressure_bar,
-        floor_bar=floor_bar,
-    )
-    split = kress91_split(
-        fO2_log=fO2_log,
-        mol_fractions=mol_fractions,
-        T_K=T_K,
-        pressure_bar=pressure_control,
-    )
-    # Kress & Carmichael 1991 uses oxide mole fractions; Holzheid et al. 1997
-    # Eq. (4) defines gamma_FeO on the X_FeO mole-fraction basis.
-    return max(0.0, float(split['x_feo']))
-
-
 def _calphad_authority_weight(delta_iw_log10: float) -> float:
     if delta_iw_log10 <= 0.0:
         return 1.0
