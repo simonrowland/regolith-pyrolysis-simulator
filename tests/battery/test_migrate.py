@@ -469,6 +469,61 @@ def _migrate_real_extract(
     return migrate(root, write=write)
 
 
+def test_extract_source_method_uncertainty_migrates_on_its_work(
+    tmp_path: Path,
+) -> None:
+    name = "kems-014-drowart-2005.yaml"
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
+    original_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    baseline = _migrate_real_extract(
+        tmp_path / "without-method-uncertainty", name, extract_doc=original_doc
+    )
+    doc = deepcopy(original_doc)
+    source_id = str(doc["source_id"])
+    doc["source"]["method_uncertainty"] = {
+        "value": "0.10",
+        "meaning": "one_sigma",
+        "quantity_basis": "log10 activity in dex",
+        "locator": {
+            "page": 7,
+            "note": "The standard deviation of log10(a) is 0.10.",
+        },
+    }
+
+    result = _migrate_real_extract(
+        tmp_path / "with-method-uncertainty", name, extract_doc=doc
+    )
+    assert {
+        observation_id: to_plain(observation)
+        for observation_id, observation in baseline.observations.items()
+    } == {
+        observation_id: to_plain(observation)
+        for observation_id, observation in result.observations.items()
+    }
+    baseline_work = next(
+        work for work in baseline.works.values() if source_id in work.source_ids
+    )
+    assert "source_method_uncertainties" not in to_plain(baseline_work)
+    work = next(work for work in result.works.values() if source_id in work.source_ids)
+    uncertainty = work.source_method_uncertainties[source_id]
+
+    assert uncertainty.value == Decimal("0.10")
+    assert uncertainty.meaning == "one_sigma"
+    assert uncertainty.quantity_basis == "log10 activity in dex"
+    assert uncertainty.locator.page == 7
+    assert uncertainty.locator.note == doc["source"]["method_uncertainty"]["locator"]["note"]
+    assert result.validation is not None
+    assert not any(
+        issue.path.startswith("work.source_method_uncertainties")
+        for issue in result.validation.issues
+    )
+    plain_work = to_plain(work)
+    assert plain_work["source_method_uncertainties"][source_id]["locator"] == {
+        "page": 7,
+        "note": "The standard deviation of log10(a) is 0.10.",
+    }
+
+
 def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
     tmp_path: Path,
 ) -> None:

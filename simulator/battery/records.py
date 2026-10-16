@@ -692,6 +692,17 @@ class Uncertainty:
 
 
 @dataclass(frozen=True)
+class SourceMethodUncertainty:
+    value: Decimal
+    meaning: str
+    quantity_basis: str
+    locator: Locator
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "value", as_decimal(self.value))
+
+
+@dataclass(frozen=True)
 class SourceFile:
     asset_id: str
     role: AssetRole
@@ -724,6 +735,7 @@ class Work:
     source_ids: tuple[str, ...]
     source_files: SourceFiles
     doi: str | None = None
+    source_method_uncertainties: Mapping[str, SourceMethodUncertainty] | None = None
 
     def __post_init__(self) -> None:
         if not self.work_id:
@@ -732,6 +744,12 @@ class Work:
             raise ValueError("Work.citation is required")
         if not self.source_ids:
             raise ValueError("Work.source_ids is required")
+        uncertainties = dict(self.source_method_uncertainties or {})
+        if not set(uncertainties).issubset(self.source_ids):
+            raise ValueError("source method uncertainty must name a source_id on the Work")
+        object.__setattr__(
+            self, "source_method_uncertainties", uncertainties or None
+        )
 
 
 @dataclass(frozen=True)

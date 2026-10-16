@@ -79,6 +79,7 @@ from simulator.battery.records import (
     Reaction,
     Residual,
     Species,
+    SourceMethodUncertainty,
     State,
     SweepGas,
     SweepGasComponent,
@@ -708,6 +709,34 @@ def validate_work(work: Work, path: str = "work") -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     if not work.work_id:
         issues.append(_issue(f"{path}.work_id", RefusalReason.CONDITIONAL_FIELD, "missing work_id"))
+    for source_id, uncertainty in (work.source_method_uncertainties or {}).items():
+        field = f"{path}.source_method_uncertainties.{source_id}"
+        if not isinstance(uncertainty, SourceMethodUncertainty):
+            issues.append(
+                _issue(field, RefusalReason.CONDITIONAL_FIELD, "requires a SourceMethodUncertainty record")
+            )
+            continue
+        if not uncertainty.value.is_finite() or uncertainty.value < 0:
+            issues.append(
+                _issue(f"{field}.value", RefusalReason.CONDITIONAL_FIELD, "requires a finite nonnegative value")
+            )
+        if uncertainty.meaning not in {"one_sigma", "two_sigma", "range_half_width"}:
+            issues.append(
+                _issue(f"{field}.meaning", RefusalReason.CONDITIONAL_FIELD, "requires one_sigma, two_sigma, or range_half_width")
+            )
+        if not uncertainty.quantity_basis.strip():
+            issues.append(
+                _issue(f"{field}.quantity_basis", RefusalReason.CONDITIONAL_FIELD, "requires the printed quantity basis")
+            )
+        locator = uncertainty.locator
+        if (
+            not (locator.page or locator.published_page)
+            or not locator.note
+            or not locator.note.strip()
+        ):
+            issues.append(
+                _issue(f"{field}.locator", RefusalReason.CONDITIONAL_FIELD, "requires a page and the quoted sentence in note")
+            )
     return issues
 
 
