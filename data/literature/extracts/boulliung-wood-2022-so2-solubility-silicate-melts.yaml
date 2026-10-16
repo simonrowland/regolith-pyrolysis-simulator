@@ -10,6 +10,10 @@ extraction:
   worker: w1-boulliung-wood-2022-so2-solubility-silicate-melts
   provenance_path: corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
 review_status: draft
+fidelity_samples:
+- path: species.S.observations[boulliung_wood_2022_starting_material_compositions].values.T_Basalt_SiO2_wt_percent_as_printed
+  value: '47.0(1)'
+  locator: {published_page: 152, pdf_page_index: 2, table: '1', note: 'T-Basalt SiO2 composition cell, wt.%, as printed.'}
 benches:
 - id: gero-vertical-furnace
   identity: {basis: described_in_this_work}
@@ -98,7 +102,9 @@ species:
       type: composition_series
       locator:
         source_path: corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
-        page: 151
+        page: 152
+        published_page: 152
+        pdf_page_index: 2
         table: '1'
         note: Every value below is transcribed from the printed Table 1 cell under its column header; parenthesized values are 1-sigma uncertainty on the last digit, b.d.l. means below detection limit.
       units: wt.% for oxide columns; dimensionless n and total
@@ -106,6 +112,7 @@ species:
         quantity: fused_starting_material_major_oxide_composition
         method_class: measured_direct
         material_form: fused_starting_material
+        T_Basalt_SiO2_wt_percent_as_printed: '47.0(1)'
         table_transcription: |
           Table 1
           Electron microprobe analyses (in wt.%) of the fused starting materials. Numbers in parentheses represents 1r uncertainties on the last digit. b.d.l.: below detection limit. Note

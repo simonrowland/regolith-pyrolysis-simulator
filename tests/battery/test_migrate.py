@@ -14626,6 +14626,64 @@ def test_stolyarova_1991_printed_compositions_reach_migrated_observations(
     assert all(obs.identity.total_pressure_Pa.is_unknown for obs in pressure_rows)
 
 
+def test_stolyarova_1991_atomic_oxygen_is_quoted_attributed_with_relation(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kems-053-stolyarova-1991.yaml", write=False
+    )
+    rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-053-stolyarova-1991"
+        and "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium"
+        in obs.observation_id
+    ]
+
+    assert len(rows) == 9
+    work_id = next(
+        work_id
+        for work_id, work in result.works.items()
+        if "kems-053-stolyarova-1991" in work.source_ids
+    )
+    assert any(
+        row.get("observation_id") == "stolyarova_1991_printed_equilibrium_1"
+        for row in result.context_by_work[work_id]
+    )
+    context = next(
+        row
+        for row in result.context_by_work[work_id]
+        if row.get("observation_id") == "stolyarova_1991_printed_equilibrium_1"
+    )
+    assert context["values"]["equation_as_printed"] == "(WO3) = (WO2) + (O)"
+    assert context["values"]["description"] == (
+        "P_O is calculated from measured WO2 and WO3 partial pressures and the "
+        "equilibrium constant for the printed gas reaction (WO3) = (WO2) + "
+        "(O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated."
+    )
+    assert Counter(row.value.point for row in rows) == Counter(
+        Decimal(value)
+        for value in (
+            "0.000101325",
+            "0.000101325",
+            "0.000101325",
+            "0.000101325",
+            "0.000101325",
+            "0.00006890100",
+            "0.00006890100",
+            "0.00007498050",
+            "0.0000678877500000000101325",
+        )
+    )
+    for obs in rows:
+        assert obs.derivation is not None
+        assert obs.derivation.relation == "atm_to_Pa"
+        assert "WO3" not in obs.derivation.relation
+        assert obs.derived_from is None
+        assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert obs.evidence.attribution == "Stolyarova et al. (1991), Table Ib, Eq. [1]"
+
+
 def test_stolyarova_1991_composition_map_mutation_removes_identity(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
