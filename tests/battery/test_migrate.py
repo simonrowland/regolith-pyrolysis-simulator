@@ -62,6 +62,7 @@ from simulator.battery.migrate import (
     citation_hash,
     compilation_family_from_store_path,
     convert_area_to_m2,
+    convert_areal_mass_to_kg_per_m2,
     convert_mass_to_kg,
     convert_pressure_to_pa,
     convert_temperature_to_k,
@@ -5894,6 +5895,7 @@ _CENSUS_CLOSED_QUANTITIES = {
     "activity",
     "activity_coefficient",
     "evaporation_coefficient_alpha",
+    "mass_loss_areal_density",
     "mass_loss_fraction",
     "mass_loss_fraction_vs_T",
     "yield_fraction",
@@ -6014,6 +6016,10 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         if len(candidates) != 1:
             return None
         return _num(candidates[0][1])
+    if q_token == "mass_loss_areal_density":
+        amount = _num(item.get("mass_loss_areal_density"))
+        converted, _relation = convert_areal_mass_to_kg_per_m2(amount, units)
+        return converted
     if q_token == "transition_temperature":
         if "T_K" in item:
             return _num(item.get("T_K"))
