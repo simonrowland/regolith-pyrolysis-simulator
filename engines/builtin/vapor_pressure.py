@@ -60,6 +60,7 @@ from engines.antoine import _antoine_log10_pressure
 from engines.builtin._common import (
     composition_wt_pct_from_account_view,
     diagnostic_control_audit,
+    merge_species_amounts_from_accounts,
     reject_wrong_intent,
     resolve_request_vacuum_floor_bar,
     resolve_transport_pO2_bar,
@@ -2008,9 +2009,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             melt_dissociation_pO2_bar, melt_dissociation_pO2_clamped = (
                 physical_melt_dissociation_pO2_bar(float(intrinsic_fO2_log))
             )
-        from simulator.accounting.ledger import _merge_species_amounts_from_accounts
-
-        melt_account_mol = _merge_species_amounts_from_accounts(
+        melt_account_mol = merge_species_amounts_from_accounts(
             request.account_view.accounts, MELT_RESIDENT_ACCOUNTS)
         basis_view = ProviderAccountView(
             accounts={self.DECLARED_ACCOUNT: melt_account_mol},

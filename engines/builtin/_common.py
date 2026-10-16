@@ -92,6 +92,20 @@ def control_float(
     return float(value)
 
 
+def merge_species_amounts_from_accounts(
+    balances: Mapping[str, Mapping[str, float]],
+    accounts: Iterable[str],
+) -> dict[str, float]:
+    """Sum provider-view species amounts in account order and one unit."""
+    merged: dict[str, float] = {}
+    for account in accounts:
+        for species, value in (balances.get(account, {}) or {}).items():
+            amount = float(value)
+            if amount:
+                merged[species] = merged.get(species, 0.0) + amount
+    return merged
+
+
 def composition_wt_pct_from_account_view(
     view: ProviderAccountView,
     account: str,

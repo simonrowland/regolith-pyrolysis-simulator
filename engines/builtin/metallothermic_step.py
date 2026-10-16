@@ -133,6 +133,7 @@ from engines.builtin._common import (
     composition_kg_from_account_view,
     diagnostic_control_audit,
     dispatch_reaction_family,
+    merge_species_amounts_from_accounts,
     reject_wrong_intent,
     unpack_controls,
 )
@@ -326,14 +327,12 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 SPENT_REDUCTANT_RESIDUE_ACCOUNT,
             )
         )
-        from simulator.accounting.ledger import _merge_species_amounts_from_accounts
-
-        composition_kg = _merge_species_amounts_from_accounts(
+        composition_kg = merge_species_amounts_from_accounts(
             {MELT_RESIDENT_ACCOUNTS[0]: composition_kg,
              SPENT_REDUCTANT_RESIDUE_ACCOUNT: spent_residue_kg},
             MELT_RESIDENT_ACCOUNTS)
         total_kg += spent_residue_total_kg
-        composition_mol = _merge_species_amounts_from_accounts(
+        composition_mol = merge_species_amounts_from_accounts(
             request.account_view.accounts, MELT_RESIDENT_ACCOUNTS)
         composition_wt_pct = self._wt_pct_from_kg(composition_kg, total_kg)
         true_available_mol = self._true_available_mol_by_species(controls)
