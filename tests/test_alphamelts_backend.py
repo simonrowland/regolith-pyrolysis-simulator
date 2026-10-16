@@ -1681,7 +1681,7 @@ def test_activity_from_coefficients_pins_mixed_oxide_projection():
     assert gammas == {'SiO2': 1.0, 'FeO': 1.0}
 
 
-def test_oxide_mole_fractions_propagates_formula_resolution_key_error(
+def test_activities_from_coefficients_propagates_formula_resolution_key_error(
     monkeypatch,
 ):
     def fail_resolution(*_args, **_kwargs):
@@ -1693,7 +1693,9 @@ def test_oxide_mole_fractions_propagates_formula_resolution_key_error(
         fail_resolution,
     )
     with pytest.raises(KeyError, match='formula resolution defect'):
-        AlphaMELTSBackend()._oxide_mole_fractions({'SiO2': 50.0})
+        AlphaMELTSBackend()._activities_from_coefficients(
+            {'SiO2': 1.0}, {'SiO2': 50.0}
+        )
 
 
 @pytest.mark.parametrize(

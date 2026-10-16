@@ -5702,24 +5702,6 @@ class _MELTSBackendSupport(MeltBackend):
         self._vapor_pressure_table = table
         return table
 
-    def _oxide_mole_fractions(self, comp_wt: Mapping[str, float]) -> Dict[str, float]:
-        moles: Dict[str, float] = {}
-        for oxide, wt in comp_wt.items():
-            if not self._is_number(wt) or float(wt) <= 0.0:
-                continue
-            molar_mass = resolve_species_formula(
-                oxide, None).molar_mass_kg_per_mol()
-            if molar_mass > 0.0:
-                moles[str(oxide)] = float(wt) / molar_mass
-        total_moles = sum(moles.values())
-        if total_moles <= 0.0:
-            return {}
-        return {
-            oxide: mol / total_moles
-            for oxide, mol in moles.items()
-        }
-
-
 class AlphaMELTSBackend(_MELTSBackendSupport, RealBackendAuthority):
     """alphaMELTS subprocess/PetThermoTools backend."""
 
