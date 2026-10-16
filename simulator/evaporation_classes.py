@@ -45,7 +45,12 @@ _VAPOR_PRESSURES_PATH: Final[Path] = _REPO_ROOT / "data" / "vapor_pressures.yaml
 
 @lru_cache(maxsize=1)
 def _species_formula_registry() -> dict[str, Any]:
-    """Return the simulator's cached base catalog formula registry."""
+    """Return formulas for every species in the full catalog (cached).
+
+    This deliberately uses the unfiltered catalog. The simulator's base registry
+    drops rows with ``direct_vapour_flux: false``, which would refuse known
+    species in these diagnostics.
+    """
 
     return load_species_formulas(_SPECIES_CATALOG_PATH)
 
