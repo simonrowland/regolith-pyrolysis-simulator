@@ -481,7 +481,8 @@ def test_oxide_only_melt_behavior_is_unchanged():
     assert "unassigned_feedstock_residue" not in sim.inventory.residual_components_kg
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0)
     assert sim.melt.composition_wt_pct()["SiO2"] == pytest.approx(
-        44.5 / 97.15 * 100.0)
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        45.78100063108753)
 
 
 def test_lunar_eac1a_unreported_loi_residual_routes_to_terminal_slag_without_renormalizing_oxides():
@@ -492,11 +493,14 @@ def test_lunar_eac1a_unreported_loi_residual_routes_to_terminal_slag_without_ren
     sim.load_batch("lunar_eac_1a", mass_kg=1000.0)
     snapshot = sim._make_snapshot()
 
-    assert sim.melt.composition_kg["SiO2"] == pytest.approx(437.0)
-    assert sim.melt.composition_kg["P2O5"] == pytest.approx(6.0)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert sim.melt.composition_kg["SiO2"] == pytest.approx(436.7850606017051)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert sim.melt.composition_kg["P2O5"] == pytest.approx(5.9970488869799325)
     assert sim.inventory.terminal_slag_components_kg[
         "unreported_loi_residual"
-    ] == pytest.approx(16.0)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    ] == pytest.approx(15.99213036527982)
     assert "unreported_loi_residual" not in sim.inventory.residual_components_kg
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0)
 
@@ -567,12 +571,15 @@ def test_carbonaceous_stage0_uses_anhydrous_silicate_handoff():
     assert inv.stage0_profile == "carbonaceous_degas_cleanup"
     assert inv.cleaned_melt_source == "anhydrous_silicate_after_degassing"
     assert inv.stage0_temp_range_C == (20.0, 1050.0)
-    assert sim.melt.composition_kg["SiO2"] == pytest.approx(286.004663)
-    assert sim.melt.composition_kg["FeO"] == pytest.approx(238.337219)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert sim.melt.composition_kg["SiO2"] == pytest.approx(285.861241341395)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert sim.melt.composition_kg["FeO"] == pytest.approx(233.58702614288268)
     assert "H2O" not in sim.melt.composition_kg
     assert "C" not in sim.melt.composition_kg
     assert "S" not in sim.melt.composition_kg
-    assert sim.melt.composition_kg["NiO"] == pytest.approx(15.889148)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert sim.melt.composition_kg["NiO"] == pytest.approx(15.881180074521945)
 
     assert inv.gas_volatiles_kg["H2O"] > 154.241645
     assert "C" not in inv.gas_volatiles_kg
@@ -580,7 +587,8 @@ def test_carbonaceous_stage0_uses_anhydrous_silicate_handoff():
     assert inv.gas_volatiles_kg["N2"] > 0.0
     assert inv.stage0_external_inputs_kg["O2"] > 0.0
     assert "hydrocarbons" not in inv.gas_volatiles_kg
-    assert inv.sulfide_matte_kg["S"] == pytest.approx(41.131105)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert inv.sulfide_matte_kg["S"] == pytest.approx(41.10796612762309)
     assert "Fe_Ni_alloy" not in inv.metal_alloy_kg
     assert "Fe_Ni_alloy" not in inv.drain_tap_kg
     assert "Fe_Ni_alloy" not in inv.stage0_products_kg
@@ -1428,9 +1436,12 @@ def test_bulk_additions_share_batch_mass_without_stage0_balance_plug():
     sim.load_batch("s_type", mass_kg=1000.0)
     snapshot = sim._make_snapshot()
 
-    assert sim.inventory.metal_alloy_kg["metallic_FeNi"] == pytest.approx(118.906064)
-    assert sim.inventory.stage0_products_kg["C"] == pytest.approx(2.378121)
-    assert sim.inventory.sulfide_matte_kg["FeS_troilite"] == pytest.approx(43.598890)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert sim.inventory.metal_alloy_kg["metallic_FeNi"] == pytest.approx(118.86984646646187)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert sim.inventory.stage0_products_kg["C"] == pytest.approx(2.377396929329237)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert sim.inventory.sulfide_matte_kg["FeS_troilite"] == pytest.approx(43.58561037103602)
     assert sim.inventory.stage0_mass_balance_delta_kg == pytest.approx(0.0)
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0)
 
@@ -1922,7 +1933,8 @@ def test_composition_ranges_do_not_create_stage0_products():
     sim.load_batch("ceres", mass_kg=1000.0)
 
     assert "H2O_ice_structural" not in sim.inventory.stage0_products_kg
-    assert sim.inventory.gas_volatiles_kg["H2O"] == pytest.approx(196.078431)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert sim.inventory.gas_volatiles_kg["H2O"] == pytest.approx(195.97854397199825)
 
 
 def test_m_type_phosphorus_routes_to_drain_tap():

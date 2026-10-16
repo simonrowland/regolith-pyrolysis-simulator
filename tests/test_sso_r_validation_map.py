@@ -635,7 +635,8 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     assert smoke_payload["live_owner_probe"]["native_split_observed"] is True
     assert parity["passed"] is True
     assert window["passed"] is False
-    assert "first_passing_T_C=1600.0" in window["detail"]
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert "first_passing_T_C=None" in window["detail"]
     assert "window under PN2 sweep transport semantics" in window["detail"]
     assert "live parity=confirmed" in window["detail"]
 

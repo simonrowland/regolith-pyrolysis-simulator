@@ -59,10 +59,12 @@ from tests.binding_admission_fixtures import (
 )
 
 _DEFAULT_MELTS_REPLAY_KEY_HASH = (
-    "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e"
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    "ec6ced377d912e150c2f0c3175e04826c936a2c5fdd96a55fe9826340b2a0ed1"
 )
 _DEFAULT_MELTS_PROVIDER_KEY_HASH = (
-    "0435dada46c55b064f6593edae3fbbac9c556e00ea56807944400dccbc3bc30a"
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    "92fc79656800e2241ee477bb9ccc809e001ff025f4b519c9a0e03bb2e4bf87a1"
 )
 
 
@@ -634,7 +636,8 @@ def test_cached_real_identity_matches_live_alphamelts_identity(
         "magemin_database": None,
     }
     assert _key_hash(blank_key) == (
-        "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e"
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "ec6ced377d912e150c2f0c3175e04826c936a2c5fdd96a55fe9826340b2a0ed1"
     )
 
 
@@ -1047,8 +1050,10 @@ def test_current_cached_real_replay_key_bytes_and_live_result_shape(
                 model="MELTSv1.0.2",
                 mode="subprocess",
             ),
-            792,
-            "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e",
+            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+            795,
+            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+            "ec6ced377d912e150c2f0c3175e04826c936a2c5fdd96a55fe9826340b2a0ed1",
         ),
         (
             "alphamelts-python-api-normalized",
@@ -1060,8 +1065,10 @@ def test_current_cached_real_replay_key_bytes_and_live_result_shape(
                 model="",
                 mode="python_api",
             ),
-            792,
-            "6768a423ef0a7b5dc476f44ec34cd100a2dc685a29271ef1434731e6ee68b3ff",
+            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+            795,
+            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+            "d284853211aeda92f3afc1ad3d5aa33fb3ff594434c3668f967f30845422c761",
         ),
         (
             "thermoengine",
@@ -1074,8 +1081,10 @@ def test_current_cached_real_replay_key_bytes_and_live_result_shape(
                 mode="thermoengine",
                 family=RealBackendFamily.THERMOENGINE,
             ),
-            761,
-            "910db5e7dcb63560d952207f990bb0ae61800a17dc83dc3414440df08240886b",
+            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+            764,
+            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+            "a44311e9545c2aeda972f0e791fc4ce783574d5480625f4ba9fb34ba5158d3b2",
         ),
     )
 
@@ -1116,18 +1125,22 @@ def test_current_cached_real_replay_key_bytes_and_live_result_shape(
         "mode": "AlphaMELTSProvider",
         "magemin_database": None,
     }
-    assert len(direct_bytes) == 810
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert len(direct_bytes) == 813
     assert hashlib.sha256(direct_bytes).hexdigest() == (
-        "c1b77e3754d6d4bc7ebfc2d941dba750dbf08c2acbe18ebfbfcbbf8436361cfe"
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "80d3cf4a048bc0314ed4b9e23421b31281905d4c124d7fcc864bd1ecbf68f87f"
     )
 
     live_sim = _build_direct_real_sim(_FakeLiveRealBackend())
     live_result = live_sim._get_equilibrium()
     live_payload = equilibrium_payload(live_sim, live_result)
     live_payload_bytes = canonical_json_bytes(live_payload)
-    assert len(live_payload_bytes) == 2690
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+    assert len(live_payload_bytes) == 5556
     assert hashlib.sha256(live_payload_bytes).hexdigest() == (
-        "2e173b88b420ee27a678e0db649d8c521e8a164e1cc70a834feb5fcb2157ab46"
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        "ab7e2b90f23847d611439f3cd7f4853a12fdfdd68dfed5e88ecee159a1dd9e2f"
     )
     assert set(live_payload) == {
         "authority",

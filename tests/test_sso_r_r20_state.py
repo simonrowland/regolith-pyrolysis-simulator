@@ -3227,7 +3227,8 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     # from the bar form used with P[atm] to 0.0018583*sqrt(2). The resulting
     # finite-series-resistance escape fraction moved with D_AB.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0019750990648993625,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+        0.001975776438377251,
         rel=0.0,
         abs=1.0e-15,
     )
