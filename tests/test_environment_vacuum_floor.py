@@ -134,14 +134,63 @@ def test_explicit_feedstock_body_sets_run_vacuum_floor() -> None:
     assert sim._commanded_pO2_bar() == pytest.approx(MOON_VACUUM_FLOOR_BAR)
 
 
-def test_intrinsic_melt_fo2_clamp_lowers_to_vacuum_body_floor() -> None:
+@pytest.mark.parametrize(
+    ("temperature_K", "expected_inverse"),
+    [
+        (1000.0, -22.164650192134065),
+        (1673.15, -10.740754356453898),
+        (1873.15, -9.161574733594396),
+    ],
+)
+def test_intrinsic_melt_fo2_inverse_reports_below_feo_saturation(
+    temperature_K: float,
+    expected_inverse: float,
+) -> None:
+    from simulator.fe_redox import (
+        calphad_ferrous_feo_activity_diagnostic,
+        feo_iw_log10_fO2_bar,
+        floor_vacuum_pressure_bar,
+    )
+
     sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
 
-    default_clamped = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
-    sim.melt.body = "moon"
-    lunar_clamped = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
+    pressure_bar = floor_vacuum_pressure_bar(
+        sim.melt.p_total_mbar / 1000.0,
+        floor_bar=sim._vacuum_floor_bar(),
+    )
+    expected_activity = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=sim._melt_oxide_wt_pct(),
+        fO2_log=feo_iw_log10_fO2_bar(temperature_K),
+        T_K=temperature_K,
+        pressure_bar=pressure_bar,
+        fe3_over_sigma_fe=0.0,
+    )["a_FeO_authoritative"]
+    expected_iw_bound = feo_iw_log10_fO2_bar(
+        temperature_K,
+        a_feo=expected_activity,
+    )
 
-    assert default_clamped == pytest.approx(math.log10(DEFAULT_VACUUM_FLOOR_BAR))
-    assert lunar_clamped == pytest.approx(math.log10(MOON_VACUUM_FLOOR_BAR))
-    assert lunar_clamped < default_clamped
+    inventory = sim.atom_ledger.mol_by_account()
+    transition_count = len(sim.atom_ledger.transitions)
+    default_inverse = sim._compute_intrinsic_melt_fO2(temperature_K)
+    sim.melt.body = "moon"
+    lunar_inverse = sim._compute_intrinsic_melt_fO2(temperature_K)
+
+    assert default_inverse == pytest.approx(expected_inverse, abs=1e-12)
+    assert lunar_inverse == pytest.approx(default_inverse, abs=1e-12)
+    assert sim.atom_ledger.mol_by_account() == inventory
+    assert len(sim.atom_ledger.transitions) == transition_count
+
+    notice = next(
+        item
+        for item in sim._redox_source_breakdown_diagnostic()[
+            "pressure_ceiling_notices"
+        ]
+        if item["flag"] == "REDOX_BELOW_FE_FEO_SATURATION"
+        and item["melt_potential"] == pytest.approx(default_inverse)
+    )
+    assert notice["melt_potential"] == pytest.approx(default_inverse)
+    assert notice["iw_bound"] == pytest.approx(expected_iw_bound)
+    assert notice["a_feo"] == pytest.approx(expected_activity)
+    assert default_inverse < notice["iw_bound"]
