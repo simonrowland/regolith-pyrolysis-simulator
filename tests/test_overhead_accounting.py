@@ -2019,6 +2019,30 @@ def test_declared_co2_fraction_does_not_supply_unspecified_atmosphere(enabled):
     assert gas.pressure_mbar == pytest.approx(5.76)
 
 
+def test_live_controlled_inlet_keeps_supplied_o2_above_ledger_only_telemetry():
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, MeltState
+
+    melt = MeltState(
+        atmosphere=Atmosphere.CONTROLLED_O2, pO2_mbar=2.0, p_total_mbar=10.0,
+        background_gas_species="Ar", background_gas_mole_fraction=1.0,
+    )
+    model = OverheadGasModel({"enabled": False})
+    inlet = EvaporationFlux(species_kg_hr={"Fe": 1.0e-6})
+    inlet.update_totals()
+    model.flowing_stream_mol_hr(
+        {"Fe": 1.0e-6}, melt,
+        model.estimate_transport_state(inlet, melt, p_downstream_bar=0.0),
+    )
+    gas = model.update(
+        EvaporationFlux(), melt, CondensationTrain.create_default(),
+        actual_O2_mol_hr=1.0e-9, transport_inlet_flux=inlet,
+        p_downstream_bar=0.0,
+    )
+    assert gas.composition["O2"] == pytest.approx(2.0)
+    assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar)
+
+
 @pytest.mark.parametrize("atmosphere,carrier", [
     (Atmosphere.PN2_SWEEP, "N2"),
     (Atmosphere.ARGON_FLOW, "Ar"),
