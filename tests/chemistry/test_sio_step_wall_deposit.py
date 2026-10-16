@@ -243,7 +243,8 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux(monkeypatch):
     # 2026-10-15 b-894 r4: r3's O2 exchange clamp shifts melt fO2 and SiO wall flux.
     try:
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            8.191790844919e-06, rel=1e-9
+            # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at b79c826d8
+            7.648561386552e-06, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9
