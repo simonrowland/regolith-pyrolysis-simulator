@@ -3442,6 +3442,7 @@ def cell_notices(
     cell: object,
 ) -> tuple[Notice, ...]:
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        AUTHORITY_EXTRAPOLATED,
         AUTHORITY_FALLBACK,
         _FLOOR_INVERSION_REASON,
     )
@@ -3453,13 +3454,37 @@ def cell_notices(
             continue
         kind = str(row.get("kind") or "")
         if _row_out_of_certified_band(kind, row):
+            raw_band = row.get("certified_band") or row.get("band")
+            band = str(raw_band or "")
+            if kind == "openimcc_temperature_extrapolated" and isinstance(
+                raw_band, Mapping
+            ):
+                intervals = _interval_certified_band(raw_band)
+                temperature_band = (
+                    None if intervals is None else intervals.get("temperature_K")
+                )
+                if temperature_band is not None:
+                    band = (
+                        f"[{temperature_band[0]:g}, {temperature_band[1]:g}] K"
+                    )
+            reason = row.get("gate_reason")
+            if reason is None:
+                reason = row.get("reason")
+            if reason is None:
+                reason = kind
             notices.append(
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                     affected_quantities=(quantity,),
-                    reason=str(row.get("gate_reason") or row.get("reason") or kind),
+                    reason=str(reason),
                     origin=f"engine:{engine.value}",
-                    band=str(row.get("certified_band") or row.get("band") or ""),
+                    band=band,
+                    authority=(
+                        Authority.EXTRAPOLATED
+                        if kind == "openimcc_temperature_extrapolated"
+                        and row.get("authority") == AUTHORITY_EXTRAPOLATED
+                        else None
+                    ),
                 )
             )
         elif kind == "floor_inversion":

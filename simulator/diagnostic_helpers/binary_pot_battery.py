@@ -1068,6 +1068,13 @@ def engine_flags_from_result(
         notices.append(copied)
         if authority is None and copied.get("authority"):
             authority = str(copied["authority"])
+        band = copied.get("certified_band")
+        if (
+            certified_band is None
+            and copied.get("kind") == "openimcc_temperature_extrapolated"
+            and isinstance(band, Mapping)
+        ):
+            certified_band = dict(band)
     return notices, authority, certified_band
 
 
@@ -1900,13 +1907,28 @@ class _OpenImccBatteryBackend:
             )
         )
         if result.extrapolated:
-            notices.append(
-                {
-                    "kind": "openimcc_temperature_extrapolated",
-                    "authority": AUTHORITY_EXTRAPOLATED,
-                    "reason": "T outside openimcc datapack domain; evaluate(allow_extrapolation=True)",
-                }
+            domains = self._pack.kernel_datapack.domains
+            certified_domain = (
+                (
+                    max(float(domain[0]) for domain in domains),
+                    min(float(domain[1]) for domain in domains),
+                )
+                if domains
+                else None
             )
+            package_notices = tuple(
+                str(notice) for notice in (result.labels.notices or ())
+            )
+            extrapolation_notice: dict[str, Any] = {
+                "kind": "openimcc_temperature_extrapolated",
+                "authority": AUTHORITY_EXTRAPOLATED,
+                "reason": "; ".join(package_notices),
+            }
+            if certified_domain is not None:
+                extrapolation_notice["certified_band"] = {
+                    "temperature_K": list(certified_domain)
+                }
+            notices.append(extrapolation_notice)
             authority = AUTHORITY_EXTRAPOLATED
         if result.envelope_status != "inside":
             notices.append(

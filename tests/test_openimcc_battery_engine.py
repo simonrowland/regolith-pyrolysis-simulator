@@ -23,6 +23,7 @@ from simulator.battery.enums import (
     PerBasis,
     MetricOperation,
     Quantity,
+    Rail,
     RefusalReason,
     ResidualStatus,
 )
@@ -1411,6 +1412,104 @@ def test_openimcc_domain_policy_flags_extrapolation() -> None:
     assert any(
         str(row.get("authority")) == "extrapolated" for row in current.notices
     )
+
+
+def test_openimcc_below_floor_real_melt_activity_has_extrapolation_flag(
+    monkeypatch,
+) -> None:
+    _require_openimcc()
+    import openimcc
+    from simulator.melt_backend import openimcc_bridge
+
+    observation_id = (
+        "kems-ms2000-044::"
+        "ms2000_044_sio2_activity_k_system_xsio2_0543_t1473_class_quote_r2"
+    )
+    context = load_score_context(sources=("kems-ms2000-044",))
+    reference = context.observations[observation_id]
+    focused_context = replace(context, observations={observation_id: reference})
+    bridge_calls = []
+    package_bridge_evaluate = openimcc_bridge.evaluate
+
+    def capture_bridge_call(**kwargs):
+        bridge_calls.append(dict(kwargs))
+        return package_bridge_evaluate(**kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", capture_bridge_call)
+    residuals, candidates = score_store(
+        focused_context,
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.MELT_ACTIVITY,
+    )
+    residual = next(row for row in residuals if row.reference == observation_id)
+    assert residual.numeric is not None
+    candidate = candidates[residual.candidate]
+    assert candidate.value.point is not None
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.origin == "engine:openimcc"
+    )
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.band == "[1700, 3000] K"
+    assert candidate.authority is Authority.EXTRAPOLATED
+    assert candidate.certified_band == {
+        "temperature_K": (Decimal("1700.0"), Decimal("3000.0"))
+    }
+
+    assert len(bridge_calls) == 1
+    call = bridge_calls[0]
+    assert call["temperature_K"] < 1700.0
+    assert call["allow_extrapolation"] is True
+    package_result = openimcc.evaluate(
+        call["composition_mol"],
+        call["temperature_K"],
+        pack=openimcc_bridge._load_pack(call["pack"]),
+        basis_type="mol",
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    direct_activity = dict(
+        zip(
+            package_result.parent_oxides,
+            package_result.parent_activity,
+            strict=True,
+        )
+    )["SiO2"]
+    assert float(candidate.value.point) == pytest.approx(direct_activity, rel=1e-9)
+    assert notice.reason == "; ".join(package_result.labels.notices)
+
+
+def test_openimcc_extrapolation_reason_preserves_package_notice(monkeypatch) -> None:
+    _require_openimcc()
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+    from simulator.melt_backend import openimcc_bridge
+
+    package_notice = "openimcc:typed-below-domain-notice:preserve-this-text"
+    evaluate = openimcc_bridge.evaluate
+
+    def evaluate_with_package_notice(**kwargs):
+        result = evaluate(**kwargs)
+        return replace(
+            result,
+            labels=replace(result.labels, notices=(package_notice,)),
+        )
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", evaluate_with_package_notice)
+    backend = _OpenImccBatteryBackend("openimcc")
+    result = backend.equilibrate(
+        temperature_C=1600.0 - 273.15,
+        composition_mol={"K2O": 0.457, "SiO2": 0.543},
+    )
+    extrapolation_notice = next(
+        row
+        for row in result.diagnostics["imcc_notices"]
+        if row["kind"] == "openimcc_temperature_extrapolated"
+    )
+    assert extrapolation_notice["reason"] == package_notice
 
 
 def test_openimcc_plante_candidates_match_mole_basis_package() -> None:
