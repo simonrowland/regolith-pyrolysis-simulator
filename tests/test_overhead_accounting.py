@@ -1725,6 +1725,7 @@ def test_step_overhead_composition_uses_real_condensation_residual():
     def _spy_update(overhead_flux, *args, **kwargs):
         seen["flux"] = overhead_flux
         seen["transport_inlet_kg_hr"] = kwargs["transport_inlet_kg_hr"]
+        seen["actual_O2_mol_hr"] = kwargs["actual_O2_mol_hr"]
         return real_update(overhead_flux, *args, **kwargs)
 
     sim.overhead_model.update = _spy_update
@@ -1742,11 +1743,19 @@ def test_step_overhead_composition_uses_real_condensation_residual():
     assert sim.overhead.transport_saturation_pct == pytest.approx(
         expected_saturation_pct
     )
-    residual_transport = sim.overhead_model.estimate_transport_state(
-        seen["flux"], sim.melt
+    # Premise: the residual outlet contains Fe vapour and real melt O2.
+    # Dalton: p_Fe / P_total = n_Fe / (n_Fe + n_O2). Convert Fe kg/hr
+    # / (g/mol / 1000 g/kg) -> mol/hr; the flow ratio is dimensionless,
+    # so P_total [mbar] times that ratio is p_Fe [mbar]. As O2 -> 0,
+    # the pure-Fe limit is p_Fe -> P_total.
+    fe_mol_hr = residual_kg / (MOLAR_MASS["Fe"] / 1000.0)
+    o2_mol_hr = seen["actual_O2_mol_hr"]
+    assert o2_mol_hr > 0.0
+    expected_fe_mbar = (
+        sim.overhead.pressure_mbar * fe_mol_hr / (fe_mol_hr + o2_mol_hr)
     )
     assert sim.overhead.composition["Fe"] == pytest.approx(
-        residual_transport["vapor_pressure_mbar"]
+        expected_fe_mbar
     )
 
 
