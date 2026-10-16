@@ -2184,6 +2184,90 @@ def test_hard_vacuum_actual_total_reaches_both_pressure_consumers(accessor):
         ) == pytest.approx(gas.pressure_mbar * 100.0)
 
 
+@pytest.mark.parametrize("carrier,total_mbar,o2_mbar", [("", 1.5, 1.5), ("Ar", 10.0, 2.0)])
+def test_closed_finite_headspace_is_the_melt_surface_state(
+    monkeypatch, carrier, total_mbar, o2_mbar,
+):
+    sim = _gas_train_sim()
+    sim._overhead_headspace_config = {"enabled": True, "volume_m3": 1.0}
+    sim.overhead_model.configure_headspace(sim._overhead_headspace_config)
+    sim.melt.campaign = CampaignPhase.C2B
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.temperature_C = 100.0
+    sim.melt.p_total_mbar = total_mbar
+    sim.melt.pO2_mbar = o2_mbar
+    sim.melt.background_gas_species = carrier
+    sim.melt.background_gas_mole_fraction = 1.0
+    monkeypatch.setattr(sim, "_update_temperature", lambda: None)
+    monkeypatch.setattr(sim, "_apply_native_fe_saturation_split", lambda **kw: None)
+    monkeypatch.setattr(sim, "_get_equilibrium", lambda: object())
+    monkeypatch.setattr(sim, "_calculate_evaporation", lambda eq: EvaporationFlux())
+    monkeypatch.setattr(sim.campaign_mgr, "check_endpoint", lambda *a, **kw: False)
+
+    for hour in range(1, 13):
+        snapshot = sim.step()
+        assert not any(sim.overhead_model.last_stream_mol_hr.values())
+        assert snapshot.overhead.headspace_volume_m3 == 1.0
+        assert snapshot.overhead.pressure_mbar == pytest.approx(total_mbar)
+        assert snapshot.overhead.composition["O2"] == pytest.approx(o2_mbar)
+        assert snapshot.melt_headspace_composition_mbar == snapshot.overhead.composition
+        assert sim._melt_headspace_total_pressure_bar() == pytest.approx(
+            snapshot.overhead.pressure_mbar / 1000.0
+        )
+        assert sim._evaporation_bulk_partial_pressure_pa("O2") == pytest.approx(
+            snapshot.overhead.composition["O2"] * 100.0
+        )
+        partials_pa = {s: p * 100.0 for s, p in snapshot.melt_headspace_composition_mbar.items()}
+        assert sim._evaporation_overhead_total_pressure_Pa(partials_pa) == pytest.approx(
+            snapshot.overhead.pressure_mbar * 100.0
+        )
+
+
+def test_finite_melt_surface_counts_retained_and_emitted_gas_once(monkeypatch):
+    sim = _gas_train_sim()
+    sim._overhead_headspace_config = {
+        "enabled": True, "volume_m3": 1.0, "downstream_pressure_bar": 0.0015,
+        "conductance_kg_s": 0.0,
+    }
+    sim.overhead_model.configure_headspace(sim._overhead_headspace_config)
+    sim.melt.campaign = CampaignPhase.C2B
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.temperature_C = 100.0
+    sim.melt.p_total_mbar = sim.melt.pO2_mbar = 1.5
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas", {"O2": 0.1, "Fe": 0.1},
+        source="test retained headspace gas", material_origin="feedstock",
+    )
+    flux = EvaporationFlux(species_kg_hr={"Fe": 1.0})
+    flux.update_totals()
+    monkeypatch.setattr(sim, "_update_temperature", lambda: None)
+    monkeypatch.setattr(sim, "_apply_native_fe_saturation_split", lambda **kw: None)
+    monkeypatch.setattr(sim, "_get_equilibrium", lambda: object())
+    monkeypatch.setattr(sim, "_calculate_evaporation", lambda eq: flux)
+    _bypass_analytic_depletion(sim)
+    monkeypatch.setattr(
+        sim.condensation_model, "route",
+        lambda *a: CondensationRouteResult(
+            remaining_by_species={"Fe": 0.5},
+            condensed_by_stage_species={1: {"Fe": 0.5}},
+        ),
+    )
+
+    snapshot = sim.step()
+    inventory = sim._overhead_holdup_mol()
+    assert inventory["Fe"] == pytest.approx(0.1 + 0.5 / (MOLAR_MASS["Fe"] / 1000.0))
+    assert inventory["O2"] > 0.0
+    expected = {
+        s: p * 1000.0 for s, p in sim.overhead_model._compute_partial_pressures(
+            inventory, snapshot.overhead.headspace_volume_m3,
+            snapshot.overhead.headspace_temperature_K,
+        ).items()
+    }
+    assert snapshot.melt_headspace_composition_mbar == pytest.approx(expected)
+    assert snapshot.overhead.composition == pytest.approx(expected)
+    assert snapshot.overhead.pressure_mbar > sim.melt.p_total_mbar
+
+
 def test_evaporation_request_includes_actual_noncondensable_pressure():
     sim = _install_passthrough_vapour_batch(_gas_train_sim())
     sim.melt.atmosphere = Atmosphere.HARD_VACUUM

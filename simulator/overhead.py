@@ -1465,6 +1465,15 @@ class OverheadGasModel:
                               flows_mol_hr=dict(flows))
         return flows
 
+    def _melt_surface_partial_pressures(
+        self, gas: OverheadGas, flowing_partials_mbar: Mapping[str, float],
+    ) -> dict[str, float]:
+        # Finite stock occupies the melt-to-turbine headspace, not a supply
+        # tank. Its achieved nRT/V includes retained gas and regulator makeup;
+        # zero outlet mol/hr cannot make that gas disappear. The finite report
+        # already owns this projection. Flowing mode has no retained volume.
+        return dict(gas.composition if self._finite_headspace_enabled else flowing_partials_mbar)
+
     def _update_stream_carrier_inventory(
         self, carrier: str, n_now: float, outlet_mol_hr: float,
         melt: MeltState, holdup_mol: Mapping[str, float],

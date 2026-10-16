@@ -14193,9 +14193,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             effective_transport_capacity=effective_transport_capacity,
         )
         self._install_upstream_projection(
-            self._flowing_stream_partial_pressures(
-                evap_flux, upstream_transport,
-                holdup_mol=self._stream_inlet_holdup_this_tick,
+            self.overhead_model._melt_surface_partial_pressures(
+                self.overhead,
+                self._flowing_stream_partial_pressures(
+                    evap_flux, upstream_transport,
+                    holdup_mol=self._stream_inlet_holdup_this_tick,
+                ),
             )
         )
         # This chunk diagnoses the uncoupled source bound; no clamp or flux

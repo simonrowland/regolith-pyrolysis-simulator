@@ -1154,11 +1154,10 @@ class EvaporationMixin:
         )
 
         # Overhead backpressure (Pa)                       [LOOP-1]
-        # Uses the previous hour's upstream melt-headspace/duct partials as
-        # backpressure. ``overhead.composition`` is the physically distinct
-        # post-condensation report, so near-total capture must not erase P_bulk
-        # above the melt. Gas pO2 has already been applied once upstream in
-        # the equilibrium vapor pressures consumed here.
+        # The overhead owner supplies the previous hour's melt-surface state:
+        # achieved nRT/V stock in finite mode, inlet stream partials in flowing
+        # mode. A zero outlet flow cannot erase finite gas over the melt.
+        # Gas pO2 has already been applied once in the equilibrium pressures.
         overhead_partials_Pa = (
             {
                 str(species): max(0.0, float(value))
