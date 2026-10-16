@@ -66,7 +66,7 @@ def _post_removal(probe, n):
         comp_wt=comp, T_K=controls['T_K'],
         pressure_bar=controls['pressure_bar'], fO2_log=value,
         fe3_over_sigma_fe=2*ferric/(feo-n+2*ferric))['a_FeO_authoritative']
-    bound = fe_redox.feo_iw_log10_fO2_bar(controls['T_K'], a_feo=activity)
+    bound = fe_redox._feo_activity_saturation_log10_fO2_bar(controls['T_K'], a_feo=activity)
     return value, bound
 
 
@@ -79,9 +79,19 @@ def _solve(probe, gas=lambda n: -300.):
         pressure_bar=controls['pressure_bar'], gas_fO2_log=gas)
 
 
-def test_melt_root_matches_independent_bisection_and_stops_at_bound(probe):
+@pytest.mark.parametrize('ferric_factor', [1., 0.1])
+def test_melt_root_matches_independent_bisection_and_stops_at_bound(probe, ferric_factor):
+    # The corrected standard-state pairing moves the historical probes above
+    # saturation. Retain those no-op cases, and reduce their ferric inventory
+    # explicitly to exercise actual precipitation against the corrected bound.
+    probe[0].atom_ledger.mol_by_account('process.cleaned_melt')['Fe2O3'] *= ferric_factor
+    probe[1]['comp']['Fe2O3'] *= ferric_factor
     result = _solve(probe)
     assert fe_redox.melt_mol_fractions_for_kress91(probe[1]['comp'])['FeOt'] <= 0.2
+    if result['native_fe_mol'] == 0.:
+        value, bound = _post_removal(probe, 0.)
+        assert value >= bound
+        return
     feo = probe[0].atom_ledger.mol_by_account('process.cleaned_melt')['FeO']
     lo, hi = 0., math.nextafter(feo, 0.)
     for _ in range(80):
@@ -104,6 +114,9 @@ def test_gas_unfavourable_boundary_prevents_precipitation(probe):
 
 
 def test_finite_gas_capacity_stops_at_gas_root(probe):
+    probe[0].atom_ledger.mol_by_account('process.cleaned_melt')['Fe2O3'] *= 0.1
+    probe[1]['comp']['Fe2O3'] *= 0.1
+    # Receiver RT/(V*1e5)=1 bar/mol O2; n/2 mol O2 therefore adds n/2 bar.
     gas = lambda n: math.log10(1e-12 + n/2)
     result = _solve(probe, gas=gas)
     n = result['native_fe_mol']
@@ -140,6 +153,7 @@ def test_provider_split_closes_atoms_and_records_committed_event(monkeypatch, fi
     if not finite_gas:
         monkeypatch.setattr(sim, '_headspace_ledger_pO2_bar_from_o2_mol', lambda n: 0.)
     before = dict(sim.atom_ledger.mol_by_account('process.cleaned_melt'))
+    transition_start = len(sim.atom_ledger.transitions)
     expected = sim._compute_native_fe_saturation_extent()
     assert expected['native_fe_mol'] > 0.
     sim._apply_native_fe_saturation_split()
@@ -150,6 +164,12 @@ def test_provider_split_closes_atoms_and_records_committed_event(monkeypatch, fi
     assert notice['flag'] == 'NATIVE_FE_PRECIPITATION'
     assert notice['limit'] == ('gas' if finite_gas else 'melt')
     assert after['Fe2O3'] == before['Fe2O3']
+    for transition in sim.atom_ledger.transitions[transition_start:]:
+        debit = transition.debit_atom_moles(sim.atom_ledger.registry)
+        credit = transition.credit_atom_moles(sim.atom_ledger.registry)
+        for element, amount in debit.items():
+            # mol-atoms/mol-atoms is dimensionless; multiply by 100 for %.
+            assert 100*abs(credit.get(element, 0.)-amount)/amount <= 5e-12
     if finite_gas:
         head = sim.atom_ledger.mol_by_account('process.overhead_gas').get('O2', 0.)
         assert sim._headspace_ledger_pO2_bar_from_o2_mol(head) < 1e-6

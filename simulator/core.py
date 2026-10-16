@@ -428,7 +428,6 @@ from simulator.fe_redox import (
     _kress91_exchange_uptake_mol,
     _reanchor_redox_state,
     calphad_ferrous_feo_activity_diagnostic,
-    feo_iw_log10_fO2_bar,
     feot_equivalent_wt_pct,
     floor_vacuum_pressure_bar,
     kress91_intrinsic_state,

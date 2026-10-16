@@ -101,7 +101,9 @@ def test_exhausted_ferric_inventory_has_an_activity_corrected_iw_lower_bound():
         mol_fractions=melt_mol_fractions_for_kress91(comp),
         composition_wt_pct=comp, T_K=T_K, pressure_bar=0.01,
         exchange_fO2_log=-9.0)
-    assert result['fO2_log'] == feo_iw_log10_fO2_bar(T_K, a_feo=activity)
+    # The activity is stoichiometric FeO; Eq. 9's pure reference is wustite.
+    multiplier = holzheid_stoich_feo_gamma_band(T_K)['conversion_multiplier']
+    assert result['fO2_log'] == feo_iw_log10_fO2_bar(T_K, a_feo=activity/multiplier)
     assert result['bound'] == 'lower'
     assert 'FE_FEO_SATURATION_BOUND' in result['flags']
     assert result['fO2_log'] != -9.0

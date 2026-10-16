@@ -497,6 +497,7 @@ def holzheid_feo_liquid_delta_g_j_mol(T_K: float) -> float:
 
 
 def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
+    """Holzheid Eq. 9 wustite-liquid reference (including formation buffers)."""
     activity = max(float(a_feo), 1.0e-300)
     R = 8.31446261815324
     ln_fO2 = 2.0 * (
@@ -504,6 +505,18 @@ def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
         + holzheid_feo_liquid_delta_g_j_mol(T_K) / (R * float(T_K))
     )
     return ln_fO2 / math.log(10.0)
+
+
+def _feo_activity_saturation_log10_fO2_bar(T_K: float, *, a_feo: float) -> float:
+    """Fe saturation for the activity owner's stoichiometric-FeO standard."""
+    multiplier = float(holzheid_stoich_feo_gamma_band(T_K)['conversion_multiplier'])
+    # Premise: gamma_s=m*gamma_w; mu_w^0+RT ln(a_w)=mu_s^0+RT ln(a_s).
+    # Thus dG_s=dG_w-RT ln(m), and ln(a_s)+dG_s/(RT) equals
+    # ln(a_s/m)+dG_w/(RT). Evaluate through the unchanged wustite owner.
+    # Both logarithm arguments and m are dimensionless; RT ln(m) is J/mol.
+    # m=1 recovers the original reference. At 1673.15 K, m=1.94 removes
+    # the erroneous +2 log10(1.94)=0.575603 dex, without tuning gamma.
+    return feo_iw_log10_fO2_bar(T_K, a_feo=float(a_feo) / multiplier)
 
 
 # This identifier follows the coded line's wustite-liquid standard. Holzheid
@@ -970,7 +983,7 @@ def _native_fe_saturation_comparison(
         # The ONE native-saturation basis selection inherits t-1293's open
         # X versus gamma X question. Preserve the existing activity owner.
         a_feo = float(activity.get('a_FeO_authoritative', 0.0) or 0.0)
-        pure_feo_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
+        pure_feo_iw = _feo_activity_saturation_log10_fO2_bar(T_K, a_feo=1.0)
     except Exception as exc:
         raise AccountingError(
             'native Fe saturation split requires grounded FeO activity; '
@@ -993,7 +1006,7 @@ def _native_fe_saturation_comparison(
         a_feo_saturation = 0.0
     else:
         a_feo_saturation = 10.0 ** saturation_log10
-    bound = feo_iw_log10_fO2_bar(T_K, a_feo=a_feo)
+    bound = _feo_activity_saturation_log10_fO2_bar(T_K, a_feo=a_feo)
     # Exact trigger; no uncertainty/tolerance band (t-1293 remains open).
     gap = float(fO2_log) - bound
     return {
@@ -1176,7 +1189,7 @@ def kress91_intrinsic_state(
         # Below this lower bound metallic Fe can form; zero ferric inventory
         # cannot specify a finite Kress potential. This is a stability bound,
         # not an equilibrium assignment to the vacuum or the headspace gas.
-        value = feo_iw_log10_fO2_bar(T_K, a_feo=a_feo)
+        value = _feo_activity_saturation_log10_fO2_bar(T_K, a_feo=a_feo)
         bound = 'lower'
         flags.append('FE_FEO_SATURATION_BOUND')
     elif feo_mol == 0.0 or fe2o3_mol == 0.0:
@@ -1224,7 +1237,7 @@ def kress91_intrinsic_state(
             # Sanity: a_FeO=1 recovers IW; a_FeO<1 lowers the bound.
             state.update(
                 a_feo=a_feo,
-                iw_bound=feo_iw_log10_fO2_bar(T_K, a_feo=a_feo),
+                iw_bound=_feo_activity_saturation_log10_fO2_bar(T_K, a_feo=a_feo),
             )
     return state
 
@@ -1641,15 +1654,19 @@ def _calphad_feo_activity_components(
             },
         },
         'metal_saturation_tie_point': {
-            'iw_pure_feo_log10_fO2_bar': pure_feo_iw,
+            # Blend weights above retain their declared wustite reference;
+            # all coexistence tiepoints use the activity's stoichiometric one.
+            'iw_pure_feo_log10_fO2_bar': (
+                _feo_activity_saturation_log10_fO2_bar(T_K, a_feo=1.0)
+            ),
             'central_melt_metal_saturation_log10_fO2_bar': (
-                feo_iw_log10_fO2_bar(T_K, a_feo=max(central, 1.0e-300))
+                _feo_activity_saturation_log10_fO2_bar(T_K, a_feo=max(central, 1.0e-300))
             ),
             'current_melt_metal_saturation_log10_fO2_bar': (
-                feo_iw_log10_fO2_bar(T_K, a_feo=max(authoritative, 1.0e-300))
+                _feo_activity_saturation_log10_fO2_bar(T_K, a_feo=max(authoritative, 1.0e-300))
             ),
             'kress91_melt_metal_saturation_log10_fO2_bar': (
-                feo_iw_log10_fO2_bar(T_K, a_feo=max(kress91_activity, 1.0e-300))
+                _feo_activity_saturation_log10_fO2_bar(T_K, a_feo=max(kress91_activity, 1.0e-300))
             ),
             'central_melt_saturation_offset_from_iw_pure_feo_log10_fO2': (
                 2.0 * math.log10(max(central, 1.0e-300))
@@ -1661,9 +1678,9 @@ def _calphad_feo_activity_components(
                 2.0 * math.log10(max(kress91_activity, 1.0e-300))
             ),
             'iw_basis_note': (
-                'IW axis is pure FeO(l), a_FeO=1. A melt with a_FeO<1 reaches '
-                'a_Fe=1 at log10(fO2) lower by 2*log10(a_FeO_melt); the '
-                'self-consistent melt-a_FeO saturation anchor is deferred.'
+                'Coexistence axis is pure stoichiometric FeO(l), a_FeO=1, '
+                'paired with dG_s=dG_w-RT ln(m). A melt with a_FeO<1 reaches '
+                'a_Fe=1 lower by 2*log10(a_FeO_melt).'
             ),
             'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['holzheid_dg_feo_l'],
         },
