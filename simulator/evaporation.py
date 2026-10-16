@@ -1182,6 +1182,9 @@ class EvaporationMixin:
                 equilibrium,
                 overhead_partials_Pa=overhead_partials_Pa,
                 overhead_pressure_pa=(
+                    self._melt_headspace_total_pressure_bar() * 1.0e5
+                    if overhead_partials_override_Pa is not None
+                    else
                     EvaporationMixin._evaporation_overhead_total_pressure_Pa(
                         self,
                         overhead_partials_Pa,

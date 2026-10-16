@@ -41,7 +41,9 @@ def test_stage0_lunar_feedstock_uses_hard_vacuum():
     )
 
     sim.load_batch("lunar")
+    assert sim._melt_headspace_total_pressure_bar() == 0.0
     sim.start_campaign(CampaignPhase.C0)
+    assert sim._melt_headspace_total_pressure_bar() == 0.0
 
     assert sim.melt.atmosphere is Atmosphere.HARD_VACUUM
     assert sim.melt.p_total_mbar == 0.0
@@ -61,7 +63,9 @@ def test_stage0_mars_feedstock_uses_surface_co2_backpressure():
     )
 
     sim.load_batch("mars")
+    assert sim._melt_headspace_composition_mbar == {"CO2": 5.76, "ambient_other": 0.24}
     sim.start_campaign(CampaignPhase.C0)
+    assert sim._melt_headspace_composition_mbar == {"CO2": 5.76, "ambient_other": 0.24}
     snapshot = sim.step()
 
     assert sim.melt.atmosphere is Atmosphere.CO2_BACKPRESSURE

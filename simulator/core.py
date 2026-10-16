@@ -1566,7 +1566,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._apply_stage0_carbon_reductant_reactions(fs, ledger_additives)
         self._apply_stage0_perchlorate_reactions(fs)
         # Stage 0 reads these conditions and reservoir while seeding the ledger.
-        self._install_upstream_projection({})
         self.melt.temperature_C = 25.0
         self.melt.atmosphere = Atmosphere.HARD_VACUUM
         environment = fs.get('environment', {}) or {}
@@ -1578,6 +1577,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.body = feedstock_body(fs)
         self.melt.p_total_mbar = self.melt.ambient_pressure_mbar
         self.melt.pO2_mbar = 0.0
+        if self.melt.ambient_pressure_mbar > 0.0:
+            self.melt.atmosphere = Atmosphere.CO2_BACKPRESSURE
+        self.train = CondensationTrain.create_default()
+        self.overhead = OverheadGas()
+        self._overhead_model = None
+        self._equipment = None
+        self.melt.hour = 0
+        self._configure_overhead_headspace()
+        self._install_initial_upstream_projection({})
         base_intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
         self.melt.fO2_log = base_intrinsic_fO2_log
         self.melt.melt_fO2_log = base_intrinsic_fO2_log
@@ -1608,9 +1616,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.campaign_hour = 0
         self.melt.update_total_mass()
 
-        # Reset condensation train
-        self.train = CondensationTrain.create_default()
-        self.overhead = OverheadGas()
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
         self._last_vapour_batch = None
@@ -3552,6 +3557,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> None:
         """Install actual upstream partials, the source of the derived total."""
         self._melt_headspace_composition_mbar = vector_mbar
+
+    def _install_initial_upstream_projection(
+        self, holdup_mol: Mapping[str, float],
+    ) -> None:
+        # Before the first evaporation solve, the regulator/ambient has already
+        # filled the headspace. Use the same owner closure as the hourly report;
+        # a pressure command alone does not establish gas in hard vacuum.
+        initial_gas = self.overhead_model.update(
+            EvaporationFlux(), self.melt, self.train,
+            overhead_holdup_mol=holdup_mol,
+            headspace_volume_m3=self._headspace_volume_m3(),
+            p_downstream_bar=self._headspace_downstream_pressure_bar(),
+        )
+        self._install_upstream_projection(dict(initial_gas.composition))
 
     def _melt_headspace_total_pressure_bar(self) -> float:
         upstream_partials_mbar = getattr(
@@ -7060,8 +7079,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return dict(rates_cache[cache_key])
             iteration_controls = dict(controls)
             iteration_controls['overhead_partials_Pa'] = dict(partials_Pa)
+            # The Picard map contains species backpressures, not regulator
+            # stock. The installed owner state supplies the absolute pressure
+            # for the gas-resistance/Kn gate, including the initial fill.
             iteration_controls['overhead_pressure_pa'] = (
-                self._evaporation_overhead_total_pressure_Pa(partials_Pa)
+                self._melt_headspace_total_pressure_bar() * 1.0e5
             )
             request = IntentRequest(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
@@ -12805,6 +12827,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             condenser_geometry_config=condenser_geometry_config,
         )
         self._configure_freeze_gate(campaign, freeze_gate_config=freeze_gate_config)
+        if self.melt.hour == 0:
+            self._install_initial_upstream_projection(self._overhead_holdup_mol())
         self._refresh_oxygen_reservoir_without_exchange(
             exchange_direction='none:campaign_start',
         )
