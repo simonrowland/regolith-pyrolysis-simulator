@@ -770,6 +770,46 @@ def test_openimcc_cell_balance_pre_generalization_golden(monkeypatch) -> None:
     )
 
 
+def test_cell_balance_calls_pressure_model_at_commanded_po2(monkeypatch) -> None:
+    import math
+    import openimcc
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "_cell_oxide_thermodynamics",
+        lambda _material, _temperature: ({}, None, {}),
+    )
+    species = openimcc.oxygen_balance_species_metadata(
+        {"Mg": "MgO", "O": None}
+    )
+
+    def pressure_model(po2_bar: float) -> dict[str, float]:
+        assert math.isfinite(po2_bar) and po2_bar > 0.0
+        root_po2 = math.sqrt(po2_bar)
+        return {
+            "Mg": 1e-8 / root_po2,
+            "O": 2e-8 * root_po2,
+        }
+
+    solved, pressures, _balance, _fraction, _info = (
+        battery._solve_cell_oxygen_balance(
+            pressure_model,
+            species,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+    )
+
+    ratio = (
+        pressures["O"]
+        * math.sqrt(species["Mg"].molar_mass)
+        / (pressures["Mg"] * math.sqrt(species["O"].molar_mass))
+    )
+    assert solved > 0.0
+    assert ratio == pytest.approx(1.0, rel=1e-9)
+
+
 def test_unknown_cell_material_is_a_typed_refusal() -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
 
