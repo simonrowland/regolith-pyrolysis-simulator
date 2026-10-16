@@ -1178,6 +1178,71 @@ def test_fo2_gas_ratio_round_trips_as_a_located_printed_value() -> None:
     assert ratio["value"]["locator"] == {"published_page": 800, "table": "I"}
 
 
+def test_darken_gurry_equilibrium_compositions_migrate_with_conditions() -> None:
+    extract = REPO_ROOT / "data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml"
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    observations = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "darken-gurry-1946-iron-oxygen-ii"
+    }
+    assert len(observations) == 88
+    assert not migrator.result.validation.hard_issues
+    assert all(
+        observation.identity.temperature_K.is_value
+        for observation in observations.values()
+    )
+    assert all(observation.point_conditions for observation in observations.values())
+
+    table_i = observations["dg46_t1_a_1383_wustite"]
+    assert table_i.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    assert table_i.identity.subtype.value == "r=(Fe++ + Fe+++)/Fe++ as printed"
+    assert table_i.value.point == Decimal("1.096")
+    assert table_i.identity.temperature_K.value == Decimal("1656.15")
+    assert "starting_material" in table_i.point_conditions
+    control = migrator.result.experiments[table_i.experiment_id].fO2_control
+    assert control is not None and control.gas_ratio is not None
+    assert control.gas_ratio.numerator_species == "CO2"
+    assert control.gas_ratio.denominator_species == "CO"
+    assert control.gas_ratio.basis == "partial_pressure"
+    assert control.gas_ratio.value.state.value.point == Decimal("0.376")
+
+    table_iii_a = observations["dg46_t3a_1390_fe2o3"]
+    assert table_iii_a.value.point == Decimal("1.081")
+    assert "equilibrium_boundary" in table_iii_a.point_conditions
+
+    table_iii_b = observations["dg46_t3b_1436"]
+    assert (
+        table_iii_b.identity.quantity.value
+        is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+    assert table_iii_b.identity.species.phase.value is Phase.G
+    assert table_iii_b.identity.subtype.value == "pCO2/pCO"
+    assert table_iii_b.value.point == Decimal("0.233")
+    assert "equilibrium_boundary" in table_iii_b.point_conditions
+
+    oxygen_run = observations["dg46_t1_l_1589_fe2o3"]
+    oxygen_control = migrator.result.experiments[
+        oxygen_run.experiment_id
+    ].fO2_control
+    assert oxygen_control is not None
+    assert oxygen_control.oxygen_partial_pressure_Pa is not None
+    assert oxygen_control.oxygen_partial_pressure_Pa.state.value.point == Decimal(
+        "101325"
+    )
+    for row_id, observation in observations.items():
+        if row_id.startswith("dg46_t1_l_"):
+            assert observation.experiment_id == oxygen_run.experiment_id
+            assert migrator.result.experiments[
+                observation.experiment_id
+            ].fO2_control.oxygen_partial_pressure_Pa.state.value.point == Decimal(
+                "101325"
+            )
+
+
 def test_malformed_registry_inference_records_issue_without_dropping_value() -> None:
     from simulator.battery.migrate import _experiment_from_plain
 
