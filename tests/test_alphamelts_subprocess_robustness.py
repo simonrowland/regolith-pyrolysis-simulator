@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import os
 import math
+import os
 import time
 from pathlib import Path
 from types import SimpleNamespace
@@ -188,9 +188,12 @@ def test_real_subprocess_projection_closes_dry_alkali_silica_oxygen_balance():
             liquid_fraction=1.0,
             liquid_composition_wt_pct=solved_liquid_wt_pct,
         )
-        pressures_pa, _sources, _diagnostic = (
+        pressures_pa, sources, _diagnostic = (
             backend._builtin_vapor_projection_for_subprocess(eq)
         )
+        assert pressures_pa['O2'] == pytest.approx(pO2_bar * 1e5, rel=1e-12)
+        assert pressures_pa['O'] > 0.0
+        assert sources['O'] == 'NASA_CEA_O2_dissociation_equilibrium'
         return SimpleNamespace(
             status='ok',
             gas_partial_pressures_Pa=pressures_pa,
@@ -202,6 +205,7 @@ def test_real_subprocess_projection_closes_dry_alkali_silica_oxygen_balance():
             cell_at_po2,
             temperature_K=1800.0,
             cell_material=None,
+            fixed_point_activities=True,
         )
     )
 

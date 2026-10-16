@@ -5410,6 +5410,7 @@ def predict_with_engine(
                     engine_call_at_po2,
                     temperature_K=float(T),
                     cell_material=po2.cell_material,
+                    fixed_point_activities=engine is Engine.ALPHAMELTS,
                 )
             )
         except _OxygenBalanceEngineTrialRefusal as exc:

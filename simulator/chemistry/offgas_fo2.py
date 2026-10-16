@@ -307,6 +307,42 @@ def _load_cea_polynomials(
     )
 
 
+def _oxygen_atom_partial_pressure_bar(
+    temperature_K: float,
+    pO2_bar: float,
+    *,
+    extract_path: pathlib.Path | str,
+) -> float:
+    """Equilibrium O(g) pressure for O2(g) ⇌ 2 O(g), using NASA CEA Gibbs data."""
+
+    pO2 = float(pO2_bar)
+    if not math.isfinite(pO2) or pO2 <= 0.0:
+        raise OffgasFO2Unavailable(
+            f"commanded pO2 must be finite and positive; got {pO2_bar!r}"
+        )
+    polynomials = _load_cea_polynomials(
+        ("O", "O2"),
+        extract_path,
+        requirement="the oxygen-dissociation projection needs O and O2",
+    )
+    oxygen = polynomials["O"]
+    molecular_oxygen = polynomials["O2"]
+    if oxygen.reference_pressure_Pa != molecular_oxygen.reference_pressure_Pa:
+        raise OffgasFO2Unavailable(
+            "NASA CEA O and O2 records use different reference pressures"
+        )
+    reference_pressure_bar = molecular_oxygen.reference_pressure_Pa / 100_000.0
+    equilibrium_constant = reaction_equilibrium_constant(
+        (
+            (2.0, oxygen.evaluate(temperature_K)),
+            (-1.0, molecular_oxygen.evaluate(temperature_K)),
+        )
+    )
+    return reference_pressure_bar * math.sqrt(
+        equilibrium_constant * (pO2 / reference_pressure_bar)
+    )
+
+
 #: Which CEA records each couple's log10 K actually reads. Domain validation is
 #: per-couple because the couples do NOT share a window: on the shipped extract
 #: H2O stops at 6000 K while CO, CO2 and O2 reach 20000 K, so K2 stays a genuine

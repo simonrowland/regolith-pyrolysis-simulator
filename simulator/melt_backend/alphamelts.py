@@ -5066,6 +5066,9 @@ class _MELTSBackendSupport(MeltBackend):
             )
 
         from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+        from simulator.chemistry.offgas_fo2 import (
+            _oxygen_atom_partial_pressure_bar,
+        )
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
@@ -5129,6 +5132,38 @@ class _MELTSBackendSupport(MeltBackend):
                 'vapor pressure/source keys differ: '
                 f'pressures={sorted(pressures)!r}; sources={sorted(sources)!r}',
             )
+        if eq.fO2_log is None or not math.isfinite(float(eq.fO2_log)):
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
+                'missing finite commanded fO2 for O and O2 vapor channels',
+            )
+        try:
+            commanded_pO2_bar = 10.0 ** float(eq.fO2_log)
+            oxygen_atom_p_bar = _oxygen_atom_partial_pressure_bar(
+                eq.temperature_C + 273.15,
+                commanded_pO2_bar,
+                extract_path=(
+                    Path(__file__).resolve().parents[2]
+                    / 'data'
+                    / 'literature'
+                    / 'extracts'
+                    / 'nasa-cea-thermo.yaml'
+                ),
+            )
+        except Exception as exc:  # noqa: BLE001 - keep thermo refusal typed
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
+                f'cannot evaluate NASA CEA O2 dissociation: {exc}',
+            ) from exc
+        # With ideal gases fO2 = pO2. For O2 ⇌ 2O, CEA gives
+        # ΔG° = 2G°(O) − G°(O2), Kp = exp(−ΔG°/RT), and
+        # pO = P° sqrt(Kp * (pO2/P°)); both channels are returned in Pa.
+        pressures['O2'] = commanded_pO2_bar * 1.0e5
+        pressures['O'] = oxygen_atom_p_bar * 1.0e5
+        sources['O2'] = 'commanded_fO2_ideal_gas'
+        sources['O'] = 'NASA_CEA_O2_dissociation_equilibrium'
+        diagnostic['vapor_pressures_Pa'] = dict(pressures)
+        diagnostic['vapor_pressures_source'] = dict(sources)
         return pressures, sources, diagnostic
 
     def _vapor_pressures_via_vaporock_or_antoine(
