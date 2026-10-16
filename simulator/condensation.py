@@ -7928,7 +7928,8 @@ def cold_spot_diagnostic(
                     and P_sat_pa is not None
                     and math.isfinite(P_sat_pa)
                 ):
-                    upstream_threshold_replaced = True
+                    if segment.name == UPSTREAM_PIPE_SEGMENT_NAME:
+                        upstream_threshold_replaced = True
                     supersaturated = p_local_pa > P_sat_pa
                     if supersaturated:
                         # For a melt-following wall, condensation requires

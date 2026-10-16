@@ -199,6 +199,32 @@ def test_melt_following_upstream_wall_uses_local_dew_point():
     )
 
 
+def test_downstream_landing_threshold_survives_upstream_dew_point_check():
+    segment = PipeSegment(
+        name="stage_1_to_stage_2",
+        upstream_stage="stage_1",
+        downstream_stage="stage_2",
+        wall_temperature_C=300.0,
+        length_m=1.0,
+        inner_diameter_m=0.12,
+    )
+
+    diagnostic = cold_spot_diagnostic(
+        [segment],
+        {"Na": 1.0},
+        upstream_hot_wall_min_C=None,
+        species_partial_pressures_pa={"Na": 1e-12},
+    )
+
+    assert diagnostic["has_cold_spot"] is True
+    assert len(diagnostic["findings"]) == 1
+    assert diagnostic["findings"][0]["segment"] == segment.name
+    assert diagnostic["findings"][0]["species"] == "Na"
+    assert diagnostic["findings"][0]["condensation_temperature_C"] == pytest.approx(
+        CONDENSATION_TEMPS_C["Na"]
+    )
+
+
 def test_cro2_routing_target_is_not_a_wall_dew_point():
     wall_C = 1150.0
     psat_pa, refused = _try_antoine_psat_pa(
