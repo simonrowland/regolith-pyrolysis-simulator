@@ -2479,7 +2479,7 @@ def test_exchange_target_cannot_exceed_controlled_total_pressure() -> None:
     )
 
 
-def test_pressure_drop_and_reducing_source_label_do_not_restore_a_scalar_ceiling() -> None:
+def test_interior_potential_above_gas_ceiling_emits_degassing_notice() -> None:
     sim = _make_sim()
     _seed_o2_bubbler_redox_state(sim, fO2_log=-3.0)
     sim.melt.p_total_mbar = 0.2
@@ -2491,7 +2491,18 @@ def test_pressure_drop_and_reducing_source_label_do_not_restore_a_scalar_ceiling
     assert sim._current_melt_redox_fO2_log() == before
     assert sim.atom_ledger.mol_by_account() == inventory
     assert len(sim.atom_ledger.transitions) == count
-    assert not sim._redox_source_breakdown_diagnostic().get('pressure_ceiling_notices')
+    notices = sim._redox_source_breakdown_diagnostic()['pressure_ceiling_notices']
+    ceiling = sim._melt_redox_fO2_upper_bound_log()
+    notice = next(
+        item for item in notices
+        if item['flag'] == 'REDOX_ABOVE_GAS_CEILING'
+        and item['melt_potential'] == pytest.approx(before)
+        and item['ceiling'] == pytest.approx(ceiling)
+    )
+    assert notice['flag'] == 'REDOX_ABOVE_GAS_CEILING'
+    assert notice['melt_potential'] == pytest.approx(before)
+    assert notice['ceiling'] == pytest.approx(ceiling)
+    assert notice['reason'] == 'degassing_pending'
 
 
 @pytest.mark.parametrize("buffer_o2_mol", [0.0, 1.0e-6])
