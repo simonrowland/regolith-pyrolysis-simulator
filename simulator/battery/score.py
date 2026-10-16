@@ -4124,26 +4124,76 @@ def _predict_fe_redox(
         except (TypeError, ValueError):
             return None
 
-    temperature = temperature_of(identity) or point_value("temperature_K")
-    if temperature is None or not temperature.is_finite() or temperature <= 0:
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "temperature_K"},
+    def temperature_input() -> tuple[Decimal | None, EnginePrediction | None]:
+        temperature = temperature_of(identity) or point_value("temperature_K")
+        if temperature is None or not temperature.is_finite() or temperature <= 0:
+            return None, refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "temperature_K"},
+            )
+        return temperature, None
+
+    def composition_input() -> tuple[
+        State[Composition] | None,
+        Composition | None,
+        EnginePrediction | None,
+    ]:
+        composition_state = identity.composition
+        if composition_state is None or not composition_state.is_value:
+            composition_state = _printed_point_composition(observation)
+        if (
+            composition_state is None
+            or not composition_state.is_value
+            or not isinstance(composition_state.value, Composition)
+        ):
+            return None, None, refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "composition"},
+            )
+        return composition_state, composition_state.value, None
+
+    def composition_weight_percent(composition: Composition) -> dict[str, float] | None:
+        return (
+            {oxide: float(amount) for oxide, amount in composition.components}
+            if composition.amount_basis is AmountBasis.MASS_PERCENT
+            else composition_wt_pct(composition)
         )
 
-    composition_state = identity.composition
-    if composition_state is None or not composition_state.is_value:
-        composition_state = _printed_point_composition(observation)
-    if (
-        composition_state is None
-        or not composition_state.is_value
-        or not isinstance(composition_state.value, Composition)
-    ):
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "composition"},
-        )
-    composition = composition_state.value
+    def printed_fo2_input() -> tuple[Decimal | None, EnginePrediction | None]:
+        fO2_log = point_value("fO2_log")
+        if fO2_log is None:
+            if _derived_fo2_condition(observation):
+                return None, refused(
+                    RefusalReason.IDENTITY_INCOMPLETE,
+                    {"reason": "missing_input", "input": "printed_fO2"},
+                )
+            oxygen_pa = identity.fO2_Pa
+            point_oxygen = (observation.point_conditions or {}).get("fO2_Pa")
+            if (
+                (oxygen_pa is None or not oxygen_pa.is_value or oxygen_pa.value is None)
+                and isinstance(point_oxygen, Located)
+                and point_oxygen.inference is None
+                and point_oxygen.state.is_value
+                and point_oxygen.state.value is not None
+            ):
+                oxygen_pa = point_oxygen.state
+            if oxygen_pa is not None and oxygen_pa.is_value and oxygen_pa.value is not None:
+                oxygen_value = float(oxygen_pa.value)
+                if oxygen_value > 0.0 and math.isfinite(oxygen_value):
+                    fO2_log = Decimal(str(math.log10(oxygen_value / 100000.0)))
+        if fO2_log is None or not fO2_log.is_finite():
+            return None, refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "printed_fO2"},
+            )
+        return fO2_log, None
+
+    temperature, input_refusal = temperature_input()
+    if input_refusal is not None:
+        return input_refusal
+    composition_state, composition, input_refusal = composition_input()
+    if input_refusal is not None:
+        return input_refusal
 
     # Premise: Borisov stores mole fractions of oxide formula units and the
     # combined iron key is single-cation. Algebra: x_i -> w_i ∝ x_i M_i, then
@@ -4152,11 +4202,7 @@ def _predict_fe_redox(
     # mole fraction. Sanity: no measured redox split is used, and the printed
     # six-significant-figure composition remains closed after the FeOt rename.
     try:
-        composition_wt = (
-            {oxide: float(amount) for oxide, amount in composition.components}
-            if composition.amount_basis is AmountBasis.MASS_PERCENT
-            else composition_wt_pct(composition)
-        )
+        composition_wt = composition_weight_percent(composition)
         if composition_wt is None:
             raise ValueError("composition cannot be converted to oxide weights")
         dropped_components, dropped_mass_fraction = kress91_dropped_components(
@@ -4174,32 +4220,9 @@ def _predict_fe_redox(
             {"reason": "missing_input", "input": "total_iron"},
         )
 
-    fO2_log = point_value("fO2_log")
-    if fO2_log is None:
-        if _derived_fo2_condition(observation):
-            return refused(
-                RefusalReason.IDENTITY_INCOMPLETE,
-                {"reason": "missing_input", "input": "printed_fO2"},
-            )
-        oxygen_pa = identity.fO2_Pa
-        point_oxygen = (observation.point_conditions or {}).get("fO2_Pa")
-        if (
-            (oxygen_pa is None or not oxygen_pa.is_value or oxygen_pa.value is None)
-            and isinstance(point_oxygen, Located)
-            and point_oxygen.inference is None
-            and point_oxygen.state.is_value
-            and point_oxygen.state.value is not None
-        ):
-            oxygen_pa = point_oxygen.state
-        if oxygen_pa is not None and oxygen_pa.is_value and oxygen_pa.value is not None:
-            oxygen_value = float(oxygen_pa.value)
-            if oxygen_value > 0.0 and math.isfinite(oxygen_value):
-                fO2_log = Decimal(str(math.log10(oxygen_value / 100000.0)))
-    if fO2_log is None or not fO2_log.is_finite():
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "printed_fO2"},
-        )
+    fO2_log, input_refusal = printed_fo2_input()
+    if input_refusal is not None:
+        return input_refusal
     # The extract labels this column log10 fO2; its air rows are about -0.68,
     # i.e. log10(0.21 bar), matching the simulator's log10(bar) convention.
     # For identity comparison, fO2(Pa) = 10**log10(fO2/bar) * 1e5 Pa/bar;
