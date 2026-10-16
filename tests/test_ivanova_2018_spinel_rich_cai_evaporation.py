@@ -19,6 +19,9 @@ def test_ivanova_2018_residue_series_migrates_and_pins_table_1_values():
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.ok
+    assert migrator.result.validation.hard_issues == ()
     assert len(migrator.result.observations) == 32
     series = document["species"]["CaO"]["observations"][0]["values"]["series"]
     first = next(row for row in series if row["sample"] == "5aN-3")

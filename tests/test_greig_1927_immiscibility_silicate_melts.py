@@ -19,6 +19,9 @@ def test_greig_1927_quench_temperatures_migrate_and_pin_table_values():
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.ok
+    assert migrator.result.validation.hard_issues == ()
     assert len(migrator.result.observations) == 3
     rows = document["species"]["SiO2"]["observations"]
     assert rows[0]["values"]["T_C_as_printed"] == 1713

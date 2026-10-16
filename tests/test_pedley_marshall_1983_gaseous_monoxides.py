@@ -19,6 +19,9 @@ def test_pedley_marshall_1983_tables_4_and_5_migrate_and_pin_enthalpies():
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.ok
+    assert migrator.result.validation.hard_issues == ()
     assert len(migrator.result.observations) == 132
     observations = document["species"]["gaseous_monoxide_assessments"]["observations"]
     table4 = next(row for row in observations if row["observation_id"].endswith("table_4_assessed_formation_enthalpies"))

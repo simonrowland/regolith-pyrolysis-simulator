@@ -19,6 +19,9 @@ def test_shornikov_2023_calcium_phosphate_migrates_and_pins_printed_examples():
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.ok
+    assert migrator.result.validation.hard_issues == ()
     assert len(migrator.result.observations) == 4
     context = [
         row

@@ -19,6 +19,9 @@ def test_shults_1995_calcium_aluminate_migrates_and_pins_table_1_currents():
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.ok
+    assert migrator.result.validation.hard_issues == ()
     assert len(migrator.result.observations) == 1
     context = [
         row

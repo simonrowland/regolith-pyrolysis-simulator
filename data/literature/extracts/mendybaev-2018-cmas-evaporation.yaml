@@ -51,13 +51,15 @@ species:
         pdf_page_index: 0
         section: Results and Discussion
         note: "Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007); they are not new measurements in this abstract."
-      phase: Type B CAI-like (CAIB) melt
+      phase: condensed_liquid
       units: mol cm^-2 s^-1
       values:
         quantity: evaporation_rate
         method_class: quoted_attributed
         evidence_class: quoted_attributed
         attribution: Richter et al. (2007), reference [1]
+        admission_status: typed_refusal
+        reason: The printed molar flux unit is incompatible with the evaporation_rate quantity unit; no conversion is made.
         points:
         - temperature_C_as_printed: 1600
           T_C: 1600

@@ -19,6 +19,9 @@ def test_zaitsev_2000_table_1_activities_migrate_and_pin_printed_values():
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.ok
+    assert migrator.result.validation.hard_issues == ()
     assert len(migrator.result.observations) == 33
     row = next(
         row for row in document["species"]["MnO"]["observations"]

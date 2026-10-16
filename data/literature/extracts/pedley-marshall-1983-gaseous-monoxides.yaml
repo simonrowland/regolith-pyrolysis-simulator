@@ -846,6 +846,8 @@ species:
         values:
           method_class: compilation_assessed
           evidence_class: compilation_assessed
+          admission_status: typed_refusal
+          reason: The printed kcal/mol unit is incompatible with the delta_fH quantity unit; no conversion is made.
           quantity: delta_fH
           rows:
             - {"sample": "AgO", "delta_fH": 75.0}

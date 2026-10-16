@@ -19,6 +19,9 @@ def test_shornikov_2002_spinel_migrates_and_pins_printed_estimates():
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.ok
+    assert migrator.result.validation.hard_issues == ()
     assert len(migrator.result.observations) == 1
     numeric_context = next(
         row

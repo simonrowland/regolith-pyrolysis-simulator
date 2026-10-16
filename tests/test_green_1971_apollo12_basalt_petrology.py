@@ -19,6 +19,9 @@ def test_green_1971_phase_temperatures_migrate_and_pin_printed_values():
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.ok
+    assert migrator.result.validation.hard_issues == ()
     assert len(migrator.result.observations) == 6
     observations = document["species"]["Apollo12_12065"]["observations"]
     liquidus = next(row for row in observations if row["observation_id"] == "green1971_12065_liquidus")

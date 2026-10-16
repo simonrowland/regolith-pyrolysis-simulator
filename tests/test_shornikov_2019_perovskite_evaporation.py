@@ -19,6 +19,9 @@ def test_shornikov_2019_perovskite_table_1_migrates_and_pins_printed_pressures()
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.ok
+    assert migrator.result.validation.hard_issues == ()
     assert len(migrator.result.observations) == 76
     ca = document["species"]["Ca"]["observations"][0]["values"]["points"]
     cao = document["species"]["CaO"]["observations"][0]["values"]["points"]
