@@ -8,6 +8,8 @@ import pytest
 
 from simulator.accounting.ledger import AccountPolicy, KNOWN_LEDGER_ACCOUNTS, AtomLedger
 from simulator.accounting.ledger_api import LEDGER_SCHEMA_VERSION, LedgerAPI
+from simulator.accounting.completeness import _species_kg_by_accounts
+from simulator.accounting.queries import AccountingQueries
 
 
 def _api() -> LedgerAPI:
@@ -63,6 +65,28 @@ def test_account_units_match_ledger_ground_truth_and_are_basis_aware():
     metal_wt = api.account("process.metal_phase_float_layer", units="wt_pct")
     assert metal_wt["basis"] == "elemental"
     assert metal_wt["species"] == {"Al": pytest.approx(100.0)}
+
+
+def test_species_account_totals_pin_projected_kg() -> None:
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"SiO2": 2.0},
+        source="species-total pin",
+        material_origin="feedstock",
+    )
+    ledger.load_external_mol(
+        "process.raw_feedstock",
+        {"SiO2": 1.0},
+        source="species-total pin",
+        material_origin="feedstock",
+    )
+    accounts = ("process.cleaned_melt", "process.raw_feedstock")
+    expected = {"SiO2": float.fromhex("0x1.7126634117f84p-3")}
+
+    queries = AccountingQueries(SimpleNamespace(atom_ledger=ledger))
+    assert queries.species_kg_by_accounts(accounts) == expected
+    assert _species_kg_by_accounts(SimpleNamespace(ledger=ledger), accounts) == expected
 
 
 def test_signed_accounts_omit_wt_pct_instead_of_renormalizing_mass():
