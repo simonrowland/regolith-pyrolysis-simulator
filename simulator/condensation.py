@@ -7852,10 +7852,10 @@ def cold_spot_diagnostic(
 ) -> dict[str, Any]:
     """Flag pipe segments that would condense flowing vapor too early.
 
-    Landing-temperature cold spots stay a fixed engineering-threshold
-    check. Upstream hot-wall fouling additionally uses local partial
-    pressure versus the existing wall Antoine P_sat when that pressure
-    is supplied; the uniform 1400 C floor remains as a coarse minimum.
+    Downstream landing temperatures retain their fixed engineering threshold.
+    The upstream segment uses local partial pressure versus wall Antoine P_sat
+    when available. A source-reaction curve is not a wall saturation curve;
+    the SiO engineering landing target remains its explicit fallback.
     """
 
     margin_C = _finite_nonnegative_value(margin_C, label='margin_C')
@@ -7899,6 +7899,7 @@ def cold_spot_diagnostic(
             if downstream_number > target_stage_number:
                 continue
             wall_T_C = float(segment.wall_temperature_C)
+            upstream_threshold_replaced = False
             if (
                 hot_wall_threshold_C is not None
                 and math.isfinite(hot_wall_threshold_C)
@@ -7937,23 +7938,68 @@ def cold_spot_diagnostic(
                     not saturation_refused
                     and P_sat_pa is not None
                     and math.isfinite(P_sat_pa)
-                    and p_local_pa > P_sat_pa
                 ):
-                    upstream_hot_wall_findings.append({
-                        'segment': segment.name,
-                        'account': segment.wall_deposit_account,
-                        'species': str(species),
-                        'kg_hr': kg_hr,
-                        'wall_temperature_C': wall_T_C,
-                        'upstream_hot_wall_min_C': hot_wall_threshold_C,
-                        'target_stage_number': target_stage_number,
-                        'warning': (
-                            f'upstream hot-wall violation {segment.name}: '
-                            f'{species} local pressure exceeds wall '
-                            f'saturation at {wall_T_C:.1f} C before stage '
-                            f'{target_stage_number}'
-                        ),
-                    })
+                    supersaturated = p_local_pa > P_sat_pa
+                    if segment.name == UPSTREAM_PIPE_SEGMENT_NAME:
+                        upstream_threshold_replaced = True
+                        if supersaturated:
+                            # For a melt-following upstream wall, condensation
+                            # requires p_i > P_sat(T_wall): both are Pa, and
+                            # equality has zero driving pressure. With source
+                            # activity a_i <= 1, p_i <= a_i*P_sat(T_melt); the
+                            # monotone P_sat curve therefore gives no condensation
+                            # at T_wall == T_melt. Fixed landing temperatures are
+                            # not a dew-point test. SiO's refused pure-component
+                            # curve keeps its separate reactive-product fallback.
+                            findings.append({
+                                'segment': segment.name,
+                                'account': segment.wall_deposit_account,
+                                'species': str(species),
+                                'kg_hr': kg_hr,
+                                'wall_temperature_C': wall_T_C,
+                                'partial_pressure_pa': p_local_pa,
+                                'wall_saturation_pressure_pa': P_sat_pa,
+                                'target_stage_number': target_stage_number,
+                                'warning': (
+                                    f'cold spot {segment.name}: {species} '
+                                    f'local pressure {p_local_pa:.6g} Pa exceeds '
+                                    f'wall saturation {P_sat_pa:.6g} Pa at '
+                                    f'{wall_T_C:.1f} C before stage '
+                                    f'{target_stage_number}'
+                                ),
+                            })
+                    if supersaturated:
+                        upstream_hot_wall_findings.append({
+                            'segment': segment.name,
+                            'account': segment.wall_deposit_account,
+                            'species': str(species),
+                            'kg_hr': kg_hr,
+                            'wall_temperature_C': wall_T_C,
+                            'upstream_hot_wall_min_C': hot_wall_threshold_C,
+                            'target_stage_number': target_stage_number,
+                            'warning': (
+                                f'upstream hot-wall violation {segment.name}: '
+                                f'{species} local pressure exceeds wall '
+                                f'saturation at {wall_T_C:.1f} C before stage '
+                                f'{target_stage_number}'
+                            ),
+                        })
+                elif (
+                    segment.name == UPSTREAM_PIPE_SEGMENT_NAME
+                    and _stable_condensation_product_backstop_authorized(
+                        str(species)
+                    )
+                ):
+                    # CrO2's Antoine entry is a source-reaction curve, not
+                    # P_sat for a wall phase. Its 1250 C condensation setting
+                    # is the dedicated-stage routing target, so it cannot
+                    # establish an upstream dew point. The wall-deposition
+                    # stable-product backstop still accounts for actual Cr2O3
+                    # formation; do not turn the routing target into a wall
+                    # saturation test here.
+                    upstream_threshold_replaced = True
+            if upstream_threshold_replaced:
+                continue
             if wall_T_C >= threshold_C:
                 continue
             findings.append({

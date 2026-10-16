@@ -24,6 +24,7 @@ from simulator.condensation import (
     CondensationModel,
     _try_antoine_psat_pa,
     _wall_deposition_driving_pressure_pa,
+    UPSTREAM_PIPE_SEGMENT_NAME,
     cold_spot_diagnostic,
 )
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState, PipeSegment
@@ -125,6 +126,74 @@ def test_species_change_and_low_wall_uniform_minimum():
     assert na["has_upstream_hot_wall_violation"] is False
     assert na["has_cold_spot"] is False
     assert low_wall["has_upstream_hot_wall_violation"] is True
+
+
+def test_melt_following_upstream_wall_uses_local_dew_point():
+    wall_C = 1225.0
+    wall_K = wall_C + CELSIUS_TO_KELVIN_OFFSET
+    psat_pa, refused = _try_antoine_psat_pa("Cr", wall_K)
+    assert refused is False
+    assert psat_pa is not None and psat_pa > 0.0
+    segment = PipeSegment(
+        name=UPSTREAM_PIPE_SEGMENT_NAME,
+        upstream_stage="stage_0",
+        downstream_stage="stage_1",
+        wall_temperature_C=wall_C,
+        length_m=1.0,
+        inner_diameter_m=0.12,
+    )
+
+    dilute = cold_spot_diagnostic(
+        [segment],
+        {"Cr": 1.0},
+        upstream_hot_wall_min_C=None,
+        species_partial_pressures_pa={"Cr": psat_pa / 2.0},
+    )
+    supersaturated = cold_spot_diagnostic(
+        [segment],
+        {"Cr": 1.0},
+        upstream_hot_wall_min_C=None,
+        species_partial_pressures_pa={"Cr": psat_pa * 2.0},
+    )
+
+    assert dilute["has_cold_spot"] is False
+    assert supersaturated["has_cold_spot"] is True
+    assert supersaturated["findings"][0]["partial_pressure_pa"] == pytest.approx(
+        2.0 * psat_pa
+    )
+    assert supersaturated["findings"][0]["wall_saturation_pressure_pa"] == pytest.approx(
+        psat_pa
+    )
+
+
+def test_cro2_routing_target_is_not_a_wall_dew_point():
+    wall_C = 1150.0
+    psat_pa, refused = _try_antoine_psat_pa(
+        "CrO2",
+        wall_C + CELSIUS_TO_KELVIN_OFFSET,
+    )
+    assert refused is True
+    assert psat_pa is None
+    segment = PipeSegment(
+        name=UPSTREAM_PIPE_SEGMENT_NAME,
+        upstream_stage="stage_0",
+        downstream_stage="stage_1",
+        wall_temperature_C=wall_C,
+        length_m=1.0,
+        inner_diameter_m=0.12,
+    )
+
+    diagnostic = cold_spot_diagnostic(
+        [segment],
+        {"CrO2": 1.0},
+        upstream_hot_wall_min_C=None,
+        species_partial_pressures_pa={"CrO2": MILLIBAR_BAKEOFF_PA},
+    )
+
+    # The 1250 C setpoint selects the dedicated Cr stage; the source-reaction
+    # Antoine entry cannot provide a wall P_sat for a dew-point comparison.
+    assert diagnostic["has_cold_spot"] is False
+    assert diagnostic["findings"] == []
 
 
 def test_wall_below_sio_landing_temperature_still_has_cold_spot():
