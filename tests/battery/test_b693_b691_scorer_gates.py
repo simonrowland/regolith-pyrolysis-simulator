@@ -28,6 +28,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
     UncertaintyKind,
+    ValueKind,
 )
 from simulator.battery.identity import quantity_token
 from simulator.battery.records import (
@@ -48,6 +49,8 @@ from simulator.battery.records import (
     Value,
 )
 from simulator.battery.score import (
+    ENGINE_CHANNELS,
+    SCORE_ENGINE_SET,
     EnginePrediction,
     ScoreContext,
     _ResidualRowsPayloadView,
@@ -338,6 +341,90 @@ def test_pin_figure_only_rows_are_comparison_candidates() -> None:
         for o in candidates
     )
     assert bench.cell_materials[0].state.value is CellMaterial.RE
+
+
+def test_quoted_attributed_rows_score_on_every_engine_with_class_notice() -> None:
+    rows, experiments, bench = _demaria_shape_figure_rows()
+    reference = replace(
+        rows[0],
+        evidence=replace(
+            rows[0].evidence,
+            class_=State.of(EvidenceClass.QUOTED_ATTRIBUTED),
+        ),
+    )
+    context = _demaria_context([reference], experiments, bench)
+
+    def predict(engine, observation, **kwargs):
+        return replace(
+            _predict(Decimal("1e-5"), observation.identity),
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+        )
+
+    residuals, _ = score_store(
+        context,
+        engines=SCORE_ENGINE_SET,
+        include_diagnostics=True,
+        predict=predict,
+    )
+    assert {Engine(row.key.rsplit("::", 1)[-1]) for row in residuals} == set(
+        SCORE_ENGINE_SET
+    )
+    assert all(row.numeric is not None or row.refusal is not None for row in residuals)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FIGURE_ONLY
+            and notice.reason == "evidence_class:quoted_attributed"
+            for notice in row.notices
+        )
+        for row in residuals
+    )
+    assert all(
+        row["n"] == 0
+        for row in headline_rows(
+            residuals,
+            context=context,
+            tier="measured",
+            engines=SCORE_ENGINE_SET,
+        )
+    )
+
+
+def test_admitted_nonmeasured_row_without_value_keeps_typed_refusals() -> None:
+    rows, experiments, bench = _demaria_shape_figure_rows()
+    reference = replace(
+        rows[0],
+        value=Value(
+            kind=ValueKind.UNAVAILABLE,
+            unavailable_reason="not reported",
+        ),
+        evidence=replace(
+            rows[0].evidence,
+            class_=State.of(EvidenceClass.QUOTED_ATTRIBUTED),
+        ),
+    )
+    context = _demaria_context([reference], experiments, bench)
+
+    residuals, _ = score_store(
+        context,
+        engines=SCORE_ENGINE_SET,
+        include_diagnostics=True,
+        predict=lambda engine, observation, **kwargs: replace(
+            _predict(Decimal("1e-5"), observation.identity),
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+        ),
+    )
+    assert len(residuals) == len(SCORE_ENGINE_SET)
+    assert all(row.status is ResidualStatus.REFUSED for row in residuals)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FIGURE_ONLY
+            and notice.reason == "evidence_class:quoted_attributed"
+            for notice in row.notices
+        )
+        for row in residuals
+    )
 
 
 def test_pin_figure_only_scores_with_notice_and_printed_band() -> None:

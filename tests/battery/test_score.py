@@ -9559,7 +9559,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     ) == 91
     assert len(headline_diagnostic_references) == 136
     assert admitted_model_derived == headline_diagnostic_references
-    assert not admitted_model_derived & {
+    assert admitted_model_derived <= {
         obs.observation_id for obs in score_module.comparison_candidates(filtered)
     }
 
@@ -9606,6 +9606,20 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         if residual.reference in headline_diagnostic_references
     ]
     assert len(headline_diagnostic_residuals) == len(headline_diagnostic_references)
+    model_derived_residuals = [
+        residual
+        for residual in headline_diagnostic_residuals
+        if residual.reference in admitted_model_derived
+    ]
+    assert len(model_derived_residuals) == len(admitted_model_derived)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FIGURE_ONLY
+            and notice.reason == "evidence_class:model_derived"
+            for notice in residual.notices
+        )
+        for residual in model_derived_residuals
+    )
     assert all(
         "reference_measured_evidence" in residual.exclusions
         for residual in headline_diagnostic_residuals
@@ -9782,7 +9796,14 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         assert unavailable_stolyarova_refs <= {
             row.reference for row in stolyarova_rows
         }
-        assert len(stolyarova_rows) == 235 + len(unavailable_stolyarova_refs)
+        expected_stolyarova_refs = {
+            observation.observation_id
+            for observation in score_module.comparison_candidates(filtered)
+            if observation.source_id
+            in {"kems-053-stolyarova-1991", "stolyarova-1995-cao-alumina-kems"}
+        } | unavailable_stolyarova_refs | stolyarova_1996_derived_pressures
+        assert {row.reference for row in stolyarova_rows} == expected_stolyarova_refs
+        assert len(stolyarova_rows) == len(expected_stolyarova_refs)
         activity_rows = [
             row for row in stolyarova_rows if row.reference in stolyarova_activities
         ]
