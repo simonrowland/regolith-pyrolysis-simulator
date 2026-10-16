@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+import simulator.ceramic_classifier as ceramic_classifier
 
 from simulator.ceramic_classifier import (
     DEFAULT_CERAMIC_TYPES_PATH,
@@ -48,11 +49,33 @@ from simulator.terminal_product_taxonomy import DEFAULT_TAXONOMY_PATH
 def test_fe2_fraction_output_pin(composition, explicit, expected):
     assert _resolve_fe2_fraction(
         composition,
-        pO2_mbar=1.0,
-        temperature_C=1200.0,
-        pressure_mbar=2.0,
         explicit=explicit,
     ) == expected
+
+
+def test_fe2_fraction_nonfinite_iron_is_unavailable_without_kress(monkeypatch):
+    kress_calls = []
+    monkeypatch.setattr(
+        ceramic_classifier,
+        "iron_oxide_values",
+        lambda composition: (10.0, 0.0),
+    )
+    monkeypatch.setattr(
+        ceramic_classifier,
+        "feot_equivalent_moles",
+        lambda composition: float("nan"),
+    )
+    monkeypatch.setattr(
+        ceramic_classifier,
+        "kress91_fe3_over_sigma_fe",
+        lambda **kwargs: kress_calls.append(kwargs) or 0.5,
+        raising=False,
+    )
+
+    assert ceramic_classifier._resolve_fe2_fraction(
+        {"FeO": 10.0}, explicit=None
+    ) == (None, "unavailable")
+    assert kress_calls == []
 
 
 CERAMIC_LEAF_WITNESSES = {
