@@ -12,7 +12,6 @@ from engines.alphamelts.subprocess_runner import equilibrate_via_subprocess
 from simulator.diagnostic_helpers.binary_pot_battery import (
     _solve_vapor_engine_cell_oxygen_balance,
 )
-from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH,
     ALPHAMELTS_REASON_SUBPROCESS_DIED,
@@ -185,71 +184,141 @@ def test_real_subprocess_projection_closes_dry_alkali_silica_oxygen_balance():
 
     backend = AlphaMELTSBackend()
     solved_liquid_wt_pct = {'Na2O': 20.0, 'K2O': 20.0, 'SiO2': 60.0}
+    temperature_K = 1800.0
+    temperature_C = temperature_K - 273.15
+    parsed_cells = {}
 
     def cell_at_po2(pO2_bar: float):
-        eq = EquilibriumResult(
-            temperature_C=1800.0 - 273.15,
+        if pO2_bar in parsed_cells:
+            return parsed_cells[pO2_bar]
+        requested_fO2_log = math.log10(pO2_bar)
+        printed_echo_log = float(f'{requested_fO2_log:.3f}')
+        system_output = (
+            'System Thermodynamic Data:\n'
+            'index Pressure Temperature mass fO2(absolute)\n'
+            f'1 1.0 {temperature_C:.6f} 100.0 {printed_echo_log:.3f}\n'
+        )
+        table_outputs = {
+            'System_main_tbl.txt': system_output,
+            'Phase_main_tbl.txt': (
+                'index 1 Pressure 1.00 Temperature 1526.85 Na2O K2O SiO2\n'
+                'liquid1 100.0 0.0 0.0 1.0 0.0 Liquid 20.0 20.0 60.0\n'
+            ),
+            'Solid_comp_tbl.txt': (
+                'Solid Composition:\n'
+                'index Pressure Temperature mass Na2O K2O SiO2\n'
+                '1 1.00 1526.85 0.000000 ---\n'
+            ),
+            'Bulk_comp_tbl.txt': (
+                'Bulk Composition:\n'
+                'index Pressure Temperature mass Na2O K2O SiO2\n'
+                '1 1.00 1526.85 100.0 20.0 20.0 60.0\n'
+            ),
+            'Liquid_comp_tbl.txt': (
+                'Liquid Composition:\n'
+                'index Pressure Temperature mass Na2O K2O SiO2\n'
+                '1 1.00 1526.85 100.0 20.0 20.0 60.0\n'
+            ),
+        }
+        stdout = (
+            '<> Stable liquid assemblage achieved.\n'
+            'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+            f'T {temperature_C:.6f} (C)\n'
+            'liquid: Na2O K2O SiO2\n'
+            '100.0 g 20.0 20.0 60.0\n'
+            'Melt fraction = 1.0\n'
+        )
+        eq = backend._parse_single_point_stdout(
+            stdout,
+            requested_temperature_C=temperature_C,
             pressure_bar=1.0,
-            fO2_log=math.log10(pO2_bar),
-            liquid_fraction=1.0,
-            liquid_composition_wt_pct=solved_liquid_wt_pct,
+            fO2_log=requested_fO2_log,
+            total_input_kg=0.1,
+            run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+            system_output=system_output,
+            fO2_constraint={
+                'path': 'Absolute',
+                'offset': float(f'{requested_fO2_log:.12g}'),
+            },
+            table_outputs=table_outputs,
+        )
+        assert eq.status == 'ok'
+        assert eq.liquid_composition_wt_pct == pytest.approx(
+            solved_liquid_wt_pct
         )
         pressures_pa, sources, _diagnostic = (
             backend._builtin_vapor_projection_for_subprocess(eq)
         )
-        assert pressures_pa['O2'] == pytest.approx(pO2_bar * 1e5, rel=1e-12)
         assert pressures_pa['O'] > 0.0
         assert sources['O'] == 'NASA_CEA_O2_dissociation_equilibrium'
-        return SimpleNamespace(
+        cell = SimpleNamespace(
             status='ok',
             gas_partial_pressures_Pa=pressures_pa,
             invalid_gas_partial_pressure_components=(),
+            requested_fO2_log=getattr(eq, 'requested_fO2_log', None),
+            printed_fO2_echo_log=getattr(
+                eq,
+                'printed_fO2_echo_log',
+                eq.fO2_log,
+            ),
         )
+        parsed_cells[pO2_bar] = cell
+        return cell
 
     pO2_bar, pressures_bar, balance, _cell_fraction, _cell_info = (
         _solve_vapor_engine_cell_oxygen_balance(
             cell_at_po2,
-            temperature_K=1800.0,
+            temperature_K=temperature_K,
             cell_material=None,
             fixed_point_activities=True,
         )
     )
 
     assert 0.0 < pO2_bar < 1.0
-    assert pressures_bar['O2'] == pytest.approx(pO2_bar, rel=1e-6)
     assert pressures_bar['O'] > 0.0
     assert balance['residual'] < 1e-8
 
     fresh_cell = cell_at_po2(pO2_bar)
+    requested_po2_bar = 10.0 ** float(
+        f'{fresh_cell.requested_fO2_log:.12g}'
+    )
+    printed_echo_po2_bar = 10.0 ** fresh_cell.printed_fO2_echo_log
+    assert fresh_cell.gas_partial_pressures_Pa['O2'] / 1.0e5 == pytest.approx(
+        requested_po2_bar,
+        rel=1e-12,
+    )
+    assert abs(math.log10(requested_po2_bar) - fresh_cell.printed_fO2_echo_log) > 0.0
+    assert fresh_cell.gas_partial_pressures_Pa['O2'] / 1.0e5 != pytest.approx(
+        printed_echo_po2_bar,
+        rel=1e-10,
+    )
     fresh_metadata = _vapor_engine_oxygen_balance_species_metadata(
         tuple(fresh_cell.gas_partial_pressures_Pa)
     )
-    fresh_anchor_pressures_bar = _engine_gas_pressures_bar_for_oxygen_balance(
-        fresh_cell.gas_partial_pressures_Pa,
-        fresh_metadata,
-    )
-    fresh_anchor_logp = math.log10(pO2_bar)
 
     def fresh_pressure_model(trial_po2_bar: float) -> dict[str, float]:
-        delta_logp = math.log10(trial_po2_bar) - fresh_anchor_logp
-        return {
-            species: pressure_bar
-            * 10.0 ** (fresh_metadata[species].pO2_exponent * delta_logp)
-            for species, pressure_bar in fresh_anchor_pressures_bar.items()
-        }
+        trial_cell = cell_at_po2(trial_po2_bar)
+        return _engine_gas_pressures_bar_for_oxygen_balance(
+            trial_cell.gas_partial_pressures_Pa,
+            fresh_metadata,
+        )
 
     fresh_po2, fresh_pressures, fresh_balance, fresh_wall_fraction, _fresh_info = (
         _solve_cell_oxygen_balance(
             fresh_pressure_model,
             fresh_metadata,
-            temperature_K=1800.0,
+            temperature_K=temperature_K,
             cell_material=None,
             bracket=tuple(balance['bracket']),
         )
     )
 
-    assert abs(math.log10(fresh_po2) - fresh_anchor_logp) <= 1e-12
+    assert abs(math.log10(fresh_po2) - math.log10(pO2_bar)) <= 1e-12
     assert pressures_bar == fresh_pressures
-    assert pressures_bar == pytest.approx(fresh_anchor_pressures_bar, rel=1e-9)
     assert balance == fresh_balance
     assert _cell_fraction == fresh_wall_fraction
+    assert balance['residual'] == fresh_balance['residual']
+    assert balance['dominant_O_carriers'] == fresh_balance['dominant_O_carriers']
+    assert balance['dominant_metal_carriers'] == fresh_balance[
+        'dominant_metal_carriers'
+    ]
