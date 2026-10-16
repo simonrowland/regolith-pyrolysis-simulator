@@ -1547,6 +1547,7 @@ def _check_sweep_gases(doc: Mapping[str, Any], label: str, errors: list[str]) ->
 
 def _check_gas_ratios(doc: Mapping[str, Any], label: str, errors: list[str]) -> None:
     from simulator.battery.migrate import _located_from_plain, _value_or_point_from_plain
+    from simulator.battery.records import GasRatio
 
     experiments = doc.get("experiments", ())
     if isinstance(experiments, Mapping):
@@ -1566,15 +1567,15 @@ def _check_gas_ratios(doc: Mapping[str, Any], label: str, errors: list[str]) -> 
                 raise ValueError("must be a mapping")
             numerator = ratio.get("numerator_species")
             denominator = ratio.get("denominator_species")
-            if not isinstance(numerator, str) or not numerator.strip():
-                raise ValueError("numerator_species must be nonempty text")
-            if not isinstance(denominator, str) or not denominator.strip():
-                raise ValueError("denominator_species must be nonempty text")
-            if numerator == denominator:
-                raise ValueError("ratio species must differ")
-            if ratio.get("basis") not in {"volume", "mole", "partial_pressure"}:
-                raise ValueError("basis must be volume, mole, or partial_pressure")
+            if not isinstance(numerator, str) or not isinstance(denominator, str):
+                raise ValueError("ratio species must be text")
             located = _located_from_plain(ratio["value"], _value_or_point_from_plain)
+            GasRatio(
+                numerator_species=numerator,
+                denominator_species=denominator,
+                value=located,
+                basis=ratio.get("basis"),
+            )
             if located.state.is_value and located.locator is None:
                 errors.append(f"{path}.value: empirical Located value requires a locator")
         except (KeyError, TypeError, ValueError, ArithmeticError) as exc:
