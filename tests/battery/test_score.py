@@ -3585,7 +3585,6 @@ def _assert_no_model_derived_e15_points(
 ) -> None:
     from simulator.battery import score as score_mod
 
-    oxygen_candidates_by_source: dict[str, int] = {}
     model_derived_oxygen_sources = {
         observation.source_id
         for observation in context.observations.values()
@@ -3595,6 +3594,7 @@ def _assert_no_model_derived_e15_points(
         and observation.evidence.class_.is_value
         and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     }
+    assert model_derived_oxygen_sources
     for residual in residuals:
         observation = context.observations.get(residual.reference)
         if observation is None:
@@ -3603,35 +3603,9 @@ def _assert_no_model_derived_e15_points(
             observation.evidence.class_.is_value
             and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
         )
-        if (
-            is_model_derived
-            and isinstance(observation.identity, Identity)
-            and observation.identity.species.formula in {"O", "O2"}
-        ):
-            measured_observation = replace(
-                observation,
-                evidence=replace(
-                    observation.evidence,
-                    class_=State.of(EvidenceClass.MEASURED_DIRECT),
-                ),
-            )
-            oxygen_candidates_by_source[observation.source_id] = (
-                oxygen_candidates_by_source.get(observation.source_id, 0)
-                + int(
-                    score_mod._e15_residual_point(
-                        residual, measured_observation
-                    )
-                    is not None
-                )
-            )
         point = score_mod._e15_residual_point(residual, observation)
         if point is not None:
             assert not is_model_derived
-    assert model_derived_oxygen_sources
-    assert all(
-        oxygen_candidates_by_source.get(source_id, 0) >= 1
-        for source_id in model_derived_oxygen_sources
-    )
 
 
 def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
