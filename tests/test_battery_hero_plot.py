@@ -289,13 +289,34 @@ def test_stamp_contents_and_png_output(tmp_path: Path) -> None:
     )
     assert "patch 0123456789ab" in patched_stamp
     assert "openimcc patch abcdef012345" in patched_stamp
+    dirty_equal_commits = replace(
+        patched,
+        stamp={
+            **patched.stamp,
+            "simulator_tree_commit": "sim-test",
+            "openimcc_installed_commit": "openimcc-test",
+            "openimcc_reported_commit": "openimcc-test",
+            "simulator_modified": True,
+            "openimcc_modified": True,
+        },
+    )
+    dirty_equal_stamp = stamp_text(
+        dirty_equal_commits,
+        simulator_commit="sim-test",
+        openimcc_commit="openimcc-test",
+        render_date="2026-10-15",
+    )
+    assert "patch 0123456789ab" in dirty_equal_stamp
+    assert "openimcc patch abcdef012345" in dirty_equal_stamp
     clean = replace(
         data,
         stamp={
             **data.stamp,
             "simulator_tree_commit": "sim-test",
+            "simulator_modified": False,
             "simulator_patch_sha256": "0123456789abcdef",
             "openimcc_installed_commit": "openimcc-test",
+            "openimcc_modified": False,
             "openimcc_patch_sha256": "abcdef0123456789",
         },
     )

@@ -850,7 +850,12 @@ def _patch_labels(
         stamp.get("simulator_tree_commit")
         and stamp.get("simulator_tree_commit") == simulator_commit
     )
-    if stamp.get("simulator_modified") is not False and not same_simulator_commit and simulator_sha:
+    simulator_modified = stamp.get("simulator_modified")
+    if (
+        simulator_modified is not False
+        and (simulator_modified is True or not same_simulator_commit)
+        and simulator_sha
+    ):
         value = str(simulator_sha)
         if value not in {"unknown", "none"}:
             labels.append(f"patch {value[:12]}")
@@ -864,9 +869,10 @@ def _patch_labels(
             or installed_commit == openimcc_commit
         )
     )
+    openimcc_modified = stamp.get("openimcc_modified")
     if (
-        stamp.get("openimcc_modified") is not False
-        and not same_reported_commit
+        openimcc_modified is not False
+        and (openimcc_modified is True or not same_reported_commit)
         and openimcc_sha
     ):
         value = str(openimcc_sha)
