@@ -17,7 +17,9 @@ def main() -> None:
     migrated = migrate(root, write=True)
     context = load_score_context(root)
     residuals, candidates = score_store(
-        context, engines=(Engine.INTERNAL_ANALYTICAL,)
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=False,
     )
     banded = sum(
         residual.numeric is not None
@@ -28,6 +30,7 @@ def main() -> None:
     print(
         f"fresh_migration_observations={len(migrated.observations)} "
         f"engine={Engine.INTERNAL_ANALYTICAL.value} "
+        "include_diagnostics=False "
         f"scored_rows={len(residuals)} candidates={len(candidates)} "
         f"rows_with_band={banded} statuses={dict(sorted(statuses.items()))}"
     )
