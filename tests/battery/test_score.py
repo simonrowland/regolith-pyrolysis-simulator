@@ -9433,8 +9433,11 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     ] == [(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION, 1)]
 
 
-def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
+def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
+    tmp_path: Path,
+) -> None:
     import simulator.battery.score as score_module
+    from tests.battery.test_migrate import _migrate_real_extract
 
     context = load_score_context(
         sources=(
@@ -9446,10 +9449,19 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     )
     observations = context.observations
     filtered = context
+    stolyarova_atomic_oxygen_pressures = {
+        key
+        for key in observations
+        if key.startswith(
+            "kems-053-stolyarova-1991::"
+            "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium::T=1933.00:"
+        )
+    }
     admitted_model_derived = {
         key
         for key, obs in observations.items()
         if obs.admission.status is AdmissionStatus.ADMITTED
+        and key not in stolyarova_atomic_oxygen_pressures
         and obs.evidence.class_.is_value
         and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     }
@@ -9472,16 +9484,6 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         if obs.source_id == "kems-053-stolyarova-1991"
         and isinstance(obs.identity, Identity)
         and quantity_token(obs.identity) is Quantity.ACTIVITY
-    }
-    stolyarova_quoted_pressures = {
-        key
-        for key, obs in observations.items()
-        if obs.source_id == "kems-053-stolyarova-1991"
-        and isinstance(obs.identity, Identity)
-        and quantity_token(obs.identity) is Quantity.P_PARTIAL
-        and obs.admission.status is AdmissionStatus.ADMITTED
-        and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
     }
     stolyarova_1995_derived_pressures = {
         key
@@ -9513,7 +9515,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     }
     headline_diagnostic_references = (
         (stolyarova_activities & admitted_model_derived)
-        | stolyarova_quoted_pressures
+        | stolyarova_atomic_oxygen_pressures
         | stolyarova_1995_derived_pressures
         | stolyarova_1996_derived_pressures
         | kems_model_derived
@@ -9521,10 +9523,25 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     assert len(allibert_admitted) == 16
     assert len(allibert_rejected) == 55
     assert len(stolyarova_activities) == 54
-    assert len(stolyarova_quoted_pressures) == 9
+    assert len(stolyarova_atomic_oxygen_pressures) == 9
     assert all(
-        observations[key].evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-        for key in stolyarova_quoted_pressures
+        observations[key].admission.status is AdmissionStatus.ADMITTED
+        for key in stolyarova_atomic_oxygen_pressures
+    )
+    fresh_stolyarova = _migrate_real_extract(
+        tmp_path, "kems-053-stolyarova-1991.yaml"
+    )
+    fresh_stolyarova_pressures = {
+        key: observation
+        for key, observation in fresh_stolyarova.observations.items()
+        if key in stolyarova_atomic_oxygen_pressures
+    }
+    assert set(fresh_stolyarova_pressures) == stolyarova_atomic_oxygen_pressures
+    assert all(
+        observation.admission.status is AdmissionStatus.ADMITTED
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        for observation in fresh_stolyarova_pressures.values()
     )
     # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9) are model-derived,
     # not measured pressures (review, Derived O / O2).
@@ -9553,11 +9570,11 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     ] == [30, 10, 15]
     assert len(kems_model_derived) == 28
     assert len(
-        stolyarova_activities | stolyarova_quoted_pressures | kems_model_derived
+        stolyarova_activities | stolyarova_atomic_oxygen_pressures | kems_model_derived
     ) == 91
     assert len(headline_diagnostic_references) == 136
     assert admitted_model_derived == (
-        headline_diagnostic_references - stolyarova_quoted_pressures
+        headline_diagnostic_references - stolyarova_atomic_oxygen_pressures
     )
     assert admitted_model_derived <= {
         obs.observation_id for obs in score_module.comparison_candidates(filtered)
@@ -9810,7 +9827,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         derived_pressure_rows = [
             row
             for row in stolyarova_rows
-            if row.reference in stolyarova_quoted_pressures
+            if row.reference in stolyarova_atomic_oxygen_pressures
         ]
         assert len(activity_rows) == 54
         assert len(derived_pressure_rows) == 9
