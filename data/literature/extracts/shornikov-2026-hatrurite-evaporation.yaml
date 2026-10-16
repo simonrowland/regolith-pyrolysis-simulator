@@ -3399,7 +3399,7 @@ species:
         pdf_page_index: 10
         table: '2'
       phase: gas
-      condensed_form: solid
+      condensed_form: liquid
       units: atm
       values:
         quantity: partial_pressure
@@ -3409,6 +3409,11 @@ species:
         reservoir_formula: Ca3SiO5
         standard_state: partial pressure of Ca(g)
         reaction_as_printed: (CaO) = (Ca) + (O)
+        reaction:
+          terms:
+          - {species: {formula: CaO, phase: g}, coefficient: -1}
+          - {species: {formula: Ca, phase: g}, coefficient: 1}
+          - {species: {formula: O, phase: g}, coefficient: 1}
         method: Knudsen effusion mass spectrometry
         table: '2'
         sample_composition_as_reported: Ca3SiO5 tricalcium silicate; source points to [14] for synthesis conditions.
@@ -3717,7 +3722,7 @@ species:
         pdf_page_index: 10
         table: '2'
       phase: gas
-      condensed_form: solid
+      condensed_form: liquid
       units: atm
       values:
         quantity: partial_pressure
@@ -3727,6 +3732,11 @@ species:
         reservoir_formula: Ca3SiO5
         standard_state: partial pressure of CaO(g)
         reaction_as_printed: (CaSiO3) = (CaO) + (SiO2)
+        reaction:
+          terms:
+          - {species: {formula: CaSiO3, phase: g}, coefficient: -1}
+          - {species: {formula: CaO, phase: g}, coefficient: 1}
+          - {species: {formula: SiO2, phase: g}, coefficient: 1}
         method: Knudsen effusion mass spectrometry
         table: '2'
         sample_composition_as_reported: Ca3SiO5 tricalcium silicate; source points to [14] for synthesis conditions.
@@ -5339,7 +5349,7 @@ species:
         pdf_page_index: 10
         table: '2'
       phase: gas
-      condensed_form: solid
+      condensed_form: liquid
       units: atm
       values:
         quantity: partial_pressure
@@ -5349,6 +5359,11 @@ species:
         reservoir_formula: Ca3SiO5
         standard_state: partial pressure of CaSiO3(g)
         reaction_as_printed: '[Ca3SiO5] = (CaSiO3) + 2(CaO)'
+        reaction:
+          terms:
+          - {species: {formula: Ca3SiO5, phase: l}, coefficient: -1}
+          - {species: {formula: CaSiO3, phase: g}, coefficient: 1}
+          - {species: {formula: CaO, phase: g}, coefficient: 2}
         method: Knudsen effusion mass spectrometry
         table: '2'
         sample_composition_as_reported: Ca3SiO5 tricalcium silicate; source points to [14] for synthesis conditions.
@@ -5609,8 +5624,24 @@ species:
           tricalcium silicate calculated by ratios (13)–(15) with an error not exceeding 7%.
       experiment: shornikov_2026_hatrurite_kems
       regime: knudsen_effusion
+benches:
+- id: shornikov-2026-mo-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Knudsen-cell mass spectrometry}
+    locator:
+      published_page: 303
+      pdf_page_index: 7
+      section: Experimental Methodology
+  cell_materials:
+  - state: {tag: value, value: Mo}
+    locator:
+      published_page: 304
+      pdf_page_index: 8
+      paragraph: Molybdenum effusion cell used for the vaporization study
 experiments:
 - experiment_id: shornikov_2026_hatrurite_kems
+  bench_id: shornikov-2026-mo-kems
   method: knudsen_effusion
   locator:
     page: 8
@@ -5641,8 +5672,6 @@ experiments:
         page: 3
         published_page: 298
         note: Derived from the stated formula 3CaO·SiO2; 3 mol CaO + 1 mol SiO2 per formula unit, so x_CaO = 3/4; oxide mole-fraction basis.
-  equipment:
-    cell_material: molybdenum effusion cell
   heating_method:
     state:
       tag: unknown
