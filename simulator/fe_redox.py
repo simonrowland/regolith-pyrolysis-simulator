@@ -1001,8 +1001,10 @@ class NativeFeSaturationNotice:
     iw_bound: float
     a_feo: float
     saturation_gap_dex: float
-    band_lower_dex: float
-    band_upper_dex: float
+    band_lower_dex: float | None
+    band_upper_dex: float | None
+    band_lower_unbounded: bool
+    band_upper_unbounded: bool
     status: str
 
 
@@ -1083,18 +1085,24 @@ def _native_fe_saturation_comparison(
     lower, upper = _native_fe_saturation_band(fe3)
     status = ('BELOW' if gap < -lower else
               'ABOVE' if gap > upper else 'INDETERMINATE')
+    band = {
+        'band_lower_dex': lower if math.isfinite(lower) else None,
+        'band_upper_dex': upper if math.isfinite(upper) else None,
+        'band_lower_unbounded': math.isinf(lower),
+        'band_upper_unbounded': math.isinf(upper),
+    }
     notice = (None if status == 'ABOVE' else asdict(NativeFeSaturationNotice(
         flag=('REDOX_BELOW_FE_FEO_SATURATION' if status == 'BELOW' else
               'REDOX_FE_FEO_SATURATION_INDETERMINATE'),
         melt_potential=float(fO2_log), iw_bound=bound, a_feo=a_feo,
-        saturation_gap_dex=gap, band_lower_dex=lower, band_upper_dex=upper,
+        saturation_gap_dex=gap, **band,
         status=status,
     )))
     return {
         'native_fe_saturation': status == 'BELOW',
         'saturation_status': status,
         'saturation_notice': notice,
-        'band_lower_dex': lower, 'band_upper_dex': upper,
+        **band,
         'native_fe_threshold': 'FeO_activity_saturation',
         'iw_bound_log': bound,
         'saturation_gap_dex': gap,
@@ -1404,6 +1412,8 @@ def kress91_intrinsic_state(
                 saturation_status=comparison['saturation_status'],
                 band_lower_dex=comparison['band_lower_dex'],
                 band_upper_dex=comparison['band_upper_dex'],
+                band_lower_unbounded=comparison['band_lower_unbounded'],
+                band_upper_unbounded=comparison['band_upper_unbounded'],
                 saturation_gap_dex=comparison['saturation_gap_dex'],
             )
     return state

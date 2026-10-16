@@ -71,6 +71,27 @@ def test_saturation_band_combines_jayasuriya_precision_and_held_out_residual(q, 
     assert band[1] == pytest.approx(upper, abs=0.001)
 
 
+@pytest.mark.parametrize('q', [0., .005, .01, .02, .999])
+def test_saturation_notice_exposes_unbounded_edges_without_nonfinite_json(monkeypatch, q):
+    import json
+
+    monkeypatch.setattr(fe_redox, 'calphad_ferrous_feo_activity_diagnostic',
+                        lambda **kw: {'a_FeO_authoritative': .3})
+    bound = fe_redox._feo_activity_saturation_log10_fO2_bar(1673.15, a_feo=.3)
+    result = fe_redox._native_fe_saturation_comparison(
+        {'FeO': 10., 'SiO2': 90.}, fe3_over_sigma_fe=q,
+        T_K=1673.15, pressure_bar=.01, fO2_log=bound)
+    notice = json.loads(json.dumps(result['saturation_notice'], allow_nan=False))
+    assert notice['status'] == 'INDETERMINATE'
+    assert notice['band_lower_unbounded'] is (q <= .01)
+    assert notice['band_upper_unbounded'] is (q == 0. or q >= .99)
+    for side in ('lower', 'upper'):
+        field = f'band_{side}_dex'
+        assert (notice[field] is None) is notice[f'band_{side}_unbounded']
+        assert result[field] == notice[field]
+    json.dumps(result, allow_nan=False)
+
+
 @pytest.mark.parametrize('margin, status', [
     (-1.2, 'BELOW'), (-0.8, 'INDETERMINATE'), (-0.031, 'INDETERMINATE'),
     (0.2, 'INDETERMINATE'), (0.6, 'INDETERMINATE'), (1.1, 'ABOVE'),
@@ -178,7 +199,8 @@ def test_unbounded_low_ferric_band_prevents_precipitation(probe):
     probe[1]['comp']['Fe2O3'] *= 0.1
     result = _solve(probe, open_sink=True)
     assert result['native_fe_state']['saturation_status'] == 'INDETERMINATE'
-    assert result['native_fe_state']['band_lower_dex'] == math.inf
+    assert result['native_fe_state']['band_lower_dex'] is None
+    assert result['native_fe_state']['band_lower_unbounded'] is True
     assert result['native_fe_mol'] == 0.
     assert result['removal_rate_notice']['melt_root_mol'] == 0.
     assert result['removal_rate_notice']['authority'] == 'equilibrium_assumed'

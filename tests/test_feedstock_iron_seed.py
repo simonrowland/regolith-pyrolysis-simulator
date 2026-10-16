@@ -261,7 +261,8 @@ def test_lunar_first_liquid_comproportionation_is_atom_closed_and_visible(monkey
             assert 100*abs(credit.get(element, 0.)-n)/n <= 5e-12
     assert diagnostic['metal_remaining_mol'] > 0.
     state = sim._last_intrinsic_redox_state
-    assert state['fO2_log'] >= state['iw_bound'] - state['band_lower_dex']
+    assert state['fO2_log'] == state['iw_bound']
+    assert state['band_lower_unbounded'] is True
     assert state['saturation_status'] == 'INDETERMINATE'
     sim._apply_feedstock_iron_comproportionation()
     assert len(sim.atom_ledger.transitions) == start+1
