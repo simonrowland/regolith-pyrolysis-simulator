@@ -168,6 +168,29 @@ def test_intrinsic_kress91_inverse_round_trip(T_K, pressure_bar, fO2_log, alkali
     assert ('OUT_OF_CERTIFIED_BAND' in state['flags']) == (T_K > 1903.15)
 
 
+@pytest.mark.parametrize('temperature_C', [1630., 1630.0001, 1750.])
+def test_kress91_ceiling_emits_typed_notice_without_clamping(temperature_C):
+    from simulator.fe_redox import kress91_intrinsic_state
+
+    T_K = temperature_C + 273.15
+    split = kress91_split(fO2_log=-9., mol_fractions=KRESS91_MOL_FRACTIONS,
+                          T_K=T_K, pressure_bar=0.01)
+    state = kress91_intrinsic_state(
+        feo_mol=1., fe2o3_mol=split['ratio'],
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=T_K, pressure_bar=.01, exchange_fO2_log=-9.)
+    assert state['fO2_log'] == pytest.approx(-9., abs=2e-14)
+    notices = state['notices']
+    assert split['notices'] == notices
+    if temperature_C > 1630.:
+        assert notices[0]['flag'] == 'KRESS91_OUT_OF_CALIBRATION_BAND'
+        assert notices[0]['max_temperature_C'] == 1630.
+        assert notices[0]['temperature_C'] == pytest.approx(temperature_C)
+        assert notices[0]['authority'] == 'extrapolated'
+    else:
+        assert notices == []
+
+
 @pytest.mark.parametrize('feo_mol, fe2o3_mol', [(1.0, 0.0), (0.0, 1.0)])
 @pytest.mark.parametrize('exchange, expected', [(-5.0, -5.0), (0.0, -2.0)])
 def test_intrinsic_kress91_ends_follow_exchange(feo_mol, fe2o3_mol, exchange, expected):

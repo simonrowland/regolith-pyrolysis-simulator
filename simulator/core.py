@@ -4363,7 +4363,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._last_intrinsic_redox_state = state
         melt_potential = float(state['fO2_log'])
-        pending_notices = []
+        pending_notices = list(state.get('notices', []))
         if not state.get('exchange_bounded') and state.get('bound') is None:
             ceiling = self._melt_redox_fO2_upper_bound_log()
             if melt_potential > ceiling:

@@ -981,6 +981,22 @@ class NativeFeSaturationNotice:
     status: str
 
 
+@dataclass(frozen=True)
+class Kress91OutOfBandNotice:
+    temperature_C: float
+    min_temperature_C: float = KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    max_temperature_C: float = KRESS91_LIQUID_CALIBRATION_MAX_T_C
+    authority: str = 'extrapolated'
+    flag: str = 'KRESS91_OUT_OF_CALIBRATION_BAND'
+    source: str = 'Kress & Carmichael 1991, doi:10.1007/BF00307328'
+
+
+def _kress91_temperature_notices(temperature_C: float) -> list[dict[str, object]]:
+    if kress91_temperature_band_case(temperature_C)['extrapolation']:
+        return [asdict(Kress91OutOfBandNotice(temperature_C=temperature_C))]
+    return []
+
+
 def _native_fe_saturation_comparison(
     comp: Mapping[str, float],
     *,
@@ -1229,7 +1245,8 @@ def kress91_intrinsic_state(
         if not math.isfinite(mol) or mol < 0.0:
             raise Kress91InvalidControls(f'{name} mol must be finite non-negative')
     flags = []
-    if kress91_temperature_band_case(T_K - 273.15)['extrapolation']:
+    notices = _kress91_temperature_notices(T_K - 273.15)
+    if notices:
         flags.append('OUT_OF_CERTIFIED_BAND')
     bounded = False
     bound = None
@@ -1272,7 +1289,8 @@ def kress91_intrinsic_state(
         value = (math.log(fe2o3_mol) - math.log(feo_mol) - math.log(baseline)) / (
             KRESS91_LN_FO2_COEFFICIENT * math.log(10.0)
         )
-    state = {'fO2_log': value, 'exchange_bounded': bounded, 'bound': bound, 'flags': flags}
+    state = {'fO2_log': value, 'exchange_bounded': bounded, 'bound': bound,
+             'flags': flags, 'notices': notices}
     if bounded:
         state.update(unclamped_fO2_log=exchange_fO2_log,
                      pressure_ceiling_fO2_log=math.log10(pressure_bar))
@@ -1802,6 +1820,7 @@ def kress91_split(
         'temperature_band_case': temperature_band['case'],
         'temperature_band_status': temperature_band['status'],
         'temperature_band_source': temperature_band['source'],
+        'notices': _kress91_temperature_notices(float(T_K) - 273.15),
         'authoritative': temperature_band['authoritative'],
         'extrapolation': temperature_band['extrapolation'],
         'high_uncertainty': temperature_band['high_uncertainty'],
