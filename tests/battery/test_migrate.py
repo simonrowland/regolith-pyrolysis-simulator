@@ -83,6 +83,7 @@ from simulator.battery.migrate import (
     compilation_record_asset_id,
     compilation_column_series_from_record,
     _provenance_from_extract,
+    _source_method_uncertainty_from_plain,
     _initial_oxide_map_from_values,
     _located_printed_and_initial,
     load_migrated_store,
@@ -483,6 +484,8 @@ def test_extract_source_method_uncertainty_migrates_on_its_work(
     doc["source"]["method_uncertainty"] = {
         "value": "0.10",
         "meaning": "one_sigma",
+        "quantity": "activity",
+        "basis": "log10_dex",
         "quantity_basis": "log10 activity in dex",
         "locator": {
             "page": 7,
@@ -509,6 +512,8 @@ def test_extract_source_method_uncertainty_migrates_on_its_work(
 
     assert uncertainty.value == Decimal("0.10")
     assert uncertainty.meaning == "one_sigma"
+    assert uncertainty.quantity is Quantity.ACTIVITY
+    assert uncertainty.basis == "log10_dex"
     assert uncertainty.quantity_basis == "log10 activity in dex"
     assert uncertainty.locator.page == 7
     assert uncertainty.locator.note == doc["source"]["method_uncertainty"]["locator"]["note"]
@@ -522,6 +527,68 @@ def test_extract_source_method_uncertainty_migrates_on_its_work(
         "page": 7,
         "note": "The standard deviation of log10(a) is 0.10.",
     }
+
+
+@pytest.mark.parametrize(
+    "payload",
+    (
+        {
+            "value": "0.10",
+            "meaning": "one_sigma",
+            "basis": "log10_dex",
+            "quantity_basis": "log10 activity in dex",
+            "locator": {"page": 7, "note": "Printed method uncertainty."},
+        },
+        {
+            "value": "0.10",
+            "meaning": "one_sigma",
+            "quantity": "not_a_quantity",
+            "basis": "log10_dex",
+            "quantity_basis": "log10 activity in dex",
+            "locator": {"page": 7, "note": "Printed method uncertainty."},
+        },
+    ),
+    ids=("missing-quantity", "invalid-quantity"),
+)
+def test_source_method_uncertainty_requires_quantity_enum(payload) -> None:
+    with pytest.raises(ValueError):
+        _source_method_uncertainty_from_plain(payload)
+
+
+def test_source_method_uncertainty_rejects_zero_value() -> None:
+    from simulator.battery.records import SourceMethodUncertainty
+    from simulator.battery.validate import validate_work
+    from tests.battery import factories as F
+
+    uncertainty = SourceMethodUncertainty(
+        value=Decimal("0"),
+        meaning="one_sigma",
+        quantity=Quantity.ACTIVITY,
+        basis="log10_dex",
+        quantity_basis="log10 activity in dex",
+        locator=F.loc(page=7, note="The standard deviation is zero."),
+    )
+    work = replace(
+        F.work(),
+        source_method_uncertainties={"work-1": uncertainty},
+    )
+
+    assert any(
+        issue.path.endswith(".value")
+        and "finite positive value" in issue.detail
+        for issue in validate_work(work)
+    )
+
+    invalid_basis = replace(
+        uncertainty, value=Decimal("0.10"), basis="not_a_basis"
+    )
+    invalid_basis_work = replace(
+        work,
+        source_method_uncertainties={"work-1": invalid_basis},
+    )
+    assert any(
+        issue.path.endswith(".basis") for issue in validate_work(invalid_basis_work)
+    )
 
 
 def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(

@@ -1043,11 +1043,18 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     assert unparseable.refusal["reason"] == "unparseable_printed_uncertainty"
 
 
-def test_source_method_uncertainty_supplies_a_source_method_band() -> None:
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_source_method_uncertainty_supplies_a_source_method_band(
+    quantity: Quantity,
+) -> None:
     from simulator.battery.score import NORMAL_95_TICKET_MULTIPLIER
 
     experiment = F.kems_experiment()
-    identity = F.activity_identity(endmember_phase=Phase.L)
+    identity = replace(
+        F.activity_identity(endmember_phase=Phase.L), quantity=quantity
+    )
     reference = F.observation(
         "source-method-activity",
         experiment.experiment_id,
@@ -1059,7 +1066,13 @@ def test_source_method_uncertainty_supplies_a_source_method_band() -> None:
     method_uncertainty = SourceMethodUncertainty(
         value=Decimal("0.10"),
         meaning="one_sigma",
-        quantity_basis="log10 activity in dex",
+        quantity=quantity,
+        basis="log10_dex",
+        quantity_basis=(
+            "log10 activity in dex"
+            if quantity is Quantity.ACTIVITY
+            else "log10 activity coefficient in dex"
+        ),
         locator=F.loc(
             page=12,
             note="The standard deviation of log10(a) is 0.10.",
@@ -1088,15 +1101,23 @@ def test_source_method_uncertainty_supplies_a_source_method_band() -> None:
 
 
 @pytest.mark.parametrize(
-    "quantity",
-    (Quantity.ACTIVITY_COEFFICIENT, Quantity.P_PARTIAL, Quantity.FE3_FE2_RATIO),
+    ("field_quantity", "quantity"),
+    (
+        (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT),
+        (Quantity.ACTIVITY, Quantity.P_PARTIAL),
+        (Quantity.ACTIVITY, Quantity.FE3_FE2_RATIO),
+        (Quantity.ACTIVITY_COEFFICIENT, Quantity.ACTIVITY),
+    ),
 )
-def test_activity_source_method_uncertainty_does_not_band_other_quantities(
-    quantity: Quantity,
+def test_source_method_uncertainty_does_not_band_other_quantities(
+    field_quantity: Quantity, quantity: Quantity,
 ) -> None:
     experiment = F.kems_experiment()
     if quantity is Quantity.ACTIVITY_COEFFICIENT:
         identity = replace(F.activity_identity(), quantity=quantity)
+        value = Decimal("0.2")
+    elif quantity is Quantity.ACTIVITY:
+        identity = F.activity_identity()
         value = Decimal("0.2")
     elif quantity is Quantity.P_PARTIAL:
         na = State.not_applicable("not an activity identity axis for partial pressure")
@@ -1128,7 +1149,13 @@ def test_activity_source_method_uncertainty_does_not_band_other_quantities(
     method_uncertainty = SourceMethodUncertainty(
         value=Decimal("0.10"),
         meaning="one_sigma",
-        quantity_basis="log10 activity in dex",
+        quantity=field_quantity,
+        basis="log10_dex",
+        quantity_basis=(
+            "log10 activity in dex"
+            if field_quantity is Quantity.ACTIVITY
+            else "log10 activity coefficient in dex"
+        ),
         locator=F.loc(
             page=12, note="The standard deviation of log10(a) is 0.10."
         ),
@@ -1148,6 +1175,65 @@ def test_activity_source_method_uncertainty_does_not_band_other_quantities(
 
     assert residual.numeric is not None
     assert residual.numeric.decision_band is None
+    assert residual.status is ResidualStatus.NO_BAND
+    assert not (
+        residual.refusal is not None
+        and residual.refusal.detail.get("reason")
+        == "printed_uncertainty_unit_unmapped"
+    )
+
+
+def test_fusion_identity_flag_uses_preconversion_source_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.kems_experiment()
+    source_identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1600"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        "quartz",
+    )
+    reference = F.observation(
+        "preconversion-source-polymorph",
+        experiment.experiment_id,
+        source_identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-preconversion-source-polymorph",
+    )
+    from simulator.battery.score import fusion_comparison_reference
+    import simulator.battery.score as score_module
+
+    original_unspecified = score_module._source_polymorph_is_unspecified
+    inspected_polymorphs = []
+
+    def record_polymorph(polymorph):
+        inspected_polymorphs.append(polymorph)
+        return original_unspecified(polymorph)
+
+    monkeypatch.setattr(
+        score_module, "_source_polymorph_is_unspecified", record_polymorph
+    )
+
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    candidate_identity = _with_activity_reference_polymorph(
+        converted.identity, None
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_predict(converted.value.point, candidate_identity),
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert inspected_polymorphs[-1] == (
+        source_identity.reference_state.value.endmember.polymorph
+    )
 
 
 def test_pooled_log_pressure_sd_known_replicates() -> None:
