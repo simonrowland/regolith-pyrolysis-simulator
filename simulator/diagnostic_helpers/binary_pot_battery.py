@@ -2188,7 +2188,16 @@ def _solve_vapor_engine_cell_oxygen_balance(
             )
             fresh_logp = math.log10(fresh_solution[0])
             if abs(fresh_logp - solved_logp) <= fixed_point_tolerance_dex:
-                return fresh_solution
+                # The refreshed solve is within Brent's xtol of this pO2.
+                # Return the pO2 where the engine cell was evaluated so the
+                # pressure and closure diagnostics stay tied to that cell.
+                return (
+                    solution[0],
+                    fresh_solution[1],
+                    fresh_solution[2],
+                    fresh_solution[3],
+                    fresh_solution[4],
+                )
             if iteration == max_fixed_point_iterations:
                 raise _OxygenBalanceRefusal(
                     "oxygen_balance_activity_fixed_point_not_converged",
