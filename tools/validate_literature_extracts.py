@@ -173,6 +173,7 @@ PATH_VALUE_KEYS = frozenset(
         "table_provenance_root",
         "chapter_pdf",
         "corpus_asset",
+        "provenance_file",
     }
 )
 
