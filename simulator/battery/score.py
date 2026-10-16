@@ -443,6 +443,7 @@ class _PrintedBandResolution:
     band: DecisionBand | None = None
     refusal: Mapping[str, object] | None = None
     notice: Notice | None = None
+    standard_uncertainty_dex: Decimal | None = None
 
 
 @dataclass(frozen=True)
@@ -1258,6 +1259,43 @@ def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
     )
 
 
+def _janaf_fusion_energy_for_reference(
+    reference: Observation,
+    temperature_K: Decimal,
+):
+    """Resolve the JANAF pair for the phase named by the source reference."""
+
+    from simulator.battery.generators.janaf import (
+        _fusion_table_pair,
+        _janaf_fusion_energy_for_pair,
+        JANAFFusionPolymorphUnavailable,
+    )
+
+    identity = reference.identity
+    if not isinstance(identity, Identity) or identity.reference_state is None:
+        raise JANAFFusionPolymorphUnavailable(
+            "source reference polymorph is not stated"
+        )
+    standard_state = identity.reference_state.value
+    polymorph = polymorph_token(standard_state.endmember)
+    if polymorph is None:
+        raise JANAFFusionPolymorphUnavailable(
+            "source reference polymorph is not stated"
+        )
+    formula = standard_state.endmember.formula
+    # JANAF has no tridymite table. The existing B1259 correction moves that
+    # named reference to cristobalite before this JANAF fusion pair is used.
+    janaf_polymorph = (
+        Polymorph.CRISTOBALITE_HIGH
+        if formula == "SiO2" and polymorph is Polymorph.TRIDYMITE
+        else polymorph
+    )
+    solid_table, liquid_table = _fusion_table_pair(formula, janaf_polymorph)
+    return _janaf_fusion_energy_for_pair(
+        formula, solid_table, liquid_table, temperature_K
+    )
+
+
 def _score_eligibility_notices(notices: Sequence[Notice]) -> tuple[Notice, ...]:
     """Remove diagnostic engine band flags; authority gates eligibility."""
 
@@ -1446,6 +1484,9 @@ def fusion_comparison_reference(
     ):
         return reference
 
+    if _source_polymorph_is_rejected(standard_state.endmember.polymorph):
+        return reference
+
     if engine is not None:
         from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
 
@@ -1486,20 +1527,25 @@ def fusion_comparison_reference(
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     from simulator.battery.generators.janaf import (
-        _JANAF_POLYMORPH_BY_TABLE,
         JANAF_R_J_PER_MOL_K,
-        JANAFFusionPolymorphUnavailable,
-        _janaf_eligible_pure_crystal_tables,
-        _janaf_fusion_energy_for_pair,
-        _janaf_stable_crystal_set,
-        janaf_fusion_energy,
     )
+
+    if _source_polymorph_is_unspecified(standard_state.endmember.polymorph):
+        notice = Notice(
+            kind=NoticeKind.INPUT_OMITTED,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason="fusion_source_reference_phase_unprinted",
+            origin=reference.observation_id,
+            band="JANAF fusion conversion requires the source-named solid polymorph",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     def fusion_missing_input_notice(reason: str) -> Notice | None:
         if not any(
             expected in reason
             for expected in (
                 f"no JANAF fusion table pair for {formula}",
+                "no unique JANAF solid table",
                 "JANAF crystal/liquid tables do not overlap",
                 "JANAF tables have fewer than two complete overlap nodes",
                 "expected one JANAF cr/l crossing",
@@ -1524,7 +1570,7 @@ def fusion_comparison_reference(
         )
 
     try:
-        fusion = janaf_fusion_energy(formula, temperature_K)
+        fusion = _janaf_fusion_energy_for_reference(reference, temperature_K)
     except ValueError as exc:
         reason = str(exc)
         notice = fusion_missing_input_notice(reason)
@@ -1537,211 +1583,12 @@ def fusion_comparison_reference(
     # Thus ΔG_fus=+28.47061 kJ/mol and Δlog10(a)=ΔG_fus*1000/(R*T*ln(10))
     # = +0.793984 dex (R=8.31441 J mol^-1 K^-1). Their branches cross at
     # 3104.945598 K, where ΔG_fus and the reference shift go to zero.
-    expected_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
     tridymite_to_cristobalite = (
         formula == "SiO2"
         and fusion.crystal_table == "O-035"
         and observed_polymorph is Polymorph.TRIDYMITE
     )
-    source_polymorph = standard_state.endmember.polymorph
-    source_polymorph_is_unknown = (
-        source_polymorph is not None
-        and _source_polymorph_is_unspecified(source_polymorph)
-    )
-    source_polymorph_is_unspecified = _source_polymorph_is_unspecified(
-        source_polymorph
-    )
-    unique_unknown_polymorph_table = False
-    inferred_reference_notice: Notice | None = None
-    eligible_solid_tables: tuple[tuple[str, Polymorph | None], ...] = ()
-    if (
-        expected_polymorph is not None
-        and observed_polymorph is not expected_polymorph
-        and source_polymorph_is_unspecified
-    ):
-        stability = None
-        try:
-            eligible_solid_tables = _janaf_eligible_pure_crystal_tables(
-                formula, temperature_K
-            )
-            if len(eligible_solid_tables) > 1:
-                stability = _janaf_stable_crystal_set(
-                    formula,
-                    temperature_K,
-                    eligible_solid_tables,
-                )
-        except JANAFFusionPolymorphUnavailable as exc:
-            notice = fusion_missing_input_notice(str(exc))
-            if notice is None:
-                notice = Notice(
-                    kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-                    affected_quantities=(Quantity.ACTIVITY,),
-                    reason=(
-                        f"fusion conversion missing input for {formula}: "
-                        f"incomplete JANAF stability candidate set: {exc}"
-                    ),
-                    origin=reference.observation_id,
-                    band=f"JANAF stability data for {formula}: {exc}",
-                )
-            return replace(
-                reference,
-                notices=union_notices(reference.notices, (notice,)),
-            )
-        if len(eligible_solid_tables) == 1:
-            unique_unknown_polymorph_table = eligible_solid_tables[0][0] == (
-                fusion.crystal_table
-            )
-        elif len(eligible_solid_tables) > 1:
-            assert stability is not None
-            stable_table = stability.selected.table_id
-            stable_polymorph = stability.selected.polymorph
-            stable_gibbs_kJ_per_mol = stability.selected.gibbs_kJ_per_mol
-            alternatives = tuple(
-                (item.table_id, item.polymorph, item.gibbs_kJ_per_mol)
-                for item in stability.alternatives
-            )
-            if alternatives:
-                # For equal chemical potential, changing the pure-solid
-                    # standard state shifts activity by exp(dG/RT). Therefore
-                    # d log10(a) = dG / (R T ln 10); J/mol divided by
-                    # (J/mol/K) K is dimensionless, and ln(10) converts ln to
-                    # log10. JANAF gives the quartz alternative to cristobalite
-                    # as 0.038716 dex at 1823 K and 0.039634 dex at 1873 K.
-                    # Its Al2O3 delta/gamma/kappa alternatives give a maximum
-                    # 0.209434 dex at 1823 K and 0.188226 dex at 1873 K. Those
-                    # transition aluminas are metastable relative to corundum
-                    # at these temperatures, so this is an upper bound over
-                    # tabulated phases, not a claim that experiments used them.
-                    # Tridymite is absent from these JANAF tables, so the SiO2
-                    # bound does not cover tridymite.
-                    bound_by_alternative = tuple(
-                        (
-                            abs(gibbs_kJ_per_mol - stable_gibbs_kJ_per_mol)
-                            * Decimal(1000)
-                            / (
-                                JANAF_R_J_PER_MOL_K
-                                * temperature_K
-                                * Decimal(10).ln()
-                            ),
-                            table_id,
-                            polymorph,
-                            gibbs_kJ_per_mol,
-                        )
-                        for table_id, polymorph, gibbs_kJ_per_mol in alternatives
-                    )
-                    bound_dex, max_table, max_polymorph, _max_gibbs = max(
-                        bound_by_alternative, key=lambda item: item[0]
-                    )
-                    row_band = _printed_uncertainty_band(
-                        Quantity.ACTIVITY,
-                        reference.uncertainty,
-                        reference.value.point,
-                        source_observation=reference,
-                    )
-                    if row_band.notice is not None:
-                        reference = replace(
-                            reference,
-                            notices=union_notices(
-                                reference.notices, (row_band.notice,)
-                            ),
-                        )
-                    bound_exceeds_row_band = (
-                        None
-                        if row_band.band is None
-                        else bound_dex > row_band.band.value
-                    )
-                    inference_detail = {
-                        "oxide": formula,
-                        "temperature_K": str(temperature_K),
-                        "chosen_polymorph": stable_polymorph.value,
-                        "chosen_table": stable_table,
-                        "alternatives": [
-                            {"polymorph": polymorph.value, "table": table_id}
-                            for table_id, polymorph, _gibbs in alternatives
-                        ],
-                        "bound_dex": str(bound_dex),
-                        "maximum_alternative": {
-                            "polymorph": max_polymorph.value,
-                            "table": max_table,
-                        },
-                        "row_decision_band_dex": (
-                            None
-                            if row_band.band is None
-                            else str(row_band.band.value)
-                        ),
-                        "row_decision_band_refusal": (
-                            None
-                            if row_band.refusal is None
-                            else dict(row_band.refusal)
-                        ),
-                        "bound_exceeds_row_band": bound_exceeds_row_band,
-                        "authority": Authority.CERTIFIED.value,
-                    }
-                    inferred_reference_notice = Notice(
-                        kind=NoticeKind.DERIVATION_USES_COMPILATION,
-                        affected_quantities=(Quantity.ACTIVITY,),
-                        reason=(
-                            "reference_polymorph_inferred_from_stability: "
-                            + json.dumps(inference_detail, sort_keys=True)
-                        ),
-                        origin=reference.observation_id,
-                        band=f"JANAF stability bound {bound_dex} dex",
-                        authority=Authority.CERTIFIED,
-                        certification=(
-                            "NIST-JANAF solid formation Gibbs energies compared at T"
-                        ),
-                    )
-                    unique_unknown_polymorph_table = True
-                    if stable_table != fusion.crystal_table:
-                        try:
-                            fusion = _janaf_fusion_energy_for_pair(
-                                formula,
-                                stable_table,
-                                fusion.liquid_table,
-                                temperature_K,
-                            )
-                        except ValueError as exc:
-                            notice = fusion_missing_input_notice(str(exc))
-                            if notice is None:
-                                raise
-                            notices = (notice,)
-                            if inferred_reference_notice is not None:
-                                notices = (inferred_reference_notice, notice)
-                            return replace(
-                                reference,
-                                notices=union_notices(reference.notices, notices),
-                            )
-    if (
-        expected_polymorph is not None
-        and observed_polymorph is not expected_polymorph
-        and not tridymite_to_cristobalite
-        and not unique_unknown_polymorph_table
-    ):
-        observed = "unknown" if observed_polymorph is None else observed_polymorph.value
-        notice = Notice(
-            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-            affected_quantities=(Quantity.ACTIVITY,),
-            reason=(
-                "fusion conversion missing input: JANAF solid table "
-                f"{fusion.crystal_table} represents polymorph "
-                f"{expected_polymorph.value}, but measured reference polymorph "
-                f"is {observed}"
-            ),
-            origin=reference.observation_id,
-            band=(
-                f"JANAF {fusion.crystal_table} requires "
-                f"{expected_polymorph.value} solid reference"
-            ),
-        )
-        return replace(reference, notices=union_notices(reference.notices, (notice,)))
-
-    if inferred_reference_notice is not None:
-        reference = replace(
-            reference,
-            notices=union_notices(reference.notices, (inferred_reference_notice,)),
-        )
-
     tridymite_notice: Notice | None = None
     tridymite_offset_dex = Decimal(0)
     if tridymite_to_cristobalite:
@@ -1826,25 +1673,17 @@ def fusion_comparison_reference(
     # move it to liquid. Since μ=G°+RT ln(a), each step multiplies activity
     # by exp(−ΔG/RT). B1259's common printed H/S grid ends at 2000 K; its edge
     # H/S are held beyond that limit (dCp=0) and the notice marks extrapolation.
-    above_crossing_notice: Notice | None = None
     if (
         temperature_K >= fusion.melting_temperature_K
         and not tridymite_to_cristobalite
     ):
-        inferred_conversion = inferred_reference_notice is not None
         domain_notice = Notice(
             kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
             affected_quantities=(Quantity.ACTIVITY,),
             reason=(
                 f"solid reference recorded at T={temperature_K} K >= "
                 f"JANAF T_fus={fusion.melting_temperature_K} K; "
-                + (
-                    "inferred solid-reference activity converted numerically; "
-                    "liquid is natural"
-                    if inferred_conversion
-                    else "no numeric reference-state conversion applied because "
-                    "liquid is natural"
-                )
+                "no numeric reference-state conversion applied because liquid is natural"
             ),
             origin=reference.observation_id,
             band=(
@@ -1852,18 +1691,15 @@ def fusion_comparison_reference(
                 f"tables={fusion.crystal_table}/{fusion.liquid_table}"
             ),
         )
-        if inferred_conversion:
-            above_crossing_notice = domain_notice
-        else:
-            notices = (domain_notice,) if melts_notice is None else (
-                domain_notice,
-                melts_notice,
-            )
-            return replace(
-                reference,
-                identity=comparison_identity,
-                notices=union_notices(reference.notices, notices),
-            )
+        notices = (domain_notice,) if melts_notice is None else (
+            domain_notice,
+            melts_notice,
+        )
+        return replace(
+            reference,
+            identity=comparison_identity,
+            notices=union_notices(reference.notices, notices),
+        )
 
     # For the same chemical potential, mu = G° + RT ln(a) gives
     # a_l = a_s*exp(-DeltaG/RT), where DeltaG=G_l-G_s per mole of oxide.
@@ -1897,7 +1733,6 @@ def fusion_comparison_reference(
         affected_quantities=(Quantity.ACTIVITY,),
         reason=(
             f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION}; "
-            f"{'source polymorph is unknown; ' if source_polymorph_is_unknown else ''}"
             "reference-state conversion (not model error); "
             f"oxide={formula}; source_activity_solid={reference.value.point}; "
             f"converted_activity_liquid={converted_activity}; "
@@ -1913,8 +1748,6 @@ def fusion_comparison_reference(
         origin=reference.observation_id,
     )
     notices = (notice,)
-    if above_crossing_notice is not None:
-        notices = (above_crossing_notice,) + notices
     if melts_notice is not None:
         notices += (melts_notice,)
     if tridymite_notice is not None:
@@ -2532,6 +2365,14 @@ _UNCERTAINTY_PAIR_RE = re.compile(
     re.IGNORECASE,
 )
 _UNCERTAINTY_SCALAR_RE = re.compile(_UNCERTAINTY_NUMBER)
+_LOG10_ACTIVITY_STANDARD_DEVIATION_RE = re.compile(
+    r"\bstandard\s+deviation\s+(?:of|in)\s+log\s*10\s*(?:\(\s*a\s*\)|a\b|activity\b)",
+    re.IGNORECASE,
+)
+
+
+def _is_log10_activity_standard_deviation(text: str) -> bool:
+    return _LOG10_ACTIVITY_STANDARD_DEVIATION_RE.search(text) is not None
 
 
 def _uncertainty_original(uncertainty: Uncertainty) -> str:
@@ -2573,7 +2414,25 @@ def _uncertainty_scope_covers_cell(uncertainty: Uncertainty, observation: object
 
 def _mapping_uncertainty_value(
     mapping: Mapping[str, object],
+    *,
+    exact_fields: Sequence[str] = (),
 ) -> tuple[object | None, str | None]:
+    for field_name in exact_fields:
+        if field_name not in mapping:
+            continue
+        value = mapping[field_name]
+        if isinstance(value, (tuple, list)) and len(value) == 2:
+            return value, "range"
+        try:
+            as_decimal(value)
+        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            if isinstance(value, str):
+                scalar = _uncertainty_scalar_from_text(value)
+                if scalar is not None:
+                    unit = "%" if re.search(r"%|percent", value, re.IGNORECASE) else None
+                    return scalar, unit
+        else:
+            return value, None
     for key, value in mapping.items():
         if str(key).casefold() in {"value", "amount", "error_value", "uncertainty_value"}:
             if isinstance(value, (tuple, list)) and len(value) == 2:
@@ -2652,6 +2511,8 @@ def _uncertainty_scalar_from_text(raw: str) -> str | None:
 
 def _printed_uncertainty_source(
     uncertainty: Uncertainty,
+    *,
+    exact_fields: Sequence[str] = (),
 ) -> tuple[Decimal | tuple[Decimal, Decimal] | None, str, str | None]:
     raw = uncertainty.verbatim
     basis = uncertainty.basis or ""
@@ -2665,7 +2526,9 @@ def _printed_uncertainty_source(
     if isinstance(value, tuple):
         shape = "range"
     if value is None and isinstance(raw, Mapping):
-        value, mapped_unit = _mapping_uncertainty_value(raw)
+        value, mapped_unit = _mapping_uncertainty_value(
+            raw, exact_fields=exact_fields
+        )
         if mapped_unit == "range":
             shape = "range"
         elif mapped_unit is not None:
@@ -2923,7 +2786,10 @@ def _confidence_level_notice(
         if isinstance(uncertainty.verbatim, Mapping)
         else "not_stated"
     )
-    if confidence_level != "not_stated":
+    if confidence_level != "not_stated" or (
+        quantity is Quantity.ACTIVITY
+        and _is_log10_activity_standard_deviation(_uncertainty_original(uncertainty))
+    ):
         return None
     source_fields = (
         [
@@ -2961,6 +2827,7 @@ def _printed_uncertainty_band(
     *,
     source_observation: Observation | None = None,
     method: MethodToken | None = None,
+    band_basis: str = "row_printed",
 ) -> _PrintedBandResolution:
     if uncertainty is None or uncertainty.kind is not UncertaintyKind.PRINTED:
         return _PrintedBandResolution()
@@ -2982,7 +2849,29 @@ def _printed_uncertainty_band(
         if isinstance(uncertainty.verbatim, Mapping)
         else "not_stated"
     )
-    source_value, shape, mapped_unit = _printed_uncertainty_source(uncertainty)
+    log10_activity_sigma = (
+        quantity is Quantity.ACTIVITY and _is_log10_activity_standard_deviation(raw_text)
+    )
+    if log10_activity_sigma:
+        confidence_level = "one_sigma"
+    exact_fields: list[str] = []
+    if source_observation is not None:
+        derivation = source_observation.derivation
+        if derivation is not None:
+            exact_fields.extend(
+                name.removeprefix("original_")
+                for name, _ in derivation.parameters
+                if name.startswith("original_")
+            )
+        identity = source_observation.identity
+        if isinstance(identity, Identity):
+            subtype = identity.subtype
+            if isinstance(subtype, State) and subtype.is_value and subtype.value:
+                exact_fields.append(str(subtype.value))
+    exact_fields.append(quantity.value)
+    source_value, shape, mapped_unit = _printed_uncertainty_source(
+        uncertainty, exact_fields=exact_fields
+    )
     envelope_value, envelope_refusal, is_temperature_envelope = (
         _temperature_envelope_value(uncertainty, source_observation)
     )
@@ -3005,13 +2894,19 @@ def _printed_uncertainty_band(
         return _PrintedBandResolution(
             refusal={"reason": "uncertainty_metric_missing", "original": raw_text}
         )
-    source_unit = _uncertainty_unit(
-        quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
+    source_unit = (
+        "dex"
+        if log10_activity_sigma
+        else _uncertainty_unit(
+            quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
+        )
     )
     if confidence_level in {"two_sigma", "ci95"}:
         kind = "printed_2sigma"
     elif confidence_level == "one_sigma":
         kind = "printed_1sigma"
+    elif confidence_level == "range_half_width":
+        kind = "printed_range"
     elif re.search(
         r"\b(?:range|limits?|maximum error|maximum deviation|bounding)\b",
         raw_text,
@@ -3064,7 +2959,17 @@ def _printed_uncertainty_band(
     notice = _confidence_level_notice(
         quantity, uncertainty, source_observation, source_value
     )
-    return _PrintedBandResolution(DecisionBand(ticket, unit, rule), notice=notice)
+    standard_uncertainty_dex = None
+    if operation is MetricOperation.DEX:
+        if confidence_level in {"one_sigma", "ci95"}:
+            standard_uncertainty_dex = ticket / NORMAL_95_TICKET_MULTIPLIER
+        elif confidence_level == "two_sigma":
+            standard_uncertainty_dex = ticket / Decimal(2)
+    return _PrintedBandResolution(
+        DecisionBand(ticket, unit, rule, band_basis=band_basis),
+        notice=notice,
+        standard_uncertainty_dex=standard_uncertainty_dex,
+    )
 
 
 def _axis_alignment_value(identity: Identity, name: str, profile: object) -> object | None:
@@ -6933,23 +6838,150 @@ def compile_residual(
     ref_point = point_magnitude(reference.value)
     assert ref_point is not None
     printed = _PrintedBandResolution()
+    fusion_band_refusal: Mapping[str, object] | None = None
     if implied_alpha:
         numeric, metric_reason, metric_detail = _implied_alpha_numeric(prediction.value)
     else:
         row_operation = _residual_metric_operation(quantity, reference)
+        band_uncertainty = source_reference.uncertainty
+        band_basis = None
+        if band_uncertainty.kind is UncertaintyKind.PRINTED:
+            band_basis = "row_printed"
+        elif band_uncertainty.kind is UncertaintyKind.NONE and experiment is not None:
+            work = context.works.get(experiment.work_id or "")
+            method_uncertainties = (
+                None if work is None else work.source_method_uncertainties
+            )
+            source_method_uncertainty = (
+                None
+                if method_uncertainties is None or source_reference.source_id is None
+                else method_uncertainties.get(source_reference.source_id)
+            )
+            if source_method_uncertainty is not None:
+                quantity_basis = source_method_uncertainty.quantity_basis
+                basis_lower = quantity_basis.casefold()
+                printed_unit = (
+                    "dex"
+                    if "dex" in basis_lower
+                    else "%"
+                    if "%" in basis_lower or "percent" in basis_lower
+                    else "fraction"
+                    if "relative" in basis_lower or "fraction" in basis_lower
+                    else quantity_basis
+                )
+                band_uncertainty = Uncertainty(
+                    kind=UncertaintyKind.PRINTED,
+                    verbatim={
+                        "value": source_method_uncertainty.value,
+                        "unit": printed_unit,
+                        "confidence_level": source_method_uncertainty.meaning,
+                        "note": source_method_uncertainty.locator.note,
+                    },
+                    value=source_method_uncertainty.value,
+                    basis=quantity_basis,
+                )
+                band_basis = "source_method"
         printed = _printed_uncertainty_band(
             quantity,
-            reference.uncertainty,
+            band_uncertainty,
             ref_point,
-            source_observation=reference,
+            source_observation=source_reference,
             method=(
                 experiment.method.value
                 if experiment is not None and experiment.method.is_value
                 else None
             ),
+            band_basis=band_basis or "row_printed",
         )
         if printed.notice is not None:
             notices = union_notices(notices, (printed.notice,))
+
+        source_phase_missing = any(
+            notice.reason == "fusion_source_reference_phase_unprinted"
+            for notice in reference.notices
+        )
+        fusion_conversion = any(
+            _is_fusion_conversion_notice(notice) for notice in reference.notices
+        )
+        if source_phase_missing:
+            fusion_band_refusal = {
+                "reason": "fusion_source_reference_phase_unprinted"
+            }
+        elif fusion_conversion:
+            assert T is not None
+            fusion_energy = _janaf_fusion_energy_for_reference(source_reference, T)
+            if fusion_energy.sigma_delta_g_fus_kJ_per_mol is None:
+                fusion_band_refusal = {
+                    "reason": "conversion_uncertainty_unprinted",
+                    "crystal_table": fusion_energy.crystal_table,
+                }
+            elif printed.refusal is not None:
+                fusion_band_refusal = dict(printed.refusal)
+            elif printed.standard_uncertainty_dex is None:
+                fusion_band_refusal = {
+                    "reason": "fusion_measurement_uncertainty_unprinted_or_not_1sigma"
+                }
+            else:
+                from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+
+                sigma_delta_g = fusion_energy.sigma_delta_g_fus_kJ_per_mol
+                assert sigma_delta_g is not None
+                # Treat the printed row/method sigma and JANAF conversion sigma
+                # as independent standard uncertainties (GUM quadrature).
+                # From dG_fus = R*T*ln(10)*delta(log10(a)),
+                # sigma_conv = sigma_dG_fus/(R*T*ln(10)). J/mol divided by
+                # J/(mol K)*K is dimensionless dex. Sanity: SiO2 at 1703 K,
+                # dH_fus~9.6 kJ/mol and T_fus~1996 K gives dG_fus~1.4 kJ/mol,
+                # a 0.043 dex shift; 10-20% dH_fus uncertainty adds <0.01 dex.
+                sigma_conversion_dex = (
+                    sigma_delta_g
+                    * Decimal(1000)
+                    / (JANAF_R_J_PER_MOL_K * T * Decimal(10).ln())
+                )
+                sigma_total_dex = (
+                    printed.standard_uncertainty_dex**2
+                    + sigma_conversion_dex**2
+                ).sqrt()
+                combined_basis = (
+                    "fusion_combined_source_method"
+                    if band_basis == "source_method"
+                    else "fusion_combined_row_printed"
+                )
+                printed = replace(
+                    printed,
+                    band=DecisionBand(
+                        NORMAL_95_TICKET_MULTIPLIER * sigma_total_dex,
+                        "dimensionless",
+                        (
+                            "fusion_combined_1sigma: independent printed reading "
+                            "and JANAF conversion uncertainties; GUM quadrature"
+                        ),
+                        band_basis=combined_basis,
+                    ),
+                    standard_uncertainty_dex=sigma_total_dex,
+                )
+        if fusion_band_refusal is not None:
+            reason = str(fusion_band_refusal["reason"])
+            printed = replace(
+                printed,
+                band=None,
+                refusal=fusion_band_refusal,
+                standard_uncertainty_dex=None,
+            )
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.INPUT_OMITTED,
+                        affected_quantities=(quantity,),
+                        reason=reason,
+                        origin="decision-band",
+                        band=json.dumps(
+                            dict(fusion_band_refusal), sort_keys=True
+                        ),
+                    ),
+                ),
+            )
         if (
             derived_band_reason is not None
             and printed.band is None
@@ -6994,8 +7026,8 @@ def compile_residual(
                 ),
             )
         printed_applies = (
-            reference.uncertainty.kind is UncertaintyKind.PRINTED
-            and _uncertainty_scope_covers_cell(reference.uncertainty, reference)
+            band_uncertainty.kind is UncertaintyKind.PRINTED
+            and _uncertainty_scope_covers_cell(band_uncertainty, source_reference)
         )
         numeric, metric_reason, metric_detail = populate_numeric(
             quantity=quantity,
@@ -7003,7 +7035,7 @@ def compile_residual(
             reference=ref_point,
             source_relation=source_relation,
             metric_uncertainty=(
-                reference.uncertainty
+                band_uncertainty
                 if printed_applies
                 else None
             ),
@@ -7039,7 +7071,7 @@ def compile_residual(
         band_preserving_kinds.add(NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG)
     has_no_band_flag = any(
         notice.kind not in band_preserving_kinds for notice in flagged_notices
-    ) or any(_is_fusion_conversion_notice(notice) for notice in notices)
+    ) or fusion_band_refusal is not None
     if has_no_band_flag:
         numeric = replace(numeric, decision_band=None)
     if implied_alpha:
@@ -10792,7 +10824,10 @@ def headline_payload_records(
                 continue
             band_data = numeric.get("decision_band")
             band = None if not isinstance(band_data, Mapping) else DecisionBand(
-                as_decimal(band_data["value"]), str(band_data["unit"]), str(band_data["rule"])
+                as_decimal(band_data["value"]),
+                str(band_data["unit"]),
+                str(band_data["rule"]),
+                str(band_data.get("band_basis") or "derived_scatter"),
             )
             flagged = bool(_flagged_payload_strata(row))
             if flagged:

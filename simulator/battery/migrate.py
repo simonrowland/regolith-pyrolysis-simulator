@@ -1627,6 +1627,7 @@ def _uncertainty_from_plain(payload: object) -> Uncertainty:
         value=value,
         basis=None if payload.get("basis") is None else str(payload["basis"]),
         derivation=derivation,
+        locator=_locator_from_plain(payload.get("locator")),
     )
 
 

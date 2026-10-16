@@ -675,6 +675,7 @@ class Uncertainty:
     value: Decimal | tuple[Decimal, Decimal] | None = None
     basis: str | None = None
     derivation: Derivation | None = None
+    locator: Locator | None = None
 
     def __post_init__(self) -> None:
         if self.kind is UncertaintyKind.PRINTED and self.verbatim is None:
@@ -1170,11 +1171,20 @@ class DecisionBand:
     value: Decimal
     unit: str
     rule: str
+    band_basis: str = "derived_scatter"
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "value", as_decimal(self.value))
         if not self.unit or not self.rule:
             raise ValueError("DecisionBand requires unit and rule")
+        if self.band_basis not in {
+            "row_printed",
+            "source_method",
+            "fusion_combined_row_printed",
+            "fusion_combined_source_method",
+            "derived_scatter",
+        }:
+            raise ValueError(f"unsupported DecisionBand.band_basis {self.band_basis!r}")
 
 
 @dataclass(frozen=True)
