@@ -322,7 +322,6 @@ def interpolate_equilibrium_payload(
         if isinstance(neighbor_diagnostics, Mapping):
             for field in ("requested_fO2_log", "printed_fO2_echo_log"):
                 if field in neighbor_diagnostics:
-                    fO2_metadata_present = True
                     diagnostic_fO2_fields.add(field)
 
     solved_temperature_C = _weighted_average_scalar(
@@ -353,6 +352,10 @@ def interpolate_equilibrium_payload(
     elif requested_fO2_log is not None:
         interpolated_result["fO2_log"] = requested_fO2_log
     if fO2_metadata_present:
+        # These top-level fix4 fields are alphaMELTS metadata. The diagnostic
+        # requested_fO2_log predates fix4 and has other meanings in
+        # ThermoEngine and MAGEMin; alphaMELTS writes it at
+        # simulator/melt_backend/alphamelts.py:4283-4284.
         # The synthesized state belongs to this query, so its requested gas
         # coordinate is the query's coordinate, not a weighted neighbor request.
         # No engine printed an echo for the synthesized state.
