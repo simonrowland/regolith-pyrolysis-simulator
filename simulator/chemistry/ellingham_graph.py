@@ -27,6 +27,9 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_segment_for_temperature,
     ellingham_stoichiometry,
 )
+from simulator.chemistry.gas_rail_authority import (
+    _gas_rail_block_is_authoritative,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
 # Match simulator.state.GAS_CONSTANT without importing simulator.state here.
@@ -353,28 +356,11 @@ def effective_equilibrium_pressure_Pa(
         gas_rail_rxn = sp_data.get("gas_rail_standard_reaction")
         gas_rail_authoritative = True
         if isinstance(gas_rail_rxn, Mapping):
-            # Mirror Builtin demotion gate (MC-5 Ca): dormant TE liquid-oxide
-            # Pref must not select over JANAF gas-metal Ellingham gas_fugacity.
-            if gas_rail_rxn.get("authoritative") is False:
-                gas_rail_authoritative = False
-            else:
-                _gr_status = str(
-                    gas_rail_rxn.get("status")
-                    or gas_rail_rxn.get("runtime_disposition")
-                    or gas_rail_rxn.get("authority_status")
-                    or ""
-                ).strip().lower()
-                if _gr_status in {
-                    "dormant",
-                    "dormant_non_authoritative",
-                    "inactive",
-                    "inactive_dormant",
-                    "inactive_provenance_only",
-                    "status_bearing_non_authoritative",
-                    "non_authoritative",
-                    "provenance_only",
-                } or _gr_status.startswith("dormant"):
-                    gas_rail_authoritative = False
+            # A dormant TE liquid-oxide Pref must not select over JANAF
+            # gas-metal Ellingham gas_fugacity (MC-5 Ca).
+            gas_rail_authoritative = _gas_rail_block_is_authoritative(
+                gas_rail_rxn
+            )
         if (
             fit_target != "standard_reaction_term"
             and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS
