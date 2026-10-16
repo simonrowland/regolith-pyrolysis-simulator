@@ -5636,6 +5636,20 @@ def predict_with_engine(
         typed = str(refusal or status or "unavailable")
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
+            cell_status = str(getattr(cell, "engine_status", "") or "")
+            if typed in {"out_of_domain", "out_of_basis"} or cell_status == "out_of_domain":
+                refusal_reason = RefusalReason.METRIC_DOMAIN
+                typed_reason = "out_of_domain"
+            else:
+                refusal_reason = RefusalReason.ATTEMPTED_UNAVAILABLE
+                if typed == REFUSAL_TIMEOUT:
+                    typed_reason = "engine_timeout"
+                elif typed == "no_liquid":
+                    typed_reason = "no_liquid"
+                elif cell_status == "RuntimeError":
+                    typed_reason = "runtime_error"
+                else:
+                    typed_reason = "engine_not_converged"
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
@@ -5647,11 +5661,12 @@ def predict_with_engine(
                 notices=notices,
                 coefficient_sources=sources,
                 lineage_complete=False,
-                refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+                refusal_reason=refusal_reason,
                 refusal_detail={
-                    "reason": "engine_not_converged",
+                    "reason": typed_reason,
                     "elapsed_s": float(getattr(cell, "wall_s", 0.0) or 0.0),
-                    "refusal_reason": typed,
+                    "cell_refusal_reason": typed,
+                    "engine_status": cell_status,
                     "engine_reason": engine_side_reason,
                 },
                 identity=identity,

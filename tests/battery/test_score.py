@@ -8883,6 +8883,91 @@ def test_magemin_nonfinite_native_activity_is_one_typed_unavailable_prediction(
     assert notice.authority is Authority.EXTRAPOLATED
 
 
+@pytest.mark.parametrize(
+    ("cell_refusal", "engine_status", "reason", "refusal_reason"),
+    [
+        ("out_of_basis", "out_of_domain", "out_of_domain", RefusalReason.METRIC_DOMAIN),
+        ("no_liquid", "refusal", "no_liquid", RefusalReason.ATTEMPTED_UNAVAILABLE),
+        ("engine_timeout", "TimeoutError", "engine_timeout", RefusalReason.ATTEMPTED_UNAVAILABLE),
+        ("unavailable", "RuntimeError", "runtime_error", RefusalReason.ATTEMPTED_UNAVAILABLE),
+    ],
+)
+def test_magemin_native_activity_failure_keeps_typed_cause(
+    monkeypatch: pytest.MonkeyPatch,
+    cell_refusal: str,
+    engine_status: str,
+    reason: str,
+    refusal_reason: RefusalReason,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        f"magemin-failed-activity-{reason}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        source_id=f"magemin-failed-activity-source-{reason}",
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args: SimpleNamespace(
+            payload={
+                "composition_mol": {
+                    "SiO2": Decimal("0.55"),
+                    "MgO": Decimal("0.20"),
+                    "Al2O3": Decimal("0.25"),
+                }
+            }
+        ),
+    )
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "equilibrate_cell",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            status="refusal",
+            refusal_reason=cell_refusal,
+            engine_status=engine_status,
+            engine_reason=engine_status,
+            wall_s=0.1,
+            melt_activities={"MgO": 0.6},
+            notices=(),
+            authority=None,
+            certified_band=None,
+            hostname="test",
+            exit_code=None,
+        ),
+    )
+
+    handle = EngineHandle("magemin", object(), True, None, False, False)
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={"magemin": handle},
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.refusal_reason is refusal_reason
+    assert prediction.refusal_detail["reason"] == reason
+    assert prediction.refusal_detail["cell_refusal_reason"] == cell_refusal
+
+
 def test_magemin_composition_gate_is_a_typed_out_of_domain_refusal(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
