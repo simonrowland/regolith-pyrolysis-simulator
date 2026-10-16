@@ -74,6 +74,7 @@ def _request(
     high_t_melt_activity: str | None = None,
     previous_temperature_K: float | None = None,
     crossing: bool = False,
+    pressure_bar: float = 1.0e-6,
     pO2_bar: float = 1.0e-9,
     intrinsic_fO2_log: float | None = -10.0,
 ) -> IntentRequest:
@@ -96,7 +97,7 @@ def _request(
             species_formula_registry={},
         ),
         temperature_C=temperature_K - 273.15,
-        pressure_bar=1.0e-6,
+        pressure_bar=pressure_bar,
         control_inputs=controls,
     )
 
@@ -452,6 +453,70 @@ def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
     assert high_t["activities_by_oxide"]["Na2O"] == high_t[
         "openimcc_activities_by_oxide"
     ]["Na2O"]
+
+
+def test_ae95_depleted_melt_continuation_root_is_selected_by_provider() -> None:
+    # Captured ae95 hot-train melt at campaign hour 66; pressure and fO2
+    # controls match the provider comparison in golden-shift.md.
+    composition_mol = {
+        "SiO2": 0.011138886562497141,
+        "MgO": 2288.8042997487846,
+        "FeO": 87.38220230346212,
+        "CaO": 2014.8644234379233,
+        "Al2O3": 1360.0091131723866,
+        "TiO2": 192.82496476933426,
+        "Na2O": 5.3731722769972105e-09,
+        "K2O": 8.844980280923895,
+    }
+    result = _provider().dispatch(
+        _request(
+            composition_mol,
+            2445.65,
+            high_t_melt_activity="openimcc",
+            pressure_bar=0.01,
+            pO2_bar=1.0e-9,
+            intrinsic_fO2_log=-2.0727607447837726,
+        )
+    )
+    high_t = result.diagnostic["high_t_melt_activity"]
+    sio_provenance = result.diagnostic["vapor_pressure_numerator_provenance"][
+        "SiO"
+    ]
+
+    assert result.status == "ok"
+    assert high_t["provider"] == "openimcc"
+    assert high_t["fallback"] is False
+    assert "fallback_reason" not in high_t
+    assert high_t["activities_by_oxide"]["SiO2"] == pytest.approx(
+        3.4859611072197934e-9,
+        rel=1e-9,
+        abs=0.0,
+    )
+    assert sio_provenance["melt_activity_authority"] == "openimcc"
+    assert not sio_provenance.get("melt_activity_fallback", False)
+    assert not any(
+        "high_t_melt_activity_fallback" in warning
+        or "openimcc_refused_constant_gamma_fallback" in warning
+        for warning in result.warnings
+    )
+    assert not any(
+        "openimcc_refused_constant_gamma_fallback" in source
+        for source in result.diagnostic["vapor_pressures_source"].values()
+    )
+
+    # The recovered root does not change the standing K2O authority ruling.
+    k2o_exclusion = high_t["authority_exclusions"]["K2O"]
+    k2o_constant_gamma = melt_oxide_activity(
+        "K2O",
+        composition_mol,
+        temperature_K=2445.65,
+    )
+    assert k2o_exclusion["tracking_id"] == "t-999"
+    assert high_t["seam"]["K2O"]["selected_activity_basis"] == "constant_gamma"
+    assert high_t["activities_by_oxide"]["K2O"] == k2o_constant_gamma.activity
+    assert high_t["openimcc_activities_by_oxide"]["K2O"] != (
+        k2o_constant_gamma.activity
+    )
 
 
 def test_k2o_pack_evaluation_table_matches_zhang_gamma_from_bridge() -> None:
