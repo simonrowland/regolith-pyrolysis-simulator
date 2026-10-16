@@ -6,7 +6,7 @@ source:
   year: 2002
   corpus_asset: raw/tranell-2002-titanium-valence/tranell-2002-titanium-valence.pdf
 extraction:
-  method: Table I values transcribed from a 400 dpi render of PDF page 3 (published page 62); pdftotext -layout
+  method: Table I values transcribed from a 400 dpi render of PDF page 3 (published page 63); pdftotext -layout
     used only as a table locator. All 57 rows and every numeric cell were checked against the render.
   date: '2026-10-16'
   worker: rdxw-ti02-1016
@@ -19,7 +19,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id001
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 1, slag CST1
@@ -32,7 +32,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST1
           value: '0.023'
@@ -91,7 +91,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id002
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 2, slag CST1
@@ -104,7 +104,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST1
           value: '0.030'
@@ -163,7 +163,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id003
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 3, slag CST1
@@ -176,7 +176,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST1
           value: '0.190'
@@ -235,7 +235,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id004
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 4, slag CST2
@@ -248,7 +248,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST2
           value: '0.029'
@@ -307,7 +307,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id005
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 5, slag CST2
@@ -320,7 +320,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST2
           value: '0.057'
@@ -379,7 +379,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id006
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 6, slag CST2
@@ -392,7 +392,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST2
           value: '0.272'
@@ -451,7 +451,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id007
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 7, slag CST3
@@ -464,7 +464,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST3
           value: '0.047'
@@ -523,7 +523,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id008
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 8, slag CST3
@@ -536,7 +536,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST3
           value: '0.063'
@@ -595,7 +595,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id009
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 9, slag CST3
@@ -608,7 +608,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST3
           value: '0.455'
@@ -667,7 +667,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id010
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 10, slag CST4
@@ -680,7 +680,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST4
           value: '0.069'
@@ -739,7 +739,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id011
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 11, slag CST4
@@ -752,7 +752,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST4
           value: '0.100'
@@ -811,7 +811,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id012
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 12, slag CST4
@@ -824,7 +824,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST4
           value: '0.632'
@@ -883,7 +883,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id013
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 13, slag CST5
@@ -896,7 +896,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST5
           value: '0.011'
@@ -955,7 +955,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id014
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 14, slag CST5
@@ -968,7 +968,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST5
           value: '0.018'
@@ -1027,7 +1027,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id015
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 15, slag CST5
@@ -1040,7 +1040,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST5
           value: '0.011'
@@ -1099,7 +1099,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id016
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 16, slag CST5
@@ -1112,7 +1112,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST5
           value: '0.027'
@@ -1171,7 +1171,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id017
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 17, slag CST5
@@ -1184,7 +1184,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST5
           value: '0.047'
@@ -1243,7 +1243,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id018
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 18, slag CST5
@@ -1256,7 +1256,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST5
           value: '0.160'
@@ -1315,7 +1315,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id019
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 19, slag CST6
@@ -1328,7 +1328,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST6
           value: '0.017'
@@ -1387,7 +1387,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id020
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 20, slag CST6
@@ -1400,7 +1400,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST6
           value: '0.026'
@@ -1459,7 +1459,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id021
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 21, slag CST6
@@ -1472,7 +1472,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST6
           value: '0.038'
@@ -1531,7 +1531,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id022
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 22, slag CST6
@@ -1544,7 +1544,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST6
           value: '0.069'
@@ -1603,7 +1603,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id023
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 23, slag CST6
@@ -1616,7 +1616,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST6
           value: '0.220'
@@ -1675,7 +1675,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id024
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 24, slag CST7
@@ -1688,7 +1688,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST7
           value: '0.034'
@@ -1747,7 +1747,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id025
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 25, slag CST7
@@ -1760,7 +1760,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST7
           value: '0.050'
@@ -1819,7 +1819,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id026
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 26, slag CST7
@@ -1832,7 +1832,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST7
           value: '0.034'
@@ -1891,7 +1891,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id027
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 27, slag CST7
@@ -1904,7 +1904,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST7
           value: '0.068'
@@ -1963,7 +1963,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id028
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 28, slag CST7
@@ -1976,7 +1976,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST7
           value: '0.076'
@@ -2035,7 +2035,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id029
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 29, slag CST7
@@ -2048,7 +2048,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST7
           value: '0.123'
@@ -2107,7 +2107,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id030
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 30, slag CST7
@@ -2120,7 +2120,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST7
           value: '0.399'
@@ -2179,7 +2179,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id031
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 31, slag CST8
@@ -2192,7 +2192,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST8
           value: '0.039'
@@ -2251,7 +2251,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id032
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 32, slag CST8
@@ -2264,7 +2264,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST8
           value: '0.061'
@@ -2323,7 +2323,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id033
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 33, slag CST8
@@ -2336,7 +2336,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST8
           value: '0.088'
@@ -2395,7 +2395,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id034
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 34, slag CST8
@@ -2408,7 +2408,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST8
           value: '0.162'
@@ -2467,7 +2467,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id035
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 35, slag CST8
@@ -2480,7 +2480,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST8
           value: '0.469'
@@ -2539,7 +2539,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id036
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 36, slag CST9
@@ -2552,7 +2552,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST9
           value: '0.024'
@@ -2611,7 +2611,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id037
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 37, slag CST9
@@ -2624,7 +2624,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST9
           value: '0.029'
@@ -2683,7 +2683,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id038
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 38, slag CST9
@@ -2696,7 +2696,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST9
           value: '0.189'
@@ -2755,7 +2755,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id039
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 39, slag CST10
@@ -2768,7 +2768,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST10
           value: '0.029'
@@ -2827,7 +2827,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id040
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 40, slag CST10
@@ -2840,7 +2840,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST10
           value: '0.054'
@@ -2899,7 +2899,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id041
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 41, slag CST10
@@ -2912,7 +2912,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST10
           value: '0.242'
@@ -2971,7 +2971,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id042
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 42, slag CST11
@@ -2984,7 +2984,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST11
           value: '0.045'
@@ -3043,7 +3043,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id043
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 43, slag CST11
@@ -3056,7 +3056,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST11
           value: '0.076'
@@ -3115,7 +3115,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id044
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 44, slag CST11
@@ -3128,7 +3128,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST11
           value: '0.413'
@@ -3187,7 +3187,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id045
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 45, slag CST12
@@ -3200,7 +3200,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST12
           value: '0.060'
@@ -3259,7 +3259,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id046
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 46, slag CST12
@@ -3272,7 +3272,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST12
           value: '0.088'
@@ -3331,7 +3331,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id047
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 47, slag CST12
@@ -3344,7 +3344,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST12
           value: '0.516'
@@ -3403,7 +3403,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id048
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 48, slag CST13
@@ -3416,7 +3416,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST13
           value: '0.030'
@@ -3475,7 +3475,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id049
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 49, slag CST13
@@ -3488,7 +3488,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST13
           value: '0.045'
@@ -3547,7 +3547,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id050
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 50, slag CST13
@@ -3560,7 +3560,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST13
           value: '0.059'
@@ -3619,7 +3619,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id051
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 51, slag CST13
@@ -3632,7 +3632,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST13
           value: '0.064'
@@ -3691,7 +3691,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id052
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 52, slag CST13
@@ -3704,7 +3704,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST13
           value: '0.303'
@@ -3763,7 +3763,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id053
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 53, slag CST14
@@ -3776,7 +3776,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST14
           value: '0.051'
@@ -3835,7 +3835,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id054
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 54, slag CST14
@@ -3848,7 +3848,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST14
           value: '0.081'
@@ -3907,7 +3907,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id055
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 55, slag CST14
@@ -3920,7 +3920,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST14
           value: '0.090'
@@ -3979,7 +3979,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id056
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 56, slag CST14
@@ -3992,7 +3992,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST14
           value: '0.123'
@@ -4051,7 +4051,7 @@ species:
       type: valence_ratio
       regime: melt_equilibration_quench
       locator: &id057
-        published_page: 62
+        published_page: 63
         pdf_page_index: 2
         table: I
         note: Table I row 57, slag CST14
@@ -4064,7 +4064,7 @@ species:
         quantity: Ti3plus_over_Ti4plus
         method_class: measured_direct
         admission_status: admitted
-        method: Modified indirect potentiometric redox titration
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
         points:
         - sample: CST14
           value: '0.452'

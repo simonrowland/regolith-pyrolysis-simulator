@@ -212,7 +212,7 @@ def test_tranell_2002_table_i_rows_migrate_with_render_pinned_values_and_conditi
         row = by_locator[locator_note]
         assert row.value.kind is ValueKind.POINT
         assert row.value.point == Decimal(value)
-        assert row.locator.published_page == 62
+        assert row.locator.published_page == 63
         assert row.locator.pdf_page_index == 2
         assert row.identity.species.formula == "Ti"
         assert row.identity.species.phase.value is Phase.L
@@ -249,7 +249,7 @@ def test_tranell_2002_table_i_rows_migrate_with_render_pinned_values_and_conditi
             "CaO_SiO2_mass_pct_ratio",
         ):
             condition = conditions[key]
-            assert condition.locator.published_page == 62
+            assert condition.locator.published_page == 63
         assert conditions["temperature_K"].state.value == row.identity.temperature_K.value
         assert conditions["fO2_Pa"].state.value.kind is ValueKind.POINT
         assert conditions["total_pressure_Pa"].state.is_unknown
