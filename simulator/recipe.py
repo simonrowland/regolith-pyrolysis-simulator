@@ -12,7 +12,7 @@ from types import MappingProxyType
 from typing import Any, Literal, Mapping, Sequence
 import warnings
 
-from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.config import DEFAULT_DATA_DIR
 from simulator.chemistry.kernel.config import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
@@ -1371,7 +1371,7 @@ class RecipeSchema:
         pinned_paths: Sequence[str | KeyPath] | None = None,
     ) -> None:
         self.setpoints = (
-            _shipped_recipe_setpoints() if setpoints is None else setpoints
+            _default_setpoints() if setpoints is None else setpoints
         )
         # Treat the class allowlist as a template even when passed explicitly, so
         # source-fingerprinted bounds (notably C5 MRE cap) refresh on use.
@@ -2025,11 +2025,6 @@ def _default_allowlist_for_source(
         _setpoints_source_fingerprint(),
         template_allowlist,
     )
-
-
-@lru_cache(maxsize=1)
-def _shipped_recipe_setpoints() -> Mapping[str, Any]:
-    return load_config_bundle().setpoints
 
 
 def _setpoint_sourced_allowlist(
