@@ -4325,7 +4325,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return 0.0
         comp = self._melt_oxide_wt_pct()
         pressure_bar = floor_vacuum_pressure_bar(
-            float(self.melt.p_total_mbar) / 1000.0,
+            self._melt_headspace_total_pressure_bar(),
             floor_bar=self._vacuum_floor_bar(),
         )
         eps_log10 = 0.001
@@ -5373,7 +5373,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # the ceiling does not mean equilibrium with pure O2. As P -> 0 the
         # vacuum floor is numerical pressure resolution, not physics.
         return math.log10(floor_vacuum_pressure_bar(
-            float(self.melt.p_total_mbar) / 1000.0,
+            self._melt_headspace_total_pressure_bar(),
             floor_bar=self._vacuum_floor_bar(),
         ))
 
@@ -5416,7 +5416,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         base_ln_fO2 = self._current_melt_redox_fO2_log() * math.log(10.0)
         pressure_bar = floor_vacuum_pressure_bar(
-            float(self.melt.p_total_mbar) / 1000.0,
+            self._melt_headspace_total_pressure_bar(),
             floor_bar=self._vacuum_floor_bar(),
         )
         delta_ln_fO2 = kress91_ln_fO2_temperature_delta(

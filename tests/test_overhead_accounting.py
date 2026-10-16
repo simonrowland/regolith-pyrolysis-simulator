@@ -2197,6 +2197,39 @@ def test_transport_estimate_has_no_command_pressure_floor():
     assert transport["pressure_mbar"] < melt.p_total_mbar
 
 
+def test_redox_pressure_consumers_use_installed_actual_total(monkeypatch):
+    import simulator.core as core_module
+
+    sim = _gas_train_sim()
+    sim.melt.p_total_mbar = 5.0
+    sim._install_upstream_projection({"N2": 0.2, "O2": 0.1})
+    actual_bar = sim._melt_headspace_total_pressure_bar()
+    assert sim._melt_redox_fO2_upper_bound_log() == pytest.approx(math.log10(actual_bar))
+    capacity_pressures = []
+    split = sim._fe3_over_sigma_fe_at_fO2
+
+    def capture_split(comp, **kwargs):
+        capacity_pressures.append(kwargs["pressure_bar"])
+        return split(comp, **kwargs)
+
+    monkeypatch.setattr(sim, "_fe3_over_sigma_fe_at_fO2", capture_split)
+    sim._melt_redox_capacity_mol_per_ln_fO2(fO2_log=-8.0, T_K=1873.15)
+    assert capacity_pressures == pytest.approx([actual_bar, actual_bar])
+
+    shift_pressures = []
+    shift = core_module.kress91_ln_fO2_temperature_delta
+
+    def capture_shift(*args, **kwargs):
+        shift_pressures.extend([kwargs["reference_pressure_bar"], kwargs["target_pressure_bar"]])
+        return shift(*args, **kwargs)
+
+    monkeypatch.setattr(core_module, "kress91_ln_fO2_temperature_delta", capture_shift)
+    monkeypatch.setattr(sim, "_current_melt_redox_reference_T_K", lambda: 1800.0)
+    monkeypatch.setattr(sim, "_melt_redox_temperature_shift_is_liquid", lambda *a, **kw: True)
+    sim._melt_fO2_reference_state_at_temperature(1873.15)
+    assert shift_pressures == pytest.approx([actual_bar, actual_bar])
+
+
 def test_live_carrier_report_closes_over_the_complete_residual_stream():
     from simulator.overhead import OverheadGasModel
     from simulator.state import CondensationTrain, MeltState
