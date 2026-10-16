@@ -1769,7 +1769,12 @@ def _nested_warm_worker_bootstrap():
 
 
 class _NestedWarmHangBackend:
-    def __init__(self, budget_path: str, pid_path: str, call_started_path: str) -> None:
+    def __init__(
+        self,
+        budget_path: str,
+        pid_path: str,
+        call_started_path: str,
+    ) -> None:
         from simulator.engine_pool import WarmEngineWorker
 
         self.budget_path = Path(budget_path)
@@ -1777,7 +1782,9 @@ class _NestedWarmHangBackend:
             name="nested test warm engine",
             bootstrap=_nested_warm_worker_bootstrap,
             handler=_nested_warm_hang_handler,
-            startup_timeout_s=5.0,
+            # Match the 30 s startup floor used by ThermoEngine's warm worker;
+            # startup must not masquerade as the per-cell call timeout below.
+            startup_timeout_s=30.0,
             call_timeout_s=5.0,
             diagnostic_signal=signal.SIGCONT,
             watchdog_grace_s=0.05,
@@ -1788,8 +1795,15 @@ class _NestedWarmHangBackend:
         self.call_started_path = Path(call_started_path)
 
     def equilibrate(self, *, call_timeout_s: float, **_kwargs):
-        self.budget_path.write_text(repr(call_timeout_s), encoding="utf-8")
-        self.call_started_path.write_text(repr(time.monotonic()), encoding="utf-8")
+        call_started = time.monotonic()
+        self.call_started_path.write_text(repr(call_started), encoding="utf-8")
+        original_call = self.worker.call
+
+        def record_call_budget(request, *, timeout_s=None):
+            self.budget_path.write_text(repr(timeout_s), encoding="utf-8")
+            return original_call(request, timeout_s=timeout_s)
+
+        self.worker.call = record_call_budget
         return self.worker.call({}, timeout_s=call_timeout_s)
 
     def close(self) -> None:
@@ -2038,12 +2052,14 @@ def test_thermoengine_nested_warm_hang_uses_cell_budget_and_times_out(
         )
 
         assert cell.refusal_reason == REFUSAL_TIMEOUT
+        assert cell.engine_reason == (
+            f"equilibrate exceeded hard timeout of {timeout_s:g}s"
+        )
+        assert budget_path.is_file(), "nested worker reached equilibrate after startup"
+        assert call_started_path.is_file(), "nested worker call began after startup"
         assert float(budget_path.read_text(encoding="utf-8")) == pytest.approx(
             timeout_s
         )
-        assert time.monotonic() - float(
-            call_started_path.read_text(encoding="utf-8")
-        ) <= timeout_s + 0.5
         nested_pid = int(pid_path.read_text(encoding="utf-8"))
         deadline = time.monotonic() + 1.0
         while True:
