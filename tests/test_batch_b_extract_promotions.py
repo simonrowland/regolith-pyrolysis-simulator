@@ -113,31 +113,35 @@ def test_shimaoka_nakamura_1991_migrates_table1_cells() -> None:
     assert _point(result, "shimaoka_1991_na_run_89a_concentration") == Decimal(
         "2074"
     )
-    rate = next(
-        observation
-        for observation in result.observations.values()
-        if observation.observation_id.endswith(
-            "::shimaoka_1991_na_run_89a_vaporization_rate"
-        )
-    )
-    assert rate.identity.quantity.is_unknown
-    assert rate.value.kind.value == "unavailable"
-    assert rate.admission.status.value == "rejected"
     document = yaml.safe_load(
         (EXTRACTS / "shimaoka-nakamura-1991-iau-colloq126-79.yaml").read_text(
             encoding="utf-8"
         )
     )
-    source_rate = next(
+    rates = [
         observation
-        for observation in document["species"]["Na"]["observations"]
-        if observation["observation_id"]
-        == "shimaoka_1991_na_run_89a_vaporization_rate"
-    )
-    assert source_rate["units"] == "cm3 min-1 cm-2 as printed"
-    assert source_rate["locator"]["row"] == "89A"
-    assert source_rate["locator"]["column"] == "k Na"
-    assert source_rate["values"]["k_cm3_min_cm2_as_printed"] == 0.000107
+        for species in document["species"].values()
+        for observation in species["observations"]
+        if observation.get("type") == "rate_series"
+        and observation.get("locator", {}).get("table") == "1"
+        and observation.get("units") == "cm3 min-1 cm-2 as printed"
+    ]
+    assert len(rates) == 15
+    for source_rate in rates:
+        observation = next(
+            row
+            for row in result.observations.values()
+            if row.observation_id.endswith(f"::{source_rate['observation_id']}")
+        )
+        assert source_rate["values"]["quantity"] == "per_area_volumetric_rate"
+        assert source_rate["values"]["status"] == "typed_refusal"
+        assert source_rate["units"] == "cm3 min-1 cm-2 as printed"
+        assert source_rate["locator"]["row"]
+        assert source_rate["locator"]["column"].startswith("k ")
+        assert "k_cm3_min_cm2_as_printed" in source_rate["values"]
+        assert observation.identity.quantity.is_unknown
+        assert observation.value.kind.value == "unavailable"
+        assert observation.admission.status.value == "rejected"
     assert all(
         observation.identity.temperature_K.is_value
         and observation.point_conditions["temperature_K"].state.is_value
