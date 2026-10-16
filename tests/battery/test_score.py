@@ -9453,7 +9453,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         and isinstance(obs.identity, Identity)
         and quantity_token(obs.identity) is Quantity.ACTIVITY
     }
-    stolyarova_derived_pressures = {
+    stolyarova_quoted_pressures = {
         key
         for key, obs in observations.items()
         if obs.source_id == "kems-053-stolyarova-1991"
@@ -9461,7 +9461,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         and quantity_token(obs.identity) is Quantity.P_PARTIAL
         and obs.admission.status is AdmissionStatus.ADMITTED
         and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
     }
     stolyarova_1995_derived_pressures = {
         key
@@ -9493,7 +9493,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     }
     headline_diagnostic_references = (
         (stolyarova_activities & admitted_model_derived)
-        | stolyarova_derived_pressures
+        | stolyarova_quoted_pressures
         | stolyarova_1995_derived_pressures
         | stolyarova_1996_derived_pressures
         | kems_model_derived
@@ -9501,7 +9501,11 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     assert len(allibert_admitted) == 16
     assert len(allibert_rejected) == 55
     assert len(stolyarova_activities) == 54
-    assert len(stolyarova_derived_pressures) == 9
+    assert len(stolyarova_quoted_pressures) == 9
+    assert all(
+        observations[key].evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        for key in stolyarova_quoted_pressures
+    )
     # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9) are model-derived,
     # not measured pressures (review, Derived O / O2).
     assert len(stolyarova_1995_derived_pressures) == 26
@@ -9529,10 +9533,12 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     ] == [30, 10, 15]
     assert len(kems_model_derived) == 28
     assert len(
-        stolyarova_activities | stolyarova_derived_pressures | kems_model_derived
+        stolyarova_activities | stolyarova_quoted_pressures | kems_model_derived
     ) == 91
     assert len(headline_diagnostic_references) == 136
-    assert admitted_model_derived == headline_diagnostic_references
+    assert admitted_model_derived == (
+        headline_diagnostic_references - stolyarova_quoted_pressures
+    )
     assert admitted_model_derived <= {
         obs.observation_id for obs in score_module.comparison_candidates(filtered)
     }
@@ -9784,7 +9790,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         derived_pressure_rows = [
             row
             for row in stolyarova_rows
-            if row.reference in stolyarova_derived_pressures
+            if row.reference in stolyarova_quoted_pressures
         ]
         assert len(activity_rows) == 54
         assert len(derived_pressure_rows) == 9
