@@ -4012,7 +4012,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
             NoticeKind.DERIVATION_USES_COMPILATION,
             "reference_converted_via_fusion;probe",
         ),
-        (NoticeKind.FIGURE_ONLY, "figure_only:probe"),
+        (NoticeKind.FIGURE_ONLY, "figure_only"),
         (NoticeKind.REACTIVE_CELL_NOT_MODELLED, "reactive_cell_not_modelled:probe"),
         (
             NoticeKind.LIQUIDUS_POSITION_CONTESTED,
