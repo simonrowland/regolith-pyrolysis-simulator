@@ -4165,10 +4165,20 @@ def test_reduced_terminal_payload_preserves_run_notices_after_projection_failure
     sim.backend = SimpleNamespace(backend_name="alphamelts")
     sim._register_freeze_gate_liquid_fraction_providers()
     sibling_notice = {"authority": "extrapolated", "count": 1}
+    fallback_notice = {
+        "kind": "high_t_melt_activity_fallback",
+        "authority": "extrapolated",
+        "reason": "imcc_nonconvergence",
+    }
     monkeypatch.setattr(
         sim,
         "engine_commissioning_run_notice",
         lambda: sibling_notice,
+    )
+    monkeypatch.setattr(
+        sim,
+        "high_t_melt_activity_run_notice",
+        lambda: fallback_notice,
     )
 
     def fail_projection(*_args, **_kwargs):
@@ -4204,6 +4214,7 @@ def test_reduced_terminal_payload_preserves_run_notices_after_projection_failure
             "alphamelts-diagnostic"
         )
         assert metadata["engine_commissioning_notice"] == sibling_notice
+        assert metadata["high_t_melt_activity_fallback_notice"] == fallback_notice
     finally:
         _clear_simulation_state(sid)
 

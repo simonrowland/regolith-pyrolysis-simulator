@@ -53,6 +53,12 @@ except (ImportError, OSError, RuntimeError) as exc:  # pragma: no cover
 else:
     _OPENIMCC_IMPORT_ERROR = None
 
+_IMCC_REFUSAL_ERROR_TYPE: type[BaseException] | None = (
+    getattr(_openimcc, "ImccRefusal", None)
+    if _openimcc is not None
+    else None
+)
+
 
 OPENIMCC_INSTALL_HINT = (
     "python -m pip install --no-deps "

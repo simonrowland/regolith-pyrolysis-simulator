@@ -1004,6 +1004,18 @@ def _feedstock_surface_pressure_mbar(feedstock: Mapping[str, Any]) -> float:
     )
 
 
+def read_high_t_melt_activity_fallback_notice(
+    sim: Any,
+) -> dict[str, Any] | None:
+    reader = getattr(sim, 'high_t_melt_activity_run_notice', None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    if not isinstance(notice, Mapping) or not notice:
+        return None
+    return dict(notice)
+
+
 class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     """
     Hour-by-hour simulator for the Oxygen Shuttle process.
@@ -1244,6 +1256,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._last_high_t_melt_activity_temperature_K: float | None = None
         self._last_high_t_melt_activity: Dict[str, Any] = {}
+        self._high_t_melt_activity_fallback_steps: list[Dict[str, Any]] = []
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._last_target_inventory_diagnostic: Dict[str, Any] = {}
         self._target_inventory_by_hour: list[Dict[str, Any]] = []
@@ -1608,6 +1621,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_imcc_activity_shadow = {}
         self._last_high_t_melt_activity_temperature_K = None
         self._last_high_t_melt_activity = {}
+        self._high_t_melt_activity_fallback_steps = []
         self._last_target_inventory_diagnostic = {}
         self._target_inventory_by_hour = []
         self._target_inventory_depletion_hour = None
@@ -8978,6 +8992,102 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
              for account in MELT_RESIDENT_ACCOUNTS},
             MELT_RESIDENT_ACCOUNTS)
 
+    def _note_high_t_melt_activity_fallback(
+        self,
+        authority: Any,
+        vapor_pressure_provenance: Any,
+    ) -> None:
+        if not isinstance(authority, Mapping) or not authority.get('fallback'):
+            return
+        if not isinstance(vapor_pressure_provenance, Mapping):
+            return
+        parent_oxides = sorted(
+            {
+                str(item.get('melt_activity_parent_oxide'))
+                for item in vapor_pressure_provenance.values()
+                if isinstance(item, Mapping)
+                and item.get('melt_activity_fallback')
+                and item.get('melt_activity_parent_oxide')
+            }
+        )
+        if not parent_oxides:
+            return
+        campaign = getattr(self.melt, 'campaign', None)
+        campaign_name = str(getattr(campaign, 'name', campaign) or '')
+        step = {
+            'hour': int(self.melt.hour) + 1,
+            'campaign': campaign_name,
+            'parent_oxides': parent_oxides,
+            'reason': dict(authority.get('fallback_reason') or {}),
+        }
+        steps = getattr(self, '_high_t_melt_activity_fallback_steps', None)
+        if not isinstance(steps, list):
+            steps = []
+            self._high_t_melt_activity_fallback_steps = steps
+        steps.append(step)
+
+    def high_t_melt_activity_run_notice(self) -> Dict[str, Any] | None:
+        """Aggregate OpenIMCC refusal predictions for the run artifact."""
+
+        steps = getattr(self, '_high_t_melt_activity_fallback_steps', ())
+        if not isinstance(steps, (list, tuple)) or not steps:
+            return None
+        valid_steps = [step for step in steps if isinstance(step, Mapping)]
+        if not valid_steps:
+            return None
+        hours = [int(step['hour']) for step in valid_steps if 'hour' in step]
+        parent_oxides = sorted(
+            {
+                str(parent)
+                for step in valid_steps
+                for parent in step.get('parent_oxides', ())
+                if str(parent)
+            }
+        )
+        if not hours or not parent_oxides:
+            return None
+        notices: list[Dict[str, Any]] = []
+        seen_reasons: set[tuple[tuple[str, str], ...]] = set()
+        for step in valid_steps:
+            reason = dict(step.get('reason') or {})
+            code = str(reason.get('code') or 'openimcc_evaluation_refused')
+            reason_key = tuple(
+                (key, str(reason.get(key) or ''))
+                for key in ('code', 'type', 'detail')
+            )
+            if reason_key in seen_reasons:
+                continue
+            seen_reasons.add(reason_key)
+            notices.append({'reason': code, **reason})
+        campaigns = sorted(
+            {
+                str(step.get('campaign'))
+                for step in valid_steps
+                if str(step.get('campaign') or '')
+            }
+        )
+        reason_codes = sorted({str(item['reason']) for item in notices})
+        notice: Dict[str, Any] = {
+            'kind': 'high_t_melt_activity_fallback',
+            'authority': 'extrapolated',
+            'reason': (
+                reason_codes[0]
+                if len(reason_codes) == 1
+                else 'multiple_openimcc_refusals'
+            ),
+            'notices': notices,
+            'affected_tick_count': len(set(hours)),
+            'affected_parent_count': len(parent_oxides),
+            'affected_parent_oxides': parent_oxides,
+            'first_hour': min(hours),
+            'last_hour': max(hours),
+        }
+        if len(campaigns) == 1:
+            notice['campaign'] = campaigns[0]
+        elif campaigns:
+            notice['campaigns'] = campaigns
+        return notice
+
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
         projected_melt = self._melt_resident_composition_kg_from_atom_ledger()
         # Project the *full* cleaned_melt account, not just OXIDE_SPECIES: a
@@ -9757,6 +9867,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(result, 'vapor_pressures_source', {}) or {}
         )
         self._last_vapor_pressure_diagnostic = diagnostic
+        note_high_t_fallback = getattr(
+            self, '_note_high_t_melt_activity_fallback', None
+        )
+        if callable(note_high_t_fallback):
+            note_high_t_fallback(
+                diagnostic.get('high_t_melt_activity'),
+                diagnostic.get('vapor_pressure_numerator_provenance'),
+            )
 
     @staticmethod
     def _kernel_vapor_pressure_source(diagnostic: Mapping[str, Any]) -> str:

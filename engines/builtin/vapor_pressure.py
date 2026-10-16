@@ -689,17 +689,26 @@ def _build_high_t_melt_activity_authority(
         "seam": {},
         "authority_exclusions": {},
     }
-    try:
-        from simulator.melt_backend.openimcc_bridge import (
-            evaluate_cleaned_melt,
-        )
+    from simulator.melt_backend.openimcc_bridge import (
+        _IMCC_REFUSAL_ERROR_TYPE,
+        OpenImccCompositionPolicyRefusal,
+        OpenImccUnavailableError,
+        evaluate_cleaned_melt,
+    )
 
+    expected_refusal_types = (
+        OpenImccCompositionPolicyRefusal,
+        OpenImccUnavailableError,
+    )
+    if _IMCC_REFUSAL_ERROR_TYPE is not None:
+        expected_refusal_types += (_IMCC_REFUSAL_ERROR_TYPE,)
+    try:
         cleaned = evaluate_cleaned_melt(
             composition_mol=composition_mol,
             temperature_K=temperature_K,
             allow_extrapolation=temperature_K > 3000.0,
         )
-    except Exception as exc:  # noqa: BLE001 - C3 is an hour-local fallback
+    except expected_refusal_types as exc:
         code = str(getattr(exc, "code", "openimcc_evaluation_refused"))
         diagnostics = getattr(exc, "diagnostics", {})
         classification = (
@@ -707,15 +716,30 @@ def _build_high_t_melt_activity_authority(
             if isinstance(diagnostics, Mapping)
             else None
         )
+        fallback_reason = {
+            "code": code,
+            "type": type(exc).__name__,
+            "detail": str(exc),
+        }
+        fallback_notice = {
+            "code": code,
+            "reason": code,
+            "authority": "extrapolated",
+            "message": str(exc),
+        }
+        if isinstance(diagnostics, Mapping):
+            for residual_key in ("residual_inf", "residual_l2"):
+                if residual_key not in diagnostics:
+                    continue
+                fallback_reason[residual_key] = diagnostics[residual_key]
+                fallback_notice[residual_key] = diagnostics[residual_key]
         base.update(
             {
                 "provider": "constant_gamma",
                 "fallback": True,
-                "fallback_reason": {
-                    "code": code,
-                    "type": type(exc).__name__,
-                    "detail": str(exc),
-                },
+                "authority": "extrapolated",
+                "fallback_reason": fallback_reason,
+                "notices": [fallback_notice],
                 "activities_by_oxide": {},
                 "openimcc_extrapolated": False,
                 "openimcc_flags": [],
@@ -910,11 +934,28 @@ def _high_t_activity_for_parent(
         composition_mol,
         temperature_K=temperature_K,
     )
-    if not authority or authority.get("provider") != "openimcc":
+    if not authority:
         return legacy
     if parent_oxide not in _HIGH_T_FLUX_OXIDES or legacy is None:
         return legacy
     if parent_oxide in _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS:
+        return legacy
+    if authority.get("fallback"):
+        fallback_reason = dict(authority.get("fallback_reason") or {})
+        fallback_warning = (
+            "openimcc_refused_constant_gamma_fallback:"
+            f"{fallback_reason.get('code', 'openimcc_evaluation_refused')}"
+        )
+        return replace(
+            legacy,
+            warning=(
+                f"{legacy.warning}; {fallback_warning}"
+                if legacy.warning
+                else fallback_warning
+            ),
+            evidence_tier="PREDICT_AND_FLAG",
+        )
+    if authority.get("provider") != "openimcc":
         return legacy
     activity = float(authority.get("activities_by_oxide", {}).get(parent_oxide, 0.0) or 0.0)
     if activity <= 0.0:
@@ -957,6 +998,11 @@ def _attach_high_t_activity_provenance(
         parent_oxide = str(row.get("parent_oxide") or "")
         if parent_oxide not in _HIGH_T_FLUX_OXIDES:
             continue
+        fallback_applied = bool(authority.get("fallback")) and (
+            parent_oxide not in _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS
+        )
+        if fallback_applied:
+            provenance["melt_activity_parent_oxide"] = parent_oxide
         provenance["high_t_melt_activity_mode"] = str(
             authority.get("requested") or "openimcc"
         )
@@ -983,6 +1029,8 @@ def _attach_high_t_activity_provenance(
                 exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(
                     parent_oxide
                 )
+        elif authority.get("fallback"):
+            exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(parent_oxide)
         if exclusion is not None:
             provenance["melt_activity_authority"] = exclusion["authority"]
             exclusion_payload = dict(exclusion)
@@ -998,7 +1046,11 @@ def _attach_high_t_activity_provenance(
                     "authority": exclusion["authority"],
                     "ruling": exclusion["ruling"],
                     "certification": exclusion["tracking_id"],
-                    "reason": exclusion["reason"],
+                    **(
+                        {"reason": exclusion["reason"]}
+                        if exclusion.get("reason")
+                        else {}
+                    ),
                     "citation": exclusion["citation"],
                 }
             token = (

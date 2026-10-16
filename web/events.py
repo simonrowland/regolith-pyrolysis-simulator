@@ -82,6 +82,7 @@ from simulator.runner import (
     RunnerError,
     _attach_diagnostic_gate_authority_notice,
     _attach_engine_commissioning_notice,
+    _attach_high_t_melt_activity_fallback_notice,
     _attach_rump_expectation_notice,
     _attach_sulfur_saturation_notice,
     _composition_projected_liquidus_notice,
@@ -2831,6 +2832,7 @@ def _available_runner_payload(
         _attach_diagnostic_gate_authority_notice,
         _attach_sulfur_saturation_notice,
         _attach_rump_expectation_notice,
+        _attach_high_t_melt_activity_fallback_notice,
     ):
         try:
             attach_notice(metadata, sim)
