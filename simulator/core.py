@@ -9074,7 +9074,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # reached. Post-equilibrium calls override this with the actual
         # melt T.
         T_K = 1473.0
-        P_bar = max(self.melt.p_total_mbar / 1000.0, 1.0e-6)
+        P_bar = self._melt_headspace_total_pressure_bar()
         fO2_log = self._current_melt_redox_fO2_log()
         self._sync_oxygen_reservoir_mirror()
         self._last_sulfur_saturation_result = (
@@ -9113,7 +9113,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         T_K = float(self.melt.temperature_C) + 273.15
         if T_K <= 0.0:
             return
-        P_bar = max(self.melt.p_total_mbar / 1000.0, 1.0e-6)
+        P_bar = self._melt_headspace_total_pressure_bar()
         fO2_log = self._current_melt_redox_fO2_log()
         self._sync_oxygen_reservoir_mirror()
         sulfur_result = self._sulfsat_gate.compute_sulfur_saturation(

@@ -3134,9 +3134,11 @@ class EvaporationMixin:
                 source_reaction_fO2_bar = None
         total_pressure_Pa = None
         try:
-            total_pressure_Pa = float(
-                getattr(self.melt, 'p_total_mbar', 0.0) or 0.0
-            ) * 100.0
+            # The activity shadow uses absolute pressure: convert the actual
+            # headspace total from bar to Pa, preserving zero-vacuum as zero.
+            total_pressure_Pa = (
+                self._melt_headspace_total_pressure_bar() * 1.0e5
+            )
         except (TypeError, ValueError):
             total_pressure_Pa = None
         try:

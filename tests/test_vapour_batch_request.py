@@ -3634,6 +3634,45 @@ def test_simulator_build_vapour_batch_is_available_and_golden_neutral() -> None:
     assert diagnostic_batch.melt_activity_shadow.as_mapping()["record_limit"] == 64
 
 
+def test_resolve_evaporation_vapour_batch_uses_actual_headspace_pressure(
+    monkeypatch,
+) -> None:
+    from simulator.config import load_config_bundle
+    from simulator.core import PyrolysisSimulator
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+
+    bundle = load_config_bundle(DATA_DIR)
+    sim = PyrolysisSimulator(
+        melt_backend=InternalAnalyticalBackend(),
+        setpoints=bundle.setpoints,
+        feedstocks=bundle.feedstocks,
+        vapor_pressures=bundle.vapor_pressures,
+    )
+    sim.melt.p_total_mbar = 10.0
+    sim._melt_headspace_composition_mbar = {
+        "Fe": 0.00042416384640343613,
+    }
+    captured: dict[str, Any] = {}
+    batch = object()
+
+    def capture_builder(**kwargs):
+        captured.update(kwargs)
+        return batch
+
+    monkeypatch.setattr(sim, "build_vapour_batch", capture_builder)
+    resolved = sim._resolve_evaporation_vapour_batch(
+        SimpleNamespace(activity_coefficients={}),
+        temperature_K=1473.0,
+        effective_pressure_source=SimpleNamespace(species_ids=frozenset()),
+    )
+
+    assert resolved is batch
+    # The supplied Fe partial is mbar; converting it to Pa multiplies by 100.
+    assert captured["total_pressure_Pa"] == pytest.approx(
+        0.04241638464034361
+    )
+
+
 # ---------------------------------------------------------------------------
 # Review regressions (review2-vr6-cx / review2-vr6-km)
 # ---------------------------------------------------------------------------

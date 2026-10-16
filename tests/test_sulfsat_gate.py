@@ -676,6 +676,36 @@ def test_sulfsat_gate_wires_shared_kress91_split_into_scss(monkeypatch):
     assert result.calibration_status == 'in_range'
 
 
+def test_zero_pressure_flags_sulfsat_numerical_resolution(monkeypatch):
+    captured: Dict[str, Any] = {}
+    fake = _make_fake_pysulfsat()
+    calculate_scss = fake.calculate_S2017_SCSS
+
+    def _capture_scss(*, df=None, T_K=None, P_kbar=None, **kwargs):
+        captured['P_kbar'] = P_kbar
+        return calculate_scss(df=df, T_K=T_K, P_kbar=P_kbar, **kwargs)
+
+    fake.calculate_S2017_SCSS = _capture_scss
+    monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+    gate = SulfSatGate()
+    assert gate.initialize({}) is True
+
+    result = gate.compute_sulfur_saturation(
+        liquid_comp_wt=_MORB_COMP_WT,
+        T_K=1400.0,
+        P_bar=0.0,
+        fO2_log=-9.0,
+        S_input_ppm=1000.0,
+    )
+
+    assert captured['P_kbar'] == pytest.approx(1.0e-12)
+    assert result.calibration_status == 'out_of_range'
+    assert any(
+        'sulfsat_pressure_resolution_applied' in warning
+        for warning in result.warnings
+    )
+
+
 def test_kress_carmichael_helper_key_error_propagates(monkeypatch):
     fake = _make_fake_pysulfsat()
     monkeypatch.setitem(sys.modules, 'PySulfSat', fake)

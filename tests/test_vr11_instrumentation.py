@@ -951,6 +951,8 @@ def test_source_guard_flags_live_map_argument_on_batch_flux_consumer() -> None:
 
 def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> None:
     """Only the named seam may read compatibility values in the flux route."""
+    from simulator.core import PyrolysisSimulator
+
 
     compatibility = CompatibilityPressureMapReadTripwire({"Na": 999.0})
     backend_shadow = CompatibilityPressureMapReadTripwire({"Na": 777.0})
@@ -984,6 +986,7 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
             melt_surface_area_m2=1.0,
             stir_state=SimpleNamespace(axial=1.0, radial=1.0),
         ),
+        _melt_headspace_composition_mbar={},
         overhead_model=SimpleNamespace(pipe_diameter_m=0.12),
         overhead=SimpleNamespace(headspace_temperature_K=1873.15),
         _last_vapor_pressure_diagnostic={
@@ -1002,6 +1005,10 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
             lambda _equilibrium, **_kwargs: {}
         ),
         _dispatch_only=_dispatch,
+    )
+    host._melt_headspace_total_pressure_bar = MethodType(
+        PyrolysisSimulator._melt_headspace_total_pressure_bar,
+        host,
     )
     host._resolve_evaporation_vapour_batch = (
         lambda equilibrium, *, temperature_K, effective_pressure_source: (

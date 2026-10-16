@@ -141,6 +141,7 @@ _SCAS_CALIBRATION_BOUNDS_WT_PCT = {
 }
 _SCAS_T_K_RANGE = (1023.0, 1598.0)
 SULFSAT_CALIBRATION_VERSION = 'pysulfsat-1.0.12-calibration-bounds-v2'
+_SULFSAT_MIN_PRESSURE_BAR = 1e-9
 
 
 @dataclass
@@ -529,7 +530,11 @@ class SulfSatGate:
         unavailable results.
         """
         df = self._build_dataframe(liquid_comp_wt)
-        P_kbar = max(P_bar, 1e-9) / 1000.0
+        # Kress91 requires positive pressure. The existing minimum is
+        # 1e-9 bar (= 1e-4 Pa = 1e-12 kbar); lower actual pressures use
+        # this named numerical resolution and are flagged below.
+        pressure_bar_for_solver = max(P_bar, _SULFSAT_MIN_PRESSURE_BAR)
+        P_kbar = pressure_bar_for_solver / 1000.0
         delta_qfm = float(fO2_log) - _qfm_logfo2_frost(T_K, P_bar)
 
         ss = self._module
@@ -569,6 +574,13 @@ class SulfSatGate:
             ))
 
         numerical_warnings: List[str] = []
+        if P_bar < _SULFSAT_MIN_PRESSURE_BAR:
+            numerical_warnings.append(
+                'sulfsat_pressure_resolution_applied: '
+                f'actual P_bar={P_bar:g}, '
+                f'calculation P_bar={_SULFSAT_MIN_PRESSURE_BAR:g}; '
+                'Kress91 requires positive pressure'
+            )
         scss_ppm, note = self._finite_capacity_ppm(
             scss_ppm,
             field='SCSS_ppm',
@@ -641,7 +653,7 @@ class SulfSatGate:
             fO2_log=float(fO2_log),
             mol_fractions=mol_fractions,
             T_K=float(T_K),
-            pressure_bar=max(float(P_kbar) * 1000.0, 1.0e-9),
+            pressure_bar=float(P_kbar) * 1000.0,
         )
         ratio = float(split['fe3'])
 
