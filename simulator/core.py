@@ -1291,7 +1291,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.inventory = ProcessInventory()
         self.train = CondensationTrain.create_default()
         self.overhead = OverheadGas()
-        self._melt_headspace_composition_mbar: Dict[str, float] = {}
+        self._install_upstream_projection({})
 
         # --- Batch record ---
         self.record = BatchRecord()
@@ -1606,7 +1606,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Reset condensation train
         self.train = CondensationTrain.create_default()
         self.overhead = OverheadGas()
-        self._melt_headspace_composition_mbar = {}
+        self._install_upstream_projection({})
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
         self._last_vapour_batch = None
@@ -3546,6 +3546,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if model == 'lumped':
             return max(1.0, melt_T_K - 100.0)
         return max(1.0, melt_T_K)
+
+    def _install_upstream_projection(
+        self, vector_mbar: Optional[Dict[str, float]],
+    ) -> None:
+        """Install actual upstream partials, the source of the derived total."""
+        self._melt_headspace_composition_mbar = vector_mbar
 
     def _melt_headspace_total_pressure_bar(self) -> float:
         upstream_partials_mbar = getattr(
@@ -14186,7 +14192,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             effective_transport_capacity=effective_transport_capacity,
         )
-        self._melt_headspace_composition_mbar = (
+        self._install_upstream_projection(
             self._flowing_stream_partial_pressures(
                 evap_flux, upstream_transport,
                 holdup_mol=self._stream_inlet_holdup_this_tick,

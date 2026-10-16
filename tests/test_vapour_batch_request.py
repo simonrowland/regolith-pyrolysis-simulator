@@ -3649,9 +3649,9 @@ def test_resolve_evaporation_vapour_batch_uses_actual_headspace_pressure(
         vapor_pressures=bundle.vapor_pressures,
     )
     sim.melt.p_total_mbar = 10.0
-    sim._melt_headspace_composition_mbar = {
+    sim._install_upstream_projection({
         "Fe": 0.00042416384640343613,
-    }
+    })
     captured: dict[str, Any] = {}
     batch = object()
 

@@ -147,9 +147,9 @@ def test_stage0_sulfsat_uses_actual_headspace_pressure(monkeypatch) -> None:
     )
     sim = run._start_session().simulator
     sim.melt.p_total_mbar = 10.0
-    sim._melt_headspace_composition_mbar = {
+    sim._install_upstream_projection({
         "Fe": 0.00042416384640343613,
-    }
+    })
     monkeypatch.setattr(sim, "_stage0_sulfur_input_ppm", lambda: 500.0)
     monkeypatch.setattr(sim, "_melt_oxide_wt_pct", lambda: {"SiO2": 45.0})
     monkeypatch.setattr(sim, "_current_melt_redox_fO2_log", lambda: -10.0)
@@ -185,9 +185,9 @@ def test_attach_post_equilibrium_sulfsat_notes_out_of_range(monkeypatch) -> None
     # Count only this post-equilibrium hook, independently of Stage 0 notices.
     sim._sulfur_saturation_steps = []
     sim.melt.p_total_mbar = 10.0
-    sim._melt_headspace_composition_mbar = {
+    sim._install_upstream_projection({
         "Fe": 0.00042416384640343613,
-    }
+    })
     monkeypatch.setattr(sim, "_stage0_sulfur_input_ppm", lambda: 500.0)
     monkeypatch.setattr(sim, "_melt_oxide_wt_pct", lambda: {"SiO2": 45.0, "FeO": 10.0})
     monkeypatch.setattr(sim, "_current_melt_redox_fO2_log", lambda: -10.0)

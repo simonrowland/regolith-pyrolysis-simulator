@@ -1482,7 +1482,7 @@ def test_authoritative_headspace_pressure_refuses_missing_projection(
     sim.melt = SimpleNamespace(p_total_mbar=5.0)
     sim.overhead = SimpleNamespace(pressure_mbar=900.0)
     if projection is None:
-        sim._melt_headspace_composition_mbar = None
+        sim._install_upstream_projection(None)
 
     with pytest.raises(
         MeltHeadspaceProjectionError,

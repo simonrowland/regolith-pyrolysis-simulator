@@ -1461,7 +1461,7 @@ def test_commanded_po2_uses_upstream_o2_when_above_setpoint():
     sim = _sio_o2_train_sim()
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
     sim.melt.pO2_mbar = 0.5
-    sim._melt_headspace_composition_mbar = {"O2": 10.0}
+    sim._install_upstream_projection({"O2": 10.0})
     sim.overhead.composition = {"O2": 0.001}
     assert sim._commanded_pO2_bar() == pytest.approx(0.01)
 
@@ -2153,7 +2153,7 @@ def test_evaporation_request_includes_actual_noncondensable_pressure():
     sim.melt.atmosphere = Atmosphere.HARD_VACUUM
     sim.melt.temperature_C = 1500.0
     sim.melt.p_total_mbar = 10.0
-    sim._melt_headspace_composition_mbar = {"Fe": 0.001, "Ar": 0.002, "O2": 0.003}
+    sim._install_upstream_projection({"Fe": 0.001, "Ar": 0.002, "O2": 0.003})
     seen = {}
 
     def capture(_intent, *, control_inputs, redox_state=None):

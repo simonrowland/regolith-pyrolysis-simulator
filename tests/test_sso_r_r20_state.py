@@ -85,10 +85,11 @@ def _make_sim(
 
 def _set_actual_n2_headspace(sim: PyrolysisSimulator, pressure_mbar: float) -> None:
     # Supply the actual pure-N2 probe through the owner's Dalton projection.
-    # The simulator has no public setter for this carried-in upstream vector.
-    sim._melt_headspace_composition_mbar = sim.overhead_model.species_partial_pressures(
-        EvaporationFlux(), pressure_mbar,
-        molar_flow_by_species={"N2": 1.0},
+    sim._install_upstream_projection(
+        sim.overhead_model.species_partial_pressures(
+            EvaporationFlux(), pressure_mbar,
+            molar_flow_by_species={"N2": 1.0},
+        )
     )
 
 
@@ -3157,14 +3158,14 @@ def test_native_fe_partition_uses_upstream_headspace_not_downstream_residual() -
     sim = _make_sim()
     sim.melt.temperature_C = 1700.0
     sim.melt.p_total_mbar = 10.0
-    sim._melt_headspace_composition_mbar = {"Fe": 4.0}
+    sim._install_upstream_projection({"Fe": 4.0})
     sim.overhead.composition = {"Fe": 0.001}
 
     diagnostic = sim._native_fe_partition_diagnostic(1.0)
 
     assert diagnostic["P_bulk_Pa"] == pytest.approx(400.0)
 
-    sim._melt_headspace_composition_mbar = {"O2": 10.0}
+    sim._install_upstream_projection({"O2": 10.0})
     diagnostic = sim._native_fe_partition_diagnostic(1.0)
     assert diagnostic["P_bulk_Pa"] == pytest.approx(0.0)
 
@@ -3175,7 +3176,7 @@ def test_native_fe_saturation_uses_upstream_total_pressure(
     sim = _make_sim()
     sim.melt.temperature_C = 1700.0
     sim.melt.p_total_mbar = 0.0
-    sim._melt_headspace_composition_mbar = {"N2": 5.0}
+    sim._install_upstream_projection({"N2": 5.0})
     seen_pressure_bar = []
 
     def capture_state(
@@ -3233,7 +3234,7 @@ def test_c7_transport_uses_upstream_headspace_not_downstream_residual() -> None:
         ca_route_surface_area_m2=0.2,
         hold_time_h=1.0,
     )
-    sim._melt_headspace_composition_mbar = {"Ca": 3.0}
+    sim._install_upstream_projection({"Ca": 3.0})
     sim.overhead.composition = {"Ca": 0.001}
 
     _extent, diagnostic = sim._c7_transport_extent_mol(
