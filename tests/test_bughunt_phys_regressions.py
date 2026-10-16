@@ -1315,6 +1315,9 @@ def test_runtime_melt_and_c7_report_use_ledger_projection_policy() -> None:
         melt=melt,
         inventory=SimpleNamespace(melt_oxide_kg=None),
     )
+    sim._melt_resident_composition_kg_from_atom_ledger = lambda: (
+        PyrolysisSimulator._melt_resident_composition_kg_from_atom_ledger(sim)
+    )
 
     PyrolysisSimulator._project_cleaned_melt_from_atom_ledger(sim)
     assert melt.composition_kg == {}
