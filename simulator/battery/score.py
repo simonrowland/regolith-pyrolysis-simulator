@@ -1248,6 +1248,12 @@ def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
     return source_polymorph.rejection_kind is PolymorphRejectionKind.OMITTED
 
 
+def _rt_ln_10_j_per_mol_K(temperature_K: Decimal) -> Decimal:
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+
+    return JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
+
+
 def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
     return (
         source_polymorph is not None
@@ -1527,9 +1533,7 @@ def fusion_comparison_reference(
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
-    from simulator.battery.generators.janaf import (
-        JANAF_R_J_PER_MOL_K,
-    )
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
 
     if _source_polymorph_is_unspecified(standard_state.endmember.polymorph):
         notice = Notice(
@@ -1598,8 +1602,8 @@ def fusion_comparison_reference(
         )
         # At equal chemical potential, G_cr + RT ln(a_cr) =
         # G_tr + RT ln(a_tr), so ln(a_cr/a_tr) = -ΔG_tr/(RT).
-        tridymite_offset_dex = -delta_g_tr_J_per_mol / (
-            JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
+        tridymite_offset_dex = -delta_g_tr_J_per_mol / _rt_ln_10_j_per_mol_K(
+            temperature_K
         )
         authority = Authority.EXTRAPOLATED if extrapolated else Authority.CERTIFIED
         band = f"B1259 common printed H/S band [{band_lo}, {band_hi}] K"
@@ -1625,9 +1629,7 @@ def fusion_comparison_reference(
         )
 
     delta_g_fus_J_per_mol = fusion.delta_g_fus_kJ_per_mol * Decimal(1000)
-    offset_dex = delta_g_fus_J_per_mol / (
-        JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
-    )
+    offset_dex = delta_g_fus_J_per_mol / _rt_ln_10_j_per_mol_K(temperature_K)
     liquid_endmember = replace(
         standard_state.endmember,
         phase=Phase.L,
@@ -6940,21 +6942,22 @@ def compile_residual(
                     "reason": "fusion_measurement_uncertainty_unprinted_or_not_1sigma"
                 }
             else:
-                from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
-
                 sigma_delta_g = fusion_energy.sigma_delta_g_fus_kJ_per_mol
                 assert sigma_delta_g is not None
                 # Treat the printed row/method sigma and JANAF conversion sigma
                 # as independent standard uncertainties (GUM quadrature).
                 # From dG_fus = R*T*ln(10)*delta(log10(a)),
-                # sigma_conv = sigma_dG_fus/(R*T*ln(10)). J/mol divided by
-                # J/(mol K)*K is dimensionless dex. Sanity: SiO2 at 1703 K,
-                # dH_fus~9.6 kJ/mol and T_fus~1996 K gives dG_fus~1.4 kJ/mol,
-                # a 0.043 dex shift; 10-20% dH_fus uncertainty adds <0.01 dex.
+                # sigma_conv = sigma_dG_fus/(R*T*ln(10)); J/mol divided by
+                # J/(mol K)*K is dimensionless dex. This code consumes sigma_dG_fus.
+                # If sigma_dH_fus is 10% of 9.6 kJ/mol, then
+                # sigma_dG_fus = sigma_dH_fus*(1 - 1703/1996) ~= 0.14 kJ/mol,
+                # giving 0.14*1000 J/kJ / (8.31441 J/(mol K)*1703 K*ln(10))
+                # ~= 0.004 dex. Taking 10% of dH_fus directly would instead
+                # give sigma_dG_fus=0.96 kJ/mol and ~= 0.029 dex.
                 sigma_conversion_dex = (
                     sigma_delta_g
                     * Decimal(1000)
-                    / (JANAF_R_J_PER_MOL_K * T * Decimal(10).ln())
+                    / _rt_ln_10_j_per_mol_K(T)
                 )
                 sigma_total_dex = (
                     printed.standard_uncertainty_dex**2

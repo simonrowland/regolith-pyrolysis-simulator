@@ -7795,77 +7795,17 @@ def test_unprinted_source_phase_is_typed_and_cannot_be_scored() -> None:
 
 
 @pytest.mark.parametrize(
+    ("formula", "temperature_K", "crossing_K"),
     (
-        "formula",
-        "temperature_K",
-        "expected_activity",
-        "expected_residual",
-        "default_solid_table",
-        "selected_solid_table",
-        "liquid_table",
-        "delta_g_kJ_per_mol",
-        "crossing_K",
-        "source_hashes",
-    ),
-    (
-        (
-            "Al2O3",
-            Decimal("2400"),
-            Decimal("0.3583233854709349838426386125"),
-            Decimal("0.021519916602154066"),
-            "Al-096",
-            "Al-096",
-            "Al-100",
-            Decimal("-3.545"),
-            Decimal("2326.528497409326424870466321"),
-            (
-                "2054107c6e2f7c35d0196530f1d9362981612271d82731437cc016d74f147da6",
-                "b27ae0ccebb7433b209b9dbd7f0b67448e49cf2b613625e22b05709e49c0dbe0",
-            ),
-        ),
-        (
-            "Al2O3",
-            Decimal("2500"),
-            Decimal("0.4337601535097755115490675312"),
-            Decimal("-0.037220177900394995"),
-            "Al-096",
-            "Al-098",
-            "Al-100",
-            Decimal("-7.664"),
-            Decimal("2289.031679617453676031081889"),
-            (
-                "035d4d22aebf50e27e86e50b938508d792aaa53b8b6ea3eec2dc8908cdabff84",
-                "b27ae0ccebb7433b209b9dbd7f0b67448e49cf2b613625e22b05709e49c0dbe0",
-            ),
-        ),
-        (
-            "SiO2",
-            Decimal("2000"),
-            Decimal("0.3004513633937164890006667638"),
-            Decimal("0.2211958252328113"),
-            "O-035",
-            "O-035",
-            "O-038",
-            Decimal("-0.025"),
-            Decimal("1994.469026548672566371681416"),
-            (
-                "b3b964ea6baf5ad47b27a212ef9192762c51fb2acf26f1cec521658fb41fb742",
-                "f1233d320c6c49aa8055a95b7e0f2d6404b47d42079f42966c5f1331f94f3f2c",
-            ),
-        ),
+        ("Al2O3", Decimal("2400"), Decimal("2326.528497409326424870466321")),
+        ("Al2O3", Decimal("2500"), Decimal("2289.031679617453676031081889")),
+        ("SiO2", Decimal("2000"), Decimal("1994.469026548672566371681416")),
     ),
 )
 def test_unnamed_reference_phase_above_crossing_is_not_selected_from_temperature(
     formula: str,
     temperature_K: Decimal,
-    expected_activity: Decimal,
-    expected_residual: Decimal,
-    default_solid_table: str,
-    selected_solid_table: str,
-    liquid_table: str,
-    delta_g_kJ_per_mol: Decimal,
     crossing_K: Decimal,
-    source_hashes: tuple[str, str],
 ) -> None:
     from simulator.battery.score import fusion_comparison_reference
 
