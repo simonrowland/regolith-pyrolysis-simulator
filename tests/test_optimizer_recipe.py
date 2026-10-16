@@ -2106,6 +2106,66 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
     assert grounded_sources > 0
 
 
+def test_recipe_schema_setpoint_bounds_match_golden_pin() -> None:
+    expected = {
+        "campaigns.C0.temp_range_C": (20, 950),
+        "campaigns.C0b_p_cleanup.temp_range_C": (1180, 1320),
+        "campaigns.C0b_p_cleanup.pO2_mbar": (3.0, 15.0),
+        "campaigns.C0b_p_cleanup.pO2_mbar_default": (3.0, 15.0),
+        "campaigns.C0b_p_cleanup.p_total_mbar_default": (3.0, 15.0),
+        "campaigns.C0b_p_cleanup.duration_hr": (0.5, 2.5),
+        "campaigns.C2A_continuous.temp_range_C": (1050, 1843),
+        "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C": (10, 20),
+        "campaigns.C2A_continuous.p_total_mbar": (5, 15),
+        "campaigns.C2A_continuous.p_total_mbar_default": (5, 15),
+        "campaigns.C2A_staged.temp_range_C": (1250, 1750),
+        "campaigns.C2A_staged.default_hold_T_C": (1250, 1750),
+        "campaigns.C2A_staged.p_total_mbar": (5, 15),
+        "campaigns.C2A_staged.p_total_mbar_default": (5, 15),
+        "campaigns.C2A_staged.stages.alkali_early_fe.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2A_staged.stages.sio_window.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2A_staged.stages.fe_hot_hold.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.p_total_mbar": (5.0, 15.0),
+        "campaigns.C2B.temp_range_C": (1320, 1480),
+        "campaigns.C2B.pO2_mbar": (0.8, 2.3),
+        "campaigns.C2B.pO2_mbar_default": (0.8, 2.3),
+        "campaigns.C2B.p_total_mbar_default": (0.8, 2.3),
+        "campaigns.C3.pO2_mbar_default": (0.5, 1.5),
+        "campaigns.C3.p_total_mbar_default": (0.5, 1.5),
+        "campaigns.C3.K_phase.pO2_bakeout_mbar": (0.5, 1.5),
+        "campaigns.C3.Na_phase.pO2_bakeout_mbar": (0.5, 1.5),
+        "campaigns.C3.duration_after_pathA_hr": (10, 18),
+        "campaigns.C3.duration_after_pathB_hr_per_phase": (20, 35),
+        "campaigns.C4.temp_range_C": (1580, 1670),
+        "campaigns.C4.default_hold_T_C": (1580, 1670),
+        "campaigns.C4.pO2_mbar": (0.08, 0.35),
+        "campaigns.C4.pO2_mbar_default": (0.08, 0.35),
+        "campaigns.C4.p_total_mbar_default": (0.08, 0.35),
+        "campaigns.C4.optional_Ca_harvest.pO2_mbar": (0.03, 0.12),
+        "campaigns.C5.temp_range_C": (1500, 1650),
+        "campaigns.C5.pO2_bar": (0.01, 0.1),
+        "campaigns.C5.pO2_mbar_default": (10, 100),
+        "campaigns.C5.p_total_mbar_default": (10, 100),
+        "campaigns.C6.temp_range_C": (1380, 1450),
+        "campaigns.C6.default_hold_T_C": (1380, 1450),
+        "campaigns.C6.pO2_mbar": (0.08, 0.35),
+        "campaigns.C6.pO2_mbar_default": (0.08, 0.35),
+        "campaigns.C6.p_total_mbar_default": (0.08, 0.35),
+    }
+    schema = RecipeSchema()
+    actual = {
+        ".".join(spec.path): (spec.low, spec.high)
+        for spec in schema.allowlist
+        if spec.bounds_source.startswith("setpoints:")
+        or spec.bounds_source.startswith(
+            "engineering_envelope converted from setpoints.yaml range "
+        )
+    }
+
+    assert len(actual) == 43
+    assert actual == expected
+
+
 def test_pressure_default_pair_map_covers_allowlisted_siblings() -> None:
     schema = RecipeSchema()
     allowlisted = {spec.path for spec in schema.allowlist}
