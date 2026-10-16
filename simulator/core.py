@@ -9534,6 +9534,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         result,
         *,
         include_diagnostic_shadows: bool = True,
+        intrinsic_fO2_log_override: float | None = None,
     ) -> None:
         """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.
 
@@ -9629,22 +9630,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # the same single path the rest of the simulator uses.
         pO2_bar = self._vapor_pressure_dispatch_pO2_bar()
         melt_redox_state = {}
-        current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
-        if callable(current_fO2):
-            intrinsic_fO2_log = current_fO2()
-            melt_redox_state = {
-                'origin': 'closed_ledger',
-                **getattr(self, '_last_intrinsic_redox_state', {}),
-            }
+        if intrinsic_fO2_log_override is not None:
+            # Battery observations supply a measured oxygen fugacity boundary;
+            # their seeded composition has no ledger history to close against.
+            intrinsic_fO2_log = float(intrinsic_fO2_log_override)
         else:
-            reservoir = getattr(self.melt, 'oxygen_reservoir', None)
-            intrinsic_fO2_log = getattr(reservoir, 'melt_intrinsic_fO2_log', None)
-            if intrinsic_fO2_log is None:
-                intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
-            if intrinsic_fO2_log is None:
-                intrinsic_fO2_log = getattr(
-                    result, 'fO2_log', getattr(self.melt, 'fO2_log', -9.0),
-                )
+            current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
+            if callable(current_fO2):
+                intrinsic_fO2_log = current_fO2()
+                melt_redox_state = {
+                    'origin': 'closed_ledger',
+                    **getattr(self, '_last_intrinsic_redox_state', {}),
+                }
+            else:
+                reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+                intrinsic_fO2_log = getattr(reservoir, 'melt_intrinsic_fO2_log', None)
+                if intrinsic_fO2_log is None:
+                    intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
+                if intrinsic_fO2_log is None:
+                    intrinsic_fO2_log = getattr(
+                        result, 'fO2_log', getattr(self.melt, 'fO2_log', -9.0),
+                    )
         intrinsic_fO2_log = float(intrinsic_fO2_log)
         vacuum_floor = (
             float(self._vacuum_floor_bar())
