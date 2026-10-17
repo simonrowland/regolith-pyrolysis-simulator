@@ -3,8 +3,12 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass
+from functools import lru_cache
+from pathlib import Path
 from types import MappingProxyType
 from typing import Literal
+
+import yaml
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.feedstock_composition import (
@@ -1031,6 +1035,7 @@ def _native_fe_saturation_comparison(
     T_K: float,
     pressure_bar: float,
     fO2_log: float,
+    prior_half_width_dex: float = 0.0,
 ) -> dict[str, object]:
     from simulator.accounting.exceptions import AccountingError
 
@@ -1083,6 +1088,13 @@ def _native_fe_saturation_comparison(
     bound = _feo_activity_saturation_log10_fO2_bar(T_K, a_feo=a_feo)
     gap = float(fO2_log) - bound
     lower, upper = _native_fe_saturation_band(fe3)
+    # A class prior is an epistemic interval, not an independent Gaussian.
+    # With r=max(delta-lo, hi-delta), any prior error lies in [-r,+r].
+    # Minkowski addition to the method+model interval [-L,+U] gives
+    # [-L-r,+U+r], conservatively retaining asymmetry and unknown correlation.
+    # All terms are dex; r=0 recovers the existing band, infinity stays open.
+    lower += prior_half_width_dex
+    upper += prior_half_width_dex
     status = ('BELOW' if gap < -lower else
               'ABOVE' if gap > upper else 'INDETERMINATE')
     band = {
@@ -1167,6 +1179,7 @@ def native_fe_equilibrium_extent(
     T_K: float, pressure_bar: float,
     gas_fO2_log: Callable[[float], float],
     open_sink: bool = False,
+    prior_half_width_dex: float = 0.0,
 ) -> dict[str, object]:
     """Instantaneous FeO -> Fe + 0.5 O2 extent at the supplied gas boundary."""
     from scipy.optimize import brentq
@@ -1199,6 +1212,7 @@ def native_fe_equilibrium_extent(
         comparison = _native_fe_saturation_comparison(
             comp, fe3_over_sigma_fe=2.0*fe2o3_mol/(total_fe-n), T_K=T_K,
             pressure_bar=pressure_bar, fO2_log=potential,
+            prior_half_width_dex=prior_half_width_dex,
         )
         return potential, comparison
 
@@ -1327,6 +1341,7 @@ def kress91_intrinsic_state(
     exchange_fO2_log: float,
     redox_state: RedoxState | None = None,
     composition_wt_pct: Mapping[str, float] | None = None,
+    prior_half_width_dex: float = 0.0,
 ) -> dict[str, object]:
     """Derive the liquid oxygen potential from its actual iron inventory."""
     if redox_state is not None:
@@ -1396,6 +1411,7 @@ def kress91_intrinsic_state(
                 composition_wt_pct,
                 fe3_over_sigma_fe=2.0 * fe2o3_mol / (feo_mol + 2.0 * fe2o3_mol),
                 T_K=T_K, pressure_bar=pressure_bar, fO2_log=value,
+                prior_half_width_dex=prior_half_width_dex,
             )
             # Premise: Kress91's ferric/ferrous ratio is a fit, not an
             # Fe/FeO equilibrium, so a finite low-ferric inverse can undercut
@@ -1503,6 +1519,12 @@ def collapse_feot_composition(
     return comp
 
 
+@lru_cache(maxsize=1)
+def _iron_class_priors() -> dict:
+    return yaml.safe_load((Path(__file__).resolve().parent.parent /
+                           'data/iron_class_priors.yaml').read_text())
+
+
 def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, dict]:
     """Preserve declared iron splits; predict missing splits once, before seeding."""
     from simulator.state import MOLAR_MASS
@@ -1584,6 +1606,7 @@ def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, di
             comp.update(FeO=feot)
     stated = 'delta_iw' in anchor
     conversion = {}
+    prior_diagnostic = {}
     if ferric_observation:
         if 'fe3_over_sum_fe' in spec:
             measured_q = float(ferric_observation['value'])
@@ -1617,7 +1640,20 @@ def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, di
         authority = declared_authority
         state = None
     else:
-        state, conversion = _feedstock_anchor_state(anchor, T_K)
+        prior_class = feedstock.get('iron_redox_class') if not stated else None
+        if prior_class is not None:
+            if prior_class not in _iron_class_priors():
+                raise Kress91InvalidControls(f'unknown iron redox class {prior_class!r}')
+            anchor = {**_iron_class_priors()[prior_class], **anchor,
+                      'authority': 'model_assumed', 'estimated': True,
+                      'buffer_source': {'reference': CONVENTIONAL_IW_SOURCE, 'page': 1067}}
+            delta = anchor['delta_iw']
+            low, high = anchor['interval']
+            prior_diagnostic = {
+                'seed_basis': 'class_prior', 'class_prior': prior_class,
+                'prior_half_width_dex': max(delta-low, high-delta),
+            }
+        state, conversion = _feedstock_anchor_state(anchor, T_K, class_prior=bool(prior_class))
         result = split_feot_composition(comp, T_K, redox_state=state)
         authority = IronSeedAuthority(anchor.get('authority', 'model_assumed'))
     # Preserve the original raw-analysis basis including nonoxide constituents;
@@ -1656,10 +1692,13 @@ def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, di
         gaps.append('formation_temperature_K')
     if authority is not IronSeedAuthority.MEASURED:
         gaps.append('measured_feedstock_iron_split')
+    if prior_diagnostic:
+        gaps.append('class_prior_unmeasured')
     # Retain computed provenance on this private prepared analysis. Re-loading
     # it must not repeat a total-Fe subtraction or lose its metal account route.
     diagnostic = {
         **result, **conversion, **metal_diagnostic,
+        **prior_diagnostic,
         **({'iron_speciation': spec} if spec else {}),
         'method': ('iron_speciation_split' if ferric_observation else
                    'declared_split' if declared_split else 'predicted_kress91_split'),
@@ -1706,7 +1745,9 @@ def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, di
     return prepared, diagnostic
 
 
-def _feedstock_anchor_state(anchor: Mapping, T_K: float) -> tuple[RedoxState | None, dict]:
+def _feedstock_anchor_state(
+    anchor: Mapping, T_K: float, *, class_prior: bool = False,
+) -> tuple[RedoxState | None, dict]:
     if 'delta_iw' not in anchor:
         raise Kress91InvalidControls(
             'unsplit feedstock iron requires cited intrinsic_redox delta_iw, buffer and interval')
@@ -1726,7 +1767,8 @@ def _feedstock_anchor_state(anchor: Mapping, T_K: float) -> tuple[RedoxState | N
     locator = anchor.get('locator', {})
     if (not isinstance(source, Mapping) or not source.get('reference') or not source.get('page')
             or not anchor.get('source') or not isinstance(locator, Mapping)
-            or not any(locator.get(k) is not None for k in ('published_page', 'page', 'pdf_page_index'))):
+            or not (class_prior and anchor.get('source') == 'class prior, no corpus citation')
+            and not any(locator.get(k) is not None for k in ('published_page', 'page', 'pdf_page_index'))):
         raise Kress91InvalidControls('intrinsic_redox buffer and delta_iw require sources with page')
     if buffer in {'pure_liquid_wustite', FE_FEO_BUFFER_STANDARD}:
         return RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, delta), {}

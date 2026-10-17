@@ -1,0 +1,98 @@
+# All intervals are deliberately broad modelling envelopes in log10(fO2/IW),
+# NOT measured confidence intervals. Cited values support only the central
+# class proxy; the widened envelopes acknowledge transfer to an unassayed charge.
+# Uncited envelopes are wider still. No metal inventory is inferred from them.
+terrestrial_basalt:
+  delta_iw: 3.0
+  interval: [-9.0, 15.0]
+  buffer: solid_iron_wustite_sato1973
+  source: class prior, no corpus citation
+  reasoning: Oxidized terrestrial basalt proxy; batch valence and weathering are unmeasured.
+terrestrial_anorthosite:
+  delta_iw: 3.0
+  interval: [-9.0, 15.0]
+  buffer: solid_iron_wustite_sato1973
+  source: class prior, no corpus citation
+  reasoning: Terrestrial anorthosite aggregate is not reduced lunar material; batch valence is unknown.
+lunar_mare:
+  delta_iw: -1.0
+  interval: [-7.0, 5.0]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 497}
+  reasoning: Lunar glass IW-1 proxy; six-dex envelope allows family and formation-history mismatch.
+lunar_kreep:
+  delta_iw: -1.0
+  interval: [-7.0, 5.0]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 497}
+  reasoning: Lunar glass proxy only; no KREEP or enriched-blend valence assay.
+lunar_highland:
+  delta_iw: -1.0
+  interval: [-7.0, 5.0]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 497}
+  reasoning: Reference-only lunar proxy; no highland-specific molten valence constraint.
+mars_basalt:
+  delta_iw: 1.5
+  interval: [-4.5, 7.5]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 502}
+  reasoning: Midpoint of shergottite IW+0.5 to IW+2.5; widened for basalt-family transfer.
+mars_regolith:
+  delta_iw: 1.5
+  interval: [-4.5, 7.5]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 502}
+  reasoning: Shergottite proxy only; alteration and terrestrial MGS-1 manufacture are unconstrained.
+s_type_ordinary_chondrite:
+  delta_iw: -1.0
+  interval: [-13.0, 11.0]
+  buffer: solid_iron_wustite_sato1973
+  source: schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  locator: {published_page: 472, section: '3.1'}
+  reasoning: Quoted Brett-Sato ordinary-chondrite measurements at 1200 K imply about IW-1; broad envelope allows solid-to-liquid transfer.
+v_type_hed:
+  delta_iw: -1.0
+  interval: [-7.0, 5.0]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 496}
+  reasoning: Eucrite IW-1 proxy; HED lithology and exposure require a broad transfer envelope.
+e_type_enstatite:
+  delta_iw: -5.0
+  interval: [-11.0, 1.0]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 494}
+  reasoning: Enstatite-chondrite IW-5 proxy; aubrite and processed silicate transfer remain unmeasured.
+m_type_silicate:
+  delta_iw: -2.5
+  interval: [-8.5, 3.5]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 495}
+  reasoning: IAB silicate-inclusion IW-2 to IW-3 midpoint is only a proxy for generic M-type silicate.
+cm_carbonaceous:
+  delta_iw: 2.0
+  interval: [-4.0, 8.0]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 494}
+  reasoning: Carbonaceous IW+1 to IW+3 midpoint; hydrated CM is not a measured liquid.
+ceres:
+  delta_iw: 2.0
+  interval: [-10.0, 14.0]
+  buffer: solid_iron_wustite_sato1973
+  source: class prior, no corpus citation
+  reasoning: Altered carbonaceous analogue only; no Ceres high-temperature iron valence anchor captured.
+comet_nucleus:
+  delta_iw: -1.0
+  interval: [-13.0, 11.0]
+  buffer: solid_iron_wustite_sato1973
+  source: class prior, no corpus citation
+  reasoning: Primitive mixed reduced and oxidized solids; no unique cometary liquid redox state captured.

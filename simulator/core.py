@@ -4366,6 +4366,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             exchange_fO2_log=math.log10(max(exchange_pO2, self._vacuum_floor_bar())),
             composition_wt_pct=comp,
+            prior_half_width_dex=getattr(self, '_feedstock_iron_initialization', {}).get(
+                'prior_half_width_dex', 0.0),
         )
         self._last_intrinsic_redox_state = state
         melt_potential = float(state['fO2_log'])
@@ -7304,6 +7306,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             gas_fO2_log=gas_fO2_log,
             open_sink=open_receiver,
+            prior_half_width_dex=getattr(self, '_feedstock_iron_initialization', {}).get(
+                'prior_half_width_dex', 0.0),
         )
         return {**result, 'feo_available_mol': feo,
                 'total_fe_mol': feo + 2.0*ferric}

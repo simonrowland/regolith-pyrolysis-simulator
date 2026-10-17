@@ -262,6 +262,7 @@ lunar_mare_low_ti:
       diluted by bulk oxygen; the cryo stage sees a clean, low-O2 feed.
 
 lunar_mare_high_ti:
+  iron_redox_class: lunar_mare
   label: "Lunar Mare Basalt (High-Ti)"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 11/17 high-Ti basaltic soils"
   confidence: "High"
@@ -923,6 +924,7 @@ lunar_pkt_kreep_average:
   process_notes: "K2O 3-30x mare baseline; P2O5 requires extended C0 or Phase 0b P volatilisation"
 
 lunar_spa_kreep_influenced:
+  iron_redox_class: lunar_kreep
   label: "South Pole-Aitken KREEP-Influenced"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: CE-6 impact glasses + noritic SPA floor (diluted deep excavation)"
   confidence: "Medium"
@@ -1112,6 +1114,7 @@ lunar_spa_kreep_influenced:
   process_notes: "Intermediate KREEP enrichment; K2O 2-8x mare"
 
 targeted_super_kreep_ore:
+  iron_redox_class: lunar_kreep
   label: "Targeted Super-KREEP Ore (Modeled Enriched Blend)"
   source: "MODELED ENRICHED BLEND (synthetic targeted-ore scenario; not a measured table); component basis: major oxides from Apollo 15386-type KREEP basalt analog, K/P/REE/Zr enrichment from VHK clasts + urKREEP immiscible fractions, Cr/Mn trace estimates"
   confidence: "Medium-High"
@@ -1318,6 +1321,7 @@ targeted_super_kreep_ore:
 # buy: https://spaceresourcetech.com/collections/regolith-simulants
 # source: Long-Fox et al. 2023 Frontiers in Space Technologies Table 2 fused-bead XRF; SRT/Exolith LHS-1.
 lunar_highlands_lhs1:
+  iron_redox_class: terrestrial_anorthosite
   name: "LHS-1 lunar highlands simulant"
   label: "LHS-1 Lunar Highlands Simulant (SRT/Exolith)"
   class: lunar_simulant
@@ -1371,6 +1375,7 @@ lunar_highlands_lhs1:
   process_notes: "Standard C0-C6 flowsheet applicable; lower Fe yield than mare material."
 
 lunar_highlands_lhs1_yu_2025_reference:
+  iron_redox_class: terrestrial_anorthosite
   name: "LHS-1 composition reported by Yu et al. 2025"
   label: "LHS-1 Yu 2025 Hollow-Anode Reference"
   class: lunar_simulant
@@ -1434,6 +1439,7 @@ lunar_highlands_lhs1_yu_2025_reference:
 # buy: https://spaceresourcetech.com/products/lms-1-lunar-mare-simulant
 # source: Long-Fox et al. 2023 Frontiers in Space Technologies Table 2 XRF; SRT/Exolith LMS-1, with vendor factsheet minors captured in catalog.
 lunar_mare_lms1:
+  iron_redox_class: terrestrial_basalt
   name: "LMS-1 lunar mare simulant"
   label: "LMS-1 Lunar Mare Simulant (SRT/Exolith)"
   class: lunar_simulant
@@ -1488,6 +1494,7 @@ lunar_mare_lms1:
 # buy: https://www.offplanetresearch.com/ (contact for quote; simulants-feedstocks-and-additives)
 # source: Off Planet Research OPR General Lunar Regolith Simulants Data Sheet references; 2022 LSIC Lunar Simulant Assessment; 2025 LPSC feedstock tables. Full current-lot XRF not public in captured research.
 lunar_mare_oprl2n:
+  iron_redox_class: terrestrial_basalt
   name: "OPRL2N lunar mare simulant"
   label: "OPRL2N Lunar Mare Simulant (Off Planet Research)"
   class: lunar_simulant
@@ -1541,6 +1548,7 @@ lunar_mare_oprl2n:
 # buy: https://www.washingtonmills.com/products/duraluna
 # source: Rickman et al. 2024 NASA NTRS 20240007991; LPSC 2022 1146; NASA/USGS NU-LHT lineage. Exact oxide table not extracted in captured research.
 lunar_highlands_nuw_lht_5m:
+  iron_redox_class: terrestrial_anorthosite
   name: "NUW-LHT-5M / DURALUNA lunar highlands simulant"
   label: "NUW-LHT-5M / DURALUNA Lunar Highlands Simulant (Washington Mills)"
   class: lunar_simulant
@@ -1639,6 +1647,7 @@ lunar_mare_jsc_1a_legacy:
 # buy: not_available (legacy_or_paper_stock)
 # source: Engelschiøn et al. 2020 Scientific Reports XRF table for EAC-1A; Robinot et al. 2026 Fig. 5 elementals retained as extraction-suspect cross-check.
 lunar_eac_1a:
+  iron_redox_class: terrestrial_basalt
   name: "EAC-1/EAC-1A lunar simulant"
   label: "EAC-1A Lunar Simulant (Engelschiøn XRF)"
   class: lunar_simulant
@@ -1719,6 +1728,7 @@ lunar_eac_1a:
 # buy: not_available (legacy_or_paper_stock)
 # source: Hill et al. 2007 JGR Planets Table 1, DOI 10.1029/2006JE002767.
 lunar_mls_1a:
+  iron_redox_class: terrestrial_basalt
   name: "MLS-1A lunar simulant"
   label: "MLS-1A Lunar Simulant (Weiblen/Hill major oxides)"
   class: lunar_simulant
@@ -1820,6 +1830,7 @@ lunar_highlands_nu_lht_2m:
 # ---------------------------------------------------------------------------
 
 s_type_asteroid_silicate:
+  iron_redox_class: s_type_ordinary_chondrite
   label: "S-Type Asteroid Silicate Fraction"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: H/L/LL ordinary chondrite meteorites; Hayabusa Itokawa sample return"
   confidence: "High"
@@ -1902,6 +1913,7 @@ m_type_metallic_phase:
   process_notes: "Melt at 1550-1600C; immiscible separation (7.9 vs 2.8 g/cm3); tap Fe-Ni-Co-P metal; process silicate separately"
 
 m_type_silicate_phase:
+  iron_redox_class: m_type_silicate
   label: "M-Type Asteroid  --  Silicate Phase"
   source: "PROCESS ASSUMPTION (50/50 bulk phase split chosen for modeling); context-not-source: Iron meteorite analogy; Psyche radar/density; pallasitic inclusions"
   confidence: "Low"
@@ -1938,6 +1950,7 @@ m_type_silicate_phase:
     external control).
 
 v_type_vesta_hed:
+  iron_redox_class: v_type_hed
   label: "V-Type Asteroid (Vesta HED Meteorites)"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: HED meteorites (howardite regolith analogs) + Dawn/Vesta surface"
   confidence: "Very High"
@@ -1974,6 +1987,7 @@ v_type_vesta_hed:
     for ceramics. Lower Mg (C4 10-25 kg/t). Early high-value ceramics feedstock.
 
 e_type_enstatite_aubrite:
+  iron_redox_class: e_type_enstatite
   label: "E-Type Asteroid (Enstatite Aubrite)"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Aubrite meteorites (enstatite achondrites) + inner-belt E-type asteroids"
   confidence: "High"
@@ -2146,6 +2160,7 @@ ci_carbonaceous_chondrite:
     High Ni (3-8%) in pyrolysis Fe product.
 
 cm_carbonaceous_chondrite:
+  iron_redox_class: cm_carbonaceous
   label: "CM Carbonaceous Chondrite"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: CM meteorites (Murchison, etc.); similar to CI but less hydrated"
   confidence: "High"
@@ -2230,6 +2245,7 @@ cm_carbonaceous_chondrite:
   process_notes: "C1-C6 identical to CI baseline. Less volatile recovery than CI but easier thermal management."
 
 ceres_regolith:
+  iron_redox_class: ceres
   label: "Ceres Regolith"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Dawn VIR/GRaND global mapping + 2025 brine/habitability reanalyses"
   confidence: "Very High"
@@ -2385,6 +2401,7 @@ ceres_regolith:
     Centigravity environment (0.029 g) simplifies mining vs micro-g bodies.
 
 comet_nucleus:
+  iron_redox_class: comet_nucleus
   label: "Comet Nucleus (Jupiter-Family)"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Rosetta/67P + other Jupiter-family comets; primitive outer-solar-system analogs"
   confidence: "High"
@@ -2520,6 +2537,7 @@ comet_nucleus:
 # buy: https://spaceresourcetech.com/collections/regolith-simulants
 # source: Long-Fox et al. 2023 Frontiers in Space Technologies Table 2 XRF for MGS-1 base; Costa et al. 2024 TiO2 cross-check.
 mars_global_mgs1:
+  iron_redox_class: mars_regolith
   name: "MGS-1 Mars global simulant"
   label: "MGS-1 Mars Global Simulant (SRT/Exolith)"
   class: mars_simulant
@@ -2702,6 +2720,7 @@ mars_basalt:
     HCl/HF scrubber (200-350C), CO2/CO separator.
 
 mars_sulfate_rich:
+  iron_redox_class: mars_regolith
   label: "Mars Sulfate-Rich Soil"
   stage0_profile: "mars_carbon_cleanup"
   stage0_carrier_keys:
@@ -2795,6 +2814,7 @@ mars_sulfate_rich:
     C1-C6 identical to baseline. Ideal early chemical production site.
 
 mars_phyllosilicate_clay:
+  iron_redox_class: mars_regolith
   label: "Mars Phyllosilicate Clay"
   stage0_profile: "mars_carbon_cleanup"
   stage0_carrier_keys:
@@ -2868,6 +2888,7 @@ mars_phyllosilicate_clay:
     baseline due to lower SiO2 activity.
 
 mars_perchlorate_rich:
+  iron_redox_class: mars_regolith
   label: "Mars Perchlorate-Rich Soil"
   stage0_carrier_keys:
     carbonate:

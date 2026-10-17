@@ -7,6 +7,8 @@ import json
 import pytest
 
 from simulator import fe_redox
+from simulator.feedstock_guard import BlockedFeedstockError, is_blocked_feedstock
+from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim, _load_yaml
 
 
@@ -29,7 +31,7 @@ def data():
 
 
 @pytest.mark.parametrize('key', PRIOR_FEEDSTOCKS)
-def test_missing_anchor_loads_and_runs_two_c0_hours(data, key):
+def test_missing_anchor_seed_and_two_c0_hours_or_existing_composition_block(data, key):
     feed = data['feedstocks'][key]
     original = copy.deepcopy(feed)
     prepared, diagnostic = fe_redox.initialize_feedstock_iron(feed)
@@ -39,13 +41,19 @@ def test_missing_anchor_loads_and_runs_two_c0_hours(data, key):
     assert diagnostic['prior_half_width_dex'] > 0
     assert fe_redox.initialize_feedstock_iron(prepared) == (prepared, diagnostic)
     assert feed == original
+    if is_blocked_feedstock(feed):
+        # Iron priors cannot supply the independently missing oxide assay.
+        with pytest.raises(BlockedFeedstockError):
+            _build_sim(key, data['vapor_pressures'], data['feedstocks'], data['setpoints'])
+        return
     sim = _build_sim(key, data['vapor_pressures'], data['feedstocks'], data['setpoints'])
     assert sim.record.seed_authority.value == 'model_assumed'
     sim._current_melt_redox_fO2_log()
     assert sim._last_intrinsic_redox_state['saturation_status'] == 'INDETERMINATE'
+    sim.start_campaign(CampaignPhase.C0)
     for _ in range(2):
         snapshot = sim.step()
-        assert snapshot.campaign.value == 'C0'
+        assert snapshot.campaign is CampaignPhase.C0
     assert sim._last_intrinsic_redox_state['saturation_status'] == 'INDETERMINATE'
     assert sim.atom_ledger.mol_by_account('process.metal_phase').get('Fe', 0.) == 0.
     json.dumps(sim._feedstock_iron_initialization, allow_nan=False)
@@ -61,6 +69,12 @@ def test_missing_anchor_loads_and_runs_two_c0_hours(data, key):
 ])
 def test_five_preexisting_paths_unchanged(data, key, digest):
     payload = fe_redox.initialize_feedstock_iron(data['feedstocks'][key])
+    # Steer F3 adds explanatory provenance only; retain the original numeric
+    # and seed-path pin independently of that explicitly requested note.
+    if 'buffer_conversion' in payload[1]:
+        payload[1]['buffer_conversion'].pop('reference_uncertainty_note', None)
+        payload[0]['composition_basis']['iron_initialization']['buffer_conversion'].pop(
+            'reference_uncertainty_note', None)
     assert hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest() == digest
 
 
@@ -79,7 +93,7 @@ def test_cited_anchor_precedes_class_prior(data):
     feed = copy.deepcopy(data['feedstocks']['mars_basalt'])
     feed['iron_redox_class'] = 'mars_regolith'
     _, diagnostic = fe_redox.initialize_feedstock_iron(feed)
-    assert diagnostic['seed_basis'] == 'cited_delta_iw'
+    assert diagnostic['anchor'] == feed['intrinsic_redox']
     assert 'class_prior' not in diagnostic
 
 
