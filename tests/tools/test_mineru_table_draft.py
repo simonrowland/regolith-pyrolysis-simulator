@@ -164,6 +164,26 @@ def test_temperature_values_immediately_below_axis_label_are_header() -> None:
     assert draft._header_row_count(grid) == 2
 
 
+def test_nazarov_table_2_rowspan_temperature_header_is_not_a_body_row(
+    tmp_path: Path,
+) -> None:
+    html = (Path(__file__).parent / "fixtures" / "nazarov-2015-table-2.html").read_text(
+        encoding="utf-8"
+    )
+    grid = draft.parse_table_html(html)
+    header_count = draft._header_row_count(grid)
+    table = draft._render_table(
+        {"page_idx": 4, "table_body": html},
+        table_number=2,
+        source_file=Path("nazarov-2015-p001-p008_content_list.json"),
+        chunk_start_page=1,
+        table_dir=tmp_path,
+    )
+
+    assert header_count == 2
+    assert table["body_rows"] == 7
+
+
 def test_source_id_from_text_and_raw_mineru_layouts() -> None:
     assert draft._sid_from_path(Path("/corpus/text/source-a/mineru/chunk-1/content_list.json")) == "source-a"
     assert draft._sid_from_path(Path("/corpus/raw/source-b/ocr-mineru/chunk-1/content_list.json")) == "source-b"
@@ -431,7 +451,7 @@ def test_compare_reports_match_and_planted_mismatch(tmp_path: Path) -> None:
     index_path.write_text(
         yaml.safe_dump(
             {"tables": [{"table_key": "p002-t01", "pdf_page": 2, "csv": csv_path.name,
-                         "columns": [{"column": 1, "header": "Value"}]}]}
+                         "columns": [{"column": 1, "header": "Components of gas phase"}]}]}
         ),
         encoding="utf-8",
     )
@@ -458,7 +478,7 @@ def test_compare_reports_match_and_planted_mismatch(tmp_path: Path) -> None:
                         "observation_id": "exact-match",
                         "locator": {"pdf_page_index": 1},
                         "values": {"points": [{"value": 0.871, "table_row_number": 1,
-                                                   "phase": "Value", "table_phase_column": 1}]},
+                                                   "phase": "gas", "table_phase_column": 1}]},
                     },
                     {
                         "observation_id": "expanded-copy-is-not-a-second-cell",

@@ -263,12 +263,22 @@ def _header_row_count(grid: list[list[Cell]]) -> int:
             tagged_count += 1
         else:
             break
-    if tagged_count:
-        count = tagged_count
-        axis_label = re.compile(r"\b(?:temperature|pressure|time|composition)\b", re.I)
+    axis_label = re.compile(r"\b(?:temperature|pressure|time|composition)\b", re.I)
+    count = tagged_count
+    if not count and grid:
+        first_row = grid[0]
+        first_row_text = " ".join(cell.text for cell in first_row)
+        if axis_label.search(first_row_text) and not any(
+            _number_value(_split_mark(cell.text, cell.superscript_text)[0]) is not None
+            for cell in first_row
+        ):
+            count = 1
+    if count:
         while count < len(grid):
             previous = " ".join(cell.text for cell in grid[count - 1])
-            row = grid[count]
+            # A rowspan cell is expanded into later grid rows but belongs to its
+            # origin row; it must not make an otherwise numeric axis row look mixed.
+            row = [cell for cell in grid[count] if cell.origin_row == count]
             populated = [cell for cell in row if cell.text.strip()]
             numeric_count = sum(
                 _number_value(_split_mark(cell.text, cell.superscript_text)[0]) is not None
@@ -613,6 +623,7 @@ def compare_extract_to_draft(
             int(column["column"]): str(column.get("header") or "")
             for column in table.get("columns") or []
         }
+        table_header = " ".join(column_headers.values())
         csv_path = index_path.parent / table["csv"]
         with csv_path.open(encoding="utf-8", newline="") as stream:
             for cell in csv.DictReader(stream):
@@ -633,7 +644,7 @@ def compare_extract_to_draft(
                         "table_key": table["table_key"],
                         "row": int(cell["row"]),
                         "column": int(cell["column"]),
-                        "phase": column_headers.get(int(cell["column"])) or None,
+                        "table_header": table_header,
                         "flags": json.loads(cell["flags"] or "[]"),
                     }
                     draft_by_page[page].append((candidate, number))
@@ -661,7 +672,15 @@ def compare_extract_to_draft(
                 point.get("table_phase_column") is None
                 or candidate["column"] == int(point["table_phase_column"])
             )
-            and (point.get("phase") is None or candidate.get("phase") == point["phase"])
+            and (
+                point.get("phase") is None
+                or re.search(
+                    rf"\b{re.escape(str(point['phase']))}\b",
+                    candidate["table_header"],
+                    re.IGNORECASE,
+                )
+                is not None
+            )
         ]
         matched_index, matched = matching_candidates[0] if matching_candidates else (None, None)
         if matched is not None:
