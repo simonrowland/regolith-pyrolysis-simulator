@@ -417,6 +417,8 @@ QUANTITY_ALIASES = {
     "pure_vapor_pressure": Quantity.P_SAT,
     "partial_pressure": Quantity.P_PARTIAL,
     "partial_pressure_overlay_figure_only": Quantity.P_PARTIAL,
+    "partial_pressure_BC_12065": Quantity.P_PARTIAL,
+    "partial_pressure_intermediate_range_reliable": Quantity.P_PARTIAL,
     "partial_pressure_O2": Quantity.P_PARTIAL,
     "partial_pressure_CsBO2": Quantity.P_PARTIAL,
     "partial_pressure_LiBO2": Quantity.P_PARTIAL,
@@ -457,6 +459,7 @@ QUANTITY_ALIASES = {
     "evaporation_coefficient_gamma_Si": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "o2_yield": Quantity.O2_YIELD,
     "mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
+    "assembly_mass_loss_relative_to_initial_mass": Quantity.MASS_LOSS_FRACTION,
     "bulk_mass_loss_wt_pct": Quantity.MASS_LOSS_FRACTION,
     "non_condensed_mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
     "mass_loss": Quantity.MASS_LOSS_FRACTION,
@@ -680,6 +683,21 @@ def _as_dec_or_none(value: object) -> Decimal | None:
         return as_decimal(value)
     except (TypeError, ValueError, ArithmeticError):
         return None
+
+
+def _printed_composition_amount(value: object) -> Decimal | None:
+    """Read a printed central composition amount, dropping its stated ± value."""
+
+    if isinstance(value, str):
+        value = re.split(r"\s*(?:±|\+/-)\s*", value, maxsplit=1)[0].strip()
+    return _as_dec_or_none(value)
+
+
+def _canonical_printed_oxide_name(name: str) -> str:
+    """Normalize source spellings of total iron to the converter's FeOT key."""
+
+    token = name.strip()
+    return "FeOT" if token in {"FeO_T", "FeO*"} else token
 
 
 def parse_declared_amount(value: object) -> Decimal:
@@ -3203,6 +3221,7 @@ _COMPOSITION_COMPONENTS: dict[str, tuple[str, str, bool]] = {
     },
     "Rb2O": ("Rb2O", "Rb2O", False),
     "SO3": ("SO3", "SO3", False),
+    "SO2": ("SO2", "SO2", False),
     "S": ("S", "S", False),
     "B2O3": ("B2O3", "B2O3", False),
     "Li2O": ("Li2O", "Li2O", False),
@@ -3228,6 +3247,8 @@ _PRINTED_COMPOSITION_MAP_KEYS = (
     "sample_oxide_composition_wt_pct",
     "starting_glass_wt_pct",
     "glass_initial_wt_pct",
+    "glass_composition_wt_pct",
+    "oxide_wt_percent",
     "printed_composition",
 )
 _PRINTED_COMPOSITION_TOTAL_KEYS = frozenset(
@@ -3425,7 +3446,7 @@ def _oxide_map_from_mapping(
             if key == "composition_mass_percent":
                 comps: dict[str, Decimal] = {}
                 for name, value in nested.items():
-                    token = str(name).strip()
+                    token = _canonical_printed_oxide_name(str(name))
                     if (
                         token in _COMPOSITION_CONDITION_KEYS
                         or token.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
@@ -3449,18 +3470,29 @@ def _oxide_map_from_mapping(
                         return None
                     return comps
                 continue
+            nested_for_parse = nested
+            if key == "oxide_wt_percent":
+                nested_for_parse = {
+                    name: parsed
+                    for name, value in nested.items()
+                    if (parsed := _printed_composition_amount(value)) is not None
+                }
             got = _oxide_map_from_mapping(
-                nested, refusal_reason=refusal_reason, declared_map=True
+                nested_for_parse, refusal_reason=refusal_reason, declared_map=True
             )
             if got:
                 for name, value in nested.items():
-                    token = str(name).strip()
+                    token = _canonical_printed_oxide_name(str(name))
                     if (
                         token in _COMPOSITION_CONDITION_KEYS
                         or token.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
                     ):
                         continue
-                    amount = _as_dec_or_none(value)
+                    amount = (
+                        _printed_composition_amount(value)
+                        if key == "oxide_wt_percent"
+                        else _as_dec_or_none(value)
+                    )
                     if amount is not None and token not in got:
                         equivalent = _kume_formula_unit_oxide(token)
                         if equivalent is not None and token != "FeOT":
@@ -3489,7 +3521,7 @@ def _oxide_map_from_mapping(
             or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
         ):
             continue
-        comps[name] = amount
+        comps[_canonical_printed_oxide_name(name)] = amount
     if len(comps) < 2:
         return None
     try:
@@ -5451,7 +5483,7 @@ def _item_mass_loss_field(item: Mapping[str, Any]) -> str | None:
 def _yield_table_items(
     values: Mapping[str, Any],
 ) -> tuple[str, list[Any]] | tuple[None, None]:
-    for key in ("points", "tests"):
+    for key in ("points", "tests", "runs"):
         items = values.get(key)
         if not isinstance(items, list) or not items:
             continue
@@ -11141,6 +11173,12 @@ class PrintedOxygenFacts:
     log_fO2_reference_Pa: Decimal = _BAR_PA
 
 
+def _rejected_log_fO2_reason(facts: PrintedOxygenFacts) -> str | None:
+    if not facts.rejected_log_fO2:
+        return None
+    return "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
+
+
 def _log_fO2_to_pa(
     log10_fO2: Decimal, reference_pressure_pa: Decimal = _BAR_PA
 ) -> Decimal:
@@ -12437,6 +12475,7 @@ class Migrator:
             ratio_oxygen is None
             and facts.log_fO2 is None
             and facts.oxygen_partial_pressure_Pa is None
+            and _rejected_log_fO2_reason(facts) is None
             and fallback
         ):
             ratio_oxygen = collect_author_ratio_oxygen(fallback, locator)
@@ -12450,6 +12489,14 @@ class Migrator:
                 log_fO2_reference_Pa=facts.log_fO2_reference_Pa,
             )
         elif facts.log_fO2 is None and facts.oxygen_partial_pressure_Pa is None:
+            refusal = _rejected_log_fO2_reason(facts)
+            if refusal is not None:
+                merged = dict(point_conditions or {})
+                merged.setdefault(
+                    "fO2_log",
+                    Located(State.unknown(refusal), locator=locator),
+                )
+                return merged
             return point_conditions
         merged = dict(point_conditions or {})
         if facts.log_fO2 is not None and "fO2_log" not in merged:
@@ -13357,6 +13404,41 @@ class Migrator:
         rows = list(iter_extract_observations(doc))
         fusion_transition_rows = self._fusion_transition_rows_by_table_row(rows)
         pressure_identity_context = _pressure_identity_context(doc, rows)
+        raw_experiments = doc.get("experiments") or ()
+        if isinstance(raw_experiments, Mapping):
+            raw_experiments = [
+                dict(value, experiment_id=key)
+                for key, value in raw_experiments.items()
+                if isinstance(value, Mapping)
+            ]
+        experiment_source_rows = {
+            str(row.get("experiment_id") or row.get("id")): row
+            for row in raw_experiments
+            if isinstance(row, Mapping)
+            and (row.get("experiment_id") or row.get("id"))
+        }
+        sample_compositions: dict[str, tuple[dict[str, Decimal], Locator | None]] = {}
+        ambiguous_sample_compositions: set[str] = set()
+        for _formula, row in rows:
+            row_values = row.get("values")
+            if not isinstance(row_values, Mapping):
+                continue
+            sample_id = row_values.get("sample_id")
+            if not isinstance(sample_id, str) or not sample_id:
+                continue
+            oxide_map = _oxide_map_from_mapping(row_values)
+            if not oxide_map:
+                continue
+            candidate = (oxide_map, locator_from_mapping(row.get("locator")))
+            previous = sample_compositions.get(sample_id)
+            if previous is not None and previous[0] != oxide_map:
+                ambiguous_sample_compositions.add(sample_id)
+                sample_compositions.pop(sample_id)
+            elif sample_id not in ambiguous_sample_compositions:
+                sample_compositions[sample_id] = candidate
+        source_context = dict(pressure_identity_context or {})
+        source_context["experiment_source_rows"] = experiment_source_rows
+        source_context["sample_compositions"] = sample_compositions
         records = phase_field_records(doc)
         self._phase_field_records[source_id] = records
         for problem in () if records is None else records.problems:
@@ -13416,7 +13498,7 @@ class Migrator:
                     extraction=extraction or {},
                     local_ids=local_ids,
                     declared_experiment_id=declared_experiment_id,
-                    source_context=pressure_identity_context,
+                    source_context=source_context,
                     provenance=extract_provenance,
                     fusion_transition_rows=fusion_transition_rows,
                 )
@@ -13609,6 +13691,49 @@ class Migrator:
             values = dict(raw_values)
         else:
             values = {}
+        context = source_context or {}
+        sample_id = values.get("sample_id")
+        sample_composition = (
+            context.get("sample_compositions", {}).get(sample_id)
+            if isinstance(sample_id, str)
+            and isinstance(context.get("sample_compositions"), Mapping)
+            else None
+        )
+        experiment_key = obs.get("experiment")
+        experiment_source_row = (
+            context.get("experiment_source_rows", {}).get(experiment_key)
+            if isinstance(experiment_key, str)
+            and isinstance(context.get("experiment_source_rows"), Mapping)
+            else None
+        )
+        experiment_conditions = (
+            experiment_source_row.get("conditions")
+            if isinstance(experiment_source_row, Mapping)
+            else None
+        )
+        experiment_log_f_o2 = (
+            experiment_conditions.get("log_fO2")
+            if isinstance(experiment_conditions, Mapping)
+            else None
+        )
+        experiment_oxygen_fallback = (
+            {"point_conditions": {"fO2_log": experiment_log_f_o2}}
+            if experiment_log_f_o2 is not None
+            else None
+        )
+        row_oxide_map = _oxide_map_from_mapping(values)
+        projected_oxide_map = row_oxide_map or (
+            sample_composition[0]
+            if isinstance(sample_composition, tuple)
+            else None
+        )
+        projected_oxide_locator = (
+            locator_from_mapping(obs.get("locator"))
+            if row_oxide_map
+            else sample_composition[1]
+            if isinstance(sample_composition, tuple)
+            else None
+        )
         t_for_rekey = None
         if isinstance(values, Mapping):
             t_sel_rekey = select_declared_source(AXIS_TEMPERATURE_K, None, values)
@@ -13768,8 +13893,18 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        species_formula = measured_tabulated_gas_formula or str(
-            values.get("formula") or formula
+        raw_quantity = values.get("quantity") if isinstance(values, Mapping) else None
+        exact_alias_gas_formula = (
+            _extract_formula_token(values.get("gas_species"))
+            if isinstance(raw_quantity, str)
+            and raw_quantity in QUANTITY_ALIASES
+            and q_token is Quantity.P_PARTIAL
+            else None
+        )
+        species_formula = (
+            measured_tabulated_gas_formula
+            or exact_alias_gas_formula
+            or str(values.get("formula") or formula)
         )
         if values.get("formula"):
             measured.formulas += 1
@@ -13782,13 +13917,16 @@ class Migrator:
             species_formula, phase, polymorph=species_polymorph
         )
         suffix_formula, suffix_derivation, suffix_reference = (None, None, None)
-        raw_quantity = values.get("quantity") if isinstance(values, Mapping) else None
         if isinstance(raw_quantity, str):
             _qualified, suffix = split_qualified_quantity(raw_quantity)
             suffix_formula, suffix_derivation, suffix_reference = parse_quantity_suffix(
                 suffix
             )
-            if suffix_formula and measured_tabulated_gas_formula is None:
+            if (
+                suffix_formula
+                and raw_quantity not in QUANTITY_ALIASES
+                and measured_tabulated_gas_formula is None
+            ):
                 species = make_species(
                     suffix_formula, phase, polymorph=species_polymorph
                 )
@@ -13801,7 +13939,7 @@ class Migrator:
             ),
         )
         total_iron_notice = _total_iron_reported_as_feo_notice(
-            initial_oxide_map, q_token, obs_id
+            projected_oxide_map, q_token, obs_id
         )
         composition_located = _composition_located_from_values(values, locator)
         catalogue_composition = _catalogue_composition_located_from_values(values, locator)
@@ -14306,6 +14444,10 @@ class Migrator:
                         initial_composition, proxy_flag=composition_role
                     )
             ident_kwargs["composition"] = State.of(initial_composition)
+        elif isinstance(sample_composition, tuple):
+            ident_kwargs["composition"] = State.of(
+                wt_pct_to_mole_fraction(sample_composition[0])
+            )
         elif composition_refusal or q_token in _BULK_PROPERTY_QUANTITIES:
             ident_kwargs["composition"] = State.unknown(
                 composition_unknown_reason(composition_refusal)
@@ -14612,6 +14754,17 @@ class Migrator:
                 **(point_conditions or {}),
                 "composition": catalogue_composition,
             }
+        elif projected_oxide_map:
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": Located(
+                    State.of(wt_pct_to_mole_fraction(projected_oxide_map)),
+                    locator=projected_oxide_locator or locator,
+                    inference=wt_pct_to_mole_fraction_derivation(
+                        projected_oxide_map, projected_oxide_locator or locator
+                    ),
+                ),
+            }
         if malformed_composition_amount is not None:
             point_conditions = {
                 **(point_conditions or {}),
@@ -14683,6 +14836,9 @@ class Migrator:
             point_conditions,
             oxygen_roots,
             locator,
+            fallback=(experiment_oxygen_fallback,)
+            if isinstance(experiment_oxygen_fallback, Mapping)
+            else (),
             skip_tables=True,
         )
         if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
@@ -15539,11 +15695,18 @@ class Migrator:
                     str(parent_values["gas_species"]), Phase.G, charge=species.charge
                 )
             elif q_for_species in _BULK_PROPERTY_QUANTITIES:
-                species_formula = bulk_property_species_formula(
-                    quantity=q_for_species,
-                    parent_formula=species.formula,
-                    sample_label=sample_label,
-                    oxide_map=point_oxide_map,
+                material = raw_item.get("material")
+                species_formula = (
+                    str(material)
+                    if source_id == "nakano-hashimoto-2020-bubbles-to-chondrites-i"
+                    and q_for_species is Quantity.MASS_LOSS_FRACTION
+                    and isinstance(material, str)
+                    else bulk_property_species_formula(
+                        quantity=q_for_species,
+                        parent_formula=species.formula,
+                        sample_label=sample_label,
+                        oxide_map=point_oxide_map,
+                    )
                 )
                 species = make_species(
                     species_formula,
@@ -15756,6 +15919,20 @@ class Migrator:
             provenance = dict(provenance or {})
             provenance["activity_coefficient_table_row_as_printed"] = dict(raw_item)
         if (
+            q_token_point is Quantity.MASS_LOSS_FRACTION
+            and isinstance(raw_item, Mapping)
+            and isinstance(raw_item.get("material"), str)
+            and isinstance(parent_values, Mapping)
+            and isinstance(parent_values.get("note"), str)
+        ):
+            provenance = dict(provenance or {})
+            provenance["printed_run_basis"] = {
+                "material": raw_item.get("material"),
+                "temperature_basis": "Tmax",
+                "heating_duration_s": raw_item.get("heating_duration_s"),
+                "mass_loss_basis": parent_values["note"],
+            }
+        if (
             q_token_point not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
             and provenance is not None
         ):
@@ -15865,6 +16042,26 @@ class Migrator:
                 charge=species.charge,
             )
         identity = fill_identity(quantity, species, **ident_kwargs)
+        if q_token_point is Quantity.FE3_FE2_RATIO and isinstance(raw_item, Mapping):
+            row_oxygen = collect_printed_oxygen((raw_item,), point_locator)
+            refusal = _rejected_log_fO2_reason(row_oxygen)
+            if refusal is not None:
+                identity = replace(
+                    identity,
+                    fO2_Pa=State.unknown(refusal),
+                )
+            elif row_oxygen.log_fO2 is not None:
+                # A printed point overrides series fO2; absence leaves the
+                # inherited series value unchanged.
+                identity = replace(
+                    identity,
+                    fO2_Pa=State.of(
+                        _log_fO2_to_pa(
+                            row_oxygen.log_fO2.state.value,
+                            row_oxygen.log_fO2_reference_Pa,
+                        )
+                    ),
+                )
         converted: Derivation | None = None
         if value_sel is not None and value_sel.available:
             emitted = value_sel.value
@@ -16325,6 +16522,18 @@ class Migrator:
                     point_conditions = {
                         **(point_conditions or {}),
                         "VF_wt_pct": Located(State.of(vf), locator=point_locator),
+                    }
+            if source_id == "nakano-hashimoto-2020-bubbles-to-chondrites-i":
+                heating_duration = _as_dec_or_none(
+                    raw_item.get("heating_duration_s")
+                )
+                if heating_duration is not None:
+                    point_conditions = {
+                        **(point_conditions or {}),
+                        "heating_duration_s": Located(
+                            State.of(as_decimal(heating_duration)),
+                            locator=point_locator,
+                        ),
                     }
         partial_total_condition = _partial_pressure_point_condition(
             ident_kwargs, point_locator

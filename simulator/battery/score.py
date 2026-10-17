@@ -3526,10 +3526,10 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                 )
             )
-        elif kind == "openimcc_notice":
+        elif kind in {"openimcc_flag", "openimcc_notice"}:
             notices.append(
                 Notice(
-                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                     affected_quantities=(quantity,),
                     reason=str(row.get("reason") or kind),
                     origin=f"engine:{engine.value}",
@@ -3544,7 +3544,8 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                 )
             )
-        elif kind in {"openimcc_flag", "openimcc_gas_unavailable"}:
+        elif kind == "openimcc_gas_unavailable":
+            # No existing kind represents an unavailable engine channel.
             notices.append(
                 Notice(
                     kind=NoticeKind.SOURCE_DISAGREEMENT,
@@ -4260,7 +4261,7 @@ def _has_printed_fo2(observation: Observation, identity: Identity) -> bool:
 def _predict_fe_redox(
     engine: Engine, observation: Observation, identity: Identity, channel: str
 ) -> EnginePrediction:
-    """Predict Fe3+/Fe2+ with the production Kress91 melt-redox split."""
+    """Predict Fe3+/Fe2+ with the production model selected by the engine."""
 
     from simulator.fe_redox import (
         KRESS91_LIQUID_CALIBRATION_MAX_T_C,
@@ -4273,7 +4274,7 @@ def _predict_fe_redox(
     )
 
     sources = ("Kress and Carmichael 1991, doi:10.1007/BF00307328",)
-    if engine is not Engine.INTERNAL_ANALYTICAL:
+    if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -4288,6 +4289,9 @@ def _predict_fe_redox(
             },
             identity=identity,
         )
+
+    if engine is Engine.OPENIMCC:
+        sources = ()
 
     def refused(reason: RefusalReason, detail: Mapping[str, object]) -> EnginePrediction:
         return EnginePrediction(
@@ -4315,26 +4319,202 @@ def _predict_fe_redox(
         except (TypeError, ValueError):
             return None
 
-    temperature = temperature_of(identity) or point_value("temperature_K")
-    if temperature is None or not temperature.is_finite() or temperature <= 0:
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "temperature_K"},
+    def temperature_input() -> tuple[Decimal | None, EnginePrediction | None]:
+        temperature = temperature_of(identity) or point_value("temperature_K")
+        if temperature is None or not temperature.is_finite() or temperature <= 0:
+            return None, refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "temperature_K"},
+            )
+        return temperature, None
+
+    def composition_input() -> tuple[
+        State[Composition] | None,
+        Composition | None,
+        EnginePrediction | None,
+    ]:
+        composition_state = identity.composition
+        if composition_state is None or not composition_state.is_value:
+            composition_state = _printed_point_composition(observation)
+        if (
+            composition_state is None
+            or not composition_state.is_value
+            or not isinstance(composition_state.value, Composition)
+        ):
+            return None, None, refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "composition"},
+            )
+        return composition_state, composition_state.value, None
+
+    def composition_weight_percent(composition: Composition) -> dict[str, float] | None:
+        return (
+            {oxide: float(amount) for oxide, amount in composition.components}
+            if composition.amount_basis is AmountBasis.MASS_PERCENT
+            else composition_wt_pct(composition)
         )
 
-    composition_state = identity.composition
-    if composition_state is None or not composition_state.is_value:
-        composition_state = _printed_point_composition(observation)
-    if (
-        composition_state is None
-        or not composition_state.is_value
-        or not isinstance(composition_state.value, Composition)
-    ):
+    def printed_fo2_input() -> tuple[Decimal | None, EnginePrediction | None]:
+        fO2_log = point_value("fO2_log")
+        if fO2_log is None:
+            if _derived_fo2_condition(observation):
+                return None, refused(
+                    RefusalReason.IDENTITY_INCOMPLETE,
+                    {"reason": "missing_input", "input": "printed_fO2"},
+                )
+            oxygen_pa = identity.fO2_Pa
+            point_oxygen = (observation.point_conditions or {}).get("fO2_Pa")
+            if (
+                (oxygen_pa is None or not oxygen_pa.is_value or oxygen_pa.value is None)
+                and isinstance(point_oxygen, Located)
+                and point_oxygen.inference is None
+                and point_oxygen.state.is_value
+                and point_oxygen.state.value is not None
+            ):
+                oxygen_pa = point_oxygen.state
+            if oxygen_pa is not None and oxygen_pa.is_value and oxygen_pa.value is not None:
+                oxygen_value = float(oxygen_pa.value)
+                if oxygen_value > 0.0 and math.isfinite(oxygen_value):
+                    fO2_log = Decimal(str(math.log10(oxygen_value / 100000.0)))
+        if fO2_log is None or not fO2_log.is_finite():
+            return None, refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "printed_fO2"},
+            )
+        return fO2_log, None
+
+    temperature, input_refusal = temperature_input()
+    if input_refusal is not None:
+        return input_refusal
+    composition_state, composition, input_refusal = composition_input()
+    if input_refusal is not None:
+        return input_refusal
+
+    try:
+        composition_wt = composition_weight_percent(composition)
+        if composition_wt is None:
+            raise ValueError("composition cannot be converted to oxide weights")
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
         return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "composition"},
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "invalid_redox_composition", "detail": str(exc)},
         )
-    composition = composition_state.value
+
+    if engine is Engine.OPENIMCC:
+        fO2_log, input_refusal = printed_fo2_input()
+        if input_refusal is not None:
+            return input_refusal
+        try:
+            from simulator.accounting.formulas import parse_formula
+
+            inventory: dict[str, float] = {}
+            for oxide, weight_percent in composition_wt.items():
+                formula = parse_formula(oxide, species=oxide)
+                oxide_moles = weight_percent / formula.molar_mass_g_mol
+                for element, atom_moles in formula.atom_moles(oxide_moles).items():
+                    inventory[element] = (
+                        inventory.get(element, 0.0) + atom_moles
+                    )
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            return refused(
+                RefusalReason.INVALID_IDENTITY,
+                {"reason": "invalid_redox_composition", "detail": str(exc)},
+            )
+        if inventory.get("Fe", 0.0) <= 0.0:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "total_iron"},
+            )
+        try:
+            import openimcc
+        except ImportError as exc:
+            return refused(
+                RefusalReason.OPENIMCC_NOT_IMPORTABLE,
+                {
+                    "reason": RefusalReason.OPENIMCC_NOT_IMPORTABLE.value,
+                    "detail": str(exc),
+                },
+            )
+        try:
+            result = openimcc.evaluate_redox(
+                inventory,
+                float(temperature),
+                "imposed",
+                lambda_imposed=float(fO2_log) * math.log(10.0),
+            )
+        except openimcc.ImccRefusal as exc:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "openimcc_redox_refused", "detail": str(exc)},
+            )
+        prediction_value = result.ferric_fe_mol / result.ferrous_fe_mol
+        if not math.isfinite(prediction_value) or prediction_value <= 0.0:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
+            )
+
+        extrapolated_rows = tuple(result.extrapolated_redox_rows)
+        authority = (
+            Authority.EXTRAPOLATED if extrapolated_rows else Authority.BRIDGE
+        )
+        band = tuple(
+            Decimal(str(value))
+            for value in result.active_row_band_intersection_K
+        )
+        notices: tuple[Notice, ...] = ()
+        if extrapolated_rows:
+            band_text = f"[{band[0]:g}, {band[1]:g}] K"
+            notices = (
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                    reason=(
+                        "openimcc_redox_pack_extrapolation; rows="
+                        f"{', '.join(extrapolated_rows)}; "
+                        f"flags={', '.join(result.flags)}"
+                    ),
+                    origin="openimcc.evaluate_redox",
+                    band=band_text,
+                    authority=authority,
+                ),
+            )
+        notices += tuple(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                reason=str(flag),
+                origin="openimcc.evaluate_redox",
+            )
+            for flag in result.flags
+        )
+        prediction_identity = replace(
+            identity,
+            composition=composition_state,
+            fO2_Pa=State.of(
+                Decimal(str(100000.0 * 10.0 ** float(fO2_log)))
+            ),
+        )
+        sources = (
+            f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="openimcc.evaluate_redox",
+            ),
+            value=as_decimal(str(prediction_value)),
+            unit="dimensionless",
+            authority=authority,
+            notices=notices,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            certified_band={"temperature_K": band},
+            identity=prediction_identity,
+            version="openimcc-redox",
+        )
 
     # Premise: Borisov stores mole fractions of oxide formula units and the
     # combined iron key is single-cation. Algebra: x_i -> w_i ∝ x_i M_i, then
@@ -4343,13 +4523,6 @@ def _predict_fe_redox(
     # mole fraction. Sanity: no measured redox split is used, and the printed
     # six-significant-figure composition remains closed after the FeOt rename.
     try:
-        composition_wt = (
-            {oxide: float(amount) for oxide, amount in composition.components}
-            if composition.amount_basis is AmountBasis.MASS_PERCENT
-            else composition_wt_pct(composition)
-        )
-        if composition_wt is None:
-            raise ValueError("composition cannot be converted to oxide weights")
         dropped_components, dropped_mass_fraction = kress91_dropped_components(
             composition_wt
         )
@@ -4365,32 +4538,9 @@ def _predict_fe_redox(
             {"reason": "missing_input", "input": "total_iron"},
         )
 
-    fO2_log = point_value("fO2_log")
-    if fO2_log is None:
-        if _derived_fo2_condition(observation):
-            return refused(
-                RefusalReason.IDENTITY_INCOMPLETE,
-                {"reason": "missing_input", "input": "printed_fO2"},
-            )
-        oxygen_pa = identity.fO2_Pa
-        point_oxygen = (observation.point_conditions or {}).get("fO2_Pa")
-        if (
-            (oxygen_pa is None or not oxygen_pa.is_value or oxygen_pa.value is None)
-            and isinstance(point_oxygen, Located)
-            and point_oxygen.inference is None
-            and point_oxygen.state.is_value
-            and point_oxygen.state.value is not None
-        ):
-            oxygen_pa = point_oxygen.state
-        if oxygen_pa is not None and oxygen_pa.is_value and oxygen_pa.value is not None:
-            oxygen_value = float(oxygen_pa.value)
-            if oxygen_value > 0.0 and math.isfinite(oxygen_value):
-                fO2_log = Decimal(str(math.log10(oxygen_value / 100000.0)))
-    if fO2_log is None or not fO2_log.is_finite():
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "printed_fO2"},
-        )
+    fO2_log, input_refusal = printed_fo2_input()
+    if input_refusal is not None:
+        return input_refusal
     # The extract labels this column log10 fO2; its air rows are about -0.68,
     # i.e. log10(0.21 bar), matching the simulator's log10(bar) convention.
     # For identity comparison, fO2(Pa) = 10**log10(fO2/bar) * 1e5 Pa/bar;

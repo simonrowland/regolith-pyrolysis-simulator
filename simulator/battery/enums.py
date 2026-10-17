@@ -220,6 +220,10 @@ class NoticeKind(StrEnum):
     TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
     SOURCE_DISAGREEMENT = "source_disagreement"
+    # An engine-reported limitation of its own model at an in-domain prediction.
+    # The engine text is carried verbatim; it is nonblocking, adds no stratum,
+    # and does not change authority.
+    ENGINE_MODEL_CAVEAT = "engine_model_caveat"
     # An input was left out because this row does not take it. The reason
     # says which input and why. Not a blocking qualification.
     INPUT_OMITTED = "input_omitted"
