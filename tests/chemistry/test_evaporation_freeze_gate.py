@@ -44,6 +44,7 @@ from simulator.melt_backend.base import (
 )
 from simulator.melt_backend.liquidus import LiquidusSolidusResult
 from simulator.reduced_real_determinism import (
+    GateCurveProviderOutcome,
     PT0DeterminismStore,
     canonical_json_bytes,
     gate_curve_memo_record,
@@ -6144,10 +6145,12 @@ def test_core_gate_curve_memo_reuses_fallback_curve_after_provider_unavailable(
         try:
             return live_producer()
         except ProviderUnavailableError:
-            return engine_binding_admission.write_gate_curve_memo_record(
+            record = engine_binding_admission.write_gate_curve_memo_record(
                 sim,
                 fallback_curve,
             )
+            record['provider_outcome'] = GateCurveProviderOutcome.NO_PROVIDER
+            return record
 
     monkeypatch.setattr(
         sim,
@@ -6158,10 +6161,86 @@ def test_core_gate_curve_memo_reuses_fallback_curve_after_provider_unavailable(
     first = sim._melt_redox_liquidus_gate_curve()
     second = sim._melt_redox_liquidus_gate_curve()
 
-    # GREEN stores the live result in its local slot and keyed memo, including
-    # this vetoed fallback: simulator/core.py:4797-4812.
+    # Stable provider absence remains reusable through the keyed core memo.
     assert len(provider_calls) == 1
     assert second == first
+    key = _freeze_gate_key_for_current_state(sim)
+    assert sim._freeze_gate_liquid_fraction_curve_memo[key][
+        'provider_outcome'
+    ] is GateCurveProviderOutcome.NO_PROVIDER
+
+
+def test_core_gate_curve_memo_recomputes_after_transient_provider_failure(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    provider_calls = []
+    fallback_curve = {
+        'source': 'kress91_liquid_calibration_floor',
+        'solidus_T_C': 1200.0,
+        'liquidus_T_C': 1200.000001,
+    }
+
+    def injected_provider_result(intent, *args, **kwargs):
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            provider_calls.append(intent)
+            if len(provider_calls) == 1:
+                return IntentResult(
+                    intent=intent,
+                    status='not_converged',
+                    transition=None,
+                    diagnostic={'backend_status': 'not_converged'},
+                )
+            return IntentResult(
+                intent=intent,
+                status='ok',
+                transition=None,
+                diagnostic={
+                    'backend_status': 'ok',
+                    'solidus_T_C': 1000.0,
+                    'liquidus_T_C': 1300.0,
+                    'liquid_fraction_path': (
+                        (1000.0, 0.0),
+                        (1300.0, 1.0),
+                    ),
+                },
+            )
+        raise AssertionError(f'unexpected intent: {intent}')
+
+    monkeypatch.setattr(sim, '_dispatch_only', injected_provider_result)
+    monkeypatch.setattr(
+        sim.backend,
+        'find_liquidus_solidus',
+        None,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_from_backend_liquidus',
+        lambda reasons, **kwargs: dict(fallback_curve),
+    )
+
+    first = sim._melt_redox_liquidus_gate_curve()
+    key = _freeze_gate_key_for_current_state(sim)
+    assert key not in sim._freeze_gate_liquid_fraction_curve_memo
+    second = sim._melt_redox_liquidus_gate_curve()
+
+    assert first == fallback_curve
+    assert second['source'] == 'gate_liquid_fraction'
+    assert second['solidus_T_C'] == 1000.0
+    assert second['liquidus_T_C'] == 1300.0
+    assert len(provider_calls) == 2
+    assert sim._freeze_gate_liquid_fraction_curve_memo[key][
+        'provider_outcome'
+    ] is GateCurveProviderOutcome.PRODUCED
 
 
 def test_replay_gate_curve_is_not_written_to_core_memo(

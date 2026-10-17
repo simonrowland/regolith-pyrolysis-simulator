@@ -2083,7 +2083,10 @@ class EvaporationMixin:
         redox_state: RedoxState | None = None,
     ) -> dict[str, Any]:
         from simulator.reduced_real_determinism import (
+            GateCurveProviderOutcome,
             gate_curve_memo_record,
+            gate_curve_memo_record_is_reusable,
+            gate_curve_provider_outcome_is_reusable,
             _is_cacheable_gate_curve,
             record_repair_notice,
             uncacheable_replay_disposition,
@@ -2091,6 +2094,9 @@ class EvaporationMixin:
 
         self._reduced_real_uncacheable_reasons = []
         self._last_reduced_real_replay_notices = None
+        self._freeze_gate_provider_outcome = (
+            GateCurveProviderOutcome.NO_PROVIDER
+        )
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
         fO2_log = self._freeze_gate_liquidus_fO2_log(
             float(self._current_melt_redox_fO2_log())
@@ -2134,6 +2140,7 @@ class EvaporationMixin:
             cache
             and cache.get('key') == key
             and cache.get('disposition') in {'live', 'memo-hit'}
+            and gate_curve_memo_record_is_reusable(cache)
             and isinstance(cached_curve, Mapping)
             and _is_cacheable_gate_curve(cached_curve)
             and isinstance(cached_notices, list)
@@ -2162,6 +2169,7 @@ class EvaporationMixin:
                 cache.get('origin'),
                 cached_notices,
                 'memo-hit',
+                provider_outcome=cache.get('provider_outcome'),
             )
 
         # Opt-in caller-owned memo for workflows that build fresh simulator
@@ -2185,6 +2193,7 @@ class EvaporationMixin:
             if (
                 isinstance(process_cached, Mapping)
                 and process_cached.get('disposition') in {'live', 'memo-hit'}
+                and gate_curve_memo_record_is_reusable(process_cached)
                 and isinstance(shared_value, Mapping)
                 and _is_cacheable_gate_curve(shared_value)
                 and isinstance(shared_notices, list)
@@ -2205,6 +2214,7 @@ class EvaporationMixin:
                     shared_origin,
                     shared_notices,
                     'memo-hit',
+                    provider_outcome=process_cached.get('provider_outcome'),
                 )
                 self._freeze_gate_liquid_fraction_cache = {
                     **record,
@@ -2355,7 +2365,13 @@ class EvaporationMixin:
 
             self._record_composition_projected_liquidus_notice_from_curve(curve)
             sticky = uncacheable_replay_disposition(self)
-            cache_eligible = not sticky and _is_cacheable_gate_curve(curve)
+            cache_eligible = (
+                not sticky
+                and gate_curve_provider_outcome_is_reusable(
+                    self._freeze_gate_provider_outcome
+                )
+                and _is_cacheable_gate_curve(curve)
+            )
             from simulator.engine_binding_admission import (
                 gate_curve_memo_evidence,
                 write_gate_curve_memo_record,
@@ -2372,6 +2388,9 @@ class EvaporationMixin:
                 repair_notices,
                 evidence=evidence,
                 **redox_state_kwargs,
+            )
+            record['provider_outcome'] = GateCurveProviderOutcome(
+                self._freeze_gate_provider_outcome
             )
             origin = record['origin']
             if cache_eligible:
@@ -2400,6 +2419,9 @@ class EvaporationMixin:
             store is not None
             and getattr(store, 'capture_enabled', False)
             and not uncacheable_replay_disposition(self)
+            and gate_curve_provider_outcome_is_reusable(
+                self._freeze_gate_provider_outcome
+            )
         ):
             store.capture_gate_curve(
                 self,
@@ -2550,7 +2572,10 @@ class EvaporationMixin:
         redox_state: RedoxState | None = None,
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_determinism import (
+            GateCurveProviderOutcome,
+            gate_curve_provider_outcome_for_status,
             mark_uncacheable_replay_disposition,
+            record_gate_curve_provider_outcome,
         )
 
         fO2_log, redox_state = normalize_redox_state(
@@ -2566,6 +2591,10 @@ class EvaporationMixin:
             try:
                 register_gate_providers()
             except Exception as exc:  # noqa: BLE001 - optional provider boundary
+                record_gate_curve_provider_outcome(
+                    self,
+                    GateCurveProviderOutcome.FAILED,
+                )
                 mark_uncacheable_replay_disposition(
                     self,
                     f'gate provider registration failed: {type(exc).__name__}',
@@ -2580,6 +2609,10 @@ class EvaporationMixin:
                 fe_redox_policy='intrinsic',
             )
         except ProviderUnavailableError as exc:
+            record_gate_curve_provider_outcome(
+                self,
+                GateCurveProviderOutcome.NO_PROVIDER,
+            )
             mark_uncacheable_replay_disposition(
                 self,
                 f'gate liquid fraction provider unavailable: {type(exc).__name__}',
@@ -2599,6 +2632,8 @@ class EvaporationMixin:
         if fallback_provider:
             source = f'gate_liquid_fraction:fallback:{fallback_provider}'
         if status != 'ok':
+            status_outcome = gate_curve_provider_outcome_for_status(status)
+            record_gate_curve_provider_outcome(self, status_outcome)
             projected = self._composition_projected_freeze_gate_curve(
                 diagnostic,
                 source=source,
@@ -2629,14 +2664,29 @@ class EvaporationMixin:
                 repair_notices=repair_notices,
             )
             if curve is not None:
+                record_gate_curve_provider_outcome(
+                    self,
+                    GateCurveProviderOutcome.PRODUCED,
+                )
                 return curve
             reasons.append('gate liquid fraction table invalid')
-        return self._freeze_gate_curve_from_bounds(
+        curve = self._freeze_gate_curve_from_bounds(
             solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
             liquidus_T_C=self._optional_float(diagnostic.get('liquidus_T_C')),
             source=source,
             reasons=reasons,
         )
+        if curve is not None:
+            record_gate_curve_provider_outcome(
+                self,
+                GateCurveProviderOutcome.PRODUCED,
+            )
+            return curve
+        record_gate_curve_provider_outcome(
+            self,
+            GateCurveProviderOutcome.NO_PROVIDER,
+        )
+        return None
 
     def _freeze_gate_curve_from_backend_liquidus(
         self,
@@ -2648,7 +2698,10 @@ class EvaporationMixin:
         redox_state: RedoxState | None = None,
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_determinism import (
+            GateCurveProviderOutcome,
+            gate_curve_provider_outcome_for_status,
             mark_uncacheable_replay_disposition,
+            record_gate_curve_provider_outcome,
         )
 
         fO2_log, redox_state = normalize_redox_state(
@@ -2657,6 +2710,10 @@ class EvaporationMixin:
         )
         finder = getattr(self.backend, 'find_liquidus_solidus', None)
         if not callable(finder):
+            record_gate_curve_provider_outcome(
+                self,
+                GateCurveProviderOutcome.NO_PROVIDER,
+            )
             reasons.append('backend liquidus finder unavailable')
             return None
         composition_mol = self.atom_ledger.project_account_mol(
@@ -2676,19 +2733,43 @@ class EvaporationMixin:
             )
         except MeltCompositionError:
             raise
+        except ProviderUnavailableError as exc:
+            record_gate_curve_provider_outcome(
+                self,
+                GateCurveProviderOutcome.NO_PROVIDER,
+            )
+            mark_uncacheable_replay_disposition(
+                self,
+                f'backend liquidus provider unavailable: {type(exc).__name__}',
+            )
+            reasons.append(f'backend liquidus provider unavailable: {exc}')
+            return None
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            record_gate_curve_provider_outcome(
+                self,
+                GateCurveProviderOutcome.FAILED,
+            )
             mark_uncacheable_replay_disposition(
                 self,
                 f'backend liquidus finder failed: {type(exc).__name__}',
             )
             reasons.append(f'backend liquidus finder failed: {exc}')
             return None
-        return self._freeze_gate_curve_from_liquidus_result(
+        status = str(getattr(result, 'status', 'unavailable'))
+        status_outcome = gate_curve_provider_outcome_for_status(status)
+        record_gate_curve_provider_outcome(self, status_outcome)
+        curve = self._freeze_gate_curve_from_liquidus_result(
             result,
             source='liquidus_solidus:backend',
             reasons=reasons,
             repair_notices=repair_notices,
         )
+        if curve is None and status_outcome is GateCurveProviderOutcome.PRODUCED:
+            record_gate_curve_provider_outcome(
+                self,
+                GateCurveProviderOutcome.NO_PROVIDER,
+            )
+        return curve
 
     def _freeze_gate_curve_from_kernel_liquidus(
         self,
@@ -2702,7 +2783,10 @@ class EvaporationMixin:
         repair_notices: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_determinism import (
+            GateCurveProviderOutcome,
+            gate_curve_provider_outcome_for_status,
             mark_uncacheable_replay_disposition,
+            record_gate_curve_provider_outcome,
         )
 
         fO2_log, redox_state = normalize_redox_state(
@@ -2741,6 +2825,10 @@ class EvaporationMixin:
                     fe_redox_policy='intrinsic',
                 )
         except ProviderUnavailableError as exc:
+            record_gate_curve_provider_outcome(
+                self,
+                GateCurveProviderOutcome.NO_PROVIDER,
+            )
             mark_uncacheable_replay_disposition(
                 self,
                 f'kernel liquidus provider unavailable: {type(exc).__name__}',
@@ -2754,6 +2842,8 @@ class EvaporationMixin:
             or diagnostic.get('backend_status')
             or 'unavailable'
         )
+        status_outcome = gate_curve_provider_outcome_for_status(status)
+        record_gate_curve_provider_outcome(self, status_outcome)
         if status != 'ok':
             reasons.append(f'kernel liquidus unavailable: status={status}')
             return None
@@ -2770,6 +2860,16 @@ class EvaporationMixin:
         if curve is not None and composition_derived:
             curve = dict(curve)
             curve['composition_derived'] = True
+        if curve is None:
+            record_gate_curve_provider_outcome(
+                self,
+                GateCurveProviderOutcome.NO_PROVIDER,
+            )
+        else:
+            record_gate_curve_provider_outcome(
+                self,
+                GateCurveProviderOutcome.PRODUCED,
+            )
         return curve
 
     def _freeze_gate_curve_from_liquidus_result(

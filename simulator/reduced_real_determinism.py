@@ -21,6 +21,7 @@ from datetime import datetime
 from datetime import timezone
 from decimal import Decimal
 from decimal import InvalidOperation
+from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, ClassVar
@@ -2627,20 +2628,92 @@ def gate_curve_memo_producer_configuration(
     }
 
 
+class GateCurveProviderOutcome(str, Enum):
+    NO_PROVIDER = "no_provider"
+    PRODUCED = "produced"
+    FAILED = "failed"
+
+
+_GATE_CURVE_NO_PROVIDER_STATUSES = frozenset({
+    "unavailable",
+    "out_of_domain",
+    "unsupported",
+    "refused",
+})
+
+
+def gate_curve_provider_outcome_for_status(
+    status: str,
+) -> GateCurveProviderOutcome:
+    """Separate stable applicability refusals from provider failures."""
+
+    normalized_status = str(status).strip().lower()
+    if normalized_status == "ok":
+        return GateCurveProviderOutcome.PRODUCED
+    if normalized_status in _GATE_CURVE_NO_PROVIDER_STATUSES:
+        return GateCurveProviderOutcome.NO_PROVIDER
+    return GateCurveProviderOutcome.FAILED
+
+
+def record_gate_curve_provider_outcome(
+    sim: Any,
+    outcome: GateCurveProviderOutcome | str,
+) -> GateCurveProviderOutcome:
+    """Keep one failed provider from being masked by a later fallback."""
+
+    next_outcome = GateCurveProviderOutcome(outcome)
+    raw_current = getattr(sim, "_freeze_gate_provider_outcome", None)
+    try:
+        current = GateCurveProviderOutcome(raw_current)
+    except (TypeError, ValueError):
+        current = None
+    if (
+        current is not GateCurveProviderOutcome.FAILED
+        or next_outcome is GateCurveProviderOutcome.FAILED
+    ):
+        sim._freeze_gate_provider_outcome = next_outcome
+    return GateCurveProviderOutcome(sim._freeze_gate_provider_outcome)
+
+
+def gate_curve_provider_outcome_is_reusable(
+    outcome: GateCurveProviderOutcome | str | None,
+) -> bool:
+    if outcome is None:
+        return True
+    try:
+        typed_outcome = GateCurveProviderOutcome(outcome)
+    except (TypeError, ValueError):
+        return False
+    return typed_outcome is not GateCurveProviderOutcome.FAILED
+
+
 def gate_curve_memo_record(
     curve: Mapping[str, Any],
     origin: Mapping[str, Any] | None,
     repair_notices: Sequence[Mapping[str, Any]] | None,
     disposition: str,
+    *,
+    provider_outcome: GateCurveProviderOutcome | str | None = None,
 ) -> dict[str, Any]:
     """Build the runtime record shared by the producer and core reader."""
 
-    return {
+    record = {
         "curve": dict(curve),
         "origin": dict(origin) if isinstance(origin, Mapping) else None,
         "repair_notices": [dict(notice) for notice in repair_notices or ()],
         "disposition": disposition,
     }
+    if provider_outcome is not None:
+        record["provider_outcome"] = GateCurveProviderOutcome(provider_outcome)
+    return record
+
+
+def gate_curve_memo_record_is_reusable(record: Mapping[str, Any]) -> bool:
+    """Transient provider failures must not become reusable fallback curves."""
+
+    return gate_curve_provider_outcome_is_reusable(
+        record.get("provider_outcome")
+    )
 
 
 def uncacheable_replay_disposition(sim: Any) -> bool:
