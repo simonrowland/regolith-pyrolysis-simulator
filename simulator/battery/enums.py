@@ -236,6 +236,8 @@ class NoticeKind(StrEnum):
     # t-1123a: printed point sits between printed liquidus positions; scored as
     # liquid, flagged (all-numeric line only). Reason carries the stated liquidus.
     LIQUIDUS_POSITION_CONTESTED = "liquidus_position_contested"
+    QUENCH_ALTERED = "quench_altered"
+    QUENCH_OXIDISING = "quench_oxidising"
 
 
 class ReferenceStateConvention(StrEnum):
@@ -254,6 +256,16 @@ class Phase(StrEnum):
     AQ = "aq"
     GLASS = "glass"
     SUPERCOOLED_L = "supercooled_l"
+
+
+class QuenchState(StrEnum):
+    ASSERTED_PRESERVED = "asserted_preserved"
+    ASSERTED_ALTERED = "asserted_altered"
+    NOT_STATED = "not_stated"
+
+
+class QuenchDirection(StrEnum):
+    OXIDISING = "oxidising"
 
 
 class Polymorph(StrEnum):

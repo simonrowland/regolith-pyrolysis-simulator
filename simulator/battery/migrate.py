@@ -1163,6 +1163,8 @@ def _point_condition_from_plain(
 
     if isinstance(payload, Located):
         return payload
+    if key in {"quench_state", "quench_direction"}:
+        return _located_from_plain(payload, str)
     if key in {"fO2_control", "atmosphere"}:
         return _located_from_plain(
             payload,
@@ -14374,8 +14376,15 @@ class Migrator:
                                 )
                             )
         point_conditions = None
+        raw_point_conditions = obs.get("point_conditions")
+        if isinstance(raw_point_conditions, Mapping):
+            point_conditions = {
+                str(key): _point_condition_from_plain(value, key=str(key))
+                for key, value in raw_point_conditions.items()
+            }
         if t_known is not None:
             point_conditions = {
+                **(point_conditions or {}),
                 "temperature_K": _converted_temperature(
                     t_known,
                     t_sel.unit_trail,
