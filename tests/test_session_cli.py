@@ -67,6 +67,9 @@ PER_HOUR_KEYS = {
 PER_HOUR_DIAGNOSTIC_KEYS = {
     "fe_redox_split",
     "stage_3_capture",
+    # d-160/d-166: seeded initial Fe0 activates the existing stratification
+    # diagnostic on advanced steps.
+    "metal_phase_stratification",
     # VR-11 exposes the selected vapour batch and its flux overlay on advanced
     # steps; the pre-advance snapshot remains the compact per-hour surface.
     "vapour_batch_summary",
