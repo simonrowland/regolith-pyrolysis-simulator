@@ -3583,9 +3583,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'authoritative melt-headspace pressure requires '
                 '_melt_headspace_composition_mbar projection'
             )
+        # Preserve invalid actual controls for the downstream typed validator;
+        # max(0, NaN/-inf) would silently turn them into numerical vacuum.
         partial_sum_mbar = sum(
-            max(0.0, float(value))
-            for value in upstream_partials_mbar.values()
+            max(0.0, value) if math.isfinite(value) else value
+            for value in map(float, upstream_partials_mbar.values())
         )
         return partial_sum_mbar / 1000.0
 
@@ -5372,10 +5374,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # N2-sweep passive exchange uses actual headspace pO2 below this bound;
         # the ceiling does not mean equilibrium with pure O2. As P -> 0 the
         # vacuum floor is numerical pressure resolution, not physics.
-        return math.log10(floor_vacuum_pressure_bar(
+        pressure_bar = floor_vacuum_pressure_bar(
             self._melt_headspace_total_pressure_bar(),
             floor_bar=self._vacuum_floor_bar(),
-        ))
+        )
+        if not math.isfinite(pressure_bar):
+            raise AccountingError(
+                'melt redox ceiling requires finite actual headspace pressure; '
+                f'got {pressure_bar!r} bar'
+            )
+        return math.log10(pressure_bar)
 
     def _melt_fO2_reference_state_at_temperature(
         self,
