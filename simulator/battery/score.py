@@ -53,6 +53,8 @@ from simulator.battery.enums import (
     Polymorph,
     PolymorphRejectionKind,
     PURE_STANDARD_THERMO,
+    QuenchDirection,
+    QuenchState,
     Quantity,
     ReferenceStateConvention,
     Rail,
@@ -60,6 +62,8 @@ from simulator.battery.enums import (
     ResidualStatus,
     SourceRelation,
     UncertaintyKind,
+    ValenceDenominatorKind,
+    ValenceValueForm,
     VAPORIZATION_ENTHALPIES,
     ValueKind,
     residual_status_token,
@@ -401,6 +405,7 @@ FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
+FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
 
 
 @dataclass(frozen=True)
@@ -689,8 +694,23 @@ def metric_operation(quantity: Quantity | None) -> MetricOperation | None:
 
 
 def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
-    """Select the stored residue metric from its measured subtype."""
+    """Select an identity-aware metric when the quantity's form requires it."""
     quantity = quantity_token(identity)
+    if quantity is Quantity.VALENCE_RATIO:
+        basis = identity.valence_basis
+        if basis is None or not basis.is_value:
+            return None
+        if basis.value.value_form in {
+            ValenceValueForm.FRACTION,
+            ValenceValueForm.RATIO,
+        }:
+            return MetricOperation.DEX
+        if basis.value.value_form in {
+            ValenceValueForm.LOG10_RATIO,
+            ValenceValueForm.AVERAGE_OXIDATION_STATE,
+        }:
+            return MetricOperation.ABSOLUTE
+        return None
     if quantity is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
         return metric_operation(quantity)
     subtype = identity.subtype.value if identity.subtype.is_value else None
@@ -1215,6 +1235,8 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND)
     if NoticeKind.OUT_OF_GAMMA_DOMAIN.value in kinds:
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
+    if NoticeKind.QUENCH_ALTERED.value in kinds:
+        strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
     return tuple(strata)
 
 
@@ -3959,6 +3981,172 @@ def _solved_effusion_po2_bar(prediction: EnginePrediction) -> float | None:
     return None
 
 
+def _is_glass_valence_identity(identity: object) -> bool:
+    return (
+        isinstance(identity, Identity)
+        and quantity_token(identity)
+        in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
+        and phase_token(identity.species) is Phase.GLASS
+    )
+
+
+def _melt_identity_for_valence(identity: Identity) -> Identity:
+    """Use the run melt as the prediction state for a quenched glass assay."""
+
+    if not _is_glass_valence_identity(identity):
+        return identity
+    return replace(identity, species=replace(identity.species, phase=Phase.L))
+
+
+def _melt_prediction_reference(reference: Observation) -> Observation:
+    if not isinstance(reference.identity, Identity):
+        return reference
+    identity = _melt_identity_for_valence(reference.identity)
+    return reference if identity is reference.identity else replace(reference, identity=identity)
+
+
+def _residual_quench_state(reference: Observation) -> QuenchState | None:
+    return reference.quench_state if _is_glass_valence_identity(reference.identity) else None
+
+
+def _quench_notices(reference: Observation) -> tuple[Notice, ...]:
+    identity = reference.identity
+    if not _is_glass_valence_identity(identity):
+        return ()
+    quantity = quantity_token(identity)
+    assert quantity is not None
+    notices: list[Notice] = []
+    if reference.quench_state is QuenchState.ASSERTED_ALTERED:
+        notices.append(
+            Notice(
+                kind=NoticeKind.QUENCH_ALTERED,
+                affected_quantities=(quantity,),
+                reason="source asserts that quenching altered the measured valence",
+                origin=reference.observation_id,
+            )
+        )
+    basis = (
+        identity.valence_basis.value
+        if quantity is Quantity.VALENCE_RATIO
+        and identity.valence_basis is not None
+        and identity.valence_basis.is_value
+        else None
+    )
+    if (
+        reference.quench_direction is QuenchDirection.OXIDISING
+        and quantity is Quantity.VALENCE_RATIO
+        and identity.species.formula == "Cr"
+        and basis is not None
+        and basis.numerator_oxidation_states == (2,)
+        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+        and basis.value_form is ValenceValueForm.FRACTION
+    ):
+        notices.append(
+            Notice(
+                kind=NoticeKind.QUENCH_OXIDISING,
+                affected_quantities=(quantity,),
+                reason=(
+                    "oxidising quench re-oxidises Cr2+; quenched Cr2+/SumCr "
+                    "is a lower bound"
+                ),
+                origin=reference.observation_id,
+            )
+        )
+    return tuple(notices)
+
+
+def paired_quench_diagnostics(
+    context: ScoreContext,
+) -> tuple[dict[str, object], ...]:
+    """Pair same-run in-situ and glass valence ratios for the score report."""
+
+    by_experiment: dict[str, list[Observation]] = defaultdict(list)
+    for observation in comparison_candidates(context):
+        identity = observation.identity
+        if not isinstance(identity, Identity):
+            continue
+        quantity = quantity_token(identity)
+        phase = phase_token(identity.species)
+        if quantity not in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+            continue
+        if phase not in {Phase.L, Phase.GLASS}:
+            continue
+        if quantity is Quantity.VALENCE_RATIO:
+            basis = identity.valence_basis
+            if (
+                basis is None
+                or not basis.is_value
+                or basis.value.value_form
+                not in {ValenceValueForm.FRACTION, ValenceValueForm.RATIO}
+            ):
+                continue
+        ratio = point_magnitude(observation.value)
+        if ratio is not None and ratio.is_finite() and ratio > 0:
+            by_experiment[observation.experiment_id].append(observation)
+
+    pairs: list[dict[str, object]] = []
+    for experiment_id, observations in sorted(by_experiment.items()):
+        glasses = [
+            row for row in observations
+            if phase_token(row.identity.species) is Phase.GLASS
+        ]
+        in_situ_rows = [
+            row for row in observations
+            if phase_token(row.identity.species) is Phase.L
+        ]
+        for glass in glasses:
+            glass_identity = _melt_identity_for_valence(glass.identity)
+            in_situ_matches = [
+                row for row in in_situ_rows
+                if identity_equal(
+                    glass_identity,
+                    _melt_identity_for_valence(row.identity),
+                ).kind is IdentityEqualKind.EQUAL
+            ]
+            if len(in_situ_matches) != 1:
+                continue
+            in_situ = in_situ_matches[0]
+            glass_matches = [
+                row for row in glasses
+                if identity_equal(
+                    _melt_identity_for_valence(row.identity),
+                    _melt_identity_for_valence(in_situ.identity),
+                ).kind is IdentityEqualKind.EQUAL
+            ]
+            if len(glass_matches) != 1:
+                continue
+            glass_ratio = point_magnitude(glass.value)
+            in_situ_ratio = point_magnitude(in_situ.value)
+            if glass_ratio is None or in_situ_ratio is None:
+                continue
+            # Premise: these are the same run and valence identity, observed
+            # once in the melt and once after quenching.
+            # Algebra: log10(glass) - log10(melt) = log10(glass / melt).
+            # Units: both ratios are dimensionless, so the difference is dex.
+            # Sanity: identical ratios give log10(1) = 0.
+            delta_log10 = glass_ratio.log10() - in_situ_ratio.log10()
+            pairs.append(
+                {
+                    "experiment_id": experiment_id,
+                    "in_situ_observation": in_situ.observation_id,
+                    "glass_observation": glass.observation_id,
+                    "in_situ_ratio": in_situ_ratio,
+                    "glass_ratio": glass_ratio,
+                    "quench_state": glass.quench_state,
+                    "delta_log10": delta_log10,
+                }
+            )
+    return tuple(
+        sorted(
+            pairs,
+            key=lambda row: (
+                str(row["experiment_id"]),
+                str(row["glass_observation"]),
+            ),
+        )
+    )
+
+
 def _comparison_identity(
     identity: Identity,
     reference: Observation,
@@ -3976,7 +4164,11 @@ def _comparison_identity(
     solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
         prediction.engine, prediction.notices
     )
-    redox = quantity_token(identity) is Quantity.FE3_FE2_RATIO
+    melt_identity = _melt_identity_for_valence(identity)
+    redox = quantity_token(identity) in {
+        Quantity.FE3_FE2_RATIO,
+        Quantity.VALENCE_RATIO,
+    }
     fusion_polymorph_flag = (
         quantity_token(identity) in FUSION_QUANTITIES
         and any(
@@ -3992,10 +4184,13 @@ def _comparison_identity(
         not solved_oxygen_balance
         and not comparison_activity
         and not redox
+        and melt_identity is identity
         and not fusion_polymorph_flag
     ):
         return identity
     updates: dict[str, State] = {}
+    if melt_identity is not identity:
+        updates["species"] = melt_identity.species
     if redox and isinstance(prediction.identity, Identity):
         # Redox predictions consume the row's printed composition and oxygen
         # condition; compare both sides at those exact point conditions.
@@ -6285,7 +6480,12 @@ def compile_residual(
     )
     if figure_only:
         figure_only_notices = (_figure_only_notice(quantity, reference),)
-    notices = union_notices(reference.notices, flagged_notices, figure_only_notices)
+    notices = union_notices(
+        reference.notices,
+        flagged_notices,
+        figure_only_notices,
+        _quench_notices(reference),
+    )
     comparison_ids = comparison_ids or {reference.observation_id}
 
     def _refused(
@@ -6327,6 +6527,7 @@ def compile_residual(
                 ),
                 numeric=None,
                 refusal=ResidualRefusal(reason, dict(detail), check_refs=_check_refs(gates, reason)),
+                quench_state=_residual_quench_state(reference),
             ),
             candidate,
         )
@@ -6517,7 +6718,7 @@ def compile_residual(
                 predictor_kwargs["bench"] = recorded
         prediction = predictor(
             engine,
-            implied_alpha_reference or reference,
+            _melt_prediction_reference(implied_alpha_reference or reference),
             **predictor_kwargs,
         )
 
@@ -6885,6 +7086,7 @@ def compile_residual(
                     dict(printed.refusal),
                 )
             ),
+            quench_state=_residual_quench_state(reference),
         ),
         candidate,
     )
@@ -9496,7 +9698,7 @@ def render_score_report(
     studio_hostname: str | None = None,
     root: Path | None = None,
 ) -> str:
-    return _render_score_report_from_payloads_legacy(
+    report = _render_score_report_from_payloads_legacy(
         _ResidualRowsPayloadView(residuals, context),
         context=context,
         engines=engines,
@@ -9506,6 +9708,33 @@ def render_score_report(
         studio_hostname=studio_hostname,
         store_stamp=derive_store_stamp(root or REPO_ROOT),
     )
+    return _append_quench_pair_diagnostics(
+        report, paired_quench_diagnostics(context)
+    )
+
+
+def _append_quench_pair_diagnostics(
+    report: str, diagnostics: Sequence[Mapping[str, object]]
+) -> str:
+    if not diagnostics:
+        return report
+    lines = [
+        "## Paired in-situ / quenched valence diagnostics",
+        "",
+        "Δlog10 is the dimensionless glass-to-melt ratio difference in dex.",
+        "",
+        "| experiment | in-situ observation | glass observation | in-situ ratio | glass ratio | quench_state | Δlog10 (dex) |",
+        "|---|---|---|---:|---:|---|---:|",
+    ]
+    for row in diagnostics:
+        lines.append(
+            f"| {row['experiment_id']} | {row['in_situ_observation']} | "
+            f"{row['glass_observation']} | {row['in_situ_ratio']} | "
+            f"{row['glass_ratio']} | {row['quench_state']} | "
+            f"{row['delta_log10']} |"
+        )
+    section = "\n".join(lines)
+    return f"{report.rstrip()}\n\n{section}\n"
 
 
 def _append_nasa9_fit_comparison_stratum(
@@ -11671,7 +11900,13 @@ def render_score_report_from_payloads(
     else:
         lines.extend(["", "All mapped legacy keys have a v2.1 comparison slot."])
     lines.append("")
-    return "\n".join(lines)
+    report = "\n".join(lines)
+    if observations is None:
+        return report
+    pair_context = ScoreContext({}, {}, observations, origins or {})
+    return _append_quench_pair_diagnostics(
+        report, paired_quench_diagnostics(pair_context)
+    )
 
 
 def _legacy_bucket(row: Mapping[str, object]) -> str:

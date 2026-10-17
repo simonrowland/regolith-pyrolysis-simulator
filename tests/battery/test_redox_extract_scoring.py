@@ -13,6 +13,8 @@ from simulator.battery.enums import (
     Authority,
     Engine,
     NoticeKind,
+    Phase,
+    QuenchState,
     Rail,
     RefusalReason,
     ResidualStatus,
@@ -25,7 +27,7 @@ from simulator.battery.score import (
     score_store,
     SCORE_ENGINE_SET,
 )
-from simulator.battery.records import State, Value
+from simulator.battery.records import Located, Locator, State, Value
 from simulator.battery.score import headline_payload_records, residual_to_plain
 
 
@@ -87,6 +89,43 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert abs(prediction155.value - Decimal("3.277000246")) < Decimal("1e-9")
     assert prediction4.refusal_reason is None
     assert prediction155.refusal_reason is None
+
+    glass_row = replace(
+        row4,
+        observation_id="borisov_2018_glass_fe3_fe2_fixture",
+        identity=replace(
+            row4.identity,
+            species=replace(row4.identity.species, phase=Phase.GLASS),
+        ),
+        point_conditions={
+            **(row4.point_conditions or {}),
+            "quench_state": Located(
+                State.of(QuenchState.ASSERTED_PRESERVED),
+                locator=row4.locator or Locator(page=2),
+            ),
+        },
+    )
+    glass_context = replace(
+        context,
+        observations={glass_row.observation_id: glass_row},
+        origins={glass_row.observation_id: extract.name},
+    )
+    glass_residuals, glass_candidates = score_store(
+        glass_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+    assert len(glass_residuals) == 1
+    glass_residual = glass_residuals[0]
+    assert glass_residual.numeric is not None
+    assert glass_residual.refusal is None
+    assert glass_residual.quench_state is QuenchState.ASSERTED_PRESERVED
+    assert glass_residual.candidate in glass_candidates
+    assert (
+        glass_candidates[glass_residual.candidate].identity.species.phase.value
+        is Phase.L
+    )
+
     out_of_band_source = next(
         row for row in source_rows if float(row["values"]["T_C"]) > 1630.0
     )

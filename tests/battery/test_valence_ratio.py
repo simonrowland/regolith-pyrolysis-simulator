@@ -1,4 +1,5 @@
 import copy
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -7,9 +8,16 @@ import yaml
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    AmountBasis,
+    Authority,
+    Engine,
     EvidenceClass,
+    ExecutionState,
     IdentityEqualKind,
+    NoticeKind,
     Phase,
+    QuenchDirection,
+    QuenchState,
     Quantity,
     Rail,
     RefusalReason,
@@ -30,12 +38,28 @@ from simulator.battery.migrate import (
     Migrator,
     _identity_from_plain,
     map_quantity,
+    observation_from_plain,
     to_plain,
 )
-from simulator.battery.records import Species, State
+from simulator.battery.records import (
+    Composition,
+    Execution,
+    Located,
+    Locator,
+    Species,
+    State,
+    Value,
+)
 from simulator.battery.score import (
     SCORE_ENGINE_SET,
+    EnginePrediction,
     ScoreContext,
+    headline_rows,
+    paired_quench_diagnostics,
+    flagged_strata,
+    render_score_report,
+    residual_to_plain,
+    render_score_report_from_payloads,
     score_store,
 )
 
@@ -397,3 +421,415 @@ def test_valence_ratio_scores_redox_and_counts_each_engine_refusal():
         assert residual.numeric is None
         assert residual.refusal is not None
         assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+
+
+def test_glass_valence_rows_keep_quench_labels_on_counted_refusals():
+    result = _migrate_sossi_cr()
+    template = _valence_template(result)
+    rows = tuple(
+        _quench_row(
+            template,
+            observation_id=f"glass-refused-{index}",
+            phase=Phase.GLASS,
+            value=value,
+            quench_state=QuenchState.ASSERTED_PRESERVED,
+        )
+        for index, value in enumerate(("0.32", "0.91"))
+    )
+    context = _quench_context(result, rows)
+    residuals, _candidates = score_store(
+        context,
+        engines=SCORE_ENGINE_SET,
+        rail=Rail.REDOX,
+    )
+
+    assert len(residuals) == len(rows) * len(SCORE_ENGINE_SET)
+    for residual in residuals:
+        assert residual.numeric is None
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+        assert residual.quench_state is QuenchState.ASSERTED_PRESERVED
+        assert residual_to_plain(residual)["quench_state"] == "asserted_preserved"
+
+    redox_headline = [
+        row
+        for row in headline_rows(
+            residuals,
+            context=context,
+            engines=SCORE_ENGINE_SET,
+        )
+        if row["rail"] == Rail.REDOX.value
+    ]
+    assert sum(row["n_candidates"] for row in redox_headline) == len(residuals)
+    assert sum(row["n_refused"] for row in redox_headline) == len(residuals)
+
+
+def _valence_template(result):
+    return next(
+        row
+        for row in result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.VALENCE_RATIO
+    )
+
+
+def _quench_row(
+    template,
+    *,
+    observation_id,
+    phase,
+    value,
+    experiment_id=None,
+    quench_state=None,
+    quench_direction=None,
+):
+    composition = Composition(
+        basis="oxide_mole_fraction",
+        components=(("SiO2", Decimal("0.5")), ("FeO", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        template.identity,
+        species=replace(template.identity.species, phase=phase),
+        temperature_K=State.of(Decimal("1673.15")),
+        fO2_Pa=State.of(Decimal("1e-5")),
+        total_pressure_Pa=State.of(Decimal("1e-4")),
+        composition=State.of(composition),
+    )
+    point_conditions = dict(template.point_conditions or {})
+    point_conditions["total_pressure_Pa"] = Located(
+        State.of(Decimal("1e-4")), locator=Locator(page=12)
+    )
+    if quench_state is not None:
+        point_conditions["quench_state"] = Located(
+            State.of(quench_state), locator=Locator(page=12)
+        )
+    if quench_direction is not None:
+        point_conditions["quench_direction"] = Located(
+            State.of(quench_direction), locator=Locator(page=12)
+        )
+    return replace(
+        template,
+        observation_id=observation_id,
+        experiment_id=experiment_id or template.experiment_id,
+        identity=identity,
+        value=Value.point_of(value),
+        evidence=replace(
+            template.evidence, class_=State.of(EvidenceClass.MEASURED_DIRECT)
+        ),
+        point_conditions=point_conditions,
+    )
+
+
+def _quench_context(result, rows):
+    experiments = dict(result.experiments)
+    template_experiment = next(iter(experiments.values()))
+    for experiment_id in {row.experiment_id for row in rows}:
+        experiments.setdefault(
+            experiment_id,
+            replace(template_experiment, experiment_id=experiment_id),
+        )
+    observations = {row.observation_id: row for row in rows}
+    return ScoreContext(
+        result.works,
+        experiments,
+        observations,
+        origins={row.observation_id: "quench-fixture" for row in rows},
+        benches=result.benches,
+        root=ROOT,
+    )
+
+
+def _numeric_quench_predictor(calls):
+    def predict(engine, reference, **_kwargs):
+        calls.append(reference)
+        return EnginePrediction(
+            engine=engine,
+            channel=engine.value,
+            execution=Execution(
+                state=ExecutionState.PRODUCED, call_evidence="test:quench"
+            ),
+            value=Decimal("0.5"),
+            unit="dimensionless",
+            authority=Authority.CERTIFIED,
+            identity=reference.identity,
+        )
+
+    return predict
+
+
+def test_quench_state_is_closed_typed_located_and_round_trips():
+    template = _valence_template(_migrate_sossi_cr())
+    for state in QuenchState:
+        row = _quench_row(
+            template,
+            observation_id=f"quench-{state.value}",
+            phase=Phase.GLASS,
+            value="0.4",
+            quench_state=state,
+        )
+        assert row.quench_state is state
+        encoded = to_plain(row)
+        decoded = observation_from_plain(encoded)
+        assert decoded.quench_state is state
+        assert decoded.point_conditions["quench_state"].locator.page == 12
+
+    with pytest.raises(ValueError, match="quench_state must be one of"):
+        _quench_row(
+            template,
+            observation_id="quench-invalid",
+            phase=Phase.GLASS,
+            value="0.4",
+            quench_state="assumed_preserved",
+        )
+    with pytest.raises(ValueError, match="requires a source locator"):
+        replace(
+            template,
+            point_conditions={
+                **(template.point_conditions or {}),
+                "quench_state": Located(State.of("not_stated")),
+            },
+        )
+
+
+def test_extract_quench_state_uses_the_typed_point_condition_key(tmp_path: Path):
+    document = yaml.safe_load(SOSSI_CR.read_text(encoding="utf-8"))
+    row = copy.deepcopy(document["species"]["Cr"]["observations"][0])
+    row["observation_id"] = "quench_condition_fixture"
+    row["point_conditions"] = {
+        "quench_state": {
+            "state": {"tag": "value", "value": "asserted_preserved"},
+            "locator": {"page": 12, "table": "3"},
+        }
+    }
+    document["species"]["Cr"]["observations"] = [row]
+    extract = tmp_path / SOSSI_CR.name
+    extract.write_text(
+        yaml.safe_dump(document, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    migrated_rows = [
+        row
+        for row in migrator.result.observations.values()
+        if "quench_condition_fixture" in row.observation_id
+    ]
+    assert migrated_rows
+    assert all(
+        row.quench_state is QuenchState.ASSERTED_PRESERVED
+        and row.point_conditions["quench_state"].locator.page == 12
+        for row in migrated_rows
+    )
+
+
+def test_glass_valence_is_scored_against_the_run_melt_and_labelled():
+    result = _migrate_sossi_cr()
+    template = _valence_template(result)
+    glass = _quench_row(
+        template,
+        observation_id="glass-valence",
+        phase=Phase.GLASS,
+        value="0.25",
+        quench_state=QuenchState.NOT_STATED,
+    )
+    in_situ = _quench_row(
+        template,
+        observation_id="in-situ-valence",
+        phase=Phase.L,
+        value="0.25",
+    )
+    context = _quench_context(result, (glass, in_situ))
+    calls = []
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+        predict=_numeric_quench_predictor(calls),
+    )
+
+    assert {row.reference for row in residuals} == {
+        "glass-valence",
+        "in-situ-valence",
+    }
+    assert all(row.numeric is not None for row in residuals)
+    glass_residual = next(row for row in residuals if row.reference == "glass-valence")
+    assert glass_residual.quench_state is QuenchState.NOT_STATED
+    assert template.identity.species.phase.value is Phase.L
+    assert glass.identity.species.phase.value is Phase.GLASS
+    glass_input = next(
+        call for call in calls if call.observation_id == "glass-valence"
+    )
+    assert glass_input.identity.species.phase.value is Phase.L
+    assert glass_input.identity.temperature_K == glass.identity.temperature_K
+    assert glass_input.identity.fO2_Pa == glass.identity.fO2_Pa
+    assert glass_input.identity.composition == glass.identity.composition
+
+
+def test_asserted_altered_is_flagged_out_of_headline_but_kept_in_report():
+    result = _migrate_sossi_cr()
+    template = _valence_template(result)
+    not_stated = _quench_row(
+        template,
+        observation_id="glass-not-stated",
+        phase=Phase.GLASS,
+        value="0.25",
+        quench_state=QuenchState.NOT_STATED,
+    )
+    altered = _quench_row(
+        template,
+        observation_id="glass-altered",
+        phase=Phase.GLASS,
+        value="0.5",
+        quench_state=QuenchState.ASSERTED_ALTERED,
+    )
+    context = _quench_context(result, (not_stated, altered))
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+        predict=_numeric_quench_predictor([]),
+    )
+
+    altered_residual = next(
+        row for row in residuals if row.reference == "glass-altered"
+    )
+    assert altered_residual.numeric is not None
+    assert altered_residual.quench_state is QuenchState.ASSERTED_ALTERED
+    assert any(
+        notice.kind is NoticeKind.QUENCH_ALTERED
+        for notice in altered_residual.notices
+    )
+    assert "quench_altered" in flagged_strata(altered_residual.notices)
+    payload = residual_to_plain(altered_residual)
+    assert payload["quench_state"] == "asserted_altered"
+    assert any(
+        notice["kind"] == "quench_altered" for notice in payload["notices"]
+    )
+
+    headline = headline_rows(
+        residuals,
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    redox = [
+        row
+        for row in headline
+        if row["rail"] == Rail.REDOX.value
+        and row["engine"] == Engine.INTERNAL_ANALYTICAL.value
+    ]
+    assert sum(row["n"] for row in redox) == 1
+    assert any(row.quench_state is QuenchState.NOT_STATED for row in residuals)
+    report = render_score_report(
+        residuals,
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        root=ROOT,
+    )
+    assert "quench_altered" in report
+
+
+def test_paired_quench_report_has_log10_difference_and_identical_ratio_zero():
+    result = _migrate_sossi_cr()
+    template = _valence_template(result)
+    first_experiment = template.experiment_id
+    second_experiment = f"{first_experiment}-paired-2"
+    rows = (
+        _quench_row(
+            template,
+            observation_id="pair-1-glass",
+            phase=Phase.GLASS,
+            value="0.5",
+            experiment_id=first_experiment,
+            quench_state=QuenchState.ASSERTED_PRESERVED,
+        ),
+        _quench_row(
+            template,
+            observation_id="pair-1-liquid",
+            phase=Phase.L,
+            value="0.25",
+            experiment_id=first_experiment,
+        ),
+        _quench_row(
+            template,
+            observation_id="pair-2-glass",
+            phase=Phase.GLASS,
+            value="0.4",
+            experiment_id=second_experiment,
+        ),
+        _quench_row(
+            template,
+            observation_id="pair-2-liquid",
+            phase=Phase.L,
+            value="0.4",
+            experiment_id=second_experiment,
+        ),
+    )
+    context = _quench_context(result, rows)
+    diagnostics = paired_quench_diagnostics(context)
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+        predict=_numeric_quench_predictor([]),
+    )
+    by_glass_id = {row["glass_observation"]: row for row in diagnostics}
+
+    assert {row.reference for row in residuals} == {row.observation_id for row in rows}
+    assert by_glass_id["pair-1-glass"]["delta_log10"] == Decimal("2").log10()
+    assert by_glass_id["pair-2-glass"]["delta_log10"] == Decimal(0)
+    report = render_score_report(
+        residuals,
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        root=ROOT,
+    )
+    assert "## Paired in-situ / quenched valence diagnostics" in report
+    assert str(Decimal("2").log10()) in report
+    payload_report = render_score_report_from_payloads(
+        [residual_to_plain(row) for row in residuals],
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        hostname="test",
+        observations=context.observations,
+        origins=context.origins,
+    )
+    assert "## Paired in-situ / quenched valence diagnostics" in payload_report
+    assert str(Decimal("2").log10()) in payload_report
+
+
+def test_oxidising_cr_glass_carries_lower_bound_notice_without_gating_score():
+    result = _migrate_sossi_cr()
+    template = _valence_template(result)
+    identity = replace(
+        template.identity,
+        valence_basis=State.of(
+            parse_valence_basis("Cr2plus_over_total_Cr", species_formula="Cr")
+        ),
+    )
+    cr_template = replace(template, identity=identity)
+    glass = _quench_row(
+        cr_template,
+        observation_id="cr-glass-oxidising-quench",
+        phase=Phase.GLASS,
+        value="0.25",
+        quench_direction=QuenchDirection.OXIDISING,
+    )
+    context = _quench_context(result, (glass,))
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+        predict=_numeric_quench_predictor([]),
+    )
+
+    residual = next(row for row in residuals if row.reference == glass.observation_id)
+    assert residual.numeric is not None
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.QUENCH_OXIDISING
+    )
+    assert "lower bound" in notice.reason
+    assert "quench_oxidising" not in flagged_strata(residual.notices)

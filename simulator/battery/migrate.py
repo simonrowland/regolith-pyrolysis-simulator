@@ -1163,6 +1163,8 @@ def _point_condition_from_plain(
 
     if isinstance(payload, Located):
         return payload
+    if key in {"quench_state", "quench_direction"}:
+        return _located_from_plain(payload, str)
     if key in {"fO2_control", "atmosphere"}:
         return _located_from_plain(
             payload,
@@ -14374,8 +14376,15 @@ class Migrator:
                                 )
                             )
         point_conditions = None
+        raw_point_conditions = obs.get("point_conditions")
+        if isinstance(raw_point_conditions, Mapping):
+            point_conditions = {
+                str(key): _point_condition_from_plain(value, key=str(key))
+                for key, value in raw_point_conditions.items()
+            }
         if t_known is not None:
             point_conditions = {
+                **(point_conditions or {}),
                 "temperature_K": _converted_temperature(
                     t_known,
                     t_sel.unit_trail,
@@ -16198,6 +16207,24 @@ class Migrator:
                     identity = replace(
                         identity, fO2_Pa=State.of(pressure.point)
                     )
+            if q_token_point is Quantity.VALENCE_RATIO:
+                total_pressure = (point_conditions or {}).get("total_pressure_Pa")
+                if (
+                    isinstance(total_pressure, Located)
+                    and total_pressure.state.is_value
+                ):
+                    pressure_value = total_pressure.state.value
+                    if isinstance(pressure_value, Value):
+                        pressure_value = (
+                            pressure_value.point
+                            if pressure_value.kind is ValueKind.POINT
+                            else None
+                        )
+                    pressure_pa = _as_dec_or_none(pressure_value)
+                    if pressure_pa is not None:
+                        identity = replace(
+                            identity, total_pressure_Pa=State.of(pressure_pa)
+                        )
         if point_composition_refusal:
             child_printed_map = next(
                 (
