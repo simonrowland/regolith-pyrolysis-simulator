@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from collections import Counter
 from dataclasses import asdict
 
 import pytest
@@ -32,6 +33,20 @@ def _stage3_unavailable_psat_model(vapor_pressure_data=None):
     return model
 
 
+@pytest.fixture
+def _isolated_route_pressure_views():
+    from simulator.vapour_rail.catalog import clear_vapor_pressure_view_caches
+
+    # Owned frozen projections must not leak through the process-wide view
+    # memo into later tests that deliberately mutate their legacy coefficients.
+    clear_vapor_pressure_view_caches()
+    try:
+        yield
+    finally:
+        clear_vapor_pressure_view_caches()
+
+
+@pytest.mark.usefixtures("_isolated_route_pressure_views")
 def test_fold15_coupled_route_exact_output_pin():
     # Pin the entire pre-optimization result, including refusal/extrapolation
     # telemetry and alpha provenance, before reusing invariant wall pressures.
@@ -47,6 +62,71 @@ def test_fold15_coupled_route_exact_output_pin():
         asdict(route), sort_keys=True, separators=(",", ":"), allow_nan=False,
     ).encode()).hexdigest()
     assert digest == "2ecc09b4f2bca4c5f9b1ad9cf7df15ac443cffdb94a63b5a7eeca6c4567f655c"
+
+
+@pytest.mark.usefixtures("_isolated_route_pressure_views")
+def test_coupled_route_reuses_invariant_wall_pressure_work(monkeypatch):
+    model = _stage3_unavailable_psat_model(condensation.VAPOR_PRESSURE_DATA)
+    evaluate = condensation._antoine_psat_pa
+    lookup = condensation._try_antoine_psat_pa
+    evaluations = Counter()
+    empty_collectors = False
+
+    def tracked_lookup(*args, **kwargs):
+        nonlocal empty_collectors
+        notices, warnings = condensation._resolve_antoine_telemetry(
+            kwargs.get("antoine_extrapolations"),
+            kwargs.get("antoine_extrapolation_warnings"),
+        )
+        previous = empty_collectors
+        empty_collectors = not notices and not warnings
+        try:
+            return lookup(*args, **kwargs)
+        finally:
+            empty_collectors = previous
+
+    def tracked_evaluation(species, temperature, **kwargs):
+        if empty_collectors:
+            evaluations[species, temperature] += 1
+        return evaluate(species, temperature, **kwargs)
+
+    monkeypatch.setattr(condensation, "_try_antoine_psat_pa", tracked_lookup)
+    monkeypatch.setattr(condensation, "_antoine_psat_pa", tracked_evaluation)
+    model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    )
+    assert model.last_wall_capture_fixed_point_iterations > 1
+    assert evaluations
+    assert max(evaluations.values()) == 1
+    assert not hasattr(model.vapor_pressure_data, "_route_wall_pressures")
+
+
+@pytest.mark.parametrize(("species", "temperature"), [
+    ("Mg", 1000.0), ("Mg", 500.0), ("SiO", 1000.0),
+])
+@pytest.mark.usefixtures("_isolated_route_pressure_views")
+def test_route_pressure_reuse_preserves_each_telemetry_channel(
+    monkeypatch, species, temperature,
+):
+    model = _stage3_unavailable_psat_model(condensation.VAPOR_PRESSURE_DATA)
+
+    def lookups(_flux=None, _melt=None):
+        outputs = []
+        for notices, warnings in ((None, None), ({}, None), (None, []), ({}, [])):
+            result = condensation._try_antoine_psat_pa(
+                species, temperature, vapor_pressure_data=model.vapor_pressure_data,
+                antoine_extrapolations=notices,
+                antoine_extrapolation_warnings=warnings,
+            )
+            outputs.append((result, notices, warnings))
+        return outputs
+
+    expected = lookups()
+    monkeypatch.setattr(model, "_route", lookups)
+    assert model.route(None, None) == expected
+    assert model.route(None, None) == expected
+    assert not hasattr(model.vapor_pressure_data, "_route_wall_pressures")
 
 
 def test_stage3_unavailable_psat_predicts_flagged_capture():

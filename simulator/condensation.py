@@ -2824,7 +2824,9 @@ class CondensationModel:
             return self._route(evap_flux, melt)
         missing = object()
         previous = getattr(data, '_route_catalog', missing)
+        previous_wall_pressures = getattr(data, '_route_wall_pressures', missing)
         data._route_catalog = None
+        data._route_wall_pressures = {}
         try:
             return self._route(evap_flux, melt)
         finally:
@@ -2832,6 +2834,10 @@ class CondensationModel:
                 del data._route_catalog
             else:
                 data._route_catalog = previous
+            if previous_wall_pressures is missing:
+                del data._route_wall_pressures
+            else:
+                data._route_wall_pressures = previous_wall_pressures
 
     def _route(self, evap_flux: EvaporationFlux, melt: MeltState):
         """
@@ -6036,6 +6042,35 @@ def _try_antoine_psat_pa(
         antoine_extrapolations, antoine_extrapolation_warnings,
     )
 
+    # Species, wall temperature and the owned catalog are invariant within a
+    # route's coupled solve; flowing pressure and available mass are not Psat
+    # inputs. Reuse exact evaluations for both the stage bands and pipe walls.
+    # Empty collectors have no prior insertion/dedup state, so their complete
+    # notices can be replayed exactly. Accumulating telemetry runs normally.
+    # The route owns this cache only for its schema-v2 compatibility view;
+    # legacy custom blocks keep their existing Python warning behavior.
+    wall_pressures = getattr(vapor_pressure_data, '_route_wall_pressures', None)
+    cache_key = None
+    if wall_pressures is not None and not antoine_extrapolations and not antoine_extrapolation_warnings:
+        cache_key = (
+            id(vapor_pressure_data.catalog_payload), species, T_K,
+            enforce_hot_train_applicability,
+        )
+        cached = wall_pressures.get(cache_key)
+        if cached is not None:
+            result, notices, warning_texts = cached
+            if antoine_extrapolations is not None:
+                antoine_extrapolations.update(copy.deepcopy(notices))
+            if antoine_extrapolation_warnings is not None:
+                antoine_extrapolation_warnings.extend(warning_texts)
+            return result
+        # Capture both observation channels even when this caller requests
+        # only one; a later identical lookup may request the other channel.
+        if antoine_extrapolations is None:
+            antoine_extrapolations = {}
+        if antoine_extrapolation_warnings is None:
+            antoine_extrapolation_warnings = []
+
     try:
         pressure_pa = _antoine_psat_pa(
             species,
@@ -6060,10 +6095,15 @@ def _try_antoine_psat_pa(
             and str(exc) not in antoine_extrapolation_warnings
         ):
             antoine_extrapolation_warnings.append(str(exc))
-        return None, True
-    if pressure_pa is None:
-        return None, True
-    return float(pressure_pa), False
+        result = (None, True)
+    else:
+        result = (None, True) if pressure_pa is None else (float(pressure_pa), False)
+    if cache_key is not None:
+        wall_pressures[cache_key] = (
+            result, copy.deepcopy(antoine_extrapolations),
+            tuple(antoine_extrapolation_warnings),
+        )
+    return result
 
 
 def _local_species_pressure_pa(
