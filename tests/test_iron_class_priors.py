@@ -7,6 +7,7 @@ import json
 import pytest
 
 from simulator import fe_redox
+from simulator.core import PyrolysisSimulator
 from simulator.feedstock_guard import BlockedFeedstockError, is_blocked_feedstock
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim, _load_yaml
@@ -46,7 +47,10 @@ def test_missing_anchor_seed_and_two_c0_hours_or_existing_composition_block(data
         with pytest.raises(BlockedFeedstockError):
             _build_sim(key, data['vapor_pressures'], data['feedstocks'], data['setpoints'])
         return
-    sim = _build_sim(key, data['vapor_pressures'], data['feedstocks'], data['setpoints'])
+    additives = ({'C': PyrolysisSimulator._carbon_reductant_required_kg(feed, 1000.)}
+                 if PyrolysisSimulator._uses_mars_carbon_cleanup(feed) else None)
+    sim = _build_sim(key, data['vapor_pressures'], data['feedstocks'], data['setpoints'],
+                     additives_kg=additives)
     assert sim.record.seed_authority.value == 'model_assumed'
     sim._current_melt_redox_fO2_log()
     assert sim._last_intrinsic_redox_state['saturation_status'] == 'INDETERMINATE'
