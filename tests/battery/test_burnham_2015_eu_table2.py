@@ -2,14 +2,19 @@ from decimal import Decimal
 from pathlib import Path
 
 from simulator.battery.enums import (
+    Engine,
     EvidenceClass,
+    NoticeKind,
     Phase,
     Quantity,
+    QuenchState,
+    Rail,
     ValenceDenominatorKind,
     ValenceValueForm,
 )
 from simulator.battery.identity import ValenceBasis
 from simulator.battery.migrate import Migrator, load_yaml, wt_pct_to_mole_fraction
+from simulator.battery.score import ScoreContext, score_store
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -34,6 +39,10 @@ def test_burnham_table2_render_pins_and_row_count():
     extract = load_yaml(EXTRACT)
     source_points = {
         observation["observation_id"]: observation["values"]["points"][0]
+        for observation in extract["species"]["Eu"]["observations"]
+    }
+    source_observations = {
+        observation["observation_id"]: observation
         for observation in extract["species"]["Eu"]["observations"]
     }
     assert len(rows) == 151
@@ -65,10 +74,58 @@ def test_burnham_table2_render_pins_and_row_count():
 
     glass_rows = [row for row in rows if "_glasses_" in row.observation_id]
     melt_rows = [row for row in rows if "_melts_" in row.observation_id]
+    na2o_footnote_samples = (
+        "cas_4",
+        "mas_1",
+        "longhi1",
+        "longhi2",
+        "longhi5",
+        "osborn4",
+    )
     assert len(glass_rows) == 113
     assert len(melt_rows) == 38
+    footnote_rows = [
+        row
+        for row in glass_rows
+        if any(
+            f"_glasses_{sample}_" in row.observation_id
+            for sample in na2o_footnote_samples
+        )
+    ]
+    assert len(footnote_rows) == 22
+    assert {
+        sample
+        for sample in na2o_footnote_samples
+        if any(f"_glasses_{sample}_" in row.observation_id for row in footnote_rows)
+    } == set(na2o_footnote_samples)
     assert all(row.identity.species.phase.value is Phase.GLASS for row in glass_rows)
     assert all(row.identity.species.phase.value is Phase.L for row in melt_rows)
+    quench_state_counts = {
+        state.value: sum(row.quench_state is state for row in rows)
+        for state in QuenchState
+    }
+    assert quench_state_counts == {
+        "asserted_preserved": 102,
+        "asserted_altered": 11,
+        "not_stated": 38,
+    }
+    for row in glass_rows:
+        morb = "_glasses_morb_" in row.observation_id
+        assert row.quench_state is (
+            QuenchState.ASSERTED_ALTERED
+            if morb
+            else QuenchState.ASSERTED_PRESERVED
+        )
+        assert row.point_conditions["quench_state"].locator.page == (3 if morb else 2)
+    assert all(
+        row.quench_state is not QuenchState.ASSERTED_ALTERED
+        for row in melt_rows
+    )
+    assert all(
+        not any(notice.kind is NoticeKind.SOURCE_DISAGREEMENT for notice in row.notices)
+        for row in glass_rows
+        if "_glasses_morb_" in row.observation_id
+    )
 
     table1_join_compositions = {
         "ad_fo": {
@@ -121,6 +178,9 @@ def test_burnham_table2_render_pins_and_row_count():
     )
     for row in rows:
         source_point = source_points[row.observation_id.split("::", 2)[1]]
+        source_observation = source_observations[
+            row.observation_id.split("::", 2)[1]
+        ]
         assert row.identity.temperature_K.is_value
         assert row.identity.temperature_K.value == (
             Decimal(str(source_point["T_C"])) + Decimal("273.15")
@@ -131,6 +191,37 @@ def test_burnham_table2_render_pins_and_row_count():
             assert migrated_condition.locator is not None
         assert "Eu3+ peak column only" in row.locator.note
         assert "Table 3 logK prime averages" in row.locator.note
+        footnote_sample = next(
+            (
+                sample
+                for sample in na2o_footnote_samples
+                if f"_glasses_{sample}_" in row.observation_id
+            ),
+            None,
+        )
+        if footnote_sample is not None:
+            source_composition = source_observation["values"][
+                "composition_mass_percent"
+            ]
+            assert source_composition["Na2O"] == "0.1"
+            assert "Footnote b reports Na2O 0.1(1) wt%" in (
+                source_point["point_conditions"]["composition"]["locator"]["note"]
+            )
+            expected_composition = wt_pct_to_mole_fraction(
+                {
+                    key: Decimal(str(value))
+                    for key, value in source_composition.items()
+                }
+            )
+            assert row.identity.composition.is_value
+            assert (
+                row.identity.composition.value.components
+                == expected_composition.components
+            )
+            assert (
+                row.point_conditions["composition"].state.value.components
+                == expected_composition.components
+            )
 
     assert "Cibin, G. & Mosselmans, J. F. W." in extract["source"]["citation"]
     assert "10.1016/j.chemgeo.2015.07.002" in extract["source"]["citation"]
@@ -169,3 +260,32 @@ def test_burnham_table2_render_pins_and_row_count():
         for row in rows
     )
     assert not result.registry_issues
+
+
+def test_burnham_eu3_peak_locator_caveat_is_a_scoring_notice():
+    result, rows = _migrate_burnham_table2()
+    row = next(
+        row
+        for row in rows
+        if row.observation_id.split("::", 2)[1]
+        == "burnham_2015_eu_glasses_ad_1300_f0p0"
+    )
+    context = ScoreContext(
+        result.works,
+        result.experiments,
+        {row.observation_id: row},
+        origins={row.observation_id: EXTRACT.name},
+        benches=result.benches,
+        root=ROOT,
+    )
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+    assert len(residuals) == 1
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and "Eu2+ peak-derived Eu3+/SumEu variant is omitted" in notice.reason
+        for notice in residuals[0].notices
+    )
