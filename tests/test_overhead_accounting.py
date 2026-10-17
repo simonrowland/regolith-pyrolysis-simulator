@@ -2095,6 +2095,30 @@ def test_mixed_commanded_supply_known_n2_balance(atmosphere, pipe_length_m, sour
     } for n in model.stream_physics_notices)
 
 
+@pytest.mark.parametrize("primed,expected_pressure", [(False, 10.0), (True, 0.15848778676312958)])
+def test_commanded_n2_stream_before_outlet_consolidation(primed, expected_pressure):
+    """Historical numeric pin for the subsequent outlet-law consolidation."""
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, MeltState
+
+    melt = MeltState(atmosphere=Atmosphere.CONTROLLED_O2, temperature_C=1500.0,
+                     p_total_mbar=10.0, pO2_mbar=2.0,
+                     background_gas_species="Ar", background_gas_mole_fraction=0.5)
+    flux = EvaporationFlux(species_kg_hr={"N2": 0.028014})
+    flux.update_totals()
+    model = OverheadGasModel({"enabled": False})
+    if primed:
+        model.flowing_stream_mol_hr(
+            {"N2": 1.0}, melt,
+            model.estimate_transport_state(flux, melt, p_downstream_bar=0.0),
+        )
+    gas = model.update(flux, melt, CondensationTrain.create_default(), p_downstream_bar=0.0)
+    assert model.last_stream_mol_hr == pytest.approx({"N2": 1.0, "O2": 0.5, "Ar": 1.0})
+    assert gas.pressure_mbar == pytest.approx(expected_pressure)
+    assert gas.composition == pytest.approx({s: y * expected_pressure for s, y in
+                                            {"N2": 0.4, "O2": 0.2, "Ar": 0.4}.items()})
+
+
 @pytest.mark.parametrize("oxygen_target,source", [
     (10.0, {"N2": 1.0e-12}),
     (2.0, {"O2": 1.0, "N2": 1.0e-12}),
