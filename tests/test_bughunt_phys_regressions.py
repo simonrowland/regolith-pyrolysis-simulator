@@ -1491,12 +1491,7 @@ def test_authoritative_headspace_pressure_refuses_missing_projection(
         MeltHeadspaceProjectionError,
         match="authoritative melt-headspace pressure",
     ):
-        sim._compute_native_fe_saturation_extent(
-            {"FeO": 1.0},
-            fe3_over_sigma_fe=0.1,
-            T_K=1873.15,
-            fO2_log=-7.5,
-        )
+        sim._melt_headspace_total_pressure_bar()
 
 
 def test_c6_acquisition_timeout_ends_as_transport_bound_refusal() -> None:

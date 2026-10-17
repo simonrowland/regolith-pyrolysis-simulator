@@ -34,6 +34,7 @@ from simulator.optimize.sso_r_owner_surface import (
     OWNER_RECIPE_TOTAL_PRESSURE_MBAR,
 )
 from simulator.runner import _deep_merge_setpoints, build_per_hour_summary
+from simulator.fe_redox import native_fe_equilibrium_extent
 from simulator.state import Atmosphere, CampaignPhase
 
 
@@ -843,7 +844,15 @@ def manual_fO2_anchors(
         )
         sim.melt.temperature_C = 1600.0
         sim.melt.p_total_mbar = 10.0
-        split = sim._compute_native_fe_saturation_extent(fO2_log=fO2_log)
+        inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+        split = native_fe_equilibrium_extent(
+            comp_wt=sim._melt_oxide_wt_pct(),
+            feo_mol=inventory.get('FeO', 0.0),
+            fe2o3_mol=inventory.get('Fe2O3', 0.0),
+            T_K=sim.melt.temperature_C + 273.15,
+            pressure_bar=sim.melt.p_total_mbar / 1000.0,
+            gas_fO2_log=lambda _n: fO2_log, open_sink=True,
+        )
         anchors.append({
             "mode": "manual_fO2_diagnostic_anchor",
             "temperature_C": 1600.0,

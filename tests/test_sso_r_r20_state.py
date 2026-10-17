@@ -711,12 +711,19 @@ def test_reductant_source_term_lowers_fO2_and_raises_native_drive() -> None:
                     for lot in transition.credits if lot.account in METAL_PHASE_ACCOUNTS)
     assert fe_credit == pytest.approx(feo_debit)
     assert fe_credit > 0.0
-    # Na also consumes/dilutes FeO, so the residual saturation fraction is
-    # not cumulative Fe production. Isolate the fO2 drive at the same final
-    # composition: the lower potential must increase native-Fe saturation.
-    actual = sim._compute_native_fe_saturation_extent(fO2_log=after_fO2)
-    counterfactual = sim._compute_native_fe_saturation_extent(fO2_log=before_fO2)
-    assert actual['native_fe_frac'] > counterfactual['native_fe_frac']
+    # Compare the owning diagnostic at the same residual composition, rather
+    # than overriding the ledger-derived potential of the extent solver.
+    from simulator.fe_redox import _native_fe_saturation_comparison
+    controls = dict(
+        fe3_over_sigma_fe=sim._compute_fe_redox_split_diagnostic()['fe3_over_sigma_fe'],
+        T_K=sim.melt.temperature_C + 273.15,
+        pressure_bar=sim.melt.p_total_mbar / 1000.0,
+    )
+    actual = _native_fe_saturation_comparison(
+        sim._melt_oxide_wt_pct(), fO2_log=after_fO2, **controls)
+    counterfactual = _native_fe_saturation_comparison(
+        sim._melt_oxide_wt_pct(), fO2_log=before_fO2, **controls)
+    assert actual['saturation_gap_dex'] < counterfactual['saturation_gap_dex']
 
 
 def test_intrinsic_redox_reads_composition_from_the_same_ledger_snapshot():
@@ -3260,48 +3267,33 @@ def test_native_fe_saturation_uses_upstream_total_pressure(
 ) -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1700.0
-    sim.melt.p_total_mbar = 0.0
+    sim.melt.p_total_mbar = 5.0
     sim._melt_headspace_composition_mbar = {"N2": 5.0}
     seen_pressure_bar = []
 
-    def capture_state(
-        _comp,
-        *,
-        fe3_over_sigma_fe,
-        T_K,
-        pressure_bar,
-        fO2_log,
-    ):
-        seen_pressure_bar.append(pressure_bar)
-        return {
-            "native_fe_saturation": False,
-            "native_fe_frac": 0.0,
-        }
+    def capture_state(**controls):
+        seen_pressure_bar.append(controls['pressure_bar'])
+        return {'native_fe_mol': 0.0, 'native_fe_frac': 0.0}
 
-    monkeypatch.setattr(sim, "_native_fe_saturation_state", capture_state)
+    monkeypatch.setattr('simulator.core.native_fe_equilibrium_extent', capture_state)
     sim.overhead.pressure_mbar = 900.0
-    sim._compute_native_fe_saturation_extent(
-        {"FeO": 1.0},
-        fe3_over_sigma_fe=0.1,
-    )
+    sim._compute_native_fe_saturation_extent()
     sim.overhead.pressure_mbar = 0.001
-    sim._compute_native_fe_saturation_extent(
-        {"FeO": 1.0},
-        fe3_over_sigma_fe=0.1,
-    )
+    sim._compute_native_fe_saturation_extent()
 
     assert seen_pressure_bar == pytest.approx([0.005, 0.005])
 
 
 def test_native_fe_saturation_refuses_invalid_ferric_fraction() -> None:
-    sim = _make_sim()
+    from simulator.fe_redox import _native_fe_saturation_comparison
 
     for fe3_over_sigma_fe in (math.nan, math.inf, -math.inf, -0.01, 1.01):
         with pytest.raises(
             ValueError,
             match=r"fe3_over_sigma_fe must be finite and within \[0, 1\]",
         ):
-            sim._compute_native_fe_saturation_extent(
+            _native_fe_saturation_comparison(
+                {'SiO2': 80.0, 'FeO': 20.0},
                 fe3_over_sigma_fe=fe3_over_sigma_fe,
                 T_K=1873.15,
                 pressure_bar=0.001,
