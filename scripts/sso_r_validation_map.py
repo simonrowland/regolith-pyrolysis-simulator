@@ -34,7 +34,7 @@ from simulator.optimize.sso_r_owner_surface import (
     OWNER_RECIPE_TOTAL_PRESSURE_MBAR,
 )
 from simulator.runner import _deep_merge_setpoints, build_per_hour_summary
-from simulator.fe_redox import native_fe_equilibrium_extent
+from simulator.fe_redox import feo_iw_log10_fO2_bar, native_fe_equilibrium_extent
 from simulator.state import Atmosphere, CampaignPhase
 
 
@@ -67,19 +67,21 @@ NATIVE_FE_PARTITION_TRANSITIONS = frozenset({
     "native_fe_metal_partition",
 })
 ANCHOR_REFERENCE_SOURCE = (
-    "docs-private/research/2026-07-01-sso-r-scope/findings.md lines 107 and 259; "
-    "CH1-CLOSEOUT.md lines 23-26 and 107-118 record the ch1/ch1c redox-state provenance"
+    "docs-private/research/2026-10-15-b899-one-redox-state/b899-r12.md; "
+    "d-166 measured-seed and gas-boundary diagnostics"
 )
+# Pre-d-155 forced-melt history: -9 -> 0.012467999513236896;
+# -9.5 -> 0.44. These are not expectations under the inventory/band contract.
 ANCHOR_REFERENCE_BY_FO2 = {
     -9.0: {
-        "native_fe_frac": 0.012467999513236896,
-        "abs_tolerance": 5.0e-6,
-        "note": "recorded forced-reduction native_frac_before at 1600 C",
+        "native_fe_frac": 0.0,
+        "abs_tolerance": 1.0e-12,
+        "note": "d-166 measured melt seed; inverse band leaves saturation indeterminate",
     },
     -9.5: {
-        "native_fe_frac": 0.44,
-        "abs_tolerance": 5.0e-4,
-        "note": "recorded manual fO2 curve native fraction, 44.0 percent at 1600 C",
+        "native_fe_frac": 0.0,
+        "abs_tolerance": 1.0e-12,
+        "note": "d-166 measured melt seed; inverse band leaves saturation indeterminate",
     },
 }
 ROW_UNITS = {
@@ -836,35 +838,77 @@ def manual_fO2_anchors(
     anchors = []
     for fO2_log in (-9.0, -9.5):
         reference = ANCHOR_REFERENCE_BY_FO2[fO2_log]
-        sim = _build_sim(
-            setpoints,
-            feedstocks,
-            vapor_pressures,
-            freeze_gate_curve_cache=freeze_gate_curve_cache,
-        )
-        sim.melt.temperature_C = 1600.0
-        sim.melt.p_total_mbar = 10.0
-        inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
-        split = native_fe_equilibrium_extent(
-            comp_wt=sim._melt_oxide_wt_pct(),
-            feo_mol=inventory.get('FeO', 0.0),
-            fe2o3_mol=inventory.get('Fe2O3', 0.0),
-            T_K=sim.melt.temperature_C + 273.15,
-            pressure_bar=sim.melt.p_total_mbar / 1000.0,
-            gas_fO2_log=lambda _n: fO2_log, open_sink=True,
-        )
-        anchors.append({
-            "mode": "manual_fO2_diagnostic_anchor",
-            "temperature_C": 1600.0,
-            "feedstock": FEEDSTOCK,
-            "fO2_log": fO2_log,
-            "native_fe_frac": float(split.get("native_fe_frac", 0.0) or 0.0),
-            "reference_native_fe_frac": reference["native_fe_frac"],
-            "reference_abs_tolerance": reference["abs_tolerance"],
-            "reference_source": ANCHOR_REFERENCE_SOURCE,
-            "reference_note": reference["note"],
-            "diagnostic_only": True,
-        })
+        for mode in ("melt_seeded", "gas_boundary"):
+            anchor_feedstocks = feedstocks
+            if mode == "melt_seeded":
+                # The existing initializer takes a buffer offset at formation T.
+                # log fO2 = IW_liquid(T) + delta, hence delta = log fO2 - IW.
+                # Both logs use 1 bar, so delta is dex; delta=0 recovers IW.
+                delta_iw = fO2_log - feo_iw_log10_fO2_bar(1873.15)
+                anchor_feedstocks = {
+                    **feedstocks,
+                    FEEDSTOCK: {
+                        **feedstocks[FEEDSTOCK],
+                        "intrinsic_redox": {
+                            "delta_iw": delta_iw,
+                            "interval": [delta_iw, delta_iw],
+                            "buffer": "pure_liquid_wustite",
+                            "buffer_source": {
+                                "reference": "Holzheid1997 Eq.9, DOI 10.1016/S0009-2541(97)00030-2",
+                                "page": "Eq.9",
+                            },
+                            "source": ANCHOR_REFERENCE_SOURCE,
+                            "locator": {"page": "d-166 manual-fO2 diagnostic"},
+                            "authority": "measured",
+                            "estimated": False,
+                            "formation_temperature_K": 1873.15,
+                            "formation_temperature_estimated": False,
+                        },
+                    },
+                }
+            sim = _build_sim(
+                setpoints,
+                anchor_feedstocks,
+                vapor_pressures,
+                freeze_gate_curve_cache=freeze_gate_curve_cache,
+            )
+            sim.melt.temperature_C = 1600.0
+            sim.melt.p_total_mbar = 10.0
+            inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+            split = native_fe_equilibrium_extent(
+                comp_wt=sim._melt_oxide_wt_pct(),
+                feo_mol=inventory.get('FeO', 0.0),
+                fe2o3_mol=inventory.get('Fe2O3', 0.0),
+                T_K=sim.melt.temperature_C + 273.15,
+                pressure_bar=sim.melt.p_total_mbar / 1000.0,
+                gas_fO2_log=lambda _n: fO2_log, open_sink=True,
+            )
+            state = split['native_fe_state']
+            seed = sim._feedstock_iron_initialization
+            anchors.append({
+                "mode": mode,
+                "temperature_C": 1600.0,
+                "feedstock": FEEDSTOCK,
+                "fO2_log": fO2_log,
+                "seed_authority": seed['seed_authority'].value,
+                "seed_method": seed['method'],
+                "melt_inventory_fO2_log": split['fO2_before_log'],
+                **{key: state[key] for key in (
+                    'iw_bound_log', 'saturation_gap_dex', 'band_lower_dex',
+                    'band_upper_dex', 'saturation_status',
+                )},
+                "native_fe_frac": float(split.get("native_fe_frac", 0.0) or 0.0),
+                "reference_native_fe_frac": (
+                    reference["native_fe_frac"] if mode == "melt_seeded" else 0.0
+                ),
+                "reference_abs_tolerance": reference["abs_tolerance"],
+                "reference_source": ANCHOR_REFERENCE_SOURCE,
+                "reference_note": (
+                    reference["note"] if mode == "melt_seeded" else
+                    "unchanged gas boundary on the loaded melt inventory"
+                ),
+                "diagnostic_only": True,
+            })
     return anchors
 
 
@@ -1019,14 +1063,17 @@ def evaluate_assertions(
             f"passing_with_divergence={len(passing_divergence_rows)}"
         ),
     )
-    anchor_by_fO2 = {float(a["fO2_log"]): a for a in anchors}
-    for fO2_log in (-9.0, -9.5):
-        anchor = anchor_by_fO2[fO2_log]
+    anchor_by_mode_fO2 = {(a["mode"], float(a["fO2_log"])): a for a in anchors}
+    for mode, fO2_log in (
+        (mode, fO2) for fO2 in (-9.0, -9.5) for mode in ("melt_seeded", "gas_boundary")
+    ):
+        anchor = anchor_by_mode_fO2[mode, fO2_log]
+        prefix = "manual" if anchor["mode"] == "melt_seeded" else "gas_boundary"
         observed = float(anchor["native_fe_frac"])
         reference = float(anchor["reference_native_fe_frac"])
         tolerance = float(anchor["reference_abs_tolerance"])
         add(
-            f"manual_fO2_anchor_{fO2_log}",
+            f"{prefix}_fO2_anchor_{fO2_log}",
             abs(observed - reference) <= tolerance,
             (
                 f"native_fe_frac={observed:.12g} reference={reference:.12g} "

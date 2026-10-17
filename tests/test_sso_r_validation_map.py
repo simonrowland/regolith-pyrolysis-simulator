@@ -85,26 +85,33 @@ def _owner_recipe_row(payload):
     return next(row for row in payload["rows"] if _is_owner_recipe_row(row))
 
 
-def test_manual_fO2_anchors_match_native_fe_design_window():
+def test_manual_fO2_anchors_match_seeded_and_gas_boundary_contracts():
     anchors = {
-        anchor["fO2_log"]: anchor
+        (anchor["mode"], anchor["fO2_log"]): anchor
         for anchor in validation_map.manual_fO2_anchors()
     }
-
-    assert anchors[-9.0]["reference_source"].startswith("docs-private/research/")
-    assert anchors[-9.5]["reference_source"].startswith("docs-private/research/")
-    assert anchors[-9.0]["native_fe_frac"] == pytest.approx(
-        anchors[-9.0]["reference_native_fe_frac"],
-        rel=0.0,
-        abs=anchors[-9.0]["reference_abs_tolerance"],
+    assert len(anchors) == 4
+    for fO2_log in (-9.0, -9.5):
+        seeded = anchors['melt_seeded', fO2_log]
+        gas = anchors['gas_boundary', fO2_log]
+        assert seeded['seed_authority'] == 'measured'
+        assert seeded['seed_method'] == 'predicted_kress91_split'
+        # The existing initializer seeds at its vacuum pressure; the inverse
+        # below reports that same inventory at the diagnostic's 0.01 bar.
+        assert seeded['melt_inventory_fO2_log'] == pytest.approx(fO2_log, abs=1e-5)
+        assert seeded['melt_inventory_fO2_log'] != gas['melt_inventory_fO2_log']
+        for anchor in (seeded, gas):
+            assert anchor['reference_source'].startswith('docs-private/research/')
+            assert anchor['native_fe_frac'] == pytest.approx(
+                anchor['reference_native_fe_frac'], rel=0.0,
+                abs=anchor['reference_abs_tolerance'],
+            )
+            assert anchor['native_fe_frac'] == 0.0
+            assert anchor['saturation_status'] == 'INDETERMINATE'
+            assert anchor['diagnostic_only'] is True
+    assert anchors['gas_boundary', -9.0]['melt_inventory_fO2_log'] == (
+        anchors['gas_boundary', -9.5]['melt_inventory_fO2_log']
     )
-    assert anchors[-9.5]["native_fe_frac"] == pytest.approx(
-        anchors[-9.5]["reference_native_fe_frac"],
-        rel=0.0,
-        abs=anchors[-9.5]["reference_abs_tolerance"],
-    )
-    assert anchors[-9.0]["diagnostic_only"] is True
-    assert anchors[-9.5]["diagnostic_only"] is True
 
 
 def test_grid_count_assertion_uses_requested_grid_size(smoke_payload):
