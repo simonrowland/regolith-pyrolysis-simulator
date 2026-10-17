@@ -522,6 +522,7 @@ REGIME_TO_METHOD = {
     "knudsen_effusion": MethodToken.KNUDSEN_EFFUSION,
     "knudsen_effusion_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
     "langmuir_free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
+    "free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
     "open_furnace_apparent": MethodToken.LANGMUIR_FREE_EVAPORATION,
     "transpiration": MethodToken.TRANSPIRATION,
     "tga": MethodToken.TGA,
@@ -5241,6 +5242,11 @@ _MASS_LOSS_YIELD_FIELDS = (
     "mass_loss_pct",
     "mass_loss_fraction",
     "non_condensed_mass_loss_fraction",
+    "total_integrated_mass_loss_wt_pct",
+    "total_loss_wt_pct",
+    "mass_loss_percent",
+    "water_released_wt_pct_as_printed",
+    "mass_loss_wt_pct_range",
 )
 _MEASURED_OXYGEN_YIELD_FIELDS: tuple[tuple[str, Quantity], ...] = (
     ("mass_yield_percent", Quantity.YIELD_FRACTION),
@@ -8072,12 +8078,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "o2_yield",
         "fraction_of_feedstock_oxygen_percent",
     ),
-    Quantity.MASS_LOSS_FRACTION: (
-        "mass_loss_fraction",
-        "non_condensed_mass_loss_fraction",
-        "mass_loss_wt_pct",
-        "mass_loss_pct",
-    ),
+    Quantity.MASS_LOSS_FRACTION: _MASS_LOSS_YIELD_FIELDS,
     Quantity.YIELD_FRACTION: (
         "yield_fraction",
         "mass_yield_percent",
@@ -8920,6 +8921,47 @@ def _selection_from_named_field(
                 )
             continue
         amount = _numeric_field(payload, key)
+        if (
+            amount is None
+            and q_token is Quantity.MASS_LOSS_FRACTION
+            and key == "mass_loss_wt_pct_range"
+        ):
+            raw_range = payload.get(key)
+            if isinstance(raw_range, (list, tuple)) and len(raw_range) == 2:
+                low, high = (_as_dec_or_none(value) for value in raw_range)
+                if low is not None and high is not None and low <= high:
+                    # The field is explicitly wt%; divide each published bound by 100
+                    # to store the same interval on the dimensionless fraction basis.
+                    return _interval_selection(
+                        low / Decimal("100"),
+                        high / Decimal("100"),
+                        key,
+                        payload,
+                        condition_ranges,
+                    )
+        approximate_payload = payload
+        if (
+            amount is None
+            and q_token is Quantity.MASS_LOSS_FRACTION
+            and key == "water_released_wt_pct_as_printed"
+        ):
+            raw_approximate = payload.get(key)
+            if isinstance(raw_approximate, str):
+                stripped = raw_approximate.strip()
+                if stripped.startswith(("~", "≈")):
+                    amount = _as_dec_or_none(stripped[1:].strip())
+                    if amount is not None:
+                        approximate_payload = {**payload, "approximate": True}
+        if (
+            q_token is Quantity.MASS_LOSS_FRACTION
+            and key == "mass_loss_percent"
+            and "approximately"
+            in " ".join(
+                str(payload.get(label) or "").lower()
+                for label in ("as_printed", "note", "qualifier")
+            )
+        ):
+            approximate_payload = {**payload, "approximate": True}
         if amount is None:
             continue
         if q_token is Quantity.MASS_LOSS_AREAL_DENSITY:
@@ -8958,10 +9000,16 @@ def _selection_from_named_field(
             Quantity.MASS_LOSS_FRACTION_VS_T,
             Quantity.YIELD_FRACTION,
             Quantity.O2_YIELD,
-        } and _percent_named_fraction_field(key, units):
+        } and (
+            _percent_named_fraction_field(key, units)
+            or key == "water_released_wt_pct_as_printed"
+        ):
+            # Percent-valued yield fields use the scorer's dimensionless fraction basis.
             amount = amount / Decimal("100")
             trail = "percent_to_fraction"
-        return _point_selection(amount, key, trail, payload, condition_ranges)
+        return _point_selection(
+            amount, key, trail, approximate_payload, condition_ranges
+        )
     decorated_prefix = f"{q_token.value}_"
     decorated = [
         (key, _numeric_field(payload, key))
@@ -13076,6 +13124,111 @@ class Migrator:
                 experiment, sample=sample
             )
 
+    @staticmethod
+    def _richter_table1_sample_inputs(doc: Mapping[str, Any]) -> Mapping[str, Any]:
+        """Lift Richter Table 1's run-specific mass and starting area to experiments."""
+        if doc.get("source_id") != "kems-010-richter-2007":
+            return doc
+        samples: dict[str, tuple[Decimal, Decimal, Mapping[str, Any]]] = {}
+        species = doc.get("species") or {}
+        if not isinstance(species, Mapping):
+            return doc
+        for block in species.values():
+            if not isinstance(block, Mapping):
+                continue
+            for observation in block.get("observations") or ():
+                if not isinstance(observation, Mapping):
+                    continue
+                equipment = observation.get("equipment") or {}
+                surface_area = (
+                    equipment.get("sample_surface_area")
+                    if isinstance(equipment, Mapping)
+                    else None
+                )
+                rows = (
+                    surface_area.get("value")
+                    if isinstance(surface_area, Mapping)
+                    else None
+                )
+                if not isinstance(rows, list):
+                    continue
+                for row in rows:
+                    if not isinstance(row, Mapping) or not row.get("sample"):
+                        continue
+                    try:
+                        area_mm2 = Decimal(str(row["initial_area_mm2"]))
+                        mass_mg = Decimal(str(row["initial_weight_mg"]))
+                    except (KeyError, ArithmeticError, ValueError):
+                        continue
+                    if (
+                        not area_mm2.is_finite()
+                        or area_mm2 <= 0
+                        or not mass_mg.is_finite()
+                        or mass_mg <= 0
+                    ):
+                        continue
+                    name = str(row["sample"])
+                    value = (mass_mg, area_mm2, row.get("locator") or {})
+                    if name in samples and samples[name][:2] != value[:2]:
+                        raise ValueError(
+                            f"Richter Table 1 has conflicting mass/area for {name}"
+                        )
+                    samples[name] = value
+
+        experiments = doc.get("experiments")
+        if not isinstance(experiments, list):
+            return doc
+        enriched = []
+        for experiment in experiments:
+            if not isinstance(experiment, Mapping):
+                enriched.append(experiment)
+                continue
+            experiment = dict(experiment)
+            experiment_locator = experiment.get("locator") or {}
+            row_name = (
+                experiment_locator.get("row")
+                if isinstance(experiment_locator, Mapping)
+                else None
+            )
+            measurement = samples.get(str(row_name))
+            if measurement is not None:
+                mass_mg, area_mm2, source_locator = measurement
+                source_locator = dict(source_locator)
+                # Exact SI conversions: 1 mg = 10^-6 kg; 1 mm^2 = 10^-6 m^2.
+                mass_kg = mass_mg * Decimal("0.000001")
+                area_m2 = area_mm2 * Decimal("0.000001")
+                sample = dict(experiment.get("sample") or {})
+                sample["mass_kg"] = {
+                    "state": {
+                        "tag": "value",
+                        "value": {"kind": "point", "point": str(mass_kg)},
+                    },
+                    "locator": {
+                        **source_locator,
+                        "note": "Table 1 initial_weight_mg; exact mg-to-kg conversion",
+                    },
+                }
+                experiment["sample"] = sample
+                apparatus = dict(experiment.get("apparatus") or {})
+                geometry = dict(apparatus.get("geometry") or {})
+                geometry["exposed_area_m2"] = {
+                    "state": {
+                        "tag": "value",
+                        "value": {"kind": "point", "point": str(area_m2)},
+                    },
+                    "locator": {
+                        **source_locator,
+                        "note": (
+                            "Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; "
+                            "exposed sample area for free evaporation"
+                        ),
+                    },
+                }
+                apparatus["geometry"] = geometry
+                experiment["apparatus"] = apparatus
+            enriched.append(experiment)
+        return {**doc, "experiments": enriched}
+
     def _migrate_extract(self, path: Path) -> None:
         rel = path.relative_to(self.root).as_posix() if path.is_relative_to(self.root) else str(path)
         count = self._count(rel)
@@ -13090,6 +13243,7 @@ class Migrator:
                 source=rel,
             )
             return
+        doc = self._richter_table1_sample_inputs(doc)
         source = doc.get("source") or {}
         if not isinstance(source, Mapping):
             source = {}

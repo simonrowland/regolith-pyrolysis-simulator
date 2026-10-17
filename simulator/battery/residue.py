@@ -289,6 +289,31 @@ class ResidueInventoryResult:
 
 
 @dataclass(frozen=True)
+class ResidueMassLossPrediction:
+    mass_loss_fraction: float
+    engine_flags: tuple[str, ...]
+    engine_metadata: Mapping[str, str]
+
+
+@dataclass(frozen=True)
+class _HashimotoGeometryIntegration:
+    composition_wt_pct: dict[str, float]
+    pO2_steps: tuple[float, ...]
+    exhaustion_notices: tuple[dict[str, float | int | str], ...]
+    refusal: ResidueEngineNonconvergence | None
+    atom_closure: dict[str, float]
+    inventory_mol: dict[str, float]
+
+    def __iter__(self):
+        # Existing Hashimoto callers unpack the original five-result view.
+        yield self.composition_wt_pct
+        yield self.pO2_steps
+        yield self.exhaustion_notices
+        yield self.refusal
+        yield self.atom_closure
+
+
+@dataclass(frozen=True)
 class _HashimotoResiduePrediction:
     """One run and alpha arm, with the declared geometry sensitivity surface."""
 
@@ -953,6 +978,211 @@ def _make_residue_pressure_model(
     )
 
 
+def _located_point(located: object | None) -> float | None:
+    if located is None:
+        return None
+    state = getattr(located, "state", None)
+    if state is None or not getattr(state, "is_value", False):
+        return None
+    value = getattr(state, "value", None)
+    kind = getattr(value, "kind", None)
+    if getattr(kind, "value", kind) != "point":
+        return None
+    try:
+        number = float(value.point)
+    except (AttributeError, TypeError, ValueError, OverflowError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def _initial_oxide_wt_percent(sample: object) -> dict[str, float]:
+    printed = getattr(sample, "printed_composition", None)
+    state = None if printed is None else getattr(printed, "state", None)
+    if state is not None and getattr(state, "is_value", False):
+        raw = getattr(state, "value", None)
+        if isinstance(raw, Mapping):
+            try:
+                values = {
+                    str(oxide): float(amount) for oxide, amount in raw.items()
+                }
+            except (TypeError, ValueError, OverflowError):
+                values = {}
+            if values and all(math.isfinite(x) and x >= 0.0 for x in values.values()):
+                return values
+
+    initial = getattr(sample, "initial_composition", None)
+    state = None if initial is None else getattr(initial, "state", None)
+    if state is None or not getattr(state, "is_value", False):
+        raise ResidueInventoryRefusal("initial_composition_not_stated")
+    composition = getattr(state, "value", None)
+    components = getattr(composition, "components", None)
+    if not components:
+        raise ResidueInventoryRefusal("initial_composition_not_stated")
+    raw_basis = getattr(composition, "amount_basis", "")
+    amount_basis = str(getattr(raw_basis, "value", raw_basis))
+    if amount_basis not in {"mole_fraction", "moles", "mole"}:
+        raise ResidueInventoryRefusal(
+            "initial_composition_basis_not_supported", amount_basis
+        )
+    try:
+        amounts = {str(oxide): float(amount) for oxide, amount in components}
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ResidueInventoryRefusal("initial_composition_invalid") from exc
+    if any(not math.isfinite(x) or x < 0.0 for x in amounts.values()):
+        raise ResidueInventoryRefusal("initial_composition_invalid")
+    masses = {
+        oxide: amount * _formula_terms(oxide)[1]
+        for oxide, amount in amounts.items()
+    }
+    total = math.fsum(masses.values())
+    if total <= 0.0:
+        raise ResidueInventoryRefusal("initial_composition_invalid")
+    return {oxide: mass / total * 100.0 for oxide, mass in masses.items()}
+
+
+def predict_mass_loss_fraction(
+    engine: str,
+    experiment: object,
+    *,
+    temperature_K: float | None,
+) -> ResidueMassLossPrediction:
+    """Predict one bulk mass-loss point through the existing residue integrator."""
+    if engine not in {"openimcc", "internal-analytical"}:
+        raise ResidueInventoryRefusal(
+            "engine_capability_unsupported",
+            f"engine={engine}; capability=free_evaporation_residue_integrator",
+        )
+
+    sample = getattr(experiment, "sample", None)
+    wt_pct = _initial_oxide_wt_percent(sample)
+    schedule = getattr(experiment, "thermal_schedule", None)
+    duration_s = _located_point(
+        None if schedule is None else getattr(schedule, "total_duration_s", None)
+    )
+    if duration_s is None or duration_s <= 0.0:
+        raise ResidueInventoryRefusal(
+            "duration_not_stated", "thermal_schedule.total_duration_s"
+        )
+    if temperature_K is None or not math.isfinite(float(temperature_K)):
+        raise ResidueInventoryRefusal("temperature_not_stated", "identity.temperature_K")
+    sample_mass_kg = _located_point(getattr(sample, "mass_kg", None))
+    if sample_mass_kg is None or sample_mass_kg <= 0.0:
+        raise ResidueInventoryRefusal("sample_mass_not_stated", "sample.mass_kg point")
+    apparatus = getattr(experiment, "apparatus", None)
+    geometry = None if apparatus is None else getattr(apparatus, "geometry", None)
+    area_m2 = _located_point(
+        None if geometry is None else getattr(geometry, "exposed_area_m2", None)
+    )
+    if area_m2 is None or area_m2 <= 0.0:
+        raise ResidueInventoryRefusal(
+            "sample_geometry_not_stated",
+            "apparatus.geometry.exposed_area_m2 point",
+        )
+
+    method_state = getattr(experiment, "method", None)
+    method = getattr(method_state, "value", None) if getattr(
+        method_state, "is_value", False
+    ) else None
+    if getattr(method, "value", method) != "langmuir_free_evaporation":
+        raise ResidueInventoryRefusal(
+            "residue_method_unsupported",
+            "capability=free_evaporation_residue_integrator; "
+            f"experiment.method={getattr(method, 'value', method)!r}",
+        )
+
+    pressure_environment = getattr(experiment, "pressure_environment", None)
+    total_pressure_Pa = _located_point(
+        None
+        if pressure_environment is None
+        else getattr(pressure_environment, "total_pressure_Pa", None)
+    )
+    if engine == "internal-analytical" and total_pressure_Pa is None:
+        raise ResidueInventoryRefusal("total_pressure_not_stated")
+
+    total_wt_pct = math.fsum(wt_pct.values())
+    if (
+        not math.isfinite(total_wt_pct)
+        or total_wt_pct <= 0.0
+        or any(not math.isfinite(value) or value < 0.0 for value in wt_pct.values())
+    ):
+        raise ResidueInventoryRefusal("initial_composition_invalid")
+    # Printed oxide wt% are normalized only for source rounding: each m_i is
+    # m0*w_i/Σw. Dividing kg by kg mol^-1 yields mol on the sample-mass basis.
+    initial_inventory_mol = {
+        oxide: sample_mass_kg * (amount / total_wt_pct)
+        / _formula_terms(oxide)[1]
+        for oxide, amount in wt_pct.items()
+    }
+    try:
+        from openimcc import load_gas_datapack
+    except ImportError as exc:
+        raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _openimcc_gas_channels_and_omission_notices,
+    )
+
+    gas_pack = load_gas_datapack()
+    gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(
+        tuple(initial_inventory_mol), gas_pack
+    )
+    if omissions:
+        raise ResidueInventoryRefusal("residue_gas_channel_missing", str(omissions))
+    if not gas_channels:
+        raise ResidueInventoryRefusal("residue_gas_channels_missing")
+    channels = tuple(
+        ResidueChannel(
+            str(species),
+            str(species),
+            parent,
+            1.0,
+            _HASHIMOTO_COMMON_UNITY_SOURCE,
+        )
+        for species, (parent, _parent_moles, _pO2_exponent) in gas_channels
+    )
+    engine_flags: set[str] = set()
+    engine_metadata: dict[str, str] = {}
+    pressure_model = _make_residue_pressure_model(
+        engine,
+        gas_channels,
+        gas_pack,
+        temperature_K=float(temperature_K),
+        total_pressure_Pa=total_pressure_Pa or 0.0,
+        engine_metadata=engine_metadata,
+        engine_flags=engine_flags,
+        missing_channels_reason="residue_pressure_channels_missing",
+        caller="Mass-loss residue prediction",
+    )
+    steps = min(_HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0)))
+    integration = _hashimoto_integrate_geometry(
+        initial_inventory_mol,
+        channels,
+        pressure_model,
+        temperature_K=float(temperature_K),
+        duration_s=duration_s,
+        steps=steps,
+        geometry_policy_id="sphere_constant",
+        initial_area_m2=area_m2,
+    )
+    if integration.refusal is not None:
+        raise integration.refusal
+    # n_residue [mol] * M_oxide [kg mol^-1] gives m_residue [kg];
+    # 1 - m_residue/m0 is therefore a dimensionless bulk mass-loss fraction.
+    # R-11's rep5 Table 1 loss of 27.8% from 190.4 mg implies 137.4688 mg
+    # residue, an independent unit and basis sanity value for this conversion.
+    residue_mass_kg = math.fsum(
+        amount * _formula_terms(oxide)[1]
+        for oxide, amount in integration.inventory_mol.items()
+    )
+    mass_loss_fraction = 1.0 - residue_mass_kg / sample_mass_kg
+    if not math.isfinite(mass_loss_fraction) or not 0.0 <= mass_loss_fraction <= 1.0:
+        raise ResidueInventoryRefusal("mass_loss_fraction_invalid")
+    return ResidueMassLossPrediction(
+        mass_loss_fraction=mass_loss_fraction,
+        engine_flags=tuple(sorted(engine_flags)),
+        engine_metadata=engine_metadata,
+    )
+
+
 def _hashimoto_table_row(table: Any, key: str, temperature_K: float) -> Mapping[str, Any]:
     try:
         selected = table.loc[key]
@@ -1059,13 +1289,7 @@ def _hashimoto_integrate_geometry(
     steps: int,
     geometry_policy_id: str,
     initial_area_m2: float,
-) -> tuple[
-    dict[str, float],
-    tuple[float, ...],
-    tuple[dict[str, float | int | str], ...],
-    ResidueEngineNonconvergence | None,
-    dict[str, float],
-]:
+) -> _HashimotoGeometryIntegration:
     inventory = {str(oxide): float(amount) for oxide, amount in initial_inventory_mol.items()}
     sample_total_mol = math.fsum(inventory.values())
     exhaustion_floor_mol = _component_exhaustion_floor_mol(sample_total_mol)
@@ -1195,12 +1419,13 @@ def _hashimoto_integrate_geometry(
                 "residue_atom_balance_failed",
                 f"{element} atom residual {residual:.17g} mol after exhaustion projection",
             )
-    return (
-        _hashimoto_project_oxide_wt_pct(inventory),
-        tuple(pO2_steps),
-        tuple(exhaustion_notices),
-        refusal,
-        closure,
+    return _HashimotoGeometryIntegration(
+        composition_wt_pct=_hashimoto_project_oxide_wt_pct(inventory),
+        pO2_steps=tuple(pO2_steps),
+        exhaustion_notices=tuple(exhaustion_notices),
+        refusal=refusal,
+        atom_closure=closure,
+        inventory_mol=dict(inventory),
     )
 
 
