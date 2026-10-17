@@ -2353,18 +2353,18 @@ species:
             equation_as_published: 'Fe3+/SumFe = a + b(x − μ) + c(x − μ)^2'
         derived_from:
           - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725
-          - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::point:1
-          - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::point:2
+          - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:0
+          - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:1
           - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2
           - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:3
           - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:4
           - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:5
         derivation:
-          relation: Weighted least-squares second-order fit of the seven Table 2 rhyolite glasses; the Mössbauer Fe3_over_FeT column supplies y for DT_46 (0.600) and DT_39 (0.320), rather than the separately quoted Moore wet-chemistry column.
+          relation: Weighted least-squares second-order fit of the seven Table 2 rhyolite glasses; y is footnote-f wet chemistry for the six Moore glasses and the Mössbauer Fe3_over_FeT value for 568_2.
           inputs:
             - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725
-            - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::point:1
-            - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::point:2
+            - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:0
+            - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:1
             - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2
             - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:3
             - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:4

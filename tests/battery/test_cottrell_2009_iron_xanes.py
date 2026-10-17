@@ -150,8 +150,8 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
     }
     rhyolite_parents = {
         f"{prefix}cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725",
-        f"{prefix}cottrell_2009_rhyolite_mossbauer::point:1",
-        f"{prefix}cottrell_2009_rhyolite_mossbauer::point:2",
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:0",
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:1",
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:2",
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:3",
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:4",
@@ -160,6 +160,22 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
     assert len(rhyolite_fit.derived_from or ()) == 7
     assert set(rhyolite_fit.derived_from or ()) == rhyolite_parents
     assert rhyolite_parents.issubset(result.observations)
+    printed_rhyolite_fractions = {
+        parent_id: dict(result.observations[parent_id].derivation.parameters)[
+            "original_Fe3_over_FeT"
+        ].state.value
+        for parent_id in rhyolite_parents
+    }
+    assert printed_rhyolite_fractions == {
+        f"{prefix}cottrell_2009_rhyolite_mossbauer::"
+        "T=1823.15:row=568_2:h=59a4f4d57725": Decimal("0.238"),
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:0": Decimal("0.569"),
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:1": Decimal("0.315"),
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:2": Decimal("0.596"),
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:3": Decimal("0.806"),
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:4": Decimal("0.630"),
+        f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:5": Decimal("0.660"),
+    }
     moore_dt39_observation = result.observations[
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:1"
     ]
