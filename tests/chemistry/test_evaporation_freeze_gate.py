@@ -399,6 +399,110 @@ def test_freeze_gate_cache_key_ignores_corpus_version(
     assert before == after
 
 
+def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
+    from simulator.core import PyrolysisSimulator
+    from simulator.melt_backend.magemin import MAGEMinBackend
+    from simulator.runner import PyrolysisRun
+    from tests.test_runner_smoke import SCENARIOS
+
+    engine_probe = MAGEMinBackend()
+    engine_available = engine_probe.initialize({
+        'python_bridge': 'subprocess',
+        'warm_worker': False,
+    })
+    engine_probe.close()
+    if not engine_available:
+        pytest.skip('shipped curve pins require the MAGEMin engine')
+
+    expected = {
+        'lunar_mare_low_ti_C0_24h': [
+            (
+                'C0',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                918.75,
+                1370.3125,
+                ((918.75, 0.0), (1370.3125, 1.0)),
+            ),
+            (
+                'C0B',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                918.75,
+                1370.3125,
+                ((918.75, 0.0), (1370.3125, 1.0)),
+            ),
+        ],
+        'mars_basalt_C2A_12h': [
+            (
+                'C2A',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                1018.75,
+                1320.3125,
+                ((1018.75, 0.0), (1320.3125, 1.0)),
+            ),
+        ],
+        'ci_carbonaceous_chondrite_C2B_12h': [
+            (
+                'C2B',
+                'kress91_liquid_calibration_floor',
+                1200.0,
+                1200.000001,
+                ((1200.0, 0.0), (1200.000001, 1.0)),
+            ),
+        ],
+    }
+    observed: dict[str, list[tuple]] = {}
+    rebuild_counts: dict[str, int] = {}
+    current_scenario = [None]
+    equilibrium_count = [0]
+    original_record = PyrolysisSimulator._freeze_gate_curve_record
+    original_equilibrate = MAGEMinBackend.equilibrate
+
+    def record_curve(sim, *args, **kwargs):
+        record = original_record(sim, *args, **kwargs)
+        curve = record['curve']
+        observed.setdefault(current_scenario[0], []).append((
+            sim.melt.campaign.name,
+            curve['source'],
+            curve['solidus_T_C'],
+            curve['liquidus_T_C'],
+            tuple(tuple(point) for point in curve['path']),
+        ))
+        rebuild_counts[current_scenario[0]] = int(
+            getattr(sim, '_freeze_gate_cache_rebuild_count', 0)
+        )
+        return record
+
+    def count_equilibrium(self, *args, **kwargs):
+        equilibrium_count[0] += 1
+        return original_equilibrate(self, *args, **kwargs)
+
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        '_freeze_gate_curve_record',
+        record_curve,
+    )
+    monkeypatch.setattr(MAGEMinBackend, 'equilibrate', count_equilibrium)
+
+    for scenario in SCENARIOS:
+        name = scenario['name']
+        current_scenario[0] = name
+        equilibrations_before = equilibrium_count[0]
+        PyrolysisRun(
+            feedstock_id=scenario['feedstock_id'],
+            campaign=scenario['campaign'],
+            hours=scenario['hours'],
+            additives_kg=dict(scenario['additives_kg']),
+            allow_fallback_vapor=True,
+            allow_unmeasured_alpha_fallback=True,
+            setpoints_patch={'freeze_gate': {'enabled': True}},
+        ).run()
+        if name == 'ci_carbonaceous_chondrite_C2B_12h':
+            assert rebuild_counts[name] == 1
+            assert equilibrium_count[0] - equilibrations_before == 8
+
+    assert observed == expected
+
+
 def test_native_fe_no_commit_split_suppresses_vapor_route(
     vapor_pressure_data,
     feedstocks_data,
