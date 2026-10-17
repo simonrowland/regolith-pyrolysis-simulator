@@ -980,10 +980,41 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         if not isinstance(series_config, Mapping):
             series_config = {}
         pipe_diameter_m = _finite_float(controls.get("pipe_diameter_m"), 0.12)
+        if "overhead_pressure_pa" not in controls:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "reason": "missing_overhead_pressure_pa",
+                    "detail": (
+                        "EVAPORATION_FLUX prices against the melt-surface "
+                        "pressure; it does not fall back to the commanded "
+                        "total"
+                    ),
+                },
+            )
         overhead_pressure_pa = _finite_float(
             controls.get("overhead_pressure_pa"),
-            max(0.0, float(request.pressure_bar) * 100000.0),
+            math.nan,
         )
+        if not math.isfinite(overhead_pressure_pa) or overhead_pressure_pa < 0.0:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "reason": "invalid_overhead_pressure_pa",
+                    "detail": (
+                        "overhead_pressure_pa must be a finite nonnegative "
+                        "melt-surface pressure in Pa"
+                    ),
+                },
+            )
         gas_temperature_K = _finite_float(controls.get("gas_temperature_K"), T_K)
         carrier_gas = str(controls.get("carrier_gas") or "N2")
         cold_skull_envelope = controls.get("cold_skull_envelope")

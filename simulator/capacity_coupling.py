@@ -20,6 +20,9 @@ OXYGEN_SPECIES = "O2"
 DEFAULT_REL_TOL = 1.0e-9
 DEFAULT_ABS_TOL_PA = 1.0e-6
 DEFAULT_MAX_ITERATIONS = 50
+SOURCE_DUCT_MAX_ITERATIONS = 80
+SOURCE_DUCT_H_REFINE_ITERATIONS = 8
+SOURCE_DUCT_ABS_TOL_PA = 1.0e-12
 
 
 @dataclass(frozen=True)
@@ -61,6 +64,8 @@ class CapacityShadowResult:
     max_delta_history_Pa: tuple[float, ...]
     mass_closure_error_pct: float
     authoritative: bool = False
+    source_duct_residual_rel: float = 0.0
+    closure_notices: tuple[Mapping[str, object], ...] = ()
 
     def __post_init__(self) -> None:
         for name in (
@@ -74,6 +79,11 @@ class CapacityShadowResult:
                 name,
                 MappingProxyType(dict(getattr(self, name))),
             )
+        object.__setattr__(
+            self,
+            "closure_notices",
+            tuple(dict(notice) for notice in self.closure_notices),
+        )
 
 
 @dataclass(frozen=True)
@@ -169,6 +179,410 @@ def combined_saturation(
     return SaturationShadow(pipe, oxygen, oxygen, "oxygen")
 
 
+def hertz_knudsen_molar_conductance_mol_s_Pa(
+    *,
+    alpha: float,
+    area_m2: float,
+    molar_mass_kg_mol: float,
+    temperature_K: float,
+) -> float:
+    # Premise: equal-temperature Hertz–Knudsen net number rate is
+    # Ndot = alpha*A*(P_eq-p)/sqrt(2*pi*m*k_B*T) [molecules/s].
+    # Algebra: m=M/N_A and k_B=R/N_A, so dividing by N_A gives the
+    # molar source q_source = H*(P_eq-p) [mol/s] with
+    # H = alpha*A/sqrt(2*pi*M*R*T) [mol/(s Pa)].
+    # Unit check: sqrt(M R T) is kg m /(mol s); Pa divided by that
+    # times m^2 is mol/s. Sanity: alpha=0 or A=0 or T<=0 gives H=0.
+    alpha_f = max(0.0, float(alpha))
+    area_f = max(0.0, float(area_m2))
+    mass_f = float(molar_mass_kg_mol)
+    temp_f = float(temperature_K)
+    if (
+        alpha_f <= 0.0
+        or area_f <= 0.0
+        or mass_f <= 0.0
+        or not math.isfinite(temp_f)
+        or temp_f <= 0.0
+    ):
+        return 0.0
+    return alpha_f * area_f / math.sqrt(
+        2.0 * math.pi * mass_f * GAS_CONSTANT * temp_f
+    )
+
+
+def pipe1_surface_pressure_Pa(
+    *,
+    P_eq_Pa: float,
+    H_mol_s_Pa: float,
+    G_mol_s_Pa2: float,
+    P_downstream_Pa: float = 0.0,
+) -> float:
+    # Premise: quasi-steady melt-only source against a PIPE-1 duct.
+    # Closure: H*(P_eq-p) = q_duct(p) in the same tick.
+    # PIPE-1 mass outflow is F=pi*d^4*M*(p^2-P_d^2)/(256*eta*L*R*T)
+    # [kg/s]; divide by M to get q_duct=G*(p^2-P_d^2) with
+    # G=pi*d^4/(256*eta*L*R*T) [mol/(s Pa^2)].
+    # Vacuum (P_d=0): G*p^2 + H*p - H*P_eq = 0. The positive root,
+    # written without subtractive cancellation, is
+    # p = 2*P_eq/(1+sqrt(1+4*G*P_eq/H)).
+    # Unit check: G*P_eq/H is dimensionless; H*(P_eq-p) and G*p^2
+    # are both mol/s.
+    # Limits: G→∞ gives p→0 (free HK); G→0 gives p→P_eq (blocked
+    # duct); P_eq=0 gives p=0. Nonzero downstream P_d raises the
+    # lower bound to P_d and replaces p^2 with (p^2-P_d^2).
+    P_eq = max(0.0, float(P_eq_Pa))
+    H = max(0.0, float(H_mol_s_Pa))
+    G = max(0.0, float(G_mol_s_Pa2))
+    P_down = max(0.0, float(P_downstream_Pa))
+    if P_eq <= 0.0:
+        return P_down
+    if H <= 0.0:
+        return P_down
+    if G <= 0.0:
+        return max(P_eq, P_down)
+    if P_down <= 0.0:
+        return 2.0 * P_eq / (1.0 + math.sqrt(1.0 + 4.0 * G * P_eq / H))
+    # Finite downstream: G*p^2 + H*p - (H*P_eq + G*P_d^2) = 0.
+    discriminant = H * H + 4.0 * G * (H * P_eq + G * P_down * P_down)
+    pressure = (-H + math.sqrt(discriminant)) / (2.0 * G)
+    return max(P_down, min(pressure, max(P_eq, P_down)))
+
+
+def _pipe1_mixture_factor(total_Pa: float, G_mol_s_Pa2: float, P_down_Pa: float) -> float:
+    # Well-mixed PIPE-1: q_i = p_i * G * (P - P_d^2/P) = p_i * factor.
+    # Vacuum reduces to factor = G*P, so q_i = G*P*p_i.
+    if G_mol_s_Pa2 <= 0.0 or total_Pa <= P_down_Pa:
+        return 0.0
+    if P_down_Pa <= 0.0:
+        return G_mol_s_Pa2 * total_Pa
+    return G_mol_s_Pa2 * (total_Pa - P_down_Pa * P_down_Pa / total_Pa)
+
+
+def _bracketed_root(
+    residual,
+    lo: float,
+    hi: float,
+    f_lo: float,
+    f_hi: float,
+    *,
+    rel_tol: float,
+    abs_tol: float,
+    max_iterations: int,
+) -> float:
+    if f_lo == 0.0:
+        return lo
+    if f_hi == 0.0:
+        return hi
+    if f_lo * f_hi > 0.0:
+        return hi if abs(f_hi) < abs(f_lo) else lo
+    for _ in range(max(1, max_iterations)):
+        mid = 0.5 * (lo + hi)
+        if hi - lo <= max(abs_tol, rel_tol * max(abs(lo), abs(hi), 1.0)):
+            return mid
+        f_mid = float(residual(mid))
+        if f_mid == 0.0:
+            return mid
+        if f_lo * f_mid <= 0.0:
+            hi = mid
+            f_hi = f_mid
+        else:
+            lo = mid
+            f_lo = f_mid
+    return 0.5 * (lo + hi)
+
+
+def mixture_surface_partials_Pa(
+    *,
+    P_eq_Pa: Mapping[str, float],
+    H_mol_s_Pa: Mapping[str, float],
+    G_mol_s_Pa2: float,
+    P_downstream_Pa: float = 0.0,
+    extra_partials_Pa: Mapping[str, float] | None = None,
+) -> dict[str, float]:
+    # Coupled mixture: P = P_extra + sum_i p_i with
+    # p_i = H_i*P_eq_i/(H_i + G*P) (vacuum) so one common total.
+    extra = {
+        str(species): max(0.0, float(pressure))
+        for species, pressure in dict(extra_partials_Pa or {}).items()
+        if float(pressure) > 0.0
+    }
+    P_extra = sum(extra.values())
+    solved_species = tuple(
+        str(species)
+        for species, pressure in P_eq_Pa.items()
+        if float(pressure) > 0.0
+        and float(H_mol_s_Pa.get(species, 0.0)) > 0.0
+        and species not in extra
+    )
+    if not solved_species:
+        return {
+            **{
+                str(species): 0.0
+                for species in P_eq_Pa
+                if species not in extra
+            },
+            **extra,
+        }
+    if len(solved_species) == 1 and not extra:
+        species = solved_species[0]
+        pressure = pipe1_surface_pressure_Pa(
+            P_eq_Pa=float(P_eq_Pa[species]),
+            H_mol_s_Pa=float(H_mol_s_Pa.get(species, 0.0)),
+            G_mol_s_Pa2=G_mol_s_Pa2,
+            P_downstream_Pa=P_downstream_Pa,
+        )
+        return {
+            str(name): (pressure if name == species else 0.0)
+            for name in P_eq_Pa
+        }
+    P_eq_sum = sum(max(0.0, float(P_eq_Pa[species])) for species in solved_species)
+    lo = 0.0
+    hi = max(P_eq_sum, 0.0)
+
+    def partials_at(P_vapour: float) -> dict[str, float]:
+        total = max(0.0, P_vapour) + P_extra
+        factor = _pipe1_mixture_factor(
+            total, G_mol_s_Pa2, max(0.0, P_downstream_Pa)
+        )
+        out = dict(extra)
+        for species in P_eq_Pa:
+            if species in extra:
+                continue
+            P_eq = max(0.0, float(P_eq_Pa[species]))
+            conductance = max(0.0, float(H_mol_s_Pa.get(species, 0.0)))
+            if P_eq <= 0.0 or conductance <= 0.0:
+                out[species] = max(0.0, P_downstream_Pa) if P_eq <= 0.0 else 0.0
+                continue
+            if factor <= 0.0:
+                out[species] = P_eq
+            else:
+                out[species] = conductance * P_eq / (conductance + factor)
+        return out
+
+    def residual(P_vapour: float) -> float:
+        solved = partials_at(P_vapour)
+        return sum(solved[species] for species in solved_species) - P_vapour
+
+    if hi <= lo:
+        return partials_at(lo)
+    f_lo = residual(lo)
+    f_hi = residual(hi)
+    if abs(f_lo) <= SOURCE_DUCT_ABS_TOL_PA:
+        return partials_at(lo)
+    if abs(f_hi) <= SOURCE_DUCT_ABS_TOL_PA:
+        return partials_at(hi)
+    if f_lo * f_hi > 0.0 and abs(f_hi) < abs(f_lo):
+        return partials_at(hi)
+    root = _bracketed_root(
+        residual,
+        lo,
+        hi,
+        f_lo,
+        f_hi,
+        rel_tol=DEFAULT_REL_TOL,
+        abs_tol=SOURCE_DUCT_ABS_TOL_PA,
+        max_iterations=SOURCE_DUCT_MAX_ITERATIONS,
+    )
+    return partials_at(root)
+
+
+def _h_from_free_flux(
+    *,
+    P_eq_Pa: Mapping[str, float],
+    flux_kg_hr: Mapping[str, float],
+    molar_mass_kg_mol: Mapping[str, float],
+) -> dict[str, float]:
+    conductance: dict[str, float] = {}
+    for species, P_eq in P_eq_Pa.items():
+        equilibrium = max(0.0, float(P_eq))
+        mass = float(molar_mass_kg_mol.get(species, 0.0))
+        if equilibrium <= 0.0 or mass <= 0.0:
+            conductance[str(species)] = 0.0
+            continue
+        q_mol_s = max(0.0, float(flux_kg_hr.get(species, 0.0))) / mass / 3600.0
+        conductance[str(species)] = q_mol_s / equilibrium
+    return conductance
+
+
+def _source_duct_residual_rel(
+    *,
+    partials_Pa: Mapping[str, float],
+    flux_kg_hr: Mapping[str, float],
+    molar_mass_kg_mol: Mapping[str, float],
+    G_mol_s_Pa2: float,
+    P_downstream_Pa: float,
+) -> float:
+    total_P = sum(max(0.0, float(pressure)) for pressure in partials_Pa.values())
+    factor = _pipe1_mixture_factor(total_P, G_mol_s_Pa2, P_downstream_Pa)
+    max_scale = 0.0
+    max_delta = 0.0
+    species = set(partials_Pa) | set(flux_kg_hr)
+    for name in species:
+        mass = float(molar_mass_kg_mol.get(name, 0.0))
+        if mass <= 0.0:
+            continue
+        q_source = max(0.0, float(flux_kg_hr.get(name, 0.0))) / mass / 3600.0
+        q_duct = max(0.0, float(partials_Pa.get(name, 0.0))) * factor
+        max_delta = max(max_delta, abs(q_source - q_duct))
+        max_scale = max(max_scale, abs(q_source), abs(q_duct))
+    if max_scale <= 0.0:
+        return 0.0
+    return max_delta / max_scale
+
+
+def solve_source_duct_closure(
+    *,
+    P_eq_Pa: Mapping[str, float],
+    flux_kg_hr_at_partials: Callable[[Mapping[str, float]], Mapping[str, float]],
+    molar_mass_kg_mol: Mapping[str, float],
+    G_mol_s_Pa2: float,
+    capacity: NoColdTrain | FiniteCapacity,
+    P_downstream_Pa: float = 0.0,
+    H_mol_s_Pa: Mapping[str, float] | None = None,
+    incoming_partials_Pa: Mapping[str, float] | None = None,
+    head_bled_species_mol: Mapping[str, float] | None = None,
+) -> CapacityShadowResult | CapacityShadowRefusal:
+    from simulator.evaporation import EvaporationFluxRefusal
+
+    equilibrium = {
+        str(species): max(0.0, float(pressure))
+        for species, pressure in dict(P_eq_Pa).items()
+        if math.isfinite(float(pressure))
+    }
+    notices: list[dict[str, object]] = []
+    extra: dict[str, float] = {}
+    for species, pressure in dict(incoming_partials_Pa or {}).items():
+        incoming = max(0.0, float(pressure))
+        P_eq = equilibrium.get(str(species), 0.0)
+        if incoming > P_eq and incoming > 0.0:
+            extra[str(species)] = incoming
+            notices.append(
+                {
+                    "reason": "retained_gas_exceeds_equilibrium",
+                    "species": str(species),
+                    "incoming_partial_Pa": incoming,
+                    "equilibrium_Pa": P_eq,
+                    "status": "model_limit",
+                    "detail": (
+                        "retained real gas exceeds newly lowered P_eq; "
+                        "inventory is not clamped or deleted"
+                    ),
+                }
+            )
+    zero_partials = {species: 0.0 for species in equilibrium}
+    try:
+        free_flux = {
+            str(species): max(0.0, float(rate))
+            for species, rate in flux_kg_hr_at_partials(zero_partials).items()
+        }
+    except EvaporationFluxRefusal:
+        raise
+    except Exception as exc:
+        return CapacityShadowRefusal(
+            f"evaporation_flux_refused:{type(exc).__name__}:{exc}",
+            0,
+        )
+    conductance = dict(H_mol_s_Pa or {})
+    if not conductance:
+        conductance = _h_from_free_flux(
+            P_eq_Pa=equilibrium,
+            flux_kg_hr=free_flux,
+            molar_mass_kg_mol=molar_mass_kg_mol,
+        )
+    G = max(0.0, float(G_mol_s_Pa2))
+    P_down = max(0.0, float(P_downstream_Pa))
+    partials = mixture_surface_partials_Pa(
+        P_eq_Pa=equilibrium,
+        H_mol_s_Pa=conductance,
+        G_mol_s_Pa2=G,
+        P_downstream_Pa=P_down,
+        extra_partials_Pa=extra,
+    )
+    try:
+        flux = {
+            str(species): max(0.0, float(rate))
+            for species, rate in flux_kg_hr_at_partials(partials).items()
+        }
+    except EvaporationFluxRefusal:
+        raise
+    except Exception as exc:
+        return CapacityShadowRefusal(
+            f"evaporation_flux_refused:{type(exc).__name__}:{exc}",
+            1,
+        )
+    iterations = 1
+    for _refine in range(SOURCE_DUCT_H_REFINE_ITERATIONS):
+        updated = dict(conductance)
+        changed = 0.0
+        for species, P_eq in equilibrium.items():
+            if species in extra:
+                continue
+            p_surface = max(0.0, float(partials.get(species, 0.0)))
+            mass = float(molar_mass_kg_mol.get(species, 0.0))
+            if P_eq <= p_surface or mass <= 0.0:
+                continue
+            q_mol_s = max(0.0, float(flux.get(species, 0.0))) / mass / 3600.0
+            new_H = q_mol_s / (P_eq - p_surface)
+            changed = max(changed, abs(new_H - float(updated.get(species, 0.0))))
+            updated[species] = new_H
+        if changed <= DEFAULT_REL_TOL * max(
+            (abs(value) for value in updated.values()),
+            default=0.0,
+        ) + 1.0e-18:
+            break
+        conductance = updated
+        partials = mixture_surface_partials_Pa(
+            P_eq_Pa=equilibrium,
+            H_mol_s_Pa=conductance,
+            G_mol_s_Pa2=G,
+            P_downstream_Pa=P_down,
+            extra_partials_Pa=extra,
+        )
+        try:
+            flux = {
+                str(species): max(0.0, float(rate))
+                for species, rate in flux_kg_hr_at_partials(partials).items()
+            }
+        except EvaporationFluxRefusal:
+            raise
+        except Exception as exc:
+            return CapacityShadowRefusal(
+                f"evaporation_flux_refused:{type(exc).__name__}:{exc}",
+                iterations,
+            )
+        iterations += 1
+    residual_rel = _source_duct_residual_rel(
+        partials_Pa=partials,
+        flux_kg_hr=flux,
+        molar_mass_kg_mol=molar_mass_kg_mol,
+        G_mol_s_Pa2=G,
+        P_downstream_Pa=P_down,
+    )
+    bled = dict(head_bled_species_mol or {})
+    return CapacityShadowResult(
+        capacity=capacity,
+        partial_pressures_Pa=partials,
+        evaporation_flux_kg_hr={
+            species: rate
+            for species, rate in flux.items()
+            if rate > 0.0
+        },
+        bled_species_mol=bled,
+        terminal_offgas_mol={
+            species: mol
+            for species, mol in bled.items()
+            if species != OXYGEN_SPECIES
+        },
+        oxygen=OxygenShadowPartition(0.0, 0.0, 0.0, 0.0, 0.0),
+        saturation=SaturationShadow(0.0, None, 0.0, "pipe"),
+        iterations=iterations,
+        max_delta_history_Pa=(),
+        mass_closure_error_pct=0.0,
+        source_duct_residual_rel=residual_rel,
+        closure_notices=tuple(notices),
+    )
+
+
 def solve_capacity_shadow(
     *,
     pre_holdup_mol: Mapping[str, float],
@@ -197,6 +611,10 @@ def solve_capacity_shadow(
     controlled_flow: bool = False,
     rel_tol: float = DEFAULT_REL_TOL,
     max_iterations: int = DEFAULT_MAX_ITERATIONS,
+    equilibrium_pressures_Pa: Mapping[str, float] | None = None,
+    hertz_knudsen_conductance_mol_s_Pa: Mapping[str, float] | None = None,
+    pipe_molar_G_mol_s_Pa2: float | None = None,
+    incoming_partials_Pa: Mapping[str, float] | None = None,
 ) -> CapacityShadowResult | CapacityShadowRefusal:
     controls = {
         "cold_train_capacity": capacity,
@@ -241,6 +659,22 @@ def solve_capacity_shadow(
             0,
         )
     if not isinstance(capacity, FiniteCapacity):
+        if (
+            isinstance(capacity, NoColdTrain)
+            and equilibrium_pressures_Pa is not None
+            and pipe_molar_G_mol_s_Pa2 is not None
+        ):
+            return solve_source_duct_closure(
+                P_eq_Pa=equilibrium_pressures_Pa,
+                flux_kg_hr_at_partials=flux_kg_hr_at_partials,
+                molar_mass_kg_mol=molar_mass_kg_mol,
+                G_mol_s_Pa2=float(pipe_molar_G_mol_s_Pa2),
+                capacity=capacity,
+                P_downstream_Pa=downstream_pressure_Pa,
+                H_mol_s_Pa=hertz_knudsen_conductance_mol_s_Pa,
+                incoming_partials_Pa=incoming_partials_Pa,
+                head_bled_species_mol=head_bled_species_mol,
+            )
         oxygen = OxygenShadowPartition(0.0, 0.0, 0.0, 0.0, 0.0)
         return CapacityShadowResult(
             capacity=capacity,

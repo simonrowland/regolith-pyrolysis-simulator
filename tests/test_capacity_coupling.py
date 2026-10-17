@@ -21,8 +21,12 @@ from simulator.capacity_coupling import (
     CapacityShadowRefusal,
     CapacityShadowResult,
     combined_saturation,
+    hertz_knudsen_molar_conductance_mol_s_Pa,
+    mixture_surface_partials_Pa,
     partition_melt_oxygen,
+    pipe1_surface_pressure_Pa,
     solve_capacity_shadow,
+    solve_source_duct_closure,
 )
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import (
@@ -1447,6 +1451,117 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
     assert "vapour_batch_flux_pressures_Pa" in captured[0]
     assert captured[0]["vapour_batch_flux_pressures_Pa"] == batch_pressures
     assert captured[0]["overhead_pressure_pa"] == pytest.approx(500.0)
+
+
+def test_pipe1_vacuum_root_closes_residual_and_limits():
+    P_eq = 10.0
+    H = 0.001
+    G = 0.002
+    pressure = pipe1_surface_pressure_Pa(
+        P_eq_Pa=P_eq, H_mol_s_Pa=H, G_mol_s_Pa2=G,
+    )
+    residual = H * (P_eq - pressure) - G * pressure * pressure
+    assert residual == pytest.approx(0.0, abs=1.0e-15)
+    assert 0.0 <= pressure <= P_eq
+    assert pipe1_surface_pressure_Pa(
+        P_eq_Pa=P_eq, H_mol_s_Pa=H, G_mol_s_Pa2=1.0e18,
+    ) / P_eq == pytest.approx(0.0, abs=1.0e-9)
+    assert pipe1_surface_pressure_Pa(
+        P_eq_Pa=P_eq, H_mol_s_Pa=H, G_mol_s_Pa2=0.0,
+    ) == pytest.approx(P_eq)
+    assert pipe1_surface_pressure_Pa(
+        P_eq_Pa=0.0, H_mol_s_Pa=H, G_mol_s_Pa2=G,
+    ) == pytest.approx(0.0)
+    conductance = hertz_knudsen_molar_conductance_mol_s_Pa(
+        alpha=1.0,
+        area_m2=0.05,
+        molar_mass_kg_mol=0.055845,
+        temperature_K=1873.15,
+    )
+    assert conductance == pytest.approx(
+        0.05 / math.sqrt(2.0 * math.pi * 0.055845 * GAS_CONSTANT * 1873.15)
+    )
+
+
+def test_mixture_common_pressure_is_the_sum_of_species_partials():
+    P_eq = {"Fe": 9.0, "Na": 25.0, "SiO": 1.2}
+    H = {"Fe": 0.001, "Na": 0.002, "SiO": 0.0008}
+    G = 0.002
+    partials = mixture_surface_partials_Pa(
+        P_eq_Pa=P_eq, H_mol_s_Pa=H, G_mol_s_Pa2=G,
+    )
+    total = sum(partials.values())
+    reconstructed = {
+        species: H[species] * P_eq[species] / (H[species] + G * total)
+        for species in P_eq
+    }
+    assert partials == pytest.approx(reconstructed, rel=1.0e-8, abs=1.0e-10)
+    assert total == pytest.approx(sum(reconstructed.values()), rel=1.0e-8)
+    for species, pressure in partials.items():
+        assert 0.0 <= pressure <= P_eq[species]
+
+
+def test_source_duct_closure_matches_linear_hk_and_pipe1_quadratic():
+    P_eq = 10.0
+    H = 0.001
+    G = 0.002
+    mass = 0.055845
+
+    def flux_at_partials(partials):
+        drive = max(0.0, P_eq - float(partials.get("Fe", 0.0)))
+        return {"Fe": H * drive * mass * 3600.0}
+
+    result = solve_source_duct_closure(
+        P_eq_Pa={"Fe": P_eq},
+        flux_kg_hr_at_partials=flux_at_partials,
+        molar_mass_kg_mol={"Fe": mass},
+        G_mol_s_Pa2=G,
+        capacity=NoColdTrain(),
+    )
+    assert isinstance(result, CapacityShadowResult)
+    expected = pipe1_surface_pressure_Pa(
+        P_eq_Pa=P_eq, H_mol_s_Pa=H, G_mol_s_Pa2=G,
+    )
+    assert result.partial_pressures_Pa["Fe"] == pytest.approx(expected, rel=1.0e-8)
+    q_source = result.evaporation_flux_kg_hr["Fe"] / mass / 3600.0
+    q_duct = G * result.partial_pressures_Pa["Fe"] ** 2
+    assert q_source == pytest.approx(q_duct, rel=1.0e-8)
+
+
+def test_evaporation_flux_refuses_missing_overhead_pressure_without_command_fallback():
+    from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+    from simulator.chemistry.kernel.capabilities import ChemistryIntent
+    from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+    provider = BuiltinEvaporationFluxProvider()
+    request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"FeO": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1600.0,
+        pressure_bar=0.01,
+        control_inputs={
+            "vapour_batch_flux_pressures_Pa": {"Fe": 9.0},
+            "overhead_partials_Pa": {"Fe": 0.0},
+            "molar_mass_kg_mol": {"Fe": 0.055845},
+            "stoich_by_species": {
+                "Fe": {
+                    "parent_oxide": "FeO",
+                    "oxide_per_product_kg": 1.0,
+                    "O2_per_product_kg": 0.0,
+                }
+            },
+            "available_oxide_kg": {"FeO": 1.0},
+            "melt_surface_area_m2": 0.2,
+            "stir_factor": 6.0,
+            "alpha": {"Fe": 1.0},
+        },
+    )
+    result = provider.dispatch(request)
+    assert result.status == "refused"
+    assert result.diagnostic["reason"] == "missing_overhead_pressure_pa"
 
 
 def test_no_cold_train_reuses_head_bleed_without_evaluating_shadow_flux():

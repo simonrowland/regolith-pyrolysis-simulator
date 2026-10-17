@@ -1182,13 +1182,12 @@ class EvaporationMixin:
                 equilibrium,
                 overhead_partials_Pa=overhead_partials_Pa,
                 overhead_pressure_pa=(
-                    self._melt_headspace_total_pressure_bar() * 1.0e5
-                    if overhead_partials_override_Pa is not None
-                    else
                     EvaporationMixin._evaporation_overhead_total_pressure_Pa(
                         self,
                         overhead_partials_Pa,
                     )
+                    if overhead_partials_override_Pa is not None
+                    else self._melt_headspace_total_pressure_bar() * 1.0e5
                 ),
                 vapour_batch_flux_pressures_Pa=vapor_pressures,
                 vapour_batch_report=batch_report,
@@ -3638,8 +3637,26 @@ class EvaporationMixin:
             return effective_rates
 
         if available_o2_kg <= 1e-12:
+            from simulator.silent_zero import (
+                CATEGORY_PROVEN_ZERO,
+                ZeroBecause,
+                record_on_host,
+            )
+
             for species, _draw in o2_draws:
                 effective_rates.pop(species, None)
+                record_on_host(
+                    self,
+                    ZeroBecause.PROVEN_EMPTY_INVENTORY,
+                    site='evaporation.oxygen_inventory_cap',
+                    species=str(species),
+                    field='available_o2_kg',
+                    detail=(
+                        'oxygen-consuming vapor rate removed because '
+                        'overhead O2 inventory is empty'
+                    ),
+                    doctrine_category=CATEGORY_PROVEN_ZERO,
+                )
             return effective_rates
 
         max_fraction = math.nextafter(1.0, 0.0)
