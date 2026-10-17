@@ -3152,29 +3152,38 @@ def test_step_does_not_reseed_live_fO2_from_heuristic() -> None:
     assert {k: after[k] for k in iron} == iron
 
 
-def test_native_fe_split_updates_fO2_to_saturation_boundary() -> None:
-    sim = _make_sim()
-    sim.melt.temperature_C = 1600.0
-    _seed_melt_redox(sim, -10.0)
+def test_native_fe_split_updates_fO2_to_saturation_boundary(monkeypatch) -> None:
+    from simulator.fe_redox import NATIVE_FE_ROOT_TOLERANCE_DEX
+    from tests.test_native_fe_equilibrium import _reducing_sim
+
+    sim = _reducing_sim()
+    _TEST_OWNED_SIMULATORS.append(sim)
+    monkeypatch.setattr(sim, "_vacuum_floor_bar", lambda: 1e-20)
+    monkeypatch.setattr(sim, "_headspace_transport_pO2_bar", lambda: 1e-20)
     sim._sync_oxygen_reservoir_mirror()
-    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_fO2 = sim._current_melt_redox_fO2_log()
+    assert sim._last_intrinsic_redox_state["saturation_status"] == "BELOW"
     before_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
     transition_count = len(sim.atom_ledger.transitions)
 
     sim._apply_native_fe_saturation_split()
 
-    after = sim._compute_fe_redox_split_diagnostic()
+    after_fO2 = sim._current_melt_redox_fO2_log()
+    iw_bound = sim._last_intrinsic_redox_state["iw_bound"]
     assert before_native > 0.0
     assert (
-        "redox_source:native_fe_saturation_split:skipped:below_threshold"
+        "redox_source:native_fe_saturation_split"
         in sim.melt.oxygen_reservoir.exchange_direction.split("|")
     )
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log > before_fO2
-    assert after["native_fe_frac"] <= 2.0e-12
+    assert after_fO2 > before_fO2
+    assert abs(after_fO2 - iw_bound) <= NATIVE_FE_ROOT_TOLERANCE_DEX
     transition = next(t for t in sim.atom_ledger.transitions[transition_count:]
                       if t.name == 'native_fe_saturation_split')
     feo = _cleaned_melt_debit_mol(sim, transition, 'FeO')
     assert feo > 0.0
+    assert _transition_account_species_mol(
+        sim, transition, side='credits', account='terminal.drain_tap_material', species='Fe',
+    ) > 0.0
     oxygen = sum(_transition_account_species_mol(sim, transition, side='credits',
         account=account, species='O2') for account in
         ('process.overhead_gas', 'reservoir.fo2_buffer'))
