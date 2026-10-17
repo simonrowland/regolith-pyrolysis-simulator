@@ -172,6 +172,37 @@ def test_fused_reference_digit_and_run_together_columns_are_flagged(tmp_path: Pa
     assert "run_together_columns=1" in str(_by_sid(rows, "run-together")["flags"])
 
 
+def test_letter_for_digit_is_flagged_in_numeric_scientific_column(tmp_path: Path) -> None:
+    body = (
+        "<table><tr><th>Sample</th><th>Reading</th></tr>"
+        "<tr><td>A</td><td>I.4×10^{-6}</td></tr>"
+        "<tr><td>B</td><td>I.6×10^{-6}</td></tr>"
+        "<tr><td>C</td><td>2.0×10^{-5}</td></tr></table>"
+    )
+    corpus = _write_corpus(tmp_path, "letter-for-digit", body, "Sample readings. " * 10)
+
+    rows, _ = qa.rank_corpus(corpus)
+    row = _by_sid(rows, "letter-for-digit")
+
+    assert "letter_for_digit=2" in str(row["flags"])
+    assert row["combined_score"] > 0
+
+
+def test_latex_superscript_citations_do_not_count_as_fused_reference_digits(
+    tmp_path: Path,
+) -> None:
+    body = (
+        "<table><tr><th>Values</th></tr>"
+        "<tr><td>$32.4^4$</td></tr><tr><td>$34.1^1$</td></tr>"
+        "<tr><td>$18.5^2$</td></tr></table>"
+    )
+    corpus = _write_corpus(tmp_path, "latex-citations", body, "Values 32.4 34.1 18.5. " * 8)
+
+    rows, _ = qa.rank_corpus(corpus)
+
+    assert "fused_reference_decimal" not in str(_by_sid(rows, "latex-citations")["flags"])
+
+
 def test_uncertainty_and_parenthetical_uncertainty_are_not_multiple_numbers(
     tmp_path: Path,
 ) -> None:

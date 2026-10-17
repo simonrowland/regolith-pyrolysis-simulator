@@ -36,6 +36,11 @@ _NUMBER_TOKEN = re.compile(
     r"(?:\(\d+\))?(?:[eE][+\-−–—]?\d+)?"
 )
 _CHUNK_PAGE_START = re.compile(r"(?:^|[-_])p(\d+)(?:[-_]|$)")
+_LETTER_FOR_DIGIT = re.compile(
+    r"(?<![A-Za-z0-9])[IlO](?:\.\d+|\d+)\s*(?:×|\\times|x)"
+    r"|(?<![A-Za-z0-9])\d+\.[IlO]\s*(?:×|\\times|x)",
+    re.IGNORECASE,
+)
 _NUMBER_ATOM = (
     r"[+\-−–—]?(?:\d+(?:[.,]\d+)?|\.\d+)"
     r"(?:\(\d+\))?(?:[eE][+\-−–—]?\d+)?"
@@ -68,6 +73,7 @@ _SCORE_WEIGHTS = {
     "multiple_numbers": 40,
     "fused_reference_decimal": 100,
     "run_together_columns": 100,
+    "letter_for_digit": 100,
     "lost_exponent_minus": 60,
     "latex": 30,
 }
@@ -210,7 +216,7 @@ def _extra_decimal_digit_cells(
     grid: list[list[draft.Cell]], header_count: int, header_texts: list[str]
 ) -> int:
     has_reference_marks = any(
-        re.search(r"(?<!\()\d[)\]]", cell.text) for row in grid for cell in row
+        re.search(r"\d+\.\d+[)\]]", cell.text) for row in grid for cell in row
     )
     if not (_reference_column(header_texts) or has_reference_marks):
         return 0
@@ -227,6 +233,26 @@ def _extra_decimal_digit_cells(
             continue
         baseline = statistics.mode(ordinary)
         hits += sum(value == baseline + 1 for value in ordinary)
+    return hits
+
+
+def _letter_for_digit_cells(
+    grid: list[list[draft.Cell]], header_count: int
+) -> int:
+    hits = 0
+    width = max((len(row) for row in grid), default=0)
+    for column in range(width):
+        cells = [
+            row[column].text.strip()
+            for row in grid[header_count:]
+            if column < len(row) and row[column].text.strip()
+        ]
+        numeric_like = [
+            text for text in cells
+            if _number_tokens(text) or _LETTER_FOR_DIGIT.search(text)
+        ]
+        if len(numeric_like) >= 2 and len(numeric_like) / len(cells) >= 0.5:
+            hits += sum(bool(_LETTER_FOR_DIGIT.search(text)) for text in numeric_like)
     return hits
 
 
@@ -387,6 +413,9 @@ def _table_row(
     if decimal_outlier_count:
         flags["fused_reference_decimal"] = decimal_outlier_count
     run_together_count = 0
+    letter_for_digit_count = _letter_for_digit_cells(grid, header_count)
+    if letter_for_digit_count:
+        flags["letter_for_digit"] = letter_for_digit_count
     for row_index, row in enumerate(grid):
         if row_index < header_count:
             continue
@@ -404,7 +433,7 @@ def _table_row(
             header_text = header_texts[column] if column < len(header_texts) else ""
             if is_numeric and _has_multiple_independent_quantities(text, header_text):
                 flags["multiple_numbers"] += 1
-            if is_numeric and re.search(r"\d+\.\d+(?:\d+\.\d+)+", text):
+            if is_numeric and re.search(r"\d+\.\d+\.\d", text):
                 run_together_count += 1
 
             if is_numeric and page_text is not None:
@@ -467,7 +496,7 @@ def _table_row(
         # A page with too little numeric overlap is not a trustworthy
         # pdftotext comparison surface (common for scanned and layout-heavy
         # pages). Keep its diagnostic count, but do not score it as OCR damage.
-        if matching_cells >= 2 and matching_cells / max(len(numeric_cells), 1) >= 0.25:
+        if matching_cells >= 2 and matching_cells / max(len(numeric_cells), 1) >= 0.5:
             numeric_mismatch_score_hits = numeric_mismatch_count
 
     if run_together_count:
