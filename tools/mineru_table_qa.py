@@ -35,6 +35,12 @@ _NUMBER_TOKEN = re.compile(
     r"(?<![A-Za-z0-9])(?:[+\-−–—])?(?:\d+(?:[.,]\d+)?|\.\d+)"
     r"(?:\(\d+\))?(?:[eE][+\-−–—]?\d+)?"
 )
+_CHUNK_PAGE_START = re.compile(r"(?:^|[-_])p(\d+)(?:[-_]|$)")
+_LETTER_FOR_DIGIT = re.compile(
+    r"(?<![A-Za-z0-9])[IlO](?:\.\d+|\d+)\s*(?:×|\\times|x)"
+    r"|(?<![A-Za-z0-9])\d+\.[IlO]\s*(?:×|\\times|x)",
+    re.IGNORECASE,
+)
 _NUMBER_ATOM = (
     r"[+\-−–—]?(?:\d+(?:[.,]\d+)?|\.\d+)"
     r"(?:\(\d+\))?(?:[eE][+\-−–—]?\d+)?"
@@ -65,6 +71,9 @@ _SCORE_WEIGHTS = {
     "comma_dot_decimal": 100,
     "ragged_rows": 100,
     "multiple_numbers": 40,
+    "fused_reference_decimal": 100,
+    "run_together_columns": 100,
+    "letter_for_digit": 100,
     "lost_exponent_minus": 60,
     "latex": 30,
 }
@@ -150,6 +159,19 @@ def _chunk_name(path: Path) -> str:
     return "full-document"
 
 
+def _chunk_start_page(path: Path) -> int:
+    """Use the draft tool's range parser, then accept single-page chunk names."""
+    try:
+        return draft._chunk_start_page(path)
+    except ValueError:
+        pass
+    for part in reversed(path.parts):
+        match = _CHUNK_PAGE_START.search(part)
+        if match:
+            return int(match.group(1))
+    return 1
+
+
 def _row_cell_counts(grid: list[list[draft.Cell]]) -> list[int]:
     counts: list[int] = []
     for row in grid:
@@ -167,6 +189,71 @@ def _number_tokens(text: str) -> list[str]:
 
 def _digit_string(token: str) -> str:
     return "".join(character for character in token if character.isdigit())
+
+
+def _page_digit_strings(page_text: str) -> set[str]:
+    values = {_digit_string(token) for token in _number_tokens(page_text)}
+    # pdftotext can split thousands groups at spaces (e.g. "1 234.5"). Keep
+    # this narrow so whitespace between separate table values is not collapsed.
+    grouped = re.finditer(r"(?<!\d)\d{1,3}(?:\s+\d{3})+(?:[.,]\d+)?(?!\d)", page_text)
+    values.update(_digit_string(match.group()) for match in grouped)
+    return values
+
+
+def _decimal_places(token: str) -> int | None:
+    match = _NUMBER_TOKEN.fullmatch(token)
+    if not match or not any(mark in token for mark in ".,"):
+        return None
+    mantissa = re.split(r"[eE]", token, maxsplit=1)[0]
+    return len(re.split(r"[.,]", mantissa)[-1])
+
+
+def _reference_column(headers: list[str]) -> bool:
+    return any(re.search(r"\bref(?:erence)?s?\.?|\bno\.", h, re.I) for h in headers)
+
+
+def _extra_decimal_digit_cells(
+    grid: list[list[draft.Cell]], header_count: int, header_texts: list[str]
+) -> int:
+    has_reference_marks = any(
+        re.search(r"\d+\.\d+[)\]]", cell.text) for row in grid for cell in row
+    )
+    if not (_reference_column(header_texts) or has_reference_marks):
+        return 0
+    hits = 0
+    width = max((len(row) for row in grid), default=0)
+    for column in range(width):
+        places = [
+            _decimal_places(_number_tokens(row[column].text.strip())[0])
+            for row in grid[header_count:]
+            if column < len(row) and _number_tokens(row[column].text.strip())
+        ]
+        ordinary = [value for value in places if value is not None]
+        if len(ordinary) < 2:
+            continue
+        baseline = statistics.mode(ordinary)
+        hits += sum(value == baseline + 1 for value in ordinary)
+    return hits
+
+
+def _letter_for_digit_cells(
+    grid: list[list[draft.Cell]], header_count: int
+) -> int:
+    hits = 0
+    width = max((len(row) for row in grid), default=0)
+    for column in range(width):
+        cells = [
+            row[column].text.strip()
+            for row in grid[header_count:]
+            if column < len(row) and row[column].text.strip()
+        ]
+        numeric_like = [
+            text for text in cells
+            if _number_tokens(text) or _LETTER_FOR_DIGIT.search(text)
+        ]
+        if len(numeric_like) >= 2 and len(numeric_like) / len(cells) >= 0.5:
+            hits += sum(bool(_LETTER_FOR_DIGIT.search(text)) for text in numeric_like)
+    return hits
 
 
 def _cell_is_numeric(
@@ -306,10 +393,7 @@ def _table_row(
     ragged_rate = mismatch_count / len(body_counts) if body_counts else 0.0
 
     page_idx = int(item["page_idx"])
-    try:
-        chunk_start_page = draft._chunk_start_page(path)
-    except ValueError:
-        chunk_start_page = 1
+    chunk_start_page = _chunk_start_page(path)
     page = draft.absolute_pdf_page(chunk_start_page, page_idx)
     page_text: str | None = None
     scan = False
@@ -325,6 +409,13 @@ def _table_row(
     numeric_cells: list[list[str]] = []
     dropped_plusminus_hits: list[dict[str, Any]] = []
     header_texts = _header_texts(grid, header_count)
+    decimal_outlier_count = _extra_decimal_digit_cells(grid, header_count, header_texts)
+    if decimal_outlier_count:
+        flags["fused_reference_decimal"] = decimal_outlier_count
+    run_together_count = 0
+    letter_for_digit_count = _letter_for_digit_cells(grid, header_count)
+    if letter_for_digit_count:
+        flags["letter_for_digit"] = letter_for_digit_count
     for row_index, row in enumerate(grid):
         if row_index < header_count:
             continue
@@ -342,6 +433,8 @@ def _table_row(
             header_text = header_texts[column] if column < len(header_texts) else ""
             if is_numeric and _has_multiple_independent_quantities(text, header_text):
                 flags["multiple_numbers"] += 1
+            if is_numeric and re.search(r"\d+\.\d+\.\d", text):
+                run_together_count += 1
 
             if is_numeric and page_text is not None:
                 if any(_exponent_minus_missing(token, page_text) for token in cell_tokens):
@@ -369,18 +462,22 @@ def _table_row(
                     )
 
     agreement: float | str
+    numeric_mismatch_score_hits = 0
     if scan:
         agreement = "scan"
         flags["numeric_check_skipped_scan"] += 1
         if missing_page_text:
             flags["pdftotext_missing"] += 1
     else:
-        page_digit_strings = {
-            _digit_string(token) for token in _number_tokens(page_text or "")
-        }
+        page_digit_strings = _page_digit_strings(page_text or "")
         matching_tokens = [
             _digit_string(token) in page_digit_strings for token in tokens
         ]
+        matching_cells = sum(
+            bool(cell_tokens)
+            and all(_digit_string(token) in page_digit_strings for token in cell_tokens)
+            for cell_tokens in numeric_cells
+        )
         agreement = (
             sum(matching_tokens) / len(tokens)
             if tokens
@@ -396,6 +493,14 @@ def _table_row(
         )
         if numeric_mismatch_count:
             flags["numeric_mismatch"] = numeric_mismatch_count
+        # A page with too little numeric overlap is not a trustworthy
+        # pdftotext comparison surface (common for scanned and layout-heavy
+        # pages). Keep its diagnostic count, but do not score it as OCR damage.
+        if matching_cells >= 2 and matching_cells / max(len(numeric_cells), 1) >= 0.5:
+            numeric_mismatch_score_hits = numeric_mismatch_count
+
+    if run_together_count:
+        flags["run_together_columns"] = run_together_count
 
     if mismatch_count:
         flags["ragged_rows"] = mismatch_count
@@ -405,6 +510,7 @@ def _table_row(
         for name in _SCORE_WEIGHTS
         if name != "ragged_rows"
     }
+    rates["numeric_mismatch"] = _evidence_rate(numeric_mismatch_score_hits, numeric_cell_count)
     rates["ragged_rows"] = _evidence_rate(mismatch_count, len(body_counts))
     score = sum(_SCORE_WEIGHTS[name] * rates[name] for name in _SCORE_WEIGHTS)
     return {
