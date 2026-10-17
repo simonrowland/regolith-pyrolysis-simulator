@@ -4,7 +4,7 @@ Source: Darken and Gurry, “The System Iron-Oxygen. II. Equilibrium and Thermod
 
 ## Part A — extraction audit
 
-The relevant printed tables were checked cell by cell against 300 dpi renders. The extract stores source columns and their printed signs, units, qualifiers, and footnote marks without adding converted numeric twins.
+The relevant printed tables were checked cell by cell against 300 dpi renders. The Table I L3 temperature was rechecked at 400 dpi and corrected to 1596 °C; its `r = 4.067` is unchanged. The extract stores source columns and their printed signs, units, qualifiers, and footnote marks without adding converted numeric twins. Table I's printed time tokens `5½`, `3¼`, and `4½` are retained verbatim beside their numeric hour values.
 
 | Table | PDF / journal page | Extracted rows | Printed quantities and units |
 | --- | --- | ---: | --- |
@@ -14,7 +14,7 @@ The relevant printed tables were checked cell by cell against 300 dpi renders. T
 | IV A | 8 / 805 | 6 | `log pO2` (atm), `log(pCO2/pCO)`, temperature (°C) |
 | IV B | 8 / 805 | 6 | `log pO2` (atm), `log(pCO2/pCO)`, temperature (°C) |
 | V | 10 / 807 | 10 | Partial molar heat, cal per gram-atom oxygen (two five-row blocks) |
-| VI | 11 / 808 | 25 | `N2/N1`, `log(pCO2/pCO)`, and the printed negative-log `pO2`, `a1`, and `aFeO` columns |
+| VI | 11 / 808 | 25 | `N2/N1`, `log(pCO2/pCO)`, and the printed negative-log `pO2`, `a1`, and `aFeO` columns; stored as measured oxygen-potential rows plus a linked derived-activity observation |
 | VII | 12 / 809 | 6 | `N2/N1`, `log K_FeO` |
 | VIII | 14 / 811 | 6 | `log K_Fe3O4`, `log(pCO2/pCO)`, `log a1` |
 | IX | 14 / 811 | 6 | Heat quantities in kcal as printed; fusion heat per gram-atom Fe and per gram-atom O |
@@ -22,9 +22,27 @@ The relevant printed tables were checked cell by cell against 300 dpi renders. T
 
 Table II is not liquid-oxide data; Table IV C is the magnetite–hematite equilibrium and is outside the requested liquid-oxide field. They were not copied into this FeO liquid extract. Table I’s printed `r = (Fe++ + Fe+++)/Fe++` has no matching quantity token in the current extract schema; it remains verbatim and is typed as unavailable rather than assigned a new schema value. Table IX does not state a temperature, so each row carries an unknown temperature condition with its table locator.
 
-The render audit resolved the OCR error in Table IV A row 6: the printed initial gas ratio is **13.62** (not 13.02). The first Table VI iron–liquid row is marked as iron–liquid equilibrium; signs in all negative-log columns were read from the render. Four render-pinned cells are tested with page locators in `tests/test_darken_gurry_1946_extract.py`.
+The render audit resolved the OCR error in Table IV A row 6: the printed initial gas ratio is **13.62** (not 13.02). The first Table VI iron–liquid row is marked as iron–liquid equilibrium; signs in all negative-log columns were read from the render. Six render-pinned cells are tested with page locators in `tests/test_darken_gurry_1946_extract.py`, including Table I L3 at 1596 °C and Table VI's 1500 °C first composition `1.0225` (without a superscript).
 
-An isolated `Migrator` run produced 159 observations from the 163 printed rows, with zero hard issues. All 159 have located point conditions and a temperature condition; six Table IX rows correctly retain temperature as unknown. The other four rows remain in the extract but do not emit a numeric observation: Table IV A row 1 has no gas-potential values, Table VI rows 1400-6 and 1400-7 are parenthesized values outside liquid stability, and Table VI row 1600-1 retains its superscript `c` tokens. The current migrator represents the 159 emitted quantities as unavailable; the source values remain present in the extract.
+An isolated `Migrator` run emitted 181 observations from 163 printed rows, with zero hard issues. Table VI's 22 mappable measured rows and 22 linked activity rows are separate emissions. All 181 carry liquid phase; all 89 Table I and III A rows carry the printed ratio as a located point composition. Six Table IX rows correctly retain temperature as unknown. Four source rows remain in the extract without numeric observations: Table IV A row 1 has no gas-potential values, Table VI rows 1400-6 and 1400-7 are parenthesized values outside liquid stability, and Table VI row 1600-1 retains its superscript `c` tokens.
+
+Migrated evidence classes by table are:
+
+| Table | Migrated class counts |
+| --- | --- |
+| I | 76 `measured_tabulated` |
+| III A | 13 `measured_tabulated` |
+| III B | 3 `measured_tabulated` |
+| IV A | 5 `measured_tabulated` |
+| IV B | 6 `measured_tabulated` |
+| V | 10 `model_derived` |
+| VI | 22 `measured_tabulated`; 22 `model_derived` |
+| VII | 6 `quoted_attributed` |
+| VIII | 6 `quoted_attributed` |
+| IX | 6 `quoted_attributed` |
+| X | 6 `quoted_attributed` |
+
+Tables V and VI name the stored Table VI oxygen-potential observation as their derivation input. Tables VII–X remain `quoted_attributed` with the D&G attribution because their underlying calculation inputs are not stored as linked rows in this extract; no parent observations were invented.
 
 `tools/mineru_table_draft.py compare` was run against the MinerU draft index. Its output was:
 
@@ -73,28 +91,28 @@ As `xb` approaches 1, the interval shrinks and the integrand contains `(x - 1)`,
 
 ## Cross-check: NASA Glenn versus JANAF solid wüstite
 
-The NASA Glenn labels at `thermo.inp` lines 12239 and 12244 say `Fe.947O(cr)` and `Fe.947O(L)`, but the corresponding composition fields encode **Fe0.95O** (molecular weight 69.05215), while JANAF Fe-001 is **Fe0.947O**. NASA’s source is the [NASA Glenn coefficient database](https://github.com/nasa/cea/blob/main/data/thermo.inp) (documented in [NASA TP 2002-211556](https://ntrs.nasa.gov/citations/20020085330)); JANAF sources are [Fe-001](https://janaf.nist.gov/tables/Fe-001.html) and [Fe-019](https://janaf.nist.gov/tables/Fe-019.html). The NASA name/formula difference is material to interpreting agreement.
+The NASA Glenn labels at `thermo.inp` lines 12239 and 12244 say `Fe.947O(cr)` and `Fe.947O(L)`, but the corresponding composition fields encode **Fe0.95O** (`n_Fe = 0.95`, molecular weight 69.05215), while JANAF Fe-001 is **Fe0.947O**. The reproduced NASA columns below use the NASA composition field, `n_Fe = 0.95`. NASA’s source is the [NASA Glenn coefficient database](https://github.com/nasa/cea/blob/main/data/thermo.inp) (documented in [NASA TP 2002-211556](https://ntrs.nasa.gov/citations/20020085330)); JANAF sources are [Fe-001](https://janaf.nist.gov/tables/Fe-001.html) and [Fe-019](https://janaf.nist.gov/tables/Fe-019.html). The published NASA label and its composition field therefore identify different stoichiometries.
 
-The table below reports residuals `NASA − JANAF`, in kJ mol`^-1`, for `G` and `ΔfG`. NASA’s solid segment covers 298.15–1652 K. JANAF Fe-001 is tabulated at 100 K intervals, so the 1650 K comparison linearly interpolates JANAF between 1600 and 1700 K. No acceptance tolerance is stated in the task or located in the cited physics ruling, so the route is **not yet classified as admissible**.
+The table reports residuals `NASA − JANAF`, in kJ mol`^-1`, for the `G` function and `ΔfG`. NASA’s solid segment covers 298.15–1652 K. JANAF Fe-001 is tabulated at 100 K intervals, so the 1650 K comparison linearly interpolates JANAF between 1600 and 1700 K. The corrected polynomial `G` residual is +0.00088 kJ mol`^-1` at 1000 K and +0.09934 kJ mol`^-1` at 1600 K. The physics ruling d-164 treats `f_GD` and `f_J` as different standard states; the residuals below are a thermochemical cross-check and do not equate those routes.
 
 | T (K) | `G` residual | `ΔfG` residual |
 | ---: | ---: | ---: |
-| 1000 | -0.07217 | +0.12746 |
-| 1100 | -0.08223 | +0.17523 |
-| 1200 | -0.08262 | +0.25358 |
-| 1300 | -0.07303 | +0.32543 |
-| 1400 | -0.06300 | +0.39860 |
-| 1500 | -0.05434 | +0.47002 |
-| 1600 | -0.04976 | +0.53884 |
-| 1650 | -0.09619 | +0.56942 |
+| 1000 | +0.00088 | +0.12746 |
+| 1100 | +0.00813 | +0.17523 |
+| 1200 | +0.02334 | +0.25358 |
+| 1300 | +0.04208 | +0.32543 |
+| 1400 | +0.06361 | +0.39860 |
+| 1500 | +0.08277 | +0.47002 |
+| 1600 | +0.09934 | +0.53884 |
+| 1650 | +0.08427 | +0.56942 |
 
-The maximum absolute residuals are 0.09619 kJ mol`^-1` in `G` and 0.56942 kJ mol`^-1` in `ΔfG`. The task’s conditional liquid route,
+The maximum absolute residuals in the overlap are 0.09934 kJ mol`^-1` in `G` and 0.56942 kJ mol`^-1` in `ΔfG`. The JANAF-anchored liquid candidate is
 
 \[
-\ln f=\frac{\Delta_fG(\mathrm{Fe}_{0.947}\mathrm O,L;NASA)-\Delta_fG(\mathrm{FeO},l;JANAF)}{RT},
+\ln f_J=\frac{\Delta_fG(\mathrm{Fe}_{0.95}\mathrm O,L;NASA)-\Delta_fG(\mathrm{FeO},l;JANAF)}{RT},
 \]
 
-must only be admitted after the tolerance and the NASA composition-label discrepancy are resolved. The NASA liquid segment begins at 1652 K; JANAF Fe-019 supplies the FeO(l) reference. The NASA data are for Fe0.95O by composition field, not Fe0.947O.
+with `n_Fe = 0.95` from the NASA composition field. It is reported as its own JANAF-anchored standard state, not as the D&G Gibbs–Duhem ratio. The NASA liquid segment begins at 1652 K; JANAF Fe-019 supplies the FeO(l) reference. The listed `ΔfG` residual is at most 0.56942 kJ mol`^-1`. No uncertainty interval is printed for the NASA coefficient record, and JANAF Fe-001 is a machine-transcribed compilation. I report the NASA/JANAF residuals without claiming a pass/fail tolerance for the composition-mismatched solids. Under d-164, `f_J` remains a separate route candidate rather than a numerical substitute for `f_GD`.
 
 ## Boundary-composition correction
 
@@ -105,22 +123,17 @@ D&G (1945) Table III A gives the iron-boundary liquid near Fe0.969O at 1400 °C.
 \qquad f_{0.947}/f_{0.969}=1.03572450.
 \]
 
-Thus using Fe0.947O in place of the Fe0.969O iron-boundary liquid overstates `ln f` by 0.03510 (3.57% in the ratio); translating a Fe0.947O result to Fe0.969O multiplies it by 0.96551. This correction quantifies the composition approximation only; it does not resolve the NASA/JANAF tolerance or the NASA formula mismatch.
+Thus using Fe0.947O in place of the Fe0.969O iron-boundary liquid overstates `ln f` by 0.03510 (3.57% in the ratio); translating a Fe0.947O result to Fe0.969O multiplies it by 0.96551. This correction quantifies that composition approximation only. It does not join `f_GD` to `f_J`; the NASA liquid composition is Fe0.95O, and no additional Fe0.969-to-Fe0.95 correction is claimed here.
 
 ## Route comparison
 
-The table keeps source-derived, quoted, and excluded routes visible without selecting by numerical agreement. NASA/JANAF values are shown as **conditional candidates** from the formula above; route admission is pending the decision stated above. The 1945 pair is repeated as unassigned evidence, not treated as `f`.
+The table keeps source-derived, quoted, and excluded routes visible without selecting by numerical agreement. `f_GD` and `f_J` have distinct headings because they use different standard states. The 1945 pair is repeated as unassigned evidence, not treated as either `f`.
 
-| T (°C) | D&G 1946 Gibbs–Duhem, primary `ln f` (`f`) | NASA/JANAF candidate `ln f` (`f`) | D&G 1945 gas-ratio pair | Holzheid/Barin quote | Masson–Temkin quote |
+| T (°C) | D&G 1946 `ln f_GD`; `f_GD = a(x=1)/a(x_b)` within the D&G melt | JANAF-anchored candidate `ln f_J`; `f_J` | D&G 1945 gas-ratio pair | Holzheid/Barin quote | Masson–Temkin quote |
 | ---: | ---: | ---: | --- | --- | --- |
-| 1400 | 0.024400 (1.024700) | 0.671341 (1.956859), conditional | 1.792 / 1.363; T/composition mapping unresolved | 1.94 (quoted at 1400 °C) | 0.936; T/reference not specified, excluded |
-| 1500 | 0.008326 (1.008361) | 0.621170 (1.861104), conditional | 1.792 / 1.363; T/composition mapping unresolved | — | 0.936; T/reference not specified, excluded |
-| 1600 | 0.002420 (1.002423) | 0.572328 (1.772388), conditional | 1.792 / 1.363; T/composition mapping unresolved | — | 0.936; T/reference not specified, excluded |
-| 1700 | Outside D&G data | 0.529406 (1.697923), conditional | 1.792 / 1.363; T/composition mapping unresolved | — | 0.936; T/reference not specified, excluded |
+| 1400 | 0.024400 (1.024700) | 0.671341 (1.956859) | 1.792 / 1.363; T/composition mapping unresolved | 1.94 (quoted at 1400 °C) | 0.936; T/reference not specified, excluded |
+| 1500 | 0.008326 (1.008361) | 0.621170 (1.861104) | 1.792 / 1.363; T/composition mapping unresolved | — | 0.936; T/reference not specified, excluded |
+| 1600 | 0.002420 (1.002423) | 0.572328 (1.772388) | 1.792 / 1.363; T/composition mapping unresolved | — | 0.936; T/reference not specified, excluded |
+| 1700 | Outside D&G data | 0.529406 (1.697923) | 1.792 / 1.363; T/composition mapping unresolved | — | 0.936; T/reference not specified, excluded |
 
-The 1945, Holzheid/Barin, and Masson–Temkin values are reproduced as supplied for this task; the 1945 PDF is not present in the expected local corpus locations, and these quotations have not been independently rederived here. The route table will be finalized once the controller resolves the remaining science choices below.
-
-## Decision needed before classifying the conditional route
-
-1. What tolerance should define NASA/JANAF agreement in both `G` and `ΔfG`, and does the NASA record’s Fe0.95O composition field disqualify the comparison with JANAF Fe0.947O even though the record label says Fe.947O? The measured maximum residuals are 0.09619 and 0.56942 kJ mol`^-1`, respectively.
-2. Are `1.792/1.363` two D&G (1945) gas-ratio values with a specific temperature/composition assignment, or should they remain unassigned in the final T-specific route table?
+The 1945, Holzheid/Barin, and Masson–Temkin values are reproduced as supplied for this task; the 1945 PDF is not present in the expected local corpus locations, and these quotations have not been independently rederived here. The 1945 gas-ratio pair remains unassigned to a temperature or composition.
