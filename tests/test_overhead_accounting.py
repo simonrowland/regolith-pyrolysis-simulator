@@ -2208,6 +2208,68 @@ def test_capture_iteration_reuses_unchanged_stage_inputs(monkeypatch):
                for alpha in route['Fe']['stage_alpha_records_by_stage'].values())
 
 
+@pytest.mark.parametrize('consumer', ['dispatch', 'liquidus_gate', 'freeze_curve', 'equilibrium'])
+def test_engine_request_pressure_uses_achieved_headspace(monkeypatch, consumer):
+    from simulator.chemistry.kernel import ChemistryIntent
+
+    sim = _gas_train_sim()
+    sim.melt.p_total_mbar = 10.0  # command: 0.01 bar
+    sim._install_upstream_projection({'N2': 0.0634, 'O2': 0.0317, 'Ar': 0.0634})
+    achieved = sim._melt_headspace_total_pressure_bar()
+    assert achieved == pytest.approx(1.585e-4)
+    captured = {}
+
+    def capture(*args, **kwargs):
+        captured.update(kwargs)
+        raise LookupError('pressure captured')
+
+    if consumer == 'dispatch':
+        monkeypatch.setattr(sim._require_chem_kernel(), 'dispatch', capture)
+        invoke = lambda: sim._dispatch_only(
+            ChemistryIntent.SILICATE_EQUILIBRIUM, control_inputs={})
+    elif consumer in {'liquidus_gate', 'freeze_curve'}:
+        monkeypatch.setattr(sim, '_freeze_gate_cache_key', capture)
+        invoke = (sim._melt_redox_liquidus_gate_record if consumer == 'liquidus_gate'
+                  else sim._freeze_gate_curve_record)
+    else:
+        monkeypatch.setattr(sim.backend, 'is_available', lambda: True)
+        monkeypatch.setattr(sim.backend, 'equilibrate', capture)
+        invoke = sim._get_equilibrium
+    with pytest.raises(LookupError, match='pressure captured'):
+        invoke()
+    assert captured['pressure_bar'] == achieved
+
+
+def test_engine_cache_pressure_uses_achieved_headspace():
+    from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.reduced_real_determinism import PT0DeterminismStore, canonical_replay_key
+
+    sim = _gas_train_sim()
+    sim.melt.p_total_mbar = 10.0
+    sim._install_upstream_projection({'N2': 0.0634, 'O2': 0.0317, 'Ar': 0.0634})
+    store = PT0DeterminismStore('capture')
+    controls = store.quantized_controls(sim, fO2_log=-10.0)
+    key = canonical_replay_key(
+        sim, artifact='equilibrium_post_record',
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        fO2_log=-10.0, fe_redox_policy='intrinsic',
+    )
+    sim.melt.p_total_mbar = 20.0
+    assert store.quantized_controls(sim, fO2_log=-10.0) == controls
+    assert canonical_replay_key(
+        sim, artifact='equilibrium_post_record',
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        fO2_log=-10.0, fe_redox_policy='intrinsic',
+    ) == key
+    sim._install_upstream_projection({'N2': 0.634, 'O2': 0.317, 'Ar': 0.634})
+    assert store.quantized_controls(sim, fO2_log=-10.0) != controls
+    assert canonical_replay_key(
+        sim, artifact='equilibrium_post_record',
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        fO2_log=-10.0, fe_redox_policy='intrinsic',
+    ) != key
+
+
 @pytest.mark.parametrize('primed', [False, True])
 def test_flowing_pressure_above_downstream_even_when_command_is_lower(primed):
     from simulator.overhead import OverheadGasModel

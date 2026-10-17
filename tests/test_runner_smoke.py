@@ -22,6 +22,7 @@ without spinning up a child process.
 from __future__ import annotations
 
 from collections import defaultdict
+import hashlib
 import json
 import subprocess
 import sys
@@ -1516,6 +1517,12 @@ def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels():
     """Design Section 9 R9.2/R9.3/R9.5: P6b-only fields are explicit P0 sentinels."""
 
     payload, _execution = _run_c2a_trace_export()
+    # Complete fold-12 artifact, independently captured by b901-f12-confirm.
+    assert hashlib.sha256(json.dumps(
+        payload, sort_keys=True, separators=(',', ':'), allow_nan=False,
+    ).encode()).hexdigest() == (
+        '096ea74c2158787e72af8b6b9fa9f950c57a5936619047d55b7f268401fb1bc9'
+    )
     assert (
         payload["final"]["pump_outlet_by_species_kg"]
         == NOT_APPLICABLE_UNTIL_P0
@@ -1532,6 +1539,17 @@ def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels():
     }.issubset(payload["per_hour_summary"][0])
     assert "deposit_by_surface_species_kg" in payload["final"]
     assert "pump_outlet_by_species_kg" in payload["final"]
+
+
+def test_runner_fold12_golden_artifact_pin():
+    # Current numeric output pin before the capture-solve optimization;
+    # the older canonical fixture remains an independent, unchanged guard.
+    payload = _run_scenario(SCENARIOS[0])
+    assert hashlib.sha256(json.dumps(
+        payload, sort_keys=True, separators=(',', ':'), allow_nan=False,
+    ).encode()).hexdigest() == (
+        '32bbbfc536a75edc96ae398249fcbd2e824cea4fe82ee3146db62a8737d24e61'
+    )
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
