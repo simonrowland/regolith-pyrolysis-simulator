@@ -397,19 +397,7 @@ def test_sossi_2018_quoted_cr_rows_migrate_as_numeric_valence_fractions():
         assert control.locator.published_page == 10921
 
 
-@pytest.mark.parametrize(
-    ("quantity", "value", "expected_detail"),
-    (
-        ("Cr2plus_over_total_Cr", "1.2", "fraction valence value"),
-        ("Cr3plus_over_Cr2plus", "-0.1", "ratio valence value"),
-    ),
-)
-def test_out_of_range_valence_values_are_typed_refusals_before_scoring(
-    tmp_path: Path,
-    quantity: str,
-    value: str,
-    expected_detail: str,
-):
+def _migrate_valence_fixture(tmp_path: Path, quantity: str, value: str):
     document = yaml.safe_load(SOSSI_CR.read_text(encoding="utf-8"))
     row = copy.deepcopy(document["species"]["Cr"]["observations"][0])
     row.update(
@@ -439,6 +427,94 @@ def test_out_of_range_valence_values_are_typed_refusals_before_scoring(
         for row in migrator.result.observations.values()
         if row.observation_id.endswith("::invalid_valence_fixture")
     )
+    return migrator, observation
+
+
+@pytest.mark.parametrize(
+    ("value", "excess", "metric_domain_refusal"),
+    (
+        ("1.2", "0.2", False),
+        ("1.01", "0.01", False),
+        ("-0.02", "0.02", True),
+        ("-0.04", "0.04", True),
+    ),
+)
+def test_out_of_range_fraction_valence_values_are_kept_with_notice(
+    tmp_path: Path, value: str, excess: str, metric_domain_refusal: bool
+):
+    migrator, observation = _migrate_valence_fixture(
+        tmp_path, "Cr2plus_over_total_Cr", value
+    )
+
+    assert observation.identity.quantity.is_value
+    assert observation.identity.quantity.value is Quantity.VALENCE_RATIO
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal(value)
+    notices = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE
+    ]
+    assert len(notices) == 1
+    assert "range [0, 1]" in notices[0].reason
+    assert f"by {excess}" in notices[0].reason
+
+    score_observation = _quench_row(
+        observation,
+        observation_id=observation.observation_id,
+        phase=Phase.L,
+        value=Decimal(value),
+    )
+    calls = []
+    residuals, _candidates = score_store(
+        _quench_context(migrator.result, (score_observation,)),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+        predict=_numeric_quench_predictor(calls),
+    )
+    assert calls == [score_observation]
+    assert len(residuals) == 1
+    assert any(
+        notice.kind is NoticeKind.SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE
+        for notice in residuals[0].notices
+    )
+    if metric_domain_refusal:
+        assert residuals[0].numeric is None
+        assert residuals[0].refusal is not None
+        assert residuals[0].refusal.reason is RefusalReason.METRIC_DOMAIN
+        assert (
+            residuals[0].refusal.detail["reason"]
+            == "observed_value_outside_metric_domain"
+        )
+        assert residuals[0].refusal.detail["observed_value"] == value
+    else:
+        assert residuals[0].numeric is not None
+
+
+def test_average_oxidation_state_without_named_bounds_gets_no_range_notice(
+    tmp_path: Path,
+):
+    _migrator, observation = _migrate_valence_fixture(
+        tmp_path, "average_oxidation_state", "4.1"
+    )
+
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("4.1")
+    assert observation.identity.valence_basis.is_value
+    basis = observation.identity.valence_basis.value
+    assert basis.value_form is ValenceValueForm.AVERAGE_OXIDATION_STATE
+    assert basis.numerator_oxidation_states == ()
+    assert basis.denominator_oxidation_state is None
+    assert not any(
+        notice.kind is NoticeKind.SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE
+        for notice in observation.notices
+    )
+
+
+def test_negative_ratio_valence_value_remains_a_typed_refusal(tmp_path: Path):
+    migrator, observation = _migrate_valence_fixture(
+        tmp_path, "Cr3plus_over_Cr2plus", "-0.1"
+    )
 
     assert observation.identity.quantity.is_unknown
     assert "invalid_source: value:" in observation.identity.quantity.reason
@@ -450,7 +526,7 @@ def test_out_of_range_valence_values_are_typed_refusals_before_scoring(
         and entry.axes == ["value"]
     )
     assert refusal.axes == ["value"]
-    assert expected_detail in refusal.why
+    assert "ratio valence value" in refusal.why
 
     calls = []
     score_store(

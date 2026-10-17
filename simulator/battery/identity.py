@@ -394,20 +394,17 @@ class ValenceBasis:
     value_form: ValenceValueForm
 
     def _validate_value(self, value: Decimal) -> None:
-        if self.value_form is ValenceValueForm.FRACTION and not (
-            Decimal("0") <= value <= Decimal("1")
-        ):
-            raise IdentityRefusal(
-                RefusalReason.INVALID_SOURCE,
-                "value",
-                f"fraction valence value {value} must lie in [0, 1]",
-            )
         if self.value_form is ValenceValueForm.RATIO and value < 0:
             raise IdentityRefusal(
                 RefusalReason.INVALID_SOURCE,
                 "value",
                 f"ratio valence value {value} must be non-negative",
             )
+
+    def _physical_range(self) -> tuple[Decimal, Decimal] | None:
+        if self.value_form is ValenceValueForm.FRACTION:
+            return Decimal("0"), Decimal("1")
+        return None
 
     def __post_init__(self) -> None:
         if not isinstance(self.numerator_oxidation_states, tuple) or any(

@@ -12669,13 +12669,41 @@ class Migrator:
         ):
             numeric_values = tuple(value for _, value in observation.value.series)
         refusal: IdentityRefusal | None = None
+        range_notices: list[Notice] = []
         if basis is not None:
+            physical_range = basis._physical_range()
             for value in numeric_values:
                 try:
                     basis._validate_value(value)
                 except IdentityRefusal as exc:
                     refusal = exc
                     break
+                if physical_range is None:
+                    continue
+                lower, upper = physical_range
+                if value < lower:
+                    excess = lower - value
+                elif value > upper:
+                    excess = value - upper
+                else:
+                    continue
+                range_notices.append(
+                    Notice(
+                        kind=NoticeKind.SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE,
+                        affected_quantities=(Quantity.VALENCE_RATIO,),
+                        reason=(
+                            f"fraction valence value {value} is outside physical "
+                            f"range [{lower}, {upper}] by {excess}"
+                        ),
+                        origin=observation.observation_id,
+                        original=value,
+                    )
+                )
+        if refusal is None and range_notices:
+            observation = replace(
+                observation,
+                notices=observation.notices + tuple(range_notices),
+            )
         if refusal is not None:
             experiment = self.result.experiments.get(observation.experiment_id)
             work_id = (

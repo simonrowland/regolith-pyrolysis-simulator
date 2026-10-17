@@ -7011,6 +7011,17 @@ def compile_residual(
             operation_override=row_operation,
             band_operation=row_operation,
         )
+        if (
+            numeric is None
+            and metric_reason is RefusalReason.METRIC_DOMAIN
+            and row_operation is MetricOperation.DEX
+            and ref_point <= 0
+        ):
+            metric_detail = {
+                **metric_detail,
+                "reason": "observed_value_outside_metric_domain",
+                "observed_value": str(ref_point),
+            }
     if numeric is None:
         return _refused(
             metric_reason or RefusalReason.METRIC_DOMAIN,
