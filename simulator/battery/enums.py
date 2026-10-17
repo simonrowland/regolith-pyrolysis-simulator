@@ -118,6 +118,10 @@ class ValenceValueForm(StrEnum):
     AVERAGE_OXIDATION_STATE = "average_oxidation_state"
 
 
+class ValencePrintedForm(StrEnum):
+    MASS_FRACTION_PAIR = "mass_fraction_pair"
+
+
 class EvidenceClass(StrEnum):
     MEASURED_DIRECT = "measured_direct"
     MEASURED_TABULATED = "measured_tabulated"
