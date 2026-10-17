@@ -1,4 +1,5 @@
 import copy
+from collections import Counter
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -37,6 +38,7 @@ from simulator.battery.identity import (
 from simulator.battery.migrate import (
     Migrator,
     _identity_from_plain,
+    fe3_fe2_ratio_from_ferric_fraction,
     map_quantity,
     observation_from_plain,
     to_plain,
@@ -49,6 +51,7 @@ from simulator.battery.records import (
     Species,
     State,
     Value,
+    phase_token,
 )
 from simulator.battery.score import (
     SCORE_ENGINE_SET,
@@ -394,6 +397,71 @@ def test_sossi_2018_quoted_cr_rows_migrate_as_numeric_valence_fractions():
         assert control.locator.published_page == 10921
 
 
+@pytest.mark.parametrize(
+    ("quantity", "value", "expected_detail"),
+    (
+        ("Cr2plus_over_total_Cr", "1.2", "fraction valence value"),
+        ("Cr3plus_over_Cr2plus", "-0.1", "ratio valence value"),
+    ),
+)
+def test_out_of_range_valence_values_are_typed_refusals_before_scoring(
+    tmp_path: Path,
+    quantity: str,
+    value: str,
+    expected_detail: str,
+):
+    document = yaml.safe_load(SOSSI_CR.read_text(encoding="utf-8"))
+    row = copy.deepcopy(document["species"]["Cr"]["observations"][0])
+    row.update(
+        {
+            "observation_id": "invalid_valence_fixture",
+            "phase": "l",
+            "values": {
+                "method_class": "measured_direct",
+                "quantity": quantity,
+                "admission_status": "admitted",
+                "value": value,
+            },
+        }
+    )
+    document["species"]["Cr"]["observations"] = [row]
+    extract = tmp_path / SOSSI_CR.name
+    extract.write_text(
+        yaml.safe_dump(document, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    observation = next(
+        row
+        for row in migrator.result.observations.values()
+        if row.observation_id.endswith("::invalid_valence_fixture")
+    )
+
+    assert observation.identity.quantity.is_unknown
+    assert "invalid_source: value:" in observation.identity.quantity.reason
+    assert observation.value.kind is ValueKind.UNAVAILABLE
+    refusal = next(
+        entry
+        for entry in migrator.result.queue
+        if entry.observation_id == observation.observation_id
+        and entry.axes == ["value"]
+    )
+    assert refusal.axes == ["value"]
+    assert expected_detail in refusal.why
+
+    calls = []
+    score_store(
+        _quench_context(migrator.result, (observation,)),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+        predict=_numeric_quench_predictor(calls),
+    )
+    assert calls == []
+
+
 def test_valence_ratio_scores_redox_and_counts_each_engine_refusal():
     result = _migrate_sossi_cr()
     context = ScoreContext(
@@ -625,6 +693,122 @@ def test_extract_quench_state_uses_the_typed_point_condition_key(tmp_path: Path)
     )
 
 
+def test_extract_malformed_quench_state_is_a_row_refusal(tmp_path: Path):
+    document = yaml.safe_load(SOSSI_CR.read_text(encoding="utf-8"))
+    template = document["species"]["Cr"]["observations"][0]
+    invalid = copy.deepcopy(template)
+    invalid["observation_id"] = "quench_invalid_fixture"
+    invalid["point_conditions"] = {
+        "quench_state": {
+            "state": {"tag": "value", "value": "assumed_preserved"},
+            "locator": {"page": 12, "table": "3"},
+        }
+    }
+    valid = copy.deepcopy(template)
+    valid["observation_id"] = "quench_valid_fixture"
+    document["species"]["Cr"]["observations"] = [invalid, valid]
+    extract = tmp_path / SOSSI_CR.name
+    extract.write_text(
+        yaml.safe_dump(document, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    assert not any(
+        "quench_invalid_fixture" in observation.observation_id
+        for observation in migrator.result.observations.values()
+    )
+    assert any(
+        "quench_valid_fixture" in observation.observation_id
+        for observation in migrator.result.observations.values()
+    )
+    refusal = next(
+        issue
+        for issue in migrator.result.validation.hard_issues
+        if "quench_invalid_fixture" in issue.path
+    )
+    assert refusal.reason is RefusalReason.INVALID_SOURCE
+    assert refusal.path.endswith(".point_conditions.quench_state")
+    assert "quench_state must be one of" in refusal.detail
+
+
+@pytest.mark.parametrize(
+    (
+        "extract_name",
+        "observation_id",
+        "ferric_fraction",
+        "glass_rows",
+        "unknown_rows",
+    ),
+    (
+        (
+            "aithala-2026-magmatic-iron-redox-to-2100c.yaml",
+            "aithala_2026_vf271_xanes",
+            "0.816",
+            16,
+            12,
+        ),
+        (
+            "matzen-2022-martian-basalt-redox.yaml",
+            "matzen_2022_run_7_method_a",
+            "0.69",
+            24,
+            0,
+        ),
+        (
+            "sossi-2020-magma-ocean-redox.yaml",
+            "sossi_2020_per_f_o2_1_xanes",
+            "0.44",
+            12,
+            0,
+        ),
+    ),
+)
+def test_quenched_glass_fe_valence_extracts_migrate_as_glass(
+    extract_name: str,
+    observation_id: str,
+    ferric_fraction: str,
+    glass_rows: int,
+    unknown_rows: int,
+):
+    extract = ROOT / "data/literature/extracts" / extract_name
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    rows = list(migrator.result.observations.values())
+    phases = Counter(phase_token(row.identity.species) for row in rows)
+    assert phases == Counter({Phase.GLASS: glass_rows, None: unknown_rows})
+
+    row = next(
+        row
+        for row in rows
+        if row.observation_id.endswith(f"::{observation_id}")
+    )
+    assert row.identity.quantity.value is Quantity.FE3_FE2_RATIO
+    assert phase_token(row.identity.species) is Phase.GLASS
+    assert row.value.kind is ValueKind.POINT
+    assert row.value.point == fe3_fe2_ratio_from_ferric_fraction(
+        Decimal(ferric_fraction)
+    )
+    assert row.quench_state is QuenchState.NOT_STATED
+
+    context = _quench_context(migrator.result, (row,))
+    calls = []
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+        predict=_numeric_quench_predictor(calls),
+    )
+    assert len(residuals) == 1
+    assert residuals[0].quench_state is QuenchState.NOT_STATED
+    assert len(calls) == 1
+    assert calls[0].identity.species.phase.value is Phase.L
+
+
 def test_glass_valence_is_scored_against_the_run_melt_and_labelled():
     result = _migrate_sossi_cr()
     template = _valence_template(result)
@@ -797,6 +981,30 @@ def test_paired_quench_report_has_log10_difference_and_identical_ratio_zero():
     )
     assert "## Paired in-situ / quenched valence diagnostics" in payload_report
     assert str(Decimal("2").log10()) in payload_report
+
+
+def test_paired_quench_diagnostics_requires_matching_source_id():
+    result = _migrate_sossi_cr()
+    template = _valence_template(result)
+    glass = _quench_row(
+        template,
+        observation_id="cross-source-glass",
+        phase=Phase.GLASS,
+        value="0.5",
+    )
+    in_situ = _quench_row(
+        template,
+        observation_id="cross-source-liquid",
+        phase=Phase.L,
+        value="0.25",
+    )
+    foreign_in_situ = replace(in_situ, source_id="different-source")
+
+    assert glass.experiment_id == foreign_in_situ.experiment_id
+    assert glass.source_id != foreign_in_situ.source_id
+    assert paired_quench_diagnostics(
+        _quench_context(result, (glass, foreign_in_situ))
+    ) == ()
 
 
 def test_oxidising_cr_glass_carries_lower_bound_notice_without_gating_score():

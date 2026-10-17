@@ -4060,7 +4060,9 @@ def paired_quench_diagnostics(
 ) -> tuple[dict[str, object], ...]:
     """Pair same-run in-situ and glass valence ratios for the score report."""
 
-    by_experiment: dict[str, list[Observation]] = defaultdict(list)
+    by_experiment_source: dict[
+        tuple[str, str], list[Observation]
+    ] = defaultdict(list)
     for observation in comparison_candidates(context):
         identity = observation.identity
         if not isinstance(identity, Identity):
@@ -4070,6 +4072,8 @@ def paired_quench_diagnostics(
         if quantity not in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
             continue
         if phase not in {Phase.L, Phase.GLASS}:
+            continue
+        if not observation.source_id:
             continue
         if quantity is Quantity.VALENCE_RATIO:
             basis = identity.valence_basis
@@ -4082,10 +4086,14 @@ def paired_quench_diagnostics(
                 continue
         ratio = point_magnitude(observation.value)
         if ratio is not None and ratio.is_finite() and ratio > 0:
-            by_experiment[observation.experiment_id].append(observation)
+            by_experiment_source[
+                (observation.experiment_id, observation.source_id)
+            ].append(observation)
 
     pairs: list[dict[str, object]] = []
-    for experiment_id, observations in sorted(by_experiment.items()):
+    for (experiment_id, _source_id), observations in sorted(
+        by_experiment_source.items()
+    ):
         glasses = [
             row for row in observations
             if phase_token(row.identity.species) is Phase.GLASS

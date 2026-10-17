@@ -373,6 +373,9 @@ PHASE_MAP: dict[str, Phase] = {
     "liquid sodium": Phase.L,
     "aq": Phase.AQ,
     "glass": Phase.GLASS,
+    "quenched silicate glass": Phase.GLASS,
+    "quenched synthetic Martian basalt glass": Phase.GLASS,
+    "quenched peridotite glass": Phase.GLASS,
     "supercooled_l": Phase.SUPERCOOLED_L,
     "solid_arsenolite": Phase.CR,
     "basaltic_silicate_melt": Phase.L,
@@ -12641,6 +12644,65 @@ class Migrator:
         *,
         source_row_index: int | None = None,
     ) -> None:
+        identity = observation.identity
+        basis_state = (
+            identity.valence_basis
+            if isinstance(identity, Identity)
+            and identity.quantity.is_value
+            and identity.quantity.value is Quantity.VALENCE_RATIO
+            else None
+        )
+        basis = (
+            basis_state.value
+            if basis_state is not None and basis_state.is_value
+            else None
+        )
+        numeric_values: tuple[Decimal, ...] = ()
+        if (
+            observation.value.kind is ValueKind.POINT
+            and observation.value.point is not None
+        ):
+            numeric_values = (observation.value.point,)
+        elif (
+            observation.value.kind is ValueKind.SERIES
+            and observation.value.series
+        ):
+            numeric_values = tuple(value for _, value in observation.value.series)
+        refusal: IdentityRefusal | None = None
+        if basis is not None:
+            for value in numeric_values:
+                try:
+                    basis._validate_value(value)
+                except IdentityRefusal as exc:
+                    refusal = exc
+                    break
+        if refusal is not None:
+            experiment = self.result.experiments.get(observation.experiment_id)
+            work_id = (
+                experiment.work_id
+                if experiment is not None and experiment.work_id
+                else observation.experiment_id.split("::", 1)[0]
+            )
+            self.result.add_queue(
+                work_id,
+                observation.locator,
+                ["value"],
+                f"{refusal.reason.value}: {refusal.detail}",
+                source=source_key,
+                observation_id=observation.observation_id,
+            )
+            observation = replace(
+                observation,
+                identity=replace(
+                    identity,
+                    quantity=State.unknown(str(refusal)),
+                    valence_basis=None,
+                ),
+                value=Value(
+                    kind=ValueKind.UNAVAILABLE,
+                    unavailable_reason=str(refusal),
+                ),
+            )
         source_parts = Path(source_key).parts
         evidence_class = observation.evidence.class_
         if (
@@ -13239,19 +13301,35 @@ class Migrator:
                         raw_experiment,
                         path=f"observation[{source_id}::{raw_obs_id}].experiment",
                     )
-            self._migrate_extract_observation(
-                formula=formula,
-                obs=obs,
-                work=work,
-                source_id=source_id,
-                source_key=rel,
-                extraction=extraction or {},
-                local_ids=local_ids,
-                declared_experiment_id=declared_experiment_id,
-                source_context=pressure_identity_context,
-                provenance=extract_provenance,
-                fusion_transition_rows=fusion_transition_rows,
-            )
+            try:
+                self._migrate_extract_observation(
+                    formula=formula,
+                    obs=obs,
+                    work=work,
+                    source_id=source_id,
+                    source_key=rel,
+                    extraction=extraction or {},
+                    local_ids=local_ids,
+                    declared_experiment_id=declared_experiment_id,
+                    source_context=pressure_identity_context,
+                    provenance=extract_provenance,
+                    fusion_transition_rows=fusion_transition_rows,
+                )
+            except (TypeError, ValueError) as exc:
+                if not str(exc).startswith(
+                    "Observation.point_conditions.quench_state "
+                ):
+                    raise
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=(
+                            f"observation[{source_id}::{obs['observation_id']}]"
+                            ".point_conditions.quench_state"
+                        ),
+                        reason=RefusalReason.INVALID_SOURCE,
+                        detail=f"row refused: {exc}",
+                    )
+                )
         # b-555: do not leave a silent extract — absence is fine, silence is not.
         self._record_silent_extract_if_needed(
             doc=doc, work=work, source_key=rel, path_stem=path.stem
@@ -16134,6 +16212,7 @@ class Migrator:
         ):
             row_oxygen = collect_printed_oxygen((raw_item,), point_locator)
             buffer_text = None
+            buffer_name_tokens = ("iw", "fmq", "qfm", "nno")
             buffer_control = (point_conditions or {}).get("fO2_control")
             if (
                 isinstance(buffer_control, Located)
@@ -16143,7 +16222,7 @@ class Migrator:
                 control_text = buffer_control.state.value
                 if any(
                     token in control_text.casefold()
-                    for token in ("iw", "fmq", "qfm", "nno")
+                    for token in buffer_name_tokens
                 ):
                     buffer_text = control_text
             if buffer_text is None:
@@ -16160,7 +16239,7 @@ class Migrator:
                     )
                     if any(
                         token in units.casefold()
-                        for token in ("iw", "fmq", "qfm", "nno")
+                        for token in buffer_name_tokens
                     ):
                         buffer_text = units
                         break
