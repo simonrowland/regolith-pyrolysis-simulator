@@ -3978,6 +3978,13 @@ class CondensationModel:
                 prior_segments.append(segment.name)
             return by_segment
 
+        # Geometry, temperatures, residence, material coefficients and total
+        # stream pressure are fixed for this solve. Only available mass and
+        # local species pressure vary between Picard passes. Reuse a stage's
+        # last exact inputs; keep this bounded to one entry per stage/species
+        # and recompute the final telemetry pass so no notices are suppressed.
+        stage_efficiencies: dict[tuple[int, str], tuple] = {}
+
         def stage_candidates(stage_capture, wall_capture, *, record_telemetry=False, seed=False):
             self.stage_species_partial_pressures_pa = {}
             for route in stage_route_by_species.values():
@@ -3998,20 +4005,32 @@ class CondensationModel:
                     available = rates[species]
                     if available <= 1e-15 or _cr_stage_isolation_blocks(stage, species):
                         continue
-                    alpha = _stage_alpha_record(stage, species, self.materials)
-                    route['stage_alpha_records_by_stage'][stage.stage_number] = dict(alpha)
-                    eta = self._condensation_efficiency(
-                        stage=stage, species=species, T_cond_C=route['T_cond_C'],
-                        flowing_pressure_pa=partials.get(species),
-                        residence_s=self.residence_time_s.get(stage.stage_number, 1.0),
-                        available_kg=available,
-                        alpha_s_value=_required_record_alpha_s(alpha, species=species, site='stage_deposition'),
-                        alpha_record=alpha,
-                        antoine_extrapolations=antoine_extrapolations if record_telemetry else None,
-                        antoine_extrapolation_warnings=antoine_extrapolation_warnings if record_telemetry else None,
-                        efficiency_outcomes=(efficiency_outcomes_by_species.setdefault(species, [])
-                                             if record_telemetry and efficiency_outcomes_by_species is not None else None),
-                    )
+                    key = (stage.stage_number, species)
+                    inputs = (available, partials.get(species))
+                    cached = stage_efficiencies.get(key)
+                    if not record_telemetry and cached is not None and cached[:2] == inputs:
+                        eta, alpha = cached[2:]
+                        route['stage_alpha_records_by_stage'][stage.stage_number] = dict(alpha)
+                    else:
+                        alpha = _stage_alpha_record(stage, species, self.materials)
+                        # Preserve the pre-evaluation alpha projection: the
+                        # evaluator adds sample metadata to its own record.
+                        route['stage_alpha_records_by_stage'][stage.stage_number] = dict(alpha)
+                        eta = self._condensation_efficiency(
+                            stage=stage, species=species, T_cond_C=route['T_cond_C'],
+                            flowing_pressure_pa=partials.get(species),
+                            residence_s=self.residence_time_s.get(stage.stage_number, 1.0),
+                            available_kg=available,
+                            alpha_s_value=_required_record_alpha_s(alpha, species=species, site='stage_deposition'),
+                            alpha_record=alpha,
+                            antoine_extrapolations=antoine_extrapolations if record_telemetry else None,
+                            antoine_extrapolation_warnings=antoine_extrapolation_warnings if record_telemetry else None,
+                            efficiency_outcomes=(efficiency_outcomes_by_species.setdefault(species, [])
+                                                 if record_telemetry and efficiency_outcomes_by_species is not None else None),
+                        )
+                        stage_efficiencies[key] = (
+                            *inputs, eta, route['stage_alpha_records_by_stage'][stage.stage_number],
+                        )
                     capture = available * eta
                     if capture > 1e-15:
                         route['hkl_condensed_by_stage'][stage.stage_number] = capture

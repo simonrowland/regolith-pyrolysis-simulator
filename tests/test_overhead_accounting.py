@@ -2160,6 +2160,54 @@ def test_commanded_n2_upstream_install_uses_achieved_pressure():
         {'N2': 0.06339511470525183, 'O2': 0.03169755735262592, 'Ar': 0.06339511470525183})
 
 
+def test_capture_iteration_reuses_unchanged_stage_inputs(monkeypatch):
+    from simulator.condensation import CondensationModel
+    from simulator.state import CondensationTrain, MeltState
+
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0, species_partial_pressures_mbar={'Fe': 1.0},
+        stage_area_m2_by_stage={'1': 1.0, '2': 1.0, '3': 1.0, '4': 1.0},
+    )
+    calls = []
+
+    def efficiency(**kwargs):
+        kwargs['alpha_record']['sample_metadata'] = 'evaluation only'
+        if kwargs['efficiency_outcomes'] is None:
+            calls.append((kwargs['stage'].stage_number, kwargs['available_kg'],
+                          kwargs['flowing_pressure_pa']))
+        else:
+            kwargs['efficiency_outcomes'].append({'stage': kwargs['stage'].stage_number})
+        return 0.2
+
+    telemetry = {}
+    monkeypatch.setattr(model, '_condensation_efficiency', efficiency)
+    monkeypatch.setattr(model, '_wall_deposit_candidates_by_segment_kg', lambda **kwargs: {})
+    flux = EvaporationFlux(species_kg_hr={'Fe': 1.0}, total_kg_hr=1.0)
+    route = {'Fe': {'T_cond_C': 1250.0, 'capture_budget_kg': 0.1}}
+    model._resolve_wall_deposit_candidates_by_species_segment_kg(
+        evap_flux=flux, melt=MeltState(), stage_route_by_species=route,
+        efficiency_outcomes_by_species=telemetry,
+    )
+    # Frozen solve context: identical local pressure and supply must not
+    # repeat the stage's thermal-band integration on the next Picard pass.
+    assert len(calls) == len(set(calls))
+    assert model.last_wall_capture_fixed_point_iterations > 0
+    assert telemetry['Fe']
+    first_calls = list(calls)
+    first_telemetry = list(telemetry['Fe'])
+    calls.clear()
+    telemetry.clear()
+    model._resolve_wall_deposit_candidates_by_species_segment_kg(
+        evap_flux=flux, melt=MeltState(), stage_route_by_species=route,
+        efficiency_outcomes_by_species=telemetry,
+    )
+    assert calls == first_calls  # reuse never crosses solve boundaries
+    assert telemetry['Fe'] == first_telemetry
+    assert all('sample_metadata' not in alpha
+               for alpha in route['Fe']['stage_alpha_records_by_stage'].values())
+
+
 @pytest.mark.parametrize('primed', [False, True])
 def test_flowing_pressure_above_downstream_even_when_command_is_lower(primed):
     from simulator.overhead import OverheadGasModel
