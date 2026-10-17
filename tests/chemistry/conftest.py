@@ -52,6 +52,11 @@ def _seed_melt_redox(sim, fO2_log: float) -> None:
     from simulator.chemistry.kernel import ChemistryIntent
     from simulator.fe_redox import kress91_oxygen_demand_mol, melt_mol_fractions_for_kress91
 
+    # Establish the requested environment when the fixture has no actual gas
+    # probe yet. Preserve explicit projections, including finite N2 probes
+    # beside an independently funded oxygen ledger.
+    if not sim._melt_headspace_composition_mbar:
+        sim._install_upstream_projection({'N2': sim.melt.p_total_mbar})
     original_T = sim.melt.temperature_C
     before_buffer_kg = sim.atom_ledger.kg_by_account('reservoir.fo2_buffer').get('O2', 0.0)
     if original_T < 1200.0:
@@ -60,7 +65,8 @@ def _seed_melt_redox(sim, fO2_log: float) -> None:
     inv = sim.atom_ledger.mol_by_account('process.cleaned_melt')
     demand = kress91_oxygen_demand_mol(
         feo_mol=inv.get('FeO', 0.0), fe2o3_mol=inv.get('Fe2O3', 0.0),
-        fO2_log=fO2_log, T_K=T_K, pressure_bar=max(sim.melt.p_total_mbar/1000, 1e-9),
+        fO2_log=fO2_log, T_K=T_K,
+        pressure_bar=max(sim._melt_headspace_total_pressure_bar(), sim._vacuum_floor_bar()),
         mol_fractions=melt_mol_fractions_for_kress91(sim._melt_oxide_wt_pct()))
     if demand > 0.0:
         lot = sim.atom_ledger.load_external_mol('reservoir.fo2_buffer', {'O2': demand},

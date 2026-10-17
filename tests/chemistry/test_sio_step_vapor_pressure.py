@@ -133,6 +133,7 @@ def test_intrinsic_kress91_iw_regime_guards_against_vacuum_floor_conflation():
     sim = _build_lunar_12022_sim(vapor_pressure_data)
     sim.melt.temperature_C = 1873.15 - 273.15
     sim.melt.pO2_mbar = 1.0e-6
+    sim._install_upstream_projection({'N2': sim.melt.p_total_mbar})
 
     initial = sim._feedstock_iron_initialization
     # Use the same pressure for the reference and hot state; the load anchor

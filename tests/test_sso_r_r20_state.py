@@ -760,6 +760,7 @@ def _configure_o2_bubbler(
     target_fO2_log: float,
 ) -> None:
     sim.melt.campaign = campaign
+    _set_actual_n2_headspace(sim, sim.melt.p_total_mbar)
     sim.campaign_mgr.overrides.setdefault(campaign.name, {}).update({
         "o2_bubbler_kg_per_hr": rate_kg_per_hr,
         "o2_bubbler_eta_absorb_default": eta_absorb,
@@ -783,7 +784,7 @@ def _finite_redox_demand(sim, target_fO2_log):
         feo_mol=inv.get('FeO', 0.0), fe2o3_mol=inv.get('Fe2O3', 0.0),
         mol_fractions=melt_mol_fractions_for_kress91(sim._melt_oxide_wt_pct()),
         fO2_log=target_fO2_log, T_K=sim.melt.temperature_C+273.15,
-        pressure_bar=max(sim.melt.p_total_mbar/1000, 1e-9))
+        pressure_bar=max(sim._melt_headspace_total_pressure_bar(), sim._vacuum_floor_bar()))
 
 
 def test_trial_oxygen_transport_matches_same_committed_headspace() -> None:
@@ -1910,6 +1911,7 @@ def test_c7_external_al_credit_changes_ledger_potential_without_scalar_step(
     # enlarge D so Kn is viscous and ledger yields stay authorized — this
     # test covers redox/credit accounting, not transport-domain refusal.
     sim.overhead_model.pipe_diameter_m = 1.0
+    _set_actual_n2_headspace(sim, sim.melt.p_total_mbar)
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim._sync_oxygen_reservoir_mirror()
     before_mol = sim.atom_ledger.mol_by_account('process.cleaned_melt')
@@ -2492,6 +2494,7 @@ def test_exchange_target_cannot_exceed_controlled_total_pressure() -> None:
     sim = _make_sim()
     _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
     sim.melt.p_total_mbar = 0.2
+    _set_actual_n2_headspace(sim, sim.melt.p_total_mbar)
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas", {"O2": 10000.0},
         source="test transient oxygen holdup before bleed", material_origin="feedstock",
