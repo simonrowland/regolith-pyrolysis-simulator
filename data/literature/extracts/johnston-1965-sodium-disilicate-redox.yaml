@@ -1,0 +1,1400 @@
+schema_version: literature_extract.v1
+source_id: johnston-1965-sodium-disilicate-redox
+source:
+  citation: W. D. Johnston, "Oxidation-Reduction Equilibria in Molten Na2O.2SiO2 Glass," Journal of the American Ceramic Society 48(4):184-190 (1965).
+  doi: 10.1111/j.1151-2916.1965.tb14709.x
+  url: https://doi.org/10.1111/j.1151-2916.1965.tb14709.x
+  year: 1965
+extraction:
+  method: >-
+    Table I transcribed from the MinerU content-list table and MinerU markdown, with pdftotext-layout as the second machine read. The rendered PDF page was used to resolve differing cells and confirm the V headers, row assignments, ditto marks, and nominal-total footnotes. Identity composition is normalized from the printed 1:2 Na2O:SiO2 formula-unit ratio. The apparent-Delta-H list was transcribed from both machine reads. Figure-only values were not extracted.
+  date: '2026-10-16'
+  worker: wave3b-john65
+  table_i_printed_data_rows: 47
+  apparent_delta_h_printed_entries: 7
+  schema_gaps:
+  - >-
+    No quantity token represents the printed reduced-species and total-element wt% pair. The pair is retained as printed under concentration_series with quantity multivalent_element_wt_percent_pair; the real migrator must leave it unavailable rather than compute a valence ratio.
+  - >-
+    No quantity token represents apparent enthalpy of reduction. The seven printed values are retained under gibbs_table with quantity apparent_enthalpy_of_reduction; the real migrator must leave them unavailable.
+  - >-
+    Table I contains no Fe row. Fe appears only in the apparent-Delta-H list; the paper attributes that fit to prior iron-equilibrium work (ref. 1), whose input rows are not in this extract.
+  - >-
+    The paper prints no numeric row-level pO2 or total pressure. Each Table I atmosphere is retained as printed; numeric fO2_Pa and total_pressure_Pa remain unknown.
+  figure_read_candidates:
+  - Figures 2-3: log pO2 axes and redox curves; not transcribed as rows.
+  - Figure 5: temperature-dependent equilibrium-constant curves; not transcribed as rows.
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.Ti.observations[johnston_1965_t1_ti_r01].values.points[0].value
+  value: 0.021
+  locator: {published_page: 186, pdf_page_index: 2, table: 'I', row: 1, note: 'Rendered Table I: Ti3+ under CO/CO2 = 10 at 1085 C.'}
+- path: species.Sn.observations[johnston_1965_t1_sn_r01].values.points[0].value
+  value: 0.011
+  locator: {published_page: 186, pdf_page_index: 2, table: 'I', row: 8, note: 'Rendered Table I: Sn2+ under CO2 at 1085 C.'}
+- path: species.Ce.observations[johnston_1965_t1_ce_r02].values.points[1].value
+  value: 3.20
+  locator: {published_page: 186, pdf_page_index: 2, table: 'I', row: 15, note: 'Rendered Table I: Total Ce under air at 1085 C.'}
+species:
+  Ti:
+    observations:
+    - observation_id: johnston_1965_t1_ti_r01
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 1}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ti3+'
+        T_C: 1085
+        atmosphere_as_published: 'CO/CO2 = 10'
+        color_as_published: 'Light purple'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ti3+', value: 0.021, value_as_published: '0.021', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_ti_r01_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 1}}, atmosphere: {state: {tag: value, value: 'CO/CO2 = 10'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 1}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 1}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ti*', value: 1.50, value_as_published: '1.50', method_class: author_estimate, total_nominal: true, T_C: 1085, point_conditions: *johnston_t1_ti_r01_conditions}
+      point_conditions: *johnston_t1_ti_r01_conditions
+    - observation_id: johnston_1965_t1_ti_r02
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 2}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ti3+'
+        T_C: 1085
+        atmosphere_as_published: 'CO/CO2 = 100'
+        color_as_published: '“ “'
+        color_resolved_as_published: Light purple
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ti3+', value: 0.035, value_as_published: '0.035', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_ti_r02_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 2}}, atmosphere: {state: {tag: value, value: 'CO/CO2 = 100'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 2}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 2}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ti*', value: 1.50, value_as_published: '1.50', method_class: author_estimate, total_nominal: true, T_C: 1085, point_conditions: *johnston_t1_ti_r02_conditions}
+      point_conditions: *johnston_t1_ti_r02_conditions
+    - observation_id: johnston_1965_t1_ti_r03
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 3}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ti3+'
+        T_C: 1085
+        atmosphere_as_published: 'H2-H2O (0°C)'
+        color_as_published: 'Medium purple'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ti3+', value: 0.089, value_as_published: '0.089', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_ti_r03_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 3}}, atmosphere: {state: {tag: value, value: 'H2-H2O (0°C)'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 3}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 3}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ti*', value: 1.50, value_as_published: '1.50', method_class: author_estimate, total_nominal: true, T_C: 1085, point_conditions: *johnston_t1_ti_r03_conditions}
+      point_conditions: *johnston_t1_ti_r03_conditions
+    - observation_id: johnston_1965_t1_ti_r04
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 4}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ti3+'
+        T_C: 1085
+        atmosphere_as_published: 'CO-C'
+        color_as_published: '“ “'
+        color_resolved_as_published: Medium purple
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ti3+', value: 0.083, value_as_published: '0.083', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_ti_r04_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 4}}, atmosphere: {state: {tag: value, value: 'CO-C'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 4}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 4}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ti*', value: 1.50, value_as_published: '1.50', method_class: author_estimate, total_nominal: true, T_C: 1085, point_conditions: *johnston_t1_ti_r04_conditions}
+      point_conditions: *johnston_t1_ti_r04_conditions
+    - observation_id: johnston_1965_t1_ti_r05
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 5}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ti3+'
+        T_C: 1000
+        atmosphere_as_published: 'CO-C'
+        color_as_published: '“ “'
+        color_resolved_as_published: Medium purple
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ti3+', value: 0.065, value_as_published: '0.065', method_class: measured_direct, T_C: 1000, point_conditions: &johnston_t1_ti_r05_conditions {T_C: {state: {tag: value, value: 1000}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 5}}, atmosphere: {state: {tag: value, value: 'CO-C'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 5}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 5}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ti*', value: 1.50, value_as_published: '1.50', method_class: author_estimate, total_nominal: true, T_C: 1000, point_conditions: *johnston_t1_ti_r05_conditions}
+      point_conditions: *johnston_t1_ti_r05_conditions
+    - observation_id: johnston_1965_t1_ti_r06
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 6}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: asserted_altered
+      quench_statement: The 1200 C CO-C sample was non-crystalline by X-ray but had inclusions suggesting possible glass separation on cooling.
+      quench_statement_locator: {page: 4, pdf_page_index: 3, published_page: 187, section: 'Results and Discussion'}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ti3+'
+        T_C: 1200
+        atmosphere_as_published: 'CO-C'
+        color_as_published: |-
+          Purple by transmission
+          Red-brown by reflection
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ti3+', value: 0.115, value_as_published: '0.115', method_class: measured_direct, T_C: 1200, point_conditions: &johnston_t1_ti_r06_conditions {T_C: {state: {tag: value, value: 1200}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 6}}, atmosphere: {state: {tag: value, value: 'CO-C'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 6}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 6}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ti*', value: 1.50, value_as_published: '1.50', method_class: author_estimate, total_nominal: true, T_C: 1200, point_conditions: *johnston_t1_ti_r06_conditions}
+      point_conditions: *johnston_t1_ti_r06_conditions
+    - observation_id: johnston_1965_t1_ti_r07
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 7}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: asserted_altered
+      quench_statement: The 1300 C CO-C sample was non-crystalline by X-ray but had inclusions suggesting possible glass separation on cooling.
+      quench_statement_locator: {page: 4, pdf_page_index: 3, published_page: 187, section: 'Results and Discussion'}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ti3+'
+        T_C: 1300
+        atmosphere_as_published: 'CO-C'
+        color_as_published: |-
+          Purple by transmission
+          Red-brown by reflection
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ti3+', value: 0.218, value_as_published: '0.218', method_class: measured_direct, T_C: 1300, point_conditions: &johnston_t1_ti_r07_conditions {T_C: {state: {tag: value, value: 1300}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 7}}, atmosphere: {state: {tag: value, value: 'CO-C'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 7}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 7}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ti*', value: 1.50, value_as_published: '1.50', method_class: author_estimate, total_nominal: true, T_C: 1300, point_conditions: *johnston_t1_ti_r07_conditions}
+      point_conditions: *johnston_t1_ti_r07_conditions
+    - observation_id: johnston_1965_t2_ti_apparent_delta_h
+      type: gibbs_table
+      locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 1}
+      units: kcal per element
+      rail: redox
+      values:
+        quantity: apparent_enthalpy_of_reduction
+        method_class: model_derived
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_apparent_enthalpy_of_reduction
+        points: [{column_as_printed: 'Apparent ΔH (kcal)', value: 115, value_as_published: '115', method_class: model_derived, point_conditions: &johnston_t2_ti_apparent_delta_h_conditions {T_C: {state: {tag: unknown, reason: fitted_temperature_dependence_no_single_T}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 1}}, atmosphere: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 1}}, fO2_Pa: {state: {tag: unknown, reason: no_numeric_pO2_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 1}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 1}}, composition: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 1}}}}]
+      derivation:
+        relation: fit of the temperature dependence of the log equilibrium constant, assuming oxygen-ion activity is temperature independent
+        inputs:
+          - johnston_1965_t1_ti_r04
+          - johnston_1965_t1_ti_r05
+          - johnston_1965_t1_ti_r06
+          - johnston_1965_t1_ti_r07
+        output_unit: kcal per element
+        locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 1}
+      derived_from:
+        - johnston_1965_t1_ti_r04
+        - johnston_1965_t1_ti_r05
+        - johnston_1965_t1_ti_r06
+        - johnston_1965_t1_ti_r07
+      point_conditions: *johnston_t2_ti_apparent_delta_h_conditions
+  Sn:
+    observations:
+    - observation_id: johnston_1965_t1_sn_r01
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 8}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Sn2+'
+        T_C: 1085
+        atmosphere_as_published: 'CO2'
+        color_as_published: 'Gray'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Sn2+', value: 0.011, value_as_published: '0.011', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_sn_r01_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 8}}, atmosphere: {state: {tag: value, value: 'CO2'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 8}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 8}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Sn', value: 1.68, value_as_published: '1.68', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_sn_r01_conditions}
+      point_conditions: *johnston_t1_sn_r01_conditions
+    - observation_id: johnston_1965_t1_sn_r02
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 9}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Sn2+'
+        T_C: 1085
+        atmosphere_as_published: 'CO2/CO = 100'
+        color_as_published: 'Blue-gray'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Sn2+', value: 0.71, value_as_published: '0.71', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_sn_r02_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 9}}, atmosphere: {state: {tag: value, value: 'CO2/CO = 100'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 9}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 9}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Sn', value: 1.68, value_as_published: '1.68', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_sn_r02_conditions}
+      point_conditions: *johnston_t1_sn_r02_conditions
+    - observation_id: johnston_1965_t1_sn_r03
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 10}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Sn2+'
+        T_C: 1085
+        atmosphere_as_published: 'CO2/CO = 10'
+        color_as_published: 'Gray'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Sn2+', value: 1.34, value_as_published: '1.34', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_sn_r03_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 10}}, atmosphere: {state: {tag: value, value: 'CO2/CO = 10'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 10}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 10}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Sn', value: 1.68, value_as_published: '1.68', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_sn_r03_conditions}
+      point_conditions: *johnston_t1_sn_r03_conditions
+    - observation_id: johnston_1965_t1_sn_r04
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 11}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Sn2+'
+        T_C: 1000
+        atmosphere_as_published: 'CO2/CO = 100'
+        color_as_published: '“'
+        color_resolved_as_published: Gray
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Sn2+', value: 0.387, value_as_published: '0.387', method_class: measured_direct, T_C: 1000, point_conditions: &johnston_t1_sn_r04_conditions {T_C: {state: {tag: value, value: 1000}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 11}}, atmosphere: {state: {tag: value, value: 'CO2/CO = 100'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 11}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 11}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Sn', value: 1.68, value_as_published: '1.68', method_class: measured_direct, T_C: 1000, point_conditions: *johnston_t1_sn_r04_conditions}
+      point_conditions: *johnston_t1_sn_r04_conditions
+    - observation_id: johnston_1965_t1_sn_r05
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 12}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Sn2+'
+        T_C: 1200
+        atmosphere_as_published: 'CO2/CO = 100'
+        color_as_published: 'Light blue'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Sn2+', value: 0.955, value_as_published: '0.955', method_class: measured_direct, T_C: 1200, point_conditions: &johnston_t1_sn_r05_conditions {T_C: {state: {tag: value, value: 1200}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 12}}, atmosphere: {state: {tag: value, value: 'CO2/CO = 100'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 12}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 12}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Sn', value: 1.56, value_as_published: '1.56', method_class: measured_direct, T_C: 1200, point_conditions: *johnston_t1_sn_r05_conditions}
+      point_conditions: *johnston_t1_sn_r05_conditions
+    - observation_id: johnston_1965_t1_sn_r06
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 13}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Sn2+'
+        T_C: 1300
+        atmosphere_as_published: 'CO2/CO = 100'
+        color_as_published: '“ “'
+        color_resolved_as_published: Light blue
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Sn2+', value: 0.727, value_as_published: '0.727', method_class: measured_direct, T_C: 1300, point_conditions: &johnston_t1_sn_r06_conditions {T_C: {state: {tag: value, value: 1300}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 13}}, atmosphere: {state: {tag: value, value: 'CO2/CO = 100'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 13}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 13}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Sn', value: 1.32, value_as_published: '1.32', method_class: measured_direct, T_C: 1300, point_conditions: *johnston_t1_sn_r06_conditions}
+      point_conditions: *johnston_t1_sn_r06_conditions
+    - observation_id: johnston_1965_t2_sn_apparent_delta_h
+      type: gibbs_table
+      locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 2}
+      units: kcal per element
+      rail: redox
+      values:
+        quantity: apparent_enthalpy_of_reduction
+        method_class: model_derived
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_apparent_enthalpy_of_reduction
+        points: [{column_as_printed: 'Apparent ΔH (kcal)', value: 170, value_as_published: '170', method_class: model_derived, point_conditions: &johnston_t2_sn_apparent_delta_h_conditions {T_C: {state: {tag: unknown, reason: fitted_temperature_dependence_no_single_T}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 2}}, atmosphere: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 2}}, fO2_Pa: {state: {tag: unknown, reason: no_numeric_pO2_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 2}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 2}}, composition: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 2}}}}]
+      derivation:
+        relation: fit of the temperature dependence of the log equilibrium constant, assuming oxygen-ion activity is temperature independent
+        inputs:
+          - johnston_1965_t1_sn_r02
+          - johnston_1965_t1_sn_r04
+          - johnston_1965_t1_sn_r05
+          - johnston_1965_t1_sn_r06
+        output_unit: kcal per element
+        locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 2}
+      derived_from:
+        - johnston_1965_t1_sn_r02
+        - johnston_1965_t1_sn_r04
+        - johnston_1965_t1_sn_r05
+        - johnston_1965_t1_sn_r06
+      point_conditions: *johnston_t2_sn_apparent_delta_h_conditions
+  Fe:
+    observations:
+    - observation_id: johnston_1965_t2_fe_apparent_delta_h
+      type: gibbs_table
+      locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}
+      units: kcal per element
+      rail: redox
+      values:
+        quantity: apparent_enthalpy_of_reduction
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: fit_inputs_for_Fe_are_not_stored_in_this_extract
+        attribution: Johnston (1965) reports the apparent reduction enthalpy; underlying Fe equilibrium data are not included in Table I.
+        points: [{column_as_printed: 'Apparent ΔH (kcal)', value: 110, value_as_published: '110', method_class: quoted_attributed, point_conditions: &johnston_t2_fe_apparent_delta_h_conditions {T_C: {state: {tag: unknown, reason: fitted_temperature_dependence_no_single_T}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}}, atmosphere: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}}, fO2_Pa: {state: {tag: unknown, reason: no_numeric_pO2_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}}, composition: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}}}}]
+      point_conditions: *johnston_t2_fe_apparent_delta_h_conditions
+  Sb:
+    observations:
+    - observation_id: johnston_1965_t1_sb_r01
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 21}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: asserted_altered
+      quench_statement: The source reports that this sample showed NaSbO3 by X-ray diffraction after quenching.
+      quench_statement_locator: {page: 4, pdf_page_index: 3, published_page: 187, section: 'Results and Discussion'}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Sb3+'
+        T_C: 1085
+        atmosphere_as_published: 'O2'
+        color_as_published: 'Milk white'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Sb3+', value: 0.10, value_as_published: '0.10', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_sb_r01_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 21}}, atmosphere: {state: {tag: value, value: 'O2'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 21}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 21}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Sb', value: 1.68, value_as_published: '1.68', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_sb_r01_conditions}
+      point_conditions: *johnston_t1_sb_r01_conditions
+    - observation_id: johnston_1965_t1_sb_r02
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 22}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: asserted_altered
+      quench_statement: The source reports that this air-equilibrated sample showed NaSbO3 by X-ray diffraction after quenching.
+      quench_statement_locator: {page: 4, pdf_page_index: 3, published_page: 187, section: 'Results and Discussion'}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Sb3+'
+        T_C: 1085
+        atmosphere_as_published: 'Air'
+        color_as_published: '“ “'
+        color_resolved_as_published: Milk white
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Sb3+', value: 0.31, value_as_published: '0.31', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_sb_r02_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 22}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 22}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 22}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Sb', value: 1.79, value_as_published: '1.79', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_sb_r02_conditions}
+      point_conditions: *johnston_t1_sb_r02_conditions
+    - observation_id: johnston_1965_t1_sb_r03
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 23}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Sb3+'
+        T_C: 1085
+        atmosphere_as_published: 'Argon/O2 = 100'
+        color_as_published: 'Clear-gray cast'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Sb3+', value: 1.00, value_as_published: '1.00', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_sb_r03_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 23}}, atmosphere: {state: {tag: value, value: 'Argon/O2 = 100'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 23}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 23}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Sb', value: 1.97, value_as_published: '1.97', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_sb_r03_conditions}
+      point_conditions: *johnston_t1_sb_r03_conditions
+    - observation_id: johnston_1965_t1_sb_r04
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 24}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Sb3+'
+        T_C: 1200
+        atmosphere_as_published: 'Air'
+        color_as_published: 'Clear'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Sb3+', value: 0.82, value_as_published: '0.82', method_class: measured_direct, T_C: 1200, point_conditions: &johnston_t1_sb_r04_conditions {T_C: {state: {tag: value, value: 1200}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 24}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 24}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 24}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Sb', value: 1.94, value_as_published: '1.94', method_class: measured_direct, T_C: 1200, point_conditions: *johnston_t1_sb_r04_conditions}
+      point_conditions: *johnston_t1_sb_r04_conditions
+    - observation_id: johnston_1965_t1_sb_r05
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 25}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Sb3+'
+        T_C: 1300
+        atmosphere_as_published: 'Air'
+        color_as_published: '“'
+        color_resolved_as_published: Clear
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Sb3+', value: 1.01, value_as_published: '1.01', method_class: measured_direct, T_C: 1300, point_conditions: &johnston_t1_sb_r05_conditions {T_C: {state: {tag: value, value: 1300}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 25}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 25}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 25}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Sb', value: 1.34, value_as_published: '1.34', method_class: measured_direct, T_C: 1300, point_conditions: *johnston_t1_sb_r05_conditions}
+      point_conditions: *johnston_t1_sb_r05_conditions
+    - observation_id: johnston_1965_t2_sb_apparent_delta_h
+      type: gibbs_table
+      locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 4}
+      units: kcal per element
+      rail: redox
+      values:
+        quantity: apparent_enthalpy_of_reduction
+        method_class: model_derived
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_apparent_enthalpy_of_reduction
+        points: [{column_as_printed: 'Apparent ΔH (kcal)', value: 105, value_as_published: '105', method_class: model_derived, point_conditions: &johnston_t2_sb_apparent_delta_h_conditions {T_C: {state: {tag: unknown, reason: fitted_temperature_dependence_no_single_T}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 4}}, atmosphere: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 4}}, fO2_Pa: {state: {tag: unknown, reason: no_numeric_pO2_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 4}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 4}}, composition: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 4}}}}]
+      derivation:
+        relation: fit of the temperature dependence of the log equilibrium constant, assuming oxygen-ion activity is temperature independent
+        inputs:
+          - johnston_1965_t1_sb_r02
+          - johnston_1965_t1_sb_r04
+          - johnston_1965_t1_sb_r05
+        output_unit: kcal per element
+        locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 4}
+      derived_from:
+        - johnston_1965_t1_sb_r02
+        - johnston_1965_t1_sb_r04
+        - johnston_1965_t1_sb_r05
+      point_conditions: *johnston_t2_sb_apparent_delta_h_conditions
+  Ce:
+    observations:
+    - observation_id: johnston_1965_t1_ce_r01
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 14}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: asserted_altered
+      quench_statement: The source reports that this sample showed NaSbO3 by X-ray diffraction after quenching.
+      quench_statement_locator: {page: 4, pdf_page_index: 3, published_page: 187, section: 'Results and Discussion'}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ce4+'
+        T_C: 1085
+        atmosphere_as_published: 'O2'
+        color_as_published: 'Opaque yellow'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ce4+', value: 2.45, value_as_published: '2.45', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_ce_r01_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 14}}, atmosphere: {state: {tag: value, value: 'O2'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 14}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 14}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ce', value: 3.31, value_as_published: '3.31', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_ce_r01_conditions}
+      point_conditions: *johnston_t1_ce_r01_conditions
+    - observation_id: johnston_1965_t1_ce_r02
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 15}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ce4+'
+        T_C: 1085
+        atmosphere_as_published: 'Air'
+        color_as_published: 'Light yellow'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ce4+', value: 2.18, value_as_published: '2.18', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_ce_r02_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 15}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 15}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 15}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ce', value: 3.20, value_as_published: '3.20', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_ce_r02_conditions}
+      point_conditions: *johnston_t1_ce_r02_conditions
+    - observation_id: johnston_1965_t1_ce_r03
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 16}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ce4+'
+        T_C: 1085
+        atmosphere_as_published: 'Argon/O2 = 100'
+        color_as_published: '“ “'
+        color_resolved_as_published: Light yellow
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ce4+', value: 1.47, value_as_published: '1.47', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_ce_r03_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 16}}, atmosphere: {state: {tag: value, value: 'Argon/O2 = 100'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 16}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 16}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ce', value: 3.18, value_as_published: '3.18', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_ce_r03_conditions}
+      point_conditions: *johnston_t1_ce_r03_conditions
+    - observation_id: johnston_1965_t1_ce_r04
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 17}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ce4+'
+        T_C: 1085
+        atmosphere_as_published: 'CO2'
+        color_as_published: '“ “'
+        color_resolved_as_published: Light yellow
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ce4+', value: 0.685, value_as_published: '0.685', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_ce_r04_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 17}}, atmosphere: {state: {tag: value, value: 'CO2'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 17}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 17}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ce', value: 3.10, value_as_published: '3.10', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_ce_r04_conditions}
+      point_conditions: *johnston_t1_ce_r04_conditions
+    - observation_id: johnston_1965_t1_ce_r05
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 18}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ce4+'
+        T_C: 1000
+        atmosphere_as_published: 'Air'
+        color_as_published: '“ “'
+        color_resolved_as_published: Light yellow
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ce4+', value: 2.49, value_as_published: '2.49', method_class: measured_direct, T_C: 1000, point_conditions: &johnston_t1_ce_r05_conditions {T_C: {state: {tag: value, value: 1000}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 18}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 18}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 18}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ce', value: 3.38, value_as_published: '3.38', method_class: measured_direct, T_C: 1000, point_conditions: *johnston_t1_ce_r05_conditions}
+      point_conditions: *johnston_t1_ce_r05_conditions
+    - observation_id: johnston_1965_t1_ce_r06
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 19}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ce4+'
+        T_C: 1200
+        atmosphere_as_published: 'Air'
+        color_as_published: '“ “'
+        color_resolved_as_published: Light yellow
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ce4+', value: 1.84, value_as_published: '1.84', method_class: measured_direct, T_C: 1200, point_conditions: &johnston_t1_ce_r06_conditions {T_C: {state: {tag: value, value: 1200}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 19}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 19}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 19}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ce', value: 2.92, value_as_published: '2.92', method_class: measured_direct, T_C: 1200, point_conditions: *johnston_t1_ce_r06_conditions}
+      point_conditions: *johnston_t1_ce_r06_conditions
+    - observation_id: johnston_1965_t1_ce_r07
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 20}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ce4+'
+        T_C: 1300
+        atmosphere_as_published: 'Air'
+        color_as_published: '“ “'
+        color_resolved_as_published: Light yellow
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ce4+', value: 1.53, value_as_published: '1.53', method_class: measured_direct, T_C: 1300, point_conditions: &johnston_t1_ce_r07_conditions {T_C: {state: {tag: value, value: 1300}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 20}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 20}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 20}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ce', value: 2.54, value_as_published: '2.54', method_class: measured_direct, T_C: 1300, point_conditions: *johnston_t1_ce_r07_conditions}
+      point_conditions: *johnston_t1_ce_r07_conditions
+    - observation_id: johnston_1965_t2_ce_apparent_delta_h
+      type: gibbs_table
+      locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 5}
+      units: kcal per element
+      rail: redox
+      values:
+        quantity: apparent_enthalpy_of_reduction
+        method_class: model_derived
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_apparent_enthalpy_of_reduction
+        points: [{column_as_printed: 'Apparent ΔH (kcal)', value: 30, value_as_published: '30', method_class: model_derived, point_conditions: &johnston_t2_ce_apparent_delta_h_conditions {T_C: {state: {tag: unknown, reason: fitted_temperature_dependence_no_single_T}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 5}}, atmosphere: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 5}}, fO2_Pa: {state: {tag: unknown, reason: no_numeric_pO2_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 5}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 5}}, composition: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 5}}}}]
+      derivation:
+        relation: fit of the temperature dependence of the log equilibrium constant, assuming oxygen-ion activity is temperature independent
+        inputs:
+          - johnston_1965_t1_ce_r02
+          - johnston_1965_t1_ce_r05
+          - johnston_1965_t1_ce_r06
+          - johnston_1965_t1_ce_r07
+        output_unit: kcal per element
+        locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 5}
+      derived_from:
+        - johnston_1965_t1_ce_r02
+        - johnston_1965_t1_ce_r05
+        - johnston_1965_t1_ce_r06
+        - johnston_1965_t1_ce_r07
+      point_conditions: *johnston_t2_ce_apparent_delta_h_conditions
+  Mn:
+    observations:
+    - observation_id: johnston_1965_t1_mn_r01
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 26}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Mn3+'
+        T_C: 1085
+        atmosphere_as_published: 'O2'
+        color_as_published: 'Dark purple'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Mn3+', value: 0.21, value_as_published: '0.21', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_mn_r01_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 26}}, atmosphere: {state: {tag: value, value: 'O2'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 26}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 26}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Mn', value: 1.375, value_as_published: '1.375', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_mn_r01_conditions}
+      point_conditions: *johnston_t1_mn_r01_conditions
+    - observation_id: johnston_1965_t1_mn_r02
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 27}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Mn3+'
+        T_C: 1085
+        atmosphere_as_published: 'Air'
+        color_as_published: '“ “'
+        color_resolved_as_published: Dark purple
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Mn3+', value: 0.17, value_as_published: '0.17', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_mn_r02_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 27}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 27}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 27}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Mn', value: 1.43, value_as_published: '1.43', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_mn_r02_conditions}
+      point_conditions: *johnston_t1_mn_r02_conditions
+    - observation_id: johnston_1965_t1_mn_r03
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 28}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Mn3+'
+        T_C: 1085
+        atmosphere_as_published: 'Argon/O2 = 100'
+        color_as_published: 'Medium purple'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Mn3+', value: 0.076, value_as_published: '0.076', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_mn_r03_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 28}}, atmosphere: {state: {tag: value, value: 'Argon/O2 = 100'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 28}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 28}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Mn', value: 1.46, value_as_published: '1.46', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_mn_r03_conditions}
+      point_conditions: *johnston_t1_mn_r03_conditions
+    - observation_id: johnston_1965_t1_mn_r04
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 29}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Mn3+'
+        T_C: 1085
+        atmosphere_as_published: 'CO2'
+        color_as_published: 'Light purple'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Mn3+', value: 0.021, value_as_published: '0.021', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_mn_r04_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 29}}, atmosphere: {state: {tag: value, value: 'CO2'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 29}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 29}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Mn', value: 1.388, value_as_published: '1.388', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_mn_r04_conditions}
+      point_conditions: *johnston_t1_mn_r04_conditions
+    - observation_id: johnston_1965_t1_mn_r05
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 30}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Mn3+'
+        T_C: 1000
+        atmosphere_as_published: 'Air'
+        color_as_published: 'Dark purple'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Mn3+', value: 0.20, value_as_published: '0.20', method_class: measured_direct, T_C: 1000, point_conditions: &johnston_t1_mn_r05_conditions {T_C: {state: {tag: value, value: 1000}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 30}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 30}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 30}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Mn', value: 1.43, value_as_published: '1.43', method_class: measured_direct, T_C: 1000, point_conditions: *johnston_t1_mn_r05_conditions}
+      point_conditions: *johnston_t1_mn_r05_conditions
+    - observation_id: johnston_1965_t1_mn_r06
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 31}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Mn3+'
+        T_C: 1200
+        atmosphere_as_published: 'Air'
+        color_as_published: 'Medium purple'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Mn3+', value: 0.12, value_as_published: '0.12', method_class: measured_direct, T_C: 1200, point_conditions: &johnston_t1_mn_r06_conditions {T_C: {state: {tag: value, value: 1200}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 31}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 31}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 31}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Mn', value: 1.43, value_as_published: '1.43', method_class: measured_direct, T_C: 1200, point_conditions: *johnston_t1_mn_r06_conditions}
+      point_conditions: *johnston_t1_mn_r06_conditions
+    - observation_id: johnston_1965_t1_mn_r07
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 32}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Mn3+'
+        T_C: 1300
+        atmosphere_as_published: 'Air'
+        color_as_published: '“ “'
+        color_resolved_as_published: Medium purple
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Mn3+', value: 0.08, value_as_published: '0.08', method_class: measured_direct, T_C: 1300, point_conditions: &johnston_t1_mn_r07_conditions {T_C: {state: {tag: value, value: 1300}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 32}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 32}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 32}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Mn', value: 1.43, value_as_published: '1.43', method_class: measured_direct, T_C: 1300, point_conditions: *johnston_t1_mn_r07_conditions}
+      point_conditions: *johnston_t1_mn_r07_conditions
+    - observation_id: johnston_1965_t2_mn_apparent_delta_h
+      type: gibbs_table
+      locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 6}
+      units: kcal per element
+      rail: redox
+      values:
+        quantity: apparent_enthalpy_of_reduction
+        method_class: model_derived
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_apparent_enthalpy_of_reduction
+        points: [{column_as_printed: 'Apparent ΔH (kcal)', value: 55, value_as_published: '55', method_class: model_derived, point_conditions: &johnston_t2_mn_apparent_delta_h_conditions {T_C: {state: {tag: unknown, reason: fitted_temperature_dependence_no_single_T}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 6}}, atmosphere: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 6}}, fO2_Pa: {state: {tag: unknown, reason: no_numeric_pO2_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 6}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 6}}, composition: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 6}}}}]
+      derivation:
+        relation: fit of the temperature dependence of the log equilibrium constant, assuming oxygen-ion activity is temperature independent
+        inputs:
+          - johnston_1965_t1_mn_r02
+          - johnston_1965_t1_mn_r05
+          - johnston_1965_t1_mn_r06
+          - johnston_1965_t1_mn_r07
+        output_unit: kcal per element
+        locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 6}
+      derived_from:
+        - johnston_1965_t1_mn_r02
+        - johnston_1965_t1_mn_r05
+        - johnston_1965_t1_mn_r06
+        - johnston_1965_t1_mn_r07
+      point_conditions: *johnston_t2_mn_apparent_delta_h_conditions
+  Co:
+    observations:
+    - observation_id: johnston_1965_t1_co_r01
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 33}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Co3+'
+        T_C: 1085
+        atmosphere_as_published: 'O2'
+        color_as_published: 'Dark blue'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Co3+', value: 0.13, value_as_published: '0.13', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_co_r01_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 33}}, atmosphere: {state: {tag: value, value: 'O2'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 33}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 33}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Co*', value: 1.84, value_as_published: '1.84', method_class: author_estimate, total_nominal: true, T_C: 1085, point_conditions: *johnston_t1_co_r01_conditions}
+      point_conditions: *johnston_t1_co_r01_conditions
+    - observation_id: johnston_1965_t1_co_r02
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 34}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Co3+'
+        T_C: 1085
+        atmosphere_as_published: 'Air'
+        color_as_published: '“ “'
+        color_resolved_as_published: Dark blue
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Co3+', value: 0.085, value_as_published: '0.085', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_co_r02_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 34}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 34}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 34}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Co*', value: 1.84, value_as_published: '1.84', method_class: author_estimate, total_nominal: true, T_C: 1085, point_conditions: *johnston_t1_co_r02_conditions}
+      point_conditions: *johnston_t1_co_r02_conditions
+    - observation_id: johnston_1965_t1_co_r03
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 35}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Co3+'
+        T_C: 1085
+        atmosphere_as_published: 'Argon/O2 = 100'
+        color_as_published: '“ “'
+        color_resolved_as_published: Dark blue
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Co3+', value: 0.042, value_as_published: '0.042', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_co_r03_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 35}}, atmosphere: {state: {tag: value, value: 'Argon/O2 = 100'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 35}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 35}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Co*', value: 1.84, value_as_published: '1.84', method_class: author_estimate, total_nominal: true, T_C: 1085, point_conditions: *johnston_t1_co_r03_conditions}
+      point_conditions: *johnston_t1_co_r03_conditions
+    - observation_id: johnston_1965_t1_co_r04
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 36}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Co3+'
+        T_C: 1000
+        atmosphere_as_published: 'Air'
+        color_as_published: '“ “'
+        color_resolved_as_published: Dark blue
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Co3+', value: 0.087, value_as_published: '0.087', method_class: measured_direct, T_C: 1000, point_conditions: &johnston_t1_co_r04_conditions {T_C: {state: {tag: value, value: 1000}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 36}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 36}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 36}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Co*', value: 1.84, value_as_published: '1.84', method_class: author_estimate, total_nominal: true, T_C: 1000, point_conditions: *johnston_t1_co_r04_conditions}
+      point_conditions: *johnston_t1_co_r04_conditions
+    - observation_id: johnston_1965_t1_co_r05
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 37}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Co3+'
+        T_C: 1200
+        atmosphere_as_published: 'Air'
+        color_as_published: '“ “'
+        color_resolved_as_published: Dark blue
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Co3+', value: 0.065, value_as_published: '0.065', method_class: measured_direct, T_C: 1200, point_conditions: &johnston_t1_co_r05_conditions {T_C: {state: {tag: value, value: 1200}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 37}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 37}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 37}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Co*', value: 1.84, value_as_published: '1.84', method_class: author_estimate, total_nominal: true, T_C: 1200, point_conditions: *johnston_t1_co_r05_conditions}
+      point_conditions: *johnston_t1_co_r05_conditions
+    - observation_id: johnston_1965_t1_co_r06
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 38}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Co3+'
+        T_C: 1300
+        atmosphere_as_published: 'Air'
+        color_as_published: '“ “'
+        color_resolved_as_published: Dark blue
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Co3+', value: 0.068, value_as_published: '0.068', method_class: measured_direct, T_C: 1300, point_conditions: &johnston_t1_co_r06_conditions {T_C: {state: {tag: value, value: 1300}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 38}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 38}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 38}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Co*', value: 1.84, value_as_published: '1.84', method_class: author_estimate, total_nominal: true, T_C: 1300, point_conditions: *johnston_t1_co_r06_conditions}
+      point_conditions: *johnston_t1_co_r06_conditions
+    - observation_id: johnston_1965_t2_co_apparent_delta_h
+      type: gibbs_table
+      locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 7}
+      units: kcal per element
+      rail: redox
+      values:
+        quantity: apparent_enthalpy_of_reduction
+        method_class: model_derived
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_apparent_enthalpy_of_reduction
+        points: [{column_as_printed: 'Apparent ΔH (kcal)', value: 20, value_as_published: '20', method_class: model_derived, point_conditions: &johnston_t2_co_apparent_delta_h_conditions {T_C: {state: {tag: unknown, reason: fitted_temperature_dependence_no_single_T}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 7}}, atmosphere: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 7}}, fO2_Pa: {state: {tag: unknown, reason: no_numeric_pO2_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 7}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 7}}, composition: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 7}}}}]
+      derivation:
+        relation: fit of the temperature dependence of the log equilibrium constant, assuming oxygen-ion activity is temperature independent
+        inputs:
+          - johnston_1965_t1_co_r02
+          - johnston_1965_t1_co_r04
+          - johnston_1965_t1_co_r05
+          - johnston_1965_t1_co_r06
+        output_unit: kcal per element
+        locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 7}
+      derived_from:
+        - johnston_1965_t1_co_r02
+        - johnston_1965_t1_co_r04
+        - johnston_1965_t1_co_r05
+        - johnston_1965_t1_co_r06
+      point_conditions: *johnston_t2_co_apparent_delta_h_conditions
+  Ni:
+    observations:
+    - observation_id: johnston_1965_t1_ni_r01
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 39}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ni3+'
+        T_C: 1085
+        atmosphere_as_published: 'O2'
+        color_as_published: 'Dark purple'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ni3+', value: 0.046, value_as_published: '0.046', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_ni_r01_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 39}}, atmosphere: {state: {tag: value, value: 'O2'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 39}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 39}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ni*', value: 1.96, value_as_published: '1.96', method_class: author_estimate, total_nominal: true, T_C: 1085, point_conditions: *johnston_t1_ni_r01_conditions}
+      point_conditions: *johnston_t1_ni_r01_conditions
+    - observation_id: johnston_1965_t1_ni_r02
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 40}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'Ni3+'
+        T_C: 1085
+        atmosphere_as_published: 'Air'
+        color_as_published: '“ “'
+        color_resolved_as_published: Dark purple
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'Ni3+', value: 0.042, value_as_published: '0.042', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_ni_r02_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 40}}, atmosphere: {state: {tag: value, value: 'Air'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 40}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 40}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total Ni*', value: 1.96, value_as_published: '1.96', method_class: author_estimate, total_nominal: true, T_C: 1085, point_conditions: *johnston_t1_ni_r02_conditions}
+      point_conditions: *johnston_t1_ni_r02_conditions
+  V:
+    observations:
+    - observation_id: johnston_1965_t1_v_r01
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 41}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'V4+ / V5+'
+        T_C: 1085
+        atmosphere_as_published: 'CO2'
+        color_as_published: 'Light green'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'V4+', value: 0.033, value_as_published: '0.033', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_v_r01_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 41}}, atmosphere: {state: {tag: value, value: 'CO2'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 41}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 41}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'V5+', value: 1.16, value_as_published: '1.16', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_v_r01_conditions}
+      point_conditions: *johnston_t1_v_r01_conditions
+    - observation_id: johnston_1965_t1_v_r02
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 42}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'V4+ / V5+'
+        T_C: 1085
+        atmosphere_as_published: 'CO2/CO = 100'
+        color_as_published: 'Medium green'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'V4+', value: 0.237, value_as_published: '0.237', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_v_r02_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 42}}, atmosphere: {state: {tag: value, value: 'CO2/CO = 100'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 42}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 42}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'V5+', value: 1.01, value_as_published: '1.01', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_v_r02_conditions}
+      point_conditions: *johnston_t1_v_r02_conditions
+    - observation_id: johnston_1965_t1_v_r03
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 43}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'V4+ / V5+'
+        T_C: 1085
+        atmosphere_as_published: 'CO2/CO = 10'
+        color_as_published: 'Medium dark green'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'V4+', value: 0.58, value_as_published: '0.58', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_v_r03_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 43}}, atmosphere: {state: {tag: value, value: 'CO2/CO = 10'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 43}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 43}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'V5+', value: 0.73, value_as_published: '0.73', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_v_r03_conditions}
+      point_conditions: *johnston_t1_v_r03_conditions
+    - observation_id: johnston_1965_t1_v_r04
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 44}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'V4+ / V5+'
+        T_C: 1085
+        atmosphere_as_published: 'CO2/CO = 1'
+        color_as_published: 'Dark green'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'V4+', value: 1.25, value_as_published: '1.25', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_v_r04_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 44}}, atmosphere: {state: {tag: value, value: 'CO2/CO = 1'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 44}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 44}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'V5+', value: 0.14, value_as_published: '0.14', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_v_r04_conditions}
+      point_conditions: *johnston_t1_v_r04_conditions
+    - observation_id: johnston_1965_t1_v_r05
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 45}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'V3+ / Total V'
+        T_C: 1085
+        atmosphere_as_published: 'CO/CO2 = 10'
+        color_as_published: 'Dark green'
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'V3+', value: 0.63, value_as_published: '0.63', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_v_r05_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 45}}, atmosphere: {state: {tag: value, value: 'CO/CO2 = 10'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 45}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 45}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total V', value: 1.26, value_as_published: '1.26', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_v_r05_conditions}
+      point_conditions: *johnston_t1_v_r05_conditions
+    - observation_id: johnston_1965_t1_v_r06
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 46}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'V3+ / Total V'
+        T_C: 1085
+        atmosphere_as_published: 'CO/CO2 = 100'
+        color_as_published: '“ “'
+        color_resolved_as_published: Dark green
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'V3+', value: 1.02, value_as_published: '1.02', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_v_r06_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 46}}, atmosphere: {state: {tag: value, value: 'CO/CO2 = 100'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 46}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 46}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total V', value: 1.34, value_as_published: '1.34', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_v_r06_conditions}
+      point_conditions: *johnston_t1_v_r06_conditions
+    - observation_id: johnston_1965_t1_v_r07
+      type: concentration_series
+      locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 47}
+      phase: glass
+      units: wt%
+      rail: redox
+      quench_assessment: not_stated
+      quench_statement: Rapid cooling is described, but this row has no source statement that redox was preserved or altered.
+      quench_statement_locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}
+      values:
+        quantity: multivalent_element_wt_percent_pair
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: no_quantity_token_for_printed_reduced_and_total_wt_percent_pair
+        printed_element_subheader: 'V3+ / Total V'
+        T_C: 1085
+        atmosphere_as_published: 'CO-C'
+        color_as_published: '“ “'
+        color_resolved_as_published: Dark green
+        color_is_ditto: true
+        composition_as_published: Na2O.2SiO2
+        composition_mol: {Na2O: 0.3333333333333333333333333333, SiO2: 0.6666666666666666666666666667}
+        points:
+        - {column_as_printed: 'V3+', value: 1.00, value_as_published: '1.00', method_class: measured_direct, T_C: 1085, point_conditions: &johnston_t1_v_r07_conditions {T_C: {state: {tag: value, value: 1085}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 47}}, atmosphere: {state: {tag: value, value: 'CO-C'}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 47}}, fO2_Pa: {state: {tag: unknown, reason: no_row_level_numeric_pO2_printed}, locator: {page: 3, pdf_page_index: 2, published_page: 186, table: 'I', row: 47}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: Procedure}}, composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.3333333333333333333333333333'], [SiO2, '0.6666666666666666666666666667']]}}, locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}}}}
+        - {column_as_printed: 'Total V', value: 1.31, value_as_published: '1.31', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_v_r07_conditions}
+      point_conditions: *johnston_t1_v_r07_conditions
