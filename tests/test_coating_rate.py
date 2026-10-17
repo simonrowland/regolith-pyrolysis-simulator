@@ -695,6 +695,261 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     )
 
 
+SOURCE_DUCT_FLUX_REL_TOL = 1.0e-3
+SOURCE_DUCT_FLUX_ABS_MOL_S = 1.0e-10
+_PRICED_PROBE_SPECIES = ("Fe", "SiO", "Na")
+
+
+def _c2a_1600_live_run(**kwargs):
+    options = {
+        "feedstock_id": "lunar_mare_low_ti",
+        "campaign": "C2A",
+        "hours": 1,
+        "allow_fallback_vapor": True,
+        "allow_unmeasured_alpha_fallback": True,
+        "sio_start_temperature_c": 1600.0,
+        "sio_hold_temperature_c": 1600.0,
+        "sio_liner_temperature_c": 1050.0,
+        "sio_pO2_mbar": 0.0,
+        "include_wall_deposit_rate_diagnostics": True,
+    }
+    options.update(kwargs)
+    return PyrolysisRun(**options)
+
+
+def _pipe_molar_G_mol_s_Pa2(simulator) -> float:
+    from simulator.accounting.formulas import resolve_species_formula
+
+    mass_kg_s = simulator.overhead_model._pipe_conductance(
+        1.0,
+        float(simulator.melt.temperature_C),
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg={"N2": 1.0},
+    )
+    molar_mass = resolve_species_formula(
+        "N2",
+        simulator.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    return mass_kg_s / molar_mass
+
+
+def _capture_live_evaporation_controls(simulator):
+    from simulator.chemistry.kernel.capabilities import ChemistryIntent
+
+    captured: list[dict] = []
+    original = simulator._dispatch_only
+
+    def _wrapped(intent, *, control_inputs, **kwargs):
+        result = original(intent, control_inputs=control_inputs, **kwargs)
+        if intent == ChemistryIntent.EVAPORATION_FLUX:
+            captured.append(
+                {
+                    "P_eq_Pa": dict(
+                        control_inputs.get("vapour_batch_flux_pressures_Pa") or {}
+                    ),
+                    "P_bulk_Pa": dict(
+                        control_inputs.get("overhead_partials_Pa") or {}
+                    ),
+                    "molar_mass_kg_mol": dict(
+                        control_inputs.get("molar_mass_kg_mol") or {}
+                    ),
+                }
+            )
+        return result
+
+    simulator._dispatch_only = _wrapped
+    return captured
+
+
+def test_c2a_1600c_six_hour_source_duct_closure_is_same_tick() -> None:
+    """Live lunar C2A 1600 °C probe used as the SC-341 / b-922 regression.
+
+    Fails at e70fbfc5e on lagged P_bulk > P_eq or positive/zero flux
+    alternation. After the same-tick closure, each priced species stays
+    inside the quasi-steady band and source molar flux matches PIPE-1
+    duct outflow at the committed surface pressure.
+    """
+
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.silent_zero import ZeroBecause
+
+    run = _c2a_1600_live_run()
+    session = run._start_session()
+    simulator = session.simulator
+    captured_controls = _capture_live_evaporation_controls(simulator)
+
+    hours = []
+    for _hour in range(6):
+        n_before = len(captured_controls)
+        payload = run._run_session(session)
+        row = payload["per_hour_summary"][0]
+        live = captured_controls[-1] if len(captured_controls) > n_before else {
+            "P_eq_Pa": {},
+            "P_bulk_Pa": {},
+            "molar_mass_kg_mol": {},
+        }
+        hours.append(
+            {
+                "flux_kg_hr": dict(row.get("vapor_species_kg_hr") or {}),
+                "P_eq_Pa": live["P_eq_Pa"],
+                "P_bulk_Pa": live["P_bulk_Pa"],
+                "molar_mass_kg_mol": live["molar_mass_kg_mol"],
+                "silent_zero_notes": list(
+                    getattr(simulator, "_silent_zero_notes", []) or []
+                ),
+            }
+        )
+
+    hour1 = hours[0]
+    for species in _PRICED_PROBE_SPECIES:
+        P_eq = float(hour1["P_eq_Pa"].get(species, 0.0))
+        p_surface = float(hour1["P_bulk_Pa"].get(species, 0.0))
+        flux_kg_hr = float(hour1["flux_kg_hr"].get(species, 0.0))
+        if P_eq > 0.0 and p_surface < P_eq * (1.0 - SOURCE_DUCT_FLUX_REL_TOL):
+            assert flux_kg_hr > 0.0, (
+                f"hour 1 {species} has P_eq={P_eq} Pa and p={p_surface} Pa "
+                f"but committed flux is {flux_kg_hr} kg/h"
+            )
+
+    G = _pipe_molar_G_mol_s_Pa2(simulator)
+    configured_downstream = simulator._overhead_headspace_config.get(
+        "downstream_pressure_bar"
+    )
+    P_down_Pa = (
+        0.0
+        if configured_downstream is None
+        else max(0.0, float(configured_downstream) * 1.0e5)
+    )
+    registry = simulator.species_formula_registry
+
+    for hour_index, hour in enumerate(hours, start=1):
+        priced = [
+            species
+            for species in hour["P_eq_Pa"]
+            if float(hour["P_eq_Pa"][species]) > 0.0
+        ]
+        constraint_zeros = {
+            str(note.get("species"))
+            for note in hour["silent_zero_notes"]
+            if note.get("zero_because")
+            in {
+                ZeroBecause.PROVEN_EMPTY_INVENTORY.value,
+                ZeroBecause.REFUSED_UPSTREAM.value,
+            }
+            and note.get("species")
+        }
+        for species in priced:
+            P_eq = float(hour["P_eq_Pa"][species])
+            p_surface = float(hour["P_bulk_Pa"].get(species, 0.0))
+            flux_kg_hr = float(hour["flux_kg_hr"].get(species, 0.0))
+            upper = max(P_eq, P_down_Pa)
+            retained_flagged = any(
+                note.get("species") == species
+                and "retained" in str(note.get("detail") or "").lower()
+                for note in hour["silent_zero_notes"]
+            )
+            if not retained_flagged:
+                assert p_surface >= -1.0e-12, (
+                    f"hour {hour_index} {species}: p_surface={p_surface} Pa"
+                )
+                assert p_surface <= upper * (1.0 + SOURCE_DUCT_FLUX_REL_TOL) + 1.0e-9, (
+                    f"hour {hour_index} {species}: p_surface={p_surface} Pa "
+                    f"exceeds P_eq={P_eq} Pa (P_down={P_down_Pa} Pa)"
+                )
+            if species in constraint_zeros:
+                continue
+            if flux_kg_hr <= 0.0:
+                continue
+            molar_mass = hour["molar_mass_kg_mol"].get(species)
+            if molar_mass is None:
+                molar_mass = resolve_species_formula(
+                    species, registry
+                ).molar_mass_kg_per_mol()
+            q_source = flux_kg_hr / float(molar_mass) / 3600.0
+            total_P = sum(
+                max(0.0, float(hour["P_bulk_Pa"].get(name, 0.0)))
+                for name in priced
+            )
+            if total_P <= 0.0:
+                q_duct = 0.0
+            elif P_down_Pa <= 0.0:
+                q_duct = G * total_P * p_surface
+            else:
+                q_duct = G * max(0.0, total_P**2 - P_down_Pa**2) * (
+                    p_surface / total_P
+                )
+            scale = max(abs(q_source), abs(q_duct), SOURCE_DUCT_FLUX_ABS_MOL_S)
+            assert abs(q_source - q_duct) <= max(
+                SOURCE_DUCT_FLUX_ABS_MOL_S,
+                SOURCE_DUCT_FLUX_REL_TOL * scale,
+            ), (
+                f"hour {hour_index} {species}: q_source={q_source} mol/s "
+                f"q_duct={q_duct} mol/s p={p_surface} Pa P_eq={P_eq} Pa"
+            )
+
+    for species in _PRICED_PROBE_SPECIES:
+        fluxes = [
+            float(hour["flux_kg_hr"].get(species, 0.0)) for hour in hours
+        ]
+        equilibria = [
+            float(hour["P_eq_Pa"].get(species, 0.0)) for hour in hours
+        ]
+        for index in range(len(fluxes) - 2):
+            P_eq_now = equilibria[index]
+            P_eq_next = equilibria[index + 1]
+            P_eq_after = equilibria[index + 2]
+            if min(P_eq_now, P_eq_next, P_eq_after) <= 0.0:
+                continue
+            span = max(P_eq_now, P_eq_next, P_eq_after)
+            if span <= 0.0:
+                continue
+            if (max(P_eq_now, P_eq_next, P_eq_after) - min(
+                P_eq_now, P_eq_next, P_eq_after
+            )) / span > 0.5:
+                continue
+            positive_zero_positive = (
+                fluxes[index] > 0.0
+                and fluxes[index + 1] == 0.0
+                and fluxes[index + 2] > 0.0
+            )
+            zero_positive_zero = (
+                fluxes[index] == 0.0
+                and fluxes[index + 1] > 0.0
+                and fluxes[index + 2] == 0.0
+            )
+            assert not positive_zero_positive and not zero_positive_zero, (
+                f"{species} flux alternates {fluxes} kg/h while P_eq stays "
+                f"{equilibria} Pa"
+            )
+
+
+def test_evaporation_flux_overhead_pressure_is_projection_not_command() -> None:
+    from simulator.chemistry.kernel.capabilities import ChemistryIntent
+
+    run = _c2a_1600_live_run()
+    session = run._start_session()
+    simulator = session.simulator
+    run._apply_sio_pre_run_controls(simulator)
+    simulator.melt.p_total_mbar = 10.0
+    simulator._install_upstream_projection({"N2": 5.0})
+    seen: list[float] = []
+    original = simulator._dispatch_only
+
+    def capture(intent, *, control_inputs, **kwargs):
+        if intent == ChemistryIntent.EVAPORATION_FLUX:
+            seen.append(float(control_inputs.get("overhead_pressure_pa")))
+        return original(intent, control_inputs=control_inputs, **kwargs)
+
+    simulator._dispatch_only = capture
+    equilibrium = simulator._get_equilibrium()
+    simulator._calculate_evaporation(equilibrium)
+    assert seen
+    # Projection N2=5 mbar is 500 Pa. Command p_total_mbar=10 is 1000 Pa.
+    # Replacing _melt_headspace_total_pressure_bar with the command makes
+    # this assertion fail (fold1 P2-1 mutation).
+    assert seen[-1] == pytest.approx(500.0)
+
+
 def test_positive_production_diagnostic_and_resumed_session_are_local() -> None:
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
