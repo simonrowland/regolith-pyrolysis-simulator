@@ -1221,6 +1221,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 )
 
         flux_kg_hr: dict[str, float] = {}
+        below_threshold_flux_kg_hr: dict[str, float] = {}
         alpha_used_by_species: dict[str, float] = {}
         alpha_evaluations_by_species: dict[str, dict[str, Any]] = {}
         alpha_authority_status_by_species: dict[str, str] = {}
@@ -1434,6 +1435,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                         alpha_authority_status
                     )
                 flux_kg_hr[species] = rate_kg_hr
+            else:
+                below_threshold_flux_kg_hr[species] = rate_kg_hr
 
         if missing_transport_parameters and not computable_transport_species:
             return IntentResult(
@@ -1466,6 +1469,11 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 "missing-species-state-dependent-melt-transfer-inputs"
             ),
         }
+        if below_threshold_flux_kg_hr:
+            diagnostic["below_threshold_evaporation_flux"] = {
+                "threshold_kg_hr": _NONTRIVIAL_FLUX_KG_HR,
+                "fluxes_kg_hr": below_threshold_flux_kg_hr,
+            }
         if alpha_authority_status_by_species:
             diagnostic["alpha_authority_status_by_species"] = (
                 alpha_authority_status_by_species
