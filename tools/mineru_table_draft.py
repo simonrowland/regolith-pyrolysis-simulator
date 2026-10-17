@@ -21,6 +21,10 @@ _CHUNK_START = re.compile(r"p(\d+)-p\d+")
 _NUMBER = re.compile(
     r"^[+\-−–—]?(?:\d+(?:\.\d+)?|\.\d+)(?:\(\d+\))?(?:[eE][+\-]?\d+)?$"
 )
+_LATEX_SCIENTIFIC = re.compile(
+    r"^([+\-−–—]?(?:\d+(?:\.\d+)?|\.\d+))\s*\\times\s*"
+    r"10\^\{?([+\-−–—]?\d+)\}?$"
+)
 _COMMA_DECIMAL = re.compile(r"(?<![\d.])\d{2,3}\.\d{3}(?!\d)")
 _FOOTNOTE_MARK = re.compile(r"([*†‡§¶|]+)$")
 _NUMERIC_SUPERSCRIPT = re.compile(
@@ -131,12 +135,16 @@ def _span(value: str | None) -> int:
 
 
 def _is_number(text: str) -> bool:
-    return bool(_NUMBER.fullmatch(text.strip()))
+    token = text.strip().strip("$").strip()
+    return bool(_NUMBER.fullmatch(token) or _LATEX_SCIENTIFIC.fullmatch(token))
 
 
 def _number_decimal(text: str) -> Decimal | None:
-    token = text.strip()
-    if not _is_number(token):
+    token = text.strip().strip("$").strip()
+    latex_scientific = _LATEX_SCIENTIFIC.fullmatch(token)
+    if latex_scientific:
+        token = f"{latex_scientific.group(1)}e{latex_scientific.group(2)}"
+    elif not _NUMBER.fullmatch(token):
         return None
     token = re.sub(r"\(\d+\)", "", token)
     token = token.translate(str.maketrans({"−": "-", "–": "-", "—": "-"}))
@@ -513,8 +521,15 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
         for observation in species_data.get("observations") or []:
             values = observation.get("values") or {}
             for point_index, point in enumerate(values.get("points") or []):
-                value = point.get("value")
-                if isinstance(value, bool) or not isinstance(value, (int, float)):
+                value_field = "value"
+                value = point.get(value_field)
+                if value is None and "pressure_atm" in point:
+                    value_field = "pressure_atm"
+                    value = point.get(value_field)
+                if isinstance(value, bool) or value is None:
+                    continue
+                number = _number_decimal(str(value))
+                if number is None:
                     continue
                 locator = point.get("locator") or observation.get("locator") or {}
                 pdf_page = locator.get("pdf_page")
@@ -528,10 +543,16 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                         "path": (
                             f"species.{species_name}.observations"
                             f"[{observation.get('observation_id', '')}]"
-                            f".values.points[{point_index}].value"
+                            f".values.points[{point_index}].{value_field}"
                         ),
                         "pdf_page": pdf_page,
-                        "value": value,
+                        "table_number": (
+                            str(int(locator["table"]))
+                            if locator.get("table") is not None
+                            and str(locator["table"]).isdecimal()
+                            else None
+                        ),
+                        "value": number,
                     }
                 )
     return points
@@ -543,8 +564,12 @@ def compare_extract_to_draft(
     index_path = Path(draft_index_path)
     index = yaml.safe_load(index_path.read_text(encoding="utf-8")) or {}
     draft_by_page: dict[int, list[tuple[dict[str, Any], Decimal]]] = defaultdict(list)
+    draft_by_table: dict[
+        tuple[int, str], list[tuple[dict[str, Any], Decimal]]
+    ] = defaultdict(list)
     for table in index.get("tables") or []:
         page = int(table["pdf_page"])
+        table_number = str(int(table["table_key"].rsplit("-t", 1)[1]))
         csv_path = index_path.parent / table["csv"]
         with csv_path.open(encoding="utf-8", newline="") as stream:
             for cell in csv.DictReader(stream):
@@ -568,24 +593,32 @@ def compare_extract_to_draft(
                         "flags": json.loads(cell["flags"] or "[]"),
                     }
                     draft_by_page[page].append((candidate, number))
+                    draft_by_table[(page, table_number)].append((candidate, number))
 
-    consumed: dict[int, set[int]] = defaultdict(set)
+    consumed: dict[tuple[int, str | None], set[int]] = defaultdict(set)
     results: list[dict[str, Any]] = []
     for point in _numeric_points(extract):
         page = point["pdf_page"]
-        indexed_candidates = draft_by_page.get(page, []) if page is not None else []
+        table_number = point["table_number"]
+        location = (page, table_number)
+        if page is None:
+            indexed_candidates = []
+        elif table_number is None:
+            indexed_candidates = draft_by_page.get(page, [])
+        else:
+            indexed_candidates = draft_by_table.get((page, table_number), [])
         point_value = Decimal(str(point["value"]))
         match_index = next(
             (
                 index
                 for index, (_, candidate_value) in enumerate(indexed_candidates)
-                if index not in consumed[page]
+                if index not in consumed[location]
                 and point_value == candidate_value
             ),
             None,
         )
         if match_index is not None:
-            consumed[page].add(match_index)
+            consumed[location].add(match_index)
             status = "matched"
         elif indexed_candidates:
             status = "mismatch"

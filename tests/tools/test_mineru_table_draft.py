@@ -285,6 +285,59 @@ def test_barin_table_12_and_label_value_rows_are_comparable(tmp_path: Path) -> N
     ]
 
 
+def test_compare_reads_partial_pressure_atm_strings(tmp_path: Path) -> None:
+    chunk_dir = tmp_path / "raw" / "pressure-string" / "ocr-mineru" / "p001-p007"
+    chunk_dir.mkdir(parents=True)
+    items = [
+        {
+            "type": "table",
+            "page_idx": 3,
+            "table_body": (
+                "<table><tr><th>T, K</th><th>pMg, atm</th></tr>"
+                "<tr><td>1851</td><td>$4.68 \\times 10^{-7}$</td></tr></table>"
+            ),
+        },
+        {
+            "type": "table",
+            "page_idx": 3,
+            "table_body": (
+                "<table><tr><th>T, K</th><th>pMg, atm</th></tr>"
+                "<tr><td>1914</td><td>$1.25 \\times 10^{-6}$</td></tr></table>"
+            ),
+        },
+    ]
+    (chunk_dir / "content_list.json").write_text(
+        json.dumps(items), encoding="utf-8"
+    )
+    index_path = draft.convert_source(
+        "pressure-string", tmp_path / "draft", corpus_root=tmp_path / "raw"
+    )
+    extract = {
+        "species": {
+            "Mg": {
+                "observations": [
+                    {
+                        "observation_id": "pressure-series",
+                        "locator": {"pdf_page_index": 3, "table": "2"},
+                        "values": {
+                            "quantity": "partial_pressure",
+                            "points": [{"pressure_atm": "1.25e-6"}],
+                        },
+                    }
+                ]
+            }
+        }
+    }
+
+    result = draft.compare_extract_to_draft(extract, index_path)
+
+    assert len(result) == 1
+    assert result[0]["status"] == "matched"
+    assert result[0]["path"].endswith(".values.points[0].pressure_atm")
+    assert result[0]["matched_cell"]["table_key"] == "p004-t02"
+    assert result[0]["matched_cell"]["text"] == "$1.25 \\times 10^{-6}$"
+
+
 def test_compare_carries_flags_for_matched_cells(tmp_path: Path) -> None:
     chunk_dir = tmp_path / "raw" / "flagged-values" / "ocr-mineru" / "p001-p010"
     chunk_dir.mkdir(parents=True)
