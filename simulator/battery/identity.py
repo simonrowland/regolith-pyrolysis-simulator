@@ -393,6 +393,22 @@ class ValenceBasis:
     denominator_oxidation_state: int | None
     value_form: ValenceValueForm
 
+    def _validate_value(self, value: Decimal) -> None:
+        if self.value_form is ValenceValueForm.FRACTION and not (
+            Decimal("0") <= value <= Decimal("1")
+        ):
+            raise IdentityRefusal(
+                RefusalReason.INVALID_SOURCE,
+                "value",
+                f"fraction valence value {value} must lie in [0, 1]",
+            )
+        if self.value_form is ValenceValueForm.RATIO and value < 0:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_SOURCE,
+                "value",
+                f"ratio valence value {value} must be non-negative",
+            )
+
     def __post_init__(self) -> None:
         if not isinstance(self.numerator_oxidation_states, tuple) or any(
             type(state) is not int for state in self.numerator_oxidation_states
