@@ -16,6 +16,182 @@ extraction:
   worker: wave3b-naz15
 review_status: draft
 corrections: []
+fidelity_samples:
+- species: SiO
+  observable: partial_pressure
+  observation_id: nazarov_2015_table2_sio
+  field: points
+  value:
+    - T_K: 1833
+      composition_mol:
+        basis: formula_derived_from_synthetic_anorthite
+        CaO: '0.25'
+        Al2O3: '0.25'
+        SiO2: '0.50'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper reports residual chamber pressure, not in-cell total pressure.
+          locator:
+            table: '2'
+            published_page: 172
+            pdf_page_index: 4
+            note: Table 2 does not print in-cell total pressure.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not state fO2 as an experimental condition.
+          locator:
+            table: '2'
+            published_page: 172
+            pdf_page_index: 4
+            note: O and O2 are vapor species, not a stated fO2 condition.
+      value: 6.95e-05
+      p_atm: 6.95e-05
+      p_atm_as_printed: 6.95 × 10^-5
+      locator:
+        table: '2'
+        published_page: 172
+        pdf_page_index: 4
+        note: SiO row, 1833 K column
+    - T_K: 1883
+      composition_mol:
+        basis: formula_derived_from_synthetic_anorthite
+        CaO: '0.25'
+        Al2O3: '0.25'
+        SiO2: '0.50'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper reports residual chamber pressure, not in-cell total pressure.
+          locator:
+            table: '2'
+            published_page: 172
+            pdf_page_index: 4
+            note: Table 2 does not print in-cell total pressure.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not state fO2 as an experimental condition.
+          locator:
+            table: '2'
+            published_page: 172
+            pdf_page_index: 4
+            note: O and O2 are vapor species, not a stated fO2 condition.
+      value: 0.000132
+      p_atm: 0.000132
+      p_atm_as_printed: 1.32 × 10^-4
+      locator:
+        table: '2'
+        published_page: 172
+        pdf_page_index: 4
+        note: SiO row, 1883 K column
+    - T_K: 1933
+      composition_mol:
+        basis: formula_derived_from_synthetic_anorthite
+        CaO: '0.25'
+        Al2O3: '0.25'
+        SiO2: '0.50'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper reports residual chamber pressure, not in-cell total pressure.
+          locator:
+            table: '2'
+            published_page: 172
+            pdf_page_index: 4
+            note: Table 2 does not print in-cell total pressure.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not state fO2 as an experimental condition.
+          locator:
+            table: '2'
+            published_page: 172
+            pdf_page_index: 4
+            note: O and O2 are vapor species, not a stated fO2 condition.
+      value: 0.000228
+      p_atm: 0.000228
+      p_atm_as_printed: 2.28 × 10^-4
+      locator:
+        table: '2'
+        published_page: 172
+        pdf_page_index: 4
+        note: SiO row, 1933 K column
+    - T_K: 1983
+      composition_mol:
+        basis: formula_derived_from_synthetic_anorthite
+        CaO: '0.25'
+        Al2O3: '0.25'
+        SiO2: '0.50'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper reports residual chamber pressure, not in-cell total pressure.
+          locator:
+            table: '2'
+            published_page: 172
+            pdf_page_index: 4
+            note: Table 2 does not print in-cell total pressure.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not state fO2 as an experimental condition.
+          locator:
+            table: '2'
+            published_page: 172
+            pdf_page_index: 4
+            note: O and O2 are vapor species, not a stated fO2 condition.
+      value: 0.000577
+      p_atm: 0.000577
+      p_atm_as_printed: 5.77 × 10^-4
+      locator:
+        table: '2'
+        published_page: 172
+        pdf_page_index: 4
+        note: SiO row, 1983 K column
+    - T_K: 2033
+      composition_mol:
+        basis: formula_derived_from_synthetic_anorthite
+        CaO: '0.25'
+        Al2O3: '0.25'
+        SiO2: '0.50'
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper reports residual chamber pressure, not in-cell total pressure.
+          locator:
+            table: '2'
+            published_page: 172
+            pdf_page_index: 4
+            note: Table 2 does not print in-cell total pressure.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not state fO2 as an experimental condition.
+          locator:
+            table: '2'
+            published_page: 172
+            pdf_page_index: 4
+            note: O and O2 are vapor species, not a stated fO2 condition.
+      value: 0.000887
+      p_atm: 0.000887
+      p_atm_as_printed: 8.87 × 10^-4
+      locator:
+        table: '2'
+        published_page: 172
+        pdf_page_index: 4
+        note: SiO row, 2033 K column
+  locator:
+    table: '2'
+    row: SiO
+    published_page: 172
+    pdf_page_index: 4
 benches:
 - id: nazarov-2015-mo-knudsen-cell
   identity:
@@ -79,6 +255,7 @@ experiments:
         reason: The paper does not identify the molecular, transitional, or viscous flow regime.
 species:
   Si:
+    observations: []
     context:
     - observation_id: nazarov_2015_table1_meteorite_compositions_context
       type: characterization
@@ -125,6 +302,7 @@ species:
           * Formula coefficients, in addition to Fe, take into account all other cations, as well as phosphorus with Si.
           # Analyses from work (Nazarov et al., 2012a), (b.d.l.) content below detection limit; (n.d.) not determined.
   MoO2:
+    observations: []
     context:
     - observation_id: nazarov_2015_moo2_cell_contaminant_context
       type: apparatus
@@ -139,6 +317,7 @@ species:
         pressure_in_table2: not_tabulated
         flag: cell_contamination
   MoO3:
+    observations: []
     context:
     - observation_id: nazarov_2015_moo3_cell_contaminant_context
       type: apparatus
