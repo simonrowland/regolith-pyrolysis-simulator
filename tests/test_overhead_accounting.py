@@ -1188,7 +1188,10 @@ def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
-    sim._overhead_headspace_config["enabled"] = True
+    sim._configure_overhead_headspace(headspace_config={
+        **sim._overhead_headspace_config, "enabled": True,
+    })
+    sim._install_initial_upstream_projection({})
 
     sim.vapor_pressures["metals"]["Fe"] = {
         "parent_oxide": "FeO",

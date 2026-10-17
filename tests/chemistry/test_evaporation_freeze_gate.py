@@ -1170,6 +1170,7 @@ def test_freeze_gate_cache_rekeys_after_real_redox_source_term(
         enabled=True,
     )
     sim.melt.p_total_mbar = 10.0
+    sim._install_upstream_projection({'N2': 10.0})
     temperature_K = 1500.0 + 273.15
     sim.melt.temperature_C = 1500.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
@@ -2755,6 +2756,7 @@ def test_freeze_gate_enabled_quench_hysteresis_uses_last_liquid_reference(
         enabled=True,
     )
     sim.melt.p_total_mbar = 10.0
+    sim._install_upstream_projection({'N2': 10.0})
 
     def fail_dispatch(*_args, **_kwargs):
         raise AssertionError('quenched redox guard must not dispatch')
@@ -3636,6 +3638,7 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
     )
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 10.0
+    sim._install_upstream_projection({'N2': 10.0})
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
     sim.melt.oxygen_reservoir.reference_T_K = 1500.0 + 273.15
     sim._sync_oxygen_reservoir_mirror()
@@ -4268,6 +4271,7 @@ def test_source_terms_and_bubbler_share_failed_tick_authority(
     )
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 10.0
+    sim._install_upstream_projection({'N2': 10.0})
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
     sim.melt.oxygen_reservoir.reference_T_K = 1600.0 + 273.15
     sim._sync_oxygen_reservoir_mirror()

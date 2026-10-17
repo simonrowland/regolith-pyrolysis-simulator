@@ -136,6 +136,7 @@ def test_quenched_redox_reference_survives_pressure_cycle() -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 10.0
+    _set_actual_n2_headspace(sim, 10.0)
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas", {"O2": 1000.0},
         source="test funded last liquid reference", material_origin="feedstock",
@@ -149,6 +150,7 @@ def test_quenched_redox_reference_survives_pressure_cycle() -> None:
     sim.melt.temperature_C = 1000.0
     for pressure in (10.0, 0.2, 10.0):
         sim.melt.p_total_mbar = pressure
+        _set_actual_n2_headspace(sim, pressure)
         sim._re_reference_melt_fO2_to_temperature(gate_authority=None)
         assert sim._current_melt_redox_fO2_log() == -2.1
         assert sim.melt.oxygen_reservoir.reference_T_K == 1873.15
@@ -161,6 +163,7 @@ def test_passive_exchange_respeciation_settles_same_buffer_once(absorbing) -> No
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 0.2
+    _set_actual_n2_headspace(sim, 0.2)
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas", {"O2": 1000.0},
         source="test funded initial redox split", material_origin="feedstock",
@@ -1387,6 +1390,7 @@ def test_redox_source_bounds_finite_absurd_candidate_fo2(
 def test_redox_source_valid_candidate_fo2_still_applies_exact_delta() -> None:
     sim = _make_sim()
     sim.melt.p_total_mbar = 10.0  # Keep the small increment below the gas ceiling.
+    _set_actual_n2_headspace(sim, 10.0)
     sim.melt.temperature_C = 1600.0
     temperature_K = 1873.15
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
@@ -1483,6 +1487,7 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
+    sim._install_initial_upstream_projection({})
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
     sim._sync_oxygen_reservoir_mirror()
     sim.atom_ledger.load_external_mol(
@@ -2196,6 +2201,7 @@ def test_elemental_evaporation_metal_loss_oxidizes_from_committed_oxide_debit(
 ) -> None:
     sim = _make_sim()
     sim.melt.p_total_mbar = 10.0  # Unsaturated source case; routing has its own regression.
+    _set_actual_n2_headspace(sim, 10.0)
     sim.melt.temperature_C = 1600.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
     sim._sync_oxygen_reservoir_mirror()
@@ -2402,6 +2408,7 @@ def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
+    sim._install_initial_upstream_projection({})
     initial_buffer_o2 = sim.atom_ledger.mol_by_account(
         "reservoir.fo2_buffer"
     ).get("O2", 0.0)
@@ -2509,6 +2516,7 @@ def test_headspace_exchange_cannot_instantly_erase_reductant_dose() -> None:
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
+    sim._install_initial_upstream_projection({})
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
     sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
