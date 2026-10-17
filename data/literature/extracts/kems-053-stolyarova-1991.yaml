@@ -1697,7 +1697,7 @@ species:
             published_page: 3711
             note: No numeric oxygen fugacity is printed for this row.
   O:
-    observations:
+    context:
     - observation_id: stolyarova_1991_printed_equilibrium_1
       type: thermodynamic_example
       locator:
@@ -1711,6 +1711,8 @@ species:
         quantity: printed_equilibrium
         method_class: method_only
         equation_as_printed: (WO3) = (WO2) + (O)
+        description: 'P_O is calculated from measured WO2 and WO3 partial pressures and the equilibrium constant for the printed gas reaction (WO3) = (WO2) + (O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated.'
+    observations:
     - observation_id: stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium
       type: partial_pressure
       locator:
@@ -1728,7 +1730,9 @@ species:
       values:
         quantity: partial_pressure
         gas_species: O
-        method_class: derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Stolyarova et al. (1991), Table Ib, Eq. [1]
         admission_status: admitted
         method: calculated-from-equilibrium-1
         method_as_printed: Calculated from equilibrium (1)
@@ -1902,13 +1906,6 @@ species:
           locator:
             published_page: 3711
             note: No numeric oxygen fugacity is printed for this row.
-      derived_from:
-      - stolyarova_1991_printed_equilibrium_1
-      derivation:
-        relation: 'P_O is calculated from measured WO2 and WO3 partial pressures and the equilibrium constant for the printed gas reaction (WO3) = (WO2) + (O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated.'
-        inputs:
-        - stolyarova_1991_printed_equilibrium_1
-        output_unit: Pa
   CaO:
     observations:
     - observation_id: stolyarova_1991_cao_activity_eq2_1933k

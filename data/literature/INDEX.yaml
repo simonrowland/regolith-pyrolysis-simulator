@@ -9,20 +9,21 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 315
-  extracts: 313
+  sources: 348
+  extracts: 346
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 61
+  extracts_with_private_locators: 62
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 313
-  alias_groups_needing_resolution: 38
+  extracts_without_pdf: 346
+  alias_groups_needing_resolution: 44
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
   - 1997jonesthermo
   - 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
   - abdul-2023-cao-sio2-calphad
+  - adamkovicova-1980-casio3-heat-of-fusion
   - aithala-2026-magmatic-iron-redox-to-2100c
   - ames-walsh-white-1967
   - ammin-73-470-oneill-1988
@@ -34,6 +35,7 @@ gaps:
   - badjukov-petrova-1993-shock-vaporization
   - banchor-matsui-naito-1986
   - banya-watanabe-1977-feto-p2o5-solid-iron
+  - basu-2008-feo-steelmaking
   - beckett-2002-silicate-melt-activities
   - behrens-rosenblatt-1972
   - bencze-yazhenskikh-2016
@@ -50,12 +52,14 @@ gaps:
   - charnoz-2023-hydrogen-magma-ocean
   - cho-suito-1994-cas-slag-activities
   - cooper-2007-sintering-lunar-simulant
+  - costa-2016-lpsc-forsterite-olivine-vaporization
   - costa-jacobson-2015
   - datz-1961-na2cl2
   - datz-and-smith-1961
   - datz-smith-taylor-1961-nacl-vapor
   - deffrennes-2020-ca-o-calphad
   - deguzman-2026-simulant-physicochemical
+  - di-donato-granati-2000
   - engelschion-2020-eac1a-simulant
   - ewing-1963-sodium-potassium-properties
   - fdm879
@@ -67,11 +71,14 @@ gaps:
   - fray-schmitt-2009-co-1
   - fray-schmitt-2009-nh3
   - fujisawa-1990-cao-al2o3-activities
+  - gaillard-2003-hydrous-silicic-melt-activity
   - gca-366-210-berry-2024
   - giauque-powell-1939-cl2
   - giauque-ruehrwein-1939-hcn-psat
   - gibbons-1963-thesis-cas-slags-cas
   - gornerup-1996-cao-corner-liquidus
+  - green-1971-apollo12-basalt-petrology
+  - greig-1927-ajs-immiscibility-silicate-melts-part1
   - guo-2021-mgo-activity-cmas-slag
   - habermann-daane-1964
   - hashimoto-nakano-2021-bubbles-to-chondrites-ii
@@ -81,6 +88,7 @@ gaps:
   - itoh-hino-banya-1997-mg-deoxidation
   - itoh-hino-banya-1998-spinel
   - iupac-o2-solid-psat
+  - ivanova-2018-spinel-rich-cai-evaporation
   - ivtan-cro2-g
   - ivtan-mno-coo-thermo
   - jaggi-2021-mercury-atmosphere
@@ -199,8 +207,10 @@ gaps:
   - lpsc-2024-bennu-pyrolysis-vandam
   - lunarsurface-2020-5029
   - mamiya-2000-sio-disproportionation
+  - mathieu-2009-sodium-solubility-thesis
   - matzen-2022-martian-basalt-redox
   - mendybaev-2017-fun-cai-lab-evaporation
+  - mendybaev-2018-cmas-evaporation
   - mendybaev-2021-cai-low-pressure-h2-evap
   - metsoc-2019-6005
   - metsoc-2024-6131
@@ -230,7 +240,9 @@ gaps:
   - okazaki-2022-ryugu-gas-treasure-box
   - oneill-2002-feo-activity-coefficients-cmas
   - oneill-2005-alkali-oxide-activities
+  - ostrovski-2000-cao-tio2-sio2
   - pahlevan-2026-protolunar-volatile-outflows
+  - pedley-marshall-1983-gaseous-monoxides
   - pending-as2o3-second-primary
   - pending-bi2o3-kems
   - pending-cacl2-kems-or-transpiration
@@ -276,17 +288,36 @@ gaps:
   - sesko-2022-tum-thesis
   - sf04-magma-companion-workbook
   - shaw-2023-vacuum-thermal-sublimation-thesis
+  - shilov-1998-sno-zno-p2o5-vaporization
+  - shimaoka-nakamura-1989-nipr2-252
+  - shimaoka-nakamura-1991-iau-colloq126-79
   - shornikov-1994-mullite-kems
   - shornikov-1997-cao-alumina-vapor
   - shornikov-1997-diopside-vaporization
   - shornikov-1998-silica-vaporization
+  - shornikov-2000-aluminosilicate-vaporization
   - shornikov-2000-cao-silica-vaporization
+  - shornikov-2001-mgalumina-silica-vaporization
+  - shornikov-2002-alumina-silica-melt-thermodynamics
+  - shornikov-2002-spinel-mgal2o4
   - shornikov-2007-cao-aluminosilicate-melts
   - shornikov-2008-redox-oxide-evaporation
+  - shornikov-2013-potassium-silicate-thermodynamics
+  - shornikov-2014-ca-al-evaporation-coefficients
+  - shornikov-2014-sodium-silicate-model
+  - shornikov-2018-spinel-solid-solutions
+  - shornikov-2019-perovskite-evaporation
+  - shornikov-2020-cao-tio2-melts
   - shornikov-2021-mgo-feo-silicate
+  - shornikov-2023-calcium-phosphate
+  - shornikov-2023-natural-cai-evaporation
+  - shornikov-2024-cai-silica-evaporation
   - shornikov-2024-wollastonite-evaporation
+  - shornikov-2025-calcium-oxide-evaporation
   - shornikov-2025-saratov-alkali-evaporation
   - shornikov-2026-hatrurite-evaporation
+  - shults-1994-mullite-evaporation
+  - shults-1995-calcium-aluminate-thermodynamics
   - slag-001-banya-1993
   - slag-002-banya-hino-nagasaka-1993
   - slag-003-hino-kitagawa-banya-1993
@@ -317,6 +348,7 @@ gaps:
   - thomas-wood-2021-chlorine-silicate-melts
   - tomioka-1991-nitride-capacity-cao-al2o3
   - ts1985
+  - tsuchiyama-1998-forsterite-mg2sio4-h2
   - ueshima-1982-fe-mo-thermal
   - usgs-lunar-sourcebook-tab8-1
   - usgs-lunar-sourcebook-tab8-2
@@ -332,6 +364,7 @@ gaps:
   - wilkerson-2023-jsc1a-outgassing
   - wimpenny-2019-zn-isotope-evaporation-extreme-t
   - yam1983
+  - zaitsev-2000-ms2000-045
   - zigo-1987-gehlenite-fusion
   untracked_files: []
   extracts_with_private_locators:
@@ -390,6 +423,7 @@ gaps:
   - okazaki-2022-ryugu-gas-treasure-box
   - pahlevan-2026-protolunar-volatile-outflows
   - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+  - shornikov-2013-potassium-silicate-thermodynamics
   - smales-1971-lpsc-12022
   - stebbins-carmichael-weill-1983
   - ta-badro-2021
@@ -716,6 +750,42 @@ gaps:
     - shornikov-1997-diopside-vaporization
     resolution: owner/controller
   - type: source_id_alias
+    key: shornikov-2000
+    source_ids:
+    - shornikov-2000-aluminosilicate-vaporization
+    - shornikov-2000-cao-silica-vaporization
+    resolution: owner/controller
+  - type: source_id_alias
+    key: shornikov-2002
+    source_ids:
+    - shornikov-2002-alumina-silica-melt-thermodynamics
+    - shornikov-2002-spinel-mgal2o4
+    resolution: owner/controller
+  - type: source_id_alias
+    key: shornikov-2014
+    source_ids:
+    - shornikov-2014-ca-al-evaporation-coefficients
+    - shornikov-2014-sodium-silicate-model
+    resolution: owner/controller
+  - type: source_id_alias
+    key: shornikov-2023
+    source_ids:
+    - shornikov-2023-calcium-phosphate
+    - shornikov-2023-natural-cai-evaporation
+    resolution: owner/controller
+  - type: source_id_alias
+    key: shornikov-2024
+    source_ids:
+    - shornikov-2024-cai-silica-evaporation
+    - shornikov-2024-wollastonite-evaporation
+    resolution: owner/controller
+  - type: source_id_alias
+    key: shornikov-2025
+    source_ids:
+    - shornikov-2025-calcium-oxide-evaporation
+    - shornikov-2025-saratov-alkali-evaporation
+    resolution: owner/controller
+  - type: source_id_alias
     key: slag-1993
     source_ids:
     - slag-001-banya-1993
@@ -911,6 +981,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/abdul-2023-cao-sio2-calphad.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: adamkovicova-1980-casio3-heat-of-fusion
+  aliases: []
+  citation: Adamkovičová, K., Kosa, L. & Proks, I. (1980), "The Heat of Fusion of CaSiO3", Silikáty XXIV,
+    193–201.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml
+    review_status: draft
+    rows: 20
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/adamkovicova-1980-casio3-heat-of-fusion/adamkovicova-1980-casio3-heat-of-fusion.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/adamkovicova-1980-casio3-heat-of-fusion/sidecar.yaml
+      present: false
+    text:
+      path: text/adamkovicova-1980-casio3-heat-of-fusion
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/adamkovicova-1980-casio3-heat-of-fusion
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/adamkovicova-1980-casio3-heat-of-fusion.yaml
       present: false
       error: null
       last_stage: null
@@ -1552,6 +1680,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/banya-watanabe-1977-feto-p2o5-solid-iron.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: basu-2008-feo-steelmaking
+  aliases: []
+  citation: Basu, S., Lahiri, A. K. & Seetharaman, S. (2008), "Activity of Iron Oxide in Steelmaking Slag",
+    Metallurgical and Materials Transactions B 39B (June 2008), pp. 447-456.
+  doi: 10.1007/s11663-008-9148-4
+  report_number: null
+  identifier: 10.1007/s11663-008-9148-4
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/basu-2008-feo-steelmaking.yaml
+    review_status: draft
+    rows: 216
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/basu-2008-feo-steelmaking/basu-2008-feo-steelmaking.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/basu-2008-feo-steelmaking/sidecar.yaml
+      present: false
+    text:
+      path: text/basu-2008-feo-steelmaking
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/basu-2008-feo-steelmaking
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/basu-2008-feo-steelmaking.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/basu-2008-feo-steelmaking.yaml
       present: false
       error: null
       last_stage: null
@@ -2495,6 +2681,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  aliases: []
+  citation: Costa, G. C. C., Jacobson, N. S. & Fegley, B. (2016), "Vaporization and Thermodynamics of
+    Forsterite-Rich Olivine", 47th Lunar and Planetary Science Conference, abstract 1454.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/costa-2016-lpsc-forsterite-olivine-vaporization.yaml
+    review_status: draft
+    rows: 8
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/costa-2016-lpsc-forsterite-olivine-vaporization/costa-2016-lpsc-forsterite-olivine-vaporization.pdf
+      present: true
+      sha256: d47d37034fab2c5dfa06cb62d01280db3cc8cdc943160872088d201102c74dab
+      matches_simulator: null
+    sidecar:
+      path: raw/costa-2016-lpsc-forsterite-olivine-vaporization/sidecar.yaml
+      present: true
+    text:
+      path: text/costa-2016-lpsc-forsterite-olivine-vaporization
+      exists: true
+      file_count: 2
+    tables:
+      path: tables/costa-2016-lpsc-forsterite-olivine-vaporization
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/costa-2016-lpsc-forsterite-olivine-vaporization.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/costa-2016-lpsc-forsterite-olivine-vaporization.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: costa-jacobson-2015
   aliases:
   - kems-007-costa-2015
@@ -2850,6 +3094,64 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: di-donato-granati-2000
+  aliases: []
+  citation: Di Donato, A. and Granati, P. (2000), “Experimental Determination of Activity of FeO, MnO
+    and Cr2O3 in Slags”, Centro Sviluppo Materiali research manuscript.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/di-donato-granati-2000.yaml
+    review_status: draft
+    rows: 95
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/di-donato-granati-2000/di-donato-granati-2000.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/di-donato-granati-2000/sidecar.yaml
+      present: false
+    text:
+      path: text/di-donato-granati-2000
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/di-donato-granati-2000
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/di-donato-granati-2000.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/di-donato-granati-2000.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: engelschion-2020-eac1a-simulant
   aliases: []
@@ -3491,6 +3793,65 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: gaillard-2003-hydrous-silicic-melt-activity
+  aliases: []
+  citation: Gaillard, F., Pichavant, M. & Scaillet, B. (2003). Experimental determination of activities
+    of FeO and Fe2O3 components in hydrous silicic melts under oxidizing conditions. Geochimica et Cosmochimica
+    Acta 67(22), 4389–4409. HAL author manuscript hal-00069333.
+  doi: 10.1016/S0016-7037(03)00376-4
+  report_number: null
+  identifier: 10.1016/S0016-7037(03)00376-4
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/gaillard-2003-hydrous-silicic-melt-activity.yaml
+    review_status: draft
+    rows: 32
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/gaillard-2003-hydrous-silicic-melt-activity/gaillard-2003-hydrous-silicic-melt-activity.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/gaillard-2003-hydrous-silicic-melt-activity/sidecar.yaml
+      present: false
+    text:
+      path: text/gaillard-2003-hydrous-silicic-melt-activity
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/gaillard-2003-hydrous-silicic-melt-activity
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/gaillard-2003-hydrous-silicic-melt-activity.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/gaillard-2003-hydrous-silicic-melt-activity.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: gca-366-210-berry-2024
   aliases: []
   citation: Berry, A.J., Doyle, P.M., Schofield, P.F., Miller, L.A., Le Losq, C., Burnham, A.D., & Mosselmans,
@@ -3780,6 +4141,123 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/gornerup-1996-cao-corner-liquidus.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: green-1971-apollo12-basalt-petrology
+  aliases: []
+  citation: Green, D. H., Ringwood, A. E., Ware, N. G., Hibberson, W. O., Major, A. & Kiss, E. (1971),
+    "Experimental petrology and petrogenesis of Apollo 12 basalts", Proceedings of the Second Lunar Science
+    Conference, Vol. 1, pp. 601–615. The M.I.T. Press.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/green-1971-apollo12-basalt-petrology.yaml
+    review_status: draft
+    rows: 6
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/green-1971-apollo12-basalt-petrology/green-1971-apollo12-basalt-petrology.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/green-1971-apollo12-basalt-petrology/sidecar.yaml
+      present: false
+    text:
+      path: text/green-1971-apollo12-basalt-petrology
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/green-1971-apollo12-basalt-petrology
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/green-1971-apollo12-basalt-petrology.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/green-1971-apollo12-basalt-petrology.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  aliases: []
+  citation: J. W. Greig, "Immiscibility in Silicate Melts" (Part I), American Journal of Science, 5th
+    series, Vol. XIII, No. 73, pp. 1-44 (January 1927).
+  doi: 10.2475/ajs.s5-13.73.1
+  report_number: null
+  identifier: 10.2475/ajs.s5-13.73.1
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml
+    review_status: draft
+    rows: 3
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/greig-1927-ajs-immiscibility-silicate-melts-part1/greig-1927-ajs-immiscibility-silicate-melts-part1.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/greig-1927-ajs-immiscibility-silicate-melts-part1/sidecar.yaml
+      present: false
+    text:
+      path: text/greig-1927-ajs-immiscibility-silicate-melts-part1
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/greig-1927-ajs-immiscibility-silicate-melts-part1
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml
       present: false
       error: null
       last_stage: null
@@ -4312,6 +4790,65 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: ivanova-2018-spinel-rich-cai-evaporation
+  aliases: []
+  citation: 'Ivanova, M. A., Mendybaev, R. A., Shornikov, S. I., Ryazantsev, K. M., & MacPherson, G. J.
+    (2018). Evaporation of Spinel-Rich CAI Melts: A Possible Link to CH-CB CAIs. 49th Lunar and Planetary
+    Science Conference, abstract 1965, LPI Contribution No. 2083.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/ivanova-2018-spinel-rich-cai-evaporation.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ivanova-2018-spinel-rich-cai-evaporation/ivanova-2018-spinel-rich-cai-evaporation.pdf
+      present: true
+      sha256: 8a0f1ed3c4073a5d4e28813a4abf40136be29cba7a8dc6c7fe5e7d2ad763ca4f
+      matches_simulator: null
+    sidecar:
+      path: raw/ivanova-2018-spinel-rich-cai-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/ivanova-2018-spinel-rich-cai-evaporation
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/ivanova-2018-spinel-rich-cai-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ivanova-2018-spinel-rich-cai-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ivanova-2018-spinel-rich-cai-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: ivtan-cro2-g
   aliases: []
@@ -7510,7 +8047,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-053-stolyarova-1991.yaml
     review_status: draft
-    rows: 18
+    rows: 17
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -11106,6 +11643,63 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: mathieu-2009-sodium-solubility-thesis
+  aliases: []
+  citation: Mathieu, R. (2009). Solubilité du sodium dans les silicates fondus. Thesis, INPL Nancy.
+  doi: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  report_number: null
+  identifier: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/mathieu-2009-sodium-solubility-thesis.yaml
+    review_status: draft
+    rows: 421
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/mathieu-2009-sodium-solubility-thesis/mathieu-2009-sodium-solubility-thesis.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/mathieu-2009-sodium-solubility-thesis/sidecar.yaml
+      present: false
+    text:
+      path: text/mathieu-2009-sodium-solubility-thesis
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/mathieu-2009-sodium-solubility-thesis
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/mathieu-2009-sodium-solubility-thesis.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/mathieu-2009-sodium-solubility-thesis.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: matzen-2022-martian-basalt-redox
   aliases: []
   citation: Matzen, A.K., Woodland, A., Beckett, J.R. & Wood, B.J. (2022) Oxidation state of iron and
@@ -11223,6 +11817,65 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: mendybaev-2018-cmas-evaporation
+  aliases: []
+  citation: 'Mendybaev, R. A., and Shornikov, S. I. (2018). Evaporation of CaO-MgO-Al2O3-SiO2 Melts: Experiments
+    and Thermodynamic Modeling. 81st Annual Meeting of The Meteoritical Society, LPI Contribution No.
+    2067, abstract 6061.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/mendybaev-2018-cmas-evaporation.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/mendybaev-2018-cmas-evaporation/mendybaev-2018-cmas-evaporation.pdf
+      present: true
+      sha256: 01fad2e988ee1fbe9c0fcf055badf2b7320dde1b4f13fed234fff6dc2cf20b5f
+      matches_simulator: null
+    sidecar:
+      path: raw/mendybaev-2018-cmas-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/mendybaev-2018-cmas-evaporation
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/mendybaev-2018-cmas-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/mendybaev-2018-cmas-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/mendybaev-2018-cmas-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: mendybaev-2021-cai-low-pressure-h2-evap
   aliases: []
@@ -12990,6 +13643,65 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: ostrovski-2000-cao-tio2-sio2
+  aliases: []
+  citation: Ostrovski, O., Tranell, G., Stolyarova, V. L., Shultz, M. M., Shornikov, S. I., and Ishkildyin,
+    A. L. (2000). High-Temperature Mass Spectrometric Study of the CaO–TiO2–SiO2 System. High Temperature
+    Materials and Processes, 19(5), 345–356.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/ostrovski-2000-cao-tio2-sio2.yaml
+    review_status: draft
+    rows: 40
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ostrovski-2000-cao-tio2-sio2/ostrovski-2000-cao-tio2-sio2.pdf
+      present: true
+      sha256: f01fca197a605af01888a51c60a193f440a67d6fc0006d24ec3998d9a357aac6
+      matches_simulator: null
+    sidecar:
+      path: raw/ostrovski-2000-cao-tio2-sio2/sidecar.yaml
+      present: true
+    text:
+      path: text/ostrovski-2000-cao-tio2-sio2
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/ostrovski-2000-cao-tio2-sio2
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ostrovski-2000-cao-tio2-sio2.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ostrovski-2000-cao-tio2-sio2.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: pahlevan-2026-protolunar-volatile-outflows
   aliases: []
   citation: Pahlevan, Kaveh; Youdin, Andrew N.; and Sossi, Paolo A. (2026), Hydrodynamic outflows of proto-lunar
@@ -13048,6 +13760,64 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: pedley-marshall-1983-gaseous-monoxides
+  aliases: []
+  citation: Pedley, J. B. & Marshall, E. M. (1983). Thermochemical data for gaseous monoxides. J. Phys.
+    Chem. Ref. Data 12, 967–1031
+  doi: 10.1063/1.555698
+  report_number: null
+  identifier: 10.1063/1.555698
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/pedley-marshall-1983-gaseous-monoxides.yaml
+    review_status: draft
+    rows: 2
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/pedley-marshall-1983-gaseous-monoxides/pedley-marshall-1983-gaseous-monoxides.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/pedley-marshall-1983-gaseous-monoxides/sidecar.yaml
+      present: false
+    text:
+      path: text/pedley-marshall-1983-gaseous-monoxides
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/pedley-marshall-1983-gaseous-monoxides
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/pedley-marshall-1983-gaseous-monoxides.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/pedley-marshall-1983-gaseous-monoxides.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: pending-as2o3-second-primary
   aliases: []
@@ -15674,6 +16444,181 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shilov-1998-sno-zno-p2o5-vaporization
+  aliases: []
+  citation: Shilov, A. L., Shornikov, S. I., Archakov, I. Yu., Ivanov, G. G., Stolyarova, V. L., and Shultz,
+    M. M. (1998), "A Mass Spectrometric Study of the Vaporization and Thermodynamic Properties of Melts
+    in the SnO–ZnO–P2O5 System", Glass Physics and Chemistry 24(5), 400–405 (English translation).
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shilov-1998-sno-zno-p2o5-vaporization.yaml
+    review_status: draft
+    rows: 23
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shilov-1998-sno-zno-p2o5-vaporization/shilov-1998-sno-zno-p2o5-vaporization.pdf
+      present: true
+      sha256: f5ae5493b9f41a8819b0f520b4eb0a5ce8f9e382451c3511033ac967b1f99c5c
+      matches_simulator: null
+    sidecar:
+      path: raw/shilov-1998-sno-zno-p2o5-vaporization/sidecar.yaml
+      present: true
+    text:
+      path: text/shilov-1998-sno-zno-p2o5-vaporization
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shilov-1998-sno-zno-p2o5-vaporization
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shilov-1998-sno-zno-p2o5-vaporization.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shilov-1998-sno-zno-p2o5-vaporization.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shimaoka-nakamura-1989-nipr2-252
+  aliases: []
+  citation: Shimaoka, T. & Nakamura, N. (1989), “Vaporization of sodium from a partially molten chondritic
+    material,” Proc. NIPR Symp. Antarct. Meteorites 2, 252–267.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shimaoka-nakamura-1989-nipr2-252.yaml
+    review_status: draft
+    rows: 12
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shimaoka-nakamura-1989-nipr2-252/shimaoka-nakamura-1989-nipr2-252.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/shimaoka-nakamura-1989-nipr2-252/sidecar.yaml
+      present: false
+    text:
+      path: text/shimaoka-nakamura-1989-nipr2-252
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shimaoka-nakamura-1989-nipr2-252
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shimaoka-nakamura-1989-nipr2-252.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shimaoka-nakamura-1989-nipr2-252.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  aliases: []
+  citation: Shimaoka, T. & Nakamura, N. (1991), "The effect of total pressure on vaporization of alkalis
+    from partially molten chondritic material", IAU Colloq. 126, 79–82.
+  doi: 10.1017/S0252921100066513
+  report_number: null
+  identifier: 10.1017/S0252921100066513
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shimaoka-nakamura-1991-iau-colloq126-79.yaml
+    review_status: draft
+    rows: 30
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shimaoka-nakamura-1991-iau-colloq126-79/shimaoka-nakamura-1991-iau-colloq126-79.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/shimaoka-nakamura-1991-iau-colloq126-79/sidecar.yaml
+      present: false
+    text:
+      path: text/shimaoka-nakamura-1991-iau-colloq126-79
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shimaoka-nakamura-1991-iau-colloq126-79
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shimaoka-nakamura-1991-iau-colloq126-79.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shimaoka-nakamura-1991-iau-colloq126-79.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: shornikov-1994-mullite-kems
   aliases: []
   citation: Shornikov, S. I., Stolyarova, V. L., and Shultz, M. M. (1994). High Temperature Mass Spectrometric
@@ -15910,6 +16855,65 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2000-aluminosilicate-vaporization
+  aliases: []
+  citation: Shornikov, S. I., Archakov, I. Yu., and Chemekova, T. Yu. (2000). A Mass-Spectrometric Study
+    of Vaporization and Phase Equilibria in the Al2O3–SiO2 System. Russian Journal of Physical Chemistry,
+    74(5), 677–683.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2000-aluminosilicate-vaporization.yaml
+    review_status: draft
+    rows: 46
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2000-aluminosilicate-vaporization/shornikov-2000-aluminosilicate-vaporization.pdf
+      present: true
+      sha256: dbd1fcb5d9d98b5b56a5b5c09651514d105c69a0a392bd5b684c7ed131766437
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2000-aluminosilicate-vaporization/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2000-aluminosilicate-vaporization
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2000-aluminosilicate-vaporization
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2000-aluminosilicate-vaporization.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2000-aluminosilicate-vaporization.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: shornikov-2000-cao-silica-vaporization
   aliases: []
   citation: Shornikov, S. I., and Archakov, I. Yu. (2000). Mass Spectrometric Study of Phase Relations
@@ -15963,6 +16967,182 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/shornikov-2000-cao-silica-vaporization.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2001-mgalumina-silica-vaporization
+  aliases: []
+  citation: Shornikov, S. I., and Archakov, I. Yu. (2001). High Temperature Mass Spectrometric Study of
+    Vaporization Processes and Thermodynamic Properties in the MgAl2O4–SiO2 System. High Temperature Corrosion
+    and Materials Chemistry III, Electrochemical Society Proceedings 2001-12, 322–329.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2001-mgalumina-silica-vaporization.yaml
+    review_status: draft
+    rows: 14
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2001-mgalumina-silica-vaporization/shornikov-2001-mgalumina-silica-vaporization.pdf
+      present: true
+      sha256: 671ead334c0ec0771c1bf429a5d1b90732c115f0f5d9ea33f0ac742c66702214
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2001-mgalumina-silica-vaporization/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2001-mgalumina-silica-vaporization
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2001-mgalumina-silica-vaporization
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2001-mgalumina-silica-vaporization.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2001-mgalumina-silica-vaporization.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  aliases: []
+  citation: Shornikov, S. I., and Archakov, I. Yu. (2002), "A Mass Spectrometric Determination of the
+    Enthalpies and Entropies of Al2O3–SiO2 Melts", Russian Journal of Physical Chemistry 76(7), 1054–1060
+    (translation of Zhurnal Fizicheskoi Khimii 76(7), 1179–1185).
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2002-alumina-silica-melt-thermodynamics.yaml
+    review_status: draft
+    rows: 13
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2002-alumina-silica-melt-thermodynamics/shornikov-2002-alumina-silica-melt-thermodynamics.pdf
+      present: true
+      sha256: f8361b2d7ed1615213375472ee816ea7382981fc9208aefb354cd32383dd674e
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2002-alumina-silica-melt-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2002-alumina-silica-melt-thermodynamics
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2002-alumina-silica-melt-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2002-alumina-silica-melt-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2002-alumina-silica-melt-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2002-spinel-mgal2o4
+  aliases: []
+  citation: Shornikov, S. I. (2002). Mass Spectrometric Study of Solid Solution Region of Spinel MgAl2O4.
+    Herald of the Earth Sciences Department RAS, No. 1(20), 1–2.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2002-spinel-mgal2o4.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2002-spinel-mgal2o4/shornikov-2002-spinel-mgal2o4.pdf
+      present: true
+      sha256: d786534c1e88bd47987aa1727e0091c6a96844c7af41d683753de5b97ec1496c
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2002-spinel-mgal2o4/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2002-spinel-mgal2o4
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2002-spinel-mgal2o4
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2002-spinel-mgal2o4.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2002-spinel-mgal2o4.yaml
       present: false
       error: null
       last_stage: null
@@ -16084,6 +17264,357 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2013-potassium-silicate-thermodynamics
+  aliases: []
+  citation: Shornikov, S. I. (2013). Thermodynamic properties of the K2O–SiO2 melts. The article citation
+    line prints “Vestn. Otd. nauk Zemle, 4” with an empty DOI; the running footer on printed pages 109–111
+    reads “Experiment in Geosciences 2013 Volume 19 N 1”. The venue metadata conflict is unresolved in
+    the supplied copy.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2013-potassium-silicate-thermodynamics.yaml
+    review_status: draft
+    rows: 27
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+      present: true
+      sha256: 3ae7836d890f178c01a04a2b3cf927cf6c0c99ffd358bdbd594982d552d84f33
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2013-potassium-silicate-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2013-potassium-silicate-thermodynamics
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2013-potassium-silicate-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2013-potassium-silicate-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2013-potassium-silicate-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2014-ca-al-evaporation-coefficients
+  aliases: []
+  citation: Shornikov, S. I. (2014). The Oxide Evaporation Coefficients in Ca–Al Inclusions. 77th Annual
+    Meeting of the Meteoritical Society, abstract 5018.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2014-ca-al-evaporation-coefficients.yaml
+    review_status: draft
+    rows: 12
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2014-ca-al-evaporation-coefficients/shornikov-2014-ca-al-evaporation-coefficients.pdf
+      present: true
+      sha256: 03e1d4e21a7752c999b56963e317aa07241b96f007994a36e854c8f4fa816b53
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2014-ca-al-evaporation-coefficients/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2014-ca-al-evaporation-coefficients
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2014-ca-al-evaporation-coefficients
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2014-ca-al-evaporation-coefficients.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2014-ca-al-evaporation-coefficients.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2014-sodium-silicate-model
+  aliases: []
+  citation: Shornikov, S. I. (2014). Thermodynamic Properties of Sodium-Silicate Melts. Experimental Geochemistry,
+    2, conference abstracts, pagination not confirmed.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2014-sodium-silicate-model.yaml
+    review_status: draft
+    rows: 17
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2014-sodium-silicate-model/shornikov-2014-sodium-silicate-model.pdf
+      present: true
+      sha256: f2d13a69b82ec727bbede5643741d276c3880835b263ef80fd43e4fedbe288e0
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2014-sodium-silicate-model/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2014-sodium-silicate-model
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2014-sodium-silicate-model
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2014-sodium-silicate-model.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2014-sodium-silicate-model.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2018-spinel-solid-solutions
+  aliases: []
+  citation: Shornikov, S. I. (2018), “Mass Spectrometry Study of the Thermodynamic Properties of Spinel
+    Solid Solutions,” Russian Journal of Physical Chemistry A 92(8), 1447–1456.
+  doi: 10.1134/S0036024418080253
+  report_number: null
+  identifier: 10.1134/S0036024418080253
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2018-spinel-solid-solutions.yaml
+    review_status: draft
+    rows: 14
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2018-spinel-solid-solutions/shornikov-2018-spinel-solid-solutions.pdf
+      present: true
+      sha256: e1826f8cff7fbdb59be85b36f23407634fb2a27f2660ba8ddc0afae81752f31e
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2018-spinel-solid-solutions/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2018-spinel-solid-solutions
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2018-spinel-solid-solutions
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2018-spinel-solid-solutions.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2018-spinel-solid-solutions.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2019-perovskite-evaporation
+  aliases: []
+  citation: Shornikov, S. (2019), "High-Temperature Study of Perovskite Evaporation," in Materials Processing
+    Fundamentals 2019, The Minerals, Metals & Materials Series, pp. 253–263.
+  doi: 10.1007/978-3-030-05728-2_23
+  report_number: null
+  identifier: 10.1007/978-3-030-05728-2_23
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2019-perovskite-evaporation.yaml
+    review_status: draft
+    rows: 7
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2019-perovskite-evaporation/shornikov-2019-perovskite-evaporation.pdf
+      present: true
+      sha256: 925a4c0786aaaa45522001352be29d483c74c5bd13bcd678aefddb3d05ba00af
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2019-perovskite-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2019-perovskite-evaporation
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2019-perovskite-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2019-perovskite-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2019-perovskite-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2020-cao-tio2-melts
+  aliases: []
+  citation: Shornikov, S. I. (2020), “Study of CaO–TiO2 Melts by Knudsen Effusion Mass Spectrometry,”
+    Russian Journal of Physical Chemistry A 94(7), 1289–1299 (English translation).
+  doi: 10.1134/S0036024420070274
+  report_number: null
+  identifier: 10.1134/S0036024420070274
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2020-cao-tio2-melts.yaml
+    review_status: draft
+    rows: 302
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2020-cao-tio2-melts/shornikov-2020-cao-tio2-melts.pdf
+      present: true
+      sha256: 42dd8caf6f00d3051e2809646eb6278e77905c896f6c653d13a86ddc38d3bf49
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2020-cao-tio2-melts/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2020-cao-tio2-melts
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2020-cao-tio2-melts
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2020-cao-tio2-melts.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2020-cao-tio2-melts.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: shornikov-2021-mgo-feo-silicate
   aliases: []
   citation: Shornikov, S. I., Ivanova, M. A., and Minaeva, M. S. (2021), Thermodynamic Properties of the
@@ -16137,6 +17668,181 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/shornikov-2021-mgo-feo-silicate.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2023-calcium-phosphate
+  aliases: []
+  citation: Shornikov, S. I. and Demidova, S. I. (2023). Thermodynamic properties of the CaO–P4O10 melts.
+    Experiment in Geosciences, 29(1), 55–57.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2023-calcium-phosphate.yaml
+    review_status: draft
+    rows: 4
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2023-calcium-phosphate/shornikov-2023-calcium-phosphate.pdf
+      present: true
+      sha256: 7d8732eaa4d7946d1d9bd99d8619626a4d015be8f5ce7d38a6132dc583112234
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2023-calcium-phosphate/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2023-calcium-phosphate
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2023-calcium-phosphate
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2023-calcium-phosphate.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2023-calcium-phosphate.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2023-natural-cai-evaporation
+  aliases: []
+  citation: Shornikov, S. I., & Yakovlev, O. I. (2023). Mass Spectrometric Study of Evaporation of Natural
+    CAIs Melts (Types A and B) in Efremovka Chondrite. 54th Lunar and Planetary Science Conference, abstract
+    1983.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2023-natural-cai-evaporation.yaml
+    review_status: draft
+    rows: 16
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2023-natural-cai-evaporation/shornikov-2023-natural-cai-evaporation.pdf
+      present: true
+      sha256: b426a6d15c161b200591f242fb3d47a9253b10c1e925df57d2e6ef5bd9aa0cb7
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2023-natural-cai-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2023-natural-cai-evaporation
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2023-natural-cai-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2023-natural-cai-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2023-natural-cai-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2024-cai-silica-evaporation
+  aliases: []
+  citation: Shornikov, S. I., and Yakovlev, O. I. (2024). Features of Silica Evaporation from CAIs Melts
+    of Types A and B. Meteoritics & Planetary Science, 59(S1), abstract 6197.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2024-cai-silica-evaporation.yaml
+    review_status: draft
+    rows: 16
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2024-cai-silica-evaporation/shornikov-2024-cai-silica-evaporation.pdf
+      present: true
+      sha256: 39a701854a39d8254eda425e41584be49d58bded24086d2a70ac130d1dcfe4df
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2024-cai-silica-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2024-cai-silica-evaporation
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2024-cai-silica-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2024-cai-silica-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2024-cai-silica-evaporation.yaml
       present: false
       error: null
       last_stage: null
@@ -16196,6 +17902,65 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/shornikov-2024-wollastonite-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2025-calcium-oxide-evaporation
+  aliases: []
+  citation: Shornikov, S. (2025). Thermodynamic Study of Calcium Oxide Evaporation Under Various Redox
+    Conditions. In Advances in Ceramic Materials and Processing. The Minerals, Metals & Materials Series,
+    pp. 217–232.
+  doi: 10.1007/978-3-031-80664-3_20
+  report_number: null
+  identifier: 10.1007/978-3-031-80664-3_20
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2025-calcium-oxide-evaporation.yaml
+    review_status: draft
+    rows: 14
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2025-calcium-oxide-evaporation/shornikov-2025-calcium-oxide-evaporation.pdf
+      present: true
+      sha256: d62c3ddc1004316e58d63655b274e17f1dd15cefce3431c08e4cbe51496db650
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2025-calcium-oxide-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2025-calcium-oxide-evaporation
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2025-calcium-oxide-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2025-calcium-oxide-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shornikov-2025-calcium-oxide-evaporation.yaml
       present: false
       error: null
       last_stage: null
@@ -16313,6 +18078,124 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/shornikov-2026-hatrurite-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shults-1994-mullite-evaporation
+  aliases: []
+  citation: Shul’ts, M. M., Shornikov, S. I., and Stolyarova, V. L. (1994), “Evaporation Processes and
+    Thermodynamic Properties of Mullite”, Doklady Physical Chemistry 336(1–3), 95–98 (translation of Doklady
+    Akademii Nauk 336(3), 368–371).
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shults-1994-mullite-evaporation.yaml
+    review_status: draft
+    rows: 45
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shults-1994-mullite-evaporation/shults-1994-mullite-evaporation.pdf
+      present: true
+      sha256: fadf2922fe29054a04e2b5bc52065cad7ea2c3bbb23691a0a9dd93173800addf
+      matches_simulator: null
+    sidecar:
+      path: raw/shults-1994-mullite-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/shults-1994-mullite-evaporation
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shults-1994-mullite-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shults-1994-mullite-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shults-1994-mullite-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shults-1995-calcium-aluminate-thermodynamics
+  aliases: []
+  citation: Shul’ts, M. M., and Shornikov, S. I. (1995). Mass Spectrometric Study of the Thermodynamic
+    Properties of Calcium Aluminate Melts. Doklady Physical Chemistry, 340(1–3), 17–19 (translation of
+    Doklady Akademii Nauk 340(3), 450–452).
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shults-1995-calcium-aluminate-thermodynamics.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shults-1995-calcium-aluminate-thermodynamics/shults-1995-calcium-aluminate-thermodynamics.pdf
+      present: true
+      sha256: 74f9c7b642f693865729998d5f91a73907e4bf311174401d6ef261c39c0058e5
+      matches_simulator: null
+    sidecar:
+      path: raw/shults-1995-calcium-aluminate-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/shults-1995-calcium-aluminate-thermodynamics
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shults-1995-calcium-aluminate-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shults-1995-calcium-aluminate-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shults-1995-calcium-aluminate-thermodynamics.yaml
       present: false
       error: null
       last_stage: null
@@ -18069,6 +19952,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  aliases: []
+  citation: Tsuchiyama, Akira and Takahashi, Toshio and Tachibana, Shogo (1998), “Evaporation rates of
+    forsterite in the system Mg2SiO4-H2”, Mineralogical Journal 20(3):113–126.
+  doi: 10.2465/minerj.20.113
+  report_number: null
+  identifier: 10.2465/minerj.20.113
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/tsuchiyama-1998-forsterite-mg2sio4-h2.yaml
+    review_status: draft
+    rows: 18
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/tsuchiyama-1998-forsterite-mg2sio4-h2/tsuchiyama-1998-forsterite-mg2sio4-h2.pdf
+      present: true
+      sha256: 706c40efe5beb6ef7a2722a6733a1dc96fe379cc40181d62f4b23802535eaf7f
+      matches_simulator: null
+    sidecar:
+      path: raw/tsuchiyama-1998-forsterite-mg2sio4-h2/sidecar.yaml
+      present: true
+    text:
+      path: text/tsuchiyama-1998-forsterite-mg2sio4-h2
+      exists: true
+      file_count: 42
+    tables:
+      path: tables/tsuchiyama-1998-forsterite-mg2sio4-h2
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/tsuchiyama-1998-forsterite-mg2sio4-h2.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/tsuchiyama-1998-forsterite-mg2sio4-h2.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: ueshima-1982-fe-mo-thermal
   aliases: []
   citation: Ueshima, Y., Ichise, E. & Mori, T. (1982). Thermal Analysis of Fe-Mo Alloys by the Use of
@@ -19000,6 +20941,64 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: zaitsev-2000-ms2000-045
+  aliases: []
+  citation: Zaitsev, A. I. (2000). "Knudsen Cell Mass Spectrometry of Slags and Silicates." Proc. VI International
+    Conference on Molten Slags, Fluxes and Salts (Stockholm-Helsinki, 2000), paper 045, 20 pp.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/zaitsev-2000-ms2000-045.yaml
+    review_status: draft
+    rows: 5
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/zaitsev-2000-ms2000-045/zaitsev-2000-ms2000-045.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/zaitsev-2000-ms2000-045/sidecar.yaml
+      present: false
+    text:
+      path: text/zaitsev-2000-ms2000-045
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/zaitsev-2000-ms2000-045
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/zaitsev-2000-ms2000-045.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/zaitsev-2000-ms2000-045.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: zigo-1987-gehlenite-fusion
   aliases: []

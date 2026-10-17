@@ -12,6 +12,10 @@ extraction:
   worker: i1-arxiv-1902-05005
   provenance_path: corpus/raw/arxiv-1902-05005/arxiv-1902-05005.pdf
 review_status: draft
+fidelity_samples:
+- path: species.Al.observations[sossi_fegley_2018_table1_parent_oxide_vapour_species].values.rows[0].gas_species
+  value: 'Al, AlO, Al2O, AlO2, Al2O2'
+  locator: {pdf_page_index: 12, table: '1', note: 'Table 1, printed p. 13; alpha-Al2O3 row.'}
 corrections: []
 species:
   Al:

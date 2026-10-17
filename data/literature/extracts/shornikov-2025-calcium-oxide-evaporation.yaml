@@ -1,0 +1,4628 @@
+schema_version: "literature_extract.v1"
+source_id: "shornikov-2025-calcium-oxide-evaporation"
+source:
+  citation: "Shornikov, S. (2025). Thermodynamic Study of Calcium Oxide Evaporation Under Various Redox Conditions. In Advances in Ceramic Materials and Processing. The Minerals, Metals & Materials Series, pp. 217–232."
+  year: 2025
+  doi: "10.1007/978-3-031-80664-3_20"
+  corpus_asset: "raw/shornikov-2025-calcium-oxide-evaporation/shornikov-2025-calcium-oxide-evaporation.pdf"
+  sha256: "d62c3ddc1004316e58d63655b274e17f1dd15cefce3431c08e4cbe51496db650"
+extraction:
+  method: "All 19 supplied PDF pages rendered at 220 dpi and inspected. Tables 1–3 transcribed first to CSV; every numeric table entry checked digit by digit against page images. Tables 1–2 retain atm as printed; Table 3 dashes are typed absences. Figs. 1–5 are figure-only; curves not digitized. Relations (1)–(37), experiment facts, numeric background, and comparative/qualifying statements are located."
+  date: "2026-10-04"
+  worker: "codex"
+review_status: "draft"
+fidelity_samples:
+  -
+    path: "species.Ca.observations[shornikov_2025_table1_ca_partial_pressure].values.points[0].pressure_atm"
+    value: "6.59e-8"
+    locator:
+      published_page: 224
+      pdf_page_index: 10
+      table: "1"
+      note: "T=1812 K; pCa cell"
+  -
+    path: "species.O.observations[shornikov_2025_table2_o_eq19].values.points[0].pressure_atm"
+    value: "4.73e-10"
+    locator:
+      published_page: 225
+      pdf_page_index: 11
+      table: "2"
+      note: "T=1812 K; column (19)"
+benches:
+  -
+    id: "shornikov-2025-mo-mi1201"
+    identity:
+      basis: "described_in_this_work"
+    apparatus_family:
+      state:
+        tag: "value"
+        value: "Serial MI-1201 mass spectrometer with modified high-temperature ion source and molybdenum Knudsen effusion cells"
+      locator:
+        published_page: 221
+        pdf_page_index: 7
+        section: "Experimental"
+    cell_material_and_liner:
+      state:
+        tag: "value"
+        value: "Molybdenum cell; liner not stated"
+      locator:
+        published_page: 221
+        pdf_page_index: 7
+        section: "Experimental"
+    cell_materials:
+      -
+        state:
+          tag: "value"
+          value: "Mo"
+        locator:
+          published_page: 221
+          pdf_page_index: 7
+          section: "Experimental"
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: "value"
+          value:
+            kind: "interval"
+            interval_low: "0.00025"
+            interval_high: "0.00030"
+        locator:
+          published_page: 221
+          pdf_page_index: 7
+          section: "Experimental"
+          note: "0.25–0.30 mm converted to m"
+      orifice_channel_length_m:
+        state:
+          tag: "unknown"
+          reason: "not_published"
+        locator:
+          published_page: 222
+          pdf_page_index: 8
+          section: "Experimental"
+          note: "No channel length; only d_or/l_or dependence of Clausing coefficient described"
+      orifice_to_sample_area_ratio:
+        state:
+          tag: "value"
+          value:
+            kind: "bound"
+            bound_operator: ">="
+            bound_value: "0.001"
+        locator:
+          published_page: 221
+          pdf_page_index: 7
+          section: "Experimental"
+          note: "At least 1:10^3, expressed as lower bound"
+    heating_method:
+      state:
+        tag: "value"
+        value: "Tubular tantalum heater with cooled copper current leads"
+      locator:
+        published_page: 221
+        pdf_page_index: 7
+        section: "Experimental"
+    detector:
+      state:
+        tag: "value"
+        value: "Modified high-temperature ion source; molecular and ion beams aligned"
+      locator:
+        published_page: 221
+        pdf_page_index: 7
+        section: "Experimental"
+    temperature_measurement:
+      sensor:
+        state:
+          tag: "value"
+          value: "W–Re thermocouple welded to effusion-cell lid"
+        locator:
+          published_page: 221
+          pdf_page_index: 7
+          section: "Experimental"
+    temperature_calibration:
+      method:
+        state:
+          tag: "unknown"
+          reason: "not_published"
+        locator:
+          published_page: 221
+          pdf_page_index: 7
+          section: "Experimental"
+    ionization:
+      method:
+        state:
+          tag: "value"
+          value: "Electron impact"
+        locator:
+          published_page: 222
+          pdf_page_index: 8
+          section: "Experimental"
+      energy_eV:
+        state:
+          tag: "value"
+          value:
+            kind: "point"
+            point: "15"
+        locator:
+          published_page: 222
+          pdf_page_index: 8
+          section: "Results and Discussion"
+          note: "Ca/O ion-current measurement"
+    other_facts:
+      -
+        name: "cell_outer_diameter"
+        unit: "mm"
+        value:
+          state:
+            tag: "value"
+            value:
+              kind: "point"
+              point: "10"
+          locator:
+            published_page: 221
+            pdf_page_index: 7
+            section: "Experimental"
+      -
+        name: "cell_height"
+        unit: "mm"
+        value:
+          state:
+            tag: "value"
+            value:
+              kind: "point"
+              point: "15"
+          locator:
+            published_page: 221
+            pdf_page_index: 7
+            section: "Experimental"
+      -
+        name: "temperature_gradient_bottom_to_lid"
+        unit: "K"
+        value:
+          state:
+            tag: "value"
+            value:
+              kind: "bound"
+              bound_operator: "<="
+              bound_value: "10"
+          locator:
+            published_page: 221
+            pdf_page_index: 7
+            section: "Experimental"
+            note: "at 1715 ± 5 K"
+      -
+        name: "temperature_at_gradient_check"
+        unit: "K"
+        value:
+          state:
+            tag: "value"
+            value:
+              kind: "interval"
+              interval_low: "1710"
+              interval_high: "1720"
+          locator:
+            published_page: 221
+            pdf_page_index: 7
+            section: "Experimental"
+            note: "1715 ± 5 K"
+      -
+        name: "ionization_energy_operating_range"
+        unit: "eV"
+        value:
+          state:
+            tag: "value"
+            value:
+              kind: "interval"
+              interval_low: "5"
+              interval_high: "70"
+          locator:
+            published_page: 221
+            pdf_page_index: 7
+            section: "Experimental"
+      -
+        name: "voltmeter_accuracy_for_electron_energy"
+        unit: "V"
+        value:
+          state:
+            tag: "value"
+            value:
+              kind: "point"
+              point: "0.01"
+          locator:
+            published_page: 221
+            pdf_page_index: 7
+            section: "Experimental"
+      -
+        name: "cell_to_ionization_source_distance"
+        unit: "mm"
+        value:
+          state:
+            tag: "value"
+            value:
+              kind: "bound"
+              bound_operator: "<="
+              bound_value: "20"
+          locator:
+            published_page: 221
+            pdf_page_index: 7
+            section: "Experimental"
+      -
+        name: "temperature_calibration_range"
+        unit: "K"
+        value:
+          state:
+            tag: "value"
+            value:
+              kind: "interval"
+              interval_low: "273"
+              interval_high: "2773"
+          locator:
+            published_page: 221
+            pdf_page_index: 7
+            section: "Experimental"
+experiments:
+  -
+    experiment_id: "cao-mo-kems-1812-2183"
+    bench_id: "shornikov-2025-mo-mi1201"
+    method: "knudsen_effusion"
+    locator:
+      published_page: 221
+      pdf_page_index: 7
+      section: "Experimental"
+      note: "CaO evaporated in molybdenum effusion cells, 1812–2183 K"
+    sample:
+      mass_kg:
+        state:
+          tag: "unknown"
+          reason: "not_published"
+        locator:
+          published_page: 221
+          pdf_page_index: 7
+          section: "Experimental"
+      printed_composition:
+        state:
+          tag: "value"
+          value:
+            material_as_printed: "CaO (chemically pure)"
+            basic_substance_wt_pct:
+              kind: "bound"
+              bound_operator: ">="
+              bound_value: "97.5"
+            CaCO3_wt_pct:
+              kind: "bound"
+              bound_operator: "<="
+              bound_value: "1.0"
+        locator:
+          published_page: 221
+          pdf_page_index: 7
+          section: "Experimental"
+      form:
+        state:
+          tag: "unknown"
+          reason: "not_published"
+        locator:
+          published_page: 221
+          pdf_page_index: 7
+          section: "Experimental"
+      characterization:
+        state:
+          tag: "unknown"
+          reason: "not_published"
+        locator:
+          published_page: 222
+          pdf_page_index: 8
+          section: "Experimental"
+          note: "No post-run chemical or compositional analysis is stated."
+    apparatus:
+      calibration:
+        method:
+          state:
+            tag: "value"
+            value: "Hertz–Knudsen calculation from integrated ion currents for Ca/O/O2/CaO (Eq. 11); ion-current comparison to Ca with cross-section and isotope-distribution correction for Mo/MoOx (Eq. 18)."
+          locator:
+            published_page: 222
+            pdf_page_index: 8
+            equation: "11"
+        reference_substance:
+          state:
+            tag: "unknown"
+            reason: "not_published"
+          locator:
+            published_page: 222
+            pdf_page_index: 8
+            section: "Results and Discussion"
+      geometry:
+        orifice_diameter_m:
+          state:
+            tag: "value"
+            value:
+              kind: "interval"
+              interval_low: "0.00025"
+              interval_high: "0.00030"
+          locator:
+            published_page: 221
+            pdf_page_index: 7
+            section: "Experimental"
+            note: "0.25–0.30 mm converted to m"
+        orifice_channel_length_m:
+          state:
+            tag: "unknown"
+            reason: "not_published"
+          locator:
+            published_page: 222
+            pdf_page_index: 8
+            section: "Experimental"
+            note: "No channel length; only d_or/l_or dependence of Clausing coefficient described"
+        orifice_to_sample_area_ratio:
+          state:
+            tag: "value"
+            value:
+              kind: "bound"
+              bound_operator: ">="
+              bound_value: "0.001"
+          locator:
+            published_page: 221
+            pdf_page_index: 7
+            section: "Experimental"
+            note: "At least 1:10^3, expressed as lower bound"
+    pressure_environment:
+      total_pressure_Pa:
+        state:
+          tag: "value"
+          value:
+            kind: "bound"
+            bound_operator: "<="
+            bound_value: "1.01325e-5"
+        locator:
+          published_page: 221
+          pdf_page_index: 7
+          section: "Experimental"
+          note: "Residual gas <=10^-10 atm converted using 101325 Pa/atm; chamber background, not sample pressure"
+      sweep_gas:
+        state:
+          tag: "unknown"
+          reason: "not_published"
+        locator:
+          published_page: 221
+          pdf_page_index: 7
+          section: "Experimental"
+          note: "Vacuum residual-pressure measurement; no sweep gas reported"
+      regime:
+        regime_class:
+          tag: "unknown"
+          reason: "not_published"
+species:
+  Ca:
+    observations:
+      -
+        observation_id: "shornikov_2025_table1_ca_partial_pressure"
+        type: "partial_pressure"
+        locator:
+          published_page: 224
+          pdf_page_index: 10
+          table: "1"
+          note: "Ca(g) partial-pressure series; paper says ratios (11) and (18)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "Ca(g)"
+          method_class: "measured_tabulated"
+          admission_status: "admitted"
+          method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
+          method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
+          composition_component: "CaO"
+          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "6.59e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1812 K; pCa_atm as printed"
+            -
+              T_K: "1833"
+              pressure_atm: "1.07e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1833 K; pCa_atm as printed"
+            -
+              T_K: "1863"
+              pressure_atm: "1.79e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1863 K; pCa_atm as printed"
+            -
+              T_K: "1889"
+              pressure_atm: "2.82e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1889 K; pCa_atm as printed"
+            -
+              T_K: "1913"
+              pressure_atm: "4.09e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1913 K; pCa_atm as printed"
+            -
+              T_K: "1933"
+              pressure_atm: "6.01e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1933 K; pCa_atm as printed"
+            -
+              T_K: "1962"
+              pressure_atm: "9.53e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1962 K; pCa_atm as printed"
+            -
+              T_K: "1983"
+              pressure_atm: "1.29e-6"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1983 K; pCa_atm as printed"
+            -
+              T_K: "2000"
+              pressure_atm: "1.76e-6"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2000 K; pCa_atm as printed"
+            -
+              T_K: "2033"
+              pressure_atm: "2.81e-6"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2033 K; pCa_atm as printed"
+            -
+              T_K: "2083"
+              pressure_atm: "6.01e-6"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2083 K; pCa_atm as printed"
+            -
+              T_K: "2100"
+              pressure_atm: "7.85e-6"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2100 K; pCa_atm as printed"
+            -
+              T_K: "2133"
+              pressure_atm: "1.22e-5"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2133 K; pCa_atm as printed"
+            -
+              T_K: "2150"
+              pressure_atm: "1.53e-5"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2150 K; pCa_atm as printed"
+            -
+              T_K: "2183"
+              pressure_atm: "2.39e-5"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2183 K; pCa_atm as printed"
+  O:
+    observations:
+      -
+        observation_id: "shornikov_2025_table1_o_partial_pressure"
+        type: "partial_pressure"
+        locator:
+          published_page: 224
+          pdf_page_index: 10
+          table: "1"
+          note: "O(g) partial-pressure series; paper says ratios (11) and (18)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "O(g)"
+          method_class: "measured_tabulated"
+          admission_status: "admitted"
+          method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
+          method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
+          composition_component: "CaO"
+          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "4.36e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1812 K; pO_atm as printed"
+            -
+              T_K: "1833"
+              pressure_atm: "6.35e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1833 K; pO_atm as printed"
+            -
+              T_K: "1863"
+              pressure_atm: "1.08e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1863 K; pO_atm as printed"
+            -
+              T_K: "1889"
+              pressure_atm: "1.77e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1889 K; pO_atm as printed"
+            -
+              T_K: "1913"
+              pressure_atm: "2.70e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1913 K; pO_atm as printed"
+            -
+              T_K: "1933"
+              pressure_atm: "3.81e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1933 K; pO_atm as printed"
+            -
+              T_K: "1962"
+              pressure_atm: "6.14e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1962 K; pO_atm as printed"
+            -
+              T_K: "1983"
+              pressure_atm: "9.02e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1983 K; pO_atm as printed"
+            -
+              T_K: "2000"
+              pressure_atm: "1.11e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2000 K; pO_atm as printed"
+            -
+              T_K: "2033"
+              pressure_atm: "1.98e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2033 K; pO_atm as printed"
+            -
+              T_K: "2083"
+              pressure_atm: "3.99e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2083 K; pO_atm as printed"
+            -
+              T_K: "2100"
+              pressure_atm: "5.15e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2100 K; pO_atm as printed"
+            -
+              T_K: "2133"
+              pressure_atm: "8.00e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2133 K; pO_atm as printed"
+            -
+              T_K: "2150"
+              pressure_atm: "1.10e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2150 K; pO_atm as printed"
+            -
+              T_K: "2183"
+              pressure_atm: "1.63e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2183 K; pO_atm as printed"
+      -
+        observation_id: "shornikov_2025_table2_o_eq11"
+        type: "partial_pressure"
+        locator:
+          published_page: 225
+          pdf_page_index: 11
+          table: "2"
+          note: "atomic oxygen partial-pressure series calculated by equation (11)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "O(g)"
+          method_class: "measured_tabulated"
+          admission_status: "admitted"
+          method: "Hertz–Knudsen calculation from integrated ion current, Eq. (11)"
+          method_as_printed: "Table 2 column (11)"
+          composition_component: "CaO"
+          composition_basis: "CaO sample described in the Experimental section"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "4.36e-10"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1812 K; column (11)"
+            -
+              T_K: "1833"
+              pressure_atm: "6.35e-10"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1833 K; column (11)"
+            -
+              T_K: "1863"
+              pressure_atm: "1.08e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1863 K; column (11)"
+            -
+              T_K: "1889"
+              pressure_atm: "1.77e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1889 K; column (11)"
+            -
+              T_K: "1913"
+              pressure_atm: "2.70e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1913 K; column (11)"
+            -
+              T_K: "1933"
+              pressure_atm: "3.81e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1933 K; column (11)"
+            -
+              T_K: "1962"
+              pressure_atm: "6.14e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1962 K; column (11)"
+            -
+              T_K: "1983"
+              pressure_atm: "9.02e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1983 K; column (11)"
+            -
+              T_K: "2000"
+              pressure_atm: "1.11e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2000 K; column (11)"
+            -
+              T_K: "2033"
+              pressure_atm: "1.98e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2033 K; column (11)"
+            -
+              T_K: "2083"
+              pressure_atm: "3.99e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2083 K; column (11)"
+            -
+              T_K: "2100"
+              pressure_atm: "5.15e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2100 K; column (11)"
+            -
+              T_K: "2133"
+              pressure_atm: "8.00e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2133 K; column (11)"
+            -
+              T_K: "2150"
+              pressure_atm: "1.10e-7"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2150 K; column (11)"
+            -
+              T_K: "2183"
+              pressure_atm: "1.63e-7"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2183 K; column (11)"
+      -
+        observation_id: "shornikov_2025_table2_o_eq19"
+        type: "partial_pressure"
+        locator:
+          published_page: 225
+          pdf_page_index: 11
+          table: "2"
+          note: "atomic oxygen partial-pressure series calculated by equation (19)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "O(g)"
+          method_class: "model_derived"
+          admission_status: "admitted"
+          method: "pO = K2 pCaO / pCa (Eq. 19)"
+          method_as_printed: "Table 2 column (19)"
+          composition_component: "CaO"
+          composition_basis: "CaO sample described in the Experimental section"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "4.73e-10"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1812 K; column (19)"
+            -
+              T_K: "1833"
+              pressure_atm: "7.08e-10"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1833 K; column (19)"
+            -
+              T_K: "1863"
+              pressure_atm: "1.24e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1863 K; column (19)"
+            -
+              T_K: "1889"
+              pressure_atm: "2.01e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1889 K; column (19)"
+            -
+              T_K: "1913"
+              pressure_atm: "3.02e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1913 K; column (19)"
+            -
+              T_K: "1933"
+              pressure_atm: "4.49e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1933 K; column (19)"
+            -
+              T_K: "1962"
+              pressure_atm: "6.68e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1962 K; column (19)"
+            -
+              T_K: "1983"
+              pressure_atm: "1.06e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1983 K; column (19)"
+            -
+              T_K: "2000"
+              pressure_atm: "1.24e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2000 K; column (19)"
+            -
+              T_K: "2033"
+              pressure_atm: "2.35e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2033 K; column (19)"
+            -
+              T_K: "2083"
+              pressure_atm: "4.71e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2083 K; column (19)"
+            -
+              T_K: "2100"
+              pressure_atm: "5.82e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2100 K; column (19)"
+            -
+              T_K: "2133"
+              pressure_atm: "9.45e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2133 K; column (19)"
+            -
+              T_K: "2150"
+              pressure_atm: "1.29e-7"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2150 K; column (19)"
+            -
+              T_K: "2183"
+              pressure_atm: "1.79e-7"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2183 K; column (19)"
+          derived_from:
+            - "shornikov_2025_table1_cao_partial_pressure"
+            - "shornikov_2025_table1_ca_partial_pressure"
+          derivation:
+            relation: "pO = K2 pCaO / pCa (Eq. 19)"
+            inputs:
+              - "shornikov_2025_table1_cao_partial_pressure"
+              - "shornikov_2025_table1_ca_partial_pressure"
+            output_unit: "atm"
+      -
+        observation_id: "shornikov_2025_table2_o_eq20"
+        type: "partial_pressure"
+        locator:
+          published_page: 225
+          pdf_page_index: 11
+          table: "2"
+          note: "atomic oxygen partial-pressure series calculated by equation (20)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "O(g)"
+          method_class: "model_derived"
+          admission_status: "admitted"
+          method: "pO = sqrt(pO2 / K3) (Eq. 20)"
+          method_as_printed: "Table 2 column (20)"
+          composition_component: "CaO"
+          composition_basis: "CaO sample described in the Experimental section"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "4.26e-10"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1812 K; column (20)"
+            -
+              T_K: "1833"
+              pressure_atm: "6.44e-10"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1833 K; column (20)"
+            -
+              T_K: "1863"
+              pressure_atm: "1.08e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1863 K; column (20)"
+            -
+              T_K: "1889"
+              pressure_atm: "1.80e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1889 K; column (20)"
+            -
+              T_K: "1913"
+              pressure_atm: "2.68e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1913 K; column (20)"
+            -
+              T_K: "1933"
+              pressure_atm: "3.87e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1933 K; column (20)"
+            -
+              T_K: "1962"
+              pressure_atm: "6.03e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1962 K; column (20)"
+            -
+              T_K: "1983"
+              pressure_atm: "9.00e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1983 K; column (20)"
+            -
+              T_K: "2000"
+              pressure_atm: "1.12e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2000 K; column (20)"
+            -
+              T_K: "2033"
+              pressure_atm: "1.96e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2033 K; column (20)"
+            -
+              T_K: "2083"
+              pressure_atm: "3.96e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2083 K; column (20)"
+            -
+              T_K: "2100"
+              pressure_atm: "5.23e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2100 K; column (20)"
+            -
+              T_K: "2133"
+              pressure_atm: "8.30e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2133 K; column (20)"
+            -
+              T_K: "2150"
+              pressure_atm: "1.09e-7"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2150 K; column (20)"
+            -
+              T_K: "2183"
+              pressure_atm: "1.63e-7"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2183 K; column (20)"
+          derived_from:
+            - "shornikov_2025_table1_o2_partial_pressure"
+          derivation:
+            relation: "pO = sqrt(pO2 / K3) (Eq. 20)"
+            inputs:
+              - "shornikov_2025_table1_o2_partial_pressure"
+            output_unit: "atm"
+      -
+        observation_id: "shornikov_2025_table2_o_eq21"
+        type: "partial_pressure"
+        locator:
+          published_page: 225
+          pdf_page_index: 11
+          table: "2"
+          note: "atomic oxygen partial-pressure series calculated by equation (21)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "O(g)"
+          method_class: "model_derived"
+          admission_status: "admitted"
+          method: "pO = K15 pMoO / pMo (Eq. 21)"
+          method_as_printed: "Table 2 column (21)"
+          composition_component: "CaO"
+          composition_basis: "CaO sample described in the Experimental section"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "4.29e-10"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1812 K; column (21)"
+            -
+              T_K: "1833"
+              pressure_atm: "6.53e-10"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1833 K; column (21)"
+            -
+              T_K: "1863"
+              pressure_atm: "1.04e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1863 K; column (21)"
+            -
+              T_K: "1889"
+              pressure_atm: "1.71e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1889 K; column (21)"
+            -
+              T_K: "1913"
+              pressure_atm: "2.95e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1913 K; column (21)"
+            -
+              T_K: "1933"
+              pressure_atm: "3.95e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1933 K; column (21)"
+            -
+              T_K: "1962"
+              pressure_atm: "5.94e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1962 K; column (21)"
+            -
+              T_K: "1983"
+              pressure_atm: "8.63e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1983 K; column (21)"
+            -
+              T_K: "2000"
+              pressure_atm: "1.12e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2000 K; column (21)"
+            -
+              T_K: "2033"
+              pressure_atm: "2.09e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2033 K; column (21)"
+            -
+              T_K: "2083"
+              pressure_atm: "3.66e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2083 K; column (21)"
+            -
+              T_K: "2100"
+              pressure_atm: "5.45e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2100 K; column (21)"
+            -
+              T_K: "2133"
+              pressure_atm: "8.04e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2133 K; column (21)"
+            -
+              T_K: "2150"
+              pressure_atm: "1.14e-7"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2150 K; column (21)"
+            -
+              T_K: "2183"
+              pressure_atm: "1.57e-7"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2183 K; column (21)"
+          derived_from:
+            - "shornikov_2025_table1_moo_partial_pressure"
+            - "shornikov_2025_table1_mo_partial_pressure"
+          derivation:
+            relation: "pO = K15 pMoO / pMo (Eq. 21)"
+            inputs:
+              - "shornikov_2025_table1_moo_partial_pressure"
+              - "shornikov_2025_table1_mo_partial_pressure"
+            output_unit: "atm"
+      -
+        observation_id: "shornikov_2025_table2_o_eq22"
+        type: "partial_pressure"
+        locator:
+          published_page: 225
+          pdf_page_index: 11
+          table: "2"
+          note: "atomic oxygen partial-pressure series calculated by equation (22)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "O(g)"
+          method_class: "model_derived"
+          admission_status: "admitted"
+          method: "pO = K16 pMoO2 / pMoO (Eq. 22)"
+          method_as_printed: "Table 2 column (22)"
+          composition_component: "CaO"
+          composition_basis: "CaO sample described in the Experimental section"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "4.38e-10"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1812 K; column (22)"
+            -
+              T_K: "1833"
+              pressure_atm: "5.51e-10"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1833 K; column (22)"
+            -
+              T_K: "1863"
+              pressure_atm: "1.15e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1863 K; column (22)"
+            -
+              T_K: "1889"
+              pressure_atm: "1.81e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1889 K; column (22)"
+            -
+              T_K: "1913"
+              pressure_atm: "2.62e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1913 K; column (22)"
+            -
+              T_K: "1933"
+              pressure_atm: "3.68e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1933 K; column (22)"
+            -
+              T_K: "1962"
+              pressure_atm: "6.26e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1962 K; column (22)"
+            -
+              T_K: "1983"
+              pressure_atm: "9.45e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1983 K; column (22)"
+            -
+              T_K: "2000"
+              pressure_atm: "1.11e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2000 K; column (22)"
+            -
+              T_K: "2033"
+              pressure_atm: "1.85e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2033 K; column (22)"
+            -
+              T_K: "2083"
+              pressure_atm: "4.19e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2083 K; column (22)"
+            -
+              T_K: "2100"
+              pressure_atm: "5.38e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2100 K; column (22)"
+            -
+              T_K: "2133"
+              pressure_atm: "7.88e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2133 K; column (22)"
+            -
+              T_K: "2150"
+              pressure_atm: "1.17e-7"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2150 K; column (22)"
+            -
+              T_K: "2183"
+              pressure_atm: "1.63e-7"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2183 K; column (22)"
+          derived_from:
+            - "shornikov_2025_table1_moo2_partial_pressure"
+            - "shornikov_2025_table1_moo_partial_pressure"
+          derivation:
+            relation: "pO = K16 pMoO2 / pMoO (Eq. 22)"
+            inputs:
+              - "shornikov_2025_table1_moo2_partial_pressure"
+              - "shornikov_2025_table1_moo_partial_pressure"
+            output_unit: "atm"
+      -
+        observation_id: "shornikov_2025_table2_o_eq23"
+        type: "partial_pressure"
+        locator:
+          published_page: 225
+          pdf_page_index: 11
+          table: "2"
+          note: "atomic oxygen partial-pressure series calculated by equation (23)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "O(g)"
+          method_class: "model_derived"
+          admission_status: "admitted"
+          method: "pO = K17 pMoO3 / pMoO2 (Eq. 23)"
+          method_as_printed: "Table 2 column (23)"
+          composition_component: "CaO"
+          composition_basis: "CaO sample described in the Experimental section"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "4.51e-10"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1812 K; column (23)"
+            -
+              T_K: "1833"
+              pressure_atm: "7.19e-10"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1833 K; column (23)"
+            -
+              T_K: "1863"
+              pressure_atm: "1.11e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1863 K; column (23)"
+            -
+              T_K: "1889"
+              pressure_atm: "1.86e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1889 K; column (23)"
+            -
+              T_K: "1913"
+              pressure_atm: "2.65e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1913 K; column (23)"
+            -
+              T_K: "1933"
+              pressure_atm: "3.43e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1933 K; column (23)"
+            -
+              T_K: "1962"
+              pressure_atm: "6.22e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1962 K; column (23)"
+            -
+              T_K: "1983"
+              pressure_atm: "8.48e-9"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=1983 K; column (23)"
+            -
+              T_K: "2000"
+              pressure_atm: "1.12e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2000 K; column (23)"
+            -
+              T_K: "2033"
+              pressure_atm: "2.03e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2033 K; column (23)"
+            -
+              T_K: "2083"
+              pressure_atm: "4.38e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2083 K; column (23)"
+            -
+              T_K: "2100"
+              pressure_atm: "4.90e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2100 K; column (23)"
+            -
+              T_K: "2133"
+              pressure_atm: "8.11e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2133 K; column (23)"
+            -
+              T_K: "2150"
+              pressure_atm: "9.70e-8"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2150 K; column (23)"
+            -
+              T_K: "2183"
+              pressure_atm: "1.55e-7"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                table: "2"
+                note: "T=2183 K; column (23)"
+          derived_from:
+            - "shornikov_2025_table1_moo3_partial_pressure"
+            - "shornikov_2025_table1_moo2_partial_pressure"
+          derivation:
+            relation: "pO = K17 pMoO3 / pMoO2 (Eq. 23)"
+            inputs:
+              - "shornikov_2025_table1_moo3_partial_pressure"
+              - "shornikov_2025_table1_moo2_partial_pressure"
+            output_unit: "atm"
+  O2:
+    observations:
+      -
+        observation_id: "shornikov_2025_table1_o2_partial_pressure"
+        type: "partial_pressure"
+        locator:
+          published_page: 224
+          pdf_page_index: 10
+          table: "1"
+          note: "O2(g) partial-pressure series; paper says ratios (11) and (18)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "O2(g)"
+          method_class: "measured_tabulated"
+          admission_status: "admitted"
+          method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
+          method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
+          composition_component: "CaO"
+          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "9.82e-12"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1812 K; pO2_atm as printed"
+            -
+              T_K: "1833"
+              pressure_atm: "1.51e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1833 K; pO2_atm as printed"
+            -
+              T_K: "1863"
+              pressure_atm: "2.49e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1863 K; pO2_atm as printed"
+            -
+              T_K: "1889"
+              pressure_atm: "4.39e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1889 K; pO2_atm as printed"
+            -
+              T_K: "1913"
+              pressure_atm: "6.50e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1913 K; pO2_atm as printed"
+            -
+              T_K: "1933"
+              pressure_atm: "9.73e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1933 K; pO2_atm as printed"
+            -
+              T_K: "1962"
+              pressure_atm: "1.48e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1962 K; pO2_atm as printed"
+            -
+              T_K: "1983"
+              pressure_atm: "2.37e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1983 K; pO2_atm as printed"
+            -
+              T_K: "2000"
+              pressure_atm: "2.83e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2000 K; pO2_atm as printed"
+            -
+              T_K: "2033"
+              pressure_atm: "5.26e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2033 K; pO2_atm as printed"
+            -
+              T_K: "2083"
+              pressure_atm: "1.04e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2083 K; pO2_atm as printed"
+            -
+              T_K: "2100"
+              pressure_atm: "1.43e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2100 K; pO2_atm as printed"
+            -
+              T_K: "2133"
+              pressure_atm: "2.29e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2133 K; pO2_atm as printed"
+            -
+              T_K: "2150"
+              pressure_atm: "3.13e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2150 K; pO2_atm as printed"
+            -
+              T_K: "2183"
+              pressure_atm: "4.59e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2183 K; pO2_atm as printed"
+  CaO:
+    observations:
+      -
+        observation_id: "shornikov_2025_table1_cao_partial_pressure"
+        type: "partial_pressure"
+        locator:
+          published_page: 224
+          pdf_page_index: 10
+          table: "1"
+          note: "CaO(g) partial-pressure series; paper says ratios (11) and (18)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "CaO(g)"
+          method_class: "measured_tabulated"
+          admission_status: "admitted"
+          method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
+          method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
+          composition_component: "CaO"
+          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "1.70e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1812 K; pCaO_atm as printed"
+            -
+              T_K: "1833"
+              pressure_atm: "2.96e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1833 K; pCaO_atm as printed"
+            -
+              T_K: "1863"
+              pressure_atm: "5.99e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1863 K; pCaO_atm as printed"
+            -
+              T_K: "1889"
+              pressure_atm: "1.08e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1889 K; pCaO_atm as printed"
+            -
+              T_K: "1913"
+              pressure_atm: "1.73e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1913 K; pCaO_atm as printed"
+            -
+              T_K: "1933"
+              pressure_atm: "2.93e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1933 K; pCaO_atm as printed"
+            -
+              T_K: "1962"
+              pressure_atm: "4.84e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1962 K; pCaO_atm as printed"
+            -
+              T_K: "1983"
+              pressure_atm: "8.09e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1983 K; pCaO_atm as printed"
+            -
+              T_K: "2000"
+              pressure_atm: "1.06e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2000 K; pCaO_atm as printed"
+            -
+              T_K: "2033"
+              pressure_atm: "2.19e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2033 K; pCaO_atm as printed"
+            -
+              T_K: "2083"
+              pressure_atm: "5.40e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2083 K; pCaO_atm as printed"
+            -
+              T_K: "2100"
+              pressure_atm: "7.27e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2100 K; pCaO_atm as printed"
+            -
+              T_K: "2133"
+              pressure_atm: "1.30e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2133 K; pCaO_atm as printed"
+            -
+              T_K: "2150"
+              pressure_atm: "1.87e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2150 K; pCaO_atm as printed"
+            -
+              T_K: "2183"
+              pressure_atm: "2.92e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2183 K; pCaO_atm as printed"
+    context:
+      -
+        observation_id: "shornikov_2025_printed_equations_1_to_37"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 217
+          pdf_page_index: 3
+          section: "equations (1)–(37)"
+        units: "as printed"
+        values:
+          quantity: "printed_equation_relations"
+          equations:
+            -
+              equation_number: 1
+              relation: "[CaO] = (CaO)"
+              locator:
+                published_page: 217
+                pdf_page_index: 3
+                equation: "1"
+            -
+              equation_number: 2
+              relation: "(CaO) = (Ca) + (O)"
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                equation: "2"
+            -
+              equation_number: 3
+              relation: "2(O) = (O2)"
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                equation: "3"
+            -
+              equation_number: 4
+              relation: "K1 = pCaO"
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                equation: "4"
+            -
+              equation_number: 5
+              relation: "K2 = pCa pO / pCaO"
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                equation: "5"
+            -
+              equation_number: 6
+              relation: "K3 = pO^2 / pO2"
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                equation: "6"
+            -
+              equation_number: 7
+              relation: "(CaO) + (O) = (Ca) + (O2)"
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                equation: "7"
+            -
+              equation_number: 8
+              relation: "(CaO) + (MoO2) = (Ca) + (MoO3)"
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                equation: "8"
+            -
+              equation_number: 9
+              relation: "(CaO) + (WO2) = (Ca) + (WO3)"
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                equation: "9"
+            -
+              equation_number: 10
+              relation: "ICa : ICaO : IO : IO2 = 100 : 0.14 : 0.085 : 0.005 at 2183 ± 5 K and 15 eV"
+              locator:
+                published_page: 222
+                pdf_page_index: 8
+                equation: "10"
+            -
+              equation_number: 11
+              relation: "pi = Kalpha (qi / (sor Cor t)) sqrt(2 pi R T / Mi)"
+              locator:
+                published_page: 222
+                pdf_page_index: 8
+                equation: "11"
+            -
+              equation_number: 12
+              relation: "Kalpha = 1 / Cor + sor (1 - Cc alphai) / (Sv alphai Cc)"
+              locator:
+                published_page: 222
+                pdf_page_index: 8
+                equation: "12"
+            -
+              equation_number: 13
+              relation: "ICa : IMo : IMoO : IMoO2 : IMoO3 = 100 : 0.006 : 0.057 : 0.43 : 0.09 at 2183 ± 5 K"
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                equation: "13"
+            -
+              equation_number: 14
+              relation: "[Mo] = (Mo)"
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                equation: "14"
+            -
+              equation_number: 15
+              relation: "(Mo) + (O) = (MoO)"
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                equation: "15"
+            -
+              equation_number: 16
+              relation: "(MoO) + (O) = (MoO2)"
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                equation: "16"
+            -
+              equation_number: 17
+              relation: "(MoO2) + (O) = (MoO3)"
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                equation: "17"
+            -
+              equation_number: 18
+              relation: "pi = pCa (Ii / ICa) (sigmaCa etaCa) / (sigmai etai)"
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                equation: "18"
+            -
+              equation_number: 19
+              relation: "pO = K2 pCaO / pCa"
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                equation: "19"
+            -
+              equation_number: 20
+              relation: "pO = pO2^(1/2) / K3^(1/2)"
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                equation: "20"
+            -
+              equation_number: 21
+              relation: "pO = K15 pMoO / pMo"
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                equation: "21"
+            -
+              equation_number: 22
+              relation: "pO = K16 pMoO2 / pMoO"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                equation: "22"
+            -
+              equation_number: 23
+              relation: "pO = K17 pMoO3 / pMoO2"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                equation: "23"
+            -
+              equation_number: 24
+              relation: "R ln Ki = -Delta_r GT / T = -Delta_r HT / T + Delta_r ST"
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                equation: "24"
+            -
+              equation_number: 25
+              relation: "[CaO] = (Ca) + (O)"
+              locator:
+                published_page: 226
+                pdf_page_index: 12
+                equation: "25"
+            -
+              equation_number: 26
+              relation: "ptot = pO + pO2 + pCa + pCaO"
+              locator:
+                published_page: 227
+                pdf_page_index: 13
+                equation: "26"
+            -
+              equation_number: 27
+              relation: "ptot = pO + pO^2 / K3 + K1 K2 / pO + K1"
+              locator:
+                published_page: 227
+                pdf_page_index: 13
+                equation: "27"
+            -
+              equation_number: 28
+              relation: "d ptot / d pO = 1 + 2 pO / K3 - K1 K2 / pO^2 = 0"
+              locator:
+                published_page: 227
+                pdf_page_index: 13
+                equation: "28"
+            -
+              equation_number: 29
+              relation: "2 pO^3 / K3 + pO^2 - K1 K2 = 0"
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                equation: "29"
+            -
+              equation_number: 30
+              relation: "d^2 ptot / d pO^2 = 2 / K3 + 2 K1 K2 / pO^3 > 0"
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                equation: "30"
+            -
+              equation_number: 31
+              relation: "[CaO] + [C] = (Ca) + (CO)"
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                equation: "31"
+            -
+              equation_number: 32
+              relation: "[CaO] + 3[C] = [CaC2] + (CO)"
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                equation: "32"
+            -
+              equation_number: 33
+              relation: "pCa / sqrt(MCa) = pO / sqrt(MO) + 2 pO2 / sqrt(MO2)"
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                equation: "33"
+            -
+              equation_number: 34
+              relation: "[CaO] + [MgF2] = [MgO] + [CaF2]"
+              locator:
+                published_page: 229
+                pdf_page_index: 15
+                equation: "34"
+            -
+              equation_number: 35
+              relation: "[SrO] + [CaF2] = [CaO] + [SrF2]"
+              locator:
+                published_page: 229
+                pdf_page_index: 15
+                equation: "35"
+            -
+              equation_number: 36
+              relation: "[Ca] + 1/2(O2) = [CaO]"
+              locator:
+                published_page: 229
+                pdf_page_index: 15
+                equation: "36"
+            -
+              equation_number: 37
+              relation: "ΔfG°_T = −RT ln K36"
+              locator:
+                published_page: 229
+                pdf_page_index: 15
+                equation: "37"
+      -
+        observation_id: "shornikov_2025_qualifying_and_comparative_statements"
+        type: "experiment_series"
+        locator:
+          published_page: 217
+          pdf_page_index: 3
+          section: "Abstract, Introduction, Results and Discussion, Conclusions"
+        units: "as printed"
+        values:
+          quantity: "verbatim_qualifiers_and_directional_comparisons"
+          statements:
+            -
+              quote: "The partial pressures of vapor species over CaO were determined with an error not exceeding 10%, which is confirmed by calculations of the gas phase equilibrium with the atomic oxygen participation."
+              locator:
+                published_page: 217
+                pdf_page_index: 3
+                section: "Abstract"
+            -
+              quote: "The obtained information correlates with the results of previously performed studies, to a large extent refining them, and also agrees with the theoretical values."
+              locator:
+                published_page: 217
+                pdf_page_index: 3
+                section: "Abstract"
+            -
+              quote: "These molecules fragmented at an energy of ionizing electrons exceeding 13–15 eV, and formed CaO+ ions, therefore, measurements of ion currents were carried out at rather low energies of ionizing electrons (about 10 eV), which may explain the significant error in measuring the ion current intensities (Fig. 1)."
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                section: "Introduction"
+            -
+              quote: "The data obtained by Farber and Srivastava [6] during the evaporation of calcium oxide from an alund cell have systematic deviations (Fig. 2), increasing with temperature rising (Fig. 1)."
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                section: "Introduction"
+            -
+              quote: "A possible reason could be the interaction of the material of the effusion cell and CaO in a condensed state, which was noted by the authors themselves."
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                section: "Introduction"
+            -
+              quote: "However, in similar experiments conducted by Samoilova and Kazenas [7] at the same temperatures, no such deviations were found."
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                section: "Introduction"
+            -
+              quote: "The obtained values corresponded to those previously determined by Drowart et al. [5] (Figs. 1 and 2)."
+              locator:
+                published_page: 219
+                pdf_page_index: 5
+                section: "Introduction"
+            -
+              quote: "However, the presence of reducing conditions caused by the interaction of the graphite crucible with oxygen formed during the dissociation of gaseous calcium oxide according to the reaction (2) had a greater effect. This led to an increase in the total vapor pressure over CaO by about 10 times (Fig. 3b)."
+              locator:
+                published_page: 220
+                pdf_page_index: 6
+                section: "Introduction"
+            -
+              quote: "Assuming that the evaporation coefficient (αCaO) is 1, they found that the evaporation rate of calcium oxide from a nickel substrate is approximately 10 times higher than from a platinum substrate, which was also due to the presence of reducing conditions."
+              locator:
+                published_page: 220
+                pdf_page_index: 6
+                section: "Introduction"
+            -
+              quote: "The calculated ptot obtained by the evaporation in a vacuum of calcium oxide on platinum [12] and rhenium [13] substrate (according to Langmuire) was close to theoretical values [4]."
+              locator:
+                published_page: 220
+                pdf_page_index: 6
+                section: "Introduction"
+            -
+              quote: "This allowed the authors to conclude that the evaporation coefficient of calcium oxide is close to 1, which to some extent corresponds to the review [14]."
+              locator:
+                published_page: 220
+                pdf_page_index: 6
+                section: "Introduction"
+            -
+              quote: "The total vapor pressure over the CaO was calculated using the weight loss of sample at evaporation and was almost identical to the calculation based on thermochemical data [4]."
+              locator:
+                published_page: 220
+                pdf_page_index: 6
+                section: "Introduction"
+            -
+              quote: "As follows from Figs. 1 and 2, the accuracy of determining the partial pressures of vapor species over CaO is low, the differences in them may exceed an order of magnitude."
+              locator:
+                published_page: 221
+                pdf_page_index: 7
+                section: "Introduction"
+            -
+              quote: "The effect of redox conditions on the evaporation of calcium oxide has not been considered, that, in turn, does not allow for a correct comparison of the available experimental data."
+              locator:
+                published_page: 221
+                pdf_page_index: 7
+                section: "Introduction"
+            -
+              quote: "The total pressure over CaO obtained by various methods on a wide temperature range are difficult to compare."
+              locator:
+                published_page: 221
+                pdf_page_index: 7
+                section: "Introduction"
+            -
+              quote: "It should also be noted that the accuracy of the obtained values is low, the non-systematic error of which can exceed 70% (Fig. 3)."
+              locator:
+                published_page: 221
+                pdf_page_index: 7
+                section: "Introduction"
+            -
+              quote: "The measurements of the total vapor pressure performed in [12, 15] seem to be quite accurate."
+              locator:
+                published_page: 221
+                pdf_page_index: 7
+                section: "Introduction"
+            -
+              quote: "The partial pressures of the vapor species of the gas phase over CaO calculated by the ratios (11) and (18) with an error not exceeding 10% are shown in Table 1."
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                section: "Results and Discussion"
+            -
+              quote: "As follows from Table 2, the partial pressures of atomic oxygen, determined by the ratio (11), satisfactorily corresponded to those calculated from thermochemical data [4] on the Kr(T) equilibrium constants of possible reactions (2), (3), (15)–(17) in the gas the phase over CaO according to the ratios:"
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                section: "Results and Discussion"
+            -
+              quote: "The observed increase in the total vapor pressure over CaO (Fig. 3) is due to an increase in the partial pressure of atomic calcium (Fig. 1a), formed due to the dissociation of gaseous calcium oxide by reaction (2)."
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                section: "Results and Discussion"
+            -
+              quote: "In turn, the partial pressures of atomic (Fig. 2c) and molecular (Fig. 2d) oxygen, on the contrary, decrease due to the reducing interaction with the material of the effusion cell."
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                section: "Results and Discussion"
+            -
+              quote: "This interrelation is confirmed by calculations using the ratios (19)–(23), which show the agreement of the partial pressure of atomic oxygen over calcium oxide calculated from various equilibria in the gas phase (15)–(17) with the formation of gaseous molybdenum oxides (Table 2)."
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                section: "Results and Discussion"
+            -
+              quote: "Note that the partial pressure of Ca, O and O2 (Fig. 1a, b, d) obtained in the present study correspond satisfactorily to those determined by Drowart et al. [5] and Banon et al. [8] under close reducing conditions (during evaporation of CaO from a molybdenum effusion cell)."
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                section: "Results and Discussion"
+            -
+              quote: "As for the temperature dependence of the partial pressure of gaseous calcium oxide (Fig. 2b), in this case the reduction conditions have no effect on the reaction (1)."
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                section: "Results and Discussion"
+            -
+              quote: "The results found in the present study correlate with the data obtained by the mass spectrometric method [5, 7, 8]."
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                section: "Results and Discussion"
+            -
+              quote: "The results obtained by Farber and Srivastava [6] systematically differ from them, except for the magnitude of the slope."
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                section: "Results and Discussion"
+            -
+              quote: "The calculations performed in this work of the enthalpies and entropies of reactions (1)–(3) by the ratio (24) confirmed the theoretical data [4] and correlated with the experimental results obtained in [5, 7] (Table 3)."
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                section: "Results and Discussion"
+            -
+              quote: "The value of the enthalpy of reaction (1) determined by Pelchowitch [22] differed by about 60 kJ/mol from all other results, non-systematic errors of Babeliowsky et al. [23] were approximately the same amount."
+              locator:
+                published_page: 225
+                pdf_page_index: 11
+                section: "Results and Discussion"
+            -
+              quote: "It can be seen (Fig. 4), that the composition (and, accordingly, the partial pressures of vapor species) of the gas phase over calcium oxide largely depend on the content (and, accordingly, the partial pressure) of oxygen, while revealing the individual characteristics of the used effusion cells made of materials similar in properties."
+              locator:
+                published_page: 226
+                pdf_page_index: 12
+                section: "Results and Discussion"
+            -
+              quote: "So, probably molybdenum effusion cells used by Banon et al. [8] and in the present study differed somewhat in composition or had different degrees of surface treatment purity, as, perhaps, the alund effusion cells used by Farber and Srivastava [6] and Samoilova and Kazenas [7]."
+              locator:
+                published_page: 226
+                pdf_page_index: 12
+                section: "Results and Discussion"
+            -
+              quote: "The authors envisaged a diffusive flow of atomic oxygen through the walls of a molybdenum effusion cell to the outside, that according to their calculation, could lead to a decrease in the oxygen content (compared with the absence of such a flow) located inside it (approximately 2 times)."
+              locator:
+                published_page: 226
+                pdf_page_index: 12
+                section: "Results and Discussion"
+            -
+              quote: "Based on the formal combination of reactions (1) and (2), which can be written as a heterogeneous reaction (25), Banon et al. [8] also drew conclusions on the significant effect of reducing conditions on the congruence of calcium oxide evaporation, which does not correspond to experimental facts."
+              locator:
+                published_page: 227
+                pdf_page_index: 13
+                section: "Results and Discussion"
+            -
+              quote: "Indeed, atomic calcium and oxygen are the predominant vapor species of the gas phase over CaO (Fig. 1) in the temperature range of 1800–2400 K, however based on the determined slopes of temperature dependences, as well as well-known theoretical propositions formulated by Kulikov [24], it can be understood that these species of the gas phase are not formed independently, but due to the dissociation of gaseous calcium oxide."
+              locator:
+                published_page: 227
+                pdf_page_index: 13
+                section: "Results and Discussion"
+            -
+              quote: "With increasing temperature, the dissociation of gaseous CaO decreases, thereby causing a decrease in the content of other forms of the gas phase (Ca, O and O2), but without affecting in any way the congruence of evaporation of calcium oxide, which can be confirmed as follows."
+              locator:
+                published_page: 227
+                pdf_page_index: 13
+                section: "Results and Discussion"
+            -
+              quote: "Note that the second derivative of the relation (27) is always positive, that indicates the presence of a minimum of the total vapor pressure over the calcium oxide and means its congruent evaporation [26]."
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+            -
+              quote: "Note that measurements performed above the temperature of 1800 K are few [34–38], the differences in Cp(CaO) exceed 10 J/(mol × K)."
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+            -
+              quote: "Thus, the Cp(CaO) obtained by Wartenberg and Witzel [34] at 2825 K is in the range from 50 to 62 J/(mol × K), which can lead to significant errors in the determination of the Gibbs energies of formation of calcium oxide."
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+            -
+              quote: "The experimental results of determination of the Gibbs energies of calcium oxide formation based on studies of heterogeneous reactions with graphite (31), (32) and similar heterogeneous reactions involving sulfur, phosphorus and oxygen [41, 42], led researchers to conclude that the thermodynamic stability of calcium oxide is lower."
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+            -
+              quote: "As follows from Fig. 5, the ΔfG° found values differ from those theoretically calculated in [4] by 10–30 kJ/mol."
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+            -
+              quote: "The found discrepancies are probably due to the procedure for calculating the Gibbs energies of calcium oxide formation, performed on the basis of inconsistent thermodynamic data, or, as in the case of Gourishankar et al. [15], the approximate calculation of the partial pressures of vapor species from the total vapor pressure over calcium oxide."
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+            -
+              quote: "The authors [15] neglected the insignificant amount of gaseous CaO and calculated the composition of the gas phase, taking into account the molecular weight of vapor species of the gas phase (Mi), according to the following ratio (33)."
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+            -
+              quote: "Probably, the incorrectness of this approach led the authors to the enthalpy of formation of crystalline calcium oxide, which differs from the recommended in [4] by approximately 33 kJ/mol."
+              locator:
+                published_page: 229
+                pdf_page_index: 15
+                section: "Results and Discussion"
+            -
+              quote: "At the same time, the results of thermodynamic studies of reactions: [CaO] + MgF2 = MgO + [CaF2] and [SrO] + [CaF2] = [CaO] + [SrF2], which performed by Jacob and Varghese [43] in the temperature range of 940–1260 K using solid-state electrochemical cells based on monocrystalline CaF2 and SrF2 also do not confirm the higher Gibbs energy of calcium oxide formation and are consistent with theoretical data [4] within 4 kJ/mol."
+              locator:
+                published_page: 229
+                pdf_page_index: 15
+                section: "Results and Discussion"
+            -
+              quote: "As can be seen from Fig. 5, the calculated values of ΔfG°T(CaO) by the ratio (37), as well as Δr36HT and Δr36ST (Table 3) are quite close to the theoretical values calculated by Glushko et al. [4]."
+              locator:
+                published_page: 229
+                pdf_page_index: 15
+                section: "Results and Discussion"
+            -
+              quote: "The mass spectrometric study of the evaporation of calcium oxide from a molybdenum effusion cell in the temperature range 1812–2183 K allowed to determine the partial pressures of the main vapor species of the gas phase over calcium oxide (Ca, CaO, O, and O2) with an error not exceeding 10%, which is confirmed by calculations of equilibria in the gas phase involving atomic oxygen."
+              locator:
+                published_page: 230
+                pdf_page_index: 16
+                section: "Conclusions"
+            -
+              quote: "The obtained experimental data correlates with the results of previously performed studies, largely clarifying them, and also agree with theoretical values."
+              locator:
+                published_page: 230
+                pdf_page_index: 16
+                section: "Conclusions"
+            -
+              quote: "Calcium molybdates and tungstates were also found in the condensed phase due to the interaction of calcium oxide with the material of the effusion cell (Mo, W)."
+              locator:
+                published_page: 218
+                pdf_page_index: 4
+                section: "Introduction"
+            -
+              quote: "The absence of contact of the thermocouple with the test substance and the possible condensation of evaporating CaO on the crucible suspension could probably affect the accuracy of the experiment."
+              locator:
+                published_page: 220
+                pdf_page_index: 6
+                section: "Introduction"
+            -
+              quote: "Note that the use of non-metallic container material (alund) may or may not lead to interaction with CaO."
+              locator:
+                published_page: 221
+                pdf_page_index: 7
+                section: "Introduction"
+            -
+              quote: "The MoOi+ ions (i = 0–3) were also observed in the mass spectra of vapor over CaO, the number of which was small at 2183 ± 5 K."
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                section: "Results and Discussion"
+            -
+              quote: "Their origin was caused by the molybdenum cell’s own evaporation at high temperature: [Mo] = (Mo), and the interaction of oxygen formed during the dissociation of gaseous CaO according to reaction (2) with the cell material, which, in turn, led to the formation of gaseous molybdenum oxides by reactions in the gas phase:"
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                section: "Results and Discussion"
+      -
+        observation_id: "shornikov_2025_figure_1_figure_only"
+        type: "figure"
+        locator:
+          published_page: 219
+          pdf_page_index: 5
+          figure: "1"
+        units: "as printed"
+        values:
+          quantity: "figure_only_curve"
+          method_class: "figure_only"
+          caption: "Logarithmic temperature dependences of partial pressures of Ca, CaO, O and O2; literature, present study and calculated values."
+          notes: "Figure image inspected; curve not digitized."
+      -
+        observation_id: "shornikov_2025_figure_2_figure_only"
+        type: "figure"
+        locator:
+          published_page: 219
+          pdf_page_index: 5
+          figure: "2"
+        units: "as printed"
+        values:
+          quantity: "figure_only_curve"
+          method_class: "figure_only"
+          caption: "Logarithmic temperature dependence of the equilibrium constant for reaction (2); literature, present study and calculated values."
+          notes: "Figure image inspected; curve not digitized."
+      -
+        observation_id: "shornikov_2025_figure_3_figure_only"
+        type: "figure"
+        locator:
+          published_page: 220
+          pdf_page_index: 6
+          figure: "3"
+        units: "as printed"
+        values:
+          quantity: "figure_only_curve"
+          method_class: "figure_only"
+          caption: "Total vapor pressure over CaO and deviations from theoretical calculations; boiling-point, Langmuir, Knudsen and calculated series."
+          notes: "Figure image inspected; curve not digitized."
+      -
+        observation_id: "shornikov_2025_figure_4_figure_only"
+        type: "figure"
+        locator:
+          published_page: 227
+          pdf_page_index: 13
+          figure: "4"
+        units: "as printed"
+        values:
+          quantity: "figure_only_curve"
+          method_class: "figure_only"
+          caption: "Gas-phase composition over CaO at 2060 K as a function of reduction conditions indexed by atomic oxygen content."
+          notes: "Figure image inspected; curve not digitized."
+      -
+        observation_id: "shornikov_2025_figure_5_figure_only"
+        type: "figure"
+        locator:
+          published_page: 229
+          pdf_page_index: 15
+          figure: "5"
+        units: "as printed"
+        values:
+          quantity: "figure_only_curve"
+          method_class: "figure_only"
+          caption: "Gibbs energy of CaO formation: experimental values and Glushko et al. calculated values."
+          notes: "Figure image inspected; curve not digitized."
+      -
+        observation_id: "shornikov_2025_table3_row_01"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 1; [CaO] = (CaO); Glushko et al. [4]"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "quoted_attributed"
+          attribution: "Glushko et al. [4]"
+          reaction: "[CaO] = (CaO)"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "1500"
+                interval_high: "3000"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "675.88"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol as printed"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "654.50"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "0.50"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "154.77"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K as printed"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "0.24"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K as printed"
+          table_reference: "Glushko et al. [4]"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+      -
+        observation_id: "shornikov_2025_table3_row_02"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 2; [CaO] = (CaO); Pelchowitch [22]"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "quoted_attributed"
+          attribution: "Pelchowitch [22]"
+          reaction: "[CaO] = (CaO)"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "1568"
+                interval_high: "1752"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol printed dash"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "723.53"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "5.20"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K printed dash"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K printed dash"
+          table_reference: "Pelchowitch [22]"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+      -
+        observation_id: "shornikov_2025_table3_row_03"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 3; [CaO] = (CaO); The present study"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "model_derived"
+          attribution: "The present study"
+          reaction: "[CaO] = (CaO)"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "1812"
+                interval_high: "2183"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol printed dash"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "661.96"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "2.95"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "159.47"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K as printed"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "1.49"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K as printed"
+          table_reference: "The present study"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+          derivation:
+            relation: "least-squares thermodynamic calculation using Eq. (24); formation row also uses Eq. (37)"
+            inputs:
+              - "shornikov_2025_table1_ca_partial_pressure"
+              - "shornikov_2025_table1_cao_partial_pressure"
+              - "shornikov_2025_table1_o_partial_pressure"
+              - "shornikov_2025_table1_o2_partial_pressure"
+              - "shornikov_2025_table2_o_eq11"
+            output_unit: "kJ/mol and J/(mol × K)"
+          derived_from:
+            - "shornikov_2025_table1_ca_partial_pressure"
+            - "shornikov_2025_table1_cao_partial_pressure"
+            - "shornikov_2025_table1_o_partial_pressure"
+            - "shornikov_2025_table1_o2_partial_pressure"
+            - "shornikov_2025_table2_o_eq11"
+      -
+        observation_id: "shornikov_2025_table3_row_04"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 4; [CaO] = (CaO); Samoilova and Kazenas [7]"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "quoted_attributed"
+          attribution: "Samoilova and Kazenas [7]"
+          reaction: "[CaO] = (CaO)"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "2018"
+                interval_high: "2227"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol printed dash"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "676.92"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "12.02"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "168.89"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K as printed"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "5.78"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K as printed"
+          table_reference: "Samoilova and Kazenas [7]"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+      -
+        observation_id: "shornikov_2025_table3_row_05"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 5; [CaO] = (CaO); Babeliowsky et al. [23]"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "quoted_attributed"
+          attribution: "Babeliowsky et al. [23]"
+          reaction: "[CaO] = (CaO)"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "2165"
+                interval_high: "2259"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol printed dash"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "583.02"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "61.50"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K printed dash"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K printed dash"
+          table_reference: "Babeliowsky et al. [23]"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+      -
+        observation_id: "shornikov_2025_table3_row_06"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 6; (CaO) = (Ca) + (O); Glushko et al. [4]"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "quoted_attributed"
+          attribution: "Glushko et al. [4]"
+          reaction: "(CaO) = (Ca) + (O)"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "1500"
+                interval_high: "3000"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "380.00"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol as printed"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "386.35"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "0.57"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "103.60"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K as printed"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "0.27"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K as printed"
+          table_reference: "Glushko et al. [4]"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+      -
+        observation_id: "shornikov_2025_table3_row_07"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 7; (CaO) = (Ca) + (O); The present study"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "model_derived"
+          attribution: "The present study"
+          reaction: "(CaO) = (Ca) + (O)"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "1812"
+                interval_high: "2183"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol printed dash"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "385.09"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "2.29"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "101.75"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K as printed"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "1.16"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K as printed"
+          table_reference: "The present study"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+          derivation:
+            relation: "least-squares thermodynamic calculation using Eq. (24); formation row also uses Eq. (37)"
+            inputs:
+              - "shornikov_2025_table1_ca_partial_pressure"
+              - "shornikov_2025_table1_cao_partial_pressure"
+              - "shornikov_2025_table1_o_partial_pressure"
+              - "shornikov_2025_table1_o2_partial_pressure"
+              - "shornikov_2025_table2_o_eq11"
+            output_unit: "kJ/mol and J/(mol × K)"
+          derived_from:
+            - "shornikov_2025_table1_ca_partial_pressure"
+            - "shornikov_2025_table1_cao_partial_pressure"
+            - "shornikov_2025_table1_o_partial_pressure"
+            - "shornikov_2025_table1_o2_partial_pressure"
+            - "shornikov_2025_table2_o_eq11"
+      -
+        observation_id: "shornikov_2025_table3_row_08"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 8; (CaO) = (Ca) + (O); Samoilova and Kazenas [7]"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "quoted_attributed"
+          attribution: "Samoilova and Kazenas [7]"
+          reaction: "(CaO) = (Ca) + (O)"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "1976"
+                interval_high: "2203"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol printed dash"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "285.99"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "25.52"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "51.79"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K as printed"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "12.56"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K as printed"
+          table_reference: "Samoilova and Kazenas [7]"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+      -
+        observation_id: "shornikov_2025_table3_row_09"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 9; (CaO) = (Ca) + (O); Farber and Srivastava [6]"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "quoted_attributed"
+          attribution: "Farber and Srivastava [6]"
+          reaction: "(CaO) = (Ca) + (O)"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "2080"
+                interval_high: "2206"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol printed dash"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "381.38"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "8.43"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "90.96"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K as printed"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "3.94"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K as printed"
+          table_reference: "Farber and Srivastava [6]"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+      -
+        observation_id: "shornikov_2025_table3_row_10"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 10; (CaO) = (Ca) + (O); Drowart et al. [5]"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "quoted_attributed"
+          attribution: "Drowart et al. [5]"
+          reaction: "(CaO) = (Ca) + (O)"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "2168"
+                interval_high: "2410"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol printed dash"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "388.44"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "3.96"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "104.527"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K as printed"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "1.71"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K as printed"
+          table_reference: "Drowart et al. [5]"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+      -
+        observation_id: "shornikov_2025_table3_row_11"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 11; (O2) = 2(O); Glushko et al. [4]"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "quoted_attributed"
+          attribution: "Glushko et al. [4]"
+          reaction: "(O2) = 2(O)"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "1500"
+                interval_high: "3000"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "493.27"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol as printed"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "510.80"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "0.19"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "133.80"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K as printed"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "0.09"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K as printed"
+          table_reference: "Glushko et al. [4]"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+      -
+        observation_id: "shornikov_2025_table3_row_12"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 12; (O2) = 2(O); The present study"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "model_derived"
+          attribution: "The present study"
+          reaction: "(O2) = 2(O)"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "1812"
+                interval_high: "2183"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol printed dash"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "507.88"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "2.37"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "132.30"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K as printed"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "1.19"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K as printed"
+          table_reference: "The present study"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+          derivation:
+            relation: "least-squares thermodynamic calculation using Eq. (24); formation row also uses Eq. (37)"
+            inputs:
+              - "shornikov_2025_table1_ca_partial_pressure"
+              - "shornikov_2025_table1_cao_partial_pressure"
+              - "shornikov_2025_table1_o_partial_pressure"
+              - "shornikov_2025_table1_o2_partial_pressure"
+              - "shornikov_2025_table2_o_eq11"
+            output_unit: "kJ/mol and J/(mol × K)"
+          derived_from:
+            - "shornikov_2025_table1_ca_partial_pressure"
+            - "shornikov_2025_table1_cao_partial_pressure"
+            - "shornikov_2025_table1_o_partial_pressure"
+            - "shornikov_2025_table1_o2_partial_pressure"
+            - "shornikov_2025_table2_o_eq11"
+      -
+        observation_id: "shornikov_2025_table3_row_13"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 13; [Ca] + 1/2(O2) = [CaO]; Glushko et al. [4]"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "quoted_attributed"
+          attribution: "Glushko et al. [4]"
+          reaction: "[Ca] + 1/2(O2) = [CaO]"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "1500"
+                interval_high: "3000"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "-635.09"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol as printed"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "-636.10"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "0.81"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "-107.17"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K as printed"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "0.35"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K as printed"
+          table_reference: "Glushko et al. [4]"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+      -
+        observation_id: "shornikov_2025_table3_row_14"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "row 14; [Ca] + 1/2(O2) = [CaO]; The present study"
+        units: "as printed"
+        values:
+          quantity: "reaction_enthalpy_entropy_table_row"
+          method_class: "model_derived"
+          attribution: "The present study"
+          reaction: "[Ca] + 1/2(O2) = [CaO]"
+          temperature_range_K:
+            state:
+              tag: "value"
+              value:
+                kind: "interval"
+                interval_low: "1812"
+                interval_high: "2183"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "temperature range as printed"
+          delta_r_H0_kJ_per_mol:
+            state:
+              tag: "unknown"
+              reason: "source_printed_dash"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H0_kJ_per_mol printed dash"
+          delta_r_H_T_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "-641.52"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_kJ_per_mol as printed"
+          delta_r_H_T_uncertainty_kJ_per_mol:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "1.85"
+            units: "kJ/mol"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_H_T_uncertainty_kJ_per_mol as printed"
+          delta_r_S_T_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "-109.81"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_J_per_mol_K as printed"
+          delta_r_S_T_uncertainty_J_per_mol_K:
+            state:
+              tag: "value"
+              value:
+                kind: "point"
+                point: "0.93"
+            units: "J/(mol × K)"
+            locator:
+              published_page: 226
+              pdf_page_index: 12
+              table: "3"
+              note: "delta_r_S_T_uncertainty_J_per_mol_K as printed"
+          table_reference: "The present study"
+          source_note: "Uncertainties are printed ± values. The Table 3 note attributes errors to non-systematic deviations in least-squares calculations."
+          derivation:
+            relation: "least-squares thermodynamic calculation using Eq. (24); formation row also uses Eq. (37)"
+            inputs:
+              - "shornikov_2025_table1_ca_partial_pressure"
+              - "shornikov_2025_table1_cao_partial_pressure"
+              - "shornikov_2025_table1_o_partial_pressure"
+              - "shornikov_2025_table1_o2_partial_pressure"
+              - "shornikov_2025_table2_o_eq11"
+            output_unit: "kJ/mol and J/(mol × K)"
+          derived_from:
+            - "shornikov_2025_table1_ca_partial_pressure"
+            - "shornikov_2025_table1_cao_partial_pressure"
+            - "shornikov_2025_table1_o_partial_pressure"
+            - "shornikov_2025_table1_o2_partial_pressure"
+            - "shornikov_2025_table2_o_eq11"
+      -
+        observation_id: "shornikov_2025_table3_uncertainty_note"
+        type: "thermodynamic_example"
+        locator:
+          published_page: 226
+          pdf_page_index: 12
+          table: "3"
+          note: "printed table note"
+        units: "as printed"
+        values:
+          quantity: "uncertainty_qualification"
+          method_class: "author_estimate"
+          quote: "The errors shown correspond to non-systematic deviations in the least squares calculations."
+      -
+        observation_id: "shornikov_2025_activity_scope"
+        type: "characterization"
+        locator:
+          published_page: 218
+          pdf_page_index: 4
+          section: "notation and equations (1)–(6)"
+        units: "as printed"
+        values:
+          quantity: "activity_scope"
+          activity_values_present: false
+          activity_ions:
+            state:
+              tag: "unknown"
+              reason: "no_activities_reported"
+            locator:
+              published_page: 224
+              pdf_page_index: 10
+              table: "1"
+          activity_standard_states:
+            state:
+              tag: "unknown"
+              reason: "no_activity_rows_or_activity_standard_state_reported"
+            locator:
+              published_page: 218
+              pdf_page_index: 4
+              equation: "1"
+          thermodynamic_condensed_reference: "Square brackets denote condensed phases; round brackets denote gas phases. The paper identifies CaO as cubic face-centered NaCl-type crystal Fm3m and refers to crystalline CaO; an activity standard-state convention is not stated."
+          locator:
+            published_page: 217
+            pdf_page_index: 3
+            section: "Introduction"
+      -
+        observation_id: "shornikov_2025_calibration_and_ion_corrections"
+        type: "apparatus"
+        locator:
+          published_page: 222
+          pdf_page_index: 8
+          section: "Results and Discussion"
+        units: "as printed"
+        values:
+          quantity: "intensity_calibration_and_ion_correction"
+          intensity_to_pressure_conversion:
+            state:
+              tag: "value"
+              value: "Hertz–Knudsen Eq. (11) from integrated component currents for Ca, O, O2 and CaO; Eq. (18) compares Mo and MoOx ion currents against pCa with effective ionization cross-sections and isotope-distribution factors."
+            locator:
+              published_page: 222
+              pdf_page_index: 8
+              equation: "11"
+          evaporation_correction_constant_Kalpha:
+            state:
+              tag: "value"
+              value: "Kalpha ≈ 1, estimated from the effusion-cell geometry and estimated CaO evaporation coefficient."
+            locator:
+              published_page: 222
+              pdf_page_index: 8
+              equation: "12"
+          ionization_cross_section_numeric_values:
+            state:
+              tag: "unknown"
+              reason: "numeric_values_not_published"
+            locator:
+              published_page: 223
+              pdf_page_index: 9
+              equation: "18"
+          ionization_cross_section_source:
+            state:
+              tag: "value"
+              value: "Equation (18) cites [21] for the ion-current ratio; individual cross-sections are not tabulated in this chapter."
+            locator:
+              published_page: 223
+              pdf_page_index: 9
+              equation: "18"
+          isotope_distribution_correction:
+            state:
+              tag: "value"
+              value: "eta_Ca / eta_i isotope-distribution ratio in Eq. (18)"
+            locator:
+              published_page: 223
+              pdf_page_index: 9
+              equation: "18"
+          additional_multiplier_correction:
+            state:
+              tag: "unknown"
+              reason: "no_additional_multiplier_correction_reported"
+            locator:
+              published_page: 223
+              pdf_page_index: 9
+              equation: "18"
+          measured_relative_ion_current_ratios:
+            state:
+              tag: "value"
+              value: "ICa:ICaO:IO:IO2 = 100:0.14:0.085:0.005 at 2183 ± 5 K and 15 eV; ICa:IMo:IMoO:IMoO2:IMoO3 = 100:0.006:0.057:0.43:0.09 at 2183 ± 5 K."
+            locator:
+              published_page: 223
+              pdf_page_index: 9
+              equation: "10 and 13"
+          ion_appearance_energy_method_and_reference:
+            state:
+              tag: "value"
+              value: "Ion appearance energies determined by Warren method [17] and corresponded to accepted atom and molecule ionization energies of Gurvich et al. [18]."
+            locator:
+              published_page: 222
+              pdf_page_index: 8
+              section: "Results and Discussion"
+      -
+        observation_id: "shornikov_2025_numeric_background"
+        type: "laboratory_conditions"
+        locator:
+          published_page: 228
+          pdf_page_index: 14
+          section: "Introduction and Results and Discussion"
+        units: "as printed"
+        values:
+          quantity: "located_numeric_background"
+          statements:
+            -
+              quote: "Thus, studies of equilibria in the gas phase over CaO by the Knudsen effusion mass spectrometric method [5–8] in the temperature range of 1900–2400 K faced the need to take into account the formation and fragmentation of gaseous products of the redox interaction of calcium oxide with the material of a metal cell."
+              locator:
+                published_page: 221
+                pdf_page_index: 7
+                section: "Introduction"
+            -
+              quote: "The reasons listed above determined the purpose of this study—to accurately determine the partial pressures of vapor species of the gas phase over calcium oxide in the temperature range of 1800–2200 K and, based on the experimental information to find out the effect of redox conditions on the CaO evaporation in order to correctly compare the results of experiments performed under different conditions."
+              locator:
+                published_page: 221
+                pdf_page_index: 7
+                section: "Introduction"
+            -
+              quote: "The same point of view is held by Gourishankar et al. [15], who studied the nonequilibrium evaporation of a calcium oxide crystal (according to Langmuire) in the temperature range 1919–2072 K."
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+            -
+              quote: "measurements of the heat capacity Cp(CaO), begun by Lavoisier and de LaPlace [32] in 1780 and continued until recently in the temperature range 2–3128 K [33]."
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+            -
+              quote: "Thus, the Cp(CaO) obtained by Wartenberg and Witzel [34] at 2825 K is in the range from 50 to 62 J/(mol × K)"
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+            -
+              quote: "As follows from Fig. 5, the Δf G° found values differ from those theoretically calculated in [4] by 10–30 kJ/mol."
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+            -
+              quote: "which performed by Jacob and Varghese [43] in the temperature range of 940–1260 K using solid-state electrochemical cells based on monocrystalline CaF2 and SrF2"
+              locator:
+                published_page: 229
+                pdf_page_index: 15
+                section: "Results and Discussion"
+            -
+              quote: "Δf H°298 (CaO) = −635.09 ± 0.89 kJ/mol"
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+            -
+              quote: "Δf S°298 (CaO) = 38.21 ± 0.13 J/(mol × K)"
+              locator:
+                published_page: 228
+                pdf_page_index: 14
+                section: "Results and Discussion"
+      -
+        observation_id: "shornikov_2025_translation_printing_glitches"
+        type: "characterization"
+        locator:
+          published_page: 220
+          pdf_page_index: 6
+          section: "Introduction and Results and Discussion"
+        units: "verbatim printed English"
+        values:
+          quantity: "translation_or_printing_glitches"
+          statements:
+            -
+              quote: "according to Langmuire"
+              locator:
+                published_page: 220
+                pdf_page_index: 6
+                section: "Introduction"
+              note: "Printed spelling retained; plainly garbled English translation."
+            -
+              quote: "the gas the phase"
+              locator:
+                published_page: 223
+                pdf_page_index: 9
+                section: "Results and Discussion"
+              note: "Printed phrase retained; plainly garbled English translation."
+            -
+              quote: "j-th vapor spesie"
+              locator:
+                published_page: 222
+                pdf_page_index: 8
+                section: "Results and Discussion"
+              note: "The image prints 'spesie'; spelling retained and identified as a printing/translation error."
+  Mo:
+    observations:
+      -
+        observation_id: "shornikov_2025_table1_mo_partial_pressure"
+        type: "partial_pressure"
+        locator:
+          published_page: 224
+          pdf_page_index: 10
+          table: "1"
+          note: "Mo(g) partial-pressure series; paper says ratios (11) and (18)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "Mo(g)"
+          method_class: "measured_tabulated"
+          admission_status: "admitted"
+          method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
+          method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
+          composition_component: "CaO"
+          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "5.35e-12"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1812 K; pMo_atm as printed"
+            -
+              T_K: "1833"
+              pressure_atm: "9.23e-12"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1833 K; pMo_atm as printed"
+            -
+              T_K: "1863"
+              pressure_atm: "1.76e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1863 K; pMo_atm as printed"
+            -
+              T_K: "1889"
+              pressure_atm: "3.30e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1889 K; pMo_atm as printed"
+            -
+              T_K: "1913"
+              pressure_atm: "5.28e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1913 K; pMo_atm as printed"
+            -
+              T_K: "1933"
+              pressure_atm: "8.53e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1933 K; pMo_atm as printed"
+            -
+              T_K: "1962"
+              pressure_atm: "1.48e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1962 K; pMo_atm as printed"
+            -
+              T_K: "1983"
+              pressure_atm: "2.43e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1983 K; pMo_atm as printed"
+            -
+              T_K: "2000"
+              pressure_atm: "3.33e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2000 K; pMo_atm as printed"
+            -
+              T_K: "2033"
+              pressure_atm: "6.00e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2033 K; pMo_atm as printed"
+            -
+              T_K: "2083"
+              pressure_atm: "1.60e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2083 K; pMo_atm as printed"
+            -
+              T_K: "2100"
+              pressure_atm: "2.07e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2100 K; pMo_atm as printed"
+            -
+              T_K: "2133"
+              pressure_atm: "3.88e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2133 K; pMo_atm as printed"
+            -
+              T_K: "2150"
+              pressure_atm: "4.84e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2150 K; pMo_atm as printed"
+            -
+              T_K: "2183"
+              pressure_atm: "9.23e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2183 K; pMo_atm as printed"
+  MoO:
+    observations:
+      -
+        observation_id: "shornikov_2025_table1_moo_partial_pressure"
+        type: "partial_pressure"
+        locator:
+          published_page: 224
+          pdf_page_index: 10
+          table: "1"
+          note: "MoO(g) partial-pressure series; paper says ratios (11) and (18)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "MoO(g)"
+          method_class: "measured_tabulated"
+          admission_status: "admitted"
+          method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
+          method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
+          composition_component: "CaO"
+          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "5.69e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1812 K; pMoO_atm as printed"
+            -
+              T_K: "1833"
+              pressure_atm: "9.82e-11"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1833 K; pMoO_atm as printed"
+            -
+              T_K: "1863"
+              pressure_atm: "1.66e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1863 K; pMoO_atm as printed"
+            -
+              T_K: "1889"
+              pressure_atm: "3.13e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1889 K; pMoO_atm as printed"
+            -
+              T_K: "1913"
+              pressure_atm: "5.57e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1913 K; pMoO_atm as printed"
+            -
+              T_K: "1933"
+              pressure_atm: "8.40e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1933 K; pMoO_atm as printed"
+            -
+              T_K: "1962"
+              pressure_atm: "1.32e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1962 K; pMoO_atm as printed"
+            -
+              T_K: "1983"
+              pressure_atm: "2.20e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1983 K; pMoO_atm as printed"
+            -
+              T_K: "2000"
+              pressure_atm: "2.93e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2000 K; pMoO_atm as printed"
+            -
+              T_K: "2033"
+              pressure_atm: "5.78e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2033 K; pMoO_atm as printed"
+            -
+              T_K: "2083"
+              pressure_atm: "1.23e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2083 K; pMoO_atm as printed"
+            -
+              T_K: "2100"
+              pressure_atm: "1.83e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2100 K; pMoO_atm as printed"
+            -
+              T_K: "2133"
+              pressure_atm: "3.10e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2133 K; pMoO_atm as printed"
+            -
+              T_K: "2150"
+              pressure_atm: "4.27e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2150 K; pMoO_atm as printed"
+            -
+              T_K: "2183"
+              pressure_atm: "7.04e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2183 K; pMoO_atm as printed"
+  MoO2:
+    observations:
+      -
+        observation_id: "shornikov_2025_table1_moo2_partial_pressure"
+        type: "partial_pressure"
+        locator:
+          published_page: 224
+          pdf_page_index: 10
+          table: "1"
+          note: "MoO2(g) partial-pressure series; paper says ratios (11) and (18)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "MoO2(g)"
+          method_class: "measured_tabulated"
+          admission_status: "admitted"
+          method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
+          method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
+          composition_component: "CaO"
+          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "1.18e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1812 K; pMoO2_atm as printed"
+            -
+              T_K: "1833"
+              pressure_atm: "1.59e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1833 K; pMoO2_atm as printed"
+            -
+              T_K: "1863"
+              pressure_atm: "2.90e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1863 K; pMoO2_atm as printed"
+            -
+              T_K: "1889"
+              pressure_atm: "4.92e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1889 K; pMoO2_atm as printed"
+            -
+              T_K: "1913"
+              pressure_atm: "7.66e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1913 K; pMoO2_atm as printed"
+            -
+              T_K: "1933"
+              pressure_atm: "1.08e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1933 K; pMoO2_atm as printed"
+            -
+              T_K: "1962"
+              pressure_atm: "1.62e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1962 K; pMoO2_atm as printed"
+            -
+              T_K: "1983"
+              pressure_atm: "2.71e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1983 K; pMoO2_atm as printed"
+            -
+              T_K: "2000"
+              pressure_atm: "3.06e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2000 K; pMoO2_atm as printed"
+            -
+              T_K: "2033"
+              pressure_atm: "5.48e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2033 K; pMoO2_atm as printed"
+            -
+              T_K: "2083"
+              pressure_atm: "1.08e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2083 K; pMoO2_atm as printed"
+            -
+              T_K: "2100"
+              pressure_atm: "1.54e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2100 K; pMoO2_atm as printed"
+            -
+              T_K: "2133"
+              pressure_atm: "2.19e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2133 K; pMoO2_atm as printed"
+            -
+              T_K: "2150"
+              pressure_atm: "3.39e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2150 K; pMoO2_atm as printed"
+            -
+              T_K: "2183"
+              pressure_atm: "4.57e-7"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2183 K; pMoO2_atm as printed"
+  MoO3:
+    observations:
+      -
+        observation_id: "shornikov_2025_table1_moo3_partial_pressure"
+        type: "partial_pressure"
+        locator:
+          published_page: 224
+          pdf_page_index: 10
+          table: "1"
+          note: "MoO3(g) partial-pressure series; paper says ratios (11) and (18)"
+        T_range_K:
+          - 1812
+          - 2183
+        phase: "gas"
+        experiment: "cao-mo-kems-1812-2183"
+        regime: "kems_effusion"
+        units: "atm as printed"
+        values:
+          quantity: "partial_pressure"
+          gas_species: "MoO3(g)"
+          method_class: "measured_tabulated"
+          admission_status: "admitted"
+          method: "Hertz–Knudsen equation for Ca, O, O2 and CaO; ion-current comparison with effective ionization-cross-section and isotope-distribution corrections for Mo and MoOx"
+          method_as_printed: "Partial pressures calculated by ratios (11) and (18); Table 1 caption gives atm."
+          composition_component: "CaO"
+          composition_basis: "CaO charge; chemically pure, basic substance at least 97.5 wt%, CaCO3 at most 1.0 wt%; remaining composition unresolved"
+          pressure_scale_as_printed: "atm"
+          points:
+            -
+              T_K: "1812"
+              pressure_atm: "5.25e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1812 K; pMoO3_atm as printed"
+            -
+              T_K: "1833"
+              pressure_atm: "7.18e-10"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1833 K; pMoO3_atm as printed"
+            -
+              T_K: "1863"
+              pressure_atm: "1.08e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1863 K; pMoO3_atm as printed"
+            -
+              T_K: "1889"
+              pressure_atm: "1.81e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1889 K; pMoO3_atm as printed"
+            -
+              T_K: "1913"
+              pressure_atm: "2.50e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1913 K; pMoO3_atm as printed"
+            -
+              T_K: "1933"
+              pressure_atm: "3.10e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1933 K; pMoO3_atm as printed"
+            -
+              T_K: "1962"
+              pressure_atm: "4.88e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1962 K; pMoO3_atm as printed"
+            -
+              T_K: "1983"
+              pressure_atm: "7.57e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=1983 K; pMoO3_atm as printed"
+            -
+              T_K: "2000"
+              pressure_atm: "8.29e-9"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2000 K; pMoO3_atm as printed"
+            -
+              T_K: "2033"
+              pressure_atm: "1.51e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2033 K; pMoO3_atm as printed"
+            -
+              T_K: "2083"
+              pressure_atm: "2.76e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2083 K; pMoO3_atm as printed"
+            -
+              T_K: "2100"
+              pressure_atm: "3.34e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2100 K; pMoO3_atm as printed"
+            -
+              T_K: "2133"
+              pressure_atm: "4.64e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2133 K; pMoO3_atm as printed"
+            -
+              T_K: "2150"
+              pressure_atm: "6.59e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2150 K; pMoO3_atm as printed"
+            -
+              T_K: "2183"
+              pressure_atm: "8.61e-8"
+              locator:
+                published_page: 224
+                pdf_page_index: 10
+                table: "1"
+                note: "T=2183 K; pMoO3_atm as printed"

@@ -1,0 +1,2965 @@
+schema_version: literature_extract.v1
+source_id: ostrovski-2000-cao-tio2-sio2
+source:
+  citation: Ostrovski, O., Tranell, G., Stolyarova, V. L., Shultz, M. M., Shornikov, S. I., and Ishkildyin, A. L.
+    (2000). High-Temperature Mass Spectrometric Study of the CaO–TiO2–SiO2 System. High Temperature Materials and
+    Processes, 19(5), 345–356.
+  year: 2000
+extraction:
+  method: manual_from_source_page_images
+  date: '2026-10-05'
+  worker: codex-resume-57046-1791219919
+  provenance_path: tables/ostrovski-2000-cao-tio2-sio2/provenance.md
+review_status: draft
+fidelity_samples:
+- species: SiO
+  observation_id: ostrovski_2000_table3_s1_sio_isothermal
+  value: 0.463
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+    note: Sample 1; complete isothermal vaporization.
+  field: coefficient_as_printed
+- species: SiO
+  observation_id: ostrovski_2000_table3_s7_sio_ioncurrent
+  value: 2.77
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+    note: Sample 7; ion-current comparison.
+  field: coefficient_as_printed
+- species: SiO2
+  observation_id: ostrovski_2000_table4_s7_activity
+  field: activity
+  value: 0.84
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+    note: Sample 7 ternary SiO2 activity.
+- species: SiO2
+  observation_id: ostrovski_2000_table4_s7_activity_coefficient
+  value: 1.615
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+    note: Sample 7 ternary SiO2 activity coefficient.
+  field: activity_coefficient
+benches:
+- id: msi301-mo-knudsen
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MSI 301 magnetic mass spectrometer for high-temperature Knudsen effusion mass spectrometry
+    locator:
+      page: 2
+      published_page: 346
+      pdf_page_index: 1
+      section: Experimental
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      page: 3
+      published_page: 347
+      pdf_page_index: 2
+      section: Experimental
+      note: Molybdenum effusion cells and block are stated directly.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum effusion cells in a molybdenum block; liner not stated
+    locator:
+      page: 3
+      published_page: 347
+      pdf_page_index: 2
+      section: Experimental
+  geometry:
+    orifice_to_sample_area_ratio:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.01'
+      locator:
+        page: 3
+        published_page: 347
+        pdf_page_index: 2
+        section: Experimental
+        note: Printed vaporization area:effusion orifice = 100:1; reciprocal = 0.01.
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 347
+        pdf_page_index: 2
+        section: Experimental
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 347
+        pdf_page_index: 2
+        section: Experimental
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Optical pyrometer EOP-66 using vanishing-glow lamp filament
+      locator:
+        page: 3
+        published_page: 347
+        pdf_page_index: 2
+        section: Experimental
+        note: Kharkov Optical Plant, Ukraine; method cited to [33].
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 347
+        pdf_page_index: 2
+        section: Experimental
+        note: No pyrometer calibration or measurement uncertainty stated.
+  ionization:
+    electron_energy:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 12 eV and 25 eV
+      unit: eV
+      locator:
+        page: 2
+        published_page: 346
+        pdf_page_index: 1
+        section: Experimental
+    mass_resolution:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '600'
+      locator:
+        page: 2
+        published_page: 346
+        pdf_page_index: 1
+        section: Experimental
+        note: At 10% line-intensity level.
+  other_facts:
+  - name: gold_vapour_sensitivity
+    unit: atm
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '>='
+          bound_value: 1e-9
+      locator:
+        page: 2
+        published_page: 346
+        pdf_page_index: 1
+        section: Experimental
+        note: Sensitivity was not less than 10^-9 atm.
+experiments:
+- experiment_id: cao-tio2-sio2-series
+  bench_id: msi301-mo-knudsen
+  method: knudsen_effusion
+  locator:
+    page: 2
+    published_page: 346
+    pdf_page_index: 1
+    section: Experimental
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000003'
+          interval_high: '0.000008'
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        section: Vaporization of the CaO-TiO2-SiO2 system
+        note: 3–8 mg samples.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 346
+        pdf_page_index: 1
+        table: '1'
+        section: Experimental
+        note: Seven analysed compositions are in Table 1; bound composition is carried per observation.
+    pretreatment:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 2
+        published_page: 346
+        pdf_page_index: 1
+        section: Experimental
+        note: Preparation described elsewhere as reference [5].
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Ion-current comparison; complete isothermal vaporization also used
+        locator:
+          page: 3
+          published_page: 347
+          pdf_page_index: 2
+          section: Calculation of partial pressures
+          note: Equations (2) and (3); Table 3.
+      reference_substance:
+        state:
+          tag: value
+          value: Gold 99.999 wt% and anhydrous CaF2 99.9 wt%
+        locator:
+          page: 3
+          published_page: 347
+          pdf_page_index: 2
+          section: Experimental
+      ionization_cross_sections:
+        state:
+          tag: value
+          value: Molecular cross-sections calculated from atomic ionization cross-sections
+        locator:
+          page: 3
+          published_page: 347
+          pdf_page_index: 2
+          section: Calculation of partial pressures
+          note: Numerical cross-sections not reported; Eq. (2) cites [36,37].
+      multiplier_isotope_corrections:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          published_page: 346
+          pdf_page_index: 1
+          section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1850'
+          interval_high: '2200'
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Abstract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 346
+        pdf_page_index: 1
+        section: Experimental
+        note: Sensitivity limit is not chamber pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 346
+        pdf_page_index: 1
+        section: Experimental
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Electron-beam heating
+      locator:
+        page: 3
+        published_page: 347
+        pdf_page_index: 2
+        section: Experimental
+species:
+  SiO:
+    observations:
+    - observation_id: ostrovski_2000_table3_s1_sio_isothermal
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: &id001
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.105'
+              - - CaO
+                - '0.505'
+              - - SiO2
+                - '0.388'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+        sample_no: 1
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: complete_isothermal_vaporization
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 0.463
+        pressure_atm: 4.6300000000000006e-06
+    - observation_id: ostrovski_2000_table3_s1_sio_ioncurrent
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: *id001
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: ion_current_comparison
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 0.283
+        pressure_atm: 2.83e-06
+    - observation_id: ostrovski_2000_table3_s2_sio_isothermal
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: &id002
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.105'
+              - - CaO
+                - '0.462'
+              - - SiO2
+                - '0.431'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+        sample_no: 2
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: complete_isothermal_vaporization
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 0.701
+        pressure_atm: 7.01e-06
+    - observation_id: ostrovski_2000_table3_s2_sio_ioncurrent
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: *id002
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: ion_current_comparison
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 0.69
+        pressure_atm: 6.9e-06
+    - observation_id: ostrovski_2000_table3_s3_sio_isothermal
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: &id003
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.106'
+              - - CaO
+                - '0.4'
+              - - SiO2
+                - '0.489'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+        sample_no: 3
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: complete_isothermal_vaporization
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 0.83
+        pressure_atm: 8.3e-06
+    - observation_id: ostrovski_2000_table3_s3_sio_ioncurrent
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: *id003
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: ion_current_comparison
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 0.878
+        pressure_atm: 8.78e-06
+    - observation_id: ostrovski_2000_table3_s4_sio_isothermal
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: &id004
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.157'
+              - - CaO
+                - '0.475'
+              - - SiO2
+                - '0.365'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+        sample_no: 4
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: complete_isothermal_vaporization
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 0.368
+        pressure_atm: 3.6800000000000003e-06
+    - observation_id: ostrovski_2000_table3_s4_sio_ioncurrent
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: *id004
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: ion_current_comparison
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 0.299
+        pressure_atm: 2.99e-06
+    - observation_id: ostrovski_2000_table3_s5_sio_isothermal
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: &id005
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.166'
+              - - CaO
+                - '0.429'
+              - - SiO2
+                - '0.401'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+        sample_no: 5
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: complete_isothermal_vaporization
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 0.537
+        pressure_atm: 5.370000000000001e-06
+    - observation_id: ostrovski_2000_table3_s5_sio_ioncurrent
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: *id005
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: ion_current_comparison
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 0.716
+        pressure_atm: 7.16e-06
+    - observation_id: ostrovski_2000_table3_s6_sio_isothermal
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: &id006
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.165'
+              - - CaO
+                - '0.37'
+              - - SiO2
+                - '0.458'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+        sample_no: 6
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: complete_isothermal_vaporization
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 1.02
+        pressure_atm: 1.02e-05
+    - observation_id: ostrovski_2000_table3_s6_sio_ioncurrent
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: *id006
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: ion_current_comparison
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 1.49
+        pressure_atm: 1.4900000000000001e-05
+    - observation_id: ostrovski_2000_table3_s7_sio_isothermal
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: &id007
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.16'
+              - - CaO
+                - '0.311'
+              - - SiO2
+                - '0.52'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+        sample_no: 7
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: complete_isothermal_vaporization
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 1.83
+        pressure_atm: 1.83e-05
+    - observation_id: ostrovski_2000_table3_s7_sio_ioncurrent
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-5
+      point_conditions: *id007
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        method: ion_current_comparison
+        species_as_printed: SiO
+        pressure_scale_as_printed: SiO × 10^5 atm
+        coefficient_as_printed: 2.77
+        pressure_atm: 2.7700000000000002e-05
+    context:
+    - observation_id: ostrovski_2000_table2_sio_row1_context
+      type: source_table_numeric_row
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        table: '2'
+        section: Table 2
+      T_range_K:
+      - 1805.0
+      - 1995.0
+      units: A in K; B dimensionless in log10(p_i/atm) = -A/T + B
+      values:
+        quantity: pure_silica_pressure_fit_table
+        method_class: measured_tabulated
+        species_as_printed: SiO
+        A: 27525.0
+        A_uncertainty: 833.0
+        B: 10.53
+        B_uncertainty: 0.43
+        relation_as_printed: log10(p_i/atm) = -A/T + B
+        reference_as_printed: Present study
+    - observation_id: ostrovski_2000_table2_sio_row2_context
+      type: source_table_numeric_row
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        table: '2'
+        section: Table 2
+      T_range_K:
+      - 2000.0
+      - 2038.0
+      units: A in K; B dimensionless in log10(p_i/atm) = -A/T + B
+      values:
+        quantity: pure_silica_pressure_fit_table
+        method_class: measured_tabulated
+        species_as_printed: SiO
+        A: 25680.0
+        A_uncertainty: 2105.0
+        B: 9.61
+        B_uncertainty: 1.04
+        relation_as_printed: log10(p_i/atm) = -A/T + B
+        reference_as_printed: Present study
+    - observation_id: ostrovski_2000_table2_sio_row3_context
+      type: source_table_numeric_row
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        table: '2'
+        section: Table 2
+      T_range_K:
+      - 1600.0
+      - 1800.0
+      units: A in K; B dimensionless in log10(p_i/atm) = -A/T + B
+      values:
+        quantity: pure_silica_pressure_fit_table
+        method_class: quoted_attributed
+        species_as_printed: SiO
+        A: 23802.0
+        A_uncertainty: 2110.0
+        B: 6.58
+        B_uncertainty: 1.73
+        relation_as_printed: log10(p_i/atm) = -A/T + B
+        reference_as_printed: Ref. 46
+        attribution: Ref. 46
+    - observation_id: ostrovski_2000_table2_sio_row4_context
+      type: source_table_numeric_row
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        table: '2'
+        section: Table 2
+      T_range_K:
+      - 1601.0
+      - 1754.0
+      units: A in K; B dimensionless in log10(p_i/atm) = -A/T + B
+      values:
+        quantity: pure_silica_pressure_fit_table
+        method_class: quoted_attributed
+        species_as_printed: SiO
+        A: 18266.0
+        A_uncertainty: 1617.0
+        B: 3.66
+        B_uncertainty: 0.96
+        relation_as_printed: log10(p_i/atm) = -A/T + B
+        reference_as_printed: Ref. 45
+        attribution: Ref. 45
+  O:
+    observations:
+    - observation_id: ostrovski_2000_oxygen_raw_inputs_not_published
+      type: gas_speciation
+      locator: {"page": 7, "published_page": 351, "pdf_page_index": 6, "section": "Results and Discussion"}
+      units: as printed
+      values: &ostrovski_2000_oxygen_raw_inputs_not_published_values {"quantity": "ion_intensity_ratio", "method_class": "quoted_unattributed", "description": "Eq. (11) names these experimental reduction inputs but publishes no numerical values. This record documents absences; it is not a measured current or model prediction.", "unavailable_inputs": {"I_MoO3+": {"state": {"tag": "unknown", "reason": "not_published"}}, "I_MoO2+": {"state": {"tag": "unknown", "reason": "not_published"}}, "K_o10_from_Ref_40": {"state": {"tag": "unknown", "reason": "not_published"}}, "sigma_MoO2_numerator": {"state": {"tag": "unknown", "reason": "not_published"}}, "sigma_MoO2_denominator": {"state": {"tag": "unknown", "reason": "not_published"}}}}
+    - observation_id: ostrovski_2000_table3_s1_o_calculated
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-9
+      point_conditions: *id001
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        method: author-calculated oxygen partial pressure, tabulated in Table 3
+        method_as_printed: Oxygen pressures calculated from the MoO3+/MoO2+ ion-current ratio using equilibrium (10)
+          and K from Ref. 40.
+        species_as_printed: O
+        pressure_scale_as_printed: O × 10^9 atm
+        coefficient_as_printed: 1.14
+        pressure_atm: 1.14e-09
+      derivation:
+        relation: "p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published."
+        inputs: &ostrovski_2000_table3_s1_o_calculated_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+        equation: "11"
+      derived_from: *ostrovski_2000_table3_s1_o_calculated_inputs
+    - observation_id: ostrovski_2000_table3_s2_o_calculated
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-9
+      point_conditions: *id002
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        method: author-calculated oxygen partial pressure, tabulated in Table 3
+        method_as_printed: Oxygen pressures calculated from the MoO3+/MoO2+ ion-current ratio using equilibrium (10)
+          and K from Ref. 40.
+        species_as_printed: O
+        pressure_scale_as_printed: O × 10^9 atm
+        coefficient_as_printed: 1.71
+        pressure_atm: 1.71e-09
+      derivation:
+        relation: "p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published."
+        inputs: &ostrovski_2000_table3_s2_o_calculated_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+        equation: "11"
+      derived_from: *ostrovski_2000_table3_s2_o_calculated_inputs
+    - observation_id: ostrovski_2000_table3_s3_o_calculated
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-9
+      point_conditions: *id003
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        method: author-calculated oxygen partial pressure, tabulated in Table 3
+        method_as_printed: Oxygen pressures calculated from the MoO3+/MoO2+ ion-current ratio using equilibrium (10)
+          and K from Ref. 40.
+        species_as_printed: O
+        pressure_scale_as_printed: O × 10^9 atm
+        coefficient_as_printed: 2.6
+        pressure_atm: 2.6e-09
+      derivation:
+        relation: "p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published."
+        inputs: &ostrovski_2000_table3_s3_o_calculated_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+        equation: "11"
+      derived_from: *ostrovski_2000_table3_s3_o_calculated_inputs
+    - observation_id: ostrovski_2000_table3_s4_o_calculated
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-9
+      point_conditions: *id004
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        method: author-calculated oxygen partial pressure, tabulated in Table 3
+        method_as_printed: Oxygen pressures calculated from the MoO3+/MoO2+ ion-current ratio using equilibrium (10)
+          and K from Ref. 40.
+        species_as_printed: O
+        pressure_scale_as_printed: O × 10^9 atm
+        coefficient_as_printed: 1.04
+        pressure_atm: 1.0400000000000001e-09
+      derivation:
+        relation: "p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published."
+        inputs: &ostrovski_2000_table3_s4_o_calculated_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+        equation: "11"
+      derived_from: *ostrovski_2000_table3_s4_o_calculated_inputs
+    - observation_id: ostrovski_2000_table3_s5_o_calculated
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-9
+      point_conditions: *id005
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        method: author-calculated oxygen partial pressure, tabulated in Table 3
+        method_as_printed: Oxygen pressures calculated from the MoO3+/MoO2+ ion-current ratio using equilibrium (10)
+          and K from Ref. 40.
+        species_as_printed: O
+        pressure_scale_as_printed: O × 10^9 atm
+        coefficient_as_printed: 1.94
+        pressure_atm: 1.94e-09
+      derivation:
+        relation: "p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published."
+        inputs: &ostrovski_2000_table3_s5_o_calculated_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+        equation: "11"
+      derived_from: *ostrovski_2000_table3_s5_o_calculated_inputs
+    - observation_id: ostrovski_2000_table3_s6_o_calculated
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-9
+      point_conditions: *id006
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        method: author-calculated oxygen partial pressure, tabulated in Table 3
+        method_as_printed: Oxygen pressures calculated from the MoO3+/MoO2+ ion-current ratio using equilibrium (10)
+          and K from Ref. 40.
+        species_as_printed: O
+        pressure_scale_as_printed: O × 10^9 atm
+        coefficient_as_printed: 2.11
+        pressure_atm: 2.11e-09
+      derivation:
+        relation: "p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published."
+        inputs: &ostrovski_2000_table3_s6_o_calculated_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+        equation: "11"
+      derived_from: *ostrovski_2000_table3_s6_o_calculated_inputs
+    - observation_id: ostrovski_2000_table3_s7_o_calculated
+      type: partial_pressure
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: gas over CaO-TiO2-SiO2 sample
+      experiment: cao-tio2-sio2-series
+      regime: kems_effusion
+      units: atm; printed coefficient × 10^-9
+      point_conditions: *id007
+      values:
+        quantity: partial_pressure
+        method_class: measured_reduced
+        method: author-calculated oxygen partial pressure, tabulated in Table 3
+        method_as_printed: Oxygen pressures calculated from the MoO3+/MoO2+ ion-current ratio using equilibrium (10)
+          and K from Ref. 40.
+        species_as_printed: O
+        pressure_scale_as_printed: O × 10^9 atm
+        coefficient_as_printed: 3.67
+        pressure_atm: 3.6700000000000004e-09
+      derivation:
+        relation: "p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published."
+        inputs: &ostrovski_2000_table3_s7_o_calculated_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+        equation: "11"
+      derived_from: *ostrovski_2000_table3_s7_o_calculated_inputs
+    context:
+    - observation_id: ostrovski_2000_table2_o_row5_context
+      type: source_table_numeric_row
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        table: '2'
+        section: Table 2
+      T_range_K:
+      - 1805.0
+      - 1995.0
+      units: A in K; B dimensionless in log10(p_i/atm) = -A/T + B
+      values:
+        quantity: pure_silica_pressure_fit_table
+        method_class: measured_tabulated
+        species_as_printed: O
+        A: 26972.0
+        A_uncertainty: 971.0
+        B: 5.62
+        B_uncertainty: 0.43
+        relation_as_printed: log10(p_i/atm) = -A/T + B
+        reference_as_printed: Present study
+    - observation_id: ostrovski_2000_table2_o_row6_context
+      type: source_table_numeric_row
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        table: '2'
+        section: Table 2
+      T_range_K:
+      - 2000.0
+      - 2038.0
+      units: A in K; B dimensionless in log10(p_i/atm) = -A/T + B
+      values:
+        quantity: pure_silica_pressure_fit_table
+        method_class: measured_tabulated
+        species_as_printed: O
+        A: 25822.0
+        A_uncertainty: 1032.0
+        B: 5.93
+        B_uncertainty: 0.66
+        relation_as_printed: log10(p_i/atm) = -A/T + B
+        reference_as_printed: Present study
+    - observation_id: ostrovski_2000_table2_o_row7_context
+      type: source_table_numeric_row
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        table: '2'
+        section: Table 2
+      T_range_K:
+      - 1600.0
+      - 1800.0
+      units: A in K; B dimensionless in log10(p_i/atm) = -A/T + B
+      values:
+        quantity: pure_silica_pressure_fit_table
+        method_class: quoted_attributed
+        species_as_printed: O
+        A: 25250.0
+        A_uncertainty: 2140.0
+        B: 6.55
+        B_uncertainty: 1.03
+        relation_as_printed: log10(p_i/atm) = -A/T + B
+        reference_as_printed: Ref. 46
+        attribution: Ref. 46
+    - observation_id: ostrovski_2000_table2_o_row8_context
+      type: source_table_numeric_row
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        table: '2'
+        section: Table 2
+      T_range_K:
+      - 1601.0
+      - 1754.0
+      units: A in K; B dimensionless in log10(p_i/atm) = -A/T + B
+      values:
+        quantity: pure_silica_pressure_fit_table
+        method_class: quoted_attributed
+        species_as_printed: O
+        A: 29992.0
+        A_uncertainty: 2539.0
+        B: 9.63
+        B_uncertainty: 1.51
+        relation_as_printed: log10(p_i/atm) = -A/T + B
+        reference_as_printed: Ref. 45
+        attribution: Ref. 45
+  SiO2:
+    observations:
+    - observation_id: ostrovski_2000_activity_raw_inputs_not_published
+      type: gas_speciation
+      locator: {"page": 10, "published_page": 354, "pdf_page_index": 9, "section": "Results and Discussion"}
+      units: as printed
+      values: &ostrovski_2000_activity_raw_inputs_not_published_values {"quantity": "ion_intensity_ratio", "method_class": "quoted_unattributed", "description": "Eq. (5a) names experimental pressures/corresponding ion currents over each sample and pure SiO2; exact raw inputs are not published. This record documents absences; Table 2 fits are not substituted.", "unavailable_inputs": {"sample_SiO_current": {"state": {"tag": "unknown", "reason": "not_published"}}, "sample_O_current": {"state": {"tag": "unknown", "reason": "not_published"}}, "pure_SiO2_reference_SiO_pressure_or_current": {"state": {"tag": "unknown", "reason": "not_published"}}, "pure_SiO2_reference_O_pressure_or_current": {"state": {"tag": "unknown", "reason": "not_published"}}}}
+    - observation_id: ostrovski_2000_table4_s1_activity
+      type: activity_coefficient
+      locator: &id015
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+      T_range_K: &id016
+      - 1850.0
+      - 1850.0
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: &id017
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.105'
+              - - CaO
+                - '0.505'
+              - - SiO2
+                - '0.388'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: 0.07
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); no condensed polymorph stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw sample/reference currents and exact reference pressures are not published. Table 3 sample 1 SiO isothermal and ion-current alternatives are contextual sample-pressure evidence only, not established causal inputs to Table 4.
+      derivation:
+        relation: "a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs. The paper does not identify which Table 3 SiO method enters Table 4."
+        inputs: &ostrovski_2000_table4_s1_activity_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s1_o_calculated
+        equation: 5a
+      derived_from: *ostrovski_2000_table4_s1_activity_inputs
+    - observation_id: ostrovski_2000_table4_s2_activity
+      type: activity_coefficient
+      locator: &id019
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+      T_range_K: &id020
+      - 1850.0
+      - 1850.0
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: &id021
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.105'
+              - - CaO
+                - '0.462'
+              - - SiO2
+                - '0.431'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: 0.15
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); no condensed polymorph stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw sample/reference currents and exact reference pressures are not published. Table 3 sample 2 SiO isothermal and ion-current alternatives are contextual sample-pressure evidence only, not established causal inputs to Table 4.
+      derivation:
+        relation: "a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs. The paper does not identify which Table 3 SiO method enters Table 4."
+        inputs: &ostrovski_2000_table4_s2_activity_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s2_o_calculated
+        equation: 5a
+      derived_from: *ostrovski_2000_table4_s2_activity_inputs
+    - observation_id: ostrovski_2000_table4_binary_s2_quoted
+      type: activity_coefficient
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: binary CaO-SiO2 system
+      standard_state: Unknown detailed binary standard state; pure-SiO2 comparison inferred from general discussion
+      units: dimensionless
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_unattributed
+        activity_coefficient: 0.035
+        composition:
+          CaO: 0.564
+          SiO2: 0.434
+      source_note: Binary Knudsen mass-spectrometric comparator; no reference is attached to Table 4. Temperature 1850 K is inferred from comparison context.
+    - observation_id: ostrovski_2000_table4_s3_activity
+      type: activity_coefficient
+      locator: &id023
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+      T_range_K: &id024
+      - 1850.0
+      - 1850.0
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: &id025
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.106'
+              - - CaO
+                - '0.4'
+              - - SiO2
+                - '0.489'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: 0.27
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); no condensed polymorph stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw sample/reference currents and exact reference pressures are not published. Table 3 sample 3 SiO isothermal and ion-current alternatives are contextual sample-pressure evidence only, not established causal inputs to Table 4.
+      derivation:
+        relation: "a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs. The paper does not identify which Table 3 SiO method enters Table 4."
+        inputs: &ostrovski_2000_table4_s3_activity_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s3_o_calculated
+        equation: 5a
+      derived_from: *ostrovski_2000_table4_s3_activity_inputs
+    - observation_id: ostrovski_2000_table4_binary_s3_quoted
+      type: activity_coefficient
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: binary CaO-SiO2 system
+      standard_state: Unknown detailed binary standard state; pure-SiO2 comparison inferred from general discussion
+      units: dimensionless
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_unattributed
+        activity_coefficient: 0.455
+        composition:
+          CaO: 0.517
+          SiO2: 0.483
+      source_note: Binary Knudsen mass-spectrometric comparator; no reference is attached to Table 4. Temperature 1850 K is inferred from comparison context.
+    - observation_id: ostrovski_2000_table4_s4_activity
+      type: activity_coefficient
+      locator: &id027
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+      T_range_K: &id028
+      - 1850.0
+      - 1850.0
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: &id029
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.157'
+              - - CaO
+                - '0.475'
+              - - SiO2
+                - '0.365'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: 0.05
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); no condensed polymorph stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw sample/reference currents and exact reference pressures are not published. Table 3 sample 4 SiO isothermal and ion-current alternatives are contextual sample-pressure evidence only, not established causal inputs to Table 4.
+      derivation:
+        relation: "a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs. The paper does not identify which Table 3 SiO method enters Table 4."
+        inputs: &ostrovski_2000_table4_s4_activity_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s4_o_calculated
+        equation: 5a
+      derived_from: *ostrovski_2000_table4_s4_activity_inputs
+    - observation_id: ostrovski_2000_table4_s5_activity
+      type: activity_coefficient
+      locator: &id031
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+      T_range_K: &id032
+      - 1850.0
+      - 1850.0
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: &id033
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.166'
+              - - CaO
+                - '0.429'
+              - - SiO2
+                - '0.401'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: 0.13
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); no condensed polymorph stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw sample/reference currents and exact reference pressures are not published. Table 3 sample 5 SiO isothermal and ion-current alternatives are contextual sample-pressure evidence only, not established causal inputs to Table 4.
+      derivation:
+        relation: "a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs. The paper does not identify which Table 3 SiO method enters Table 4."
+        inputs: &ostrovski_2000_table4_s5_activity_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s5_o_calculated
+        equation: 5a
+      derived_from: *ostrovski_2000_table4_s5_activity_inputs
+    - observation_id: ostrovski_2000_table4_s6_activity
+      type: activity_coefficient
+      locator: &id035
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+      T_range_K: &id036
+      - 1850.0
+      - 1850.0
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: &id037
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.165'
+              - - CaO
+                - '0.37'
+              - - SiO2
+                - '0.458'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: 0.27
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); no condensed polymorph stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw sample/reference currents and exact reference pressures are not published. Table 3 sample 6 SiO isothermal and ion-current alternatives are contextual sample-pressure evidence only, not established causal inputs to Table 4.
+      derivation:
+        relation: "a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs. The paper does not identify which Table 3 SiO method enters Table 4."
+        inputs: &ostrovski_2000_table4_s6_activity_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s6_o_calculated
+        equation: 5a
+      derived_from: *ostrovski_2000_table4_s6_activity_inputs
+    - observation_id: ostrovski_2000_table4_s7_activity
+      type: activity_coefficient
+      locator: &id039
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+      T_range_K: &id040
+      - 1850.0
+      - 1850.0
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: &id041
+        composition:
+          state:
+            tag: value
+            value:
+              basis: measured_as_printed
+              amount_basis: mole_fraction
+              components:
+              - - TiO2
+                - '0.16'
+              - - CaO
+                - '0.311'
+              - - SiO2
+                - '0.52'
+          locator:
+            page: 2
+            published_page: 346
+            pdf_page_index: 1
+            table: '1'
+            section: Table 1
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        activity: 0.84
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); no condensed polymorph stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw sample/reference currents and exact reference pressures are not published. Table 3 sample 7 SiO isothermal and ion-current alternatives are contextual sample-pressure evidence only, not established causal inputs to Table 4.
+      derivation:
+        relation: "a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs. The paper does not identify which Table 3 SiO method enters Table 4."
+        inputs: &ostrovski_2000_table4_s7_activity_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s7_o_calculated
+        equation: 5a
+      derived_from: *ostrovski_2000_table4_s7_activity_inputs
+    - observation_id: ostrovski_2000_table4_binary_s7_quoted
+      type: activity_coefficient
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+      T_range_K:
+      - 1850.0
+      - 1850.0
+      phase: binary CaO-SiO2 system
+      standard_state: Unknown detailed binary standard state; pure-SiO2 comparison inferred from general discussion
+      units: dimensionless
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_unattributed
+        activity_coefficient: 1.49
+        composition:
+          CaO: 0.342
+          SiO2: 0.658
+      source_note: Binary Knudsen mass-spectrometric comparator; no reference is attached to Table 4. Temperature 1850 K is inferred from comparison context.
+    - observation_id: ostrovski_2000_table4_s1_activity_coefficient
+      type: activity_coefficient
+      locator: *id015
+      T_range_K: *id016
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: *id017
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        activity_coefficient: 0.189
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); condensed polymorph not stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw reference currents/pressures are not published.
+      derivation:
+        relation: "gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition SiO2 mole fraction, printed in Tables 1/4. Source internally inconsistent: printed 0.189 differs from printed 0.07/0.388 = 0.180412; preserve 0.189."
+        inputs: &ostrovski_2000_table4_s1_activity_coefficient_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s1_activity
+        parameters:
+        - - x_SiO2
+          - {"state": {"tag": "value", "value": "0.388"}, "locator": {"page": 2, "published_page": 346, "pdf_page_index": 1, "table": "1", "note": "Sample 1 SiO2 mole fraction; also printed in Table 4."}}
+        equation: gamma = a/x
+      derived_from: *ostrovski_2000_table4_s1_activity_coefficient_inputs
+    - observation_id: ostrovski_2000_table4_s2_activity_coefficient
+      type: activity_coefficient
+      locator: *id019
+      T_range_K: *id020
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: *id021
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        activity_coefficient: 0.348
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); condensed polymorph not stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw reference currents/pressures are not published.
+      derivation:
+        relation: "gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition SiO2 mole fraction, printed in Tables 1/4. "
+        inputs: &ostrovski_2000_table4_s2_activity_coefficient_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s2_activity
+        parameters:
+        - - x_SiO2
+          - {"state": {"tag": "value", "value": "0.431"}, "locator": {"page": 2, "published_page": 346, "pdf_page_index": 1, "table": "1", "note": "Sample 2 SiO2 mole fraction; also printed in Table 4."}}
+        equation: gamma = a/x
+      derived_from: *ostrovski_2000_table4_s2_activity_coefficient_inputs
+    - observation_id: ostrovski_2000_table4_s3_activity_coefficient
+      type: activity_coefficient
+      locator: *id023
+      T_range_K: *id024
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: *id025
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        activity_coefficient: 0.552
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); condensed polymorph not stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw reference currents/pressures are not published.
+      derivation:
+        relation: "gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition SiO2 mole fraction, printed in Tables 1/4. "
+        inputs: &ostrovski_2000_table4_s3_activity_coefficient_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s3_activity
+        parameters:
+        - - x_SiO2
+          - {"state": {"tag": "value", "value": "0.489"}, "locator": {"page": 2, "published_page": 346, "pdf_page_index": 1, "table": "1", "note": "Sample 3 SiO2 mole fraction; also printed in Table 4."}}
+        equation: gamma = a/x
+      derived_from: *ostrovski_2000_table4_s3_activity_coefficient_inputs
+    - observation_id: ostrovski_2000_table4_s4_activity_coefficient
+      type: activity_coefficient
+      locator: *id027
+      T_range_K: *id028
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: *id029
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        activity_coefficient: 0.137
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); condensed polymorph not stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw reference currents/pressures are not published.
+      derivation:
+        relation: "gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition SiO2 mole fraction, printed in Tables 1/4. "
+        inputs: &ostrovski_2000_table4_s4_activity_coefficient_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s4_activity
+        parameters:
+        - - x_SiO2
+          - {"state": {"tag": "value", "value": "0.365"}, "locator": {"page": 2, "published_page": 346, "pdf_page_index": 1, "table": "1", "note": "Sample 4 SiO2 mole fraction; also printed in Table 4."}}
+        equation: gamma = a/x
+      derived_from: *ostrovski_2000_table4_s4_activity_coefficient_inputs
+    - observation_id: ostrovski_2000_table4_s5_activity_coefficient
+      type: activity_coefficient
+      locator: *id031
+      T_range_K: *id032
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: *id033
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        activity_coefficient: 0.324
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); condensed polymorph not stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw reference currents/pressures are not published.
+      derivation:
+        relation: "gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition SiO2 mole fraction, printed in Tables 1/4. "
+        inputs: &ostrovski_2000_table4_s5_activity_coefficient_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s5_activity
+        parameters:
+        - - x_SiO2
+          - {"state": {"tag": "value", "value": "0.401"}, "locator": {"page": 2, "published_page": 346, "pdf_page_index": 1, "table": "1", "note": "Sample 5 SiO2 mole fraction; also printed in Table 4."}}
+        equation: gamma = a/x
+      derived_from: *ostrovski_2000_table4_s5_activity_coefficient_inputs
+    - observation_id: ostrovski_2000_table4_s6_activity_coefficient
+      type: activity_coefficient
+      locator: *id035
+      T_range_K: *id036
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: *id037
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        activity_coefficient: 0.59
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); condensed polymorph not stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw reference currents/pressures are not published.
+      derivation:
+        relation: "gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition SiO2 mole fraction, printed in Tables 1/4. "
+        inputs: &ostrovski_2000_table4_s6_activity_coefficient_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s6_activity
+        parameters:
+        - - x_SiO2
+          - {"state": {"tag": "value", "value": "0.458"}, "locator": {"page": 2, "published_page": 346, "pdf_page_index": 1, "table": "1", "note": "Sample 6 SiO2 mole fraction; also printed in Table 4."}}
+        equation: gamma = a/x
+      derived_from: *ostrovski_2000_table4_s6_activity_coefficient_inputs
+    - observation_id: ostrovski_2000_table4_s7_activity_coefficient
+      type: activity_coefficient
+      locator: *id039
+      T_range_K: *id040
+      phase: CaO-TiO2-SiO2 slag; physical phase not specified
+      standard_state: Pure SiO2 vapour-pressure reference; condensed polymorph not stated
+      regime: kems_effusion
+      units: dimensionless
+      point_conditions: *id041
+      values:
+        quantity: activity_coefficient
+        method_class: measured_reduced
+        activity_coefficient: 1.615
+        gas_species:
+        - SiO
+        - O
+        condensed_component: SiO2
+        standard_state_as_printed: Pure SiO2 reference partial pressures in Eq. (5a); condensed polymorph not stated.
+      source_note: Eq. (5a) uses experimental sample and pure-SiO2 pressures/corresponding ion currents. The paper does not specify a Table 3 method or use of Table 2 fitted reference pressures; raw reference currents/pressures are not published.
+      derivation:
+        relation: "gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition SiO2 mole fraction, printed in Tables 1/4. "
+        inputs: &ostrovski_2000_table4_s7_activity_coefficient_inputs
+        - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s7_activity
+        parameters:
+        - - x_SiO2
+          - {"state": {"tag": "value", "value": "0.520"}, "locator": {"page": 2, "published_page": 346, "pdf_page_index": 1, "table": "1", "note": "Sample 7 SiO2 mole fraction; also printed in Table 4."}}
+        equation: gamma = a/x
+      derived_from: *ostrovski_2000_table4_s7_activity_coefficient_inputs
+    context:
+    - observation_id: ostrovski_2000_equation_1_context
+      type: method
+      locator: {"page": 3, "published_page": 347, "pdf_page_index": 2, "section": "Results and Discussion, equation (1)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "1", "relation_as_printed": "p_i = b sum_j I_ij T / sigma_i", "definitions_as_printed": "I_ij: j-ion current from ionization of gaseous i-component; sigma: molecule ionization cross-section; b: device sensitivity constant; q_i: mass vaporized from surface area s in time t through orifice with Clausing coefficient L; M_i: molecular mass; R: gas constant; K_p: vaporization equilibrium constant; H^o: vaporization enthalpy; superscript o: standard state. Eq. (2) retains reference s and measured i subscripts and gamma factors as printed; gamma is not separately defined in this paragraph."}
+    - observation_id: ostrovski_2000_equation_2_context
+      type: method
+      locator: {"page": 3, "published_page": 347, "pdf_page_index": 2, "section": "Results and Discussion, equation (2)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "2", "relation_as_printed": "p_i = p_s I_i T_i sigma_s gamma_s / (I_s T_s sigma_i gamma_i)", "definitions_as_printed": "I_ij: j-ion current from ionization of gaseous i-component; sigma: molecule ionization cross-section; b: device sensitivity constant; q_i: mass vaporized from surface area s in time t through orifice with Clausing coefficient L; M_i: molecular mass; R: gas constant; K_p: vaporization equilibrium constant; H^o: vaporization enthalpy; superscript o: standard state. Eq. (2) retains reference s and measured i subscripts and gamma factors as printed; gamma is not separately defined in this paragraph."}
+    - observation_id: ostrovski_2000_equation_3_context
+      type: method
+      locator: {"page": 3, "published_page": 347, "pdf_page_index": 2, "section": "Results and Discussion, equation (3)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "3", "relation_as_printed": "p_i = (q_i / (s t L)) (2 pi R T / M_i)^(-1/2)", "definitions_as_printed": "I_ij: j-ion current from ionization of gaseous i-component; sigma: molecule ionization cross-section; b: device sensitivity constant; q_i: mass vaporized from surface area s in time t through orifice with Clausing coefficient L; M_i: molecular mass; R: gas constant; K_p: vaporization equilibrium constant; H^o: vaporization enthalpy; superscript o: standard state. Eq. (2) retains reference s and measured i subscripts and gamma factors as printed; gamma is not separately defined in this paragraph."}
+    - observation_id: ostrovski_2000_equation_4_context
+      type: method
+      locator: {"page": 3, "published_page": 347, "pdf_page_index": 2, "section": "Results and Discussion, equation (4)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "4", "relation_as_printed": "d ln K_p / dT = H^o_(s,i,T) / (R T^2)", "definitions_as_printed": "I_ij: j-ion current from ionization of gaseous i-component; sigma: molecule ionization cross-section; b: device sensitivity constant; q_i: mass vaporized from surface area s in time t through orifice with Clausing coefficient L; M_i: molecular mass; R: gas constant; K_p: vaporization equilibrium constant; H^o: vaporization enthalpy; superscript o: standard state. Eq. (2) retains reference s and measured i subscripts and gamma factors as printed; gamma is not separately defined in this paragraph."}
+    - observation_id: ostrovski_2000_equation_5_context
+      type: method
+      locator: {"page": 3, "published_page": 347, "pdf_page_index": 2, "section": "Results and Discussion, equation (5)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "5", "relation_as_printed": "a_i = p_i / p_i^o", "definitions_as_printed": "I_ij: j-ion current from ionization of gaseous i-component; sigma: molecule ionization cross-section; b: device sensitivity constant; q_i: mass vaporized from surface area s in time t through orifice with Clausing coefficient L; M_i: molecular mass; R: gas constant; K_p: vaporization equilibrium constant; H^o: vaporization enthalpy; superscript o: standard state. Eq. (2) retains reference s and measured i subscripts and gamma factors as printed; gamma is not separately defined in this paragraph."}
+    - observation_id: ostrovski_2000_equation_7_context
+      type: method
+      locator: {"page": 6, "published_page": 350, "pdf_page_index": 5, "section": "Results and Discussion, equation (7)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "7", "relation_as_printed": "[SiO2] = (SiO) + (O)"}
+    - observation_id: ostrovski_2000_equation_8_context
+      type: method
+      locator: {"page": 6, "published_page": 350, "pdf_page_index": 5, "section": "Results and Discussion, equation (8)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "8", "relation_as_printed": "[SiO2] = (SiO2)"}
+    - observation_id: ostrovski_2000_equation_9_context
+      type: method
+      locator: {"page": 6, "published_page": 350, "pdf_page_index": 5, "section": "Results and Discussion, equation (9)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "9", "relation_as_printed": "2(O) = (O2)"}
+    - observation_id: ostrovski_2000_equation_10_context
+      type: method
+      locator: {"page": 6, "published_page": 350, "pdf_page_index": 5, "section": "Results and Discussion, equation (10)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "10", "relation_as_printed": "[Mo] + 3/2 O2 = (MoO3); (MoO3) = (MoO2) + (O)", "phase_notation_as_printed": "Round brackets gas phase; square brackets condensed phase. The first printed reaction uses an equilibrium arrow; the second uses equality."}
+    - observation_id: ostrovski_2000_equation_11_context
+      type: method
+      locator: {"page": 7, "published_page": 351, "pdf_page_index": 6, "section": "Results and Discussion, equation (11)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "11", "relation_as_printed": "p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]", "source_inconsistency": "Numerator and denominator both print sigma(MoO2); do not silently replace either by MoO3. K_o10 is equilibrium constant of (10) using Ref. 40; raw currents and numerical cross-sections/K_o10 are not published."}
+    - observation_id: ostrovski_2000_equation_12_context
+      type: method
+      locator: {"page": 8, "published_page": 352, "pdf_page_index": 7, "section": "Results and Discussion, equation (12)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "12", "relation_as_printed": "q_1 = q_o (1 - s_1/s_o)", "definitions_as_printed": "q_1 is described as the fraction of SiO2 evaporated by t_1; q_o is initial SiO2 quantity; s_o integrates SiO+ current through complete evaporation time t; s_1 integrates to t_1. Printed 1-s_1/s_o is retained despite apparent conflict with evaporated-fraction wording."}
+    - observation_id: ostrovski_2000_equation_13_context
+      type: method
+      locator: {"page": 9, "published_page": 353, "pdf_page_index": 8, "section": "Results and Discussion, equation (13)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "13", "relation_as_printed": "TiO2 + e = TiO+ + O+ + 2e"}
+    - observation_id: ostrovski_2000_equation_14_context
+      type: method
+      locator: {"page": 9, "published_page": 353, "pdf_page_index": 8, "section": "Results and Discussion, equation (14)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "14", "relation_as_printed": "TiO2 + e = Ti+ + O2 + 2e"}
+    - observation_id: ostrovski_2000_equation_15_context
+      type: method
+      locator: {"page": 9, "published_page": 353, "pdf_page_index": 8, "section": "Results and Discussion, equation (15)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "15", "relation_as_printed": "TiO + e = Ti+ + O + 2e"}
+    - observation_id: ostrovski_2000_equation_16_context
+      type: method
+      locator: {"page": 10, "published_page": 354, "pdf_page_index": 9, "section": "Results and Discussion, equation (16)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "16", "relation_as_printed": "[CaO] = (Ca) + (O)"}
+    - observation_id: ostrovski_2000_equation_17_context
+      type: method
+      locator: {"page": 10, "published_page": 354, "pdf_page_index": 9, "section": "Results and Discussion, equation (17)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "17", "relation_as_printed": "[TiO2] = (TiO2)"}
+    - observation_id: ostrovski_2000_equation_18_context
+      type: method
+      locator: {"page": 10, "published_page": 354, "pdf_page_index": 9, "section": "Results and Discussion, equation (18)"}
+      units: as printed
+      values: {"quantity": "source_equation", "method_class": "quoted_unattributed", "equation_as_printed": "18", "relation_as_printed": "[TiO2] = (TiO) + (O)"}
+    - observation_id: ostrovski_2000_apparatus_beams_shutter_cells
+      type: method
+      locator: {"page": 2, "published_page": 346, "pdf_page_index": 1, "section": "Experimental (continued on PDF page 3)"}
+      units: as printed
+      values: {"quantity": "apparatus_context", "method_class": "quoted_unattributed", "description": "Molecular beam from Knudsen cell perpendicular to electron beam from ion source; moving shutter filters background peaks; transmission mechanism permits two effusion cells simultaneously in the same block, studying two samples under the same conditions."}
+    - observation_id: ostrovski_2000_ternary_caf2_paired_control
+      type: method
+      locator: {"page": 6, "published_page": 350, "pdf_page_index": 5, "section": "Vaporization of the CaO-TiO2-SiO2 system"}
+      units: as printed
+      values: {"quantity": "calibration_context", "method_class": "quoted_unattributed", "description": "CaF2 standard vaporized simultaneously from the second effusion cell, for partial pressures by ion-current comparison (2) and control of mass-spectrometer sensitivity during experiments."}
+    - observation_id: ostrovski_2000_ternary_ion_binding
+      type: method
+      locator: {"page": 8, "published_page": 352, "pdf_page_index": 7, "section": "Results and Discussion"}
+      units: as printed
+      values: {"quantity": "mass_spectra_context", "method_class": "quoted_unattributed", "description": "Samples 1-7, Table 1: at 25 eV over 1700-2350 K the ions were Ca+, TiO+, TiO2+, Ti+, SiO+, SiO2+, Si+, MoO2+, MoO3+. SiO+/Si+ ratio was the same as over pure SiO2."}
+    - observation_id: ostrovski_2000_figure3_reference_ranges
+      type: method
+      locator: {"page": 5, "published_page": 349, "pdf_page_index": 4, "section": "Figure 3 caption"}
+      units: as printed
+      values: {"quantity": "figure_caption_context", "method_class": "figure_only", "description": "Ref. 44 CaF2 reference data ranges: 1100-1424 K; 1424-1691 K; temperature higher than 1691 K. No graphical coordinates digitized."}
+    - observation_id: ostrovski_2000_oxygen_raw_inputs_not_published_context
+      type: method
+      locator: {"page": 7, "published_page": 351, "pdf_page_index": 6, "section": "Results and Discussion"}
+      units: as printed; numeric inputs not published
+      values: *ostrovski_2000_oxygen_raw_inputs_not_published_values
+    - observation_id: ostrovski_2000_activity_raw_inputs_not_published_context
+      type: method
+      locator: {"page": 10, "published_page": 354, "pdf_page_index": 9, "section": "Results and Discussion"}
+      units: as printed; numeric inputs not published
+      values: *ostrovski_2000_activity_raw_inputs_not_published_values
+    - observation_id: ostrovski_2000_qualifying_statement_01
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_attributed
+        quote: According to Frohberg et al. [1,2], addition of TiO2 to the CaO-SiO2 system increases the fluidity
+          of slags.
+    - observation_id: ostrovski_2000_qualifying_statement_02
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_attributed
+        quote: The viscosities of CaO-TiO2-SiO2 melts are in the range from 0.5 to 4 Pa s at temperatures of about
+          1800 K.
+    - observation_id: ostrovski_2000_qualifying_statement_03
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_attributed
+        quote: The values of the specific electrical conductivity of this system at 1470-1740 K were found by Mori
+          [3] to be equal to 0.1-1.0 Ohm^-1 cm^-1.
+    - observation_id: ostrovski_2000_qualifying_statement_04
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_attributed
+        quote: It was concluded that these melts have the ionic conductivity, which increases with TiO2 content at
+          constant CaO:SiO2 ratio and with increasing CaO:SiO2 ratio at constant TiO2 content.
+    - observation_id: ostrovski_2000_qualifying_statement_05
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_attributed
+        quote: The Ti3+/Ti4+ ratio decreases with the increasing CaO/SiO2 ratio, increasing oxygen potential and decreasing
+          temperature (Tranell et al. [5]).
+    - observation_id: ostrovski_2000_qualifying_statement_06
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_attributed
+        quote: Sphene (CaTiSiO5) with the melting point of 1655 K was the only ternary compound identified in the
+          condensed phase of this system.
+    - observation_id: ostrovski_2000_qualifying_statement_07
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_attributed
+        quote: Sakai and Suito [8] at 1873 K found the nitride capacity to be strongly affected by titanium oxide;
+          they reported a significant loss of SiO2 at low oxygen partial pressures (log pO2 = -11-(-14) atm).
+    - observation_id: ostrovski_2000_qualifying_statement_08
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_attributed
+        quote: Phase equilibria in the CaO-TiO2-SiO2 system were considered using microprobe analysis (beam size of
+          200 μm).
+    - observation_id: ostrovski_2000_qualifying_statement_09
+      type: method
+      locator:
+        page: 2
+        published_page: 346
+        pdf_page_index: 1
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_attributed
+        quote: Prior studies covered CaO-SiO2 at 1933-2133 K, TiO-TiO2, Ti2O3-TiO2 and CaO-Ti2O3-TiO2 at 1700-2200
+          K.
+    - observation_id: ostrovski_2000_qualifying_statement_10
+      type: method
+      locator:
+        page: 2
+        published_page: 346
+        pdf_page_index: 1
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_attributed
+        quote: Negative deviations from ideality were observed in CaO-SiO2 and CaO-Ti2O3-TiO2; the sign of deviations
+          in TiO-TiO2 and Ti2O3-TiO2 changes depending on titanium concentration in different oxidation states.
+    - observation_id: ostrovski_2000_qualifying_statement_11
+      type: method
+      locator:
+        page: 3
+        published_page: 347
+        pdf_page_index: 2
+        section: Calibration results
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: measured_tabulated
+        quote: At 1744 K, Au partial pressure was (4.3 ± 0.6)·10^-5 atm, in good agreement with Paule and Mandel [38].
+    - observation_id: ostrovski_2000_qualifying_statement_12
+      type: method
+      locator:
+        page: 3
+        published_page: 347
+        pdf_page_index: 2
+        section: CaF2 calibration
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: measured_tabulated
+        quote: At 25 eV and 1613 K, Ca+:CaF+:CaF2+ intensity ratio was (0.0014 ± 0.0003):1:(0.031 ± 0.002).
+    - observation_id: ostrovski_2000_qualifying_statement_13
+      type: method
+      locator:
+        page: 3
+        published_page: 347
+        pdf_page_index: 2
+        section: CaF2 calibration
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: measured_tabulated
+        quote: 'The CaF2 sublimation enthalpy was (389.3 ± 5.4) kJ/mole; its reported pressure equation applies from
+          1600 to 1690 K: log p(atm)=-(20422 ± 283)/T+(13.99 ± 0.03).'
+    - observation_id: ostrovski_2000_qualifying_statement_14
+      type: method
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        section: Pure silica vaporization
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: measured_tabulated
+        quote: Over pure SiO2 at 1700-2350 K, observed ions were SiO+, Si+, SiO2+, MoO3+, and MoO2+; SiO+:Si+ current
+          ratio was 1:0.14.
+    - observation_id: ostrovski_2000_qualifying_statement_15
+      type: method
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        section: Pure silica vaporization
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_unattributed
+        quote: The SiO+ and SiO2+ ions are the parent ones and Si+ is the result of fragmentation.
+    - observation_id: ostrovski_2000_qualifying_statement_16
+      type: method
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        section: Ternary vaporization
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: measured_tabulated
+        quote: At 1900 K, partial pressures of Ca, TiO, and TiO2 measured by ion-current comparison were lower than
+          10^-8 atm.
+    - observation_id: ostrovski_2000_qualifying_statement_17
+      type: method
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        section: Ternary vaporization
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_unattributed
+        quote: A significant difference in volatility between SiO, Ca, TiO, and TiO2 at 1850 K caused sample compositions
+          to change during isothermal vaporization.
+    - observation_id: ostrovski_2000_qualifying_statement_18
+      type: method
+      locator:
+        page: 8
+        published_page: 352
+        pdf_page_index: 7
+        section: Composition-change procedure
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: measured_tabulated
+        quote: Samples were chosen so composition change was not greater than 0.01-0.04 mole fractions/hour.
+    - observation_id: ostrovski_2000_qualifying_statement_19
+      type: method
+      locator:
+        page: 8
+        published_page: 352
+        pdf_page_index: 7
+        section: Composition-change procedure
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_unattributed
+        quote: It was assumed that vaporization of a sample (SiO2) eventually goes to completion as a result of gradually increasing temperature.
+    - observation_id: ostrovski_2000_qualifying_statement_20
+      type: method
+      locator:
+        page: 8
+        published_page: 352
+        pdf_page_index: 7
+        section: Selective vaporization
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_unattributed
+        quote: Fig. 6 summarizes changes in concentrations of SiO2 and TiO2 in samples No 1-7 of the CaO-TiO2-SiO2 system during the selective vaporization of components, when the temperature of vaporization increased from 1550 to 2175 K.
+    - observation_id: ostrovski_2000_qualifying_statement_21
+      type: method
+      locator:
+        page: 8
+        published_page: 352
+        pdf_page_index: 7
+        section: Selective vaporization
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_unattributed
+        quote: Enrichment of the condensed phase of the CaO-TiO2-SiO2 system with CaO and TiO2 during vaporization is also presented on the phase equilibrium diagram [6] for all samples studied (Fig. 7).
+    - observation_id: ostrovski_2000_qualifying_statement_22
+      type: method
+      locator:
+        page: 8
+        published_page: 352
+        pdf_page_index: 7
+        section: Method accuracy
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_attributed
+        quote: The accuracy of such calculation of partial pressures of vapour species in oxide systems was found to be satisfactory in an earlier study [49,50] of the B2O3-SiO2 and B2O3-Al2O3 systems.
+    - observation_id: ostrovski_2000_qualifying_statement_23
+      type: method
+      locator:
+        page: 9
+        published_page: 353
+        pdf_page_index: 8
+        section: Titanium ionization
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: measured_tabulated
+        quote: The intensity of the Ti+ ion current was evaluated to be about 7% of the value of the TiO+ ion current. Further experiments were carried out at the ionizing-electron energy of 12 eV to be sure that ionization of TiO2 and TiO species in accordance with reactions (13)-(15) could be neglected.
+    - observation_id: ostrovski_2000_qualifying_statement_24
+      type: method
+      locator:
+        page: 9
+        published_page: 353
+        pdf_page_index: 8
+        section: Titanium ionization
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_attributed
+        attribution: Banon et al. [29] (12.2 eV parent ion); Ref. [51] (Ti and TiO ionization energies).
+        quote: Banon et al. [29] showed that at low ionizing electron energies (12.2 eV), the TiO+ ion may be considered as the parent. Ionization energy of Ti and TiO is (6.3±0.3)eV and (6.8±0.5)eV respectively [51].
+    - observation_id: ostrovski_2000_qualifying_statement_25
+      type: method
+      locator:
+        page: 9
+        published_page: 353
+        pdf_page_index: 8
+        section: Mass spectra
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: measured_tabulated
+        quote: The vapour mass spectra over the samples of the CaO-TiO2-SiO2 system of different compositions showed the same ion species as in the mass spectra of vapour over individual oxides CaO, TiO2, and SiO2 and over the CaO-SiO2 and CaO-TiO2-Ti2O3 systems.
+    - observation_id: ostrovski_2000_qualifying_statement_26
+      type: method
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        section: Activity discussion
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_unattributed
+        quote: Binary CaO-SiO2 SiO2 activities and activity coefficients decrease with decreasing basicity (xCaO/xSiO2);
+          the same trend is stated for the ternary system.
+    - observation_id: ostrovski_2000_qualifying_statement_27
+      type: method
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        section: Activity discussion
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_unattributed
+        quote: Replacement of CaO with TiO2 in the slag of basicity xCaO/xSiO2=1.07 with about the same SiO2 concentration (xSiO2=0.431-0.434) results in sharp increase in SiO2 activity and activity coefficient.
+    - observation_id: ostrovski_2000_qualifying_statement_28
+      type: method
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        section: Activity discussion
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_unattributed
+        quote: However, the effect of TiO2 on the SiO2 activity and activity coefficient in slags of low basicity is rather small.
+    - observation_id: ostrovski_2000_qualifying_statement_29
+      type: method
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        section: Activity discussion
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_unattributed
+        quote: This could be expected because TiO2 is regarded as an acidic oxide, while CaO is a basic oxide. However, the effect of TiO2 on the SiO2 activity and activity coefficient in slags of low basicity is rather small, which could be an indication that in the acidic slag TiO2 behaves as a basic oxide.
+    - observation_id: ostrovski_2000_qualifying_statement_30
+      type: method
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        section: Activity limits
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_unattributed
+        quote: To determine accurately the thermodynamic activities of CaO and TiO2 in the CaO-TiO2-SiO2 system, much higher temperatures are required, as vapour pressures of species in the vaporization of these oxides are much lower than of SiO. However, at high temperatures SiO2 would be about completely vaporised. Because of this limitation, activities of CaO and TiO2 were not determined.
+    - observation_id: ostrovski_2000_qualifying_statement_31
+      type: method
+      locator:
+        page: 11
+        published_page: 355
+        pdf_page_index: 10
+        section: Conclusions
+      units: as printed
+      values:
+        quantity: source_qualifying_statement
+        method_class: quoted_unattributed
+        quote: Replacement of CaO with TiO2 in the slag of basicity xCaO/xSiO2=1.07 with about the same SiO2 concentration results in a sharp increase in SiO2 activity. However, this has little effect on the SiO2 activity in slags of low basicity.
+    - observation_id: ostrovski_2000_figure_1_figure_only
+      type: figure_only
+      locator:
+        page: 4
+        published_page: 348
+        pdf_page_index: 3
+        section: Results and Discussion
+        note: Au+ current from two Mo cells against gold vaporization time at 1744 K in calibration experiments.
+        figure: '1'
+      units: not digitized
+      values:
+        quantity: figure_only
+        method_class: figure_only
+        description: Au+ current from two Mo cells against gold vaporization time at 1744 K in calibration experiments.
+        digitization: not performed
+    - observation_id: ostrovski_2000_figure_2_figure_only
+      type: figure_only
+      locator:
+        page: 4
+        published_page: 348
+        pdf_page_index: 3
+        section: Results and Discussion
+        note: Ca+, CaF+, CaF2+ currents at 1658 K against CaF2 vaporization time; plus signs indicate temperature
+          change.
+        figure: '2'
+      units: not digitized
+      values:
+        quantity: figure_only
+        method_class: figure_only
+        description: Ca+, CaF+, CaF2+ currents at 1658 K against CaF2 vaporization time; plus signs indicate temperature
+          change.
+        digitization: not performed
+    - observation_id: ostrovski_2000_figure_3_figure_only
+      type: figure_only
+      locator:
+        page: 5
+        published_page: 349
+        pdf_page_index: 4
+        section: Results and Discussion
+        note: CaF2 partial pressure over pure CaF2 against temperature, present study and Ref. 44 points.
+        figure: '3'
+      units: not digitized
+      values:
+        quantity: figure_only
+        method_class: figure_only
+        description: CaF2 partial pressure over pure CaF2 against temperature, present study and Ref. 44 points.
+        digitization: not performed
+    - observation_id: ostrovski_2000_figure_4_figure_only
+      type: figure_only
+      locator:
+        page: 5
+        published_page: 349
+        pdf_page_index: 4
+        section: Results and Discussion
+        note: CaF+ ion-current temperature dependence used to determine vaporization enthalpy with equations 1 and
+          4.
+        figure: '4'
+      units: not digitized
+      values:
+        quantity: figure_only
+        method_class: figure_only
+        description: CaF+ ion-current temperature dependence used to determine vaporization enthalpy with equations
+          1 and 4.
+        digitization: not performed
+    - observation_id: ostrovski_2000_figure_5_figure_only
+      type: figure_only
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        section: Results and Discussion
+        note: Changes in TiO2 and SiO2 concentrations in samples 3 and 5 during selective vaporization over 1500-2200
+          K.
+        figure: '5'
+      units: not digitized
+      values:
+        quantity: figure_only
+        method_class: figure_only
+        description: Changes in TiO2 and SiO2 concentrations in samples 3 and 5 during selective vaporization over
+          1500-2200 K.
+        digitization: not performed
+    - observation_id: ostrovski_2000_figure_6_figure_only
+      type: figure_only
+      locator:
+        page: 8
+        published_page: 352
+        pdf_page_index: 7
+        section: Results and Discussion
+        note: Changes in SiO2 and TiO2 concentration in samples 1-7 during selective vaporization; caption states
+          1750-2175 K, differing from body text.
+        figure: '6'
+      units: not digitized
+      values:
+        quantity: figure_only
+        method_class: figure_only
+        description: Changes in SiO2 and TiO2 concentration in samples 1-7 during selective vaporization; caption
+          states 1750-2175 K, differing from body text.
+        digitization: not performed
+    - observation_id: ostrovski_2000_figure_7_figure_only
+      type: figure_only
+      locator:
+        page: 9
+        published_page: 353
+        pdf_page_index: 8
+        section: Results and Discussion
+        note: Phase diagram from reference 10 with composition changes for samples 1-7 during selective vaporization
+          from 1750 to 2175 K.
+        figure: '7'
+      units: not digitized
+      values:
+        quantity: figure_only
+        method_class: figure_only
+        description: Phase diagram from reference 10 with composition changes for samples 1-7 during selective vaporization
+          from 1750 to 2175 K.
+        digitization: not performed
+    - observation_id: ostrovski_2000_temperature_gradient
+      type: method
+      locator:
+        page: 3
+        published_page: 347
+        pdf_page_index: 2
+        section: Experimental
+        note: 10±5 K between cell top and bottom at 2000 K.
+      units: K
+      values:
+        quantity: temperature_gradient
+        method_class: measured_tabulated
+        printed_value: 10±5 K at 2000 K
+    - observation_id: ostrovski_2000_sample_composition_change_rate
+      type: method
+      locator:
+        page: 8
+        published_page: 352
+        pdf_page_index: 7
+        section: Experimental data for samples of changing composition
+        note: Sample mass chosen so change rate was not greater than 0.01–0.04 mole fractions/hour.
+      units: mole fraction/hour
+      values:
+        quantity: sample_composition_change_rate_bound
+        method_class: measured_tabulated
+        printed_upper_bound: not greater than 0.01–0.04
+    - observation_id: ostrovski_2000_oxygen_calculation_eq11_inputs
+      type: method
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        section: Results and Discussion
+        table: '3'
+        note: The Table 3 paragraph and equation (11) specify oxygen partial pressure calculated from MoO3+/MoO2+
+          currents and equilibrium (10), with K from Ref. 40; raw currents are not tabulated.
+      units: as printed
+      values:
+        quantity: oxygen_pressure_calculation_inputs
+        method_class: measured_reduced
+        relation: "p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; raw MoO3+ and MoO2+ currents, K_o10 and numerical cross-sections are not published; K_o10 uses Ref. 40. Both printed cross-sections are MoO2, an apparent source error retained."
+    - observation_id: ostrovski_2000_table1_sample_composition_context
+      type: source_table_numeric_rows
+      locator:
+        page: 2
+        published_page: 346
+        pdf_page_index: 1
+        table: '1'
+        section: Experimental
+      units: mole fraction as printed
+      values:
+        quantity: sample_composition_table
+        method_class: measured_tabulated
+        analysis_method: ICP-AES
+        rows_as_printed:
+        - sample_no: 1
+          TiO2_mole_fraction: 0.105
+          CaO_mole_fraction: 0.505
+          SiO2_mole_fraction: 0.388
+          Ti2O3_mole_fraction_less_than: 0.005
+        - sample_no: 2
+          TiO2_mole_fraction: 0.105
+          CaO_mole_fraction: 0.462
+          SiO2_mole_fraction: 0.431
+          Ti2O3_mole_fraction_less_than: 0.005
+        - sample_no: 3
+          TiO2_mole_fraction: 0.106
+          CaO_mole_fraction: 0.4
+          SiO2_mole_fraction: 0.489
+          Ti2O3_mole_fraction_less_than: 0.005
+        - sample_no: 4
+          TiO2_mole_fraction: 0.157
+          CaO_mole_fraction: 0.475
+          SiO2_mole_fraction: 0.365
+          Ti2O3_mole_fraction_less_than: 0.005
+        - sample_no: 5
+          TiO2_mole_fraction: 0.166
+          CaO_mole_fraction: 0.429
+          SiO2_mole_fraction: 0.401
+          Ti2O3_mole_fraction_less_than: 0.005
+        - sample_no: 6
+          TiO2_mole_fraction: 0.165
+          CaO_mole_fraction: 0.37
+          SiO2_mole_fraction: 0.458
+          Ti2O3_mole_fraction_less_than: 0.005
+        - sample_no: 7
+          TiO2_mole_fraction: 0.16
+          CaO_mole_fraction: 0.311
+          SiO2_mole_fraction: 0.52
+          Ti2O3_mole_fraction_less_than: 0.005
+        Ti2O3_note_as_printed: less than 0.5 mole % in all samples
+      notes: Full Table 1 is also transcribed in tables/ostrovski-2000-cao-tio2-sio2/t1.csv; per-sample measured composition
+        is bound to the pressure and activity observations.
+    - observation_id: ostrovski_2000_table2_sio2_row9_context
+      type: source_table_numeric_row
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        table: '2'
+        section: Table 2
+      T_range_K:
+      - 1833.0
+      - 1995.0
+      units: A in K; B dimensionless in log10(p_i/atm) = -A/T + B
+      values:
+        quantity: pure_silica_pressure_fit_table
+        method_class: measured_tabulated
+        species_as_printed: SiO2
+        A: 30710.0
+        A_uncertainty: 510.0
+        B: 8.46
+        B_uncertainty: 0.47
+        relation_as_printed: log10(p_i/atm) = -A/T + B
+        reference_as_printed: Present study
+    - observation_id: ostrovski_2000_table2_sio2_row10_context
+      type: source_table_numeric_row
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        table: '2'
+        section: Table 2
+      T_range_K:
+      - 2000.0
+      - 2038.0
+      units: A in K; B dimensionless in log10(p_i/atm) = -A/T + B
+      values:
+        quantity: pure_silica_pressure_fit_table
+        method_class: measured_tabulated
+        species_as_printed: SiO2
+        A: 28771.0
+        A_uncertainty: 669.0
+        B: 7.6
+        B_uncertainty: 0.64
+        relation_as_printed: log10(p_i/atm) = -A/T + B
+        reference_as_printed: Present study
+    - observation_id: ostrovski_2000_table2_sio2_row11_context
+      type: source_table_numeric_row
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        table: '2'
+        section: Table 2
+      T_range_K:
+      - 1996.0
+      - 2300.0
+      units: A in K; B dimensionless in log10(p_i/atm) = -A/T + B
+      values:
+        quantity: pure_silica_pressure_fit_table
+        method_class: quoted_attributed
+        species_as_printed: SiO2
+        A: 28834.0
+        A_uncertainty: 35.0
+        B: 8.27
+        B_uncertainty: 0.02
+        relation_as_printed: log10(p_i/atm) = -A/T + B
+        reference_as_printed: Ref. 40
+        attribution: Ref. 40
+    - observation_id: ostrovski_2000_verbatim_statement_01
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Abstract
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: The SiO2 activities in the CaO-TiO2-SiO2 system were found to have negative deviations from the ideality
+          for all compositions except the sample with high SiO2 concentration (CaO/SiO2=0.6, 16 mole % TiO2).
+    - observation_id: ostrovski_2000_verbatim_statement_02
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Abstract
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: Replacement of CaO with TiO2 in slags of relatively high basicity (xCaO/xSiO2>1) causes a sharp increase
+          in the SiO2 activity and activity coefficient.
+    - observation_id: ostrovski_2000_verbatim_statement_03
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Abstract
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: In more acidic slags, addition of TiO2 to the CaO-SiO2 system does not have a strong effect on the
+          SiO2 activity and activity coefficient.
+    - observation_id: ostrovski_2000_verbatim_statement_04
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_attributed
+        quote: It has been noted [4] that various aspects of the behaviour of TiO2 in slags can be accounted for by
+          the specific structure of the electron shell of a titanium atom and by the high polarizability of the Ti+4
+          cation.
+    - observation_id: ostrovski_2000_verbatim_statement_05
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_attributed
+        quote: Titanium partitioning between Ti3+ and Ti4+ valency states in the CaO-SiO2-TiOx system as a function
+          of temperature, oxygen potential, titanium oxide content and CaO:SiO2 ratio was examined by Tranell et al.
+          [5]. It was found that the Ti3+/Ti4+ ratio decreases with the increasing CaO/SiO2 ratio, increasing oxygen
+          potential and decreasing temperature.
+    - observation_id: ostrovski_2000_verbatim_statement_06
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: Literature data on the vaporization and thermodynamic properties of the CaO-TiO2-SiO2 system are extremely
+          limited.
+    - observation_id: ostrovski_2000_verbatim_statement_07
+      type: method
+      locator:
+        page: 1
+        published_page: 345
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_attributed
+        quote: Thermodynamic properties of multi-component slags based on the CaO-TiO2-SiO2 system were studied by
+          the gas-slag equilibrium technique with addition of FeO and MnO [4], and MgO and Al2O3 [5].
+    - observation_id: ostrovski_2000_verbatim_statement_08
+      type: method
+      locator:
+        page: 2
+        published_page: 346
+        pdf_page_index: 1
+        section: Experimental
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: measured_tabulated
+        quote: In the first series, the titanium oxide content was 10.5 mole % and CaO/SiO2 ratio was between 0.82
+          and 1.30. The second series of samples contained 16-17 mole % TiO2 at CaO/SiO2 ratio from 0.60 to 1.30.
+    - observation_id: ostrovski_2000_verbatim_statement_09
+      type: method
+      locator:
+        page: 2
+        published_page: 346
+        pdf_page_index: 1
+        section: Introduction
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_attributed
+        quote: Vaporization and thermodynamic properties of titanium oxides by high temperature mass spectrometric
+          method were examined by Semenov [10] and Gilles et al. [11-26].
+    - observation_id: ostrovski_2000_verbatim_statement_10
+      type: method
+      locator:
+        page: 3
+        published_page: 347
+        pdf_page_index: 2
+        section: CaF2 calibration
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_attributed
+        quote: The calculated partial pressure of CaF2 as a function of temperature is plotted in Fig. 3. It agrees
+          well with reference data [40] also presented in Fig. 3.
+    - observation_id: ostrovski_2000_verbatim_statement_11
+      type: method
+      locator:
+        page: 6
+        published_page: 350
+        pdf_page_index: 5
+        section: Vaporization of pure silica
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_attributed
+        quote: Partial pressures of SiO2 obtained at the present study are in agreement with data recommended in Ref.
+          40.
+    - observation_id: ostrovski_2000_verbatim_statement_12
+      type: method
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        section: Table 3 discussion
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: measured_tabulated
+        quote: Partial pressures of Ca, TiO and TiO2 evaluated by the ion current comparison method (Eqn. 2) at 1900
+          K were lower than 10^-8 atm.
+    - observation_id: ostrovski_2000_verbatim_statement_13
+      type: method
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        section: Table 3 discussion
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: As a result of significant difference in the volatility between SiO, Ca, TiO and TiO2 at 1850 K, initial
+          compositions of the system changed during isothermal vaporization of samples.
+    - observation_id: ostrovski_2000_verbatim_statement_14
+      type: method
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        section: Table 3 discussion
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: figure_only
+        quote: Fig. 5 illustrates changes in concentrations of TiO2 and SiO2 in samples No 3 and No 5 relative to
+          the initial concentrations as a result of the selective vaporization of components in the temperature range
+          1500-2200 K.
+    - observation_id: ostrovski_2000_verbatim_statement_15
+      type: method
+      locator:
+        page: 8
+        published_page: 352
+        pdf_page_index: 7
+        section: Composition-change procedure
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: The quantity of remaining CaO and TiO2 in the residual sample was calculated from the ratios of the
+          areas of their ion-current plots in the same way.
+    - observation_id: ostrovski_2000_verbatim_statement_16
+      type: method
+      locator:
+        page: 8
+        published_page: 352
+        pdf_page_index: 7
+        section: Selective vaporization
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: figure_only
+        quote: Fig. 6 summarizes changes in concentrations of SiO2 and TiO2 in samples No 1-7 when the temperature
+          of vaporization increased from 1550 to 2175 K. Figure 6 caption instead states 1750 to 2175 K.
+    - observation_id: ostrovski_2000_verbatim_statement_17
+      type: method
+      locator:
+        page: 8
+        published_page: 352
+        pdf_page_index: 7
+        section: Selective vaporization
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: figure_only
+        quote: Enrichment of the condensed phase of the CaO-TiO2-SiO2 system with CaO and TiO2 during vaporization
+          is also presented on the phase equilibrium diagram [6] for all samples studied (Fig. 7).
+    - observation_id: ostrovski_2000_verbatim_statement_18
+      type: method
+      locator:
+        page: 8
+        published_page: 352
+        pdf_page_index: 7
+        section: Selective vaporization
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: These data on the distillation of the CaO-TiO2-SiO2 system during vaporization can be useful in various
+          high-temperature processes.
+    - observation_id: ostrovski_2000_verbatim_statement_19
+      type: method
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        section: Silica activity discussion
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: measured_reduced
+        quote: The SiO2 activity in the CaO-TiO2-SiO2 system at 1850 K was calculated using experimental data on vapour
+          pressure of SiO and O measured over the samples and pure SiO2.
+    - observation_id: ostrovski_2000_verbatim_statement_20
+      type: method
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        section: Silica activity discussion
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: SiO2 activities and activity coefficients in the binary CaO-SiO2 system decrease with decreasing basicity
+          (xCaO/xSiO2 ratio). The same trend is observed for the ternary CaO-SiO2-TiO2 system.
+    - observation_id: ostrovski_2000_verbatim_statement_21
+      type: method
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        section: Silica activity discussion
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: Replacement of CaO with TiO2 in the slag of basicity xCaO/xSiO2=1.07 with about the same SiO2 concentration
+          (xSiO2=0.431-0.434) results in sharp increase in SiO2 activity and activity coefficient.
+    - observation_id: ostrovski_2000_verbatim_statement_22
+      type: method
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        section: Silica activity discussion
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: This could be expected because TiO2 is regarded as an acidic oxide, while CaO is a basic oxide. However,
+          the effect of TiO2 on the SiO2 activity and activity coefficient in slags of low basicity is rather small,
+          which could be an indication that in the acidic slag TiO2 behaves as a basic oxide.
+    - observation_id: ostrovski_2000_verbatim_statement_23
+      type: method
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        section: Activity limits
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: To determine accurately the thermodynamic activities of CaO and TiO2 in the CaO-TiO2-SiO2 system, much
+          higher temperatures are required, as vapour pressures of species in the vaporization of these oxides are
+          much lower than of SiO. However, at high temperatures SiO2 would be about completely vaporised. Because
+          of this limitation, activities of CaO and TiO2 were not determined.
+    - observation_id: ostrovski_2000_verbatim_statement_24
+      type: method
+      locator:
+        page: 11
+        published_page: 355
+        pdf_page_index: 10
+        section: Conclusions
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: Using experimental data on vapour pressure of SiO and O over the CaO-TiO2-SiO2 system, the thermodynamic
+          activity of SiO2 was calculated and compared with the SiO2 activity in the binary CaO-SiO2 system.
+    - observation_id: ostrovski_2000_verbatim_statement_25
+      type: method
+      locator:
+        page: 11
+        published_page: 355
+        pdf_page_index: 10
+        section: Conclusions
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: Replacement of CaO with TiO2 in the slag of basicity xCaO/xSiO2=1.07 with about the same SiO2 concentration
+          results in a sharp increase in SiO2 activity. However, this has little effect on the SiO2 activity in slags
+          of low basicity.
+    - observation_id: ostrovski_2000_verbatim_statement_26
+      type: method
+      locator:
+        page: 11
+        published_page: 355
+        pdf_page_index: 10
+        section: Conclusions
+      units: as printed
+      values:
+        quantity: source_statement
+        method_class: quoted_unattributed
+        quote: This indicates that TiO2 could be regarded as an acidic oxide in a basic slag and as a basic oxide
+          in the acidic slag.

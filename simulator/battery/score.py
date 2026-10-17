@@ -1204,7 +1204,10 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
-    if NoticeKind.FIGURE_ONLY.value in kinds:
+    if any(
+        kind == NoticeKind.FIGURE_ONLY.value and reason == "figure_only"
+        for kind, reason in notices
+    ):
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
@@ -3846,16 +3849,22 @@ def _reactive_cell_not_modelled_notice(
     )
 
 
-def _figure_only_notice(
+def _evidence_class_notice(
     quantity: Quantity | None, observation: Observation
 ) -> Notice:
-    # Quantity may be unknown (typed refusal quantity_unknown); the evidence
-    # class label must still attach. Empty affected_quantities is allowed only
-    # for FIGURE_ONLY (see Notice.__post_init__).
+    # Keep evidence labels on the existing FIGURE_ONLY notice channel. Quantity
+    # may be unknown (typed refusal quantity_unknown); empty affected_quantities
+    # is allowed only for FIGURE_ONLY (see Notice.__post_init__).
+    evidence_class = observation.evidence.class_
+    class_label = evidence_class.value.value if evidence_class.is_value else "unknown"
     return Notice(
         kind=NoticeKind.FIGURE_ONLY,
         affected_quantities=() if quantity is None else (quantity,),
-        reason="figure_only",
+        reason=(
+            "figure_only"
+            if class_label == EvidenceClass.FIGURE_ONLY.value
+            else f"evidence_class:{class_label}"
+        ),
         origin=observation.observation_id,
     )
 
@@ -4867,6 +4876,30 @@ def predict_with_engine(
         from simulator.battery.enums import AmountBasis
         from simulator.battery.generators.bench import activity_request_for_engine
         from simulator.battery.records import Composition as OxideComposition
+        from simulator.chemistry.melt_activity import (
+            MELT_OXIDE_CATIONS_PER_FORMULA,
+        )
+
+        if (
+            engine is Engine.INTERNAL_ANALYTICAL
+            and quantity is Quantity.ACTIVITY
+            and formula not in MELT_OXIDE_CATIONS_PER_FORMULA
+        ):
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                authority=Authority.REFUSED,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+                refusal_detail={
+                    "reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value,
+                    "formula": formula,
+                    "model": "simulator.chemistry.melt_activity.melt_oxide_activity",
+                },
+                identity=identity,
+            )
 
         if experiment is None:
             return EnginePrediction(
@@ -4901,6 +4934,27 @@ def predict_with_engine(
         )
         requested = identity.composition if identity.composition is not None and identity.composition.is_value else State.of(built)
         composition_value = built
+        if engine is Engine.INTERNAL_ANALYTICAL and quantity is Quantity.ACTIVITY:
+            unsupported_components = sorted(
+                set(moles) - set(MELT_OXIDE_CATIONS_PER_FORMULA)
+            )
+            if unsupported_components:
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.UNSUPPORTED),
+                    authority=Authority.REFUSED,
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+                    refusal_detail={
+                        "reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value,
+                        "unsupported_composition_components": unsupported_components,
+                        "model": "simulator.chemistry.melt_activity.melt_oxide_activity",
+                    },
+                    identity=identity,
+                    requested_composition=requested,
+                )
         wt = composition_wt_pct(built)
         if wt is None:
             return EnginePrediction(
@@ -4913,6 +4967,98 @@ def predict_with_engine(
                 refusal_detail={"reason": "composition_unparsed"},
                 identity=identity,
                 requested_composition=requested,
+            )
+        if engine is Engine.INTERNAL_ANALYTICAL and quantity is Quantity.ACTIVITY:
+            from simulator.chemistry.melt_activity import melt_oxide_activity
+
+            activity = melt_oxide_activity(
+                formula,
+                moles,
+                temperature_K=float(T),
+            )
+            if activity is None:
+                return _input_refusal(
+                    engine=engine,
+                    channel=channel,
+                    sources=sources,
+                    identity=identity,
+                    requested=requested,
+                    reason=RefusalReason.IDENTITY_INCOMPLETE,
+                    detail={
+                        "reason": "melt_activity_missing_composition",
+                        "formula": formula,
+                    },
+                    notices=tuple(input_notices),
+                )
+
+            # melt_oxide_activity returns single-cation a(MO_x) on its
+            # Raoultian pure-liquid reference. Battery activity identities
+            # name the parent oxide; mu(MO_x)=mu(parent)/c therefore gives
+            # a(parent)=a(MO_x)^c via the production result's conversion.
+            parent_activity = activity.thermodynamic_parent_activity()
+            authority = Authority.BRIDGE
+            notices: list[Notice] = list(input_notices)
+            certified_band = None
+            if activity.valid_range_K is not None:
+                low, high = (float(activity.valid_range_K[0]), float(activity.valid_range_K[1]))
+                certified_band = {
+                    "temperature_K": (Decimal(str(low)), Decimal(str(high)))
+                }
+                if activity.authority_status == (
+                    "out_of_gamma_domain_status_bearing_non_authoritative"
+                ):
+                    authority = Authority.EXTRAPOLATED
+                    notices.append(
+                        Notice(
+                            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                            affected_quantities=(Quantity.ACTIVITY,),
+                            reason=(activity.warning or "melt oxide activity extrapolated"),
+                            origin=(
+                                "simulator.chemistry.melt_activity.melt_oxide_activity"
+                            ),
+                            band=f"[{low:g}, {high:g}] K",
+                            authority=Authority.EXTRAPOLATED,
+                        )
+                    )
+            elif activity.evidence_tier == "UNCERTIFIED" or activity.warning:
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            activity.warning
+                            or "melt_oxide_activity has no certified evidence tier"
+                        ),
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    )
+                )
+            activity_sources = tuple(
+                dict.fromkeys((*sources, activity.citation))
+            )
+            activity_lineage_complete = lineage_complete_for(activity_sources)
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.PRODUCED,
+                    call_evidence=(
+                        "simulator.chemistry.melt_activity.melt_oxide_activity:"
+                        f"{formula}"
+                    ),
+                ),
+                value=as_decimal(str(parent_activity)),
+                unit="dimensionless",
+                authority=authority,
+                notices=tuple(notices),
+                coefficient_sources=activity_sources,
+                lineage_complete=activity_lineage_complete,
+                certified_band=certified_band,
+                identity=identity,
+                requested_composition=requested,
+                version=activity.activity_model,
             )
     elif identity.composition is not None and identity.composition.is_value:
         requested = identity.composition
@@ -6276,15 +6422,18 @@ def compile_residual(
         else _bench_for_score(experiment, context.benches)
     )
     flagged_notices = _flagged_stratum_notices(reference, experiment, gates, bench)
-    figure_only_notices: tuple[Notice, ...] = ()
-    evidence_class = reference.evidence.class_
-    figure_only = (
+    evidence_class_notices: tuple[Notice, ...] = ()
+    evidence_class = source_reference.evidence.class_
+    non_measured_comparison = (
+        not evidence_class.is_value
+        or evidence_class.value not in MEASURED_EVIDENCE
+    ) and not (
         evidence_class.is_value
-        and evidence_class.value is EvidenceClass.FIGURE_ONLY
+        and evidence_class.value is EvidenceClass.COMPILATION_ASSESSED
     )
-    if figure_only:
-        figure_only_notices = (_figure_only_notice(quantity, reference),)
-    notices = union_notices(reference.notices, flagged_notices, figure_only_notices)
+    if non_measured_comparison:
+        evidence_class_notices = (_evidence_class_notice(quantity, source_reference),)
+    notices = union_notices(reference.notices, flagged_notices, evidence_class_notices)
     comparison_ids = comparison_ids or {reference.observation_id}
 
     def _refused(
@@ -6820,7 +6969,10 @@ def compile_residual(
         NoticeKind.FIGURE_ONLY,
         NoticeKind.REACTIVE_CELL_NOT_MODELLED,
     }
-    if figure_only:
+    if (
+        evidence_class.is_value
+        and evidence_class.value is EvidenceClass.FIGURE_ONLY
+    ):
         band_preserving_kinds.add(NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG)
     has_no_band_flag = any(
         notice.kind not in band_preserving_kinds for notice in flagged_notices
@@ -6978,33 +7130,53 @@ def load_score_context(
     )
 
 
-def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
-    """Measured or figure_only evidence, admitted or pending (pending is diagnostic).
+def _is_compilation_thermo_reference(
+    observation: Observation, origin: str | None
+) -> bool:
+    evidence_class = observation.evidence.class_
+    quantity = (
+        quantity_token(observation.identity)
+        if isinstance(observation.identity, Identity)
+        else None
+    )
+    compilation = (
+        evidence_class.is_value
+        and evidence_class.value is EvidenceClass.COMPILATION_ASSESSED
+    ) or is_compilation_source(observation.source_id, origin)
+    return bool(
+        quantity in FORMATION_QUANTITIES | PURE_STANDARD_THERMO
+        and compilation
+        and not is_internal_consistency(origin)
+        and not is_sf04_workbook(observation)
+    )
 
-    FIGURE_ONLY rows are candidates (owner mandate: score everything; evidence
-    class is a label). They stay out of the certified/measured headline via
-    the figure_only notice and by not being in MEASURED_EVIDENCE.
+
+def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
+    """Admitted or pending comparison evidence; class labels do not gate scoring.
+
+    Compilation-assessed and compilation-thermo rows stay on their compilation
+    scoring route. Other admitted/pending rows outside internal ledgers use the
+    comparison route and carry a typed label notice when residuals are compiled.
     """
 
     out: list[Observation] = []
     for obs in context.observations.values():
         ev = obs.evidence.class_
-        if not (
-            ev.is_value
-            and (
-                ev.value in MEASURED_EVIDENCE
-                or ev.value is EvidenceClass.FIGURE_ONLY
-            )
-        ):
-            continue
         if obs.admission.status not in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}:
+            continue
+        origin = getattr(context, "origins", {}).get(obs.observation_id)
+        if is_internal_consistency(origin):
+            continue
+        if ev.is_value and ev.value is EvidenceClass.COMPILATION_ASSESSED:
+            continue
+        if _is_compilation_thermo_reference(obs, origin):
             continue
         out.append(obs)
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
 
 def diagnostic_references(context: ScoreContext) -> tuple[Observation, ...]:
-    """Compilation / ledger / model-derived rows: never empirical headline."""
+    """Compilation, ledger, and SF04 rows scored through diagnostic paths."""
 
     out: list[Observation] = []
     for obs in context.observations.values():
@@ -7077,7 +7249,6 @@ def _score_store_with_decisions(
     resolved_handles = dict(provided_handles)
     refs = list(comparison_candidates(context))
     fusion_diagnostic_ids: set[str] = set()
-    admitted_model_derived_ids: set[str] = set()
     if include_diagnostics:
         seen = {o.observation_id for o in refs}
         for obs in diagnostic_references(context):
@@ -7094,18 +7265,6 @@ def _score_store_with_decisions(
                 if obs.observation_id not in seen:
                     refs.append(converted)
                     seen.add(obs.observation_id)
-        for obs in context.observations.values():
-            evidence_class = obs.evidence.class_
-            if (
-                obs.admission.status is not AdmissionStatus.ADMITTED
-                or not evidence_class.is_value
-                or evidence_class.value is not EvidenceClass.MODEL_DERIVED
-                or obs.observation_id in seen
-            ):
-                continue
-            refs.append(obs)
-            seen.add(obs.observation_id)
-            admitted_model_derived_ids.add(obs.observation_id)
         for obs in _refusal_diagnostic_references(context):
             if obs.observation_id not in seen:
                 refs.append(obs)
@@ -7192,15 +7351,8 @@ def _score_store_with_decisions(
                         if isinstance(point.identity, Identity)
                         else None
                     )
-                    thermo = quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO
-                    compilation_thermo = (
-                        thermo
-                        and (
-                            is_compilation_evidence(point)
-                            or is_compilation_source(point.source_id, point_origin)
-                        )
-                        and not is_internal_consistency(point_origin)
-                        and not is_sf04_workbook(point)
+                    compilation_thermo = _is_compilation_thermo_reference(
+                        point, point_origin
                     )
                     source_tier = (
                         "compilation"
@@ -7240,7 +7392,6 @@ def _score_store_with_decisions(
                         prediction = None
                         if (
                             diagnostic
-                            and obs.observation_id not in admitted_model_derived_ids
                             and point.observation_id not in fusion_diagnostic_ids
                             and predict is None
                             and not compilation_thermo

@@ -234,9 +234,18 @@ def test_iron_without_oxygen_is_a_typed_refusal():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.payload is None for item in results)
-    assert all(item.readiness.status is ReadinessStatus.GAP for item in results)
-    gaps = results[0].readiness.gaps
+    internal = next(
+        item for item in results
+        if item.readiness.engine == "internal-analytical"
+    )
+    assert internal.readiness.status is ReadinessStatus.READY
+    assert internal.readiness.gaps == ()
+    assert internal.payload is not None
+    assert "fO2_log" not in internal.payload
+    redox_engines = [item for item in results if item is not internal]
+    assert all(item.payload is None for item in redox_engines)
+    assert all(item.readiness.status is ReadinessStatus.GAP for item in redox_engines)
+    gaps = redox_engines[0].readiness.gaps
     oxygen = [gap for gap in gaps if gap.waypoint == "oxygen_condition"]
     assert len(oxygen) == 1
     assert oxygen[0].reason is GapReason.MISSING_EVIDENCE
@@ -372,9 +381,16 @@ def test_multivalent_oxide_without_oxygen_is_a_typed_refusal(oxide):
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.payload is None for item in results)
-    assert all(item.readiness.status is ReadinessStatus.GAP for item in results)
-    oxygen = [gap for gap in results[0].readiness.gaps if gap.waypoint == "oxygen_condition"]
+    internal = next(
+        item for item in results
+        if item.readiness.engine == "internal-analytical"
+    )
+    assert internal.payload is not None
+    assert internal.readiness.status is ReadinessStatus.READY
+    redox_engines = [item for item in results if item is not internal]
+    assert all(item.payload is None for item in redox_engines)
+    assert all(item.readiness.status is ReadinessStatus.GAP for item in redox_engines)
+    oxygen = [gap for gap in redox_engines[0].readiness.gaps if gap.waypoint == "oxygen_condition"]
     assert len(oxygen) == 1
     assert oxygen[0].reason is GapReason.MISSING_EVIDENCE
     assert oxide in oxygen[0].missing
@@ -393,8 +409,14 @@ def test_iron_alias_without_oxygen_is_a_typed_refusal(alias):
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.payload is None for item in results)
-    oxygen = [gap for gap in results[0].readiness.gaps if gap.waypoint == "oxygen_condition"]
+    internal = next(
+        item for item in results
+        if item.readiness.engine == "internal-analytical"
+    )
+    assert internal.payload is not None
+    redox_engines = [item for item in results if item is not internal]
+    assert all(item.payload is None for item in redox_engines)
+    oxygen = [gap for gap in redox_engines[0].readiness.gaps if gap.waypoint == "oxygen_condition"]
     assert len(oxygen) == 1
     assert alias in oxygen[0].missing
 
@@ -405,8 +427,14 @@ def test_zero_iron_does_not_hide_another_multivalent_oxide():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.payload is None for item in results)
-    oxygen = [gap for gap in results[0].readiness.gaps if gap.waypoint == "oxygen_condition"]
+    internal = next(
+        item for item in results
+        if item.readiness.engine == "internal-analytical"
+    )
+    assert internal.payload is not None
+    redox_engines = [item for item in results if item is not internal]
+    assert all(item.payload is None for item in redox_engines)
+    oxygen = [gap for gap in redox_engines[0].readiness.gaps if gap.waypoint == "oxygen_condition"]
     assert len(oxygen) == 1
     assert "TiO2" in oxygen[0].missing
     assert "FeO" not in oxygen[0].missing

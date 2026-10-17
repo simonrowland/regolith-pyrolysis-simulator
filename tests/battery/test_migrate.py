@@ -62,6 +62,7 @@ from simulator.battery.migrate import (
     citation_hash,
     compilation_family_from_store_path,
     convert_area_to_m2,
+    convert_areal_mass_to_kg_per_m2,
     convert_mass_to_kg,
     convert_pressure_to_pa,
     convert_temperature_to_k,
@@ -5894,6 +5895,7 @@ _CENSUS_CLOSED_QUANTITIES = {
     "activity",
     "activity_coefficient",
     "evaporation_coefficient_alpha",
+    "mass_loss_areal_density",
     "mass_loss_fraction",
     "mass_loss_fraction_vs_T",
     "yield_fraction",
@@ -6014,6 +6016,10 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         if len(candidates) != 1:
             return None
         return _num(candidates[0][1])
+    if q_token == "mass_loss_areal_density":
+        amount = _num(item.get("mass_loss_areal_density"))
+        converted, _relation = convert_areal_mass_to_kg_per_m2(amount, units)
+        return converted
     if q_token == "transition_temperature":
         if "T_K" in item:
             return _num(item.get("T_K"))
@@ -6406,7 +6412,11 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # Gibson & Hubbard (1972), Table 2: K 4220/3027/1437/88 and Na
     # 4660/4110/3140/1730. These are residual component abundances, so all eight
     # are residue_component_composition points.
-    assert census.get("residue_component_composition") == 1282
+    # Ivanova (2018), Table 1, p. 1 adds 32 printed residue oxide-abundance
+    # cells: four components across eight evaporated samples. The count moved
+    # because the data was added, not because a check was relaxed; mismatches
+    # stays 0.
+    assert census.get("residue_component_composition") == 1314
     assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
     assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
@@ -6414,6 +6424,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     }
     assert per_source.get("kems-026-markova-1984") == {
         "residue_component_composition": 110
+    }
+    assert per_source.get("ivanova-2018-spinel-rich-cai-evaporation") == {
+        "residue_component_composition": 32
     }
     # Current total includes the 110 Markova 1984 residue components and omits
     # the 12 duplicate Fedkin mirror cells (b677: the pre-item24 total 1877->1865).
@@ -6427,9 +6440,12 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     assert per_source.get("sugawara-akaogi-2004-liquid-calorimetry") == {
         "H_minus_H298": 6
     }
-    # The merged store adds 65 Holzheid points, 109 Sato points, and six Sugawara
-    # heat-content points to the green baseline's 1891 numeric series: 2071 total.
-    assert n_numeric == 2071, (n_numeric, census, n_unavailable)
+    # Fresh regeneration restores 33 missing extract siblings. Three add numeric
+    # series cells: Gaillard (82 activity), Ivanova (32 residue oxides), and
+    # Tsuchiyama (18 areal mass-loss cells). Their 132 cells have zero mismatches;
+    # the merged numeric-series count moves 2071->2203 because the data became
+    # visible, not because a check was relaxed.
+    assert n_numeric == 2203, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
@@ -8494,7 +8510,7 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         "None": 6,
         "SiO_evolution": 45,
         "melt_activity": 137,
-        "vapour": 63,
+        "vapour": 118,
     }
 
 
@@ -8990,7 +9006,7 @@ def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None
         )
     )
     candidate_ids = {obs.observation_id for obs in candidates}
-    assert r2_ids.isdisjoint(candidate_ids)
+    assert r2_ids <= candidate_ids
     assert {obs.observation_id for obs in superseded}.isdisjoint(candidate_ids)
     residuals, _ = score_store(
         ScoreContext(
@@ -9007,6 +9023,14 @@ def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None
     assert all(row.status is ResidualStatus.NO_BAND for row in silica_residuals)
     assert all(row.numeric is not None for row in silica_residuals)
     assert all(row.numeric.value.is_finite() for row in silica_residuals if row.numeric)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FIGURE_ONLY
+            and notice.reason == "evidence_class:model_derived"
+            for notice in row.notices
+        )
+        for row in silica_residuals
+    )
 
 
 def test_unprinted_temperature_envelopes_are_not_loaded(tmp_path: Path) -> None:
@@ -14499,8 +14523,13 @@ def test_stolyarova_1995_printed_compositions_reach_migrated_observations(
         )
         for obs in candidates
     )
-    assert len(candidates) == 24
-    assert rails == {"vapour": 24}
+    assert len(candidates) == 50
+    assert rails == {"vapour": 50}
+    assert sum(
+        obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        for obs in candidates
+    ) == 26
 
 
 def test_stolyarova_1995_composition_mutation_removes_identity_map(
@@ -14611,6 +14640,64 @@ def test_stolyarova_1991_printed_compositions_reach_migrated_observations(
     assert pressure_rows
     assert all(obs.identity.fO2_Pa.is_unknown for obs in pressure_rows)
     assert all(obs.identity.total_pressure_Pa.is_unknown for obs in pressure_rows)
+
+
+def test_stolyarova_1991_atomic_oxygen_is_quoted_attributed_with_relation(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kems-053-stolyarova-1991.yaml", write=False
+    )
+    rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-053-stolyarova-1991"
+        and "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium"
+        in obs.observation_id
+    ]
+
+    assert len(rows) == 9
+    work_id = next(
+        work_id
+        for work_id, work in result.works.items()
+        if "kems-053-stolyarova-1991" in work.source_ids
+    )
+    assert any(
+        row.get("observation_id") == "stolyarova_1991_printed_equilibrium_1"
+        for row in result.context_by_work[work_id]
+    )
+    context = next(
+        row
+        for row in result.context_by_work[work_id]
+        if row.get("observation_id") == "stolyarova_1991_printed_equilibrium_1"
+    )
+    assert context["values"]["equation_as_printed"] == "(WO3) = (WO2) + (O)"
+    assert context["values"]["description"] == (
+        "P_O is calculated from measured WO2 and WO3 partial pressures and the "
+        "equilibrium constant for the printed gas reaction (WO3) = (WO2) + "
+        "(O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated."
+    )
+    assert Counter(row.value.point for row in rows) == Counter(
+        Decimal(value)
+        for value in (
+            "0.000101325",
+            "0.000101325",
+            "0.000101325",
+            "0.000101325",
+            "0.000101325",
+            "0.00006890100",
+            "0.00006890100",
+            "0.00007498050",
+            "0.0000678877500000000101325",
+        )
+    )
+    for obs in rows:
+        assert obs.derivation is not None
+        assert obs.derivation.relation == "atm_to_Pa"
+        assert "WO3" not in obs.derivation.relation
+        assert obs.derived_from is None
+        assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert obs.evidence.attribution == "Stolyarova et al. (1991), Table Ib, Eq. [1]"
 
 
 def test_stolyarova_1991_composition_map_mutation_removes_identity(
@@ -15225,3 +15312,70 @@ def test_kambayashi_printed_compositions_and_conditions_reach_observations(
         assert observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
         assert observation.locator is not None
         assert "bound_not_point_ordering" in observation.locator.note
+
+
+@pytest.mark.parametrize(
+    ("filename", "observation_ids", "expected_class", "expected_count"),
+    [
+        (
+            "busemann-2000-phase-q-noble-gases.yaml",
+            ("busemann_2000_table3_he_quoted_prior_work",),
+            EvidenceClass.QUOTED_ATTRIBUTED,
+            8,
+        ),
+        (
+            "kems-020-hastie-1981-nbsir.yaml",
+            ("hastie_1981_table2_k_logP_coefficients_quoted_20260906",),
+            EvidenceClass.MODEL_DERIVED,
+            17,
+        ),
+        (
+            "kems-118-yamamoto-1983.yaml",
+            ("yamamoto_1983_table6_comparison",),
+            EvidenceClass.QUOTED_UNATTRIBUTED,
+            7,
+        ),
+        (
+            "kems-190-wu-1993.yaml",
+            (
+                "wu_1993_table1_mgo_compiled_thermochemistry",
+                "wu_1993_table1_sio2_compiled_thermochemistry",
+            ),
+            EvidenceClass.COMPILATION_ASSESSED,
+            6,
+        ),
+    ],
+)
+def test_exploded_rows_keep_parent_evidence_outside_author_estimates(
+    tmp_path: Path,
+    filename: str,
+    observation_ids: tuple[str, ...],
+    expected_class: EvidenceClass,
+    expected_count: int,
+) -> None:
+    result = _migrate_real_extract(tmp_path / Path(filename).stem, filename)
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            f"::{observation_id}::" in observation.observation_id
+            for observation_id in observation_ids
+        )
+    ]
+
+    assert len(observations) == expected_count
+    assert {observation.evidence.class_.value for observation in observations} == {
+        expected_class
+    }
+
+    if filename == "busemann-2000-phase-q-noble-gases.yaml":
+        source_row = next(
+            row
+            for row in _extract_observations(filename)
+            if row.get("observation_id") == observation_ids[0]
+        )
+        expected_attribution = source_row["values"]["attribution"]
+        assert expected_attribution
+        assert {
+            observation.evidence.attribution for observation in observations
+        } == {expected_attribution}

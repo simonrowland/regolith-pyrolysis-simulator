@@ -221,13 +221,14 @@ points:
   observation_type: transition_point
   species: Al
   residual_unit: K
-  residual_K: -464.518421490156
+  residual_K: -4.573822804614792
   band_K: 0.05
   status: mismatch
-  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
-    ±0.05 K is numerical noise, not an accuracy tolerance.
+  note: REF-020 JANAF sidecar refit in 3e54afda8 replaces the old Stull fit; the 1 atm inverse moves
+    2328.482 -> 2788.426 K against the printed NIST 2793 K (residual -464.518 -> -4.574 K).
+    Regression band ±0.05 K is numerical noise, not an accuracy tolerance.
   temperature_K: 2793.0
-  residual: -464.518421490156
+  residual: -4.573822804614792
 - key: Ca_normal_boiling_point:Psat=1atm
   case_id: nist-webbook::Ca_normal_boiling_point
   source_id: nist-webbook
@@ -390,14 +391,15 @@ points:
   observation_type: transition_point
   species: Si
   residual_unit: K
-  residual_K: -944.4304423798353
+  residual_K: -0.6097951762786
   band_K: 0.05
-  status: mismatch
-  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
-    ±0.05 K is numerical noise, not an accuracy tolerance. Target pressure is JANAF 1 bar (extract pressure_basis),
+  status: match
+  note: REF-020 JANAF sidecar refit in 3e54afda8 replaces the old Stull fit; the 1 bar inverse moves
+    2560.186 -> 3504.006 K against the printed JANAF 3504.616 K (residual -944.430 -> -0.610 K).
+    Regression band ±0.05 K is numerical noise, not an accuracy tolerance. Target pressure is JANAF 1 bar,
     not 1 atm.
   temperature_K: 3504.616
-  residual: -944.4304423798353
+  residual: -0.6097951762786
 - key: Ti_normal_boiling_point:Psat=1atm
   case_id: janaf-4th::Ti_normal_boiling_point
   source_id: janaf-4th
@@ -453,25 +455,7 @@ points:
   status: mismatch
   note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
   temperature_K: 1673.0
-- key: zhang_2021_table4_K_evaporation_coefficients:T=1473.15
-  case_id: "kems-006-zhang-2021::zhang_2021_table4_K_evaporation_coefficients"
-  source_id: kems-006-zhang-2021
-  observation_type: alpha
-  species: K
-  residual_dex: 0.414973347970818
-  band_dex: 0.01
-  residual: 0.08
-  status: mismatch
-  note: Newly comparable Zhang 2021 Table 4 K evaporation coefficient at 1473.15 K. Residual reported, not tuned.
-  temperature_K: 1473.15
-- key: zhang_2021_table4_K_evaporation_coefficients:T=1673.15
-  case_id: "kems-006-zhang-2021::zhang_2021_table4_K_evaporation_coefficients"
-  source_id: kems-006-zhang-2021
-  observation_type: alpha
-  species: K
-  residual_dex: 0.0
-  band_dex: 0.01
-  residual: 0.0
-  status: match
-  note: Newly comparable Zhang 2021 Table 4 K evaporation coefficient at 1673.15 K. Residual reported, not tuned.
-  temperature_K: 1673.15
+# Offer19 review: Zhang Table 4 gives alpha-times-gamma evidence, not per-point
+# alpha; production evaluation typed-refuses it as
+# rate_series_without_alpha_and_no_motzfeldt_geometry. Removed stale pins:
+# 1473.15 K residual 0.414973347970818 and 1673.15 K residual 0.0.

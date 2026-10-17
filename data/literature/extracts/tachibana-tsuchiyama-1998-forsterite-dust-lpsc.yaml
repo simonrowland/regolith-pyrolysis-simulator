@@ -11,6 +11,10 @@ extraction:
   source_path: raw/tachibana-tsuchiyama-1998-forsterite-dust-lpsc/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.pdf
   note: This two-page abstract reports theoretical calculations and cites prior experiments; it contains no own apparatus or direct numeric measurement table.
 review_status: draft
+fidelity_samples:
+- path: species.forsterite.observations[tachibana_1998_forsterite_hbd_alpha_assumption].values.alpha
+  value: 0.1
+  locator: {page: 1, section: 'Evaporation rates', paragraph: 'In the HBD regime'}
 species:
   forsterite:
     observations:

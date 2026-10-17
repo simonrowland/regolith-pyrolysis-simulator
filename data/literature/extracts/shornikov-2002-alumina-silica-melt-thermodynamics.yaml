@@ -1,0 +1,1210 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+source:
+  citation: 'Shornikov, S. I., and Archakov, I. Yu. (2002), "A Mass Spectrometric Determination of the Enthalpies and Entropies of Al2O3–SiO2 Melts", Russian Journal of Physical Chemistry 76(7), 1054–1060 (translation of Zhurnal Fizicheskoi Khimii 76(7), 1179–1185).'
+  year: 2002
+  doi: null
+  corpus_asset: raw/shornikov-2002-alumina-silica-melt-thermodynamics/shornikov-2002-alumina-silica-melt-thermodynamics.pdf
+  corpus_sha256: f8361b2d7ed1615213375472ee816ea7382981fc9208aefb354cd32383dd674e
+extraction:
+  method: >-
+    Manual transcription of both tables after rendering and reading all seven
+    pages at 250 dpi. Every table cell and every quoted numeric or directional
+    claim was checked against its page image. The PDF text extraction is a lead;
+    the page images are authoritative. Figures 1–4 remain figure-only and were
+    not digitized.
+  date: '2026-10-05'
+  worker: codex-resume-35989-1791199028
+  provenance_path: text/shornikov-2002-alumina-silica-melt-thermodynamics/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+- path: species.SiO2.observations[shornikov_2002_t2_method_I_sio2_activity].values.points[0].activity
+  value: 0.96
+  locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+- path: species.Al2O3.observations[shornikov_2002_t2_method_IV_alumina_activity].values.points[0].activity
+  value: 0.37
+  locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+- path: species.Al6Si2O13.observations[shornikov_2002_t2_method_V_mullite_activity].values.points[1].activity
+  value: 0.86
+  locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+benches:
+- id: kems-apparatus-not-described
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state: {tag: value, value: Knudsen effusion mass spectrometry}
+    locator:
+      published_page: 1054
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract names the method; this article does not identify an instrument model.
+  cell_material_and_liner:
+    state: {tag: unknown, reason: not_published}
+    locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No cell or liner material is stated in this article.}
+  cell_materials: []
+  geometry:
+    orifice_diameter_m:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No orifice diameter is stated in this article.}
+    orifice_channel_length_m:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No orifice channel length is stated in this article.}
+  temperature_measurement:
+    sensor:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No temperature sensor is stated in this article.}
+  temperature_calibration:
+    method:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No temperature calibration method or uncertainty is stated in this article.}
+  ionization:
+    electron_energy_eV:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No ionization energy is stated in this article.}
+    cross_sections:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No ionization cross-sections are stated in this article.}
+    cross_section_source:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No source for ionization cross-sections is stated in this article.}
+    multiplier_correction:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No multiplier correction is stated in this article.}
+    isotope_correction:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No isotope correction is stated in this article.}
+  detector:
+    state: {tag: unknown, reason: not_published}
+    locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No detector model is stated in this article.}
+experiments:
+- experiment_id: alumina-silica-kems-thermodynamic-study
+  bench_id: kems-apparatus-not-described
+  method: knudsen_effusion
+  locator:
+    published_page: 1054
+    pdf_page_index: 0
+    section: Abstract
+    note: The abstract says the melt enthalpies and entropies were determined experimentally by Knudsen effusion mass spectrometry; individual apparatus runs are not separately described.
+  sample:
+    initial_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No charge compositions or preparation recipe are given in this article.}
+    characterization:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: Starting-material purity and post-run analysis are not reported in this article.}
+    pretreatment:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No sample synthesis or pretreatment procedure is given in this article.}
+  apparatus:
+    calibration:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No intensity-to-pressure calibration is stated; this article reports no partial-pressure table.}
+      reference_substance:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No pressure-calibration reference substance is stated in this article.}
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No run-specific orifice diameter is stated.}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: No run-specific orifice channel length is stated.}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Introduction, note: "The 1900–2500 K range in the introduction is the study range, not a run-specific setpoint."}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: Chamber background pressure is not reported.}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract, note: Sweep gas is not reported.}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+      locator: {published_page: 1054, pdf_page_index: 0, section: Abstract}
+species:
+  Al6Si2O13:
+    observations:
+    - observation_id: shornikov_2002_t2_method_I_mullite_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_liquid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method I, calculations from eutectic data [12], as stated in the footnote.
+        method_as_printed: I
+        component_formula: Al6Si2O13
+        points:
+        - T_K: 1857
+          activity: 0.055
+          activity_as_printed: '0.055'
+          x_e_Al2O3_mol_percent: 3.32
+          x_e_Al2O3_mol_percent_as_printed: '3.32'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.0332']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=3.32 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: SiO2–Al6Si2O13
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method I row 1; a(Al6Si2O13).}
+        - T_K: 2123
+          activity: 0.63
+          activity_as_printed: '0.63'
+          x_e_Al2O3_mol_percent: 68.91
+          x_e_Al2O3_mol_percent_as_printed: '68.91'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.6891']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=68.91 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: Al6Si2O13–Al2O3
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method I row 6; a(Al6Si2O13).}
+    - observation_id: shornikov_2002_t2_method_II_mullite_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_liquid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method II, calculations from eutectic data [2], as stated in the footnote.
+        method_as_printed: II
+        component_formula: Al6Si2O13
+        points:
+        - T_K: 1879
+          activity: 0.037
+          activity_as_printed: '0.037'
+          x_e_Al2O3_mol_percent: 5.45
+          x_e_Al2O3_mol_percent_as_printed: '5.45'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.0545']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: SiO2–Al6Si2O13
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method II row 2; a(Al6Si2O13).}
+        - T_K: 2160
+          activity: 0.83
+          activity_as_printed: '0.83'
+          x_e_Al2O3_mol_percent: 67.63
+          x_e_Al2O3_mol_percent_as_printed: '67.63'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.6763']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: Al6Si2O13–Al2O3
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method II row 7; a(Al6Si2O13).}
+    - observation_id: shornikov_2002_t2_method_V_mullite_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_liquid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method V, extrapolation of Al2O3–SiO2 melt component activities [3], as stated in the footnote.
+        method_as_printed: V
+        component_formula: Al6Si2O13
+        points:
+        - T_K: 1879
+          activity: 0.037
+          activity_as_printed: '0.037'
+          x_e_Al2O3_mol_percent: 5.45
+          x_e_Al2O3_mol_percent_as_printed: '5.45'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.0545']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: SiO2–Al6Si2O13
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method V row 5; a(Al6Si2O13).}
+        - T_K: 2160
+          activity: 0.86
+          activity_as_printed: '0.86'
+          x_e_Al2O3_mol_percent: 67.63
+          x_e_Al2O3_mol_percent_as_printed: '67.63'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.6763']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: Al6Si2O13–Al2O3
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method V row 10; a(Al6Si2O13).}
+    context:
+    - observation_id: shornikov_2002_equations_1_to_6
+      type: author_equations_context
+      locator: {published_page: 1054, pdf_page_index: 0, equations: '1–6'}
+      units: mathematical relations as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: printed_thermodynamic_relations
+        equations_as_printed:
+        - "(1) μ(i) = H(i) − T S(i)."
+        - "(2) μ(i) = RT ln a(i)."
+        - "(3) ln a(SiO2) = −∫ [2x(Al2O3)/(1+x(Al2O3))] d ln [I(Al)+/I(SiO)+]."
+        - "(4) ln a(Al2O3) = −∫ [x(SiO2)/(1−x(SiO2))] d ln a(SiO2)."
+        - "(5) H(i) = R [d ln a(i)/d(1/T)]."
+        - "(6) H(SiO2) = −R ∫_{x(Al2O3)=0}^{x(Al2O3)} x(Al2O3) d [d ln(a(Al2O3)/a(SiO2))/d(1/T)]."
+        note: "Equation (5) retains the positive R printed in the source. Equations (3) and (4) print no integration limits. H, S and μ denote the source's partial thermodynamic formation functions; no new numerical value is derived."
+    - observation_id: shornikov_2002_equations_7_to_11
+      type: author_equations_context
+      locator: {published_page: 1055, pdf_page_index: 1, equations: '7–11'}
+      units: mathematical relations as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: printed_thermodynamic_relations
+        equations_as_printed:
+        - "(7) H(SiO2) = −R ∫_{x(Al2O3)=0}^{x(Al2O3)} [x(Al2O3)/(1+x(Al2O3))] d [d ln((I(Al)+)^2 I(AlO)+ / ((I(SiO)+)^2 I(Al)+))/d(1/T)]."
+        - "(8) H(SiO2) = −2R ∫_{x(Al2O3)=0}^{x(Al2O3)} [x(Al2O3)/(1+x(Al2O3))] d [d ln(I(Al)+/I(SiO)+)/d(1/T)]."
+        - "(9) H(Al2O3) = −∫_{x(SiO2)=0}^{x(SiO2)} [x(SiO2)/(1−x(SiO2))] d H(SiO2)."
+        - "(10) fF = Σ x(i) f(i)."
+        - "(11) fF = x(SiO2) ∫ f(Al2O3) d [x(SiO2)/x(Al2O3)]."
+        definitions_as_printed: "F stands for the H, S, and G thermodynamic functions and f(i) is H(i), S(i), or μ(i), respectively. The leading f in fF represents the source's formation subscript. Equation (11) prints no integration limits; superscript + labels an ion-current species, and exponent 2 squares its current."
+    - observation_id: shornikov_2002_equations_13_and_14
+      type: author_equations_context
+      locator: {published_page: 1056, pdf_page_index: 2, equations: '13–14'}
+      units: mathematical relations as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: printed_fusion_relations
+        equations_as_printed:
+        - "(13) fusH(Al6Si2O13) = R T_e ln x_e T_fus/(T_e−T_fus)."
+        - "(14) fusH(i) = RT ln x(i) T_fus/(T−T_fus)."
+        note: "fusH represents the source's fusion subscript on H. Equation (12), fusH(i)/T_fus(i) ≈ 8.8 J/(g-at. K), is retained in the existing fusion-entropy context on this page."
+    - observation_id: shornikov_2002_equation_15
+      type: author_equations_context
+      locator: {published_page: 1058, pdf_page_index: 4, equation: '15'}
+      units: mathematical relation as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: printed_fusion_activity_relation
+        equation_as_printed: "(15) ln a_T(Al6Si2O13) = [fusH(Al6Si2O13)/(RT)] [(T−T_fus)/T_fus]."
+        note: "fusH represents the source's fusion subscript on H; T is the activity subscript. This relation ignores pressure corrections and the contribution of the heat-capacity difference, as stated immediately before it."
+    - observation_id: shornikov_2002_table1_row_1
+      type: thermodynamic_example
+      locator: {table: '1', published_page: 1058, pdf_page_index: 4, note: Table 1 row 1.}
+      units: kJ/mol compound and K
+      values:
+        quantity: fusion_enthalpy
+        method_class: quoted_attributed
+        method_as_printed: 'Estimated value'
+        T_fus_K: 2123
+        H_fus_kJ_per_mol: 85.7
+        T_fus_K_as_printed: '2123'
+        H_fus_kJ_per_mol_as_printed: '85.7'
+        attribution: 'Reference [4], as cited in Table 1.'
+
+    - observation_id: shornikov_2002_table1_row_2
+      type: thermodynamic_example
+      locator: {table: '1', published_page: 1058, pdf_page_index: 4, note: Table 1 row 2.}
+      units: kJ/mol compound and K
+      values:
+        quantity: fusion_enthalpy
+        method_class: quoted_attributed
+        method_as_printed: 'Recommended value'
+        T_fus_K: 2123
+        H_fus_kJ_per_mol: 37.7
+        T_fus_K_as_printed: '2123'
+        H_fus_kJ_per_mol_as_printed: '37.7'
+        attribution: 'Reference [5], as cited in Table 1.'
+
+    - observation_id: shornikov_2002_table1_row_3
+      type: thermodynamic_example
+      locator: {table: '1', published_page: 1058, pdf_page_index: 4, note: Table 1 row 3.}
+      units: kJ/mol compound and K
+      values:
+        quantity: fusion_enthalpy
+        method_class: quoted_attributed
+        method_as_printed: 'Calculations by general solubility equation (15) based on the data from [7]'
+        T_fus_K: 2101
+        H_fus_kJ_per_mol: 113
+        T_fus_K_as_printed: '2101 ± 10'
+        H_fus_kJ_per_mol_as_printed: '113'
+        attribution: 'Reference [6], calculation based on data from reference [7], as printed in Table 1.'
+        T_fus_uncertainty_K: 10
+
+    - observation_id: shornikov_2002_table1_row_4
+      type: thermodynamic_example
+      locator: {table: '1', published_page: 1058, pdf_page_index: 4, note: Table 1 row 4.}
+      units: kJ/mol compound and K
+      values:
+        quantity: fusion_enthalpy
+        method_class: quoted_attributed
+        method_as_printed: 'Calculations with the use of weighted mean enthalpies of fusion of the initial compounds'
+        T_fus_K: 2101
+        H_fus_kJ_per_mol: 66.9
+        T_fus_K_as_printed: '2101 ± 10'
+        H_fus_kJ_per_mol_as_printed: '66.9'
+        attribution: 'Reference [6], as cited in Table 1.'
+        T_fus_uncertainty_K: 10
+
+    - observation_id: shornikov_2002_table1_row_5
+      type: thermodynamic_example
+      locator: {table: '1', published_page: 1058, pdf_page_index: 4, note: Table 1 row 5.}
+      units: kJ/mol compound and K
+      values:
+        quantity: fusion_enthalpy
+        method_class: quoted_attributed
+        method_as_printed: 'Estimate based on the critical liquation binodal temperature'
+        T_fus_K: 2183
+        H_fus_kJ_per_mol: 170
+        T_fus_K_as_printed: '2183'
+        H_fus_kJ_per_mol_as_printed: '170'
+        attribution: 'Reference [8], as cited in Table 1.'
+
+    - observation_id: shornikov_2002_table1_row_6
+      type: thermodynamic_example
+      locator: {table: '1', published_page: 1058, pdf_page_index: 4, note: Table 1 row 6.}
+      units: kJ/mol compound and K
+      values:
+        quantity: fusion_enthalpy
+        method_class: quoted_attributed
+        method_as_printed: 'Recommended value'
+        T_fus_K: 2123
+        H_fus_kJ_per_mol: 22.6
+        T_fus_K_as_printed: '2123'
+        H_fus_kJ_per_mol_as_printed: '22.6'
+        attribution: 'Reference [9], as cited in Table 1.'
+
+    - observation_id: shornikov_2002_table1_row_7
+      type: thermodynamic_example
+      locator: {table: '1', published_page: 1058, pdf_page_index: 4, note: Table 1 row 7.}
+      units: kJ/mol compound and K
+      values:
+        quantity: fusion_enthalpy
+        method_class: quoted_attributed
+        method_as_printed: 'Estimated value'
+        T_fus_K: 2123
+        H_fus_kJ_per_mol: 12.7
+        T_fus_K_as_printed: '2123'
+        H_fus_kJ_per_mol_as_printed: '12.7'
+        attribution: 'Reference [10], as cited in Table 1.'
+
+    - observation_id: shornikov_2002_table1_row_8
+      type: thermodynamic_example
+      locator: {table: '1', published_page: 1058, pdf_page_index: 4, note: Table 1 row 8.}
+      units: kJ/mol compound and K
+      values:
+        quantity: fusion_enthalpy
+        method_class: quoted_attributed
+        method_as_printed: 'Estimated value'
+        T_fus_K: 2123
+        H_fus_kJ_per_mol: 64
+        T_fus_K_as_printed: '2123'
+        H_fus_kJ_per_mol_as_printed: '64.0'
+        attribution: 'Reference [11], as cited in Table 1.'
+
+    - observation_id: shornikov_2002_table1_row_9
+      type: thermodynamic_example
+      locator: {table: '1', published_page: 1058, pdf_page_index: 4, note: Table 1 row 9.}
+      units: kJ/mol compound and K
+      values:
+        quantity: fusion_enthalpy
+        method_class: author_estimate
+        method_as_printed: 'Knudsen effusion mass spectrometry'
+        T_fus_K: 2180
+        H_fus_kJ_per_mol: 74.8
+        T_fus_K_as_printed: '2180 ± 10'
+        H_fus_kJ_per_mol_as_printed: '74.8 ± 4.6'
+        T_fus_uncertainty_K: 10
+        H_fus_uncertainty_kJ_per_mol: 4.6
+        model: 'Fusion-enthalpy estimate combining this work’s KEMS thermodynamic results with solid-phase data [1].'
+      reason: 'source_internally_inconsistent: Table 1 prints ±4.6 kJ/mol; the conclusion prints ±4.8 kJ/mol.'
+
+    - observation_id: shornikov_2002_table1_row_10
+      type: thermodynamic_example
+      locator: {table: '1', published_page: 1058, pdf_page_index: 4, note: Table 1 row 10.}
+      units: kJ/mol compound and K
+      values:
+        quantity: fusion_enthalpy
+        method_class: author_estimate
+        method_as_printed: 'Calculations with the use of weighted mean enthalpies of fusion of the initial compounds'
+        T_fus_K: 2180
+        H_fus_kJ_per_mol: 74.7
+        T_fus_K_as_printed: '2180'
+        H_fus_kJ_per_mol_as_printed: '74.7 ± 15.5'
+        H_fus_uncertainty_kJ_per_mol: 15.5
+        model: 'Authors’ weighted-mean calculation from enthalpies of fusion of the initial compounds.'
+
+    - observation_id: shornikov_2002_table1_row_11
+      type: thermodynamic_example
+      locator: {table: '1', published_page: 1058, pdf_page_index: 4, note: Table 1 row 11.}
+      units: kJ/mol compound and K
+      values:
+        quantity: fusion_enthalpy
+        method_class: model_derived
+        method_as_printed: 'Calculations by Schröder equation (13)'
+        T_fus_K: 2180
+        H_fus_kJ_per_mol: 68.6
+        T_fus_K_as_printed: '2180'
+        H_fus_kJ_per_mol_as_printed: '68.6 ± 14.3'
+        H_fus_uncertainty_kJ_per_mol: 14.3
+        derivation: 'Schröder equation (13), using eutectic data; the prose attributes eutectic positions to reference [2].'
+        source_inputs: 'Eutectic positions from reference [2], as described on published page 1056.'
+
+    - observation_id: shornikov_2002_table1_row_12
+      type: thermodynamic_example
+      locator: {table: '1', published_page: 1058, pdf_page_index: 4, note: Table 1 row 12.}
+      units: kJ/mol compound and K
+      values:
+        quantity: fusion_enthalpy
+        method_class: model_derived
+        method_as_printed: 'Calculations by solubility equation (14) for ideal solutions based on the data from [12]'
+        T_fus_K: 2183
+        H_fus_kJ_per_mol: 59.9
+        T_fus_K_as_printed: '2183'
+        H_fus_kJ_per_mol_as_printed: '59.9'
+        derivation: 'Solubility equation (14) for ideal solutions, applied to eutectic data from reference [12].'
+    - observation_id: shornikov_2002_method_and_ion_current_relations
+      type: method
+      locator: {published_page: 1054, pdf_page_index: 0, section: Results, equations: '3–8', note: "Equations (7)–(8) and the AlO contribution discussion continue on p. 1055 / PDF index 1."}
+      units: as printed
+      values:
+        quantity: activity_and_partial_enthalpy_reduction
+        method_class: quoted_unattributed
+        note: >-
+          Silicon dioxide activity is obtained from the Gibbs–Duhem/Belton–Fruehan
+          integral using I(Al)+/I(SiO)+; aluminum oxide activity follows from the
+          Gibbs–Duhem equation. The partial enthalpy of SiO2 uses the temperature
+          dependence of that ion-current ratio. Equation (7) includes I(AlO)+;
+          the text says its I(AlO)+/I(Al)+ contribution is small and can be ignored.
+          No conversion of ion intensities to partial pressures is given here.
+    - observation_id: shornikov_2002_study_temperature_range
+      type: qualitative_claim
+      locator: {published_page: 1054, pdf_page_index: 0, section: Introduction}
+      units: K
+      values:
+        quantity: qualitative_claim
+        method_class: quoted_unattributed
+        quote: >-
+          Its goal was to obtain reliable information on the partial and integral
+          enthalpies [∆H(i) and ∆fH] and entropies [∆S(i) and ∆f S] of formation
+          of melts in the aluminosilicate system in the temperature range
+          1900–2500 K and establish a correspondence between the obtained
+          thermodynamic properties and the phase relations in the system.
+        T_low_K: 1900
+        T_high_K: 2500
+        T_range_as_printed: 1900–2500 K
+    - observation_id: shornikov_2002_intro_experimental_limitations
+      type: qualitative_claim
+      locator: {published_page: 1054, pdf_page_index: 0, section: Introduction}
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quote: >-
+          The absence of thermodynamic data on Al2O3–SiO2 melts [2, 3] and
+          contradictions in estimates of the enthalpy of fusion of mullite
+          Al6Si2O13 (Table 1) are explained by a complex of problems involved in
+          correctly designing experiments. These problems are caused by the
+          physicochemical properties of the system, which determine the necessity
+          of reaching temperatures close to 2300 K and above; the high viscosity
+          of melts, which complicates the synthesis of samples [13, 14];
+          substantial differences in system component volatilities, imposing the
+          requirement of a wide dynamic scope of the apparatus; the necessity of
+          taking into account chemical equilibrium shifts caused by high-temperature
+          interactions between melts and container materials [1, 2, 13]; and small
+          negative deviations from ideality, which manifest themselves by small
+          Gibbs energies of formation of solid phases comparable with the errors
+          of experimental methods [1, 15–17].
+    - observation_id: shornikov_2002_fig1_activity_comparisons
+      type: qualitative_claim
+      locator: {published_page: 1055, pdf_page_index: 1, section: Results, figure: '1'}
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quote: >-
+          Figure 1a shows that the concentration dependence of the activity of
+          mullite in Al2O3–SiO2 melts has a maximum at x(Al2O3) ≈ 60 mol %, which
+          is almost symmetrical with respect to the SiO2–Al6Si2O13 and
+          Al6Si2O13–Al2O3 systems (Fig. 1b). At similar concentrations close to
+          the stoichiometric mullite composition, the concentration dependences
+          of the activities of aluminum oxide and silicon dioxide intersect
+          [a(SiO2) ≈ a(Al2O3)] in aluminosilicate melts (Fig. 1a). The corresponding
+          dependences of a(SiO2) and a(Al2O3) intersect with that of a(Al6Si2O13)
+          in the SiO2–Al6Si2O13 and Al6Si2O13–Al2O3 systems at x(Al6Si2O13) ≈ 60
+          mol % (Fig. 1b). Of interest is also the symmetrical character of the
+          deviations from ideality of a(SiO2) in the SiO2–Al6Si2O13 system and
+          a(Al2O3) in the Al6Si2O13–Al2O3 system with respect to the deviations
+          in mullite, positive for a(SiO2) and negative for a(Al2O3), which are
+          ~2 times larger (Fig. 1b). The symmetrical character of the
+          thermodynamic properties in the subsystems under consideration and the
+          degree of deviations from ideality most clearly manifest themselves in
+          the concentration dependences of the activity coefficients of the
+          system components [γ(i)] shown in Fig. 1c.
+    - observation_id: shornikov_2002_fig1_figure_only
+      type: figure_only_curve
+      locator: {published_page: 1055, pdf_page_index: 1, figure: '1'}
+      units: figure only; no digitized values
+      values:
+        quantity: activities_and_activity_coefficients
+        method_class: figure_only
+        plotted_series_as_printed: Al2O3, SiO2, and Al6Si2O13
+        systems_as_printed: Al6Si2O13–Al2O3 and SiO2–Al6Si2O13
+        temperature_K: 2400
+        digitized: false
+    - observation_id: shornikov_2002_fig2_integral_partial_relationships
+      type: qualitative_claim
+      locator: {published_page: 1056, pdf_page_index: 2, section: Results, figure: '2'}
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quote: >-
+          Note that the partial enthalpies of Al2O3 and SiO2 calculated by (1)
+          and (2) coincide with those determined by the Belton–Fruehan method
+          [Eq. (8)] and by Gibbs–Duhem equation (9) within the errors of the
+          methods [16, 17], which do not exceed 6 kJ/mol in the concentration
+          range 10–90 mol % Al2O3 (Fig. 2b). Like a(Al6Si2O13), the integral
+          thermodynamic properties of aluminosilicate melts (∆fG, ∆fH, and ∆fS)
+          have extrema at concentrations close to the stoichiometric mullite
+          composition (Fig. 2). As required, the partial thermodynamic property
+          values [∆µ(i), ∆H(i), and ∆S(i)] coincide with the integral function
+          extrema (Fig. 2). The reliability of the integral thermodynamic values
+          found by (10) was substantiated in calculations by Duhem–Margules
+          equation (11). The deviations did not exceed 2.5 kJ/mol for ∆fG and
+          ∆fH and 1.5 J/(mol K) for ∆fS (Fig. 2).
+    - observation_id: shornikov_2002_fig2_figure_only
+      type: figure_only_curve
+      locator: {published_page: 1056, pdf_page_index: 2, figure: '2'}
+      units: figure only; no digitized values
+      values:
+        quantity: partial_and_integral_thermodynamic_properties
+        method_class: figure_only
+        plotted_series_as_printed: Al2O3 and SiO2 partial properties; aluminosilicate integral properties
+        temperature_K: 2400
+        digitized: false
+    - observation_id: shornikov_2002_mullite_fusion_entropy_comparisons
+      type: qualitative_claim
+      locator: {published_page: 1056, pdf_page_index: 2, section: Results and discussion}
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quote: >-
+          The earlier data on the enthalpy and entropy of mullite formation in
+          the solid state [1] can be used to determine the enthalpy of fusion of
+          Al6Si2O13, which equals 74.8 ± 4.6 kJ/mol (per mol of the compound).
+          The entropy of fusion [∆fusS = 34.3 ± 2.1 J/(mol K)] is substantially
+          larger than the value found by the Walden rule [19], which holds for a
+          fairly large number of compounds. The Walden rule is, however, obviously
+          inapplicable to quite a number of substances such as magnesium aluminate
+          (∆fusS(MgAl2O4) = 32.4 ± 5.0 J/(mol K) [20]), and substances melting at
+          lower temperatures, for instance, zinc pyrophosphate
+          (∆fusS(Zn2P2O7) = 26.3 ± 2.0 J/(mol K) [21]). Note that the entropy of
+          fusion of mullite (per g-at. of the compound) equals 8.17 ± 0.50
+          J/(g-at. K) and approximately obeys the well-known empirical rule
+          ∆fusH(i)/Tfus(i) ≈ 8.8 [J/(g-at. K)].
+    - observation_id: shornikov_2002_mullite_fusion_literature_comparison
+      type: qualitative_claim
+      locator: {published_page: 1056, pdf_page_index: 2, section: Results and discussion, table: '1'}
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quote: >-
+          As follows from Table 1, the values recommended in [4, 11] are closest
+          to the experimental enthalpy of fusion of mullite, which was determined
+          for the first time in this work. The values cited in the other works
+          [10] and handbooks [5, 9] are much lower. Risbud and Pask [6] obtained
+          a ∆fusH(Al6Si2O13) value almost two times larger based on the data on
+          the phase diagram of the Al2O3–SiO2 system [7] with incongruent mullite
+          fusion (recall that the results obtained in [7] were considered by us
+          in detail in [2] and criticized for several inconsistencies). The
+          authors of [6] obtained the critical temperature dependence of
+          metastable liquation on ∆fusH(Al6Si2O13) based on fairly rough
+          approximations. This dependence was used in [8] to determine the
+          enthalpy of fusion of mullite. Their estimate was still larger than
+          that suggested in [6] (Table 1).
+    - observation_id: shornikov_2002_schroder_estimates_caveat
+      type: qualitative_claim
+      locator: {published_page: 1056, pdf_page_index: 2, section: Results and discussion, equation: '13'}
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quote: >-
+          The coincidence of the experimental ∆fusH(Al6Si2O13) value with the
+          estimates based on the use of weighted mean entropies of fusion of the
+          initial substances [1, 25] and calculated by the Schröder equation
+          from the positions of the eutectic points (xe, Te) in the Al2O3–SiO2
+          system determined in [2] should be considered fortuitous to a great
+          extent because of the rough approximations used in the calculations
+          (Table 1).
+    - observation_id: shornikov_2002_fig3_liquidus_comparisons
+      type: qualitative_claim
+      locator: {published_page: 1057, pdf_page_index: 3, section: Results and discussion, figure: '3'}
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quote: >-
+          The ∆fusH(Al6Si2O13) value given in Table 1 is likely to be the maximum
+          among those obtained by (14) from eutectic composition data in the
+          region under consideration [7, 10, 26–32], which are shown in Fig. 3a.
+          Note that the uncertainty in the position of this eutectic composition
+          shown by the contour in Fig. 3a is large and amounts to 5 mol % for
+          concentration and 65 K for temperature. The uncertainty in the
+          position of the eutectic point in the Al6Si2O13–Al2O3 system amounts
+          to 2 mol % for concentration and 70 K for temperature (Fig. 3b). The
+          liquidus line calculated by (14) is identical to that reported in [12]
+          (Fig. 3a). Because of its approximate character, (14) cannot,
+          however, be used to satisfactorily (in agreement with [12]) construct
+          the liquidus line of the Al6Si2O13–Al2O3 system based on the calculated
+          ∆fusH(Al6Si2O13) value given in Table 1 and the ∆fusH(Al2O3) value
+          reported in [33]. If the data from [2] are used, we obtain a
+          correspondence between the line of mullite crystallization calculated
+          by (14) and the position of the eutectic point in the mullite–aluminum
+          oxide system. Nevertheless, the aluminum oxide crystallization line in
+          the Al6Si2O13–Al2O3 system cannot be calculated.
+    - observation_id: shornikov_2002_fig3_figure_only
+      type: figure_only_curve
+      locator: {published_page: 1057, pdf_page_index: 3, figure: '3'}
+      units: figure only; no digitized values
+      values:
+        quantity: liquidus_line_and_eutectic_points
+        method_class: figure_only
+        systems_as_printed: SiO2–Al6Si2O13 and Al6Si2O13–Al2O3
+        digitized: false
+    - observation_id: shornikov_2002_fig4_model_limits
+      type: qualitative_claim
+      locator: {published_page: 1057, pdf_page_index: 3, section: Results and discussion, figure: '4'}
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quote: >-
+          Figure 4 shows that there is an obvious dependence of ∆fusH(Al2O3)
+          estimated by (14) along the crystallization line on the concentration
+          of aluminum oxide [x*(Al2O3)] in the systems under consideration. At
+          x*(Al2O3) > 40 mol %, the calculated ∆fusH(Al2O3) values coincided
+          with the recommendations of [47] based on the data reported in [33]
+          within 50%. At lower x*(Al2O3) concentrations and for the
+          Al6Si2O13–Al2O3 system (see above), (14) is inapplicable, and deviations
+          may be several times larger than true values (Fig. 4). It is likely
+          that the observed discrepancies are caused by deviations from the
+          behavior of ideal solutions rather than errors in determining the
+          liquidus line, as has been suggested in [23]. In the Al2O3–SiO2
+          system, the error in estimating ∆fusH(Al2O3) might be caused by the
+          observed negative deviations from ideality, which clearly manifest
+          themselves in the concentration dependence of γ(Al2O3) in
+          Al6Si2O13–Al2O3 melts (Fig. 1c). Small positive deviations from
+          ideality in SiO2–Al6Si2O13 melts (Fig. 1c) allow the ∆fusH(SiO2) =
+          12.5 ± 6.0 kJ/mol value to be estimated from the crystallization line
+          of silicon dioxide [12] (Fig. 3a), which coincides with the
+          recommendations of [47] within acceptable deviations.
+    - observation_id: shornikov_2002_fig4_figure_only
+      type: figure_only_curve
+      locator: {published_page: 1057, pdf_page_index: 3, figure: '4'}
+      units: figure only; no digitized values
+      values:
+        quantity: alumina_fusion_enthalpy_comparisons
+        method_class: figure_only
+        digitized: false
+    - observation_id: shornikov_2002_t2_comparisons
+      type: qualitative_claim
+      locator: {published_page: 1058, pdf_page_index: 4, section: Results and discussion, table: '2'}
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quote: >-
+          Table 2 shows that the experimental aluminosilicate melt component
+          activities extrapolated to the eutectic compositions are close to
+          those calculated from the eutectic data on the SiO2–Al6Si2O13 and
+          Al6Si2O13–Al2O3 systems and to the values characterizing the solid
+          phases of the system [1, 48]. The results of calculations based on the
+          data from [12] somewhat differ from those obtained in this work, but
+          the discrepancies do not exceed 15% (Table 2) and appear to be
+          acceptable considering the approximations involved in the methods for
+          determining the required values and the procedures for extrapolation
+          to the region of lower temperatures.
+    - observation_id: shornikov_2002_summary_claims
+      type: qualitative_claim
+      locator: {published_page: 1058, pdf_page_index: 4, section: Conclusions, note: "Begins at the bottom of p. 1058 and continues on p. 1059 / PDF index 5."}
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quote: >-
+          To summarize, we for the first time determined the partial and
+          integral thermodynamic properties of Al2O3–SiO2 melts by Knudsen
+          effusion mass spectrometry. The obtained thermodynamic data on melts
+          in the aluminosilicate system are evidence of negative deviations
+          from ideality. The partial thermodynamic properties coincide with the
+          extrema of the integral thermodynamic properties of aluminosilicate
+          melts at concentrations close to the stoichiometric mullite
+          composition. The reliability of the obtained data is substantiated by
+          applying an additional independent approach based on the
+          Belton–Fruehan method and by Duhem–Margules equation calculations.
+    - observation_id: shornikov_2002_conclusion_fusion_enthalpy_discrepancy
+      type: qualitative_claim
+      locator: {published_page: 1059, pdf_page_index: 5, section: Conclusions}
+      units: kJ/mol compound
+      values:
+        method_class: quoted_unattributed
+        quote: >-
+          Combining the data obtained in this work with those on the solid
+          phases in the aluminosilicate system allowed us to estimate the
+          enthalpy of fusion of mullite Al6Si2O13, which was found to equal
+          74.8 ± 4.8 kJ/mol.
+        H_fus_kJ_per_mol: 74.8
+        H_fus_uncertainty_kJ_per_mol: 4.8
+    - observation_id: shornikov_2002_conclusion_comparisons
+      type: qualitative_claim
+      locator: {published_page: 1059, pdf_page_index: 5, section: Conclusions}
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quote: >-
+          This value is in satisfactory agreement with the results of
+          approximate calculations and the earlier estimates [4, 11]. A
+          consideration of the range of applicability of the variant of the
+          solubility equation for ideal solutions to aluminate systems
+          containing a simple eutectic composition showed that the accuracy of
+          calculations depended on the concentration of aluminum oxide in the
+          systems under consideration and on possible negative deviations from
+          the behavior of ideal solutions. The thermodynamic values obtained in
+          this work for solid and liquid phases in the Al2O3–SiO2 system were
+          shown to be consistent with the results of calculations based on the
+          data on eutectic compositions by the variant of the general solubility
+          equation that ignored corrections for pressure and contributions of
+          the difference of heat capacities.
+    - observation_id: shornikov_2002_standard_state_absence
+      type: method
+      locator: {published_page: 1054, pdf_page_index: 0, equation: '2', note: "See also equations (3)–(4) and Table 2 on p. 1058 / PDF index 4."}
+      units: as printed
+      values:
+        quantity: activity_reference_states
+        note: The article calls the functions activities and prints their calculation relations, but it does not identify pure-solid or pure-liquid oxide standard states for Al2O3, SiO2, or Al6Si2O13.
+
+    - observation_id: shornikov_2002_table2_unprinted_cells
+      type: method
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 blank cells}
+      units: as printed
+      values:
+        quantity: unprinted_table_cells
+        note: >-
+          Blank activity cells remain blank in the CSV and are typed unknown here;
+          no zero values are inferred. The two method III composition coordinates
+          without printed values are also identified below.
+        unprinted_cells:
+          - row: 1
+            method_as_printed: I
+            T_e_K: 1857
+            composition_x_e_Al2O3_mol_percent: {state: {tag: value, value: 3.32}}
+            eutectic_system_as_printed: SiO2–Al6Si2O13
+            column: a(Al2O3)
+            state: {tag: unknown, reason: not_published}
+            locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 row 1 blank activity cell}
+          - row: 2
+            method_as_printed: II
+            T_e_K: 1879
+            composition_x_e_Al2O3_mol_percent: {state: {tag: value, value: 5.45}}
+            eutectic_system_as_printed: SiO2–Al6Si2O13
+            column: a(Al2O3)
+            state: {tag: unknown, reason: not_published}
+            locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 row 2 blank activity cell}
+          - row: 3
+            method_as_printed: III
+            T_e_K: 1879
+            composition_x_e_Al2O3_mol_percent: {state: {tag: unknown, reason: not_published}}
+            eutectic_system_as_printed: SiO2–Al6Si2O13
+            column: a(Al6Si2O13)
+            state: {tag: unknown, reason: not_published}
+            locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 row 3 blank activity cell}
+          - row: 4
+            method_as_printed: IV
+            T_e_K: 1879
+            composition_x_e_Al2O3_mol_percent: {state: {tag: value, value: 5.45}}
+            eutectic_system_as_printed: SiO2–Al6Si2O13
+            column: a(Al6Si2O13)
+            state: {tag: unknown, reason: not_published}
+            locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 row 4 blank activity cell}
+          - row: 6
+            method_as_printed: I
+            T_e_K: 2123
+            composition_x_e_Al2O3_mol_percent: {state: {tag: value, value: 68.91}}
+            eutectic_system_as_printed: Al6Si2O13–Al2O3
+            column: a(SiO2)
+            state: {tag: unknown, reason: not_published}
+            locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 row 6 blank activity cell}
+          - row: 7
+            method_as_printed: II
+            T_e_K: 2160
+            composition_x_e_Al2O3_mol_percent: {state: {tag: value, value: 67.63}}
+            eutectic_system_as_printed: Al6Si2O13–Al2O3
+            column: a(SiO2)
+            state: {tag: unknown, reason: not_published}
+            locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 row 7 blank activity cell}
+          - row: 8
+            method_as_printed: III
+            T_e_K: 2160
+            composition_x_e_Al2O3_mol_percent: {state: {tag: unknown, reason: not_published}}
+            eutectic_system_as_printed: Al6Si2O13–Al2O3
+            column: a(Al6Si2O13)
+            state: {tag: unknown, reason: not_published}
+            locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 row 8 blank activity cell}
+          - row: 9
+            method_as_printed: IV
+            T_e_K: 2160
+            composition_x_e_Al2O3_mol_percent: {state: {tag: value, value: 67.63}}
+            eutectic_system_as_printed: Al6Si2O13–Al2O3
+            column: a(Al6Si2O13)
+            state: {tag: unknown, reason: not_published}
+            locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 row 9 blank activity cell}
+
+
+  Al2O3:
+    observations:
+    - observation_id: shornikov_2002_t2_method_I_alumina_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_liquid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method I, calculations from eutectic data [12], as stated in the footnote.
+        method_as_printed: I
+        component_formula: Al2O3
+        points:
+        - T_K: 2123
+          activity: 0.58
+          activity_as_printed: '0.58'
+          x_e_Al2O3_mol_percent: 68.91
+          x_e_Al2O3_mol_percent_as_printed: '68.91'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.6891']]}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=68.91 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: Al6Si2O13–Al2O3
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Method I row 6; a(Al2O3)."}
+    - observation_id: shornikov_2002_t2_method_II_alumina_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_liquid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method II, calculations from eutectic data [2], as stated in the footnote.
+        method_as_printed: II
+        component_formula: Al2O3
+        points:
+        - T_K: 2160
+          activity: 0.64
+          activity_as_printed: '0.64'
+          x_e_Al2O3_mol_percent: 67.63
+          x_e_Al2O3_mol_percent_as_printed: '67.63'
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.6763']]}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: Al6Si2O13–Al2O3
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Method II row 7; a(Al2O3)."}
+    - observation_id: shornikov_2002_t2_method_III_alumina_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_liquid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method III, calculations from the Gibbs energy of formation of Al6Si2O13 [48], as stated in the footnote.
+        method_as_printed: III
+        component_formula: Al2O3
+        points:
+        - T_K: 1879
+          activity: 0.34
+          activity_as_printed: '0.34'
+          eutectic_system_as_printed: SiO2–Al6Si2O13
+          x_e_Al2O3_mol_percent:
+            state: {tag: unknown, reason: not_published}
+            locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 method III row has no printed x_e value.}
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: not_published}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Table 2 method III has no printed x_e coordinate in eutectic system SiO2–Al6Si2O13."}
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method III row 3; a(Al2O3).}
+        - T_K: 2160
+          activity: 1.00
+          activity_as_printed: '1.00'
+          eutectic_system_as_printed: Al6Si2O13–Al2O3
+          x_e_Al2O3_mol_percent:
+            state: {tag: unknown, reason: not_published}
+            locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 method III row has no printed x_e value.}
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: not_published}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Table 2 method III has no printed x_e coordinate in eutectic system Al6Si2O13–Al2O3."}
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method III row 8; a(Al2O3).}
+    - observation_id: shornikov_2002_t2_method_IV_alumina_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_solid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method IV, mass-spectrometric determination of component activities in solid Al2O3–SiO2 system phases [1], as stated in the footnote.
+        method_as_printed: IV
+        component_formula: Al2O3
+        points:
+        - T_K: 1879
+          activity: 0.37
+          activity_as_printed: '0.37'
+          x_e_Al2O3_mol_percent: 5.45
+          x_e_Al2O3_mol_percent_as_printed: '5.45'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.0545']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: SiO2–Al6Si2O13
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method IV row 4; a(Al2O3).}
+        - T_K: 2160
+          activity: 1.00
+          activity_as_printed: '1.00'
+          x_e_Al2O3_mol_percent: 67.63
+          x_e_Al2O3_mol_percent_as_printed: '67.63'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.6763']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: Al6Si2O13–Al2O3
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method IV row 9; a(Al2O3).}
+    - observation_id: shornikov_2002_t2_method_V_alumina_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_liquid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method V, extrapolation of Al2O3–SiO2 melt component activities [3], as stated in the footnote.
+        method_as_printed: V
+        component_formula: Al2O3
+        points:
+        - T_K: 1879
+          activity: 0.36
+          activity_as_printed: '0.36'
+          x_e_Al2O3_mol_percent: 5.45
+          x_e_Al2O3_mol_percent_as_printed: '5.45'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.0545']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: SiO2–Al6Si2O13
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method V row 5; a(Al2O3).}
+        - T_K: 2160
+          activity: 0.95
+          activity_as_printed: '0.95'
+          x_e_Al2O3_mol_percent: 67.63
+          x_e_Al2O3_mol_percent_as_printed: '67.63'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.6763']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: Al6Si2O13–Al2O3
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method V row 10; a(Al2O3).}
+  SiO2:
+    observations:
+    - observation_id: shornikov_2002_t2_method_I_sio2_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_liquid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method I, calculations from eutectic data [12], as stated in the footnote.
+        method_as_printed: I
+        component_formula: SiO2
+        points:
+        - T_K: 1857
+          activity: 0.96
+          activity_as_printed: '0.96'
+          x_e_Al2O3_mol_percent: 3.32
+          x_e_Al2O3_mol_percent_as_printed: '3.32'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.0332']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=3.32 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: SiO2–Al6Si2O13
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method I row 1; a(SiO2).}
+    - observation_id: shornikov_2002_t2_method_II_sio2_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_liquid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method II, calculations from eutectic data [2], as stated in the footnote.
+        method_as_printed: II
+        component_formula: SiO2
+        points:
+        - T_K: 1879
+          activity: 0.97
+          activity_as_printed: '0.97'
+          x_e_Al2O3_mol_percent: 5.45
+          x_e_Al2O3_mol_percent_as_printed: '5.45'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.0545']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: SiO2–Al6Si2O13
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method II row 2; a(SiO2).}
+    - observation_id: shornikov_2002_t2_method_III_sio2_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_liquid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method III, calculations from the Gibbs energy of formation of Al6Si2O13 [48], as stated in the footnote.
+        method_as_printed: III
+        component_formula: SiO2
+        points:
+        - T_K: 1879
+          activity: 1.00
+          activity_as_printed: '1.00'
+          eutectic_system_as_printed: SiO2–Al6Si2O13
+          x_e_Al2O3_mol_percent:
+            state: {tag: unknown, reason: not_published}
+            locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 method III row has no printed x_e value.}
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: not_published}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Table 2 method III has no printed x_e coordinate in eutectic system SiO2–Al6Si2O13."}
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method III row 3; a(SiO2).}
+        - T_K: 2160
+          activity: 0.15
+          activity_as_printed: '0.15'
+          eutectic_system_as_printed: Al6Si2O13–Al2O3
+          x_e_Al2O3_mol_percent:
+            state: {tag: unknown, reason: not_published}
+            locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Table 2 method III row has no printed x_e value.}
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: not_published}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Table 2 method III has no printed x_e coordinate in eutectic system Al6Si2O13–Al2O3."}
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method III row 8; a(SiO2).}
+    - observation_id: shornikov_2002_t2_method_IV_sio2_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_solid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method IV, mass-spectrometric determination of component activities in solid Al2O3–SiO2 system phases [1], as stated in the footnote.
+        method_as_printed: IV
+        component_formula: SiO2
+        points:
+        - T_K: 1879
+          activity: 1.00
+          activity_as_printed: '1.00'
+          x_e_Al2O3_mol_percent: 5.45
+          x_e_Al2O3_mol_percent_as_printed: '5.45'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.0545']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: SiO2–Al6Si2O13
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method IV row 4; a(SiO2).}
+        - T_K: 2160
+          activity: 0.19
+          activity_as_printed: '0.19'
+          x_e_Al2O3_mol_percent: 67.63
+          x_e_Al2O3_mol_percent_as_printed: '67.63'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.6763']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: Al6Si2O13–Al2O3
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method IV row 9; a(SiO2).}
+    - observation_id: shornikov_2002_t2_method_V_sio2_activity
+      type: activity_coefficient
+      locator: {table: '2', published_page: 1058, pdf_page_index: 4}
+      phase: condensed_liquid
+      regime: tabulation
+      units: dimensionless activity as printed
+      standard_state:
+        state: {tag: unknown, reason: not_published}
+        locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: The table does not state activity standard states.}
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Table 2 method V, extrapolation of Al2O3–SiO2 melt component activities [3], as stated in the footnote.
+        method_as_printed: V
+        component_formula: SiO2
+        points:
+        - T_K: 1879
+          activity: 0.98
+          activity_as_printed: '0.98'
+          x_e_Al2O3_mol_percent: 5.45
+          x_e_Al2O3_mol_percent_as_printed: '5.45'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.0545']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: SiO2–Al6Si2O13
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method V row 5; a(SiO2).}
+        - T_K: 2160
+          activity: 0.20
+          activity_as_printed: '0.20'
+          x_e_Al2O3_mol_percent: 67.63
+          x_e_Al2O3_mol_percent_as_printed: '67.63'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_e_Al2O3_mol_percent_axis, amount_basis: mole_fraction, components: [[Al2O3, '0.6763']]}}
+              locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: "Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred."}
+          eutectic_system_as_printed: Al6Si2O13–Al2O3
+          locator: {table: '2', published_page: 1058, pdf_page_index: 4, note: Method V row 10; a(SiO2).}
+notes:
+- AMENDMENTS PROPOSED:
+  - The current extract observation vocabulary has no fusion-enthalpy quantity with fusion temperature and uncertainty. Table 1 values and the conclusion estimate are retained as located context rather than assigned an invented scored type.

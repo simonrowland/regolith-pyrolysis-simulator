@@ -1,0 +1,752 @@
+schema_version: literature_extract.v1
+source_id: shilov-1998-sno-zno-p2o5-vaporization
+source:
+  citation: >-
+    Shilov, A. L., Shornikov, S. I., Archakov, I. Yu., Ivanov, G. G., Stolyarova, V. L.,
+    and Shultz, M. M. (1998), "A Mass Spectrometric Study of the Vaporization and
+    Thermodynamic Properties of Melts in the SnO–ZnO–P2O5 System", Glass Physics and
+    Chemistry 24(5), 400–405 (English translation).
+  year: 1998
+  corpus_asset: raw/shilov-1998-sno-zno-p2o5-vaporization/shilov-1998-sno-zno-p2o5-vaporization.pdf
+  corpus_sha256: f5ae5493b9f41a8819b0f520b4eb0a5ce8f9e382451c3511033ac967b1f99c5c
+extraction:
+  method: >-
+    Manually transcribed from 400 dpi renders of the six-page corpus PDF; pdftotext -layout
+    was used to locate material, not as the source for numeric cells. Tables 1–5 transcribed
+    in full: Table 1 has 10 observed-ion rows, Table 2 has 8 vapor-species rows, Table 3 has
+    7 system rows, Table 4 has 4 composition rows, and Table 5 has 6 composition rows (35
+    printed rows total). Five rows were checked digit-by-digit against the page renders:
+    Table 1 47(PO)+ and 183(SnPO2)+; Table 2 (PO); Table 4 xSnO=40.0; Table 5 xSnO=40.0.
+    Dashes are recorded separately from numeric zeroes. Table 1 literature comparison
+    columns and Table 2 literature data columns are transcribed as printed and attributed
+    to their cited sources.
+  date: '2026-10-09'
+  worker: cshilov-x1
+review_status: draft
+fidelity_samples:
+  - path: species.PO.observations[shilov_1998_table1_PO_relative_ion_current].values.points[0].relative_ion_intensity
+    value: 1.54
+    locator: {table: '1', published_page: 401, pdf_page_index: 1, note: '47(PO)+ row, first spectrum column'}
+  - path: species.SnPO2.observations[shilov_1998_table1_SnPO2_relative_ion_current].values.points[0].relative_ion_intensity
+    value: 0.002
+    locator: {table: '1', published_page: 401, pdf_page_index: 1, note: '183(SnPO2)+ row, second spectrum column'}
+  - path: species.PO.observations[shilov_1998_table2_PO_partial_pressures].values.points[1].p_atm
+    value: 1.51e-7
+    locator: {table: '2', published_page: 402, pdf_page_index: 2, note: '(PO), xSnO=40.0 mol %'}
+  - path: species.O.observations[shilov_1998_table4_atomic_oxygen_partial_pressures].values.points[0].pO_from_eq4_times_1e15_atm
+    value: 5.79
+    locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'xSnO=40.0 mol %, equation (4) column'}
+  - path: species.SnO.observations[shilov_1998_table5_SnO_activities].values.points[0].activity
+    value: 1.42e-4
+    locator: {table: '5', published_page: 403, pdf_page_index: 3, note: 'xSnO=40.0 mol %, reaction (16)'}
+species:
+  PO:
+    observations:
+      - observation_id: shilov_1998_table1_PO_relative_ion_current
+        type: gas_speciation
+        locator: {table: '1', published_page: 401, pdf_page_index: 1}
+        standard_state: Relative positive-ion current, normalized only where Table 1 footnotes state a reference ion.
+        regime: kems_effusion
+        units: relative ion-current intensity as printed
+        values:
+          non_quantity_token: relative_ion_current_spectrum
+          ion_as_printed: 47(PO)+
+          nominal_m_z: 47
+          table_row_count: 10
+          points:
+            - {spectrum_id: zn2p2o7_ref4, relative_ion_intensity: 1.54, relative_ion_intensity_as_printed: '1.54'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_star, relative_ion_intensity: 6.25, relative_ion_intensity_as_printed: '6.25'}
+            - {spectrum_id: sn2p2o7_ref7, relative_ion_intensity: 60.8, relative_ion_intensity_as_printed: '60.8'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_double_star, relative_ion_intensity: 86.3, relative_ion_intensity_as_printed: '86.3'}
+      - observation_id: shilov_1998_table2_PO_partial_pressures
+        type: partial_pressure
+        locator: {table: '2', published_page: 402, pdf_page_index: 2}
+        T_range_K: [1300.0, 1300.0]
+        phase: vapor_over_pyrophosphate_melts
+        standard_state: Gas-phase partial pressure of (PO); no separate pressure reference state is specified.
+        regime: kems_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species_as_printed: (PO)
+          points:
+            - {xSnO_mol_pct: 0.0, p_atm: 6.11e-6, p_atm_as_printed: '6.11 × 10−6', source_as_printed: 'Data taken from [4]', method_class: quoted_attributed}
+            - {xSnO_mol_pct: 40.0, p_atm: 1.51e-7, p_atm_as_printed: '1.51 × 10−7', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 46.7, p_atm: 1.77e-7, p_atm_as_printed: '1.77 × 10−7', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 53.3, p_atm: 2.24e-7, p_atm_as_printed: '2.24 × 10−7', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 60.0, p_atm: 4.07e-7, p_atm_as_printed: '4.07 × 10−7', source_as_printed: This work, method_class: measured_tabulated}
+          printed_dash_xSnO_mol_pct: [66.7]
+  P2:
+    observations:
+      - observation_id: shilov_1998_table1_P2_relative_ion_current
+        type: gas_speciation
+        locator: {table: '1', published_page: 401, pdf_page_index: 1}
+        standard_state: Relative positive-ion current, normalized only where Table 1 footnotes state a reference ion.
+        regime: kems_effusion
+        units: relative ion-current intensity as printed
+        values:
+          non_quantity_token: relative_ion_current_spectrum
+          ion_as_printed: 62(P2)+
+          nominal_m_z: 62
+          points:
+            - {spectrum_id: zn2p2o7_ref4, relative_ion_intensity: 2.31, relative_ion_intensity_as_printed: '2.31'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_star, relative_ion_intensity: 1.87, relative_ion_intensity_as_printed: '1.87'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_double_star, relative_ion_intensity: 25.8, relative_ion_intensity_as_printed: '25.8'}
+          printed_dash_spectrum_ids: [sn2p2o7_ref7]
+      - observation_id: shilov_1998_table2_P2_partial_pressures
+        type: partial_pressure
+        locator: {table: '2', published_page: 402, pdf_page_index: 2}
+        T_range_K: [1300.0, 1300.0]
+        phase: vapor_over_pyrophosphate_melts
+        standard_state: Gas-phase partial pressure of (P2); no separate pressure reference state is specified.
+        regime: kems_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species_as_printed: (P2)
+          points:
+            - {xSnO_mol_pct: 0.0, p_atm: 5.87e-6, p_atm_as_printed: '5.87 × 10−6', source_as_printed: 'Data taken from [4]', method_class: quoted_attributed}
+            - {xSnO_mol_pct: 40.0, p_atm: 2.12e-8, p_atm_as_printed: '2.12 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 46.7, p_atm: 3.18e-8, p_atm_as_printed: '3.18 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 53.3, p_atm: 4.23e-8, p_atm_as_printed: '4.23 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 60.0, p_atm: 1.13e-7, p_atm_as_printed: '1.13 × 10−7', source_as_printed: This work, method_class: measured_tabulated}
+          printed_dash_xSnO_mol_pct: [66.7]
+  PO2:
+    observations:
+      - observation_id: shilov_1998_table1_PO2_relative_ion_current
+        type: gas_speciation
+        locator: {table: '1', published_page: 401, pdf_page_index: 1}
+        standard_state: Relative positive-ion current, normalized only where Table 1 footnotes state a reference ion.
+        regime: kems_effusion
+        units: relative ion-current intensity as printed
+        values:
+          non_quantity_token: relative_ion_current_spectrum
+          ion_as_printed: 63(PO2)+
+          nominal_m_z: 63
+          points:
+            - {spectrum_id: zn2p2o7_ref4, relative_ion_intensity: 0.049, relative_ion_intensity_as_printed: '0.049'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_star, relative_ion_intensity: 1.13, relative_ion_intensity_as_printed: '1.13'}
+            - {spectrum_id: sn2p2o7_ref7, relative_ion_intensity: 135.1, relative_ion_intensity_as_printed: '135.1'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_double_star, relative_ion_intensity: 15.5, relative_ion_intensity_as_printed: '15.5'}
+      - observation_id: shilov_1998_table2_PO2_partial_pressures
+        type: partial_pressure
+        locator: {table: '2', published_page: 402, pdf_page_index: 2}
+        T_range_K: [1300.0, 1300.0]
+        phase: vapor_over_pyrophosphate_melts
+        standard_state: Gas-phase partial pressure of (PO2); no separate pressure reference state is specified.
+        regime: kems_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species_as_printed: (PO2)
+          points:
+            - {xSnO_mol_pct: 0.0, p_atm: 1.58e-7, p_atm_as_printed: '1.58 × 10−7', source_as_printed: 'Data taken from [4]', method_class: quoted_attributed}
+            - {xSnO_mol_pct: 40.0, p_atm: 1.07e-8, p_atm_as_printed: '1.07 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 46.7, p_atm: 8.90e-9, p_atm_as_printed: '8.90 × 10−9', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 53.3, p_atm: 1.18e-8, p_atm_as_printed: '1.18 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 60.0, p_atm: 2.40e-8, p_atm_as_printed: '2.40 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 66.7, p_atm: 3.47e-8, p_atm_as_printed: '3.47 × 10−8', source_as_printed: 'Data taken from [7]', method_class: quoted_attributed}
+  Zn:
+    observations:
+      - observation_id: shilov_1998_table1_Zn_relative_ion_current
+        type: gas_speciation
+        locator: {table: '1', published_page: 401, pdf_page_index: 1}
+        standard_state: Relative positive-ion current, normalized only where Table 1 footnotes state a reference ion.
+        regime: kems_effusion
+        units: relative ion-current intensity as printed
+        values:
+          non_quantity_token: relative_ion_current_spectrum
+          ion_as_printed: 64(Zn)+
+          nominal_m_z: 64
+          points:
+            - {spectrum_id: zn2p2o7_ref4, relative_ion_intensity: 100.0, relative_ion_intensity_as_printed: '100.0'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_star, relative_ion_intensity: 100.0, relative_ion_intensity_as_printed: '100.0'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_double_star, relative_ion_intensity: 1380.0, relative_ion_intensity_as_printed: '1380'}
+          printed_dash_spectrum_ids: [sn2p2o7_ref7]
+      - observation_id: shilov_1998_table2_Zn_partial_pressures
+        type: partial_pressure
+        locator: {table: '2', published_page: 402, pdf_page_index: 2}
+        T_range_K: [1300.0, 1300.0]
+        phase: vapor_over_pyrophosphate_melts
+        standard_state: Gas-phase partial pressure of (Zn); no separate pressure reference state is specified.
+        regime: kems_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species_as_printed: (Zn)
+          points:
+            - {xSnO_mol_pct: 0.0, p_atm: 1.00e-3, p_atm_as_printed: '1.00 × 10−3', source_as_printed: 'Data taken from [4]', method_class: quoted_attributed}
+            - {xSnO_mol_pct: 40.0, p_atm: 3.28e-6, p_atm_as_printed: '3.28 × 10−6', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 46.7, p_atm: 2.27e-6, p_atm_as_printed: '2.27 × 10−6', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 53.3, p_atm: 1.30e-6, p_atm_as_printed: '1.30 × 10−6', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 60.0, p_atm: 1.03e-6, p_atm_as_printed: '1.03 × 10−6', source_as_printed: This work, method_class: measured_tabulated}
+          printed_dash_xSnO_mol_pct: [66.7]
+  Sn:
+    observations:
+      - observation_id: shilov_1998_table1_Sn_relative_ion_current
+        type: gas_speciation
+        locator: {table: '1', published_page: 401, pdf_page_index: 1}
+        standard_state: Relative positive-ion current, normalized only where Table 1 footnotes state a reference ion.
+        regime: kems_effusion
+        units: relative ion-current intensity as printed
+        values:
+          non_quantity_token: relative_ion_current_spectrum
+          ion_as_printed: 120(Sn)+
+          nominal_m_z: 120
+          points:
+            - {spectrum_id: mixed_pyrophosphate_this_work_star, relative_ion_intensity: 12.0, relative_ion_intensity_as_printed: '12.0'}
+            - {spectrum_id: sn2p2o7_ref7, relative_ion_intensity: 13.5, relative_ion_intensity_as_printed: '13.5'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_double_star, relative_ion_intensity: 165.6, relative_ion_intensity_as_printed: '165.6'}
+          printed_dash_spectrum_ids: [zn2p2o7_ref4]
+      - observation_id: shilov_1998_table2_Sn_partial_pressures
+        type: partial_pressure
+        locator: {table: '2', published_page: 402, pdf_page_index: 2}
+        T_range_K: [1300.0, 1300.0]
+        phase: vapor_over_pyrophosphate_melts
+        standard_state: Gas-phase partial pressure of (Sn); no separate pressure reference state is specified.
+        regime: kems_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species_as_printed: (Sn)
+          points:
+            - {xSnO_mol_pct: 40.0, p_atm: 2.98e-9, p_atm_as_printed: '2.98 × 10−9', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 46.7, p_atm: 3.20e-9, p_atm_as_printed: '3.20 × 10−9', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 53.3, p_atm: 4.88e-9, p_atm_as_printed: '4.88 × 10−9', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 60.0, p_atm: 6.08e-9, p_atm_as_printed: '6.08 × 10−9', source_as_printed: This work, method_class: measured_tabulated}
+          printed_dash_xSnO_mol_pct: [0.0, 66.7]
+  SnO:
+    observations:
+      - observation_id: shilov_1998_table1_SnO_relative_ion_current
+        type: gas_speciation
+        locator: {table: '1', published_page: 401, pdf_page_index: 1}
+        standard_state: Relative positive-ion current, normalized only where Table 1 footnotes state a reference ion.
+        regime: kems_effusion
+        units: relative ion-current intensity as printed
+        values:
+          non_quantity_token: relative_ion_current_spectrum
+          ion_as_printed: 136(SnO)+
+          nominal_m_z: 136
+          points:
+            - {spectrum_id: mixed_pyrophosphate_this_work_star, relative_ion_intensity: 7.25, relative_ion_intensity_as_printed: '7.25'}
+            - {spectrum_id: sn2p2o7_ref7, relative_ion_intensity: 100.0, relative_ion_intensity_as_printed: '100.0'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_double_star, relative_ion_intensity: 100.0, relative_ion_intensity_as_printed: '100.0'}
+          printed_dash_spectrum_ids: [zn2p2o7_ref4]
+      - observation_id: shilov_1998_table2_SnO_partial_pressures
+        type: partial_pressure
+        locator: {table: '2', published_page: 402, pdf_page_index: 2}
+        T_range_K: [1300.0, 1300.0]
+        phase: vapor_over_pyrophosphate_melts
+        standard_state: Gas-phase partial pressure of (SnO); no separate pressure reference state is specified.
+        regime: kems_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species_as_printed: (SnO)
+          points:
+            - {xSnO_mol_pct: 40.0, p_atm: 3.93e-8, p_atm_as_printed: '3.93 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 46.7, p_atm: 6.08e-8, p_atm_as_printed: '6.08 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 53.3, p_atm: 7.12e-8, p_atm_as_printed: '7.12 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 60.0, p_atm: 7.60e-8, p_atm_as_printed: '7.60 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 66.7, p_atm: 7.43e-8, p_atm_as_printed: '7.43 × 10−8', source_as_printed: 'Data taken from [7]', method_class: quoted_attributed}
+          printed_dash_xSnO_mol_pct: [0.0]
+      - observation_id: shilov_1998_table5_SnO_activities
+        type: activity_coefficient
+        locator: {table: '5', published_page: 403, pdf_page_index: 3}
+        T_range_K: [1300.0, 1300.0]
+        phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
+        standard_state: >-
+          A separate activity reference state is not explicitly stated; the activity is
+          calculated according to equilibrium (16), using its constant from [10].
+        regime: kems_effusion
+        units: dimensionless activity as printed
+        values:
+          quantity: oxide_activity
+          component_as_printed: SnO
+          table_row_count: 6
+          points:
+            - {xSnO_mol_pct: 40.0, activity: 1.42e-4, activity_as_printed: '1.42 × 10−4', source_as_printed: This work, method_class: model_derived}
+            - {xSnO_mol_pct: 46.7, activity: 2.39e-4, activity_as_printed: '2.39 × 10−4', source_as_printed: This work, method_class: model_derived}
+            - {xSnO_mol_pct: 53.3, activity: 2.64e-4, activity_as_printed: '2.64 × 10−4', source_as_printed: This work, method_class: model_derived}
+            - {xSnO_mol_pct: 60.0, activity: 2.69e-4, activity_as_printed: '2.69 × 10−4', source_as_printed: This work, method_class: model_derived}
+            - {xSnO_mol_pct: 66.7, activity: 3.46e-4, activity_as_printed: '3.46 × 10−4', source_as_printed: '[7]', method_class: quoted_attributed}
+          printed_dash_xSnO_mol_pct: [0.0]
+    context:
+      - observation_id: shilov_1998_experimental_method_cell_and_samples
+        type: apparatus_method
+        locator: {published_page: 400, pdf_page_index: 0, section: Experimental}
+        units: as printed; K, mol %, and area ratio
+        values:
+          method_as_printed: Knudsen effusion high-temperature mass-spectrometric technique
+          instrument: MI-1201 mass spectrometer modified for high-temperature investigations
+          effusion_cell_material: platinum
+          evaporation_to_effusion_orifice_area_ratio_as_printed: more than 300
+          sample_series_as_printed:
+            - 40.0 mol % SnO at a constant content of 33.3 mol % P2O5
+            - 46.7 mol % SnO at a constant content of 33.3 mol % P2O5
+            - 53.3 mol % SnO at a constant content of 33.3 mol % P2O5
+            - 60.0 mol % SnO at a constant content of 33.3 mol % P2O5
+          experimental_temperature_range_K: [900.0, 1850.0]
+          gas_and_condensed_phase_notation: Gas phases are designated by parentheses and condensed phases by square brackets.
+      - observation_id: shilov_1998_prior_phase_equilibria_and_binary_studies
+        type: thermodynamic_calculation
+        locator: {published_page: 400, pdf_page_index: 0, section: Introduction}
+        units: mol % and K as printed
+        values:
+          eutectic_composition: {Sn2P2O7_mol_pct: 73.0, temperature_K: 773.0}
+          congruent_melting_temperatures_K: [{compound: Zn2P2O7, value: 1287.0, uncertainty: 5.0}, {compound: Sn2P2O7, value: 883.0, uncertainty: 5.0}]
+          prior_ZnO_P2O5_study_temperature_ranges_K:
+            - {method: electromotive_force, range: [973.0, 1173.0], reference: '[3]'}
+            - {method: Knudsen_effusion_mass_spectrometry, range: [940.0, 1340.0], reference: '[4]'}
+      - observation_id: shilov_1998_table1_spectrum_conditions_and_normalization
+        type: calibration
+        locator: {table: '1', published_page: 401, pdf_page_index: 1}
+        units: eV, K, and cell material as printed
+        values:
+          table_row_count: 10
+          spectra:
+            - spectrum_id: zn2p2o7_ref4
+              method_class: quoted_attributed
+              system_as_printed: Zn2P2O7
+              source_as_printed: '[4]'
+              ionization_energy_eV: 20.0
+              ionization_energy_as_printed: '20.0'
+              cell_material: Mo
+              temperature_K: 1300
+              temperature_as_printed: '1300'
+            - spectrum_id: mixed_pyrophosphate_this_work_star
+              method_class: measured_tabulated
+              system_as_printed: Zn2P2O7–Sn2P2O7
+              source_as_printed: this work
+              ionization_energy_eV: 18.0
+              ionization_energy_as_printed: '18.0'
+              cell_material: Pt
+              temperature_K: 1450
+              temperature_as_printed: '1450'
+              normalization_as_printed: '* normalized to the intensity of the 64(Zn)+ ion current'
+            - spectrum_id: sn2p2o7_ref7
+              method_class: quoted_attributed
+              system_as_printed: Sn2P2O7
+              source_as_printed: '[7]'
+              ionization_energy_eV: 25.0
+              ionization_energy_as_printed: '25.0'
+              cell_material: Pt
+              temperature_range_K: [1350.0, 1470.0]
+              temperature_as_printed: 1350–1470
+            - spectrum_id: mixed_pyrophosphate_this_work_double_star
+              method_class: measured_tabulated
+              system_as_printed: Zn2P2O7–Sn2P2O7
+              source_as_printed: this work
+              ionization_energy_eV: 18.0
+              ionization_energy_as_printed: '18.0'
+              cell_material: Pt
+              temperature_K: 1450
+              temperature_as_printed: '1450'
+              normalization_as_printed: '** normalized to the intensity of the 136(SnO)+ ion current'
+          note: Table 1 does not print a sample xSnO assignment for the two this-work spectra.
+      - observation_id: shilov_1998_pressure_calibration
+        type: calibration
+        locator: {published_page: 401, pdf_page_index: 1, section: Results and Discussion}
+        units: as printed; pressure in atm
+        values:
+          pressure_determination_as_printed: >-
+            Partial pressures were determined by the complete evaporation technique and by
+            comparison of ion currents using atomic cross-sections calculated in reference [13].
+          reference_pressures_as_printed:
+            - silver vapor pressure over [Ag], reference [14]
+            - zinc vapor pressure over [ZnO], reference [8]
+          ionization_energy_as_printed: >-
+            Standard 70.0 ± 0.1 eV and low 18.0 ± 0.1 eV; the standard value was determined
+            using the chosen molecular ionization cross-sections.
+          reference_appearance_potentials_as_printed: Silver and zinc ion appearance potentials were used as reference potentials, as in [4].
+          low_ionization_energy_range_eV: [7.0, 15.0]
+          zinc_oxide_ion_detection: The (ZnO)+ ion current was below the mass spectrometer sensitivity, preventing confirmation of gaseous (ZnO).
+          unsuccessful_ion_detection_attempts: Special attempts to reveal (Sn2O)+, (P4O10)+, or (P2O5)+ ions were unsuccessful; (Sn2O)+ current is nevertheless reported in Table 1.
+          table1_relative_current_normalizations:
+            - '* mass spectrum normalized to 64(Zn)+ ion current'
+            - '** mass spectrum normalized to 136(SnO)+ ion current'
+      - observation_id: shilov_1998_table3_equilibrium_constants
+        type: thermodynamic_calculation
+        locator: {table: '3', published_page: 402, pdf_page_index: 2}
+        units: dimensionless equilibrium constants as printed at 1300 K
+        values:
+          quantity_context: gas_phase_equilibrium_constants_for_reactions_1_to_3
+          temperature_K: 1300
+          table_row_count: 7
+          reaction_labels_as_printed:
+            K1: '(PO) = 1/4(P2) + 1/2(PO2), equation (1)'
+            K2: '(SnPO2) = (SnO) + (PO), equation (2)'
+            K3: '(SnPO3) = (SnO) + (PO2), equation (3)'
+          rows:
+            - system_as_printed: P4O10
+              method_class: quoted_attributed
+              K1: 7.42
+              K1_as_printed: '7.42'
+              reference_as_printed: '[10]'
+              printed_blank_constants: [K2, K3]
+            - system_as_printed: Zn2P2O7
+              method_class: quoted_attributed
+              K1: 3.20
+              K1_as_printed: '3.20'
+              reference_as_printed: '[4]'
+              printed_blank_constants: [K2, K3]
+            - system_as_printed: Sn2P2O7
+              method_class: quoted_attributed
+              K2: 1.81e-5
+              K2_as_printed: '1.81 × 10−5'
+              K3: 6.57e-8
+              K3_as_printed: '6.57 × 10−8'
+              reference_as_printed: '[7]'
+              printed_dash_constants: [K1]
+            - system_as_printed: 0.40SnO · 0.27ZnO · 0.33P2O5
+              method_class: model_derived
+              K1: 8.30
+              K1_as_printed: '8.30'
+              K2: 2.06e-5
+              K2_as_printed: '2.06 × 10−5'
+              K3: 4.82e-8
+              K3_as_printed: '4.82 × 10−8'
+              reference_as_printed: This work
+            - system_as_printed: 0.47SnO · 0.20ZnO · 0.33P2O5
+              method_class: model_derived
+              K1: 7.12
+              K1_as_printed: '7.12'
+              K2: 2.11e-5
+              K2_as_printed: '2.11 × 10−5'
+              K3: 4.01e-8
+              K3_as_printed: '4.01 × 10−8'
+              reference_as_printed: This work
+            - system_as_printed: 0.53SnO · 0.14ZnO · 0.33P2O5
+              method_class: model_derived
+              K1: 6.96
+              K1_as_printed: '6.96'
+              K2: 1.89e-5
+              K2_as_printed: '1.89 × 10−5'
+              K3: 5.49e-8
+              K3_as_printed: '5.49 × 10−8'
+              reference_as_printed: This work
+            - system_as_printed: 0.60SnO · 0.07ZnO · 0.33P2O5
+              method_class: model_derived
+              K1: 6.98
+              K1_as_printed: '6.98'
+              K2: 2.45e-5
+              K2_as_printed: '2.45 × 10−5'
+              K3: 6.50e-8
+              K3_as_printed: '6.50 × 10−8'
+              reference_as_printed: This work
+      - observation_id: shilov_1998_equations_1_to_19_and_calculation_lineage
+        type: thermodynamic_calculation
+        locator: {published_page: 402, pdf_page_index: 2, equation: '1–19'}
+        units: equations as printed; partial pressures in atm and activities dimensionless
+        values:
+          equations_as_printed:
+            - '(1) (PO) = 1/4(P2) + 1/2(PO2)'
+            - '(2) (SnPO2) = (SnO) + (PO)'
+            - '(3) (SnPO3) = (SnO) + (PO2)'
+            - '(4) (PO2) = (PO) + (O)'
+            - '(5) (O2) = 2(O)'
+            - '(6) pO = K4 pPO2 / pPO'
+            - '(7) pO2 = pO^2 / K5'
+            - '(8) (PO) = 1/2(P2) + (O)'
+            - '(9) (PO2) = 1/2(P2) + 2(O)'
+            - '(10) (PO) + (PO2) = (P2) + 3(O)'
+            - '(11) (SnO) = (Sn) + (O)'
+            - '(12) [ZnO] = (Zn) + (O)'
+            - '(13) 1/2[P4O10] + (P2) = (PO2) + 3(PO)'
+            - '(14) 1/2[P4O10] + (PO) = 3(PO2)'
+            - '(15) 1/2[P4O10] = (PO) + (PO2) + 2(O)'
+            - '(16) [SnO] = (SnO)'
+            - '(17) aP2O5 = (pPO)^3 pPO2 / (pP2 K13)'
+            - '(18) aP2O5 = (pPO2)^3 / (pPO K14)'
+            - '(19) ln aP2O5 = ln a*P2O5 + 2 ln a*ZnO − 2 ln aZnO − 3 integral from 0 to xSnO of xSnO d ln(aZnO/aSnO)'
+          calculation_lineage:
+            table_3: Equilibrium constants for reactions (1)–(3); this-work rows use partial pressures from Table 2.
+            table_4: Atomic and molecular oxygen partial pressures computed from gas-phase equilibria; Ki values are taken from [10].
+            table_5:
+              - aZnO calculated using equilibrium (12), with its constant from [8].
+              - aSnO calculated using equilibrium (16), with its constant from [10].
+              - aP2O5 calculated from the measured (P2), (PO), and (PO2) pressures and constants for equilibria (13) and (14); the comparison column uses Gibbs–Duhem equation (19).
+      - observation_id: shilov_1998_vaporization_stages_and_tables3_4_agreement
+        type: thermodynamic_calculation
+        locator: {published_page: 403, pdf_page_index: 3}
+        units: K and percent error as printed
+        values:
+          vaporization_stages_K: {zinc_oxide_stage: [900.0, 1450.0], phosphorus_oxide_stage: [1400.0, 1850.0]}
+          table_3_agreement: This-work equilibrium constants agree with [7] within errors of no more than 20%.
+          table_4_agreement: Atomic oxygen pressures from equilibrium (4) coincide with values from other gas equilibria within errors that mainly do not exceed 20%.
+      - observation_id: shilov_1998_table5_gibbs_duhem_comparison
+        type: thermodynamic_calculation
+        locator: {published_page: 404, pdf_page_index: 4}
+        units: percent error as printed
+        values:
+          table_5_agreement: Activities from Table 5 agree with Gibbs–Duhem values within errors of no more than 20%.
+  SnPO2:
+    observations:
+      - observation_id: shilov_1998_table1_SnPO2_relative_ion_current
+        type: gas_speciation
+        locator: {table: '1', published_page: 401, pdf_page_index: 1}
+        standard_state: Relative positive-ion current, normalized only where Table 1 footnotes state a reference ion.
+        regime: kems_effusion
+        units: relative ion-current intensity as printed
+        values:
+          non_quantity_token: relative_ion_current_spectrum
+          ion_as_printed: 183(SnPO2)+
+          nominal_m_z: 183
+          points:
+            - {spectrum_id: mixed_pyrophosphate_this_work_star, relative_ion_intensity: 0.002, relative_ion_intensity_as_printed: '0.002'}
+            - {spectrum_id: sn2p2o7_ref7, relative_ion_intensity: 0.68, relative_ion_intensity_as_printed: '0.68'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_double_star, relative_ion_intensity: 0.023, relative_ion_intensity_as_printed: '0.023'}
+          printed_dash_spectrum_ids: [zn2p2o7_ref4]
+      - observation_id: shilov_1998_table2_SnPO2_partial_pressures
+        type: partial_pressure
+        locator: {table: '2', published_page: 402, pdf_page_index: 2}
+        T_range_K: [1300.0, 1300.0]
+        phase: vapor_over_pyrophosphate_melts
+        standard_state: Gas-phase partial pressure of (SnPO2); no separate pressure reference state is specified.
+        regime: kems_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species_as_printed: (SnPO2)
+          points:
+            - {xSnO_mol_pct: 40.0, p_atm: 2.88e-10, p_atm_as_printed: '2.88 × 10−10', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 46.7, p_atm: 5.10e-10, p_atm_as_printed: '5.10 × 10−10', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 53.3, p_atm: 8.46e-10, p_atm_as_printed: '8.46 × 10−10', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 60.0, p_atm: 1.26e-9, p_atm_as_printed: '1.26 × 10−9', source_as_printed: This work, method_class: measured_tabulated}
+          printed_dash_xSnO_mol_pct: [0.0, 66.7]
+  SnPO3:
+    observations:
+      - observation_id: shilov_1998_table1_SnPO3_relative_ion_current
+        type: gas_speciation
+        locator: {table: '1', published_page: 401, pdf_page_index: 1}
+        standard_state: Relative positive-ion current, normalized only where Table 1 footnotes state a reference ion.
+        regime: kems_effusion
+        units: relative ion-current intensity as printed
+        values:
+          non_quantity_token: relative_ion_current_spectrum
+          ion_as_printed: 199(SnPO3)+
+          nominal_m_z: 199
+          points:
+            - {spectrum_id: mixed_pyrophosphate_this_work_star, relative_ion_intensity: 0.75, relative_ion_intensity_as_printed: '0.75'}
+            - {spectrum_id: sn2p2o7_ref7, relative_ion_intensity: 43.2, relative_ion_intensity_as_printed: '43.2'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_double_star, relative_ion_intensity: 10.3, relative_ion_intensity_as_printed: '10.3'}
+          printed_dash_spectrum_ids: [zn2p2o7_ref4]
+      - observation_id: shilov_1998_table2_SnPO3_partial_pressures
+        type: partial_pressure
+        locator: {table: '2', published_page: 402, pdf_page_index: 2}
+        T_range_K: [1300.0, 1300.0]
+        phase: vapor_over_pyrophosphate_melts
+        standard_state: Gas-phase partial pressure of (SnPO3); no separate pressure reference state is specified.
+        regime: kems_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species_as_printed: (SnPO3)
+          points:
+            - {xSnO_mol_pct: 40.0, p_atm: 8.75e-9, p_atm_as_printed: '8.75 × 10−9', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 46.7, p_atm: 1.35e-8, p_atm_as_printed: '1.35 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 53.3, p_atm: 1.53e-8, p_atm_as_printed: '1.53 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 60.0, p_atm: 2.81e-8, p_atm_as_printed: '2.81 × 10−8', source_as_printed: This work, method_class: measured_tabulated}
+            - {xSnO_mol_pct: 66.7, p_atm: 3.93e-8, p_atm_as_printed: '3.93 × 10−8', source_as_printed: 'Data taken from [7]', method_class: quoted_attributed}
+          printed_dash_xSnO_mol_pct: [0.0]
+  Sn2O:
+    observations:
+      - observation_id: shilov_1998_table1_Sn2O_relative_ion_current
+        type: gas_speciation
+        locator: {table: '1', published_page: 401, pdf_page_index: 1}
+        standard_state: Relative positive-ion current, normalized only where Table 1 footnotes state a reference ion.
+        regime: kems_effusion
+        units: relative ion-current intensity as printed
+        values:
+          non_quantity_token: relative_ion_current_spectrum
+          ion_as_printed: 256(Sn2O)+
+          nominal_m_z: 256
+          points:
+            - {spectrum_id: mixed_pyrophosphate_this_work_star, relative_ion_intensity: 0.01, relative_ion_intensity_as_printed: '0.01'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_double_star, relative_ion_intensity: 0.13, relative_ion_intensity_as_printed: '0.13'}
+          printed_dash_spectrum_ids: [zn2p2o7_ref4, sn2p2o7_ref7]
+  Sn2O2:
+    observations:
+      - observation_id: shilov_1998_table1_Sn2O2_relative_ion_current
+        type: gas_speciation
+        locator: {table: '1', published_page: 401, pdf_page_index: 1}
+        standard_state: Relative positive-ion current, normalized only where Table 1 footnotes state a reference ion.
+        regime: kems_effusion
+        units: relative ion-current intensity as printed
+        values:
+          non_quantity_token: relative_ion_current_spectrum
+          ion_as_printed: 272(Sn2O2)+
+          nominal_m_z: 272
+          points:
+            - {spectrum_id: mixed_pyrophosphate_this_work_star, relative_ion_intensity: 0.25, relative_ion_intensity_as_printed: '0.25'}
+            - {spectrum_id: mixed_pyrophosphate_this_work_double_star, relative_ion_intensity: 3.44, relative_ion_intensity_as_printed: '3.44'}
+          printed_dash_spectrum_ids: [zn2p2o7_ref4, sn2p2o7_ref7]
+  O:
+    observations:
+      - observation_id: shilov_1998_table4_atomic_oxygen_partial_pressures
+        type: partial_pressure
+        locator: {table: '4', published_page: 402, pdf_page_index: 2}
+        T_range_K: [1300.0, 1300.0]
+        phase: vapor_over_pyrophosphate_melts
+        standard_state: Gas-phase atomic oxygen partial pressure; no separate pressure reference state is specified.
+        regime: kems_effusion
+        units: atm; printed pO values are multiplied by 10^15 in the table header
+        values:
+          quantity: partial_pressure
+          method_class: calculated
+          gas_species_as_printed: pO
+          table_row_count: 4
+          xSnO_basis: mol %
+          points:
+            - xSnO_mol_pct: 40.0
+              pO_from_eq4_times_1e15_atm: 5.79
+              pO_from_eq4_as_printed: '5.79'
+              pO_from_eq8_times_1e15_atm: 4.62
+              pO_from_eq8_as_printed: '4.62'
+              pO_from_eq9_times_1e15_atm: 5.17
+              pO_from_eq9_as_printed: '5.17'
+              pO_from_eq10_times_1e15_atm: 4.96
+              pO_from_eq10_as_printed: '4.96'
+              pO_from_eq11_times_1e15_atm: 3.24
+              pO_from_eq11_as_printed: '3.24'
+            - xSnO_mol_pct: 46.7
+              pO_from_eq4_times_1e15_atm: 4.09
+              pO_from_eq4_as_printed: '4.09'
+              pO_from_eq8_times_1e15_atm: 4.43
+              pO_from_eq8_as_printed: '4.43'
+              pO_from_eq9_times_1e15_atm: 4.26
+              pO_from_eq9_as_printed: '4.26'
+              pO_from_eq10_times_1e15_atm: 4.29
+              pO_from_eq10_as_printed: '4.29'
+              pO_from_eq11_times_1e15_atm: 4.65
+              pO_from_eq11_as_printed: '4.65'
+            - xSnO_mol_pct: 53.3
+              pO_from_eq4_times_1e15_atm: 4.28
+              pO_from_eq4_as_printed: '4.28'
+              pO_from_eq8_times_1e15_atm: 4.87
+              pO_from_eq8_as_printed: '4.87'
+              pO_from_eq9_times_1e15_atm: 4.57
+              pO_from_eq9_as_printed: '4.57'
+              pO_from_eq10_times_1e15_atm: 4.64
+              pO_from_eq10_as_printed: '4.64'
+              pO_from_eq11_times_1e15_atm: 3.58
+              pO_from_eq11_as_printed: '3.58'
+            - xSnO_mol_pct: 60.0
+              pO_from_eq4_times_1e15_atm: 4.80
+              pO_from_eq4_as_printed: '4.80'
+              pO_from_eq9_times_1e15_atm: 5.09
+              pO_from_eq9_as_printed: '5.09'
+              pO_from_eq10_times_1e15_atm: 5.17
+              pO_from_eq10_as_printed: '5.17'
+              pO_from_eq11_times_1e15_atm: 3.06
+              pO_from_eq11_as_printed: '3.06'
+              pO_from_eq8_times_1e15_atm: 5.41
+              pO_from_eq8_as_printed: '5.41'
+  O2:
+    observations:
+      - observation_id: shilov_1998_table4_molecular_oxygen_partial_pressures
+        type: partial_pressure
+        locator: {table: '4', published_page: 402, pdf_page_index: 2}
+        T_range_K: [1300.0, 1300.0]
+        phase: vapor_over_pyrophosphate_melts
+        standard_state: Gas-phase molecular oxygen partial pressure; no separate pressure reference state is specified.
+        regime: kems_effusion
+        units: atm; printed pO2 values are multiplied by 10^16 in the table header
+        values:
+          quantity: partial_pressure
+          method_class: calculated
+          gas_species_as_printed: pO2
+          points:
+            - {xSnO_mol_pct: 40.0, pO2_times_1e16_atm: 8.68, pO2_as_printed: '8.68'}
+            - {xSnO_mol_pct: 46.7, pO2_times_1e16_atm: 6.00, pO2_as_printed: '6.00'}
+            - {xSnO_mol_pct: 53.3, pO2_times_1e16_atm: 6.94, pO2_as_printed: '6.94'}
+            - {xSnO_mol_pct: 60.0, pO2_times_1e16_atm: 8.63, pO2_as_printed: '8.63'}
+  P2O5:
+    observations:
+      - observation_id: shilov_1998_table5_P2O5_activities
+        type: activity_coefficient
+        locator: {table: '5', published_page: 403, pdf_page_index: 3}
+        T_range_K: [1300.0, 1300.0]
+        phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
+        standard_state: >-
+          A separate activity reference state is not explicitly stated; the activities are
+          calculated from equilibria (13) and (14), with a comparison from Gibbs–Duhem
+          equation (19).
+        regime: kems_effusion
+        units: dimensionless activity as printed
+        values:
+          quantity: oxide_activity
+          component_as_printed: P2O5
+          table_row_count: 6
+          points:
+            - xSnO_mol_pct: 0.0
+              method_class: quoted_attributed
+              activity_from_eq13_eq14: 2.61e-4
+              activity_from_eq13_eq14_as_printed: '2.61 × 10−4'
+              printed_dash_columns: [gibbs_duhem_eq19]
+              source_as_printed: '[4]'
+            - xSnO_mol_pct: 40.0
+              method_class: model_derived
+              activity_from_eq13_eq14: 5.20e-8
+              activity_from_eq13_eq14_as_printed: '5.20 × 10−8'
+              activity_from_gibbs_duhem_eq19: 4.67e-8
+              activity_from_gibbs_duhem_eq19_as_printed: '4.67 × 10−8'
+              source_as_printed: This work
+            - xSnO_mol_pct: 46.7
+              method_class: model_derived
+              activity_from_eq13_eq14: 4.28e-8
+              activity_from_eq13_eq14_as_printed: '4.28 × 10−8'
+              activity_from_gibbs_duhem_eq19: 5.70e-8
+              activity_from_gibbs_duhem_eq19_as_printed: '5.70 × 10−8'
+              source_as_printed: This work
+            - xSnO_mol_pct: 53.3
+              method_class: model_derived
+              activity_from_eq13_eq14: 7.84e-8
+              activity_from_eq13_eq14_as_printed: '7.84 × 10−8'
+              activity_from_gibbs_duhem_eq19: 6.25e-8
+              activity_from_gibbs_duhem_eq19_as_printed: '6.25 × 10−8'
+              source_as_printed: This work
+            - xSnO_mol_pct: 60.0
+              method_class: model_derived
+              activity_from_eq13_eq14: 3.33e-7
+              activity_from_eq13_eq14_as_printed: '3.33 × 10−7'
+              activity_from_gibbs_duhem_eq19: 2.10e-7
+              activity_from_gibbs_duhem_eq19_as_printed: '2.10 × 10−7'
+              source_as_printed: This work
+          printed_dash_xSnO_mol_pct: [66.7]
+    context:
+      - observation_id: shilov_1998_table5_activity_standard_state_and_row_count
+        type: thermodynamic_calculation
+        locator: {table: '5', published_page: 403, pdf_page_index: 3}
+        units: as printed; activity dimensionless
+        values:
+          table_row_count: 6
+          activity_columns_as_printed:
+            aSnO: calculated according to reaction (16)
+            aZnO: calculated according to reaction (12)
+            aP2O5: calculated according to reactions (13) and (14)
+            aP2O5_Gibbs_Duhem: calculated according to equation (19)
+          activity_standard_state_as_printed: not stated separately in the paper
+  ZnO:
+    observations:
+      - observation_id: shilov_1998_table5_ZnO_activities
+        type: activity_coefficient
+        locator: {table: '5', published_page: 403, pdf_page_index: 3}
+        T_range_K: [1300.0, 1300.0]
+        phase: melt_in_the_Zn2P2O7_Sn2P2O7_system
+        standard_state: >-
+          A separate activity reference state is not explicitly stated; the activity is
+          calculated according to heterogeneous equilibrium (12), using its constant from [8].
+        regime: kems_effusion
+        units: dimensionless activity as printed
+        values:
+          quantity: oxide_activity
+          component_as_printed: ZnO
+          table_row_count: 6
+          points:
+            - {xSnO_mol_pct: 0.0, activity: 4.45e-3, activity_as_printed: '4.45 × 10−3', source_as_printed: '[4]', method_class: quoted_attributed}
+            - {xSnO_mol_pct: 40.0, activity: 4.11e-5, activity_as_printed: '4.11 × 10−5', source_as_printed: This work, method_class: model_derived}
+            - {xSnO_mol_pct: 46.7, activity: 2.36e-5, activity_as_printed: '2.36 × 10−5', source_as_printed: This work, method_class: model_derived}
+            - {xSnO_mol_pct: 53.3, activity: 1.46e-5, activity_as_printed: '1.46 × 10−5', source_as_printed: This work, method_class: model_derived}
+            - {xSnO_mol_pct: 60.0, activity: 1.29e-5, activity_as_printed: '1.29 × 10−5', source_as_printed: This work, method_class: model_derived}
+          printed_dash_xSnO_mol_pct: [66.7]
