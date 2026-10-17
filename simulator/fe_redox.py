@@ -1114,17 +1114,15 @@ def _native_fe_saturation_comparison(
     # All terms are dex; r=0 recovers the existing band, infinity stays open.
     lower += prior_half_width_dex
     upper += prior_half_width_dex
-    if (iron_seed or {}).get('method') == 'imposed_fO2':
-        # The declared potential interval is [f-L, f+U]. Relative to IW it
-        # is [gap-L, gap+U], so BELOW requires its upper endpoint <0 and
-        # ABOVE its lower endpoint >0 (all dex). Zero widths recover the
-        # point comparison; touching IW remains indeterminate. Preserve the
-        # existing assay/prior comparison below under d-166's scope.
-        status = ('BELOW' if gap + upper < 0.0 else
-                  'ABOVE' if gap - lower > 0.0 else 'INDETERMINATE')
-    else:
-        status = ('BELOW' if gap < -lower else
-                  'ABOVE' if gap > upper else 'INDETERMINATE')
+    # The band owner defines L downward and U upward from the potential
+    # (log R - log R_low)/a and (log R_high - log R)/a, respectively.
+    # Thus [f-L, f+U] relative to IW is [gap-L, gap+U], in dex, for every
+    # provenance. BELOW requires its upper endpoint <0; ABOVE its lower
+    # endpoint >0. Zero widths recover the point comparison; touching IW
+    # remains indeterminate. A lower-unbounded interval can still be BELOW
+    # when its upper endpoint is finite and below IW.
+    status = ('BELOW' if gap + upper < 0.0 else
+              'ABOVE' if gap - lower > 0.0 else 'INDETERMINATE')
     if seed_basis == 'class_prior' and status == 'BELOW':
         status = 'UNMEASURED_PRIOR_BELOW'
     band = {

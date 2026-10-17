@@ -105,6 +105,34 @@ def test_imposed_fO2_interval_must_lie_wholly_on_one_side_of_iw(
     assert comparison['saturation_status'] == status
 
 
+@pytest.mark.parametrize('method, seed_basis, radius, status', [
+    ('imposed_fO2', None, 0., 'BELOW'),
+    ('iron_speciation_split', None, 0., 'BELOW'),
+    ('predicted_kress91_split', 'class_prior', 4., 'UNMEASURED_PRIOR_BELOW'),
+])
+def test_saturation_interval_direction_is_shared_by_all_seed_provenances(
+    monkeypatch, method, seed_basis, radius, status,
+):
+    seed = {'method': method,
+            'anchor': {'delta_iw': -1., 'interval': [-1.125, -.9375]}}
+    lower, upper = fe_redox._native_fe_saturation_band(.039, iron_seed=seed)
+    assert lower > upper
+    # Choose a gap between the two negative widths, including the prior's
+    # symmetric radius (all dex). Its upper potential endpoint is below IW;
+    # the larger downward width cannot make that endpoint cross the bound.
+    gap = -(lower + upper) / 2. - radius
+    monkeypatch.setattr(fe_redox, 'calphad_ferrous_feo_activity_diagnostic',
+                        lambda **kw: {'a_FeO_authoritative': .3})
+    bound = fe_redox._feo_activity_saturation_log10_fO2_bar(1873.15, a_feo=.3)
+    comparison = fe_redox._native_fe_saturation_comparison(
+        {'FeO': 10., 'SiO2': 90.}, fe3_over_sigma_fe=.039,
+        T_K=1873.15, pressure_bar=.01, fO2_log=bound+gap,
+        iron_seed=seed, seed_basis=seed_basis, prior_half_width_dex=radius,
+    )
+    assert comparison['saturation_status'] == status
+    assert comparison['native_fe_saturation'] is (status == 'BELOW')
+
+
 @pytest.mark.parametrize('authority', ['measured', 'literature_typical'])
 def test_assay_seed_at_imposed_anchor_gap_remains_indeterminate(monkeypatch, authority):
     from tests.test_feedstock_iron_seed import _observation
