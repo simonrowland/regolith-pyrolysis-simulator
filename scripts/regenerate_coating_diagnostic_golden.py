@@ -45,9 +45,15 @@ def produce_bytes() -> bytes:
             "kernel_commit_sha": "goal-18-fixture",
         },
     )
+    payload = run.run()
+    # Mirror the test exactly: b-238 excludes this cache-sensitive counter from
+    # the hash (cold vs warm _freeze_gate_curve() gives total_count 14 vs 0 on
+    # one tree). Without the pop this script pins a digest the test can never
+    # reproduce (found 2026-10-17: f1349dd0... here vs 3aba97b3... in the test).
+    payload.pop("melt_redox_gate_floor_fallback_engagement")
     return (
         json.dumps(
-            run.run(),
+            payload,
             indent=2,
             sort_keys=False,
             allow_nan=False,
