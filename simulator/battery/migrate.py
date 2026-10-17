@@ -12671,22 +12671,16 @@ class Migrator:
         refusal: IdentityRefusal | None = None
         range_notices: list[Notice] = []
         if basis is not None:
-            physical_range = basis._physical_range()
             for value in numeric_values:
                 try:
                     basis._validate_value(value)
                 except IdentityRefusal as exc:
                     refusal = exc
                     break
-                if physical_range is None:
+                range_excess = basis._physical_range_excess(value)
+                if range_excess is None:
                     continue
-                lower, upper = physical_range
-                if value < lower:
-                    excess = lower - value
-                elif value > upper:
-                    excess = value - upper
-                else:
-                    continue
+                lower, upper, excess = range_excess
                 range_notices.append(
                     Notice(
                         kind=NoticeKind.SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE,
@@ -12726,10 +12720,7 @@ class Migrator:
                     quantity=State.unknown(str(refusal)),
                     valence_basis=None,
                 ),
-                value=Value(
-                    kind=ValueKind.UNAVAILABLE,
-                    unavailable_reason=str(refusal),
-                ),
+                value=_unavailable_selection(str(refusal)).value,
             )
         source_parts = Path(source_key).parts
         evidence_class = observation.evidence.class_
@@ -13344,15 +13335,22 @@ class Migrator:
                     fusion_transition_rows=fusion_transition_rows,
                 )
             except (TypeError, ValueError) as exc:
-                if not str(exc).startswith(
-                    "Observation.point_conditions.quench_state "
-                ):
+                error = str(exc)
+                condition_key = next(
+                    (
+                        key
+                        for key in ("quench_state", "quench_direction")
+                        if error.startswith(f"Observation.point_conditions.{key} ")
+                    ),
+                    None,
+                )
+                if condition_key is None:
                     raise
                 self.result.registry_issues.append(
                     ValidationIssue(
                         path=(
                             f"observation[{source_id}::{obs['observation_id']}]"
-                            ".point_conditions.quench_state"
+                            f".point_conditions.{condition_key}"
                         ),
                         reason=RefusalReason.INVALID_SOURCE,
                         detail=f"row refused: {exc}",

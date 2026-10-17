@@ -406,6 +406,19 @@ class ValenceBasis:
             return Decimal("0"), Decimal("1")
         return None
 
+    def _physical_range_excess(
+        self, value: Decimal
+    ) -> tuple[Decimal, Decimal, Decimal] | None:
+        physical_range = self._physical_range()
+        if physical_range is None:
+            return None
+        lower, upper = physical_range
+        if value < lower:
+            return lower, upper, lower - value
+        if value > upper:
+            return lower, upper, value - upper
+        return None
+
     def __post_init__(self) -> None:
         if not isinstance(self.numerator_oxidation_states, tuple) or any(
             type(state) is not int for state in self.numerator_oxidation_states
