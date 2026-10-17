@@ -2887,12 +2887,15 @@ def _printed_uncertainty_band(
     if source_observation is not None:
         derivation = source_observation.derivation
         if derivation is not None:
+            # Parameter names are optional. A derivation that only names
+            # output_unit contributes no original_ fields.
+            parameters = getattr(derivation, "parameters", ())
             exact_fields.extend(
                 name.removeprefix("original_")
-                for name, _ in derivation.parameters
+                for name, _ in parameters
                 if name.startswith("original_")
             )
-        identity = source_observation.identity
+        identity = getattr(source_observation, "identity", None)
         if isinstance(identity, Identity):
             subtype = identity.subtype
             if isinstance(subtype, State) and subtype.is_value and subtype.value:
