@@ -1,0 +1,805 @@
+schema_version: literature_extract.v1
+source_id: nazarov-2015-dhofar-silicides
+source:
+  citation: 'Nazarov, M. A., Shornikov, S. I. & Demidova, S. I. (2015), "Origin of Native Silicon and Iron Silicides in the Dhofar 280 Lunar Meteorite", Petrology 23(2), 168–175.'
+  doi: 10.1134/S0869591115020071
+  year: 2015
+extraction:
+  method: >-
+    Table 2 transcribed from the MinerU table block and markdown, checked against
+    pdftotext-layout. The Table 2 row/column layout was checked against the
+    render of PDF page 5 (published p. 172). Table 1 is retained as a
+    context-only transcription from MinerU and pdftotext; its layout was checked
+    against the render of PDF page 3 (published p. 170). The invented MinerU
+    <details><summary>line</summary> block under Fig. 4 is ignored.
+  date: '2026-10-16'
+  worker: wave3b-naz15
+review_status: draft
+corrections: []
+benches:
+- id: nazarov-2015-mo-knudsen-cell
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      published_page: 168
+      pdf_page_index: 0
+      section: Methods
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 168
+      pdf_page_index: 0
+      section: Methods
+experiments:
+- experiment_id: nazarov-2015-synthetic-anorthite-kems
+  bench_id: nazarov-2015-mo-knudsen-cell
+  method: knudsen_effusion
+  locator:
+    published_page: 168
+    pdf_page_index: 0
+    section: Methods
+    note: Partial pressures above a melt of synthetic anorthite were measured in a molybdenum cell.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports residual chamber pressure around 10^-10 atm, not the in-cell total pressure.
+      locator:
+        published_page: 168
+        pdf_page_index: 0
+        section: Methods
+        note: Residual chamber pressure is not the total vapor pressure in the Knudsen cell.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 168
+        pdf_page_index: 0
+        section: Methods
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The approximate residual pressure is printed in atm; no base pressure in Pa is stated.
+        locator:
+          published_page: 168
+          pdf_page_index: 0
+          section: Methods
+          note: 'Source wording: under vacuum at residual pressure around 10^-10 atm.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The paper does not identify the molecular, transitional, or viscous flow regime.
+species:
+  Si:
+    context:
+    - observation_id: nazarov_2015_table1_meteorite_compositions_context
+      type: characterization
+      locator:
+        table: '1'
+        published_page: 170
+        pdf_page_index: 2
+        note: Context only; meteorite Si0 objects and Fe silicides, not a vaporization rail.
+      units: wt % as printed
+      values:
+        context_kind: meteorite_native_silicon_and_iron_silicide_composition
+        row_count: 16
+        column_headers:
+        - element
+        - Si0_objects_mean
+        - Si0_objects_limits
+        - Si0_objects_number_of_analyses
+        - Fe2.83Si
+        - Fe2.00Si#
+        - Fe4.86Si3
+        - Fe1.00Si
+        - Fe0.97Si
+        - Fe0.93Si
+        - Fe0.87Si#
+        - Fe2.99Si7
+        rows_as_printed: |
+          Si | 57.6 | 50.9–68.4 | 24 | 14.8 | 18.8 | 23.0 | 33.1 | 33.3 | 33.7 | 35.9 | 53.7
+          Ti | 0.02 | <0.24 | 24 | b.d.l. | b.d.l. | 0.35 | 0.02 | 0.09 | b.d.l. | 1.40 | b.d.l.
+          Al | 0.96 | 0.03–5.39 | 23 | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d.
+          Cr | 0.04 | <0.14 | 24 | b.d.l. | 0.26 | 9.30 | 0.15 | 0.54 | 0.05 | 2.60 | 1.94
+          Fe | 4.85 | 0.54–11.3 | 24 | 81.0 | 66.9 | 65.3 | 62.0 | 61.9 | 59.1 | 57.65 | 43.7
+          Mn | 0.17 | <0.40 | 24 | b.d.l. | b.d.l. | 0.16 | b.d.l. | 0.32 | 0.03 | 0.82 | 0.47
+          Mg | 0.15 | <0.70 | 16 | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d.
+          Ca | 0.26 | 0.05–2.13 | 16 | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d.
+          Na | 0.03 | <0.09 | 16 | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d.
+          K | 0.02 | <0.12 | 16 | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d. | n.d.
+          Ni | 0.53 | <1.76 | 24 | 2.92 | 12.2 | 0.16 | 4.14 | 3.47 | 5.80 | 0.82 | 0.02
+          Co | n.d. | n.d. | n.d. | 0.14 | 0.18 | b.d.l. | 0.22 | 0.05 | 0.22 | b.d.l. | b.d.l.
+          Cu | n.d. | n.d. | n.d. | n.d. | 0.16 | n.d. | b.d.l. | n.d. | n.d. | b.d.l. | n.d.
+          P | 0.24 | 0.11–0.45 | 8 | 0.07 | 1.04 | 0.58 | 0.26 | 0.92 | 1.27 | 0.67 | 0.81
+          S | 0.16 | <0.51 | 13 | b.d.l. | b.d.l. | b.d.l. | b.d.l. | b.d.l. | b.d.l. | b.d.l. | b.d.l.
+          Total | 65.0 | 60–73 |  | 98.9 | 99.6 | 98.8 | 99.9 | 100.6 | 100.2 | 100.0 | 100.6
+        footnotes_as_printed: >-
+          * Formula coefficients, in addition to Fe, take into account all other cations, as well as phosphorus with Si.
+          # Analyses from work (Nazarov et al., 2012a), (b.d.l.) content below detection limit; (n.d.) not determined.
+  MoO2:
+    context:
+    - observation_id: nazarov_2015_moo2_cell_contaminant_context
+      type: apparatus
+      locator:
+        published_page: 171
+        pdf_page_index: 3
+        section: Vaporization of an Anorthitic Melt
+      units: as described
+      values:
+        context_kind: molybdenum_cell_contamination_species
+        species_as_printed: MoO2
+        pressure_in_table2: not_tabulated
+        flag: cell_contamination
+  MoO3:
+    context:
+    - observation_id: nazarov_2015_moo3_cell_contaminant_context
+      type: apparatus
+      locator:
+        published_page: 171
+        pdf_page_index: 3
+        section: Vaporization of an Anorthitic Melt
+      units: as described
+      values:
+        context_kind: molybdenum_cell_contamination_species
+        species_as_printed: MoO3
+        pressure_in_table2: not_tabulated
+        flag: cell_contamination
+  Ca:
+    observations:
+    - observation_id: nazarov_2015_table2_ca
+      experiment: nazarov-2015-synthetic-anorthite-kems
+      type: partial_pressure
+      locator:
+        table: '2'
+        row: Ca
+        published_page: 172
+        pdf_page_index: 4
+      phase: gas
+      regime: kems_effusion
+      units: atm as printed
+      values:
+        quantity: partial_pressure
+        gas_species: Ca(g)
+        rail: vapour
+        method_class: measured_direct
+        admission_status: admitted
+        composition_as_published: synthetic anorthite
+        composition_note: Stoichiometric oxide mole proportions from the named endmember formula CaAl2Si2O8; not a separately printed oxide analysis.
+        points:
+        - T_K: 1833
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 1.93e-9
+          p_atm: 1.93e-9
+          p_atm_as_printed: '1.93 × 10^-9'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Ca row, 1833 K column'}
+        - T_K: 1883
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 6.11e-9
+          p_atm: 6.11e-9
+          p_atm_as_printed: '6.11 × 10^-9'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Ca row, 1883 K column'}
+        - T_K: 1933
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 1.89e-8
+          p_atm: 1.89e-8
+          p_atm_as_printed: '1.89 × 10^-8'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Ca row, 1933 K column'}
+        - T_K: 1983
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 5.87e-8
+          p_atm: 5.87e-8
+          p_atm_as_printed: '5.87 × 10^-8'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Ca row, 1983 K column'}
+        - T_K: 2033
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 1.14e-7
+          p_atm: 1.14e-7
+          p_atm_as_printed: '1.14 × 10^-7'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Ca row, 2033 K column'}
+      uncertainty:
+        note: No individual pressure uncertainty is printed.
+  Al:
+    observations:
+    - observation_id: nazarov_2015_table2_al
+      experiment: nazarov-2015-synthetic-anorthite-kems
+      type: partial_pressure
+      locator:
+        table: '2'
+        row: Al
+        published_page: 172
+        pdf_page_index: 4
+      phase: gas
+      regime: kems_effusion
+      units: atm as printed
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        rail: vapour
+        method_class: measured_direct
+        admission_status: admitted
+        composition_as_published: synthetic anorthite
+        composition_note: Stoichiometric oxide mole proportions from the named endmember formula CaAl2Si2O8; not a separately printed oxide analysis.
+        points:
+        - T_K: 1833
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 1.33e-9
+          p_atm: 1.33e-9
+          p_atm_as_printed: '1.33 × 10^-9'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Al row, 1833 K column'}
+        - T_K: 1883
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 3.29e-9
+          p_atm: 3.29e-9
+          p_atm_as_printed: '3.29 × 10^-9'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Al row, 1883 K column'}
+        - T_K: 1933
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 7.51e-9
+          p_atm: 7.51e-9
+          p_atm_as_printed: '7.51 × 10^-9'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Al row, 1933 K column'}
+        - T_K: 1983
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 2.98e-8
+          p_atm: 2.98e-8
+          p_atm_as_printed: '2.98 × 10^-8'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Al row, 1983 K column'}
+        - T_K: 2033
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 6.07e-8
+          p_atm: 6.07e-8
+          p_atm_as_printed: '6.07 × 10^-8'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Al row, 2033 K column'}
+      uncertainty:
+        note: No individual pressure uncertainty is printed.
+  AlO:
+    observations:
+    - observation_id: nazarov_2015_table2_alo
+      experiment: nazarov-2015-synthetic-anorthite-kems
+      type: partial_pressure
+      locator:
+        table: '2'
+        row: AlO
+        published_page: 172
+        pdf_page_index: 4
+      phase: gas
+      regime: kems_effusion
+      units: atm as printed
+      values:
+        quantity: partial_pressure
+        gas_species: AlO(g)
+        rail: vapour
+        method_class: measured_direct
+        admission_status: admitted
+        composition_as_published: synthetic anorthite
+        composition_note: Stoichiometric oxide mole proportions from the named endmember formula CaAl2Si2O8; not a separately printed oxide analysis.
+        blank_cells_as_printed:
+        - '1833 K: —'
+        - '1883 K: —'
+        points:
+        - T_K: 1933
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 1.18e-9
+          p_atm: 1.18e-9
+          p_atm_as_printed: '1.18 × 10^-9'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'AlO row, 1933 K column'}
+        - T_K: 1983
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 5.61e-9
+          p_atm: 5.61e-9
+          p_atm_as_printed: '5.61 × 10^-9'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'AlO row, 1983 K column'}
+        - T_K: 2033
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 2.29e-8
+          p_atm: 2.29e-8
+          p_atm_as_printed: '2.29 × 10^-8'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'AlO row, 2033 K column'}
+      uncertainty:
+        note: No individual pressure uncertainty is printed.
+  SiO:
+    observations:
+    - observation_id: nazarov_2015_table2_sio
+      experiment: nazarov-2015-synthetic-anorthite-kems
+      type: partial_pressure
+      locator:
+        table: '2'
+        row: SiO
+        published_page: 172
+        pdf_page_index: 4
+      phase: gas
+      regime: kems_effusion
+      units: atm as printed
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        rail: SiO_evolution
+        method_class: measured_direct
+        admission_status: admitted
+        composition_as_published: synthetic anorthite
+        composition_note: Stoichiometric oxide mole proportions from the named endmember formula CaAl2Si2O8; not a separately printed oxide analysis.
+        points:
+        - T_K: 1833
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 6.95e-5
+          p_atm: 6.95e-5
+          p_atm_as_printed: '6.95 × 10^-5'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'SiO row, 1833 K column'}
+        - T_K: 1883
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 1.32e-4
+          p_atm: 1.32e-4
+          p_atm_as_printed: '1.32 × 10^-4'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'SiO row, 1883 K column'}
+        - T_K: 1933
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 2.28e-4
+          p_atm: 2.28e-4
+          p_atm_as_printed: '2.28 × 10^-4'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'SiO row, 1933 K column'}
+        - T_K: 1983
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 5.77e-4
+          p_atm: 5.77e-4
+          p_atm_as_printed: '5.77 × 10^-4'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'SiO row, 1983 K column'}
+        - T_K: 2033
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 8.87e-4
+          p_atm: 8.87e-4
+          p_atm_as_printed: '8.87 × 10^-4'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'SiO row, 2033 K column'}
+      uncertainty:
+        note: No individual pressure uncertainty is printed.
+  SiO2:
+    observations:
+    - observation_id: nazarov_2015_table2_sio2
+      experiment: nazarov-2015-synthetic-anorthite-kems
+      type: partial_pressure
+      locator:
+        table: '2'
+        row: SiO2
+        published_page: 172
+        pdf_page_index: 4
+      phase: gas
+      regime: kems_effusion
+      units: atm as printed
+      values:
+        quantity: partial_pressure
+        gas_species: SiO2(g)
+        rail: vapour
+        method_class: measured_direct
+        admission_status: admitted
+        composition_as_published: synthetic anorthite
+        composition_note: Stoichiometric oxide mole proportions from the named endmember formula CaAl2Si2O8; not a separately printed oxide analysis.
+        points:
+        - T_K: 1833
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 1.58e-8
+          p_atm: 1.58e-8
+          p_atm_as_printed: '1.58 × 10^-8'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'SiO2 row, 1833 K column'}
+        - T_K: 1883
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 3.94e-8
+          p_atm: 3.94e-8
+          p_atm_as_printed: '3.94 × 10^-8'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'SiO2 row, 1883 K column'}
+        - T_K: 1933
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 8.88e-8
+          p_atm: 8.88e-8
+          p_atm_as_printed: '8.88 × 10^-8'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'SiO2 row, 1933 K column'}
+        - T_K: 1983
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 2.08e-7
+          p_atm: 2.08e-7
+          p_atm_as_printed: '2.08 × 10^-7'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'SiO2 row, 1983 K column'}
+        - T_K: 2033
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 4.43e-7
+          p_atm: 4.43e-7
+          p_atm_as_printed: '4.43 × 10^-7'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'SiO2 row, 2033 K column'}
+      uncertainty:
+        note: No individual pressure uncertainty is printed.
+  O:
+    observations:
+    - observation_id: nazarov_2015_table2_o_calculated
+      experiment: nazarov-2015-synthetic-anorthite-kems
+      type: partial_pressure
+      locator:
+        table: '2'
+        row: O*
+        published_page: 172
+        pdf_page_index: 4
+      phase: gas
+      regime: kems_effusion
+      units: atm as printed
+      values:
+        quantity: partial_pressure
+        gas_species: O(g)
+        rail: vapour
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_as_published: synthetic anorthite
+        composition_note: Stoichiometric oxide mole proportions from the named endmember formula CaAl2Si2O8; not a separately printed oxide analysis.
+        reduction_as_printed: Calculated from MoO3 = MoO2 + O, AlO = Al + O, and SiO2 = SiO + O.
+        derivation:
+          relation: O* calculated from the equilibria printed in Table 2 footnote *.
+          output_unit: atm
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Footnote * states the equilibria used for O*; numerical raw inputs are not tabulated.'}
+        cell_contamination_note: MoO2 and MoO3 are molybdenum-cell contamination species; their pressures are not tabulated in Table 2.
+        points:
+        - T_K: 1833
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 3.16e-10
+          p_atm: 3.16e-10
+          p_atm_as_printed: '3.16 × 10^-10'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O* row, 1833 K column'}
+        - T_K: 1883
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 9.20e-10
+          p_atm: 9.20e-10
+          p_atm_as_printed: '9.20 × 10^-10'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O* row, 1883 K column'}
+        - T_K: 1933
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 2.63e-9
+          p_atm: 2.63e-9
+          p_atm_as_printed: '2.63 × 10^-9'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O* row, 1933 K column'}
+        - T_K: 1983
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 5.00e-9
+          p_atm: 5.00e-9
+          p_atm_as_printed: '5.00 × 10^-9'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O* row, 1983 K column'}
+        - T_K: 2033
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 1.40e-8
+          p_atm: 1.40e-8
+          p_atm_as_printed: '1.40 × 10^-8'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O* row, 2033 K column'}
+      uncertainty:
+        note: Calculated from the printed gas-phase equilibria; no individual pressure uncertainty is stated.
+  O2:
+    observations:
+    - observation_id: nazarov_2015_table2_o2_calculated
+      experiment: nazarov-2015-synthetic-anorthite-kems
+      type: partial_pressure
+      locator:
+        table: '2'
+        row: O2**
+        published_page: 172
+        pdf_page_index: 4
+      phase: gas
+      regime: kems_effusion
+      units: atm as printed
+      values:
+        quantity: partial_pressure
+        gas_species: O2(g)
+        rail: vapour
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_as_published: synthetic anorthite
+        composition_note: Stoichiometric oxide mole proportions from the named endmember formula CaAl2Si2O8; not a separately printed oxide analysis.
+        reduction_as_printed: Calculated from O2 = 2O.
+        derivation:
+          relation: O2** calculated from the equilibrium printed in Table 2 footnote **.
+          output_unit: atm
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Footnote ** states the equilibrium used for O2**; numerical raw inputs are not tabulated.'}
+        cell_contamination_note: O2 is from the molybdenum-cell vapor; MoO2 and MoO3 are not pressure rows in Table 2.
+        points:
+        - T_K: 1833
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 3.66e-12
+          p_atm: 3.66e-12
+          p_atm_as_printed: '3.66 × 10^-12'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O2** row, 1833 K column'}
+        - T_K: 1883
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 1.28e-11
+          p_atm: 1.28e-11
+          p_atm_as_printed: '1.28 × 10^-11'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O2** row, 1883 K column'}
+        - T_K: 1933
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 4.48e-11
+          p_atm: 4.48e-11
+          p_atm_as_printed: '4.48 × 10^-11'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O2** row, 1933 K column'}
+        - T_K: 1983
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 7.31e-11
+          p_atm: 7.31e-11
+          p_atm_as_printed: '7.31 × 10^-11'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O2** row, 1983 K column'}
+        - T_K: 2033
+          composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
+          point_conditions:
+            total_pressure_Pa:
+              state: {tag: unknown, reason: 'The paper reports residual chamber pressure, not in-cell total pressure.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Table 2 does not print in-cell total pressure.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: 'The paper does not state fO2 as an experimental condition.'}
+              locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O and O2 are vapor species, not a stated fO2 condition.'}
+          value: 2.68e-10
+          p_atm: 2.68e-10
+          p_atm_as_printed: '2.68 × 10^-10'
+          locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'O2** row, 2033 K column'}
+      uncertainty:
+        note: Calculated from the printed O2 = 2O equilibrium; no individual pressure uncertainty is stated.
+source_caveats:
+- locator:
+    published_page: 171
+    pdf_page_index: 3
+    section: Vaporization of an Anorthitic Melt
+  quote: The molybdenum cell forms gaseous molybdenum oxides.
+  note: MoO2 and MoO3 are retained as cell-contamination context and flagged on the reduced oxygen row. Neither has a numerical partial-pressure row in Table 2, so no MoOx pressure observations are fabricated.
+- locator:
+    table: '2'
+    published_page: 172
+    pdf_page_index: 4
+  quote: Table 2 reports Ca, Al, AlO, SiO, SiO2, O*, and O2**.
+  note: Seven printed species rows; 33 numeric pressure cells; AlO has printed em dashes at 1833 and 1883 K. The O* and O2** values are measured_reduced as marked by their footnotes.
+- locator:
+    figure: '4'
+    published_page: 173
+    pdf_page_index: 5
+  quote: SiO disproportionation Gibbs-energy curves.
+  note: Figure-read candidate only; no figure values extracted. The MinerU details/line table below Fig. 4 is a chart-to-table hallucination and is ignored.
+deepening:
+  table_inventory:
+  - table: '1'
+    published_page: 170
+    pdf_page_index: 2
+    completeness: full_context_only
+    body_rows: 16
+    note: Full printed table retained under species.Si.context; it feeds no rail.
+  - table: '2'
+    published_page: 172
+    pdf_page_index: 4
+    completeness: full
+    body_rows: 7
+    numeric_cells: 33
+    blank_cells: 2
+    note: Partial pressures over synthetic anorthite; the printed table has no MoO2 or MoO3 pressure rows.
