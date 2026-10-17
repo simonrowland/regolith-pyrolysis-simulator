@@ -66,7 +66,7 @@ OPENIMCC_INSTALL_HINT = (
 )
 OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
-    "@34733f266cb4e8b30ff337a53ee0ec310f775268"
+    "@e1423d82237486f58dc8ffbb1f8c295f54f169c0"
 )
 
 

@@ -49,7 +49,7 @@ dependencies = [
 
 [project.optional-dependencies]
 # Optional extras for paths NOT required by the default operational chain.
-imcc = ["openimcc @ git+https://github.com/simonrowland/openimcc@34733f266cb4e8b30ff337a53ee0ec310f775268"]
+imcc = ["openimcc @ git+https://github.com/simonrowland/openimcc@e1423d82237486f58dc8ffbb1f8c295f54f169c0"]
 optimize = ["optuna==4.8.0"]
 e2e = ["playwright>=1.61,<2"]
 # MAGEMin (https://github.com/ComputationalThermodynamics/MAGEMin) is a
