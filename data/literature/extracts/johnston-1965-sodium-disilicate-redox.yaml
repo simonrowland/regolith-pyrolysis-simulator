@@ -1397,9 +1397,11 @@ species:
         - {column_as_printed: 'Total V', value: 1.31, value_as_published: '1.31', method_class: measured_direct, T_C: 1085, point_conditions: *johnston_t1_v_r07_conditions}
       point_conditions: *johnston_t1_v_r07_conditions
   Na2O.2SiO2:
+    observations: []
     context:
     - observation_id: johnston_1965_alkali_shuttle_context
       type: study_context
+      units: text
       locator: {page: 2, pdf_page_index: 1, published_page: 185, section: 'Master melts'}
       values:
         context_rail: alkali_shuttle
