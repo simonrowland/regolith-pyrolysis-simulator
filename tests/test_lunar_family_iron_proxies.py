@@ -15,6 +15,6 @@ def test_lunar_proxy_is_median_of_cited_samples(key, central, interval, samples)
     assert observation['value'] == central
     assert observation['interval'] == interval
     assert observation['authority'] == 'literature_typical'
-    assert 'median' in observation['note']
+    assert 'median' in observation['note'].lower()
     for sample in samples:
         assert sample in observation['note']
