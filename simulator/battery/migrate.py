@@ -140,6 +140,7 @@ from simulator.battery.records import (
     Sample,
     SourceFile,
     SourceFiles,
+    SourceMethodUncertainty,
     Species,
     State,
     SweepGas,
@@ -1689,6 +1690,7 @@ def _uncertainty_from_plain(payload: object) -> Uncertainty:
         value=value,
         basis=None if payload.get("basis") is None else str(payload["basis"]),
         derivation=derivation,
+        locator=_locator_from_plain(payload.get("locator")),
     )
 
 
@@ -1820,11 +1822,40 @@ def _source_file_from_plain(payload: object) -> SourceFile:
     )
 
 
+def _source_method_uncertainty_from_plain(
+    payload: object,
+) -> SourceMethodUncertainty:
+    if not isinstance(payload, Mapping):
+        raise ValueError("source.method_uncertainty must be a mapping")
+    locator = _locator_from_plain(payload.get("locator"))
+    if locator is None:
+        raise ValueError("source.method_uncertainty requires a locator")
+    if "quantity" not in payload:
+        raise ValueError("source.method_uncertainty requires a quantity")
+    return SourceMethodUncertainty(
+        value=parse_declared_amount(payload.get("value")),
+        meaning=str(payload.get("meaning") or ""),
+        quantity=Quantity(str(payload["quantity"])),
+        basis=str(payload.get("basis") or ""),
+        quantity_basis=str(payload.get("quantity_basis") or ""),
+        locator=locator,
+    )
+
+
 def work_from_plain(payload: object) -> Work:
     assert isinstance(payload, Mapping)
     files_payload = payload.get("source_files") or {}
     files = tuple(_source_file_from_plain(f) for f in (files_payload.get("files") or ()))
     commit = files_payload.get("corpus_commit")
+    raw_method_uncertainties = payload.get("source_method_uncertainties")
+    source_method_uncertainties = (
+        {
+            str(source_id): _source_method_uncertainty_from_plain(uncertainty)
+            for source_id, uncertainty in raw_method_uncertainties.items()
+        }
+        if isinstance(raw_method_uncertainties, Mapping)
+        else None
+    )
     return Work(
         work_id=str(payload["work_id"]),
         citation=str(payload["citation"]),
@@ -1837,6 +1868,7 @@ def work_from_plain(payload: object) -> Work:
             files=files,
         ),
         doi=payload.get("doi"),
+        source_method_uncertainties=source_method_uncertainties,
     )
 
 
@@ -12068,6 +12100,7 @@ class Migrator:
         doi: str | None,
         source_id: str,
         index_row: Mapping[str, Any] | None,
+        source_method_uncertainty: SourceMethodUncertainty | None = None,
     ) -> Work:
         work_id, canonical_doi = work_id_for(
             citation=citation,
@@ -12087,6 +12120,22 @@ class Migrator:
             self._work_index_row[work_id] = index_row
         if source_id not in self._work_source_ids[work_id]:
             self._work_source_ids[work_id].append(source_id)
+        existing_work = self.result.works.get(work_id)
+        source_method_uncertainties = dict(
+            {}
+            if existing_work is None
+            else existing_work.source_method_uncertainties or {}
+        )
+        if source_method_uncertainty is not None:
+            existing_uncertainty = source_method_uncertainties.get(source_id)
+            if (
+                existing_uncertainty is not None
+                and existing_uncertainty != source_method_uncertainty
+            ):
+                raise ValueError(
+                    f"conflicting source method uncertainty for {source_id}"
+                )
+            source_method_uncertainties[source_id] = source_method_uncertainty
         pack = source_files_for(source_id, index_row)
         merged = self._merge_extra_assets(work_id, list(pack.files))
         work = Work(
@@ -12095,6 +12144,7 @@ class Migrator:
             source_ids=tuple(self._work_source_ids[work_id]),
             source_files=replace(pack, files=tuple(merged)),
             doi=self._work_dois[work_id],
+            source_method_uncertainties=source_method_uncertainties or None,
         )
         self.result.works[work_id] = work
         return work
@@ -12130,6 +12180,7 @@ class Migrator:
                     files=tuple(files),
                 ),
                 doi=work.doi,
+                source_method_uncertainties=work.source_method_uncertainties,
             )
         self.result.works = rebuilt
 
@@ -13244,6 +13295,11 @@ class Migrator:
             source = {}
         citation = str(source.get("citation") or "")
         source_id = str(doc.get("source_id") or path.stem)
+        source_method_uncertainty = None
+        if source.get("method_uncertainty") is not None:
+            source_method_uncertainty = _source_method_uncertainty_from_plain(
+                source["method_uncertainty"]
+            )
         index_row = self.index.get(source_id)
         doi = extract_doi(
             source.get("doi"),
@@ -13255,6 +13311,7 @@ class Migrator:
             doi=doi,
             source_id=source_id,
             index_row=index_row,
+            source_method_uncertainty=source_method_uncertainty,
         )
         experiment_refs = self._lift_extract_registries(
             doc, work=work, source_key=rel

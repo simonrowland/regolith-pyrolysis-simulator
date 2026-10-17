@@ -37,6 +37,13 @@ source:
   url: "https://…"                       # optional
   version: null                          # database / edition version when applicable
   year: 2015                             # optional
+  method_uncertainty:                     # optional source-level method uncertainty
+    value: 0.10
+    meaning: one_sigma                    # one_sigma | two_sigma | range_half_width
+    quantity: activity                    # Quantity enum value
+    basis: log10_dex                      # log10_dex | absolute | relative_percent
+    quantity_basis: "log10 activity in dex" # printed description, retained verbatim
+    locator: { page: 12, note: "Quoted sentence from the source, retained verbatim." }
 extraction:
   method: manual_from_draft              # required free text
   date: "2026-08-01"                     # ISO YYYY-MM-DD required
@@ -62,6 +69,15 @@ fidelity_samples:
   #   locator: { record: costa_jacobson_2015_fe_olivine_kems }
 species: {}                              # map: canonical U0 / manifest id → species block
 ```
+
+`source.method_uncertainty` applies only to rows from this source that do not
+state their own uncertainty. `quantity` is a `Quantity` enum value and selects
+the only rows the field can band. `basis` records the printed width basis:
+`log10_dex`, `absolute`, or `relative_percent`. `meaning` records the printed
+convention; `quantity_basis` retains the printed description without being
+matched to infer a quantity or unit. `locator.page` and `locator.note` give the
+page and exact quoted sentence. No value or meaning is inferred when this field
+is absent.
 
 ### `review_status`
 

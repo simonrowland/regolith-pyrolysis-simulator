@@ -75,6 +75,7 @@ from simulator.battery.records import (
     ResidualNumeric,
     DecisionBand,
     Species,
+    SourceMethodUncertainty,
     State,
     Uncertainty,
     Value,
@@ -946,6 +947,439 @@ def test_plante_kems_pressure_envelope_reports_unstated_confidence(
     assert printed.notice.reason == "confidence_level_not_stated"
     assert "original=" in printed.notice.band
     assert '"published_page": 276' in printed.notice.band
+
+
+def test_cho_suito_log10_activity_standard_deviations_are_one_sigma(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import (
+        NORMAL_95_TICKET_MULTIPLIER,
+        _printed_uncertainty_band,
+        point_magnitude,
+    )
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    migrated = _migrate_real_extract(
+        tmp_path, "cho-suito-1994-cas-slag-activities.yaml"
+    )
+    expected = {
+        "cho_suito_1994_t5_acs2_sio2_cn": Decimal("0.10"),
+        "cho_suito_1994_t5_acs4_sio2_cn": Decimal("0.23"),
+        "cho_suito_1994_t5_cas5_sio2_cn": Decimal("0.15"),
+        "cho_suito_1994_t5_cas8_sio2_cn": Decimal("0.22"),
+    }
+    rows = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrated.observations.values()
+        if row.observation_id.rsplit("::", 1)[-1] in expected
+    }
+    assert set(rows) == set(expected)
+    for observation_id, sigma_dex in expected.items():
+        row = rows[observation_id]
+        reference = point_magnitude(row.value)
+        assert reference is not None
+        printed = _printed_uncertainty_band(
+            Quantity.ACTIVITY,
+            row.uncertainty,
+            reference,
+            source_observation=row,
+        )
+        assert printed.notice is None
+        assert printed.refusal is None
+        assert printed.standard_uncertainty_dex == sigma_dex
+        assert printed.band is not None
+        assert printed.band.band_basis == "row_printed"
+        assert printed.band.value == sigma_dex * NORMAL_95_TICKET_MULTIPLIER
+
+
+def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    identity = Identity(
+        quantity=Quantity.FE3_FE2_RATIO,
+        species=Species("Fe", Phase.CR),
+    )
+    observation = F.observation(
+        "redox-field-uncertainty",
+        "redox-field-experiment",
+        identity,
+        Decimal("0.72"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derivation=Derivation(
+            relation="Fe3_over_FeT to Fe3+/Fe2+",
+            inputs=("redox-source-row",),
+            parameters=(("original_Fe3_over_FeT", F.located(Decimal("0.72"))),),
+            output_unit="dimensionless",
+        ),
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={"Fe3_over_FeT": "±0.02", "sigma": "±0.90"},
+    )
+
+    printed = _printed_uncertainty_band(
+        Quantity.FE3_FE2_RATIO,
+        uncertainty,
+        Decimal("0.72"),
+        source_observation=observation,
+    )
+
+    assert printed.refusal is None
+    assert printed.band is not None
+    assert printed.band.band_basis == "row_printed"
+    assert printed.band.value == Decimal("0.01223445641701162951905623210")
+
+    unparseable = _printed_uncertainty_band(
+        Quantity.FE3_FE2_RATIO,
+        replace(
+            uncertainty,
+            verbatim={"Fe3_over_FeT": "not stated", "sigma": "±0.05"},
+        ),
+        Decimal("0.72"),
+        source_observation=observation,
+    )
+    assert unparseable.band is None
+    assert unparseable.refusal is not None
+    assert unparseable.refusal["reason"] == "unparseable_printed_uncertainty"
+
+
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_source_method_uncertainty_supplies_a_source_method_band(
+    quantity: Quantity,
+) -> None:
+    from simulator.battery.score import NORMAL_95_TICKET_MULTIPLIER
+
+    experiment = F.kems_experiment()
+    identity = replace(
+        F.activity_identity(endmember_phase=Phase.L), quantity=quantity
+    )
+    reference = F.observation(
+        "source-method-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="source-method-fixture",
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=Decimal("0.10"),
+        meaning="one_sigma",
+        quantity=quantity,
+        basis="log10_dex",
+        quantity_basis=(
+            "log10 activity in dex"
+            if quantity is Quantity.ACTIVITY
+            else "log10 activity coefficient in dex"
+        ),
+        locator=F.loc(
+            page=12,
+            note="The standard deviation of log10(a) is 0.10.",
+        ),
+    )
+    base_work = F.work()
+    work = replace(
+        base_work,
+        source_ids=(*base_work.source_ids, "source-method-fixture"),
+        source_method_uncertainties={"source-method-fixture": method_uncertainty},
+    )
+    context = _context(work, experiment, reference, review="reviewed")
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=_predict(Decimal("0.2"), identity),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is not None
+    assert residual.numeric.decision_band.band_basis == "source_method"
+    assert residual.numeric.decision_band.value == (
+        Decimal("0.10") * NORMAL_95_TICKET_MULTIPLIER
+    )
+
+
+@pytest.mark.parametrize(
+    ("basis", "value", "meaning", "note", "reference_value", "expected_band", "rule"),
+    (
+        (
+            "relative_percent",
+            "10",
+            "one_sigma",
+            "The standard deviation of log10(a) is 0.10.",
+            "0.2",
+            "0.08968303352185472833542869883",
+            "printed_1sigma",
+        ),
+        (
+            "absolute",
+            "0.02",
+            "one_sigma",
+            "The standard deviation of log10(a) is 0.10.",
+            "0.2",
+            "0.08968303352185472833542869883",
+            "printed_1sigma",
+        ),
+        (
+            "log10_dex",
+            "0.20",
+            "two_sigma",
+            "The standard deviation of log10(a) is 0.10.",
+            "0.2",
+            "0.20",
+            "printed_2sigma",
+        ),
+        (
+            "log10_dex",
+            "0.10",
+            "one_sigma",
+            "An explicitly stated dex uncertainty.",
+            "0.2",
+            str(Decimal("0.10") * Decimal("1.959963984540054")),
+            "printed_1sigma",
+        ),
+    ),
+)
+def test_source_method_activity_band_uses_explicit_basis_and_meaning(
+    basis: str,
+    value: str,
+    meaning: str,
+    note: str,
+    reference_value: str,
+    expected_band: str,
+    rule: str,
+) -> None:
+    # Independently, a 10% relative width spans log10(0.9) to log10(1.1);
+    # the larger magnitude is log10(10/9), then the 95% one-sigma multiplier
+    # gives 0.08968303352185472833542869883. This is the metric's conservative
+    # dex width and does not use the production uncertainty converter.
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(endmember_phase=Phase.L)
+    reference = F.observation(
+        "source-method-explicit-band",
+        experiment.experiment_id,
+        identity,
+        Decimal(reference_value),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="source-method-explicit-fixture",
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=Decimal(value),
+        meaning=meaning,
+        quantity=Quantity.ACTIVITY,
+        basis=basis,
+        quantity_basis="activity in the stated basis",
+        locator=F.loc(page=12, note=note),
+    )
+    base_work = F.work()
+    work = replace(
+        base_work,
+        source_ids=(*base_work.source_ids, "source-method-explicit-fixture"),
+        source_method_uncertainties={
+            "source-method-explicit-fixture": method_uncertainty
+        },
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(work, experiment, reference, review="reviewed"),
+        prediction=_predict(Decimal(reference_value), identity),
+    )
+
+    assert residual.numeric is not None
+    band = residual.numeric.decision_band
+    assert band is not None
+    assert band.band_basis == "source_method"
+    assert band.value == Decimal(expected_band)
+    assert band.rule.startswith(f"{rule}:")
+
+
+@pytest.mark.parametrize(
+    ("basis", "value", "expected_reason"),
+    (
+        ("not_a_basis", Decimal("0.10"), "source_method_uncertainty_basis_unmapped"),
+        ("log10_dex", Decimal("0"), "source_method_uncertainty_value_nonpositive"),
+    ),
+)
+def test_source_method_invalid_basis_or_zero_value_refuses_band(
+    basis: str, value: Decimal, expected_reason: str
+) -> None:
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(endmember_phase=Phase.L)
+    reference = F.observation(
+        "source-method-invalid-band",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="source-method-invalid-fixture",
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=value,
+        meaning="one_sigma",
+        quantity=Quantity.ACTIVITY,
+        basis=basis,
+        quantity_basis="activity in the stated basis",
+        locator=F.loc(page=12, note="invalid fixture"),
+    )
+    base_work = F.work()
+    work = replace(
+        base_work,
+        source_ids=(*base_work.source_ids, "source-method-invalid-fixture"),
+        source_method_uncertainties={
+            "source-method-invalid-fixture": method_uncertainty
+        },
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(work, experiment, reference, review="reviewed"),
+        prediction=_predict(Decimal("0.2"), identity),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert residual.refusal.detail["reason"] == expected_reason
+
+
+@pytest.mark.parametrize(
+    ("field_quantity", "quantity"),
+    (
+        (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT),
+        (Quantity.ACTIVITY, Quantity.P_PARTIAL),
+        (Quantity.ACTIVITY, Quantity.FE3_FE2_RATIO),
+        (Quantity.ACTIVITY_COEFFICIENT, Quantity.ACTIVITY),
+    ),
+)
+def test_source_method_uncertainty_does_not_band_other_quantities(
+    field_quantity: Quantity, quantity: Quantity,
+) -> None:
+    experiment = F.kems_experiment()
+    if quantity is Quantity.ACTIVITY_COEFFICIENT:
+        identity = replace(F.activity_identity(), quantity=quantity)
+        value = Decimal("0.2")
+    elif quantity is Quantity.ACTIVITY:
+        identity = F.activity_identity()
+        value = Decimal("0.2")
+    elif quantity is Quantity.P_PARTIAL:
+        na = State.not_applicable("not an activity identity axis for partial pressure")
+        identity = replace(
+            F.activity_identity(),
+            quantity=quantity,
+            per=na,
+            reference_state=na,
+        )
+        value = Decimal("1")
+    else:
+        na = State.not_applicable("not a redox identity axis")
+        identity = replace(
+            F.activity_identity(formula="Fe"),
+            quantity=quantity,
+            species=Species("Fe", Phase.L),
+            per=na,
+            reference_state=na,
+        )
+        value = Decimal("0.72")
+    reference = F.observation(
+        f"activity-method-{quantity.value}",
+        experiment.experiment_id,
+        identity,
+        value,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="activity-method-fixture",
+    )
+    method_uncertainty = SourceMethodUncertainty(
+        value=Decimal("0.10"),
+        meaning="one_sigma",
+        quantity=field_quantity,
+        basis="log10_dex",
+        quantity_basis=(
+            "log10 activity in dex"
+            if field_quantity is Quantity.ACTIVITY
+            else "log10 activity coefficient in dex"
+        ),
+        locator=F.loc(
+            page=12, note="The standard deviation of log10(a) is 0.10."
+        ),
+    )
+    base_work = F.work()
+    work = replace(
+        base_work,
+        source_ids=(*base_work.source_ids, "activity-method-fixture"),
+        source_method_uncertainties={"activity-method-fixture": method_uncertainty},
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(work, experiment, reference, review="reviewed"),
+        prediction=_predict(value, identity),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.status is ResidualStatus.NO_BAND
+    assert not (
+        residual.refusal is not None
+        and residual.refusal.detail.get("reason")
+        == "printed_uncertainty_unit_unmapped"
+    )
+
+
+def test_fusion_identity_flag_uses_preconversion_source_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.kems_experiment()
+    source_identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1600"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        "quartz",
+    )
+    reference = F.observation(
+        "preconversion-source-polymorph",
+        experiment.experiment_id,
+        source_identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-preconversion-source-polymorph",
+    )
+    from simulator.battery.score import fusion_comparison_reference
+    import simulator.battery.score as score_module
+
+    original_unspecified = score_module._source_polymorph_is_unspecified
+    inspected_polymorphs = []
+
+    def record_polymorph(polymorph):
+        inspected_polymorphs.append(polymorph)
+        return original_unspecified(polymorph)
+
+    monkeypatch.setattr(
+        score_module, "_source_polymorph_is_unspecified", record_polymorph
+    )
+
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    candidate_identity = _with_activity_reference_polymorph(
+        converted.identity, None
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_predict(converted.value.point, candidate_identity),
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert inspected_polymorphs[-1] == (
+        source_identity.reference_state.value.endmember.polymorph
+    )
 
 
 def test_pooled_log_pressure_sd_known_replicates() -> None:
@@ -7181,6 +7615,134 @@ def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
     assert converted.source_id == "another-source"
 
 
+def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery import score as score_module
+
+    temperature = Decimal("2000")
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.8")), ("Al2O3", Decimal("0.2"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+            composition=composition,
+        ),
+        "lime",
+    )
+    reference = replace(
+        F.observation(
+            "fusion-reference-with-printed-band",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.3"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fusion-band-fixture",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="±0.10 standard deviation of log10(a) as printed",
+            locator=F.loc(page=4, table="2"),
+        ),
+    )
+    resolve_energy = score_module._janaf_fusion_energy_for_reference
+
+    def resolve_with_printed_sigma(row, temperature_K):
+        energy = resolve_energy(row, temperature_K)
+        return replace(
+            energy,
+            sigma_delta_g_fus_kJ_per_mol=Decimal("1"),
+            uncertainty_locator=F.loc(
+                page=4,
+                table="10",
+                note="Printed fusion uncertainty fixture, JANAF Ca-027/Ca-028.",
+            ),
+        )
+
+    monkeypatch.setattr(
+        score_module, "_janaf_fusion_energy_for_reference", resolve_with_printed_sigma
+    )
+    converted = score_module.fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_predict(converted.value.point, converted.identity),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is not None
+    band = residual.numeric.decision_band
+    assert band.band_basis == "fusion_combined_row_printed"
+    assert band.value > Decimal("0.10") * score_module.NORMAL_95_TICKET_MULTIPLIER
+    # sigma_conv = 1 kJ/mol * 1000 J/kJ / (8.31441 J/(mol K) * 2000 K * ln(10));
+    # sigma_total = sqrt(0.10^2 + sigma_conv^2) dex; ticket = 1.959963984540054 * sigma_total.
+    assert band.value.quantize(Decimal("0.00001")) == Decimal("0.20257")
+    assert any(
+        item.reason.startswith("reference_converted_via_fusion;")
+        for item in residual.notices
+    )
+
+
+def test_fusion_conversion_without_printed_janaf_sigma_has_typed_no_band() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    temperature = Decimal("2000")
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+        ),
+        "lime",
+    )
+    reference = replace(
+        F.observation(
+            "fusion-reference-without-janaf-sigma",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.3"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fusion-no-sigma-fixture",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="±0.10 standard deviation of log10(a) as printed",
+            locator=F.loc(page=4, table="2"),
+        ),
+    )
+    converted = fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_predict(converted.value.point, converted.identity),
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "conversion_uncertainty_unprinted"
+    assert any(
+        item.reason.startswith("reference_converted_via_fusion;")
+        for item in residual.notices
+    )
+
+
 @pytest.mark.parametrize(
     ("formula", "polymorph", "expected_offset", "tables"),
     (
@@ -7353,32 +7915,17 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
     )
     assert refused.value.point == reference.value.point
     assert refused.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        "Mg-008 represents polymorph periclase" in notice.reason
+    assert not any(
+        notice.reason.startswith("reference_converted_via_fusion;")
         for notice in refused.notices
     )
 
 @pytest.mark.parametrize(
-    ("temperature", "expected_shift_dex"),
-    (
-        (Decimal("1823"), Decimal("-0.96857")),
-        (Decimal("1873"), Decimal("-0.90911")),
-    ),
+    "temperature", (Decimal("1823"), Decimal("1873"))
 )
-def test_unknown_cao_polymorph_converts_via_unique_janaf_solid_table(
+def test_unnamed_cao_reference_phase_is_a_missing_fusion_input(
     temperature: Decimal,
-    expected_shift_dex: Decimal,
 ) -> None:
-    """The sole eligible CaO(cr) JANAF table fixes the unknown solid reference.
-
-    For the same chemical potential, mu = G° + RT ln(a) gives
-    log10(a_l/a_s) = -DeltaG_fus/(RT ln(10)). JANAF's DeltaG_fus is in
-    kJ/mol, so convert by 1000 and use R = 8.314462618 J/(mol K). The
-    interpolated JANAF values are 33.80370 kJ/mol at 1823 K and 32.59870
-    kJ/mol at 1873 K, giving shifts -0.96857 and -0.90911 dex. As a
-    sanity check, DeltaH_fus(1 - T/Tm), with Tm = 3200 K, gives 34.208 and
-    32.966 kJ/mol at those temperatures, close to the JANAF interpolations.
-    """
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -7403,26 +7950,22 @@ def test_unknown_cao_polymorph_converts_via_unique_janaf_solid_table(
 
     converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
-    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
-    assert converted.value.point != reference.value.point
-    assert abs(
-        (converted.value.point / reference.value.point).log10() - expected_shift_dex
-    ) < Decimal("0.0005")
-    notice = next(
-        item
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert converted.value.point == reference.value.point
+    assert any(
+        item.reason == "fusion_source_reference_phase_unprinted"
         for item in converted.notices
-        if item.kind is NoticeKind.DERIVATION_USES_COMPILATION
     )
-    assert "reference_converted_via_fusion" in notice.reason
-    assert "source polymorph is unknown" in notice.reason
 
 
 def test_stated_silica_polymorph_is_not_reinferred() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
             formula="SiO2",
-            T_K=Decimal("1823"),
+            T_K=Decimal("1600"),
             endmember_phase=Phase.CR,
             component_basis="SiO2",
         ),
@@ -7437,21 +7980,14 @@ def test_stated_silica_polymorph_is_not_reinferred() -> None:
         source_id="synthetic-stated-silica-polymorph",
     )
 
-    residual, _candidate = compile_residual(
-        reference,
-        Engine.OPENIMCC,
-        context=_context(F.work(), experiment, reference, review="reviewed"),
-    )
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert residual.refusal.detail["reason"] == (
-        "solid_liquid_reference_conversion_missing_input"
-    )
-    assert residual.refusal.detail["notice"] == (
-        "fusion conversion missing input: JANAF solid table O-035 represents "
-        "polymorph cristobalite_high, but measured reference polymorph is quartz"
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        notice.reason.startswith("reference_converted_via_fusion;")
+        and "tables=O-037/O-038" in notice.reason
+        for notice in comparison.notices
     )
 
 
@@ -7493,7 +8029,7 @@ def test_solid_reference_without_temperature_remains_a_missing_input_refusal() -
     )
 
 
-def test_kume_2000_silica_row_conversion_view_has_stability_inference_flag() -> None:
+def test_kume_2000_silica_unnamed_phase_is_not_converted() -> None:
     from simulator.battery.score import fusion_comparison_reference
 
     context = load_score_context(sources=("kume-2000-cao-activities",))
@@ -7503,14 +8039,15 @@ def test_kume_2000_silica_row_conversion_view_has_stability_inference_flag() -> 
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
-    assert comparison.value.point != reference.value.point
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     assert any(
-        notice.reason.startswith("reference_polymorph_inferred_from_stability: ")
+        notice.reason == "fusion_source_reference_phase_unprinted"
         for notice in comparison.notices
     )
 
 
-def test_inference_notice_reaches_a_numeric_residual() -> None:
+def test_unprinted_source_phase_is_typed_and_cannot_be_scored() -> None:
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
@@ -7540,94 +8077,53 @@ def test_inference_notice_reaches_a_numeric_residual() -> None:
     context = _context(F.work(), experiment, reference, review="reviewed")
 
     residual, candidate = compile_residual(
-        reference, Engine.OPENIMCC, context=context
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=_predict(Decimal("0.3"), identity),
     )
 
-    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == (
+        "fusion_source_reference_phase_unprinted"
+    )
     assert candidate is not None
     assert any(
-        notice.reason.startswith("reference_polymorph_inferred_from_stability: ")
+        notice.reason == "fusion_source_reference_phase_unprinted"
         for notice in residual.notices
     )
 
+    quartz_identity = _with_activity_reference_polymorph(identity, "quartz")
+    mismatched, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=_predict(Decimal("0.3"), quartz_identity),
+    )
+    assert mismatched.status is ResidualStatus.REFUSED
+    assert mismatched.refusal is not None
+    assert mismatched.refusal.reason in {
+        RefusalReason.IDENTITY_UNKNOWN,
+        RefusalReason.IDENTITY_MISMATCH,
+    }
+
 
 @pytest.mark.parametrize(
+    ("formula", "temperature_K", "crossing_K"),
     (
-        "formula",
-        "temperature_K",
-        "expected_activity",
-        "expected_residual",
-        "default_solid_table",
-        "selected_solid_table",
-        "liquid_table",
-        "delta_g_kJ_per_mol",
-        "crossing_K",
-        "source_hashes",
-    ),
-    (
-        (
-            "Al2O3",
-            Decimal("2400"),
-            Decimal("0.3583233854709349838426386125"),
-            Decimal("0.021519916602154066"),
-            "Al-096",
-            "Al-096",
-            "Al-100",
-            Decimal("-3.545"),
-            Decimal("2326.528497409326424870466321"),
-            (
-                "2054107c6e2f7c35d0196530f1d9362981612271d82731437cc016d74f147da6",
-                "b27ae0ccebb7433b209b9dbd7f0b67448e49cf2b613625e22b05709e49c0dbe0",
-            ),
-        ),
-        (
-            "Al2O3",
-            Decimal("2500"),
-            Decimal("0.4337601535097755115490675312"),
-            Decimal("-0.037220177900394995"),
-            "Al-096",
-            "Al-098",
-            "Al-100",
-            Decimal("-7.664"),
-            Decimal("2289.031679617453676031081889"),
-            (
-                "035d4d22aebf50e27e86e50b938508d792aaa53b8b6ea3eec2dc8908cdabff84",
-                "b27ae0ccebb7433b209b9dbd7f0b67448e49cf2b613625e22b05709e49c0dbe0",
-            ),
-        ),
-        (
-            "SiO2",
-            Decimal("2000"),
-            Decimal("0.3004513633937164890006667638"),
-            Decimal("0.2211958252328113"),
-            "O-035",
-            "O-035",
-            "O-038",
-            Decimal("-0.025"),
-            Decimal("1994.469026548672566371681416"),
-            (
-                "b3b964ea6baf5ad47b27a212ef9192762c51fb2acf26f1cec521658fb41fb742",
-                "f1233d320c6c49aa8055a95b7e0f2d6404b47d42079f42966c5f1331f94f3f2c",
-            ),
-        ),
+        ("Al2O3", Decimal("2400"), Decimal("2326.528497409326424870466321")),
+        ("Al2O3", Decimal("2500"), Decimal("2289.031679617453676031081889")),
+        ("SiO2", Decimal("2000"), Decimal("1994.469026548672566371681416")),
     ),
 )
-def test_inferred_solid_activity_above_crossing_is_converted_with_selected_pair(
+def test_unnamed_reference_phase_above_crossing_is_not_selected_from_temperature(
     formula: str,
     temperature_K: Decimal,
-    expected_activity: Decimal,
-    expected_residual: Decimal,
-    default_solid_table: str,
-    selected_solid_table: str,
-    liquid_table: str,
-    delta_g_kJ_per_mol: Decimal,
     crossing_K: Decimal,
-    source_hashes: tuple[str, str],
 ) -> None:
-    import json
-
-    from simulator.battery.generators.janaf import janaf_fusion_energy
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -7655,55 +8151,17 @@ def test_inferred_solid_activity_above_crossing_is_converted_with_selected_pair(
     )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    inference = next(
-        notice
-        for notice in comparison.notices
-        if notice.reason.startswith("reference_polymorph_inferred_from_stability: ")
-    )
-    detail = json.loads(inference.reason.split(": ", 1)[1])
-    conversion = next(
-        notice
-        for notice in comparison.notices
-        if notice.reason.startswith("reference_converted_via_fusion;")
-    )
-    domain_notice = next(
-        notice
-        for notice in comparison.notices
-        if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
-    )
-    residual, _candidate = compile_residual(
-        reference,
-        Engine.OPENIMCC,
-        context=_context(F.work(), experiment, reference, review="reviewed"),
-    )
 
     assert temperature_K > crossing_K
-    assert janaf_fusion_energy(formula, temperature_K).crystal_table == (
-        default_solid_table
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        notice.reason == "fusion_source_reference_phase_unprinted"
+        for notice in comparison.notices
     )
-    assert detail["chosen_table"] == selected_solid_table
-    assert comparison.value.point == expected_activity
-    assert f"DeltaG_fus={delta_g_kJ_per_mol} kJ/mol" in conversion.reason
-    assert f"JANAF_Tm={crossing_K} K" in conversion.reason
-    assert f"tables={selected_solid_table}/{liquid_table}" in conversion.reason
-    assert f"source_sha256={source_hashes[0]}/{source_hashes[1]}" in conversion.reason
-    assert domain_notice.reason == (
-        f"solid reference recorded at T={temperature_K} K >= "
-        f"JANAF T_fus={crossing_K} K; inferred solid-reference activity "
-        "converted numerically; liquid is natural"
-    )
-    assert residual.status is not ResidualStatus.REFUSED
-    assert residual.numeric is not None
-    assert residual.numeric.value == expected_residual
 
 
-def test_unknown_polymorph_with_multiple_solid_tables_uses_lowest_janaf_gibbs() -> None:
-    import json
-
-    from simulator.battery.generators.janaf import (
-        _fusion_table_points,
-        _interpolate_formation_gibbs,
-    )
+def test_unnamed_silica_reference_phase_does_not_select_a_janaf_table() -> None:
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -7726,33 +8184,15 @@ def test_unknown_polymorph_with_multiple_solid_tables_uses_lowest_janaf_gibbs() 
     )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    inference = next(
-        item
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        item.reason == "fusion_source_reference_phase_unprinted"
         for item in comparison.notices
-        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
     )
-    detail = json.loads(inference.reason.split(": ", 1)[1])
-    table_gibbs = {}
-    for table_id in ("O-035", "O-037"):
-        points, _sha = _fusion_table_points(table_id)
-        table_gibbs[table_id] = _interpolate_formation_gibbs(
-            points, Decimal("1823")
-        )
-
-    assert detail["chosen_table"] == min(table_gibbs, key=table_gibbs.get)
-    assert detail["chosen_polymorph"] == "cristobalite_high"
-    assert detail["alternatives"] == [{"polymorph": "quartz", "table": "O-037"}]
-    assert detail["maximum_alternative"] == {
-        "polymorph": "quartz",
-        "table": "O-037",
-    }
-    assert Decimal(detail["bound_dex"]) == Decimal("0.03871558648583859430554675770")
-    assert detail["bound_exceeds_row_band"] is None
-    assert comparison.value.point != reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
 
 
-def _unknown_silica_activity_observation():
+def _quartz_silica_activity_observation():
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
@@ -7761,7 +8201,7 @@ def _unknown_silica_activity_observation():
             endmember_phase=Phase.CR,
             component_basis="SiO2",
         ),
-        None,
+        "quartz",
     )
     reference = F.observation(
         "silica-unknown-polymorph-activity-golden",
@@ -7794,22 +8234,11 @@ def _corrupt_o037_janaf_source_hash(monkeypatch: pytest.MonkeyPatch) -> None:
     janaf._janaf_pure_solid_table_temperature_range.cache_clear()
 
 
-def test_unknown_polymorph_activity_conversion_has_numeric_golden_pin() -> None:
-    from simulator.battery.score import fusion_comparison_reference
-
-    _experiment, reference = _unknown_silica_activity_observation()
-
-    comparison = fusion_comparison_reference(reference)
-
-    assert comparison.value.point == Decimal("0.2859156906189812475869526078")
-    assert float(comparison.value.point).hex() == "0x1.24c715327cb38p-2"
-
-
 def test_corrupt_o037_activity_candidate_hash_refuses_compile_residual(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     _corrupt_o037_janaf_source_hash(monkeypatch)
-    experiment, reference = _unknown_silica_activity_observation()
+    experiment, reference = _quartz_silica_activity_observation()
 
     residual, _candidate = compile_residual(
         reference,
@@ -7832,7 +8261,7 @@ def test_corrupt_o037_activity_candidate_is_counted_by_score_store_census(
     from simulator.battery.score import refusal_census
 
     _corrupt_o037_janaf_source_hash(monkeypatch)
-    experiment, reference = _unknown_silica_activity_observation()
+    experiment, reference = _quartz_silica_activity_observation()
     context = _context(F.work(), experiment, reference, review="reviewed")
 
     residuals, _candidates = score_store(
@@ -7853,9 +8282,7 @@ def test_corrupt_o037_activity_candidate_is_counted_by_score_store_census(
     }
 
 
-def test_unknown_alumina_activity_notice_lists_all_dictionary_crystals() -> None:
-    import json
-
+def test_unnamed_alumina_reference_phase_is_not_inferred() -> None:
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -7878,24 +8305,15 @@ def test_unknown_alumina_activity_notice_lists_all_dictionary_crystals() -> None
     )
 
     comparison = fusion_comparison_reference(reference)
-    notice = next(
-        item
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        item.reason == "fusion_source_reference_phase_unprinted"
         for item in comparison.notices
-        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
     )
-    detail = json.loads(notice.reason.split(": ", 1)[1])
-
-    assert detail["chosen_table"] == "Al-096"
-    assert {item["table"] for item in detail["alternatives"]} == {
-        "Al-097",
-        "Al-098",
-        "Al-099",
-    }
 
 
-def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> None:
-    import json
-
+def test_unnamed_silica_reference_with_row_band_keeps_missing_phase_reason() -> None:
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -7927,50 +8345,15 @@ def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> 
     )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    inference = next(
-        item
-        for item in comparison.notices
-        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
-    )
-    detail = json.loads(inference.reason.split(": ", 1)[1])
-
-    assert Decimal(detail["bound_dex"]) > Decimal("0.01")
-    assert detail["row_decision_band_dex"] == "0.01"
-    assert detail["row_decision_band_refusal"] is None
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     assert any(
-        item.reason == "confidence_level_not_stated"
+        item.reason == "fusion_source_reference_phase_unprinted"
         for item in comparison.notices
     )
 
-    unmapped = replace(
-        reference,
-        observation_id="silica-inference-bound-unmapped-unit",
-        uncertainty=Uncertainty(
-            kind=UncertaintyKind.PRINTED,
-            verbatim="1 furlong",
-            value=Decimal("1"),
-            basis="furlong",
-        ),
-        notices=(),
-    )
-    refused_comparison = fusion_comparison_reference(
-        unmapped, engine=Engine.OPENIMCC
-    )
-    refused_inference = next(
-        item
-        for item in refused_comparison.notices
-        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
-    )
-    refused_detail = json.loads(refused_inference.reason.split(": ", 1)[1])
-    assert refused_detail["row_decision_band_dex"] is None
-    assert refused_detail["row_decision_band_refusal"]["reason"] == (
-        "printed_uncertainty_unit_unmapped"
-    )
-    assert detail["bound_exceeds_row_band"] is True
-    assert comparison.value.point != reference.value.point
 
-
-def test_single_table_cao_conversion_keeps_its_value_and_flag_byte_identical() -> None:
+def test_unnamed_cao_reference_phase_is_not_converted() -> None:
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -7994,21 +8377,12 @@ def test_single_table_cao_conversion_keeps_its_value_and_flag_byte_identical() -
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
-    assert comparison.value.point == Decimal("0.03698396471321415622463886555")
-    assert tuple(notice.reason for notice in comparison.notices) == (
-        "reference_converted_via_fusion; source polymorph is unknown; "
-        "reference-state conversion (not model error); oxide=CaO; "
-        "source_activity_solid=0.3; "
-        "converted_activity_liquid=0.03698396471321415622463886555; "
-        "offset_dex=+0.9091077886543268821557037928; "
-        "DeltaG_fus=32.59870 kJ/mol; T=1873 K; JANAF_Tm=3200.0 K; "
-        "distance_below_JANAF_Tm=1327.0 K; accepted_Tm~2886 K; "
-        "JANAF_minus_accepted_Tm=314.0 K; "
-        "table/accepted melting-point mismatch adds uncertainty to the "
-        "metastable-liquid reference; tables=Ca-027/Ca-028; "
-        "source_sha256=b6a05e07aa1156d58ec9fa701a4c3e338dbbde38c0c6c16660a23c57aac7563d/"
-        "44546e962fd516f7e9cf035429593916440008b7f81c06b5915da86b1203d072"
-    ,)
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        notice.reason == "fusion_source_reference_phase_unprinted"
+        for notice in comparison.notices
+    )
 
 
 def test_rejected_cao_reference_polymorph_is_not_converted_or_scored() -> None:
@@ -8124,9 +8498,14 @@ def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
     )
     after_comparison = fusion_comparison_reference(after, engine=Engine.OPENIMCC)
 
+    assert before_comparison.value.point == before.value.point
     assert (
         before_comparison.identity.reference_state.value.endmember.phase.value
-        is Phase.L
+        is Phase.CR
+    )
+    assert any(
+        notice.reason == "fusion_source_reference_phase_unprinted"
+        for notice in before_comparison.notices
     )
     assert (
         after_comparison.identity.reference_state.value.endmember.phase.value
@@ -8297,21 +8676,17 @@ def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     if polymorph is None:
-        assert comparison.value.point != reference.value.point
-        assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
         assert any(
-            notice.reason.startswith("reference_converted_via_fusion;")
-            and "source polymorph is unknown" in notice.reason
+            notice.reason == "fusion_source_reference_phase_unprinted"
             for notice in comparison.notices
         )
         return
 
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        "fusion conversion missing input" in notice.reason
-        and "Ca-027 represents polymorph lime" in notice.reason
+    assert not any(
+        notice.reason.startswith("reference_converted_via_fusion;")
         for notice in comparison.notices
     )
 
@@ -8323,12 +8698,13 @@ def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert residual.refusal.detail["missing_input"] == (
-        "JANAF solid polymorph matching the selected table"
+    assert residual.refusal.detail["notice"] == (
+        "fusion conversion missing input for CaO: no unique JANAF solid table "
+        "for CaO polymorph quartz"
     )
 
 
-def test_silica_solid_activity_with_stated_quartz_refuses_conversion() -> None:
+def test_silica_solid_activity_above_quartz_crossing_keeps_quartz_table() -> None:
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -8352,23 +8728,11 @@ def test_silica_solid_activity_with_stated_quartz_refuses_conversion() -> None:
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
-        "fusion conversion missing input" in notice.reason
-        and "O-035 represents polymorph cristobalite_high" in notice.reason
+        notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+        and "tables=O-037/O-038" in notice.band
         for notice in comparison.notices
-    )
-
-    residual, _candidate = compile_residual(
-        reference,
-        Engine.OPENIMCC,
-        context=_context(F.work(), experiment, reference, review="reviewed"),
-    )
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert residual.refusal.detail["missing_input"] == (
-        "JANAF solid polymorph matching the selected table"
     )
 
 
@@ -8866,10 +9230,17 @@ def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
         source_id="another-source",
     )
 
-    def no_unique_crossing(formula: str, temperature_K: Decimal):
+    def no_unique_crossing(
+        formula: str,
+        solid_table: str,
+        liquid_table: str,
+        temperature_K: Decimal,
+    ):
         raise ValueError(f"{formula}: expected one JANAF cr/l crossing, got []")
 
-    monkeypatch.setattr(janaf, "janaf_fusion_energy", no_unique_crossing)
+    monkeypatch.setattr(janaf, "_janaf_fusion_energy_for_pair", no_unique_crossing)
+    identity = _with_activity_reference_polymorph(identity, "lime")
+    reference = replace(reference, identity=identity)
     result = fusion_comparison_reference(reference)
 
     assert result.value.point == reference.value.point
@@ -9031,10 +9402,7 @@ def test_score_store_attempts_all_owned_handle_closes(
 
 @pytest.mark.parametrize(
     ("formula", "temperature", "missing_reason"),
-    (
-        ("CaO", Decimal("100"), "outside the JANAF table range"),
-        ("NaO0.5", Decimal("1000"), "no JANAF fusion table pair"),
-    ),
+    (("CaO", Decimal("100"), "outside the JANAF table range"),),
 )
 def test_missing_janaf_fusion_input_refuses_activity_residual(
     formula: str, temperature: Decimal, missing_reason: str
@@ -9051,6 +9419,8 @@ def test_missing_janaf_fusion_input_refuses_activity_residual(
         endmember_phase=Phase.CR,
         component_basis=formula,
     )
+    if formula == "CaO":
+        identity = _with_activity_reference_polymorph(identity, "lime")
     reference = F.observation(
         f"missing-janaf-{formula}-activity",
         experiment.experiment_id,
@@ -9747,9 +10117,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         assert len(allibert_cao_rows) == 8
         assert all(
             any(
-                notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
-                and notice.reason.startswith("reference_converted_via_fusion;")
-                and "source polymorph is unknown" in notice.reason
+                notice.reason == "fusion_source_reference_phase_unprinted"
                 for notice in row.notices
             )
             for row in allibert_cao_rows
@@ -9923,9 +10291,13 @@ def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
     )
     residual = next(row for row in residuals if row.reference == observation_id)
 
-    assert residual.numeric is not None
-    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.status is ResidualStatus.REFUSED
     assert residual.score_eligible is False
+    assert any(
+        notice.reason == "fusion_source_reference_phase_unprinted"
+        for notice in residual.notices
+    )
     # t-1225 supports this Table 2 method, so no apparatus warning is expected.
     assert not any(
         notice.kind is NoticeKind.UNVERIFIED_APPARATUS

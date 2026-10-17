@@ -94,6 +94,7 @@ from simulator.battery.enums import (
     IdentityEqualKind,
     PerBasis,
     Phase,
+    PolymorphRejectionKind,
     Quantity,
     RefusalReason,
     StateTag,
@@ -1171,6 +1172,7 @@ def _species_equal(
     b: Species,
     *,
     allow_unknown_phase: bool = False,
+    allow_unknown_polymorph: bool = False,
 ) -> IdentityEqualOutcome:
     fields: list[str] = []
     unknown: list[str] = []
@@ -1208,6 +1210,14 @@ def _species_equal(
         b.polymorph,
         required=a_token is Phase.CR,
     )
+    both_polymorphs_unspecified = all(
+        polymorph is None
+        or (
+            polymorph.is_unknown
+            and polymorph.rejection_kind is PolymorphRejectionKind.OMITTED
+        )
+        for polymorph in (a.polymorph, b.polymorph)
+    )
     if (
         a.polymorph is not None
         and b.polymorph is not None
@@ -1218,9 +1228,17 @@ def _species_equal(
         return poly
     if a_token is Phase.CR:
         if poly.kind is not IdentityEqualKind.EQUAL:
-            return poly
+            if not (
+                allow_unknown_polymorph
+                and both_polymorphs_unspecified
+                and poly.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+            ):
+                return poly
         # Crystal phase requires a physically resolved polymorph value.
-        if a.polymorph is None or not a.polymorph.is_value:
+        if (
+            (a.polymorph is None or not a.polymorph.is_value)
+            and not (allow_unknown_polymorph and both_polymorphs_unspecified)
+        ):
             return IdentityEqualOutcome(
                 IdentityEqualKind.IDENTITY_UNKNOWN,
                 ("species.polymorph",),
@@ -1240,6 +1258,7 @@ def _state_compare(
     *,
     required: bool,
     permitted_na: bool = False,
+    allow_unknown_species_polymorph: bool = False,
 ) -> IdentityEqualOutcome:
     """v2.1 state_truth_table on one axis."""
 
@@ -1267,7 +1286,12 @@ def _state_compare(
             f"{name} is required; not_applicable is not permitted",
         )
     # value vs value — preserve nested three-valued outcomes
-    return _values_compare(name, a.value, b.value)
+    return _values_compare(
+        name,
+        a.value,
+        b.value,
+        allow_unknown_species_polymorph=allow_unknown_species_polymorph,
+    )
 
 
 def _mismatch(name: str) -> IdentityEqualOutcome:
@@ -1400,7 +1424,13 @@ def _multiset_compare(
     return _mismatch(name)
 
 
-def _values_compare(name: str, left: Any, right: Any) -> IdentityEqualOutcome:
+def _values_compare(
+    name: str,
+    left: Any,
+    right: Any,
+    *,
+    allow_unknown_species_polymorph: bool = False,
+) -> IdentityEqualOutcome:
     if isinstance(left, Decimal) or isinstance(right, Decimal):
         if as_decimal(left) == as_decimal(right):
             return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
@@ -1418,7 +1448,11 @@ def _values_compare(name: str, left: Any, right: Any) -> IdentityEqualOutcome:
             return _mismatch(name)
         if left.reference_pressure_bar != right.reference_pressure_bar:
             return _mismatch(name)
-        nested = _species_equal(left.endmember, right.endmember)
+        nested = _species_equal(
+            left.endmember,
+            right.endmember,
+            allow_unknown_polymorph=allow_unknown_species_polymorph,
+        )
         if nested.kind is IdentityEqualKind.EQUAL:
             return nested
         if nested.kind is IdentityEqualKind.IDENTITY_MISMATCH:
@@ -1594,8 +1628,9 @@ def _identity_equal(
     right: Identity,
     *,
     allow_unknown_species_phase: bool = False,
+    allow_unknown_species_polymorph: bool = False,
 ) -> IdentityEqualOutcome:
-    """Compare identities, optionally omitting only an unknown species phase."""
+    """Compare identities, optionally allowing an unknown phase or polymorph."""
 
     left_q_state = _quantity_state(left)
     right_q_state = _quantity_state(right)
@@ -1627,6 +1662,7 @@ def _identity_equal(
         left.species,
         right.species,
         allow_unknown_phase=allow_unknown_species_phase,
+        allow_unknown_polymorph=allow_unknown_species_polymorph,
     )
     if species_outcome.kind is not IdentityEqualKind.EQUAL:
         return species_outcome
@@ -1679,6 +1715,9 @@ def _identity_equal(
                 right_axis,
                 required=required,
                 permitted_na=permitted_na,
+                allow_unknown_species_polymorph=(
+                    allow_unknown_species_polymorph and name == "reference_state"
+                ),
             )
         if outcome.kind is IdentityEqualKind.IDENTITY_MISMATCH:
             mismatch.extend(outcome.fields)
