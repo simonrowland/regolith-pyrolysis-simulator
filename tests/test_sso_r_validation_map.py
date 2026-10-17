@@ -662,7 +662,10 @@ def test_owner_live_pn2_tick_uses_sweep_floor_and_drains_o2(smoke_payload):
     terminal_delta = (
         probe["terminal_stored_o2_delta_mol"] + probe["terminal_vented_o2_delta_mol"]
     )
-    assert probe["native_split_o2_mol"] > 700.0
+    # d-156/d-166: melt above IW(a_FeO) releases no FeO-split O2;
+    # native metal is still partitioned into the metal pool.
+    assert probe["native_split_o2_mol"] == 0.0
+    assert probe["native_fe_pool_mol"] > 0.0
     assert probe["bled_o2_mol"] >= probe["native_split_o2_mol"]
     assert (
         terminal_delta
