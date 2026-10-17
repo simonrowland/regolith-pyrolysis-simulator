@@ -1,0 +1,4165 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2019-lunar-meteorite-evaporation-model
+source:
+  citation: Shornikov, S. I. (2019), “Thermodynamic modeling of evaporation processes of lunar and meteorite substance,” Geochemistry
+    International 57(8), 865–872.
+  doi: 10.1134/S001670291908010X
+  year: 2019
+  url: https://doi.org/10.1134/S001670291908010X
+extraction:
+  method: Table 1 and Table 2 transcribed from MinerU content-list tables and pdftotext-layout; all numeric cells cross-checked
+    between machine reads, with page renders used for flagged decimal cells, ranges, dashes, and table row/column assignment.
+  date: '2026-10-17'
+  worker: wave3b-shlm19
+  provenance_path: raw/shornikov-2019-lunar-meteorite-evaporation-model/shornikov-2019-lunar-meteorite-evaporation-model.pdf
+review_status: draft
+fidelity_samples:
+- path: species.CaO.observations[shornikov_2019_table1_r01_solid_CaO].values.value
+  value: '-421.511'
+  locator:
+    pdf_page_index: 3
+    published_page: 868
+    table: '1'
+    note: Page 4 render, Table 1 row 1 solid CaO cell.
+- path: species.CaO.observations[shornikov_2019_table1_r01_liquid_CaO].values.value
+  value: '-409.450'
+  locator:
+    pdf_page_index: 3
+    published_page: 868
+    table: '1'
+    note: Page 4 render, Table 1 row 1 liquid CaO cell.
+- path: species.Ca.observations[shornikov_2019_table1_r01_gas_Ca].values.value
+  value: '-21.080'
+  locator:
+    pdf_page_index: 3
+    published_page: 868
+    table: '1'
+    note: Page 4 render, Table 1 row 1 gas Ca cell.
+species:
+  CaO:
+    observations:
+    - observation_id: shornikov_2019_table1_r01_solid_CaO
+      type: gibbs_table
+      locator: &id001
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 1, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id001
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-421.511'
+        points:
+        - value: -421.511
+        table_row_number: 1
+        table_phase_column: solid
+        formula_as_published: CaO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r01_liquid_CaO
+      type: gibbs_table
+      locator: &id002
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 1, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id002
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-409.450'
+        points:
+        - value: -409.45
+        table_row_number: 1
+        table_phase_column: liquid
+        formula_as_published: CaO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r03_gas_CaO
+      type: gibbs_table
+      locator: &id003
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 3, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id003
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-74.308'
+        points:
+        - value: -74.308
+        table_row_number: 3
+        table_phase_column: gas
+        formula_as_published: CaO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    context:
+    - observation_id: shornikov_2019_table2_starting_composition_r01
+      type: composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 869
+        table: '2'
+        note: Table 2 printed body row 1; sample label additionally identified in page 5; Table 2 setup and Fig. 2 discussion.
+      units: mol % and K as printed
+      values:
+        quantity: model_starting_melt_composition
+        method_class: quoted_attributed
+        sample_label_as_printed_in_discussion_or_caption: 5aN-3
+        evaporation_temperature_as_printed: '2173'
+        temperature_unit: K
+        oxide_concentration_mol_pct_as_printed:
+          CaO: '14.43'
+          MgO: '25.60'
+          Al2O3: '23.83'
+          SiO2: '36.14'
+        oxide_cells_printed_as_dash:
+        - FeO
+        - TiO2
+        attribution_as_printed: Ivanova et al., 2018
+        note: Initial model composition, not a measured residual composition. The table’s mol% is preserved as printed and
+          is not converted to fractions.
+    - observation_id: shornikov_2019_table2_starting_composition_r02
+      type: composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 869
+        table: '2'
+        note: Table 2 printed body row 2; sample label additionally identified in page 5; Table 2 setup and Fig. 2 discussion.
+      units: mol % and K as printed
+      values:
+        quantity: model_starting_melt_composition
+        method_class: quoted_attributed
+        sample_label_as_printed_in_discussion_or_caption: CAI 4
+        evaporation_temperature_as_printed: '2173'
+        temperature_unit: K
+        oxide_concentration_mol_pct_as_printed:
+          CaO: '24.10'
+          MgO: '24.32'
+          Al2O3: '15.52'
+          SiO2: '36.06'
+        oxide_cells_printed_as_dash:
+        - FeO
+        - TiO2
+        attribution_as_printed: Mendybaev and Richter, 2016
+        note: Initial model composition, not a measured residual composition. The table’s mol% is preserved as printed and
+          is not converted to fractions.
+    - observation_id: shornikov_2019_table2_starting_composition_r03
+      type: composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 869
+        table: '2'
+        note: Table 2 printed body row 3; sample label additionally identified in page 5; Table 2 setup and Fig. 2 discussion.
+      units: mol % and K as printed
+      values:
+        quantity: model_starting_melt_composition
+        method_class: quoted_attributed
+        sample_label_as_printed_in_discussion_or_caption: CAI B
+        evaporation_temperature_as_printed: '2173'
+        temperature_unit: K
+        oxide_concentration_mol_pct_as_printed:
+          CaO: '26.76'
+          MgO: '17.05'
+          Al2O3: '11.41'
+          SiO2: '44.78'
+        oxide_cells_printed_as_dash:
+        - FeO
+        - TiO2
+        attribution_as_printed: Richter et al., 2007
+        note: Initial model composition, not a measured residual composition. The table’s mol% is preserved as printed and
+          is not converted to fractions.
+    - observation_id: shornikov_2019_table2_starting_composition_r04
+      type: composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 869
+        table: '2'
+        note: Table 2 printed body row 4; sample label additionally identified in page 6; Table 2 setup and Fig. 3 caption.
+      units: mol % and K as printed
+      values:
+        quantity: model_starting_melt_composition
+        method_class: quoted_attributed
+        sample_label_as_printed_in_discussion_or_caption: lunar aluminous basalt
+        evaporation_temperature_as_printed: 1850-2400
+        temperature_unit: K
+        oxide_concentration_mol_pct_as_printed:
+          CaO: '19.44'
+          MgO: '7.26'
+          FeO: '3.98'
+          Al2O3: '18.72'
+          TiO2: '0.25'
+          SiO2: '50.35'
+        oxide_cells_printed_as_dash: []
+        attribution_as_printed: Markova et al., 1986
+        note: Initial model composition, not a measured residual composition. The table’s mol% is preserved as printed and
+          is not converted to fractions.
+    - observation_id: shornikov_2019_table2_starting_composition_r05
+      type: composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 869
+        table: '2'
+        note: Table 2 printed body row 5; sample label additionally identified in page 6; Table 2 setup and Fig. 3 caption.
+      units: mol % and K as printed
+      values:
+        quantity: model_starting_melt_composition
+        method_class: quoted_attributed
+        sample_label_as_printed_in_discussion_or_caption: synthetic oxide material of solar elemental composition
+        evaporation_temperature_as_printed: 1700-2300
+        temperature_unit: K
+        oxide_concentration_mol_pct_as_printed:
+          CaO: '2.08'
+          MgO: '35.15'
+          FeO: '29.18'
+          Al2O3: '1.38'
+          TiO2: '0.08'
+          SiO2: '32.13'
+        oxide_cells_printed_as_dash: []
+        attribution_as_printed: Wang et al., 2001
+        note: Initial model composition, not a measured residual composition. The table’s mol% is preserved as printed and
+          is not converted to fractions.
+  Ca:
+    observations:
+    - observation_id: shornikov_2019_table1_r01_gas_Ca
+      type: gibbs_table
+      locator: &id004
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 1, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id004
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-21.080'
+        points:
+        - value: -21.08
+        table_row_number: 1
+        table_phase_column: gas
+        formula_as_published: Ca
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  MgO:
+    observations:
+    - observation_id: shornikov_2019_table1_r02_solid_MgO
+      type: gibbs_table
+      locator: &id005
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 2, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id005
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-376.430'
+        points:
+        - value: -376.43
+        table_row_number: 2
+        table_phase_column: solid
+        formula_as_published: MgO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r02_liquid_MgO
+      type: gibbs_table
+      locator: &id006
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 2, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id006
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-345.380'
+        points:
+        - value: -345.38
+        table_row_number: 2
+        table_phase_column: liquid
+        formula_as_published: MgO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r06_gas_MgO
+      type: gibbs_table
+      locator: &id007
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 6, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id007
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-107.759'
+        points:
+        - value: -107.759
+        table_row_number: 6
+        table_phase_column: gas
+        formula_as_published: MgO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca2:
+    observations:
+    - observation_id: shornikov_2019_table1_r02_gas_Ca2
+      type: gibbs_table
+      locator: &id008
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 2, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id008
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '77.075'
+        points:
+        - value: 77.075
+        table_row_number: 2
+        table_phase_column: gas
+        formula_as_published: Ca2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Al2O3:
+    observations:
+    - observation_id: shornikov_2019_table1_r03_solid_Al2O3
+      type: gibbs_table
+      locator: &id009
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 3, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id009
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1033.869'
+        points:
+        - value: -1033.869
+        table_row_number: 3
+        table_phase_column: solid
+        formula_as_published: Al2O3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r03_liquid_Al2O3
+      type: gibbs_table
+      locator: &id010
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 3, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id010
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1018.664'
+        points:
+        - value: -1018.664
+        table_row_number: 3
+        table_phase_column: liquid
+        formula_as_published: Al2O3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r13_gas_Al2O3
+      type: gibbs_table
+      locator: &id011
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 13, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id011
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-404.059'
+        points:
+        - value: -404.059
+        table_row_number: 13
+        table_phase_column: gas
+        formula_as_published: Al2O3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  FeO:
+    observations:
+    - observation_id: shornikov_2019_table1_r04_solid_FeO
+      type: gibbs_table
+      locator: &id012
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 4, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id012
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-146.291'
+        points:
+        - value: -146.291
+        table_row_number: 4
+        table_phase_column: solid
+        formula_as_published: FeO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r04_liquid_FeO
+      type: gibbs_table
+      locator: &id013
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 4, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id013
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-152.867'
+        points:
+        - value: -152.867
+        table_row_number: 4
+        table_phase_column: liquid
+        formula_as_published: FeO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r16_gas_FeO
+      type: gibbs_table
+      locator: &id014
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 16, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id014
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '67.370'
+        points:
+        - value: 67.37
+        table_row_number: 16
+        table_phase_column: gas
+        formula_as_published: FeO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Mg:
+    observations:
+    - observation_id: shornikov_2019_table1_r04_gas_Mg
+      type: gibbs_table
+      locator: &id015
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 4, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id015
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-57.263'
+        points:
+        - value: -57.263
+        table_row_number: 4
+        table_phase_column: gas
+        formula_as_published: Mg
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  TiO2:
+    observations:
+    - observation_id: shornikov_2019_table1_r05_solid_TiO2
+      type: gibbs_table
+      locator: &id016
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 5, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id016
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-583.299'
+        points:
+        - value: -583.299
+        table_row_number: 5
+        table_phase_column: solid
+        formula_as_published: TiO2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r05_liquid_TiO2
+      type: gibbs_table
+      locator: &id017
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 5, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id017
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-577.637'
+        points:
+        - value: -577.637
+        table_row_number: 5
+        table_phase_column: liquid
+        formula_as_published: TiO2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r27_gas_TiO2
+      type: gibbs_table
+      locator: &id018
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 27, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id018
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-337.178'
+        points:
+        - value: -337.178
+        table_row_number: 27
+        table_phase_column: gas
+        formula_as_published: TiO2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Mg2:
+    observations:
+    - observation_id: shornikov_2019_table1_r05_gas_Mg2
+      type: gibbs_table
+      locator: &id019
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 5, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id019
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '34.414'
+        points:
+        - value: 34.414
+        table_row_number: 5
+        table_phase_column: gas
+        formula_as_published: Mg2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  SiO2:
+    observations:
+    - observation_id: shornikov_2019_table1_r06_solid_SiO2
+      type: gibbs_table
+      locator: &id020
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 6, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id020
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-550.476'
+        points:
+        - value: -550.476
+        table_row_number: 6
+        table_phase_column: solid
+        formula_as_published: SiO2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r06_liquid_SiO2
+      type: gibbs_table
+      locator: &id021
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 6, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id021
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-550.607'
+        points:
+        - value: -550.607
+        table_row_number: 6
+        table_phase_column: liquid
+        formula_as_published: SiO2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r23_gas_SiO2
+      type: gibbs_table
+      locator: &id022
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 23, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id022
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-314.875'
+        points:
+        - value: -314.875
+        table_row_number: 23
+        table_phase_column: gas
+        formula_as_published: SiO2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  CaAl2O4:
+    observations:
+    - observation_id: shornikov_2019_table1_r07_solid_CaAl2O4
+      type: gibbs_table
+      locator: &id023
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 7, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id023
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1517.600'
+        points:
+        - value: -1517.6
+        table_row_number: 7
+        table_phase_column: solid
+        formula_as_published: CaAl2O4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r07_liquid_CaAl2O4
+      type: gibbs_table
+      locator: &id024
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 7, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id024
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1521.781'
+        points:
+        - value: -1521.781
+        table_row_number: 7
+        table_phase_column: liquid
+        formula_as_published: CaAl2O4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Al:
+    observations:
+    - observation_id: shornikov_2019_table1_r07_gas_Al
+      type: gibbs_table
+      locator: &id025
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 7, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id025
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '82.257'
+        points:
+        - value: 82.257
+        table_row_number: 7
+        table_phase_column: gas
+        formula_as_published: Al
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  CaAl4O7:
+    observations:
+    - observation_id: shornikov_2019_table1_r08_solid_CaAl4O7
+      type: gibbs_table
+      locator: &id026
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 8, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id026
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2567.915'
+        points:
+        - value: -2567.915
+        table_row_number: 8
+        table_phase_column: solid
+        formula_as_published: CaAl4O7
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r08_liquid_CaAl4O7
+      type: gibbs_table
+      locator: &id027
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 8, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id027
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2566.521'
+        points:
+        - value: -2566.521
+        table_row_number: 8
+        table_phase_column: liquid
+        formula_as_published: CaAl4O7
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Al2:
+    observations:
+    - observation_id: shornikov_2019_table1_r08_gas_Al2
+      type: gibbs_table
+      locator: &id028
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 8, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id028
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '191.266'
+        points:
+        - value: 191.266
+        table_row_number: 8
+        table_phase_column: gas
+        formula_as_published: Al2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  CaAl12O19:
+    observations:
+    - observation_id: shornikov_2019_table1_r09_solid_CaAl12O19
+      type: gibbs_table
+      locator: &id029
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 9, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id029
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-6714.869'
+        points:
+        - value: -6714.869
+        table_row_number: 9
+        table_phase_column: solid
+        formula_as_published: CaAl12O19
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  AlO:
+    observations:
+    - observation_id: shornikov_2019_table1_r09_gas_AlO
+      type: gibbs_table
+      locator: &id030
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 9, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id030
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-74.765'
+        points:
+        - value: -74.765
+        table_row_number: 9
+        table_phase_column: gas
+        formula_as_published: AlO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca3Al2O6:
+    observations:
+    - observation_id: shornikov_2019_table1_r10_solid_Ca3Al2O6
+      type: gibbs_table
+      locator: &id031
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 10, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id031
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2375.802'
+        points:
+        - value: -2375.802
+        table_row_number: 10
+        table_phase_column: solid
+        formula_as_published: Ca3Al2O6
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  AlO2:
+    observations:
+    - observation_id: shornikov_2019_table1_r10_gas_AlO2
+      type: gibbs_table
+      locator: &id032
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 10, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id032
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-99.108'
+        points:
+        - value: -99.108
+        table_row_number: 10
+        table_phase_column: gas
+        formula_as_published: AlO2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca5Al6O14:
+    observations:
+    - observation_id: shornikov_2019_table1_r11_solid_Ca5Al6O14
+      type: gibbs_table
+      locator: &id033
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 11, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id033
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-5431.722'
+        points:
+        - value: -5431.722
+        table_row_number: 11
+        table_phase_column: solid
+        formula_as_published: Ca5Al6O14
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Al2O:
+    observations:
+    - observation_id: shornikov_2019_table1_r11_gas_Al2O
+      type: gibbs_table
+      locator: &id034
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 11, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id034
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-292.198'
+        points:
+        - value: -292.198
+        table_row_number: 11
+        table_phase_column: gas
+        formula_as_published: Al2O
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca12Al14O33:
+    observations:
+    - observation_id: shornikov_2019_table1_r12_solid_Ca12Al14O33
+      type: gibbs_table
+      locator: &id035
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 12, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id035
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-12797.385'
+        points:
+        - value: -12797.385
+        table_row_number: 12
+        table_phase_column: solid
+        formula_as_published: Ca12Al14O33
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r12_liquid_Ca12Al14O33
+      type: gibbs_table
+      locator: &id036
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 12, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id036
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-12882.862'
+        points:
+        - value: -12882.862
+        table_row_number: 12
+        table_phase_column: liquid
+        formula_as_published: Ca12Al14O33
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Al2O2:
+    observations:
+    - observation_id: shornikov_2019_table1_r12_gas_Al2O2
+      type: gibbs_table
+      locator: &id037
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 12, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id037
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-385.783'
+        points:
+        - value: -385.783
+        table_row_number: 12
+        table_phase_column: gas
+        formula_as_published: Al2O2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  CaTiO3:
+    observations:
+    - observation_id: shornikov_2019_table1_r13_solid_CaTiO3
+      type: gibbs_table
+      locator: &id038
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 13, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id038
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1097.162'
+        points:
+        - value: -1097.162
+        table_row_number: 13
+        table_phase_column: solid
+        formula_as_published: CaTiO3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r13_liquid_CaTiO3
+      type: gibbs_table
+      locator: &id039
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 13, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id039
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1086.922'
+        points:
+        - value: -1086.922
+        table_row_number: 13
+        table_phase_column: liquid
+        formula_as_published: CaTiO3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r34_gas_CaTiO3
+      type: gibbs_table
+      locator: &id040
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 34, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id040
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-661.870'
+        points:
+        - value: -661.87
+        table_row_number: 34
+        table_phase_column: gas
+        formula_as_published: CaTiO3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca3Ti2O7:
+    observations:
+    - observation_id: shornikov_2019_table1_r14_solid_Ca3Ti2O7
+      type: gibbs_table
+      locator: &id041
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 14, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id041
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2586.656'
+        points:
+        - value: -2586.656
+        table_row_number: 14
+        table_phase_column: solid
+        formula_as_published: Ca3Ti2O7
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Fe:
+    observations:
+    - observation_id: shornikov_2019_table1_r14_gas_Fe
+      type: gibbs_table
+      locator: &id042
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 14, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id042
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '130.028'
+        points:
+        - value: 130.028
+        table_row_number: 14
+        table_phase_column: gas
+        formula_as_published: Fe
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca4Ti3O10:
+    observations:
+    - observation_id: shornikov_2019_table1_r15_solid_Ca4Ti3O10
+      type: gibbs_table
+      locator: &id043
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 15, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id043
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-3708.030'
+        points:
+        - value: -3708.03
+        table_row_number: 15
+        table_phase_column: solid
+        formula_as_published: Ca4Ti3O10
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Fe2:
+    observations:
+    - observation_id: shornikov_2019_table1_r15_gas_Fe2
+      type: gibbs_table
+      locator: &id044
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 15, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id044
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '383.352'
+        points:
+        - value: 383.352
+        table_row_number: 15
+        table_phase_column: gas
+        formula_as_published: Fe2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  CaSiO3:
+    observations:
+    - observation_id: shornikov_2019_table1_r16_solid_CaSiO3
+      type: gibbs_table
+      locator: &id045
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 16, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id045
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1058.628'
+        points:
+        - value: -1058.628
+        table_row_number: 16
+        table_phase_column: solid
+        formula_as_published: CaSiO3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r16_liquid_CaSiO3
+      type: gibbs_table
+      locator: &id046
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 16, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id046
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1064.401'
+        points:
+        - value: -1064.401
+        table_row_number: 16
+        table_phase_column: liquid
+        formula_as_published: CaSiO3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca2SiO4:
+    observations:
+    - observation_id: shornikov_2019_table1_r17_solid_Ca2SiO4
+      type: gibbs_table
+      locator: &id047
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 17, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id047
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1531.242'
+        points:
+        - value: -1531.242
+        table_row_number: 17
+        table_phase_column: solid
+        formula_as_published: Ca2SiO4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r17_liquid_Ca2SiO4
+      type: gibbs_table
+      locator: &id048
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 17, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id048
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1522.120'
+        points:
+        - value: -1522.12
+        table_row_number: 17
+        table_phase_column: liquid
+        formula_as_published: Ca2SiO4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  FeO2:
+    observations:
+    - observation_id: shornikov_2019_table1_r17_gas_FeO2
+      type: gibbs_table
+      locator: &id049
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 17, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id049
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '35.366'
+        points:
+        - value: 35.366
+        table_row_number: 17
+        table_phase_column: gas
+        formula_as_published: FeO2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca3SiO5:
+    observations:
+    - observation_id: shornikov_2019_table1_r18_solid_Ca3SiO5
+      type: gibbs_table
+      locator: &id050
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 18, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id050
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1945.934'
+        points:
+        - value: -1945.934
+        table_row_number: 18
+        table_phase_column: solid
+        formula_as_published: Ca3SiO5
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Si:
+    observations:
+    - observation_id: shornikov_2019_table1_r18_gas_Si
+      type: gibbs_table
+      locator: &id051
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 18, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id051
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '167.228'
+        points:
+        - value: 167.228
+        table_row_number: 18
+        table_phase_column: gas
+        formula_as_published: Si
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca3Si2O7:
+    observations:
+    - observation_id: shornikov_2019_table1_r19_solid_Ca3Si2O7
+      type: gibbs_table
+      locator: &id052
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 19, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id052
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2577.486'
+        points:
+        - value: -2577.486
+        table_row_number: 19
+        table_phase_column: solid
+        formula_as_published: Ca3Si2O7
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Si2:
+    observations:
+    - observation_id: shornikov_2019_table1_r19_gas_Si2
+      type: gibbs_table
+      locator: &id053
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 19, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id053
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '216.304'
+        points:
+        - value: 216.304
+        table_row_number: 19
+        table_phase_column: gas
+        formula_as_published: Si2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  MgAl2O4:
+    observations:
+    - observation_id: shornikov_2019_table1_r20_solid_MgAl2O4
+      type: gibbs_table
+      locator: &id054
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 20, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id054
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1454.460'
+        points:
+        - value: -1454.46
+        table_row_number: 20
+        table_phase_column: solid
+        formula_as_published: MgAl2O4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r20_liquid_MgAl2O4
+      type: gibbs_table
+      locator: &id055
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 20, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id055
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1435.549'
+        points:
+        - value: -1435.549
+        table_row_number: 20
+        table_phase_column: liquid
+        formula_as_published: MgAl2O4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Si3:
+    observations:
+    - observation_id: shornikov_2019_table1_r20_gas_Si3
+      type: gibbs_table
+      locator: &id056
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 20, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id056
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '265.892'
+        points:
+        - value: 265.892
+        table_row_number: 20
+        table_phase_column: gas
+        formula_as_published: Si3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  MgSiO3:
+    observations:
+    - observation_id: shornikov_2019_table1_r21_solid_MgSiO3
+      type: gibbs_table
+      locator: &id057
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 21, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id057
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-956.936'
+        points:
+        - value: -956.936
+        table_row_number: 21
+        table_phase_column: solid
+        formula_as_published: MgSiO3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r21_liquid_MgSiO3
+      type: gibbs_table
+      locator: &id058
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 21, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id058
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-963.013'
+        points:
+        - value: -963.013
+        table_row_number: 21
+        table_phase_column: liquid
+        formula_as_published: MgSiO3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Si4:
+    observations:
+    - observation_id: shornikov_2019_table1_r21_gas_Si4
+      type: gibbs_table
+      locator: &id059
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 21, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id059
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '278.763'
+        points:
+        - value: 278.763
+        table_row_number: 21
+        table_phase_column: gas
+        formula_as_published: Si4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Mg2SiO4:
+    observations:
+    - observation_id: shornikov_2019_table1_r22_solid_Mg2SiO4
+      type: gibbs_table
+      locator: &id060
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 22, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id060
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1360.399'
+        points:
+        - value: -1360.399
+        table_row_number: 22
+        table_phase_column: solid
+        formula_as_published: Mg2SiO4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r22_liquid_Mg2SiO4
+      type: gibbs_table
+      locator: &id061
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 22, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id061
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1351.811'
+        points:
+        - value: -1351.811
+        table_row_number: 22
+        table_phase_column: liquid
+        formula_as_published: Mg2SiO4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  SiO:
+    observations:
+    - observation_id: shornikov_2019_table1_r22_gas_SiO
+      type: gibbs_table
+      locator: &id062
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 22, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id062
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-248.438'
+        points:
+        - value: -248.438
+        table_row_number: 22
+        table_phase_column: gas
+        formula_as_published: SiO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Al2TiO5:
+    observations:
+    - observation_id: shornikov_2019_table1_r23_solid_Al2TiO5
+      type: gibbs_table
+      locator: &id063
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 23, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id063
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1625.208'
+        points:
+        - value: -1625.208
+        table_row_number: 23
+        table_phase_column: solid
+        formula_as_published: Al2TiO5
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r23_liquid_Al2TiO5
+      type: gibbs_table
+      locator: &id064
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 23, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id064
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1622.180'
+        points:
+        - value: -1622.18
+        table_row_number: 23
+        table_phase_column: liquid
+        formula_as_published: Al2TiO5
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Al4TiO8:
+    observations:
+    - observation_id: shornikov_2019_table1_r24_solid_Al4TiO8
+      type: gibbs_table
+      locator: &id065
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 24, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id065
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2649.215'
+        points:
+        - value: -2649.215
+        table_row_number: 24
+        table_phase_column: solid
+        formula_as_published: Al4TiO8
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Si2O2:
+    observations:
+    - observation_id: shornikov_2019_table1_r24_gas_Si2O2
+      type: gibbs_table
+      locator: &id066
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 24, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id066
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-546.135'
+        points:
+        - value: -546.135
+        table_row_number: 24
+        table_phase_column: gas
+        formula_as_published: Si2O2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Al2SiO5:
+    observations:
+    - observation_id: shornikov_2019_table1_r25_solid_Al2SiO5
+      type: gibbs_table
+      locator: &id067
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 25, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id067
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1596.884'
+        points:
+        - value: -1596.884
+        table_row_number: 25
+        table_phase_column: solid
+        formula_as_published: Al2SiO5
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ti:
+    observations:
+    - observation_id: shornikov_2019_table1_r25_gas_Ti
+      type: gibbs_table
+      locator: &id068
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 25, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id068
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '191.645'
+        points:
+        - value: 191.645
+        table_row_number: 25
+        table_phase_column: gas
+        formula_as_published: Ti
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Al2Si2O7:
+    observations:
+    - observation_id: shornikov_2019_table1_r26_solid_Al2Si2O7
+      type: gibbs_table
+      locator: &id069
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 26, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id069
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2079.741'
+        points:
+        - value: -2079.741
+        table_row_number: 26
+        table_phase_column: solid
+        formula_as_published: Al2Si2O7
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  TiO:
+    observations:
+    - observation_id: shornikov_2019_table1_r26_gas_TiO
+      type: gibbs_table
+      locator: &id070
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 26, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id070
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-125.135'
+        points:
+        - value: -125.135
+        table_row_number: 26
+        table_phase_column: gas
+        formula_as_published: TiO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Al6Si2O13:
+    observations:
+    - observation_id: shornikov_2019_table1_r27_solid_Al6Si2O13
+      type: gibbs_table
+      locator: &id071
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 27, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id071
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-4254.309'
+        points:
+        - value: -4254.309
+        table_row_number: 27
+        table_phase_column: solid
+        formula_as_published: Al6Si2O13
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r27_liquid_Al6Si2O13
+      type: gibbs_table
+      locator: &id072
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 27, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id072
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-4223.411'
+        points:
+        - value: -4223.411
+        table_row_number: 27
+        table_phase_column: liquid
+        formula_as_published: Al6Si2O13
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  FeAl2O4:
+    observations:
+    - observation_id: shornikov_2019_table1_r28_solid_FeAl2O4
+      type: gibbs_table
+      locator: &id073
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 28, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id073
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1189.680'
+        points:
+        - value: -1189.68
+        table_row_number: 28
+        table_phase_column: solid
+        formula_as_published: FeAl2O4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r28_liquid_FeAl2O4
+      type: gibbs_table
+      locator: &id074
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 28, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id074
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1189.518'
+        points:
+        - value: -1189.518
+        table_row_number: 28
+        table_phase_column: liquid
+        formula_as_published: FeAl2O4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ti2O3:
+    observations:
+    - observation_id: shornikov_2019_table1_r28_gas_Ti2O3
+      type: gibbs_table
+      locator: &id075
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 28, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id075
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-663.737'
+        points:
+        - value: -663.737
+        table_row_number: 28
+        table_phase_column: gas
+        formula_as_published: Ti2O3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  FeTiO3:
+    observations:
+    - observation_id: shornikov_2019_table1_r29_solid_FeTiO3
+      type: gibbs_table
+      locator: &id076
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 29, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id076
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-730.540'
+        points:
+        - value: -730.54
+        table_row_number: 29
+        table_phase_column: solid
+        formula_as_published: FeTiO3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r29_liquid_FeTiO3
+      type: gibbs_table
+      locator: &id077
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 29, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id077
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-743.874'
+        points:
+        - value: -743.874
+        table_row_number: 29
+        table_phase_column: liquid
+        formula_as_published: FeTiO3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ti2O4:
+    observations:
+    - observation_id: shornikov_2019_table1_r29_gas_Ti2O4
+      type: gibbs_table
+      locator: &id078
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 29, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id078
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-826.662'
+        points:
+        - value: -826.662
+        table_row_number: 29
+        table_phase_column: gas
+        formula_as_published: Ti2O4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  FeTi2O5:
+    observations:
+    - observation_id: shornikov_2019_table1_r30_solid_FeTi2O5
+      type: gibbs_table
+      locator: &id079
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 30, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id079
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1309.606'
+        points:
+        - value: -1309.606
+        table_row_number: 30
+        table_phase_column: solid
+        formula_as_published: FeTi2O5
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  O:
+    observations:
+    - observation_id: shornikov_2019_table1_r30_gas_O
+      type: gibbs_table
+      locator: &id080
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 30, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id080
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '121.662'
+        points:
+        - value: 121.662
+        table_row_number: 30
+        table_phase_column: gas
+        formula_as_published: O
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Fe2TiO4:
+    observations:
+    - observation_id: shornikov_2019_table1_r31_solid_Fe2TiO4
+      type: gibbs_table
+      locator: &id081
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 31, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id081
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-870.076'
+        points:
+        - value: -870.076
+        table_row_number: 31
+        table_phase_column: solid
+        formula_as_published: Fe2TiO4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r31_liquid_Fe2TiO4
+      type: gibbs_table
+      locator: &id082
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 31, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id082
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-881.055'
+        points:
+        - value: -881.055
+        table_row_number: 31
+        table_phase_column: liquid
+        formula_as_published: Fe2TiO4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  O2:
+    observations:
+    - observation_id: shornikov_2019_table1_r31_gas_O2
+      type: gibbs_table
+      locator: &id083
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 31, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id083
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '0.000'
+        points:
+        - value: 0.0
+        table_row_number: 31
+        table_phase_column: gas
+        formula_as_published: O2
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  FeSiO3:
+    observations:
+    - observation_id: shornikov_2019_table1_r32_solid_FeSiO3
+      type: gibbs_table
+      locator: &id084
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 32, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id084
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-701.651'
+        points:
+        - value: -701.651
+        table_row_number: 32
+        table_phase_column: solid
+        formula_as_published: FeSiO3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  O3:
+    observations:
+    - observation_id: shornikov_2019_table1_r32_gas_O3
+      type: gibbs_table
+      locator: &id085
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 32, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id085
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '273.851'
+        points:
+        - value: 273.851
+        table_row_number: 32
+        table_phase_column: gas
+        formula_as_published: O3
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Fe2SiO4:
+    observations:
+    - observation_id: shornikov_2019_table1_r33_solid_Fe2SiO4
+      type: gibbs_table
+      locator: &id086
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 33, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id086
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-839.970'
+        points:
+        - value: -839.97
+        table_row_number: 33
+        table_phase_column: solid
+        formula_as_published: Fe2SiO4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r33_liquid_Fe2SiO4
+      type: gibbs_table
+      locator: &id087
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 33, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id087
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-848.079'
+        points:
+        - value: -848.079
+        table_row_number: 33
+        table_phase_column: liquid
+        formula_as_published: Fe2SiO4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  O4:
+    observations:
+    - observation_id: shornikov_2019_table1_r33_gas_O4
+      type: gibbs_table
+      locator: &id088
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 33, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id088
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '193.351'
+        points:
+        - value: 193.351
+        table_row_number: 33
+        table_phase_column: gas
+        formula_as_published: O4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  CaAl2SiO6:
+    observations:
+    - observation_id: shornikov_2019_table1_r34_solid_CaAl2SiO6
+      type: gibbs_table
+      locator: &id089
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 34, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id089
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2083.286'
+        points:
+        - value: -2083.286
+        table_row_number: 34
+        table_phase_column: solid
+        formula_as_published: CaAl2SiO6
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  CaAl2Si2O8:
+    observations:
+    - observation_id: shornikov_2019_table1_r35_solid_CaAl2Si2O8
+      type: gibbs_table
+      locator: &id090
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 35, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id090
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2654.359'
+        points:
+        - value: -2654.359
+        table_row_number: 35
+        table_phase_column: solid
+        formula_as_published: CaAl2Si2O8
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r35_liquid_CaAl2Si2O8
+      type: gibbs_table
+      locator: &id091
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 35, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id091
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2666.733'
+        points:
+        - value: -2666.733
+        table_row_number: 35
+        table_phase_column: liquid
+        formula_as_published: CaAl2Si2O8
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  AlSi:
+    observations:
+    - observation_id: shornikov_2019_table1_r35_gas_AlSi
+      type: gibbs_table
+      locator: &id092
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 35, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id092
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '1136.071'
+        points:
+        - value: 1136.071
+        table_row_number: 35
+        table_phase_column: gas
+        formula_as_published: AlSi
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca2Al2SiO7:
+    observations:
+    - observation_id: shornikov_2019_table1_r36_solid_Ca2Al2SiO7
+      type: gibbs_table
+      locator: &id093
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 36, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id093
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2593.512'
+        points:
+        - value: -2593.512
+        table_row_number: 36
+        table_phase_column: solid
+        formula_as_published: Ca2Al2SiO7
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r36_liquid_Ca2Al2SiO7
+      type: gibbs_table
+      locator: &id094
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 36, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id094
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2606.167'
+        points:
+        - value: -2606.167
+        table_row_number: 36
+        table_phase_column: liquid
+        formula_as_published: Ca2Al2SiO7
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  AlSiO:
+    observations:
+    - observation_id: shornikov_2019_table1_r36_gas_AlSiO
+      type: gibbs_table
+      locator: &id095
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 36, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id095
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-208.996'
+        points:
+        - value: -208.996
+        table_row_number: 36
+        table_phase_column: gas
+        formula_as_published: AlSiO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca3Al2Si3O12:
+    observations:
+    - observation_id: shornikov_2019_table1_r37_solid_Ca3Al2Si3O12
+      type: gibbs_table
+      locator: &id096
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 37, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id096
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-4217.301'
+        points:
+        - value: -4217.301
+        table_row_number: 37
+        table_phase_column: solid
+        formula_as_published: Ca3Al2Si3O12
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  MgAlO:
+    observations:
+    - observation_id: shornikov_2019_table1_r37_gas_MgAlO
+      type: gibbs_table
+      locator: &id097
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 37, gas phase column.
+      phase: g
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id097
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-265.016'
+        points:
+        - value: -265.016
+        table_row_number: 37
+        table_phase_column: gas
+        formula_as_published: MgAlO
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  CaMgSiO4:
+    observations:
+    - observation_id: shornikov_2019_table1_r38_solid_CaMgSiO4
+      type: gibbs_table
+      locator: &id098
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 38, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id098
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1461.894'
+        points:
+        - value: -1461.894
+        table_row_number: 38
+        table_phase_column: solid
+        formula_as_published: CaMgSiO4
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  CaMgSi2O6:
+    observations:
+    - observation_id: shornikov_2019_table1_r39_solid_CaMgSi2O6
+      type: gibbs_table
+      locator: &id099
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 39, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id099
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2038.188'
+        points:
+        - value: -2038.188
+        table_row_number: 39
+        table_phase_column: solid
+        formula_as_published: CaMgSi2O6
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r39_liquid_CaMgSi2O6
+      type: gibbs_table
+      locator: &id100
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 39, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id100
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2065.893'
+        points:
+        - value: -2065.893
+        table_row_number: 39
+        table_phase_column: liquid
+        formula_as_published: CaMgSi2O6
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca2MgSi2O7:
+    observations:
+    - observation_id: shornikov_2019_table1_r40_solid_Ca2MgSi2O7
+      type: gibbs_table
+      locator: &id101
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 40, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id101
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2478.460'
+        points:
+        - value: -2478.46
+        table_row_number: 40
+        table_phase_column: solid
+        formula_as_published: Ca2MgSi2O7
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r40_liquid_Ca2MgSi2O7
+      type: gibbs_table
+      locator: &id102
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 40, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id102
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2498.156'
+        points:
+        - value: -2498.156
+        table_row_number: 40
+        table_phase_column: liquid
+        formula_as_published: Ca2MgSi2O7
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca3MgSi2O8:
+    observations:
+    - observation_id: shornikov_2019_table1_r41_solid_Ca3MgSi2O8
+      type: gibbs_table
+      locator: &id103
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 41, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id103
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-2976.156'
+        points:
+        - value: -2976.156
+        table_row_number: 41
+        table_phase_column: solid
+        formula_as_published: Ca3MgSi2O8
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Ca3MgAl4O10:
+    observations:
+    - observation_id: shornikov_2019_table1_r42_solid_Ca3MgAl4O10
+      type: gibbs_table
+      locator: &id104
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 42, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id104
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-3844.251'
+        points:
+        - value: -3844.251
+        table_row_number: 42
+        table_phase_column: solid
+        formula_as_published: Ca3MgAl4O10
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r42_liquid_Ca3MgAl4O10
+      type: gibbs_table
+      locator: &id105
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 42, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id105
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-3843.595'
+        points:
+        - value: -3843.595
+        table_row_number: 42
+        table_phase_column: liquid
+        formula_as_published: Ca3MgAl4O10
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  CaTiSiO5:
+    observations:
+    - observation_id: shornikov_2019_table1_r43_solid_CaTiSiO5
+      type: gibbs_table
+      locator: &id106
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 43, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id106
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1689.686'
+        points:
+        - value: -1689.686
+        table_row_number: 43
+        table_phase_column: solid
+        formula_as_published: CaTiSiO5
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r43_liquid_CaTiSiO5
+      type: gibbs_table
+      locator: &id107
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 43, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id107
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1717.151'
+        points:
+        - value: -1717.151
+        table_row_number: 43
+        table_phase_column: liquid
+        formula_as_published: CaTiSiO5
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  MgAl2SiO6:
+    observations:
+    - observation_id: shornikov_2019_table1_r44_solid_MgAl2SiO6
+      type: gibbs_table
+      locator: &id108
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 44, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id108
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-1980.995'
+        points:
+        - value: -1980.995
+        table_row_number: 44
+        table_phase_column: solid
+        formula_as_published: MgAl2SiO6
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Mg2Al4SiO10:
+    observations:
+    - observation_id: shornikov_2019_table1_r45_solid_Mg2Al4SiO10
+      type: gibbs_table
+      locator: &id109
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 45, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id109
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-3451.173'
+        points:
+        - value: -3451.173
+        table_row_number: 45
+        table_phase_column: solid
+        formula_as_published: Mg2Al4SiO10
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Mg2Al4Si5O18:
+    observations:
+    - observation_id: shornikov_2019_table1_r46_solid_Mg2Al4Si5O18
+      type: gibbs_table
+      locator: &id110
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 46, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id110
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-5773.135'
+        points:
+        - value: -5773.135
+        table_row_number: 46
+        table_phase_column: solid
+        formula_as_published: Mg2Al4Si5O18
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r46_liquid_Mg2Al4Si5O18
+      type: gibbs_table
+      locator: &id111
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 46, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id111
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-5794.061'
+        points:
+        - value: -5794.061
+        table_row_number: 46
+        table_phase_column: liquid
+        formula_as_published: Mg2Al4Si5O18
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+  Mg3Al2Si3O12:
+    observations:
+    - observation_id: shornikov_2019_table1_r47_solid_Mg3Al2Si3O12
+      type: gibbs_table
+      locator: &id112
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 47, solid phase column.
+      phase: cr
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id112
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-3859.457'
+        points:
+        - value: -3859.457
+        table_row_number: 47
+        table_phase_column: solid
+        formula_as_published: Mg3Al2Si3O12
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
+    - observation_id: shornikov_2019_table1_r47_liquid_Mg3Al2Si3O12
+      type: gibbs_table
+      locator: &id113
+        page: 4
+        pdf_page_index: 3
+        published_page: 868
+        table: '1'
+        note: Table 1 printed body row 47, liquid phase column.
+      phase: l
+      per: mol_species
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator: *id113
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: 2000
+        value: '-3872.296'
+        points:
+        - value: -3872.296
+        table_row_number: 47
+        table_phase_column: liquid
+        formula_as_published: Mg3Al2Si3O12
+        attribution: 'Table 1 caption: “calculations in the course of this research”; the preceding text cites thermodynamic
+          data for binary oxide systems, but does not state per-row input lineage.'
+        note: Single-temperature model-input/comparator table; author-computed inputs are retained as quoted_attributed because
+          their derivation inputs are not stored here. This is not a new primary measurement and may duplicate JANAF/IVTAN
+          comparator data.
