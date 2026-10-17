@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
+import sys
 from io import StringIO
 from pathlib import Path
 
@@ -153,14 +156,16 @@ def test_fused_reference_digit_and_run_together_columns_are_flagged(tmp_path: Pa
         "<table><tr><th>Value</th><th>Reference</th></tr>"
         "<tr><td>11.0</td><td>5</td></tr>"
         "<tr><td>11.06</td><td>6</td></tr>"
-        "<tr><td>11.1</td><td>7</td></tr></table>"
+        "<tr><td>11.07</td><td>7</td></tr>"
+        "<tr><td>11.1</td><td>8</td></tr></table>"
     )
     fused = _write_corpus(tmp_path, "fused", body, "Values 11.0 11.06 11.1 references. " * 4)
     rows, _ = qa.rank_corpus(fused)
     fused_row = _by_sid(rows, "fused")
 
-    assert "fused_reference_decimal=1" in str(fused_row["flags"])
-    assert fused_row["combined_score"] > 0
+    assert "fused_reference_decimal=2" in str(fused_row["flags"])
+    assert "fused_reference_decimal=0.250" in str(fused_row["rates"])
+    assert fused_row["combined_score"] == 25.0
 
     merged_body = (
         "<table><tr><th>Composition</th></tr>"
@@ -170,6 +175,60 @@ def test_fused_reference_digit_and_run_together_columns_are_flagged(tmp_path: Pa
     rows, _ = qa.rank_corpus(merged)
 
     assert "run_together_columns=1" in str(_by_sid(rows, "run-together")["flags"])
+
+
+def test_run_number_column_is_not_treated_as_reference_column(tmp_path: Path) -> None:
+    body = (
+        "<table><tr><th>Run No.</th><th>Slag composition</th></tr>"
+        "<tr><td>1.8</td><td>85.27</td></tr>"
+        "<tr><td>1.10</td><td>85.88</td></tr>"
+        "<tr><td>3.10</td><td>81.67</td></tr></table>"
+    )
+    corpus = _write_corpus(tmp_path, "run-numbers", body, "Run data. " * 20)
+
+    rows, _ = qa.rank_corpus(corpus)
+    row = _by_sid(rows, "run-numbers")
+
+    assert "fused_reference_decimal" not in str(row["flags"])
+
+
+def test_calibration_tsv_matches_live_scores_and_ranks_mangled_tables(tmp_path: Path) -> None:
+    repo_root = Path(__file__).resolve().parents[2]
+    calibration = repo_root / "tests/tools/mineru_table_qa_calibration.tsv"
+    output = tmp_path / "calibration.tsv"
+    env = os.environ.copy()
+    env.setdefault("MPLCONFIGDIR", "/private/tmp/claude-501/main-review/mplcache")
+
+    subprocess.run(
+        [
+            sys.executable,
+            str(repo_root / "tests/tools/calibrate_mineru_table_qa.py"),
+            str(calibration),
+            "/Users/simonrowland/Repos/regolith-corpus",
+            str(output),
+        ],
+        cwd=repo_root,
+        env=env,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert output.read_bytes() == calibration.read_bytes()
+    rows = [line.split("\t") for line in output.read_text(encoding="utf-8").splitlines()[1:]]
+    mangled = [row for row in rows if row[1] == "MANGLED"]
+    assert len(mangled) == 4
+    assert all(int(row[4]) <= 8 for row in mangled)
+
+
+def test_score_formula_docstring_lists_all_weights_and_overlap_gate() -> None:
+    doc = qa.__doc__ or ""
+
+    for signal in (
+        "fused-reference decimals", "run-together columns", "letter-for-digit",
+        "overlap rate is at least 0.5", "Every signal contributes only with at least two hits",
+    ):
+        assert signal in doc
 
 
 def test_letter_for_digit_is_flagged_in_numeric_scientific_column(tmp_path: Path) -> None:

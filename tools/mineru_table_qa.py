@@ -2,12 +2,13 @@
 
 Cell-level damage rates are hit cells divided by numeric cells; raggedness is
 ragged body rows divided by body rows. Dropped plus-minus requires a matching
-pdftotext value; a signal contributes only with at least two hits. The combined
-score is 100 times the rates for dropped plus-minus,
-numeric mismatch, comma/dot decimals, and ragged rows, plus 40 times the
-multiple-number rate, 60 times the lost-exponent-minus rate, and 30 times the
-LaTeX-damage rate. Scan pages skip numeric-mismatch scoring. The ``flags``
-column retains hit counts and ``rates`` shows the normalized values.
+pdftotext value. Every signal contributes only with at least two hits. The
+combined score weights dropped plus-minus, numeric mismatch, comma/dot
+decimals, ragged rows, fused-reference decimals, run-together columns, and
+letter-for-digit at 100; multiple numbers at 40; lost-exponent-minus at 60;
+and LaTeX damage at 30. Numeric mismatch contributes only when its page-number
+overlap rate is at least 0.5, and scan pages skip numeric-mismatch scoring.
+The ``flags`` column retains hit counts and ``rates`` shows normalized values.
 
 Markdown ``<details>`` blocks are counted per source and explicitly marked as
 invented material; they are never treated as data or included in table scores.
@@ -209,7 +210,11 @@ def _decimal_places(token: str) -> int | None:
 
 
 def _reference_column(headers: list[str]) -> bool:
-    return any(re.search(r"\bref(?:erence)?s?\.?|\bno\.", h, re.I) for h in headers)
+    return any(
+        re.search(r"\bref(?:erence)?s?\.?", header, re.I)
+        or re.fullmatch(r"\s*no\.\s*", header, re.I)
+        for header in headers
+    )
 
 
 def _extra_decimal_digit_cells(

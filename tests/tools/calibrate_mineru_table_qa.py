@@ -31,17 +31,24 @@ def main() -> None:
     parser.add_argument("output_tsv", type=Path)
     args = parser.parse_args()
 
-    lines = args.baseline_tsv.read_text(encoding="utf-8").splitlines()
-    table_header = next(index for index, line in enumerate(lines) if line.startswith("sid\tchunk\t"))
-    original = list(csv.DictReader(lines[table_header:table_header + 41], delimiter="\t"))
-    current, _ = qa.rank_corpus(args.corpus_root, sorted({row["sid"] for row in original}))
+    with args.baseline_tsv.open(encoding="utf-8", newline="") as stream:
+        original = list(csv.DictReader(stream, delimiter="\t"))
+    if not original or not {"table_id", "verdict", "old_score"}.issubset(original[0]):
+        raise ValueError("baseline must be the committed table_id/verdict/old_score TSV")
+    identity = {
+        row["table_id"]: tuple(row["table_id"].rsplit("/", 2))
+        for row in original
+    }
+    current, _ = qa.rank_corpus(
+        args.corpus_root, sorted({parts[0] for parts in identity.values()})
+    )
     current_tables = {
-        (row["sid"], row["chunk"], str(row["table_index"])): row
+        (row["sid"], str(row["absolute_page"]), str(row["table_index"])): row
         for row in current
     }
     calibrated = []
     for row in original:
-        key = (row["sid"], row["chunk"], row["table_index"])
+        key = identity[row["table_id"]]
         updated = current_tables.get(key)
         if updated is None:
             raise ValueError(f"missing calibrated table: {key}")
@@ -50,41 +57,41 @@ def main() -> None:
         calibrated,
         key=lambda pair: (
             -float(pair[1]["combined_score"]),
-            pair[0]["sid"],
+            identity[pair[0]["table_id"]][0],
             int(pair[1]["absolute_page"]),
-            int(pair[0]["table_index"]),
-            pair[0]["chunk"],
+            int(identity[pair[0]["table_id"]][2]),
+            pair[1]["chunk"],
         ),
     )
-    ranks = {id(row): rank for rank, (row, _) in enumerate(ranked, start=1)}
+    ranks = {row["table_id"]: rank for rank, (row, _) in enumerate(ranked, start=1)}
     out_of_top_eight = []
     for row, updated in calibrated:
-        truth_key = (row["sid"], row["absolute_page"], row["table_index"])
+        sid, page, table_index = identity[row["table_id"]]
+        truth_key = (sid, page, table_index)
         if truth_key in _MANGLED_TABLES:
-            rank = ranks[id(row)]
-            required_flag = _MANGLED_FLAGS[row["sid"]]
+            rank = ranks[row["table_id"]]
+            required_flag = _MANGLED_FLAGS[sid]
             flags = {part.split("=", 1)[0] for part in updated["flags"].split(";") if part}
             print(
-                f"MANGLED rank {rank}: {row['sid']}/{updated['absolute_page']}/"
-                f"{row['table_index']} flags={updated['flags']}"
+                f"MANGLED rank {rank}: {sid}/{updated['absolute_page']}/"
+                f"{table_index} flags={updated['flags']}"
             )
             if required_flag not in flags:
-                out_of_top_eight.append((rank, row["sid"], f"missing {required_flag}"))
+                out_of_top_eight.append((rank, sid, f"missing {required_flag}"))
             if rank > 8:
-                out_of_top_eight.append((rank, row["sid"], row["table_index"]))
+                out_of_top_eight.append((rank, sid, table_index))
 
     with args.output_tsv.open("w", encoding="utf-8", newline="") as stream:
         writer = csv.writer(stream, delimiter="\t", lineterminator="\n")
         writer.writerow(("table_id", "verdict", "old_score", "new_score", "new_rank"))
         for row, updated in calibrated:
-            truth_key = (row["sid"], row["absolute_page"], row["table_index"])
-            table_id = "/".join((row["sid"], str(updated["absolute_page"]), row["table_index"]))
+            table_id = row["table_id"]
             writer.writerow((
                 table_id,
-                "MANGLED" if truth_key in _MANGLED_TABLES else "OK",
-                row["combined_score"],
+                row["verdict"],
+                row["old_score"],
                 updated["combined_score"],
-                ranks[id(row)],
+                ranks[table_id],
             ))
     if out_of_top_eight:
         raise SystemExit(f"MANGLED tables outside top 8: {out_of_top_eight}")

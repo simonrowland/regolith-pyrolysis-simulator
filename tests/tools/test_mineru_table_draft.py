@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import shutil
@@ -115,11 +116,37 @@ def test_each_mechanical_flag_fires_only_on_the_suspect_cell() -> None:
 def test_comma_decimal_suspect_is_european_comma_only() -> None:
     grid = draft.parse_table_html(
         "<table><tr><th>Value</th></tr><tr><td>123.456</td></tr>"
-        "<tr><td>123,456</td></tr></table>"
+        "<tr><td>1.234,56</td></tr><tr><td>25,540</td></tr>"
+        "<tr><td>1,234</td></tr></table>"
     )
     draft._add_cell_flags(grid, draft._header_row_count(grid), {0})
     assert "comma_decimal_suspect" not in grid[1][0].flags
     assert "comma_decimal_suspect" in grid[2][0].flags
+    assert "comma_decimal_suspect" in grid[3][0].flags
+    assert "comma_decimal_suspect" not in grid[4][0].flags
+
+
+def test_composition_header_without_unit_keeps_single_measurement_row() -> None:
+    grid = draft.parse_table_html(
+        "<table><tr><th>Composition</th></tr>"
+        "<tr><td>25.4</td><td>31.2</td></tr></table>"
+    )
+
+    header_count = draft._header_row_count(grid)
+    draft._add_cell_flags(grid, header_count, {0, 1})
+
+    assert header_count == 1
+    assert [cell.numeric_value for cell in grid[1]] == [25.4, 31.2]
+
+
+def test_axis_header_with_unit_promotes_following_numeric_axis_row() -> None:
+    grid = draft.parse_table_html(
+        "<table><tr><th>Temperature, K</th></tr>"
+        "<tr><td>1833</td><td>1883</td><td>1933</td></tr>"
+        "<tr><td>Cr</td><td>1</td><td>2</td></tr></table>"
+    )
+
+    assert draft._header_row_count(grid) == 2
 
 
 def test_latex_numeric_cells_convert_and_compare(tmp_path: Path) -> None:
@@ -532,3 +559,93 @@ def test_compare_reports_match_and_planted_mismatch(tmp_path: Path) -> None:
     mutated = draft.compare_extract_to_draft(wrong_row, index_path)
     assert mutated[0]["status"] == "mismatch"
     assert mutated[0]["matched_cell"] is None
+
+
+def test_compare_phase_is_bound_to_the_candidate_column(tmp_path: Path) -> None:
+    csv_path = tmp_path / "p001-t01.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        for column_number, text in ((1, "1.50"), (2, "2.50")):
+            writer.writerow({
+                "row": 2, "column": column_number, "row_type": "body",
+                "text": text, "value_text": text, "mark": "",
+                "numeric_column": column_number, "origin_row": 2,
+                "origin_column": column_number, "rowspan": 1, "colspan": 1,
+                "flags": "[]",
+            })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{
+        "table_key": "p001-t01", "pdf_page": 1, "csv": csv_path.name,
+        "columns": [
+            {"column": 1, "header": "liquid wt%"},
+            {"column": 2, "header": "gas wt%"},
+        ],
+    }]}), encoding="utf-8")
+    extract = {"species": {"Fe": {"observations": [{
+        "observation_id": "wrong-phase-column", "locator": {"pdf_page": 1},
+        "values": {"points": [{
+            "value": 1.50, "table_row_number": 2, "phase": "gas",
+        }]},
+    }]}}}
+
+    result = draft.compare_extract_to_draft(extract, index_path)[0]
+    assert result["status"] == "mismatch"
+    assert result["matched_cell"] is None
+
+
+def test_phase_tokens_do_not_match_words_in_other_column_headers(tmp_path: Path) -> None:
+    csv_path = tmp_path / "p005-t01.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        writer.writerow({
+            "row": 3, "column": 1, "row_type": "body", "text": "1.93e-9",
+            "value_text": "1.93e-9", "mark": "", "numeric_column": 1,
+            "origin_row": 3, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{
+        "table_key": "p005-t01", "pdf_page": 5, "csv": csv_path.name,
+        "columns": [
+            {"column": 1, "header": "liquid (K)"},
+            {"column": 2, "header": "Components of gas phase"},
+        ],
+    }]}), encoding="utf-8")
+
+    for phase in ("", "K", "of", "phase", "gas"):
+        extract = {"species": {"Ca": {"observations": [{
+            "observation_id": f"wrong-{phase!r}", "locator": {"pdf_page": 5},
+            "values": {"points": [{
+                "value": 1.93e-9, "table_row_number": 3,
+                "table_phase_column": 1, "phase": phase,
+            }]},
+        }]}}}
+        result = draft.compare_extract_to_draft(extract, index_path)[0]
+        assert result["status"] == "mismatch", phase
+
+
+def test_compare_summary_prints_presence_only_count(tmp_path: Path, capsys) -> None:
+    csv_path = tmp_path / "p001-t01.csv"
+    csv_path.write_text(
+        "row,column,row_type,text,value_text,mark,numeric_column,origin_row,"
+        "origin_column,rowspan,colspan,flags\n"
+        "2,1,body,1.5,1.5,,1,2,1,1,1,[]\n",
+        encoding="utf-8",
+    )
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{
+        "table_key": "p001-t01", "pdf_page": 1, "csv": csv_path.name,
+    }]}), encoding="utf-8")
+    extract_path = tmp_path / "extract.yaml"
+    extract_path.write_text(yaml.safe_dump({"species": {"Fe": {"observations": [{
+        "observation_id": "presence", "locator": {"pdf_page": 1},
+        "values": {"points": [{"value": 1.5}]},
+    }]}}}), encoding="utf-8")
+
+    draft._compare_command(
+        argparse.Namespace(extract=str(extract_path), draft_index=str(index_path))
+    )
+
+    assert "presence-only=1" in capsys.readouterr().err

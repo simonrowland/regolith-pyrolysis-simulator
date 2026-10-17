@@ -27,7 +27,9 @@ _CHUNK_START = re.compile(r"p(\d+)-p\d+")
 _NUMBER = re.compile(
     r"^[+\-−–—]?(?:\d+(?:\.\d+)?|\.\d+)(?:\(\d+\))?(?:[eE][+\-]?\d+)?$"
 )
-_COMMA_DECIMAL = re.compile(r"(?<![\d.,])\d{1,3},\d+(?!\d)")
+_COMMA_DECIMAL = re.compile(
+    r"(?<![\d.,])(?:\d{1,3}\.\d{3},\d+|\d{2,},\d{3})(?!\d)"
+)
 _FOOTNOTE_MARK = re.compile(r"([*†‡§¶|]+)$")
 _NUMERIC_SUPERSCRIPT = re.compile(
     r"[+\-−–—]?\d+|[⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+"
@@ -263,12 +265,17 @@ def _header_row_count(grid: list[list[Cell]]) -> int:
             tagged_count += 1
         else:
             break
-    axis_label = re.compile(r"\b(?:temperature|pressure|time|composition)\b", re.I)
+    axis_with_unit = re.compile(
+        r"\b(?:temperature|pressure|time|composition)\b"
+        r"[^\n]{0,24}(?:\b(?:K|°?C|bar|Pa|atm|mmHg|s|sec|min|h|hr)\b|"
+        r"(?:wt|mass|mol)\s*%|\bmole\s*fraction\b)",
+        re.I,
+    )
     count = tagged_count
     if not count and grid:
         first_row = grid[0]
         first_row_text = " ".join(cell.text for cell in first_row)
-        if axis_label.search(first_row_text) and not any(
+        if axis_with_unit.search(first_row_text) and not any(
             _number_value(_split_mark(cell.text, cell.superscript_text)[0]) is not None
             for cell in first_row
         ):
@@ -289,7 +296,7 @@ def _header_row_count(grid: list[list[Cell]]) -> int:
                 and populated[-1].text.strip() in {"K", "°C", "C"}
             )
             if (
-                axis_label.search(previous)
+                axis_with_unit.search(previous)
                 and numeric_count >= 2
                 and all(
                     _number_value(_split_mark(cell.text, cell.superscript_text)[0])
@@ -611,6 +618,18 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
     return points
 
 
+def _phase_matches_column(phase: Any, column_header: str) -> bool:
+    if phase is None:
+        return True
+    token = str(phase).strip().casefold()
+    if token not in {"gas", "liquid", "solid"}:
+        return False
+    return (
+        re.search(rf"(?<!\w){re.escape(token)}(?!\w)", column_header, re.I)
+        is not None
+    )
+
+
 def compare_extract_to_draft(
     extract: Mapping[str, Any], draft_index_path: str | Path
 ) -> list[dict[str, Any]]:
@@ -623,7 +642,6 @@ def compare_extract_to_draft(
             int(column["column"]): str(column.get("header") or "")
             for column in table.get("columns") or []
         }
-        table_header = " ".join(column_headers.values())
         csv_path = index_path.parent / table["csv"]
         with csv_path.open(encoding="utf-8", newline="") as stream:
             for cell in csv.DictReader(stream):
@@ -644,7 +662,7 @@ def compare_extract_to_draft(
                         "table_key": table["table_key"],
                         "row": int(cell["row"]),
                         "column": int(cell["column"]),
-                        "table_header": table_header,
+                        "column_header": column_headers.get(int(cell["column"]), ""),
                         "flags": json.loads(cell["flags"] or "[]"),
                     }
                     draft_by_page[page].append((candidate, number))
@@ -672,15 +690,7 @@ def compare_extract_to_draft(
                 point.get("table_phase_column") is None
                 or candidate["column"] == int(point["table_phase_column"])
             )
-            and (
-                point.get("phase") is None
-                or re.search(
-                    rf"\b{re.escape(str(point['phase']))}\b",
-                    candidate["table_header"],
-                    re.IGNORECASE,
-                )
-                is not None
-            )
+            and _phase_matches_column(point.get("phase"), candidate["column_header"])
         ]
         matched_index, matched = matching_candidates[0] if matching_candidates else (None, None)
         if matched is not None:
@@ -738,7 +748,8 @@ def _compare_command(args: argparse.Namespace) -> int:
     counts = Counter(row["status"] for row in results)
     print(
         f"compare: matched={counts['matched']} no-match={counts['no-match']} "
-        f"mismatch={counts['mismatch']} total={len(results)}",
+        f"mismatch={counts['mismatch']} presence-only={counts['presence-only']} "
+        f"total={len(results)}",
         file=sys.stderr,
     )
     return 0
