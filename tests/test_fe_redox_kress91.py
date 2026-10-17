@@ -76,11 +76,26 @@ def test_measured_initial_split_is_preserved_without_kress_reanchoring():
     assert diagnostic['method'] == 'declared_split'
 
 
-def test_missing_initial_anchor_is_a_typed_refusal():
+def test_missing_initial_anchor_uses_flagged_unclassified_prior():
     from simulator.fe_redox import initialize_feedstock_iron
 
-    with pytest.raises(Kress91InvalidControls, match='cited intrinsic_redox'):
-        initialize_feedstock_iron({'composition_wt_pct': {'SiO2': 80.0, 'FeO': 20.0}})
+    from simulator.fe_redox import FE_FEO_BUFFER_STANDARD, split_feot_composition
+
+    feed = {'composition_wt_pct': {'SiO2': 80.0, 'FeO': 20.0}}
+    prepared, diagnostic = initialize_feedstock_iron(feed)
+    assert diagnostic['class_prior'] == 'unclassified'
+    assert diagnostic['seed_basis'] == 'class_prior'
+    assert diagnostic['seed_authority'].value == 'model_assumed'
+    assert diagnostic['anchor']['delta_iw'] == 0.0
+    assert diagnostic['anchor']['buffer'] == FE_FEO_BUFFER_STANDARD
+    assert diagnostic['anchor']['interval'] == [-10.0, 10.0]
+    assert 'class_prior_unmeasured' in diagnostic['certification_gaps']
+    # Existing public split owner defines the historical predicted default.
+    expected = split_feot_composition(feed['composition_wt_pct'],
+                                     diagnostic['formation_temperature_K'])
+    assert diagnostic['fO2_log'] == expected['fO2_log']
+    assert prepared['composition_wt_pct']['Fe2O3'] > 0.0
+    assert initialize_feedstock_iron(prepared) == (prepared, diagnostic)
 
 
 def test_exhausted_ferric_inventory_has_an_activity_corrected_iw_lower_bound():

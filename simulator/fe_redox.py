@@ -1652,13 +1652,14 @@ def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, di
         authority = declared_authority
         state = None
     else:
-        prior_class = feedstock.get('iron_redox_class') if not stated else None
+        prior_class = (feedstock.get('iron_redox_class') or 'unclassified') if not stated else None
         if prior_class is not None:
             if prior_class not in _iron_class_priors():
                 raise Kress91InvalidControls(f'unknown iron redox class {prior_class!r}')
             anchor = {**_iron_class_priors()[prior_class], **anchor,
                       'authority': 'model_assumed', 'estimated': True,
-                      'buffer_source': {'reference': CONVENTIONAL_IW_SOURCE, 'page': 1067}}
+                      'buffer_source': _iron_class_priors()[prior_class].get(
+                          'buffer_source', {'reference': CONVENTIONAL_IW_SOURCE, 'page': 1067})}
             delta = anchor['delta_iw']
             low, high = anchor['interval']
             prior_diagnostic = {

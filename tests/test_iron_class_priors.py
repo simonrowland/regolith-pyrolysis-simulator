@@ -124,6 +124,16 @@ def test_cited_anchor_precedes_class_prior(data):
     assert 'class_prior' not in diagnostic
 
 
+def test_unclassified_prior_completes_without_precipitation(data):
+    feed = {'composition_wt_pct': {'SiO2': 80., 'FeO': 20.}}
+    sim = _build_sim('ad_hoc', data['vapor_pressures'], {'ad_hoc': feed},
+                     data['setpoints'])
+    sim.melt.temperature_C = 1400.
+    assert sim._feedstock_iron_initialization['class_prior'] == 'unclassified'
+    assert sim._compute_native_fe_saturation_extent()['native_fe_mol'] == 0.
+    assert sim.atom_ledger.mol_by_account('process.metal_phase').get('Fe', 0.) == 0.
+
+
 @pytest.mark.parametrize('margin, status', [(-6., 'BELOW'), (-4., 'INDETERMINATE'),
                                           (4., 'INDETERMINATE'), (6., 'ABOVE')])
 def test_prior_range_controls_saturation_decision(monkeypatch, margin, status):

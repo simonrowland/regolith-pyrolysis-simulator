@@ -1,6 +1,17 @@
 # Physical class envelopes in log10(fO2/IW), NOT measured lot intervals.
 # Sources constrain the class context; reasoning identifies rounded bounds
 # and assumed transfers. No metal inventory or precipitation is inferred.
+unclassified:
+  # Historical split_feot_composition default: delta=0 against the pure
+  # liquid Fe/FeO (Holzheid1997 Eq9) reference, not conventional solid IW.
+  # +/-10 dex spans a factor 1e20 in the fO2 ratio. This deliberately broad
+  # model envelope includes the named classes; it is not a measured range.
+  delta_iw: 0.0
+  interval: [-10.0, 10.0]
+  buffer: wustite_FeO_l_holzheid1997_eq9
+  source: 'class prior, no corpus citation'
+  buffer_source: {reference: 'Holzheid et al. 1997 Eq.9, wustite-liquid FeO reference', page: 30}
+  reasoning: 'Unclassified analysis: historical predicted IW default from split_feot_composition; broad assumed envelope without lot or class evidence. No metal precipitation from this prior.'
 terrestrial_basalt:
   # Sossi2018 p10921 places terrestrial magmatic liquids near FMQ. Existing
   # Frost1991 Table1 FMQ at 1 bar is 8.735-25096.3/T; Sato1973 IW is
