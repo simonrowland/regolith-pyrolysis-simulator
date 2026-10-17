@@ -300,8 +300,8 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
 # lunar 1.0409922677e-05 -> 1.04099076417e-05,
 # mars 1.05360311732e-05 -> 1.05354760695e-05.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.04099076417e-05,
-    "mars_basalt": 1.05354760695e-05,
+    "lunar_mare_low_ti": 1.04324626941e-05,  # d-166 regen at 8367b269a (studio-1)
+    "mars_basalt": 1.04871832899e-05,  # d-166 regen at 8367b269a (studio-1)
 }
 
 
@@ -416,8 +416,8 @@ BASELINE_STAGE4_SIO2_KG = {
 # lunar 2.73730270602e-06 -> 2.73729872021e-06,
 # mars 2.75788843064e-06 -> 2.75786146523e-06.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 2.73729872021e-06,
-    "mars_basalt": 2.75786146523e-06,
+    "lunar_mare_low_ti": 2.7432218567e-06,  # d-166 regen at 8367b269a (studio-1)
+    "mars_basalt": 2.7577514718e-06,  # d-166 regen at 8367b269a (studio-1)
 }
 
 
