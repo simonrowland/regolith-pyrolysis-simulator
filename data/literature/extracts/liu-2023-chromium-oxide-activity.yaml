@@ -1,0 +1,1125 @@
+schema_version: literature_extract.v1
+source_id: liu-2023-chromium-oxide-activity
+source:
+  citation: >-
+    Liu, B., Li, Z. and Kobayashi, Y. (2023), Activity of chromium oxide in calcium silicate bearing molten slag for highly clean chromium steel refining, ISIJ International 63(2), 313-318.
+  doi: 10.2355/isijinternational.ISIJINT-2022-368
+  year: 2023
+extraction:
+  method: >-
+    Transcribed from the supplied MinerU table blocks and born-digital pdftotext-layout.txt. Tables 1, 2 and 3 were each checked against a page render to confirm row and column alignment; the renders confirmed all values below. No MinerU details/chart block was used. Table 1's four rows are the initial slag compositions (mass%). Table 2's twelve rows are the average post-equilibration slag compositions (mass%); the separate CrO1.5 and CrO columns are kept as printed and no Cr2+/total-Cr ratio is derived. Table 3's twelve rows are retained for aCr, aCrO1.5, aCrO and aCrOx. The paper gives 1823 K (1550 C), not 1873 K. The Table 3 aCrO1.5 values 1.5519 and 3.2610 are kept as printed; the source explicitly reports an activity greater than one and no correction is made. Table 3 aCr is quoted_attributed because the per-run chromium concentration in the Cu-Cr alloy is not tabulated; the source attributes the activity coefficient to Kobayashi et al. (1995), ref. 27. Table 3 aCrO1.5 and aCrO are model_derived from the corresponding stored aCr row, printed P_O2 and T, using Eqs. (13) and (14). Table 3 aCrOx is retained as a typed refusal because CrOx has variable x and no canonical stoichiometric species token. Table 2 CrO1.5 and CrO mass-percent columns are typed refusals because no closed quantity token represents oxide mass percent as a redox observable in this schema; the printed values remain present. Table 2 full compositions are retained per row. The migrator cannot bind CaF2, CrO1.5, CrO or MoO2 as composition components, so slag-activity composition identity remains unavailable with that schema gap recorded; no partial composition is promoted. The Cr-Cu alloy composition is not printed and remains unknown for aCr. The source reports water quenching immediately after 24 h but does not state quench preservation. Table 2 is bulk quenched-slag analysis, not an asserted glass-only analysis. Figure 3 Cr2+/total-Cr mass ratio is figure-read-only and is not digitized.
+  date: '2026-10-16'
+  worker: wave3b-liu23
+review_status: draft
+fidelity_samples:
+  - path: species.Cr.context[liu23_table1_initial_compositions].values.rows[0].composition_mass_percent_as_published.CaF2
+    value: '4.98'
+    locator:
+      page: 2
+      published_page: 314
+      pdf_page_index: 1
+      table: '1'
+      row: '1'
+      note: Table 1 initial slag composition CaF2 cell.
+  - path: species.Cr.observations[liu23_table2_oxide_mass_pct].values.points[0].composition_wt_pct.MoO2
+    value: '32.39'
+    locator:
+      page: 3
+      published_page: 315
+      pdf_page_index: 2
+      table: '2'
+      row: '1'
+      note: Table 2 first post-equilibration composition MoO2 cell.
+  - path: species.CrO1.5.observations[liu23_t3_a_cro15_row01].values.points[0].activity
+    value: 1.5519
+    locator:
+      page: 5
+      published_page: 317
+      pdf_page_index: 4
+      table: '3'
+      row: '1'
+      note: Table 3 aCrO1.5 row 1, printed above one.
+  - path: species.CrO1.5.observations[liu23_t3_a_cro15_row04].values.points[0].activity
+    value: 3.261
+    locator:
+      page: 5
+      published_page: 317
+      pdf_page_index: 4
+      table: '3'
+      row: '4'
+      note: Table 3 aCrO1.5 row 4, printed above one.
+species:
+  Cr:
+    context:
+      - observation_id: liu23_table1_initial_compositions
+        type: composition
+        locator:
+          page: 2
+          published_page: 314
+          pdf_page_index: 1
+          table: '1'
+          note: Initial slag compositions before chemical-equilibrium experiments.
+        units: mass%
+        values:
+          quantity: initial_slag_composition_mass_percent_as_published
+          rows:
+            - row: '1'
+              composition_mass_percent_as_published:
+                CaO: '39.01'
+                CaF2: '4.98'
+                MgO: '0.00'
+                Al2O3: '10.01'
+                SiO2: '38.99'
+                MnO: '4.99'
+                Cr2O3: '2.02'
+                Total: '100'
+            - row: '2'
+              composition_mass_percent_as_published:
+                CaO: '33.99'
+                CaF2: '5.01'
+                MgO: '9.99'
+                Al2O3: '10.01'
+                SiO2: '34.00'
+                MnO: '5.00'
+                Cr2O3: '2.00'
+                Total: '100'
+            - row: '3'
+              composition_mass_percent_as_published:
+                CaO: '29.02'
+                CaF2: '4.99'
+                MgO: '19.98'
+                Al2O3: '9.99'
+                SiO2: '28.98'
+                MnO: '5.02'
+                Cr2O3: '2.02'
+                Total: '100'
+            - row: '4'
+              composition_mass_percent_as_published:
+                CaO: '26.50'
+                CaF2: '5.01'
+                MgO: '24.96'
+                Al2O3: '10.00'
+                SiO2: '26.49'
+                MnO: '5.02'
+                Cr2O3: '2.02'
+                Total: '100'
+    observations:
+      - observation_id: liu23_table2_oxide_mass_pct
+        type: concentration_series
+        locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          note: Average post-equilibration slag compositions and separate CrO1.5 and CrO mass-percent columns.
+        phase: water-quenched slag bulk
+        regime: quench_equilibration
+        units: mass%
+        values:
+          quantity: chromium_oxide_mass_percent_as_published
+          method_class: measured_direct
+          evidence_class: measured_direct
+          admission_status: typed_refusal
+          refusal_reason: No schema quantity token represents the separately printed CrO1.5 and CrO mass-percent redox values.
+          T_K: '1823'
+          quench_statement: Samples were taken out quickly from the furnace and water quenched immediately; preservation is not stated.
+          quench_statement_status: not_stated
+          quench_statement_locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}
+          points:
+            - row: '1'
+              slag_number_as_published: '1'
+              oxide_species_as_published: CrO1.5
+              value: 0.94
+              value_as_printed: '0.94'
+              CO_CO2_ratio: '1'
+              oxygen_partial_pressure: {value: '6.38e-8', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '1'}
+              composition_wt_pct: &liu23_t2r1_comp {CaO: '31.25', CaF2: '1.66', MgO: '0.00', Al2O3: '5.98', SiO2: '24.26', MnO: '3.18', CrO1.5: '0.94', CrO: '0.34', MoO2: '32.39', Total: '100'}
+              point_conditions: &liu23_t2r1_pc
+                temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}
+                total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '1'}}
+                composition: {state: {tag: unknown, reason: "Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed composition map cannot bind."}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '1'}}
+                CO_CO2_ratio: {state: {tag: value, value: '1'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '1'}}
+                oxygen_partial_pressure: {state: {tag: value, value: '6.38e-8'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '1'}}
+            - row: '1'
+              slag_number_as_published: '1'
+              oxide_species_as_published: CrO
+              value: 0.34
+              value_as_printed: '0.34'
+              CO_CO2_ratio: '1'
+              oxygen_partial_pressure: {value: '6.38e-8', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '1'}
+              composition_wt_pct: *liu23_t2r1_comp
+              point_conditions: *liu23_t2r1_pc
+            - row: '2'
+              slag_number_as_published: '1'
+              oxide_species_as_published: CrO1.5
+              value: 0.01
+              value_as_printed: '0.01'
+              CO_CO2_ratio: '20'
+              oxygen_partial_pressure: {value: '1.60e-10', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '2'}
+              composition_wt_pct: &liu23_t2r2_comp {CaO: '44.33', CaF2: '2.16', MgO: '0.00', Al2O3: '8.03', SiO2: '37.58', MnO: '5.35', CrO1.5: '0.01', CrO: '2.12', MoO2: '0.42', Total: '100'}
+              point_conditions: &liu23_t2r2_pc
+                temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}
+                total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '2'}}
+                composition: {state: {tag: unknown, reason: "Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed composition map cannot bind."}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '2'}}
+                CO_CO2_ratio: {state: {tag: value, value: '20'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '2'}}
+                oxygen_partial_pressure: {state: {tag: value, value: '1.60e-10'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '2'}}
+            - row: '2'
+              slag_number_as_published: '1'
+              oxide_species_as_published: CrO
+              value: 2.12
+              value_as_printed: '2.12'
+              CO_CO2_ratio: '20'
+              oxygen_partial_pressure: {value: '1.60e-10', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '2'}
+              composition_wt_pct: *liu23_t2r2_comp
+              point_conditions: *liu23_t2r2_pc
+            - row: '3'
+              slag_number_as_published: '1'
+              oxide_species_as_published: CrO1.5
+              value: 0.01
+              value_as_printed: '0.01'
+              CO_CO2_ratio: '100'
+              oxygen_partial_pressure: {value: '6.38e-12', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '3'}
+              composition_wt_pct: &liu23_t2r3_comp {CaO: '43.85', CaF2: '2.17', MgO: '0.00', Al2O3: '8.94', SiO2: '39.85', MnO: '3.33', CrO1.5: '0.01', CrO: '1.54', MoO2: '0.31', Total: '100'}
+              point_conditions: &liu23_t2r3_pc
+                temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}
+                total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '3'}}
+                composition: {state: {tag: unknown, reason: "Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed composition map cannot bind."}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '3'}}
+                CO_CO2_ratio: {state: {tag: value, value: '100'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '3'}}
+                oxygen_partial_pressure: {state: {tag: value, value: '6.38e-12'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '3'}}
+            - row: '3'
+              slag_number_as_published: '1'
+              oxide_species_as_published: CrO
+              value: 1.54
+              value_as_printed: '1.54'
+              CO_CO2_ratio: '100'
+              oxygen_partial_pressure: {value: '6.38e-12', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '3'}
+              composition_wt_pct: *liu23_t2r3_comp
+              point_conditions: *liu23_t2r3_pc
+            - row: '4'
+              slag_number_as_published: '2'
+              oxide_species_as_published: CrO1.5
+              value: 0.40
+              value_as_printed: '0.40'
+              CO_CO2_ratio: '1'
+              oxygen_partial_pressure: {value: '6.38e-8', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '4'}
+              composition_wt_pct: &liu23_t2r4_comp {CaO: '27.97', CaF2: '2.11', MgO: '5.50', Al2O3: '7.16', SiO2: '22.21', MnO: '3.13', CrO1.5: '0.40', CrO: '0.56', MoO2: '30.96', Total: '100'}
+              point_conditions: &liu23_t2r4_pc
+                temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}
+                total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '4'}}
+                composition: {state: {tag: unknown, reason: "Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed composition map cannot bind."}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '4'}}
+                CO_CO2_ratio: {state: {tag: value, value: '1'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '4'}}
+                oxygen_partial_pressure: {state: {tag: value, value: '6.38e-8'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '4'}}
+            - row: '4'
+              slag_number_as_published: '2'
+              oxide_species_as_published: CrO
+              value: 0.56
+              value_as_printed: '0.56'
+              CO_CO2_ratio: '1'
+              oxygen_partial_pressure: {value: '6.38e-8', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '4'}
+              composition_wt_pct: *liu23_t2r4_comp
+              point_conditions: *liu23_t2r4_pc
+            - row: '5'
+              slag_number_as_published: '2'
+              oxide_species_as_published: CrO1.5
+              value: 1.22
+              value_as_printed: '1.22'
+              CO_CO2_ratio: '5'
+              oxygen_partial_pressure: {value: '2.55e-9', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '5'}
+              composition_wt_pct: &liu23_t2r5_comp {CaO: '36.92', CaF2: '1.92', MgO: '8.21', Al2O3: '8.49', SiO2: '30.73', MnO: '4.57', CrO1.5: '1.22', CrO: '0.95', MoO2: '6.99', Total: '100'}
+              point_conditions: &liu23_t2r5_pc
+                temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}
+                total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '5'}}
+                composition: {state: {tag: unknown, reason: "Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed composition map cannot bind."}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '5'}}
+                CO_CO2_ratio: {state: {tag: value, value: '5'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '5'}}
+                oxygen_partial_pressure: {state: {tag: value, value: '2.55e-9'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '5'}}
+            - row: '5'
+              slag_number_as_published: '2'
+              oxide_species_as_published: CrO
+              value: 0.95
+              value_as_printed: '0.95'
+              CO_CO2_ratio: '5'
+              oxygen_partial_pressure: {value: '2.55e-9', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '5'}
+              composition_wt_pct: *liu23_t2r5_comp
+              point_conditions: *liu23_t2r5_pc
+            - row: '6'
+              slag_number_as_published: '2'
+              oxide_species_as_published: CrO1.5
+              value: 0.73
+              value_as_printed: '0.73'
+              CO_CO2_ratio: '20'
+              oxygen_partial_pressure: {value: '1.60e-10', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '6'}
+              composition_wt_pct: &liu23_t2r6_comp {CaO: '40.43', CaF2: '1.28', MgO: '8.26', Al2O3: '8.95', SiO2: '34.42', MnO: '4.52', CrO1.5: '0.73', CrO: '0.87', MoO2: '0.54', Total: '100'}
+              point_conditions: &liu23_t2r6_pc
+                temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}
+                total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '6'}}
+                composition: {state: {tag: unknown, reason: "Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed composition map cannot bind."}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '6'}}
+                CO_CO2_ratio: {state: {tag: value, value: '20'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '6'}}
+                oxygen_partial_pressure: {state: {tag: value, value: '1.60e-10'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '6'}}
+            - row: '6'
+              slag_number_as_published: '2'
+              oxide_species_as_published: CrO
+              value: 0.87
+              value_as_printed: '0.87'
+              CO_CO2_ratio: '20'
+              oxygen_partial_pressure: {value: '1.60e-10', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '6'}
+              composition_wt_pct: *liu23_t2r6_comp
+              point_conditions: *liu23_t2r6_pc
+            - row: '7'
+              slag_number_as_published: '2'
+              oxide_species_as_published: CrO1.5
+              value: 0.04
+              value_as_printed: '0.04'
+              CO_CO2_ratio: '100'
+              oxygen_partial_pressure: {value: '6.38e-12', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '7'}
+              composition_wt_pct: &liu23_t2r7_comp {CaO: '39.59', CaF2: '3.43', MgO: '9.43', Al2O3: '9.60', SiO2: '33.46', MnO: '3.13', CrO1.5: '0.04', CrO: '1.07', MoO2: '0.25', Total: '100'}
+              point_conditions: &liu23_t2r7_pc
+                temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}
+                total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '7'}}
+                composition: {state: {tag: unknown, reason: "Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed composition map cannot bind."}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '7'}}
+                CO_CO2_ratio: {state: {tag: value, value: '100'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '7'}}
+                oxygen_partial_pressure: {state: {tag: value, value: '6.38e-12'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '7'}}
+            - row: '7'
+              slag_number_as_published: '2'
+              oxide_species_as_published: CrO
+              value: 1.07
+              value_as_printed: '1.07'
+              CO_CO2_ratio: '100'
+              oxygen_partial_pressure: {value: '6.38e-12', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '7'}
+              composition_wt_pct: *liu23_t2r7_comp
+              point_conditions: *liu23_t2r7_pc
+            - row: '8'
+              slag_number_as_published: '3'
+              oxide_species_as_published: CrO1.5
+              value: 0.20
+              value_as_printed: '0.20'
+              CO_CO2_ratio: '20'
+              oxygen_partial_pressure: {value: '1.60e-10', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '8'}
+              composition_wt_pct: &liu23_t2r8_comp {CaO: '35.68', CaF2: '3.19', MgO: '17.55', Al2O3: '8.88', SiO2: '29.37', MnO: '4.09', CrO1.5: '0.20', CrO: '0.37', MoO2: '0.67', Total: '100'}
+              point_conditions: &liu23_t2r8_pc
+                temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}
+                total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '8'}}
+                composition: {state: {tag: unknown, reason: "Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed composition map cannot bind."}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '8'}}
+                CO_CO2_ratio: {state: {tag: value, value: '20'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '8'}}
+                oxygen_partial_pressure: {state: {tag: value, value: '1.60e-10'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '8'}}
+            - row: '8'
+              slag_number_as_published: '3'
+              oxide_species_as_published: CrO
+              value: 0.37
+              value_as_printed: '0.37'
+              CO_CO2_ratio: '20'
+              oxygen_partial_pressure: {value: '1.60e-10', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '8'}
+              composition_wt_pct: *liu23_t2r8_comp
+              point_conditions: *liu23_t2r8_pc
+            - row: '9'
+              slag_number_as_published: '3'
+              oxide_species_as_published: CrO1.5
+              value: 0.23
+              value_as_printed: '0.23'
+              CO_CO2_ratio: '100'
+              oxygen_partial_pressure: {value: '6.38e-12', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '9'}
+              composition_wt_pct: &liu23_t2r9_comp {CaO: '35.58', CaF2: '3.92', MgO: '17.46', Al2O3: '8.84', SiO2: '30.53', MnO: '2.67', CrO1.5: '0.23', CrO: '0.42', MoO2: '0.35', Total: '100'}
+              point_conditions: &liu23_t2r9_pc
+                temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}
+                total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '9'}}
+                composition: {state: {tag: unknown, reason: "Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed composition map cannot bind."}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '9'}}
+                CO_CO2_ratio: {state: {tag: value, value: '100'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '9'}}
+                oxygen_partial_pressure: {state: {tag: value, value: '6.38e-12'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '9'}}
+            - row: '9'
+              slag_number_as_published: '3'
+              oxide_species_as_published: CrO
+              value: 0.42
+              value_as_printed: '0.42'
+              CO_CO2_ratio: '100'
+              oxygen_partial_pressure: {value: '6.38e-12', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '9'}
+              composition_wt_pct: *liu23_t2r9_comp
+              point_conditions: *liu23_t2r9_pc
+            - row: '10'
+              slag_number_as_published: '3'
+              oxide_species_as_published: CrO1.5
+              value: 0.03
+              value_as_printed: '0.03'
+              CO_CO2_ratio: '500'
+              oxygen_partial_pressure: {value: '2.55e-13', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '10'}
+              composition_wt_pct: &liu23_t2r10_comp {CaO: '35.73', CaF2: '3.78', MgO: '17.42', Al2O3: '8.58', SiO2: '31.28', MnO: '2.27', CrO1.5: '0.03', CrO: '0.48', MoO2: '0.43', Total: '100'}
+              point_conditions: &liu23_t2r10_pc
+                temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}
+                total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '10'}}
+                composition: {state: {tag: unknown, reason: "Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed composition map cannot bind."}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '10'}}
+                CO_CO2_ratio: {state: {tag: value, value: '500'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '10'}}
+                oxygen_partial_pressure: {state: {tag: value, value: '2.55e-13'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '10'}}
+            - row: '10'
+              slag_number_as_published: '3'
+              oxide_species_as_published: CrO
+              value: 0.48
+              value_as_printed: '0.48'
+              CO_CO2_ratio: '500'
+              oxygen_partial_pressure: {value: '2.55e-13', units: atm}
+              crucible_as_published: Mo
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '10'}
+              composition_wt_pct: *liu23_t2r10_comp
+              point_conditions: *liu23_t2r10_pc
+            - row: '11'
+              slag_number_as_published: '4'
+              oxide_species_as_published: CrO1.5
+              value: 0.06
+              value_as_printed: '0.06'
+              CO_CO2_ratio: '100'
+              oxygen_partial_pressure: {value: '6.38e-12', units: atm}
+              crucible_as_published: MgO
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '11'}
+              composition_wt_pct: &liu23_t2r11_comp {CaO: '28.89', CaF2: '2.96', MgO: '20.19', Al2O3: '10.87', SiO2: '35.44', MnO: '1.34', CrO1.5: '0.06', CrO: '0.25', MoO2: '0.00', Total: '100'}
+              point_conditions: &liu23_t2r11_pc
+                temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}
+                total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '11'}}
+                composition: {state: {tag: unknown, reason: "Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed composition map cannot bind."}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '11'}}
+                CO_CO2_ratio: {state: {tag: value, value: '100'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '11'}}
+                oxygen_partial_pressure: {state: {tag: value, value: '6.38e-12'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '11'}}
+            - row: '11'
+              slag_number_as_published: '4'
+              oxide_species_as_published: CrO
+              value: 0.25
+              value_as_printed: '0.25'
+              CO_CO2_ratio: '100'
+              oxygen_partial_pressure: {value: '6.38e-12', units: atm}
+              crucible_as_published: MgO
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '11'}
+              composition_wt_pct: *liu23_t2r11_comp
+              point_conditions: *liu23_t2r11_pc
+            - row: '12'
+              slag_number_as_published: '4'
+              oxide_species_as_published: CrO1.5
+              value: 0.14
+              value_as_printed: '0.14'
+              CO_CO2_ratio: '500'
+              oxygen_partial_pressure: {value: '2.55e-13', units: atm}
+              crucible_as_published: MgO
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '12'}
+              composition_wt_pct: &liu23_t2r12_comp {CaO: '23.52', CaF2: '3.63', MgO: '22.49', Al2O3: '12.18', SiO2: '36.60', MnO: '1.12', CrO1.5: '0.14', CrO: '0.32', MoO2: '0.00', Total: '100'}
+              point_conditions: &liu23_t2r12_pc
+                temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}
+                total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '12'}}
+                composition: {state: {tag: unknown, reason: "Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed composition map cannot bind."}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '12'}}
+                CO_CO2_ratio: {state: {tag: value, value: '500'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '12'}}
+                oxygen_partial_pressure: {state: {tag: value, value: '2.55e-13'}, locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '12'}}
+            - row: '12'
+              slag_number_as_published: '4'
+              oxide_species_as_published: CrO
+              value: 0.32
+              value_as_printed: '0.32'
+              CO_CO2_ratio: '500'
+              oxygen_partial_pressure: {value: '2.55e-13', units: atm}
+              crucible_as_published: MgO
+              crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '12'}
+              composition_wt_pct: *liu23_t2r12_comp
+              point_conditions: *liu23_t2r12_pc
+      - observation_id: liu23_t3_a_cr_row01
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '1'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-8', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '1'}}
+          points:
+            - {row: '1', slag_number_as_published: '1', activity: &liu23_t3_1_1_0p00014 0.00014, value: *liu23_t3_1_1_0p00014, value_as_printed: '0.00014', CO_CO2_ratio: '1', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '1'}, point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}, total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '1'}}, composition: {state: {tag: unknown, reason: Per-run chromium concentration in the Cu-Cr alloy is not tabulated.}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Analysis}}, CO_CO2_ratio: {state: {tag: value, value: '1'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '1'}}, oxygen_partial_pressure: {state: {tag: value, value: '6.38e-8'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '1'}}}}
+      - observation_id: liu23_t3_a_cr_row02
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '2'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '2'}}
+          points:
+            - {row: '2', slag_number_as_published: '1', activity: &liu23_t3_2_1_0p00166 0.00166, value: *liu23_t3_2_1_0p00166, value_as_printed: '0.00166', CO_CO2_ratio: '20', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '2'}, point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}, total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '2'}}, composition: {state: {tag: unknown, reason: Per-run chromium concentration in the Cu-Cr alloy is not tabulated.}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Analysis}}, CO_CO2_ratio: {state: {tag: value, value: '20'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '2'}}, oxygen_partial_pressure: {state: {tag: value, value: '1.60e-10'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '2'}}}}
+      - observation_id: liu23_t3_a_cr_row03
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '3'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '3'}}
+          points:
+            - {row: '3', slag_number_as_published: '1', activity: &liu23_t3_3_1_0p00566 0.00566, value: *liu23_t3_3_1_0p00566, value_as_printed: '0.00566', CO_CO2_ratio: '100', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '3'}, point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}, total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '3'}}, composition: {state: {tag: unknown, reason: Per-run chromium concentration in the Cu-Cr alloy is not tabulated.}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Analysis}}, CO_CO2_ratio: {state: {tag: value, value: '100'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '3'}}, oxygen_partial_pressure: {state: {tag: value, value: '6.38e-12'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '3'}}}}
+      - observation_id: liu23_t3_a_cr_row04
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '4'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-8', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '4'}}
+          points:
+            - {row: '4', slag_number_as_published: '2', activity: &liu23_t3_4_2_0p00029 0.00029, value: *liu23_t3_4_2_0p00029, value_as_printed: '0.00029', CO_CO2_ratio: '1', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '4'}, point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}, total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '4'}}, composition: {state: {tag: unknown, reason: Per-run chromium concentration in the Cu-Cr alloy is not tabulated.}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Analysis}}, CO_CO2_ratio: {state: {tag: value, value: '1'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '4'}}, oxygen_partial_pressure: {state: {tag: value, value: '6.38e-8'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '4'}}}}
+      - observation_id: liu23_t3_a_cr_row05
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '5'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '2.55e-9', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '5'}}
+          points:
+            - {row: '5', slag_number_as_published: '2', activity: &liu23_t3_5_2_0p00024 0.00024, value: *liu23_t3_5_2_0p00024, value_as_printed: '0.00024', CO_CO2_ratio: '5', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '5'}, point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}, total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '5'}}, composition: {state: {tag: unknown, reason: Per-run chromium concentration in the Cu-Cr alloy is not tabulated.}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Analysis}}, CO_CO2_ratio: {state: {tag: value, value: '5'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '5'}}, oxygen_partial_pressure: {state: {tag: value, value: '2.55e-9'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '5'}}}}
+      - observation_id: liu23_t3_a_cr_row06
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '6'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '6'}}
+          points:
+            - {row: '6', slag_number_as_published: '2', activity: &liu23_t3_6_2_0p00153 0.00153, value: *liu23_t3_6_2_0p00153, value_as_printed: '0.00153', CO_CO2_ratio: '20', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '6'}, point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}, total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '6'}}, composition: {state: {tag: unknown, reason: Per-run chromium concentration in the Cu-Cr alloy is not tabulated.}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Analysis}}, CO_CO2_ratio: {state: {tag: value, value: '20'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '6'}}, oxygen_partial_pressure: {state: {tag: value, value: '1.60e-10'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '6'}}}}
+      - observation_id: liu23_t3_a_cr_row07
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '7'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '7'}}
+          points:
+            - {row: '7', slag_number_as_published: '2', activity: &liu23_t3_7_2_0p00836 0.00836, value: *liu23_t3_7_2_0p00836, value_as_printed: '0.00836', CO_CO2_ratio: '100', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '7'}, point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}, total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '7'}}, composition: {state: {tag: unknown, reason: Per-run chromium concentration in the Cu-Cr alloy is not tabulated.}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Analysis}}, CO_CO2_ratio: {state: {tag: value, value: '100'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '7'}}, oxygen_partial_pressure: {state: {tag: value, value: '6.38e-12'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '7'}}}}
+      - observation_id: liu23_t3_a_cr_row08
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '8'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '8'}}
+          points:
+            - {row: '8', slag_number_as_published: '3', activity: &liu23_t3_8_3_0p00078 0.00078, value: *liu23_t3_8_3_0p00078, value_as_printed: '0.00078', CO_CO2_ratio: '20', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '8'}, point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}, total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '8'}}, composition: {state: {tag: unknown, reason: Per-run chromium concentration in the Cu-Cr alloy is not tabulated.}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Analysis}}, CO_CO2_ratio: {state: {tag: value, value: '20'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '8'}}, oxygen_partial_pressure: {state: {tag: value, value: '1.60e-10'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '8'}}}}
+      - observation_id: liu23_t3_a_cr_row09
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '9'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '9'}}
+          points:
+            - {row: '9', slag_number_as_published: '3', activity: &liu23_t3_9_3_0p006 0.006, value: *liu23_t3_9_3_0p006, value_as_printed: '0.00600', CO_CO2_ratio: '100', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '9'}, point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}, total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '9'}}, composition: {state: {tag: unknown, reason: Per-run chromium concentration in the Cu-Cr alloy is not tabulated.}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Analysis}}, CO_CO2_ratio: {state: {tag: value, value: '100'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '9'}}, oxygen_partial_pressure: {state: {tag: value, value: '6.38e-12'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '9'}}}}
+      - observation_id: liu23_t3_a_cr_row10
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '10'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '2.55e-13', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '10'}}
+          points:
+            - {row: '10', slag_number_as_published: '3', activity: &liu23_t3_10_3_0p00613 0.00613, value: *liu23_t3_10_3_0p00613, value_as_printed: '0.00613', CO_CO2_ratio: '500', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '10'}, point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}, total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '10'}}, composition: {state: {tag: unknown, reason: Per-run chromium concentration in the Cu-Cr alloy is not tabulated.}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Analysis}}, CO_CO2_ratio: {state: {tag: value, value: '500'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '10'}}, oxygen_partial_pressure: {state: {tag: value, value: '2.55e-13'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '10'}}}}
+      - observation_id: liu23_t3_a_cr_row11
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '11'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '11'}}
+          points:
+            - {row: '11', slag_number_as_published: '4', activity: &liu23_t3_11_4_0p0015 0.0015, value: *liu23_t3_11_4_0p0015, value_as_printed: '0.00150', CO_CO2_ratio: '100', table2_crucible_as_published: MgO, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '11'}, point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}, total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '11'}}, composition: {state: {tag: unknown, reason: Per-run chromium concentration in the Cu-Cr alloy is not tabulated.}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Analysis}}, CO_CO2_ratio: {state: {tag: value, value: '100'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '11'}}, oxygen_partial_pressure: {state: {tag: value, value: '6.38e-12'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '11'}}}}
+      - observation_id: liu23_t3_a_cr_row12
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '12'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '2.55e-13', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '12'}}
+          points:
+            - {row: '12', slag_number_as_published: '4', activity: &liu23_t3_12_4_0p00393 0.00393, value: *liu23_t3_12_4_0p00393, value_as_printed: '0.00393', CO_CO2_ratio: '500', table2_crucible_as_published: MgO, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '12'}, point_conditions: {temperature_K: {state: {tag: value, value: '1823'}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Experimental Procedure}}, total_pressure_Pa: {state: {tag: unknown, reason: Source reports the gas ratio and P_O2 but no total gas pressure.}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '12'}}, composition: {state: {tag: unknown, reason: Per-run chromium concentration in the Cu-Cr alloy is not tabulated.}, locator: {page: 2, published_page: 314, pdf_page_index: 1, section: Analysis}}, CO_CO2_ratio: {state: {tag: value, value: '500'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '12'}}, oxygen_partial_pressure: {state: {tag: value, value: '2.55e-13'}, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '12'}}}}
+  CrO1.5:
+    observations:
+      - observation_id: liu23_t3_a_cro15_row01
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '1'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO1.5, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies CrO1.5(s) but not its crystal polymorph'}}, component_basis: CrO1.5}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row01]
+        derivation:
+          relation: "Eq. (13): ΔG°9 = −555070 + 123.65 T J/mol; calculated from row-matched aCr, printed P_O2 and T."
+          inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row01]
+          output_unit: dimensionless
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-8', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '1'}}
+          points:
+            - {row: '1', slag_number_as_published: '1', activity: &liu23_t3_1_1_1p5519 1.5519, value: *liu23_t3_1_1_1p5519, value_as_printed: '1.5519', CO_CO2_ratio: '1', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '1'}, composition_wt_pct: *liu23_t2r1_comp, point_conditions: *liu23_t2r1_pc}
+      - observation_id: liu23_t3_a_cro15_row02
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '2'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO1.5, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies CrO1.5(s) but not its crystal polymorph'}}, component_basis: CrO1.5}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row02]
+        derivation: {relation: "Eq. (13): ΔG°9 = −555070 + 123.65 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row02], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '2'}}
+          points:
+            - {row: '2', slag_number_as_published: '1', activity: &liu23_t3_2_1_0p2070 0.2070, value: *liu23_t3_2_1_0p2070, value_as_printed: '0.2070', CO_CO2_ratio: '20', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '2'}, composition_wt_pct: *liu23_t2r2_comp, point_conditions: *liu23_t2r2_pc}
+      - observation_id: liu23_t3_a_cro15_row03
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '3'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO1.5, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies CrO1.5(s) but not its crystal polymorph'}}, component_basis: CrO1.5}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row03]
+        derivation: {relation: "Eq. (13): ΔG°9 = −555070 + 123.65 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row03], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '3'}}
+          points:
+            - {row: '3', slag_number_as_published: '1', activity: &liu23_t3_3_1_0p0633 0.0633, value: *liu23_t3_3_1_0p0633, value_as_printed: '0.0633', CO_CO2_ratio: '100', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '3'}, composition_wt_pct: *liu23_t2r3_comp, point_conditions: *liu23_t2r3_pc}
+      - observation_id: liu23_t3_a_cro15_row04
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '4'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO1.5, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies CrO1.5(s) but not its crystal polymorph'}}, component_basis: CrO1.5}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row04]
+        derivation: {relation: "Eq. (13): ΔG°9 = −555070 + 123.65 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row04], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-8', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '4'}}
+          points:
+            - {row: '4', slag_number_as_published: '2', activity: &liu23_t3_4_2_3p2610 3.2610, value: *liu23_t3_4_2_3p2610, value_as_printed: '3.2610', CO_CO2_ratio: '1', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '4'}, composition_wt_pct: *liu23_t2r4_comp, point_conditions: *liu23_t2r4_pc}
+      - observation_id: liu23_t3_a_cro15_row05
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '5'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO1.5, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies CrO1.5(s) but not its crystal polymorph'}}, component_basis: CrO1.5}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row05]
+        derivation: {relation: "Eq. (13): ΔG°9 = −555070 + 123.65 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row05], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '2.55e-9', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '5'}}
+          points:
+            - {row: '5', slag_number_as_published: '2', activity: &liu23_t3_5_2_0p2357 0.2357, value: *liu23_t3_5_2_0p2357, value_as_printed: '0.2357', CO_CO2_ratio: '5', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '5'}, composition_wt_pct: *liu23_t2r5_comp, point_conditions: *liu23_t2r5_pc}
+      - observation_id: liu23_t3_a_cro15_row06
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '6'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO1.5, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies CrO1.5(s) but not its crystal polymorph'}}, component_basis: CrO1.5}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row06]
+        derivation: {relation: "Eq. (13): ΔG°9 = −555070 + 123.65 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row06], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '6'}}
+          points:
+            - {row: '6', slag_number_as_published: '2', activity: &liu23_t3_6_2_0p1912 0.1912, value: *liu23_t3_6_2_0p1912, value_as_printed: '0.1912', CO_CO2_ratio: '20', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '6'}, composition_wt_pct: *liu23_t2r6_comp, point_conditions: *liu23_t2r6_pc}
+      - observation_id: liu23_t3_a_cro15_row07
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '7'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO1.5, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies CrO1.5(s) but not its crystal polymorph'}}, component_basis: CrO1.5}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row07]
+        derivation: {relation: "Eq. (13): ΔG°9 = −555070 + 123.65 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row07], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '7'}}
+          points:
+            - {row: '7', slag_number_as_published: '2', activity: &liu23_t3_7_2_0p0934 0.0934, value: *liu23_t3_7_2_0p0934, value_as_printed: '0.0934', CO_CO2_ratio: '100', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '7'}, composition_wt_pct: *liu23_t2r7_comp, point_conditions: *liu23_t2r7_pc}
+      - observation_id: liu23_t3_a_cro15_row08
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '8'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO1.5, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies CrO1.5(s) but not its crystal polymorph'}}, component_basis: CrO1.5}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row08]
+        derivation: {relation: "Eq. (13): ΔG°9 = −555070 + 123.65 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row08], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '8'}}
+          points:
+            - {row: '8', slag_number_as_published: '3', activity: &liu23_t3_8_3_0p0979 0.0979, value: *liu23_t3_8_3_0p0979, value_as_printed: '0.0979', CO_CO2_ratio: '20', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '8'}, composition_wt_pct: *liu23_t2r8_comp, point_conditions: *liu23_t2r8_pc}
+      - observation_id: liu23_t3_a_cro15_row09
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '9'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO1.5, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies CrO1.5(s) but not its crystal polymorph'}}, component_basis: CrO1.5}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row09]
+        derivation: {relation: "Eq. (13): ΔG°9 = −555070 + 123.65 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row09], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '9'}}
+          points:
+            - {row: '9', slag_number_as_published: '3', activity: &liu23_t3_9_3_0p0671 0.0671, value: *liu23_t3_9_3_0p0671, value_as_printed: '0.0671', CO_CO2_ratio: '100', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '9'}, composition_wt_pct: *liu23_t2r9_comp, point_conditions: *liu23_t2r9_pc}
+      - observation_id: liu23_t3_a_cro15_row10
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '10'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO1.5, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies CrO1.5(s) but not its crystal polymorph'}}, component_basis: CrO1.5}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row10]
+        derivation: {relation: "Eq. (13): ΔG°9 = −555070 + 123.65 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row10], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '2.55e-13', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '10'}}
+          points:
+            - {row: '10', slag_number_as_published: '3', activity: &liu23_t3_10_3_0p0061 0.0061, value: *liu23_t3_10_3_0p0061, value_as_printed: '0.0061', CO_CO2_ratio: '500', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '10'}, composition_wt_pct: *liu23_t2r10_comp, point_conditions: *liu23_t2r10_pc}
+      - observation_id: liu23_t3_a_cro15_row11
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '11'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO1.5, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies CrO1.5(s) but not its crystal polymorph'}}, component_basis: CrO1.5}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row11]
+        derivation: {relation: "Eq. (13): ΔG°9 = −555070 + 123.65 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row11], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '11'}}
+          points:
+            - {row: '11', slag_number_as_published: '4', activity: &liu23_t3_11_4_0p0168 0.0168, value: *liu23_t3_11_4_0p0168, value_as_printed: '0.0168', CO_CO2_ratio: '100', table2_crucible_as_published: MgO, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '11'}, composition_wt_pct: *liu23_t2r11_comp, point_conditions: *liu23_t2r11_pc}
+      - observation_id: liu23_t3_a_cro15_row12
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '12'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO1.5, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies CrO1.5(s) but not its crystal polymorph'}}, component_basis: CrO1.5}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row12]
+        derivation: {relation: "Eq. (13): ΔG°9 = −555070 + 123.65 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row12], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '2.55e-13', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '12'}}
+          points:
+            - {row: '12', slag_number_as_published: '4', activity: &liu23_t3_12_4_0p0039 0.0039, value: *liu23_t3_12_4_0p0039, value_as_printed: '0.0039', CO_CO2_ratio: '500', table2_crucible_as_published: MgO, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '12'}, composition_wt_pct: *liu23_t2r12_comp, point_conditions: *liu23_t2r12_pc}
+  CrO:
+    observations:
+      - observation_id: liu23_t3_a_cro_row01
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '1'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row01]
+        derivation: {relation: "Eq. (14): ΔG°11 = −334220 + 63.81 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row01], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-8', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '1'}}
+          points:
+            - {row: '1', slag_number_as_published: '1', activity: &liu23_t3_1_1_0p0613 0.0613, value: *liu23_t3_1_1_0p0613, value_as_printed: '0.0613', CO_CO2_ratio: '1', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '1'}, composition_wt_pct: *liu23_t2r1_comp, point_conditions: *liu23_t2r1_pc}
+      - observation_id: liu23_t3_a_cro_row02
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '2'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row02]
+        derivation: {relation: "Eq. (14): ΔG°11 = −334220 + 63.81 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row02], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '2'}}
+          points:
+            - {row: '2', slag_number_as_published: '1', activity: &liu23_t3_2_1_0p0366 0.0366, value: *liu23_t3_2_1_0p0366, value_as_printed: '0.0366', CO_CO2_ratio: '20', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '2'}, composition_wt_pct: *liu23_t2r2_comp, point_conditions: *liu23_t2r2_pc}
+      - observation_id: liu23_t3_a_cro_row03
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '3'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row03]
+        derivation: {relation: "Eq. (14): ΔG°11 = −334220 + 63.81 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row03], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '3'}}
+          points:
+            - {row: '3', slag_number_as_published: '1', activity: &liu23_t3_3_1_0p025 0.025, value: *liu23_t3_3_1_0p025, value_as_printed: '0.0250', CO_CO2_ratio: '100', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '3'}, composition_wt_pct: *liu23_t2r3_comp, point_conditions: *liu23_t2r3_pc}
+      - observation_id: liu23_t3_a_cro_row04
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '4'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row04]
+        derivation: {relation: "Eq. (14): ΔG°11 = −334220 + 63.81 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row04], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-8', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '4'}}
+          points:
+            - {row: '4', slag_number_as_published: '2', activity: &liu23_t3_4_2_0p1289 0.1289, value: *liu23_t3_4_2_0p1289, value_as_printed: '0.1289', CO_CO2_ratio: '1', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '4'}, composition_wt_pct: *liu23_t2r4_comp, point_conditions: *liu23_t2r4_pc}
+      - observation_id: liu23_t3_a_cro_row05
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '5'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row05]
+        derivation: {relation: "Eq. (14): ΔG°11 = −334220 + 63.81 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row05], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '2.55e-9', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '5'}}
+          points:
+            - {row: '5', slag_number_as_published: '2', activity: &liu23_t3_5_2_0p0208 0.0208, value: *liu23_t3_5_2_0p0208, value_as_printed: '0.0208', CO_CO2_ratio: '5', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '5'}, composition_wt_pct: *liu23_t2r5_comp, point_conditions: *liu23_t2r5_pc}
+      - observation_id: liu23_t3_a_cro_row06
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '6'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row06]
+        derivation: {relation: "Eq. (14): ΔG°11 = −334220 + 63.81 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row06], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '6'}}
+          points:
+            - {row: '6', slag_number_as_published: '2', activity: &liu23_t3_6_2_0p0338 0.0338, value: *liu23_t3_6_2_0p0338, value_as_printed: '0.0338', CO_CO2_ratio: '20', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '6'}, composition_wt_pct: *liu23_t2r6_comp, point_conditions: *liu23_t2r6_pc}
+      - observation_id: liu23_t3_a_cro_row07
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '7'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row07]
+        derivation: {relation: "Eq. (14): ΔG°11 = −334220 + 63.81 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row07], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '7'}}
+          points:
+            - {row: '7', slag_number_as_published: '2', activity: &liu23_t3_7_2_0p0369 0.0369, value: *liu23_t3_7_2_0p0369, value_as_printed: '0.0369', CO_CO2_ratio: '100', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '7'}, composition_wt_pct: *liu23_t2r7_comp, point_conditions: *liu23_t2r7_pc}
+      - observation_id: liu23_t3_a_cro_row08
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '8'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row08]
+        derivation: {relation: "Eq. (14): ΔG°11 = −334220 + 63.81 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row08], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '8'}}
+          points:
+            - {row: '8', slag_number_as_published: '3', activity: &liu23_t3_8_3_0p0173 0.0173, value: *liu23_t3_8_3_0p0173, value_as_printed: '0.0173', CO_CO2_ratio: '20', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '8'}, composition_wt_pct: *liu23_t2r8_comp, point_conditions: *liu23_t2r8_pc}
+      - observation_id: liu23_t3_a_cro_row09
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '9'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row09]
+        derivation: {relation: "Eq. (14): ΔG°11 = −334220 + 63.81 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row09], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '9'}}
+          points:
+            - {row: '9', slag_number_as_published: '3', activity: &liu23_t3_9_3_0p0265 0.0265, value: *liu23_t3_9_3_0p0265, value_as_printed: '0.0265', CO_CO2_ratio: '100', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '9'}, composition_wt_pct: *liu23_t2r9_comp, point_conditions: *liu23_t2r9_pc}
+      - observation_id: liu23_t3_a_cro_row10
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '10'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row10]
+        derivation: {relation: "Eq. (14): ΔG°11 = −334220 + 63.81 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row10], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '2.55e-13', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '10'}}
+          points:
+            - {row: '10', slag_number_as_published: '3', activity: &liu23_t3_10_3_0p0054 0.0054, value: *liu23_t3_10_3_0p0054, value_as_printed: '0.0054', CO_CO2_ratio: '500', table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '10'}, composition_wt_pct: *liu23_t2r10_comp, point_conditions: *liu23_t2r10_pc}
+      - observation_id: liu23_t3_a_cro_row11
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '11'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row11]
+        derivation: {relation: "Eq. (14): ΔG°11 = −334220 + 63.81 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row11], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '11'}}
+          points:
+            - {row: '11', slag_number_as_published: '4', activity: &liu23_t3_11_4_0p0066 0.0066, value: *liu23_t3_11_4_0p0066, value_as_printed: '0.0066', CO_CO2_ratio: '100', table2_crucible_as_published: MgO, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '11'}, composition_wt_pct: *liu23_t2r11_comp, point_conditions: *liu23_t2r11_pc}
+      - observation_id: liu23_t3_a_cro_row12
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '12'}
+        phase: l
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: CrO, phase: l}, component_basis: CrO}
+        regime: quench_equilibration
+        units: dimensionless
+        derived_from: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row12]
+        derivation: {relation: "Eq. (14): ΔG°11 = −334220 + 63.81 T J/mol; calculated from row-matched aCr, printed P_O2 and T.", inputs: [liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row12], output_unit: dimensionless}
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          T_K: '1823'
+          oxygen_partial_pressure: {value: '2.55e-13', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '12'}}
+          points:
+            - {row: '12', slag_number_as_published: '4', activity: &liu23_t3_12_4_0p0035 0.0035, value: *liu23_t3_12_4_0p0035, value_as_printed: '0.0035', CO_CO2_ratio: '500', table2_crucible_as_published: MgO, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '12'}, composition_wt_pct: *liu23_t2r12_comp, point_conditions: *liu23_t2r12_pc}
+  CrOx:
+    observations:
+      - observation_id: liu23_t3_a_crox
+        type: activity_coefficient
+        locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', note: aCrOx values versus CO/CO2 and P_O2.}
+        phase: l
+        standard_state: No canonical endmember is stated for variable-stoichiometry CrOx; source definition is Eq. (15).
+        regime: quench_equilibration
+        units: dimensionless
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+          admission_status: typed_refusal
+          refusal_reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
+          T_K: '1823'
+          points:
+            - {row: '1', slag_number_as_published: '1', value: 0.6109, value_as_printed: '0.6109', CO_CO2_ratio: '1', oxygen_partial_pressure: {value: '6.38e-8', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '1'}}, composition_wt_pct: *liu23_t2r1_comp, table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '1'}, point_conditions: *liu23_t2r1_pc}
+            - {row: '2', slag_number_as_published: '1', value: 0.0368, value_as_printed: '0.0368', CO_CO2_ratio: '20', oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '2'}}, composition_wt_pct: *liu23_t2r2_comp, table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '2'}, point_conditions: *liu23_t2r2_pc}
+            - {row: '3', slag_number_as_published: '1', value: 0.025, value_as_printed: '0.0250', CO_CO2_ratio: '100', oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '3'}}, composition_wt_pct: *liu23_t2r3_comp, table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '3'}, point_conditions: *liu23_t2r3_pc}
+            - {row: '4', slag_number_as_published: '2', value: 0.4552, value_as_printed: '0.4552', CO_CO2_ratio: '1', oxygen_partial_pressure: {value: '6.38e-8', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '4'}}, composition_wt_pct: *liu23_t2r4_comp, table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '4'}, point_conditions: *liu23_t2r4_pc}
+            - {row: '5', slag_number_as_published: '2', value: 0.0762, value_as_printed: '0.0762', CO_CO2_ratio: '5', oxygen_partial_pressure: {value: '2.55e-9', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '5'}}, composition_wt_pct: *liu23_t2r5_comp, table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '5'}, point_conditions: *liu23_t2r5_pc}
+            - {row: '6', slag_number_as_published: '2', value: 0.071, value_as_printed: '0.0710', CO_CO2_ratio: '20', oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '6'}}, composition_wt_pct: *liu23_t2r6_comp, table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '6'}, point_conditions: *liu23_t2r6_pc}
+            - {row: '7', slag_number_as_published: '2', value: 0.038, value_as_printed: '0.0380', CO_CO2_ratio: '100', oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '7'}}, composition_wt_pct: *liu23_t2r7_comp, table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '7'}, point_conditions: *liu23_t2r7_pc}
+            - {row: '8', slag_number_as_published: '3', value: 0.0304, value_as_printed: '0.0304', CO_CO2_ratio: '20', oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '8'}}, composition_wt_pct: *liu23_t2r8_comp, table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '8'}, point_conditions: *liu23_t2r8_pc}
+            - {row: '9', slag_number_as_published: '3', value: 0.0362, value_as_printed: '0.0362', CO_CO2_ratio: '100', oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '9'}}, composition_wt_pct: *liu23_t2r9_comp, table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '9'}, point_conditions: *liu23_t2r9_pc}
+            - {row: '10', slag_number_as_published: '3', value: 0.0054, value_as_printed: '0.0054', CO_CO2_ratio: '500', oxygen_partial_pressure: {value: '2.55e-13', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '10'}}, composition_wt_pct: *liu23_t2r10_comp, table2_crucible_as_published: Mo, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '10'}, point_conditions: *liu23_t2r10_pc}
+            - {row: '11', slag_number_as_published: '4', value: 0.0079, value_as_printed: '0.0079', CO_CO2_ratio: '100', oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '11'}}, composition_wt_pct: *liu23_t2r11_comp, table2_crucible_as_published: MgO, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '11'}, point_conditions: *liu23_t2r11_pc}
+            - {row: '12', slag_number_as_published: '4', value: 0.0036, value_as_printed: '0.0036', CO_CO2_ratio: '500', oxygen_partial_pressure: {value: '2.55e-13', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '12'}}, composition_wt_pct: *liu23_t2r12_comp, table2_crucible_as_published: MgO, table2_crucible_locator: {page: 3, published_page: 315, pdf_page_index: 2, table: '2', row: '12'}, point_conditions: *liu23_t2r12_pc}
