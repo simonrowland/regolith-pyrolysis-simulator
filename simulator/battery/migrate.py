@@ -832,6 +832,37 @@ def _comparison_method_cancellation_notice_reason(
         "Knudsen-cell constant"
     )
 
+
+def _hold_reason_notice(
+    reason: str,
+    *,
+    quantity: Quantity | None,
+    origin: str,
+    band: object = None,
+    include_misprint: bool = True,
+) -> Notice | None:
+    if not isinstance(quantity, Quantity) or not reason:
+        return None
+    lowered = reason.lower()
+    if include_misprint and lowered.startswith("probable source misprint"):
+        kind = NoticeKind.PROBABLE_SOURCE_MISPRINT
+    elif lowered.startswith("out_of_certified_band:"):
+        kind = NoticeKind.OUT_OF_CERTIFIED_BAND
+    elif _is_source_internally_inconsistent(
+        NoticeKind.SOURCE_DISAGREEMENT, reason
+    ):
+        kind = NoticeKind.SOURCE_DISAGREEMENT
+    else:
+        return None
+    return Notice(
+        kind=kind,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin=origin,
+        band=str(band) if kind is NoticeKind.OUT_OF_CERTIFIED_BAND and band else None,
+    )
+
+
 def _temperature_number(value: object) -> Decimal | None:
     if isinstance(value, Value) and value.kind is ValueKind.POINT:
         return value.point
@@ -15483,32 +15514,14 @@ class Migrator:
                     source=composition.proxy_source,
                 )
             )
-        if (
-            isinstance(q_token, Quantity)
-            and hold_reason.lower().startswith("probable source misprint")
-        ):
-            observation_notices.append(
-                Notice(
-                    kind=NoticeKind.PROBABLE_SOURCE_MISPRINT,
-                    affected_quantities=(q_token,),
-                    reason=hold_reason,
-                    origin=obs_id,
-                )
-            )
-        elif (
-            isinstance(q_token, Quantity)
-            and _is_source_internally_inconsistent(
-                NoticeKind.SOURCE_DISAGREEMENT, hold_reason
-            )
-        ):
-            observation_notices.append(
-                Notice(
-                    kind=NoticeKind.SOURCE_DISAGREEMENT,
-                    affected_quantities=(q_token,),
-                    reason=hold_reason,
-                    origin=obs_id,
-                )
-            )
+        hold_reason_notice = _hold_reason_notice(
+            hold_reason,
+            quantity=q_token,
+            origin=obs_id,
+            band=values.get("band"),
+        )
+        if hold_reason_notice is not None:
+            observation_notices.append(hold_reason_notice)
         bulk_fence = _bulk_composition_pressure_fence(values)
         if bulk_fence:
             observation_notices.append(
@@ -16727,17 +16740,15 @@ class Migrator:
             ):
                 identity = replace(identity, composition=located_composition.state)
         child_notices = list(notices)
-        if _is_source_internally_inconsistent(
-            NoticeKind.SOURCE_DISAGREEMENT, parent_reason
-        ) and isinstance(q_token_point, Quantity):
-            child_notices.append(
-                Notice(
-                    kind=NoticeKind.SOURCE_DISAGREEMENT,
-                    affected_quantities=(q_token_point,),
-                    reason=parent_reason,
-                    origin=point_id,
-                )
-            )
+        parent_hold_notice = _hold_reason_notice(
+            parent_reason,
+            quantity=q_token_point,
+            origin=point_id,
+            band=(parent_values or {}).get("band"),
+            include_misprint=False,
+        )
+        if parent_hold_notice is not None:
+            child_notices.append(parent_hold_notice)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
 
         if (
