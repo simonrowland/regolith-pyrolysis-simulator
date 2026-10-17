@@ -411,6 +411,7 @@ def test_native_fe_no_commit_split_suppresses_vapor_route(
     )
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
+    sim._apply_feedstock_iron_comproportionation()
     sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
     sim._compute_native_fe_saturation_extent = lambda **_kwargs: {
         'native_fe_frac': 0.5,
@@ -559,6 +560,7 @@ def test_native_fe_error_without_transition_refuses_before_vapor_mutation(
     )
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
+    sim._apply_feedstock_iron_comproportionation()
     sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
     sim._compute_native_fe_saturation_extent = lambda **_kwargs: {
         'native_fe_frac': 0.5,
