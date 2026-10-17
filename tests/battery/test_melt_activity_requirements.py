@@ -199,15 +199,19 @@ def test_requirement_tuple_does_not_include_pressure_or_oxygen():
 
 
 def test_no_iron_without_oxygen_is_ready_and_engine_point_stays_gap():
-    # SiO2 is a pure-liquid-oxide activity for every activity engine. Na2O is not.
+    # The liquid-basis engines are ready. MAGEMin requires the production
+    # fusion owner to convert this liquid reference to its quartz standard.
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
     assert [item.readiness.engine for item in results] == list(MELT_ACTIVITY_ENGINES)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
-    assert all(item.readiness.gaps == () for item in results)
+    liquid_basis = [item for item in results if item.readiness.engine != "magemin"]
+    assert all(item.readiness.status is ReadinessStatus.READY for item in liquid_basis)
+    assert all(item.readiness.gaps == () for item in liquid_basis)
+    magemin = next(item for item in results if item.readiness.engine == "magemin")
+    assert magemin.readiness.status is ReadinessStatus.NOT_APPLICABLE
     payload = results[0].payload
     assert payload["engine"] == "alphamelts"
     assert payload["temperature_C"] == pytest.approx(1473.15 - 273.15)
@@ -242,8 +246,11 @@ def test_iron_without_oxygen_is_a_typed_refusal():
     assert internal.readiness.gaps == ()
     assert internal.payload is not None
     assert "fO2_log" not in internal.payload
-    redox_engines = [item for item in results if item is not internal]
-    assert all(item.payload is None for item in redox_engines)
+    assert all(item.payload is None for item in results if item is not internal)
+    redox_engines = [
+        item for item in results
+        if item is not internal and item.readiness.engine != "magemin"
+    ]
     assert all(item.readiness.status is ReadinessStatus.GAP for item in redox_engines)
     gaps = redox_engines[0].readiness.gaps
     oxygen = [gap for gap in gaps if gap.waypoint == "oxygen_condition"]
@@ -260,7 +267,10 @@ def test_iron_with_point_oxygen_is_ready():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
+    assert all(
+        item.readiness.status is ReadinessStatus.READY
+        for item in results if item.readiness.engine != "magemin"
+    )
     assert results[0].payload["fO2_log"] == pytest.approx(-9)
     assert "pressure_bar" not in results[0].payload
 
@@ -271,7 +281,10 @@ def test_zero_iron_does_not_demand_oxygen():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
+    assert all(
+        item.readiness.status is ReadinessStatus.READY
+        for item in results if item.readiness.engine != "magemin"
+    )
     assert "fO2_log" not in results[0].payload
 
 
@@ -289,7 +302,10 @@ def test_missing_composition_is_refused_and_not_defaulted():
     )
     results = _melt(experiment, bench, observation)
     assert all(item.payload is None for item in results)
-    assert all(item.readiness.status is ReadinessStatus.GAP for item in results)
+    assert all(
+        item.readiness.status is ReadinessStatus.GAP
+        for item in results if item.readiness.engine != "magemin"
+    )
     assert results[0].readiness.gaps[0].waypoint == "normalized_composition"
     assert results[0].readiness.gaps[0].reason is GapReason.MISSING_EVIDENCE
     assert not any(gap.waypoint == "oxygen_condition" for gap in results[0].readiness.gaps)
@@ -326,8 +342,11 @@ def test_activity_coefficient_uses_the_same_contract():
     assert all(
         item.readiness.status is ReadinessStatus.READY
         for item in results
-        if item.readiness.engine != "internal-analytical"
+        if item.readiness.engine not in {"internal-analytical", "magemin"}
     )
+    assert next(
+        item for item in results if item.readiness.engine == "magemin"
+    ).readiness.status is ReadinessStatus.NOT_APPLICABLE
     assert results[0].payload["quantity"] == "activity_coefficient"
     assert results[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
     activity = _melt(*_case(
@@ -387,8 +406,11 @@ def test_multivalent_oxide_without_oxygen_is_a_typed_refusal(oxide):
     )
     assert internal.payload is not None
     assert internal.readiness.status is ReadinessStatus.READY
-    redox_engines = [item for item in results if item is not internal]
-    assert all(item.payload is None for item in redox_engines)
+    assert all(item.payload is None for item in results if item is not internal)
+    redox_engines = [
+        item for item in results
+        if item is not internal and item.readiness.engine != "magemin"
+    ]
     assert all(item.readiness.status is ReadinessStatus.GAP for item in redox_engines)
     oxygen = [gap for gap in redox_engines[0].readiness.gaps if gap.waypoint == "oxygen_condition"]
     assert len(oxygen) == 1

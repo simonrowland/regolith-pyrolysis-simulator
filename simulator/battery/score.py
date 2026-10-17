@@ -1504,11 +1504,29 @@ def fusion_comparison_reference(
         return reference
     standard_state = identity.reference_state.value
     formula = standard_state.endmember.formula
+    observed_reference_phase = phase_token(standard_state.endmember)
+    magemin_native_reference = any(
+        notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        and notice.reason.startswith("MAGEMin native solid-reference conversion;")
+        for notice in reference.notices
+    )
+    magemin_native_formula = False
+    if engine is Engine.MAGEMIN:
+        from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+        magemin_native_formula = formula in MAGEMIN_NATIVE_MELT_ACTIVITIES
     if (
         identity.species.formula != formula
         or standard_state.component_basis != formula
         or standard_state.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
-        or phase_token(standard_state.endmember) is not Phase.CR
+        or (
+            observed_reference_phase is not Phase.CR
+            and not (
+                engine is Engine.MAGEMIN
+                and magemin_native_formula
+                and observed_reference_phase is Phase.L
+            )
+        )
         or reference.value.kind is not ValueKind.POINT
         or reference.value.point is None
         or reference.value.point <= 0
@@ -1557,9 +1575,19 @@ def fusion_comparison_reference(
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
-    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        JANAFFusionPolymorphUnavailable,
+        _janaf_eligible_pure_crystal_tables,
+        _janaf_fusion_energy_for_pair,
+        _janaf_stable_crystal_set,
+        janaf_fusion_energy,
+    )
 
-    if _source_polymorph_is_unspecified(standard_state.endmember.polymorph):
+    if (
+        observed_reference_phase is Phase.CR
+        and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
+    ):
         notice = Notice(
             kind=NoticeKind.INPUT_OMITTED,
             affected_quantities=(Quantity.ACTIVITY,),
@@ -1568,6 +1596,20 @@ def fusion_comparison_reference(
             band="JANAF fusion conversion requires the source-named solid polymorph",
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
+    magemin_target_polymorph: Polymorph | None = None
+    magemin_source_polymorph: Polymorph | None = None
+    if engine is Engine.MAGEMIN:
+        from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+
+        native = MAGEMIN_NATIVE_MELT_ACTIVITIES.get(formula)
+        if native is None:
+            return reference
+        magemin_target_polymorph = Polymorph(native[1])
+        magemin_source_polymorph = polymorph_token(standard_state.endmember)
+        if magemin_source_polymorph is magemin_target_polymorph:
+            # Guo's MgO measurement is already on the periclase standard.
+            return reference
 
     def fusion_missing_input_notice(reason: str) -> Notice | None:
         if not any(
@@ -1599,13 +1641,171 @@ def fusion_comparison_reference(
         )
 
     try:
-        fusion = _janaf_fusion_energy_for_reference(reference, temperature_K)
+        if engine is Engine.MAGEMIN:
+            # The MAGEMin adapter resolves the source and target crystal
+            # tables itself and reads only this oxide's liquid table. A liquid
+            # reference names no crystal polymorph, so the source-named lookup
+            # cannot supply that table.
+            fusion = janaf_fusion_energy(formula, temperature_K)
+        else:
+            fusion = _janaf_fusion_energy_for_reference(reference, temperature_K)
     except ValueError as exc:
         reason = str(exc)
         notice = fusion_missing_input_notice(reason)
         if notice is None:
             raise
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
+    if engine is Engine.MAGEMIN:
+        assert magemin_target_polymorph is not None
+        source_polymorph = magemin_source_polymorph
+        target_polymorph = magemin_target_polymorph
+
+        try:
+            eligible = _janaf_eligible_pure_crystal_tables(formula, temperature_K)
+            target_tables = tuple(
+                table for table, polymorph in eligible
+                if polymorph is target_polymorph
+            )
+            if len(target_tables) != 1:
+                raise ValueError(
+                    f"expected one JANAF table for MAGEMin {target_polymorph.value}, "
+                    f"got {[table for table in target_tables]}"
+                )
+            if observed_reference_phase is Phase.L:
+                source_table = fusion.liquid_table
+                source_label = "liquid"
+                inferred_source = False
+                source_pair = None
+            elif source_polymorph is None or _source_polymorph_is_unspecified(
+                standard_state.endmember.polymorph
+            ):
+                stability = _janaf_stable_crystal_set(
+                    formula, temperature_K, eligible
+                )
+                source_table = stability.selected.table_id
+                source_polymorph = stability.selected.polymorph
+                source_label = source_polymorph.value
+                inferred_source = True
+                source_pair = _janaf_fusion_energy_for_pair(
+                    formula, source_table, fusion.liquid_table, temperature_K
+                )
+            else:
+                source_tables = tuple(
+                    table for table, polymorph in eligible
+                    if polymorph is source_polymorph
+                )
+                if len(source_tables) != 1:
+                    raise ValueError(
+                        f"expected one JANAF table for observed "
+                        f"{source_polymorph.value}, got {list(source_tables)}"
+                    )
+                source_table = source_tables[0]
+                source_label = source_polymorph.value
+                inferred_source = False
+                source_pair = _janaf_fusion_energy_for_pair(
+                    formula, source_table, fusion.liquid_table, temperature_K
+                )
+            target_pair = _janaf_fusion_energy_for_pair(
+                formula, target_tables[0], fusion.liquid_table, temperature_K
+            )
+        except (ValueError, JANAFFusionPolymorphUnavailable) as exc:
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"fusion conversion missing input for {formula}: MAGEMin "
+                    f"native reference could not be resolved: {exc}"
+                ),
+                origin=reference.observation_id,
+                band=f"JANAF solid-reference pair for MAGEMin {formula}: {exc}",
+            )
+            return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
+        # MAGEMin's native ig activities use periclase for MgO and quartz for
+        # SiO2 (the low-pressure basis used by this scorer; the official API
+        # also names coesite at high pressure). At equal chemical potential,
+        # mu=G°+RT ln(a), so a_target=a_source*exp((G_source-G_target)/RT).
+        # With ΔG_fus=G_liquid-G_crystal, G_source-G_target is
+        # ΔG_fus(target)-ΔG_fus(source), fixing the conversion sign. The
+        # JANAF kJ/mol difference is multiplied by 1000 J/kJ and divided by
+        # R[J/(mol K)]*T[K], so the exponent is dimensionless. Pure-limit
+        # check: when source and target are the same pure polymorph, ΔG=0 and
+        # activity 1 remains 1.
+        delta_g_source_minus_target_J_per_mol = (
+            target_pair.delta_g_fus_kJ_per_mol
+            if source_pair is None
+            else target_pair.delta_g_fus_kJ_per_mol
+            - source_pair.delta_g_fus_kJ_per_mol
+        ) * Decimal(1000)
+        converted_activity = reference.value.point * (
+            delta_g_source_minus_target_J_per_mol
+            / (JANAF_R_J_PER_MOL_K * temperature_K)
+        ).exp()
+        native_endmember = replace(
+            standard_state.endmember,
+            phase=Phase.CR,
+            polymorph=State.of(target_polymorph),
+        )
+        native_state = replace(standard_state, endmember=native_endmember)
+        native_identity = replace(identity, reference_state=State.of(native_state))
+        conversion_notice = Notice(
+            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                "MAGEMin native solid-reference conversion; "
+                f"formula={formula}; source_reference={source_label}; "
+                f"target_polymorph={target_polymorph.value}; "
+                f"source_activity={reference.value.point}; "
+                f"target_activity={converted_activity}; "
+                f"delta_g_source_minus_target={delta_g_source_minus_target_J_per_mol} J/mol; "
+                f"source_table={source_table}; target_table={target_tables[0]}; "
+                f"inferred_source_polymorph={inferred_source}"
+            ),
+            origin=reference.observation_id,
+            band=f"JANAF reference {source_label} to {target_polymorph.value}",
+            authority=Authority.CERTIFIED,
+            certification="NIST-JANAF crystal Gibbs energies compared at T",
+        )
+        return replace(
+            reference,
+            value=replace(reference.value, point=converted_activity),
+            identity=native_identity,
+            notices=union_notices(reference.notices, (conversion_notice,)),
+        )
+
+    if engine is not Engine.MAGEMIN and magemin_native_reference:
+        # The prior MAGEMin conversion explicitly established a quartz solid
+        # basis. Resolve that same JANAF table when the next owner request is
+        # for a liquid-reference engine; the generic stable-solid choice can
+        # be a different SiO2 polymorph at this temperature.
+        source_polymorph = polymorph_token(standard_state.endmember)
+        try:
+            eligible = _janaf_eligible_pure_crystal_tables(formula, temperature_K)
+            source_tables = tuple(
+                table for table, polymorph in eligible
+                if polymorph is source_polymorph
+            )
+            if len(source_tables) != 1:
+                raise ValueError(
+                    f"expected one JANAF table for MAGEMin source "
+                    f"{source_polymorph}, got {list(source_tables)}"
+                )
+            fusion = _janaf_fusion_energy_for_pair(
+                formula, source_tables[0], fusion.liquid_table, temperature_K
+            )
+        except (ValueError, JANAFFusionPolymorphUnavailable) as exc:
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"fusion conversion missing input for {formula}: MAGEMin "
+                    f"source reference could not be resolved for liquid basis: {exc}"
+                ),
+                origin=reference.observation_id,
+                band=f"JANAF MAGEMin source/liquid pair for {formula}: {exc}",
+            )
+            return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     # JANAF Mg-008 (MgO(cr), periclase) and Mg-009 (MgO(l)) give, by node
     # interpolation at 1873 K, G_s°=-345.91812 and G_l°=-317.44751 kJ/mol.
@@ -1700,33 +1900,54 @@ def fusion_comparison_reference(
     # move it to liquid. Since μ=G°+RT ln(a), each step multiplies activity
     # by exp(−ΔG/RT). B1259's common printed H/S grid ends at 2000 K; its edge
     # H/S are held beyond that limit (dCp=0) and the notice marks extrapolation.
+    magemin_above_crossing_notice: Notice | None = None
     if (
         temperature_K >= fusion.melting_temperature_K
         and not tridymite_to_cristobalite
     ):
-        domain_notice = Notice(
-            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-            affected_quantities=(Quantity.ACTIVITY,),
-            reason=(
-                f"solid reference recorded at T={temperature_K} K >= "
-                f"JANAF T_fus={fusion.melting_temperature_K} K; "
-                "no numeric reference-state conversion applied because liquid is natural"
-            ),
-            origin=reference.observation_id,
-            band=(
-                f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
-                f"tables={fusion.crystal_table}/{fusion.liquid_table}"
-            ),
-        )
-        notices = (domain_notice,) if melts_notice is None else (
-            domain_notice,
-            melts_notice,
-        )
-        return replace(
-            reference,
-            identity=comparison_identity,
-            notices=union_notices(reference.notices, notices),
-        )
+        if magemin_native_reference:
+            # The engine already named its solid standard. Convert that known
+            # reference; do not invent a polymorph for an unprinted source.
+            magemin_above_crossing_notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"solid reference recorded at T={temperature_K} K >= "
+                    f"JANAF T_fus={fusion.melting_temperature_K} K; "
+                    "MAGEMin native solid-reference activity converted numerically; "
+                    "its explicit polymorph table supplies the source standard; "
+                    "liquid is natural"
+                ),
+                origin=reference.observation_id,
+                band=(
+                    f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
+                    f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+                ),
+            )
+        else:
+            domain_notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"solid reference recorded at T={temperature_K} K >= "
+                    f"JANAF T_fus={fusion.melting_temperature_K} K; "
+                    "no numeric reference-state conversion applied because liquid is natural"
+                ),
+                origin=reference.observation_id,
+                band=(
+                    f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
+                    f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+                ),
+            )
+            notices = (domain_notice,) if melts_notice is None else (
+                domain_notice,
+                melts_notice,
+            )
+            return replace(
+                reference,
+                identity=comparison_identity,
+                notices=union_notices(reference.notices, notices),
+            )
 
     # For the same chemical potential, mu = G° + RT ln(a) gives
     # a_l = a_s*exp(-DeltaG/RT), where DeltaG=G_l-G_s per mole of oxide.
@@ -1775,6 +1996,8 @@ def fusion_comparison_reference(
         origin=reference.observation_id,
     )
     notices = (notice,)
+    if magemin_above_crossing_notice is not None:
+        notices = (magemin_above_crossing_notice,) + notices
     if melts_notice is not None:
         notices += (melts_notice,)
     if tridymite_notice is not None:
@@ -5458,6 +5681,29 @@ def predict_with_engine(
             )
         )
 
+    if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY and wt is not None:
+        from engines.magemin.domain import MAGEMinDomainGate
+
+        valid, warnings, gate_reason = MAGEMinDomainGate.validate_with_reason(wt)
+        if not valid:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                authority=Authority.REFUSED,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.METRIC_DOMAIN,
+                refusal_detail={
+                    "reason": "out_of_domain",
+                    "out_of_domain_reason": gate_reason,
+                    "gate": "magemin_composition_validity",
+                    "warnings": warnings,
+                },
+                identity=identity,
+                requested_composition=requested,
+            )
+
     if composition_value is None and wt is None:
         return EnginePrediction(
             engine=engine,
@@ -5469,7 +5715,6 @@ def predict_with_engine(
             refusal_detail={"reason": "quantity_has_no_engine_pot", "quantity": quantity.value},
             identity=identity,
         )
-
     pressure_bar: float | None = None
     if activity_payload is None:
         pressure_bar, pressure_notice, pressure_invalid = total_pressure_bar_for_score(
@@ -5726,6 +5971,21 @@ def predict_with_engine(
     extra_notices: list[Notice] = list(input_notices)
     authority = Authority.BRIDGE
     certified_band = None
+    if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
+        extra_notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "MAGEMin ig melt_activity validation band is not established; "
+                    "native activity is predicted outside a certified temperature band"
+                ),
+                origin="engine:magemin",
+                band="MAGEMin ig melt_activity validation band not established",
+                authority=Authority.EXTRAPOLATED,
+            )
+        )
+        authority = Authority.EXTRAPOLATED
     if name in MELTS_FAMILY_ENGINES:
         gate = assess_qualification_gate(wt, float(T))
         if not gate.get("valid"):
@@ -5738,6 +5998,11 @@ def predict_with_engine(
     use_isolated = isolated
     if use_isolated is None:
         use_isolated = qualification and name in MELTS_FAMILY_ENGINES
+    # MAGEMin's existing warm-worker hard wall is 15 s; the scorer's 20 s
+    # cell timeout remains a secondary bound. call_timeout_s carries the
+    # remaining cell budget into the worker, whose 15 s pool limit kills the
+    # observed >50 s non-finite Gamma loop. Expiry maps below to
+    # engine_not_converged with this cell's elapsed wall time.
     cell = equilibrate_cell(
         handle,
         pot,
@@ -5747,6 +6012,11 @@ def predict_with_engine(
         isolated=use_isolated,
         arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
         physical_pressure_bar=pressure_bar,
+        native_activity_formula=(
+            formula
+            if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY
+            else None
+        ),
     )
     notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
@@ -5764,6 +6034,44 @@ def predict_with_engine(
     if status != "ok":
         typed = str(refusal or status or "unavailable")
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
+        if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
+            cell_status = str(getattr(cell, "engine_status", "") or "")
+            if typed in {"out_of_domain", "out_of_basis"} or cell_status == "out_of_domain":
+                refusal_reason = RefusalReason.METRIC_DOMAIN
+                typed_reason = "out_of_domain"
+            else:
+                refusal_reason = RefusalReason.ATTEMPTED_UNAVAILABLE
+                if typed == REFUSAL_TIMEOUT:
+                    typed_reason = "engine_timeout"
+                elif typed == "no_liquid":
+                    typed_reason = "no_liquid"
+                elif cell_status == "RuntimeError":
+                    typed_reason = "runtime_error"
+                else:
+                    typed_reason = "engine_not_converged"
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                    call_evidence=call_evidence,
+                ),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=refusal_reason,
+                refusal_detail={
+                    "reason": typed_reason,
+                    "elapsed_s": float(getattr(cell, "wall_s", 0.0) or 0.0),
+                    "cell_refusal_reason": typed,
+                    "engine_status": cell_status,
+                    "engine_reason": engine_side_reason,
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
         openimcc_outside_species = engine is Engine.OPENIMCC and any(
             token in f"{typed} {engine_side_reason}"
             for token in (
@@ -7065,7 +7373,14 @@ def compile_residual(
         None,
     )
     if missing_fusion_input is not None:
-        if "JANAF solid table " in missing_fusion_input.reason:
+        native_pair_failure = (
+            engine is Engine.MAGEMIN
+            and "MAGEMin native reference could not be resolved:"
+            in missing_fusion_input.reason
+        )
+        if native_pair_failure:
+            missing_input = "JANAF source/target tables for MAGEMin native reference"
+        elif "JANAF solid table " in missing_fusion_input.reason:
             missing_input = "JANAF solid polymorph matching the selected table"
         elif "no temperature_K" in missing_fusion_input.reason:
             missing_input = "activity observation temperature_K"
@@ -7074,7 +7389,9 @@ def compile_residual(
         return _refused(
             RefusalReason.IDENTITY_INCOMPLETE,
             {
-                "reason": "solid_liquid_reference_conversion_missing_input",
+                "reason": "magemin_native_reference_conversion_missing_input"
+                if native_pair_failure
+                else "solid_liquid_reference_conversion_missing_input",
                 "missing_input": missing_input,
                 "notice": missing_fusion_input.reason,
             },

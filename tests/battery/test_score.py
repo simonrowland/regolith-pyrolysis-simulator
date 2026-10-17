@@ -8113,7 +8113,10 @@ def test_stated_silica_polymorph_is_not_reinferred() -> None:
     )
 
 
-def test_solid_reference_without_temperature_remains_a_missing_input_refusal() -> None:
+@pytest.mark.parametrize("engine", (Engine.OPENIMCC, Engine.MAGEMIN))
+def test_solid_reference_without_temperature_remains_a_missing_input_refusal(
+    engine: Engine,
+) -> None:
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
@@ -8136,13 +8139,16 @@ def test_solid_reference_without_temperature_remains_a_missing_input_refusal() -
 
     residual, _candidate = compile_residual(
         reference,
-        Engine.OPENIMCC,
+        engine,
         context=_context(F.work(), experiment, reference, review="reviewed"),
     )
 
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "solid_liquid_reference_conversion_missing_input"
+    )
     assert residual.refusal.detail["missing_input"] == (
         "activity observation temperature_K"
     )
@@ -9285,7 +9291,8 @@ def test_fusion_conversion_without_janaf_pair_returns_typed_notice() -> None:
     assert notice.band
 
 
-def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual() -> None:
+def test_magemin_without_native_activity_keeps_reference_for_unsupported_route() -> None:
+    from simulator.battery.generators.bench import _engine_reports_formula
     from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -9308,27 +9315,428 @@ def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual()
     )
 
     result = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
-    prediction = replace(
-        _predict(reference.value.point, identity), engine=Engine.MAGEMIN
-    )
-    residual, _candidate = compile_residual(
-        reference,
-        Engine.MAGEMIN,
-        context=_context(F.work(), experiment, reference),
-        prediction=prediction,
-    )
 
     assert result.value.point == reference.value.point
     assert result.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert not result.notices
+    assert _engine_reports_formula("magemin", "CaO") == (
+        False,
+        "typed-refusal:magemin_no_native_activity:CaO",
+    )
+
+
+def test_guo_mgo_periclase_reference_matches_magemin_native_basis() -> None:
+    from simulator.battery.migrate import REPO_ROOT, load_migrated_store
+    from simulator.battery.generators.bench import (
+        _ENGINE_REPORTED_ACTIVITY,
+        _reference_matches,
+    )
+    from simulator.battery.score import fusion_comparison_reference
+
+    _works, _experiments, observations = load_migrated_store(
+        REPO_ROOT, sources=("guo-2021-mgo-activity-cmas-slag",)
+    )
+    reference = next(
+        row for row in observations.values()
+        if row.identity.species.formula == "MgO"
+    )
+    converted = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
+    standard = converted.identity.reference_state.value
+
+    assert converted is reference
+    assert standard.endmember.polymorph.value is Polymorph.PERICLASE
+    assert _reference_matches(
+        standard, _ENGINE_REPORTED_ACTIVITY["magemin"], "magemin"
+    ) == (True, "raoultian_native_crystal_activity")
+
+
+def _raw_janaf_formation_gibbs_at(table_id: str, temperature_K: Decimal) -> Decimal:
+    """Interpolate checked-in JANAF rows without the scorer's converter."""
+    table_path = (
+        Path(__file__).resolve().parents[2]
+        / "data/literature/compilations/janaf/tables"
+        / f"{table_id}.yaml"
+    )
+    table = yaml.safe_load(table_path.read_text(encoding="utf-8"))["table"]
+    points = tuple(
+        (
+            Decimal(str(row["temperature"]["value"])),
+            Decimal(str(row["formation_gibbs_energy"]["value"])),
+        )
+        for row in table["values"]
+        if row.get("formation_gibbs_energy", {}).get("value") is not None
+    )
+    left, right = next(
+        (a, b)
+        for a, b in zip(points, points[1:])
+        if a[0] <= temperature_K <= b[0]
+    )
+    return left[1] + (right[1] - left[1]) * (temperature_K - left[0]) / (
+        right[0] - left[0]
+    )
+
+
+def test_silica_observation_polymorph_converts_to_magemin_quartz() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        "cristobalite_high",
+    )
+    reference = F.observation(
+        "silica-polymorph-magemin-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.4"),
+        source_id="silica-polymorph-source",
+    )
+
+    converted = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
+
+    standard = converted.identity.reference_state.value
+    assert standard.endmember.polymorph.value is Polymorph.QUARTZ
+    assert converted.value.point != reference.value.point
     notice = next(
-        n for n in result.notices if n.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+        item for item in converted.notices
+        if item.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        and "MAGEMin native solid-reference conversion" in item.reason
     )
-    assert notice.reason == (
-        "solid/liquid reference conversion skipped: engine reference is "
-        "unestablished for magemin; measured solid-reference value left unchanged"
+    assert "source_reference=cristobalite_high" in notice.reason
+    assert "target_polymorph=quartz" in notice.reason
+    temperature = Decimal("1823")
+    independent_value = Decimal("0.4") * (
+        (
+            _raw_janaf_formation_gibbs_at("O-035", temperature)
+            - _raw_janaf_formation_gibbs_at("O-037", temperature)
+        )
+        * Decimal(1000)
+        / (Decimal("8.31441") * temperature)
+    ).exp()
+    assert independent_value == Decimal("0.3658848311154413382374911057")
+    assert converted.value.point == independent_value
+
+
+def test_liquid_silica_reference_converts_to_magemin_quartz_standard() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(
+        formula="SiO2",
+        T_K=Decimal("1823"),
+        endmember_phase=Phase.L,
+        component_basis="SiO2",
     )
-    assert notice.band == "engine activity reference unestablished: magemin"
-    assert notice in residual.notices
+    reference = F.observation(
+        "liquid-silica-magemin-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        source_id="liquid-silica-source",
+    )
+
+    converted = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
+
+    standard = converted.identity.reference_state.value
+    assert standard.endmember.phase.value is Phase.CR
+    assert standard.endmember.polymorph.value is Polymorph.QUARTZ
+    temperature = Decimal("1823")
+    independent_value = (
+        (
+            _raw_janaf_formation_gibbs_at("O-038", temperature)
+            - _raw_janaf_formation_gibbs_at("O-037", temperature)
+        )
+        * Decimal(1000)
+        / (Decimal("8.31441") * temperature)
+    ).exp()
+    assert independent_value == Decimal("0.9597711225379085591688714995")
+    assert converted.value.point == independent_value
+
+
+def test_pure_liquid_silica_activity_converts_to_one_on_liquid_basis() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    temperature = Decimal("1823")
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(
+        formula="SiO2",
+        T_K=temperature,
+        endmember_phase=Phase.L,
+        component_basis="SiO2",
+    )
+    reference = F.observation(
+        "pure-liquid-silica-on-liquid-standard",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        source_id="pure-liquid-silica-source",
+    )
+
+    magemin_basis = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
+    liquid_basis = fusion_comparison_reference(
+        magemin_basis, engine=Engine.OPENIMCC
+    )
+
+    assert magemin_basis.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert (
+        magemin_basis.identity.reference_state.value.endmember.polymorph.value
+        is Polymorph.QUARTZ
+    )
+    assert liquid_basis.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert liquid_basis.value.point == pytest.approx(
+        Decimal("1"), rel=Decimal("1e-9")
+    )
+
+
+def test_magemin_nonfinite_native_activity_is_one_typed_unavailable_prediction(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.melt_backend.base import EquilibriumResult
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        "magemin-nonfinite-mgo",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        source_id="magemin-nonfinite-source",
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args: SimpleNamespace(
+            payload={
+                "composition_mol": {
+                    "SiO2": Decimal("0.55"),
+                    "MgO": Decimal("0.20"),
+                    "Al2O3": Decimal("0.25"),
+                }
+            }
+        ),
+    )
+
+    class FailedNativeBackend:
+        def equilibrate(self, **_kwargs):
+            return EquilibriumResult(
+                status="not_converged",
+                diagnostics={
+                    "backend_status_reason": "engine_not_converged",
+                    "magemin_native_activity_invalid": True,
+                },
+            )
+
+    handle = EngineHandle(
+        "magemin", FailedNativeBackend(), True, None, False, False
+    )
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={"magemin": handle},
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["reason"] == "engine_not_converged"
+    assert prediction.refusal_detail["elapsed_s"] >= 0.0
+    notice = next(
+        item for item in prediction.notices
+        if item.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+    )
+    assert notice.authority is Authority.EXTRAPOLATED
+
+
+@pytest.mark.parametrize(
+    ("cell_refusal", "engine_status", "reason", "refusal_reason"),
+    [
+        ("out_of_basis", "out_of_domain", "out_of_domain", RefusalReason.METRIC_DOMAIN),
+        ("no_liquid", "refusal", "no_liquid", RefusalReason.ATTEMPTED_UNAVAILABLE),
+        ("engine_timeout", "TimeoutError", "engine_timeout", RefusalReason.ATTEMPTED_UNAVAILABLE),
+        ("unavailable", "RuntimeError", "runtime_error", RefusalReason.ATTEMPTED_UNAVAILABLE),
+    ],
+)
+def test_magemin_native_activity_failure_keeps_typed_cause(
+    monkeypatch: pytest.MonkeyPatch,
+    cell_refusal: str,
+    engine_status: str,
+    reason: str,
+    refusal_reason: RefusalReason,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        f"magemin-failed-activity-{reason}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        source_id=f"magemin-failed-activity-source-{reason}",
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args: SimpleNamespace(
+            payload={
+                "composition_mol": {
+                    "SiO2": Decimal("0.55"),
+                    "MgO": Decimal("0.20"),
+                    "Al2O3": Decimal("0.25"),
+                }
+            }
+        ),
+    )
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "equilibrate_cell",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            status="refusal",
+            refusal_reason=cell_refusal,
+            engine_status=engine_status,
+            engine_reason=engine_status,
+            wall_s=0.1,
+            melt_activities={"MgO": 0.6},
+            notices=(),
+            authority=None,
+            certified_band=None,
+            hostname="test",
+            exit_code=None,
+        ),
+    )
+
+    handle = EngineHandle("magemin", object(), True, None, False, False)
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={"magemin": handle},
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.refusal_reason is refusal_reason
+    assert prediction.refusal_detail["reason"] == reason
+    assert prediction.refusal_detail["cell_refusal_reason"] == cell_refusal
+
+
+def test_magemin_composition_gate_is_a_typed_out_of_domain_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        "magemin-out-of-domain-mgo",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        source_id="magemin-out-of-domain-source",
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args: SimpleNamespace(
+            payload={"composition_mol": {"SiO2": Decimal("0.1"), "MgO": Decimal("0.9")}}
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        experiment=experiment,
+        handles={},
+    )
+
+    assert prediction.execution.state is ExecutionState.NOT_PROBED
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail["reason"] == "out_of_domain"
+    assert prediction.refusal_detail["out_of_domain_reason"] == "silicate_window"
+    assert prediction.refusal_detail["gate"] == "magemin_composition_validity"
+
+
+def test_magemin_native_pair_failure_has_native_missing_input_label(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.generators import janaf
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        "cristobalite_high",
+    )
+    reference = F.observation(
+        "silica-native-pair-missing",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="silica-native-pair-missing-source",
+    )
+    monkeypatch.setattr(
+        janaf, "_janaf_eligible_pure_crystal_tables", lambda *_args: ()
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.MAGEMIN,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "magemin_native_reference_conversion_missing_input"
+    )
 
 
 def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
