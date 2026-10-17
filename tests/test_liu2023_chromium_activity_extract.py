@@ -10,7 +10,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import (
+    Migrator,
+    _kume_formula_unit_oxide,
+    oxide_molar_mass,
+    wt_pct_to_mole_fraction,
+)
+from simulator.state import MOLAR_MASS
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -135,8 +141,15 @@ def test_real_migrator_receives_each_rows_conditions_and_lineage():
     )
     for species in ("CrO1.5", "CrO"):
         composition = representatives[species].identity.composition
-        assert composition.is_unknown
-        assert "unsupported numeric component(s)" in composition.reason
+        assert composition.is_value
+        axes = composition.value.as_map()
+        assert axes["CaF2"] > 0
+        assert axes["MoO2"] > 0
+        assert axes["Cr2O3"] > 0
+        if species == "CrO1.5":
+            assert "CrO1.5" not in axes
+        else:
+            assert axes["CrO"] > 0
 
     for species in ("CrO1.5", "CrO"):
         rows = [
@@ -154,3 +167,52 @@ def test_real_migrator_receives_each_rows_conditions_and_lineage():
             assert parent_row == child_row
             assert observation.derivation is not None
             assert observation.derivation.inputs == observation.derived_from
+
+    bound = [
+        o for o in admitted
+        if o.identity.species.formula in {"CrO1.5", "CrO"}
+    ]
+    assert len(bound) == 24
+    assert all(o.identity.composition.is_value for o in bound)
+
+
+def test_cr_oxide_formula_unit_mapping_and_component_mutation():
+    # M(Cr2O3) is twice M(CrO1.5); wt% / M(Cr2O3) therefore yields canonical
+    # Cr2O3 formula-unit moles for the printed CrO1.5 component.
+    assert oxide_molar_mass("CrO1.5") == Decimal(str(MOLAR_MASS["Cr2O3"]))
+    formula_unit_mass = 2 * (
+        Decimal(str(MOLAR_MASS["Cr"]))
+        + Decimal("1.5") * Decimal(str(MOLAR_MASS["O"]))
+    )
+    assert abs(Decimal(str(MOLAR_MASS["Cr2O3"])) - formula_unit_mass) < Decimal("1e-12")
+    assert _kume_formula_unit_oxide("CrO1.5") == ("Cr2O3", Decimal("0.5"))
+    composition = wt_pct_to_mole_fraction(
+        {"CrO1.5": Decimal("10"), "SiO2": Decimal("90")}
+    ).as_map()
+    canonical_cr2o3_moles = Decimal("10") / oxide_molar_mass("CrO1.5")
+    silica_moles = Decimal("90") / oxide_molar_mass("SiO2")
+    assert composition["Cr2O3"] == canonical_cr2o3_moles / (
+        canonical_cr2o3_moles + silica_moles
+    )
+
+    from simulator.battery import migrate as migrate_module
+
+    removed = {
+        name: migrate_module._COMPOSITION_COMPONENTS.pop(name)
+        for name in ("CrO", "CrO1.5", "CaF2", "MoO2")
+    }
+    try:
+        migrator = Migrator(root=ROOT)
+        migrator._migrate_extract(EXTRACT)
+        migrator.finalize()
+        observations = [
+            o for o in migrator.result.observations.values()
+            if o.source_id == EXTRACT.stem and o.locator
+            and o.locator.table == "3"
+            and o.identity.species.formula in {"CrO1.5", "CrO"}
+            and o.admission.status.value == "admitted"
+        ]
+        assert len(observations) == 24
+        assert all(o.identity.composition.is_unknown for o in observations)
+    finally:
+        migrate_module._COMPOSITION_COMPONENTS.update(removed)

@@ -3082,6 +3082,16 @@ _COMPOSITION_COMPONENTS: dict[str, tuple[str, str, bool]] = {
             "CoO",
         )
     },
+    # CrO1.5 is one chromium atom per formula unit; Cr2O3 is two. Mapping its
+    # printed wt% through M(Cr2O3) makes n(Cr2O3) = w/M(Cr2O3), exactly half
+    # the CrO1.5 formula-unit amount because M(Cr2O3) = 2 M(CrO1.5).
+    # The printed key remains CrO1.5; only its identity component is canonical.
+    "CrO1.5": ("Cr2O3", "Cr2O3", True),
+    "CrO": ("CrO", "CrO", False),
+    # Despite the map's historical oxide-oriented name, Liu prints CaF2 as a
+    # slag component; retain it in the printed-composition identity.
+    "CaF2": ("CaF2", "CaF2", False),
+    "MoO2": ("MoO2", "MoO2", False),
     "Rb2O": ("Rb2O", "Rb2O", False),
     "SO3": ("SO3", "SO3", False),
     "S": ("S", "S", False),
@@ -3244,16 +3254,16 @@ def _total_iron_reported_as_feo_notice(
 def _kume_formula_unit_oxide(name: str) -> tuple[str, Decimal] | None:
     if name == "FeOT":
         return "FeOT", Decimal("1")
-    component = _COMPOSITION_COMPONENTS.get(name)
-    if component is not None:
-        return component[1], Decimal("1")
-    if name != "AlO1.5":
+    if name not in {"AlO1.5", "CrO1.5"}:
+        component = _COMPOSITION_COMPONENTS.get(name)
+        if component is not None:
+            return component[1], Decimal("1")
         return None
 
-    # AlO1.5 is half an Al2O3 formula unit and M(AlO1.5) = M(Al2O3)/2.
-    # Mole conversion uses n(Al2O3) = n(AlO1.5)/2 before renormalising all
-    # components; mass percent is invariant, so rename AlO1.5 only. For the
-    # mole-to-mass path, x [mol/mol] * M [g/mol] = relative mass [g/mol].
+    # AlO1.5 and CrO1.5 are half an Al2O3 and Cr2O3 formula unit respectively.
+    # Reuse the formula-unit resolver so mole-basis maps apply the 0.5 factor;
+    # mass percent is invariant, so the printed wt% path only renames the key.
+    # For mole-to-mass, x [mol/mol] * M [g/mol] = relative mass [g/mol].
     # Sanity check: 50:50 CaO:AlO1.5 becomes 2/3 CaO, 1/3 Al2O3.
     from simulator.chemistry.structural_activity import normalize_formula_unit_moles
 
@@ -15438,6 +15448,16 @@ class Migrator:
                 composition_unknown_reason(point_composition_refusal)
             )
         elif q_token_point is Quantity.P_PARTIAL and point_oxide_map:
+            ident_kwargs["composition"] = State.of(
+                wt_pct_to_mole_fraction(point_oxide_map)
+            )
+        elif (
+            q_token_point in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+            and point_oxide_map
+        ):
+            # Activity points may print the composition for this exact row;
+            # bind that local map to the identity rather than only retaining it
+            # as a non-identity condition on the exploded point.
             ident_kwargs["composition"] = State.of(
                 wt_pct_to_mole_fraction(point_oxide_map)
             )
