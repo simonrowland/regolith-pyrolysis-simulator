@@ -35,6 +35,20 @@ The row-14 render reads **33.42 / 33.41 / 33.17**. The ratio column is kept
 at its printed values; despite its header, the quotient is dimensionless. The
 zero in row 17 is retained as printed.
 
+The focused test pins TiO2 values from rows 1, 5, and 14. Mutation checks each
+turned the test red: row 1 5.05→5.06, row 5 10.65→10.66, and row 14
+33.41→33.40. The source values were restored after each check.
+
+The melting-point cell on PDF page 3 (printed page 1466) is a separate text-layer
+reconciliation: `pdftotext-layout` places the ± glyph on the following line and
+reads 1643 ± 15 K for the composition stated as 37.60 mole % TiO2. MinerU's
+1643.15 K is rejected as a decimal reading. The page render appears decimal-like;
+this fix follows the review ruling to retain the text-layer value. The point is
+recorded for air, with only the printed TiO2 percentage and no inferred balance.
+The current composition schema cannot express a lone mole-percent component as
+a complete composition, so the printed phrase is retained verbatim and the
+point-condition composition remains unknown; no Table 1 balance is borrowed.
+
 ## Scope and migration
 
 - The table is the setup composition of the 17 samples, stored once as
@@ -43,22 +57,32 @@ zero in row 17 is retained as printed.
   as temperature-dependent residue observations.
 - The trajectories in Figs. 1–3 over 1700–2500 K are figure-read candidates
   only. No figure values or inferred pressures were added.
+- Apparatus/setup values left out: background pressure < 1e-8 atm is the
+  instrument's background-gas pressure, pyrometer uncertainty < 10 K at 2400 K
+  is instrument accuracy rather than a point uncertainty, and SiO2 purity 99.90
+  mass % describes a starting reagent; none is a requested residue or vapour
+  observation.
 - The named predominant vapour species SiO, Ca, TiO, and TiO2 are recorded as
   context, with the text's 25 eV mass-spectrometry condition and no pressures.
 - The adjacent `shornikov-2000-titania-melts` companion extract in corpus
   `origin/main` gives study-wide composition ranges but no per-charge
   assignments. It does not establish whether these exact 17 samples were
   reused; the 1999 Table 1 values are retained here once and are not duplicated
-  as companion observations.
-- Isolated real-migrator result: 1 work, 2 context rows, 0 observations,
-  0 experiments, 0 hard issues, and 1 unavailable queue item (`extract yielded
-  no observations`). That typed absence is expected for this setup-only
-  extract.
+  as companion observations. Their published figure windows differ: the 1999
+  residue trajectories cover 1700–2500 K, while the companion assigns activity
+  curves to 2100 K and liquidus interpretation to 2400–2500 K (both state
+  1700–2500 K overall).
+- Isolated real-migrator result after this fix: 1 work, 1 experiment, 2 context
+  rows, 1 transition-temperature observation, 0 hard issues, and 1 unavailable
+  queue item (`source does not state method`). The observation value is 1643 K;
+  its printed uncertainty is retained as `T_m_uncertainty_K: 15` with confidence
+  level not stated. Migrated point conditions carry temperature 1643 K, air,
+  and the located unknown full composition.
 - `mineru_table_draft.py compare` reports 0 matched, 0 no-match, 0 mismatch,
-  0 total because its numeric-point comparison covers scored observation
-  points, while these table values are intentionally in context. The command's
-  header-only CSV output is committed alongside this audit; the full cell audit
-  above records the machine-read and render checks.
-- Expected regenerated store delta: one work with two context rows; no
-  experiments or scored observations; one extract-level unavailable item. No
+  0 total because it compares numeric table-draft cells; Table 1 is context and
+  the transition point is prose rather than a MinerU table cell. The command's
+  header-only CSV output remains committed alongside this audit; the full cell
+  audit above records the machine-read and render checks.
+- Expected regenerated store delta: one work, one experiment, two context rows,
+  one transition-temperature observation, and one unavailable method item. No
   store regeneration was committed.
