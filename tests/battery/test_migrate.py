@@ -15048,6 +15048,8 @@ def test_shornikov_1994_printed_mullite_composition_reaches_every_point(
     )
     rows = [obs for obs in result.observations.values() if obs.source_id == source_id]
     assert len(rows) == 41
+    assert result.validation is not None
+    assert len(result.validation.hard_issues) == 0
     assert all("::T=" in obs.observation_id for obs in rows)
 
     named = {
@@ -15080,8 +15082,17 @@ def test_shornikov_1994_printed_mullite_composition_reaches_every_point(
             assert identity.species.phase.value is Phase.G
             assert identity.fO2_Pa.is_unknown
             assert identity.total_pressure_Pa.is_unknown
+        elif "_activity_" in obs.observation_id:
+            assert identity.quantity.value is Quantity.ACTIVITY
+            assert identity.species.phase.is_value
+            assert identity.species.phase.value is Phase.CR
+            if "shornikov_1994_al2o3_activity_1833k" in obs.observation_id:
+                assert obs.value.point == Decimal("1.05")
+            elif "shornikov_1994_sio2_activity_2033k" in obs.observation_id:
+                assert obs.value.point == Decimal("0.17")
 
     assert found_named == set(named)
+
 
 def test_ohara_1987_printed_compositions_reach_migrated_observations(
     tmp_path: Path,
