@@ -3837,7 +3837,22 @@ def _mole_fraction_composition_from_values(
                     omitted.append(token)
                     continue
                 components.append((component, parsed))
+    basis = _declared_composition_mol_basis(values, raw) or _DEFAULT_COMPOSITION_MOL_BASIS
     if len(components) < 2:
+        if (
+            len(components) == 1
+            and basis == "pure_oxide_system"
+            and components[0][1] == Decimal("1")
+            and not omitted
+        ):
+            return (
+                Composition(
+                    basis=basis,
+                    components=tuple(components),
+                    amount_basis=AmountBasis.MOLE_FRACTION,
+                ),
+                (),
+            )
         for key in ("X_Na2O_as_published", "X_Na2O"):
             fraction = _as_dec_or_none(values.get(key))
             if fraction is None or not Decimal("0") <= fraction <= Decimal("1"):
@@ -3848,9 +3863,6 @@ def _mole_fraction_composition_from_values(
         return None, tuple(omitted)
     if omitted:
         return None, tuple(omitted)
-    basis = (
-        _declared_composition_mol_basis(values, raw) or _DEFAULT_COMPOSITION_MOL_BASIS
-    )
     return (
         Composition(
             basis=basis,

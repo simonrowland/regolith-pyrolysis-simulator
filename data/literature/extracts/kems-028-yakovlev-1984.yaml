@@ -50,13 +50,20 @@ fidelity_samples:
     published_page: 946
     pdf_page_index: 2
     paragraph: SiO pressure reaches the maximum value P_SiO=6.2×10^-3 tor at T=1875 C
-- path: species.O2.observations[yakovlev_1984_Po2_table_calculated].values.points[0].p_torr
+- path: species.O2.observations[yakovlev_1984_Po2_table_calculated].values.points[0].P
   value: 1.4e-06
   locator:
     table: Po2
     published_page: 946
     pdf_page_index: 2
     note: Table first Murchison cell T=2020 C, I.4×10^-6 torr
+- path: species.O2.observations[yakovlev_1984_Po2_table_calculated].values.points[10].P
+  value: 1.9e-04
+  locator:
+    table: Po2
+    published_page: 946
+    pdf_page_index: 2
+    note: Table last Efremovka type A cell T=2348 C, 1.9×10^-4 torr
 - species: K
   observable: psat_series
   observation_id: yakovlev_1984_murchison_K_P_1225C
@@ -834,17 +841,29 @@ species:
       quote: The calculation of Po2 has been done using the equilibriums AlO=Al+O, O2=2O. The Po2 calculation
         for the high temperature vaporization of Murchison and CAI inclusions of Efremovka shows that
         vaporization of latter takes place at the conditions with higher Po2 (table).
+      derived_from: [pdf:kems-028-yakovlev-1984]
+      derivation:
+        relation: Authors calculated p(O2) from the printed equilibria AlO=Al+O and O2=2O.
+        inputs: [pdf:kems-028-yakovlev-1984]
       T_range_K:
       - 2293.15
       - 2621.15
       phase: high_T_residual_Murchison_and_Efremovka_CAI
       standard_state: calculated p(O2) from AlO=Al+O and O2=2O; torr as printed
+      condensed_form:
+        state: {tag: unknown, reason: phase_not_stated_for_high_temperature_residuals}
+        locator: {table: Po2, published_page: 946, pdf_page_index: 2}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: numerical_bulk_composition_not_published}
+          locator: {table: Po2, published_page: 946, pdf_page_index: 2}
       regime: kems_effusion
-      units: torr as published (p_Pa = p_torr × 133.322)
+      units: torr
       values:
         quantity: partial_pressure
         gas_species: O2(g)
         method_class: model_derived
+        model: Authors' equilibrium calculation using AlO=Al+O and O2=2O.
         admission_status: admitted
         T_K_conversion: T_K = T_C + 273.15
         equilibria_as_printed:
@@ -854,58 +873,91 @@ species:
         - T_C: 2020
           T_K: 2293.15
           sample: Murchison
-          p_torr: 1.4e-06
-          p_Pa: 0.00018665079999999998
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_composition_not_published}
+              locator: {table: Po2, published_page: 946, pdf_page_index: 2}
+          P: 1.4e-06
         - T_C: 2072
           T_K: 2345.15
           sample: Murchison
-          p_torr: 1.6e-06
-          p_Pa: 0.0002133152
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_composition_not_published}
+              locator: {table: Po2, published_page: 946, pdf_page_index: 2}
+          P: 1.6e-06
         - T_C: 2130
           T_K: 2403.15
           sample: Murchison
-          p_torr: 1.5e-06
-          p_Pa: 0.000199983
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_composition_not_published}
+              locator: {table: Po2, published_page: 946, pdf_page_index: 2}
+          P: 1.5e-06
         - T_C: 2130
           T_K: 2403.15
           sample: Efremovka_type_A
-          p_torr: 2.0e-05
-          p_Pa: 0.0026664400000000004
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_composition_not_published}
+              locator: {table: Po2, published_page: 946, pdf_page_index: 2}
+          P: 2.0e-05
         - T_C: 2130
           T_K: 2403.15
           sample: Efremovka_type_B
-          p_torr: 0.00034
-          p_Pa: 0.045329480000000005
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_composition_not_published}
+              locator: {table: Po2, published_page: 946, pdf_page_index: 2}
+          P: 0.00034
         - T_C: 2180
           T_K: 2453.15
           sample: Efremovka_type_A
-          p_torr: 4.7e-06
-          p_Pa: 0.0006266134
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_composition_not_published}
+              locator: {table: Po2, published_page: 946, pdf_page_index: 2}
+          P: 4.7e-06
         - T_C: 2205
           T_K: 2478.15
           sample: Efremovka_type_A
-          p_torr: 3.6e-06
-          p_Pa: 0.0004799592
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_composition_not_published}
+              locator: {table: Po2, published_page: 946, pdf_page_index: 2}
+          P: 3.6e-06
         - T_C: 2205
           T_K: 2478.15
           sample: Efremovka_type_B
-          p_torr: 0.00028
-          p_Pa: 0.037330159999999994
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_composition_not_published}
+              locator: {table: Po2, published_page: 946, pdf_page_index: 2}
+          P: 0.00028
         - T_C: 2267
           T_K: 2540.15
           sample: Efremovka_type_A
-          p_torr: 5.5e-05
-          p_Pa: 0.00733271
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_composition_not_published}
+              locator: {table: Po2, published_page: 946, pdf_page_index: 2}
+          P: 5.5e-05
         - T_C: 2267
           T_K: 2540.15
           sample: Efremovka_type_B
-          p_torr: 4.1e-05
-          p_Pa: 0.005466202
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_composition_not_published}
+              locator: {table: Po2, published_page: 946, pdf_page_index: 2}
+          P: 4.1e-05
         - T_C: 2348
           T_K: 2621.15
           sample: Efremovka_type_A
-          p_torr: 0.00019
-          p_Pa: 0.025331180000000002
+          point_conditions:
+            composition:
+              state: {tag: unknown, reason: numerical_bulk_composition_not_published}
+              locator: {table: Po2, published_page: 946, pdf_page_index: 2}
+          P: 0.00019
         blank_cells_as_printed:
         - Murchison blank at 2180, 2205, 2267, 2348 C
         - Efremovka type B blank at 2180 and 2348 C
