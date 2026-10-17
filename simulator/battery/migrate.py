@@ -1179,7 +1179,14 @@ def _point_condition_from_plain(
         )
     if isinstance(payload, Mapping) and isinstance(payload.get("state"), Mapping):
         state = payload["state"]
-        if state.get("tag") == "value" and isinstance(state.get("value"), str):
+        raw_value = state.get("value")
+        # Text labels (starting material, equilibrium boundary) stay strings.
+        # A numeric string is still a lab-axis decimal, so supersede keys match.
+        if (
+            state.get("tag") == "value"
+            and isinstance(raw_value, str)
+            and _as_dec_or_none(raw_value) is None
+        ):
             return _located_from_plain(payload, lambda value: value)
     if key == "pressure_on_throw_Torr":
         return _located_from_plain(

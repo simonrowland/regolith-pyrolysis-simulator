@@ -1304,6 +1304,7 @@ def tmp_extracts(tmp_path: Path):
                     "gas_speciation": ["fixture-source"],
                     "sulfur_solubility_and_sulfate_capacity_series": ["fixture-source"],
                     "composition_series": ["fixture-source"],
+                    "equilibrium_phase_composition": ["fixture-source"],
                 },
             }
         ),
