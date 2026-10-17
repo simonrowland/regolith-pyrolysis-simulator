@@ -5483,6 +5483,23 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
                 "experiment_id": experiment_id,
                 "engine": engine,
                 "oxygen_model": f"own oxygen balance: {engine}",
+                "surface_pO2_balance_floor": (
+                    {
+                        "steps_at_floor": 2,
+                        "first_step": 3,
+                        "fraction_of_time_at_floor": 0.25,
+                        "time_at_floor_s": 12.0,
+                        "pO2_bar": 1.0e-30,
+                    }
+                    if index == 0
+                    else {
+                        "steps_at_floor": 0,
+                        "first_step": None,
+                        "fraction_of_time_at_floor": 0.0,
+                        "time_at_floor_s": 0.0,
+                        "pO2_bar": None,
+                    }
+                ),
                 "integration": {
                     "steps": 256,
                     "refinement_status": "unconverged_at_cap",
@@ -5533,6 +5550,52 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
         assert first_prediction.refusal_detail["production_alpha_arm"]["alpha_arm"] == "alpha_runtime_catalog"
         assert any("feo_melt_redox_stack2_pending" in notice.reason for notice in first_prediction.notices)
         assert any("residue_time_refinement_unconverged" in notice.reason for notice in first_prediction.notices)
+        floor_notice = next(
+            notice
+            for notice in first_prediction.notices
+            if notice.reason == "surface_pO2_at_balance_floor"
+        )
+        assert floor_notice.kind is NoticeKind.FLOOR_INVERSION
+        assert float(floor_notice.original) == 1.0e-30
+        assert first_prediction.refusal_detail["surface_pO2_balance_floor"] == {
+            "steps_at_floor": 2,
+            "first_step": 3,
+            "fraction_of_time_at_floor": 0.25,
+            "time_at_floor_s": 12.0,
+            "pO2_bar": 1.0e-30,
+        }
+        assert not any(
+            notice.reason == "surface_pO2_at_balance_floor"
+            for notice in second_prediction.notices
+        )
+        first_run_references = [
+            observation
+            for observation in context.observations.values()
+            if observation.source_id == "kems-015-hashimoto-1983"
+            and observation.experiment_id == first.experiment_id
+            and "::hashimoto_1983_table3_residue_composition_series::"
+            in observation.observation_id
+            and quantity_token(observation.identity)
+            is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        ]
+        assert {row.identity.species.formula for row in first_run_references} == {
+            "FeO",
+            "MgO",
+            "SiO2",
+            "CaO",
+            "Al2O3",
+        }
+        first_run_predictions = [
+            score._hashimoto_residue_prediction(context, row, engine, cache)
+            for row in first_run_references
+        ]
+        assert all(
+            any(
+                notice.reason == "surface_pO2_at_balance_floor"
+                for notice in prediction.notices
+            )
+            for prediction in first_run_predictions
+        )
         candidate = score.candidate_observation(first, first_prediction)
         assert candidate.identity.species.phase == first.identity.species.phase
         assert candidate.identity.exposure.value.area_m2 == first.identity.exposure.value.area_m2
@@ -5559,6 +5622,38 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
         assert refusal.value is None
         assert refusal.refusal_reason is RefusalReason.UNSUPPORTED
         assert "injected_refusal" in refusal.refusal_detail["reason"]
+
+    engine_diagnostic = {
+        "kind": "floor_inversion",
+        "species": "Mg",
+        "reason": "melt_dissociation_pO2_floor_inverted_through_mass_action",
+        "original": 0.125,
+        "band": {"pO2_bar": [1.0e-12, 100.0]},
+    }
+
+    def fail_with_engine_floor_diagnostic(*_args, **_kwargs):
+        raise residue.ResidueInventoryRefusal(
+            "hashimoto_internal_analytical_channels_missing",
+            json.dumps(
+                {
+                    "missing_channels": ["FeO"],
+                    "engine_floor_inversion_diagnostics": [engine_diagnostic],
+                }
+            ),
+        )
+
+    monkeypatch.setattr(
+        residue,
+        "_predict_hashimoto_residue_cohort",
+        fail_with_engine_floor_diagnostic,
+    )
+    diagnostic_refusal = score._hashimoto_residue_prediction(
+        context, first, Engine.INTERNAL_ANALYTICAL, {}
+    )
+    assert diagnostic_refusal.refusal_reason is RefusalReason.UNSUPPORTED
+    assert len(diagnostic_refusal.notices) == 1
+    assert diagnostic_refusal.notices[0].kind is NoticeKind.FLOOR_INVERSION
+    assert diagnostic_refusal.notices[0].origin == "engine:internal-analytical"
 
 
 @pytest.mark.parametrize(
