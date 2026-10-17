@@ -1329,16 +1329,15 @@ class OverheadGasModel:
                 'species': 'ambient_other',
             })
         controlled = atmosphere in {'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE'}
+        # A regulated supply must size its makeup against the commanded
+        # boundary, including when a nonsupplied source is already flowing.
+        # The source-only transport estimate does not include that makeup.
+        if command_total is not None and pressure_mbar < command_total:
+            pressure_mbar = command_total
         carrier = str(getattr(melt, 'background_gas_species', '') or '')
         if atmosphere in {'PN2_SWEEP', 'ARGON_FLOW', 'CO2_BACKPRESSURE'}:
             carrier = carrier or {'PN2_SWEEP': 'N2', 'ARGON_FLOW': 'Ar',
                                   'CO2_BACKPRESSURE': 'CO2'}[atmosphere]
-            if atmosphere in {'PN2_SWEEP', 'ARGON_FLOW'}:
-                # The regulator supplies the remainder at its setpoint. This
-                # boundary closes actual carrier flow below; the transport
-                # estimate itself contains only the source pressure.
-                if command_total is not None and pressure_mbar < command_total:
-                    pressure_mbar = command_total
             if atmosphere == 'CO2_BACKPRESSURE' and not any(q > 0.0 and s != carrier for s, q in flows.items()):
                 pressure_mbar = sum(supplied_partials.values())
         elif controlled:
