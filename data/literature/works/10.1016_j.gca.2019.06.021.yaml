@@ -12664,6 +12664,17 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    pumping:
+      pumping:
+        state:
+          tag: value
+          value: Continuous gas flow, evacuated by a line at the top of the furnace; evaporated material condensed in cold
+            zones of the tube.
+        locator:
+          page: 6
+          section: 2.1 Experimental Methods, lines 113-119 (PDF page; manuscript p. 5)
+          note: quote=The gas continually flowed through the tube, and was evacuated by a line at the top of the furnace.
+          source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
   work_id: 10.1016/j.gca.2019.06.021
   locator:
     section: 4.6 Evaporation coefficients
@@ -12745,6 +12756,18 @@ experiments:
                 note: quote=3-cm-long hotspot of a 42-mm internal-diameter, 70-cm-long GERO vertical alumina tube furnace
                 source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
           output_unit: m
+    calibration:
+      calibration:
+        state:
+          tag: value
+          value: LA-ICP-MS standards bracket every 12-24 points (two samples), using three NIST-612 and two basaltic standards
+            (BCR-2G, GSD-1G, GSE-1G or BIR-1G, session-dependent). NIST-612 (≈40 ppm trace elements) supplies counts-per-second
+            versus concentration curves; internal 29Si (41 wt. % SiO2 in samples) and basaltic standards correct matrix effects.
+        locator:
+          page: 7
+          section: 2.2 Analytical Methods, lines 150-158
+          note: quote=29Si was used as an internal standard (41 wt. % SiO2 in samples)
+          source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
 benches:
 - id: 10.1016/j.gca.2019.06.021::bench::gero-open-furnace
   work_id: 10.1016/j.gca.2019.06.021

@@ -1,0 +1,1330 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shimaoka-nakamura-1989-nipr2-252.yaml
+observations:
+- observation_id: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_27_a
+  experiment_id: f0047e4de1838f5c723eb25bad3f79d975a885d595a579a50aeef831df767776::experiment::sample-A-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'quenched_partial_melt_run_product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '462'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies especially
+        large uncertainty or rejection for runs 32A, 27A and 31A.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_27_a
+  source_id: shimaoka-nakamura-1989-nipr2-252
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+    note: Run 27 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+  read_from: unknown:shimaoka-nakamura-1989-nipr2-252
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 27 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 27 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 27 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1989-nipr2-252
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_28_a
+  experiment_id: f0047e4de1838f5c723eb25bad3f79d975a885d595a579a50aeef831df767776::experiment::sample-A-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'quenched_partial_melt_run_product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '98'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies especially
+        large uncertainty or rejection for runs 32A, 27A and 31A.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_28_a
+  source_id: shimaoka-nakamura-1989-nipr2-252
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+    note: Run 28 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+  read_from: unknown:shimaoka-nakamura-1989-nipr2-252
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 28 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 28 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 28 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1989-nipr2-252
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_29_a
+  experiment_id: f0047e4de1838f5c723eb25bad3f79d975a885d595a579a50aeef831df767776::experiment::sample-A-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'quenched_partial_melt_run_product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '1170'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies especially
+        large uncertainty or rejection for runs 32A, 27A and 31A.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_29_a
+  source_id: shimaoka-nakamura-1989-nipr2-252
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+    note: Run 29 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+  read_from: unknown:shimaoka-nakamura-1989-nipr2-252
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 29 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 29 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 29 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1989-nipr2-252
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_30_a
+  experiment_id: f0047e4de1838f5c723eb25bad3f79d975a885d595a579a50aeef831df767776::experiment::sample-A-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'quenched_partial_melt_run_product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '87'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies especially
+        large uncertainty or rejection for runs 32A, 27A and 31A.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_30_a
+  source_id: shimaoka-nakamura-1989-nipr2-252
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+    note: Run 30 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+  read_from: unknown:shimaoka-nakamura-1989-nipr2-252
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 30 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 30 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 30 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1989-nipr2-252
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_31_a
+  experiment_id: f0047e4de1838f5c723eb25bad3f79d975a885d595a579a50aeef831df767776::experiment::sample-A-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'quenched_partial_melt_run_product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '109'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies especially
+        large uncertainty or rejection for runs 32A, 27A and 31A.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_31_a
+  source_id: shimaoka-nakamura-1989-nipr2-252
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+    note: Run 31 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+  read_from: unknown:shimaoka-nakamura-1989-nipr2-252
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 31 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 31 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 31 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1989-nipr2-252
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_32_a
+  experiment_id: f0047e4de1838f5c723eb25bad3f79d975a885d595a579a50aeef831df767776::experiment::sample-A-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'quenched_partial_melt_run_product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies especially
+        large uncertainty or rejection for runs 32A, 27A and 31A.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - residue_component_composition
+    reason: 'source_internally_inconsistent: Table 2 prints 6 ppm for run 32A, while §3.4 prose states 5 ppm; both values
+      are retained at their respective locators.'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_32_a
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_32_a
+  source_id: shimaoka-nakamura-1989-nipr2-252
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+    note: Run 32 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+  read_from: unknown:shimaoka-nakamura-1989-nipr2-252
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 32 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 32 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 32 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1989-nipr2-252
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_35_a
+  experiment_id: f0047e4de1838f5c723eb25bad3f79d975a885d595a579a50aeef831df767776::experiment::sample-A-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'quenched_partial_melt_run_product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '129'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies especially
+        large uncertainty or rejection for runs 32A, 27A and 31A.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_35_a
+  source_id: shimaoka-nakamura-1989-nipr2-252
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+    note: Run 35 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+  read_from: unknown:shimaoka-nakamura-1989-nipr2-252
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 35 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 35 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 35 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1989-nipr2-252
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_37_a
+  experiment_id: f0047e4de1838f5c723eb25bad3f79d975a885d595a579a50aeef831df767776::experiment::sample-A-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'quenched_partial_melt_run_product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '450'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies especially
+        large uncertainty or rejection for runs 32A, 27A and 31A.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_37_a
+  source_id: shimaoka-nakamura-1989-nipr2-252
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+    note: Run 37 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+  read_from: unknown:shimaoka-nakamura-1989-nipr2-252
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 37 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 37 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 37 A; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1989-nipr2-252
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_41_b
+  experiment_id: f0047e4de1838f5c723eb25bad3f79d975a885d595a579a50aeef831df767776::experiment::sample-B-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'quenched_partial_melt_run_product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '65'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies especially
+        large uncertainty or rejection for runs 32A, 27A and 31A.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_41_b
+  source_id: shimaoka-nakamura-1989-nipr2-252
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+    note: Run 41 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+  read_from: unknown:shimaoka-nakamura-1989-nipr2-252
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 41 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 41 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 41 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1989-nipr2-252
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_42_b
+  experiment_id: f0047e4de1838f5c723eb25bad3f79d975a885d595a579a50aeef831df767776::experiment::sample-B-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'quenched_partial_melt_run_product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '1120'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies especially
+        large uncertainty or rejection for runs 32A, 27A and 31A.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_42_b
+  source_id: shimaoka-nakamura-1989-nipr2-252
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+    note: Run 42 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+  read_from: unknown:shimaoka-nakamura-1989-nipr2-252
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 42 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 42 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 42 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1989-nipr2-252
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_51_b
+  experiment_id: f0047e4de1838f5c723eb25bad3f79d975a885d595a579a50aeef831df767776::experiment::sample-B-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'quenched_partial_melt_run_product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '2360'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies especially
+        large uncertainty or rejection for runs 32A, 27A and 31A.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_51_b
+  source_id: shimaoka-nakamura-1989-nipr2-252
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+    note: Run 51 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+  read_from: unknown:shimaoka-nakamura-1989-nipr2-252
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 51 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 51 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 51 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1989-nipr2-252
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_53_b
+  experiment_id: f0047e4de1838f5c723eb25bad3f79d975a885d595a579a50aeef831df767776::experiment::sample-B-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'quenched_partial_melt_run_product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '354'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row numerical uncertainty is printed. Table 2 Na values are blank-corrected; the text identifies especially
+        large uncertainty or rejection for runs 32A, 27A and 31A.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1989-nipr2-252::shimaoka_1989_table2_run_53_b
+  source_id: shimaoka-nakamura-1989-nipr2-252
+  locator:
+    published_page: 258
+    pdf_page_index: 6
+    table: '2'
+    note: Run 53 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+  read_from: unknown:shimaoka-nakamura-1989-nipr2-252
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        published_page: 258
+        pdf_page_index: 6
+        table: '2'
+        note: Run 53 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 53 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 258
+              pdf_page_index: 6
+              table: '2'
+              note: Run 53 B; complete printed row is retained in tables/shimaoka-nakamura-1989-nipr2-252/t2.csv.
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1989-nipr2-252
+    parameters: []
+    output_unit: Pa

@@ -1,0 +1,840 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  citation: Shornikov, S. I., & Yakovlev, O. I. (2023). Mass Spectrometric Study of Evaporation of Natural CAIs Melts (Types
+    A and B) in Efremovka Chondrite. 54th Lunar and Planetary Science Conference, abstract 1983.
+  source_ids:
+  - shornikov-2023-natural-cai-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:shornikov-2023-natural-cai-evaporation
+      role: pdf
+      path: raw/shornikov-2023-natural-cai-evaporation/shornikov-2023-natural-cai-evaporation.pdf
+      sha256:
+        tag: value
+        value: b426a6d15c161b200591f242fb3d47a9253b10c1e925df57d2e6ef5bd9aa0cb7
+    - asset_id: unknown:shornikov-2023-natural-cai-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_a
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.000015'
+          approximate: false
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Printed sample mass 10–15 mg; converted to kg without further calculation.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '36.2'
+          MgO: '5'
+          Al2O3: '38.3'
+          SiO2: '20.5'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        note: Initial composition of type A CAI, wt %. The paper also says the samples contained some K, Na, S, Fe, Ti, Cr,
+          and Ni oxides.
+    form:
+      state:
+        tag: value
+        value: Natural CAI inclusion, heated to a melt
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+    container:
+      state:
+        tag: value
+        value: Rhenium foil
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: The sample was placed in rhenium foil inside the tungsten cell.
+    characterization:
+      state:
+        tag: value
+        value: Natural inclusion in Efremovka chondrite (CV3); the authors also report some potassium, sodium, sulfur, iron,
+          titanium, chromium, and nickel oxides.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+    pretreatment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: No preparation procedure or purity is stated.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1300'
+          interval_high: '2600'
+          approximate: false
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Overall reported experimental range 1300–2600 K; not an individual run setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: No chamber background or residual pressure is reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: No sweep gas is reported.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Experimental
+    note: Natural Efremovka CAI type A melt measurements; the paper gives the overall experimental temperature interval.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Experimental
+          note: No effusion-orifice diameter is stated.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Experimental
+          note: No effusion-orifice channel length is stated.
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Comparison of ion currents using equation (2)
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Results and Discussion
+      reference_substance:
+        state:
+          tag: value
+          value: Gold vapor partial pressure, p_s
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Results and Discussion
+          note: Gold partial pressure is identified as the standard substance and attributed to reference [3].
+      reference_source:
+        state:
+          tag: value
+          value: Paule and Mandel (1972), reference [3]
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Results and Discussion
+  bench_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::bench::shornikov-2023-tungsten-kems
+- experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_b
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.000015'
+          approximate: false
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Printed sample mass 10–15 mg; converted to kg without further calculation.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '27.6'
+          MgO: '11.4'
+          Al2O3: '32.3'
+          SiO2: '28.7'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        note: Initial composition of type B CAI, wt %. The paper also says the samples contained some K, Na, S, Fe, Ti, Cr,
+          and Ni oxides.
+    form:
+      state:
+        tag: value
+        value: Natural CAI inclusion, heated to a melt
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+    container:
+      state:
+        tag: value
+        value: Rhenium foil
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: The sample was placed in rhenium foil inside the tungsten cell.
+    characterization:
+      state:
+        tag: value
+        value: Natural inclusion in Efremovka chondrite (CV3); the authors also report some potassium, sodium, sulfur, iron,
+          titanium, chromium, and nickel oxides.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+    pretreatment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: No preparation procedure or purity is stated.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1300'
+          interval_high: '2600'
+          approximate: false
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Overall reported experimental range 1300–2600 K; not an individual run setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: No chamber background or residual pressure is reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: No sweep gas is reported.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Experimental
+    note: Natural Efremovka CAI type B melt measurements; the paper gives the overall experimental temperature interval.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Experimental
+          note: No effusion-orifice diameter is stated.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Experimental
+          note: No effusion-orifice channel length is stated.
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Comparison of ion currents using equation (2)
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Results and Discussion
+      reference_substance:
+        state:
+          tag: value
+          value: Gold vapor partial pressure, p_s
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Results and Discussion
+          note: Gold partial pressure is identified as the standard substance and attributed to reference [3].
+      reference_source:
+        state:
+          tag: value
+          value: Paule and Mandel (1972), reference [3]
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Results and Discussion
+  bench_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::bench::shornikov-2023-tungsten-kems
+benches:
+- id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::bench::shornikov-2023-tungsten-kems
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Tungsten effusion cell with mass spectrometry
+    locator:
+      page: 1
+      pdf_page_index: 0
+      section: Experimental
+      note: Knudsen effusion mass spectrometric method; cylindrical tungsten cell.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Tungsten cylindrical effusion cell; no cell liner is stated.
+    locator:
+      page: 1
+      pdf_page_index: 0
+      section: Experimental
+  cell_materials:
+  - state:
+      tag: value
+      value: W
+    locator:
+      page: 1
+      pdf_page_index: 0
+      section: Experimental
+      note: Printed as a tungsten effusion cell. The separate rhenium foil holds the sample and is not identified as a cell
+        liner.
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Experimental
+          note: Cell is called cylindrical, but no dimensions are stated.
+  ionization:
+    energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '28'
+          approximate: false
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: Printed ionizing electron energy is 28 eV.
+    mode:
+      state:
+        tag: value
+        value: Electron impact ionization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+    effective_cross_sections:
+      state:
+        tag: value
+        value: The pressure equation uses effective ionization cross-sections σ_i and σ_s; numerical values are not printed.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+        note: Equation (2) and its following definition.
+    cross_section_source:
+      state:
+        tag: value
+        value: Reference [4], Semenov et al. (1976)
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+        note: Equation (2) cites [4] for the pressure relation; no individual cross-section values are printed.
+    isotope_correction:
+      state:
+        tag: value
+        value: Isotopic distribution coefficient η_i appears in equation (2); no numerical isotope or multiplier corrections
+          are printed.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+        note: Equation (2) and its following definition.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: No temperature sensor or measurement method is stated.
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental
+        note: No temperature calibration or uncertainty is stated.
+  heating_method:
+    state:
+      tag: value
+      value: Electron bombardment
+    locator:
+      page: 1
+      pdf_page_index: 0
+      section: Experimental
+  other_facts: []
+context:
+- observation_id: shornikov_2023_activity_status_context
+  type: activity_status_context
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Results and Discussion
+    note: The abstract reports vapor pressures and calculated residual compositions; it does not report oxide activities or
+      activity coefficients.
+  units: reported status and typed absences
+  values:
+    quantity: activity_measurement_status
+    method_class: quoted_unattributed
+    activities_reported: false
+    defining_ions: No activities are reported; no defining ion is assigned to an activity.
+    standard_states: No activity standard state is stated.
+    post_run_composition: No post-run composition assay is reported.
+    uncertainty: No experimental uncertainty is stated.
+  context_id: shornikov-2023-natural-cai-evaporation::context::shornikov_2023_activity_status_context
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  source_id: shornikov-2023-natural-cai-evaporation
+  species: Ca
+- observation_id: shornikov_2023_directional_and_qualifying_statements
+  type: data_qualification_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Results and Discussion
+  units: source prose; numeric_facts units are stated per value
+  values:
+    quantity: author_qualifications_and_comparisons
+    method_class: quoted_unattributed
+    statements:
+    - The comparison of the temperature dependences of partial pressures of vapor species over CAIs melts of types A and B
+      (Fig. 1 and 2) shows their approximate similarity.
+    - Note that the CaO and Al2O3 content in the condensed phase of CAIs type A is higher than in type B.
+    - At the same time there are some differences in the p_i temperature dependences of CAIs melts of types A and B.
+    - It can be seen that in CAIs type A melts MgO is the first to leave the melt, ahead of SiO2 that it follows from the
+      position of the p_Mg and p_SiO maxima (Fig. 1).
+    - On the contrary the MgO and SiO2 simultaneous exit from the melt that is specific for CAIs melts of type B.
+    - An interesting feature of the evaporation of CAIs melts of types A and B is the presence of SiO vapor specie in the
+      gas phase to high temperatures exceeding 2500 K (Fig. 1). This indicates the presence of silicon dioxide in the condensed
+      phase of CAIs melts.
+    - The calculated changes in CAIs melt compositions of types A and B during evaporation at 1800–2600 K are shown in Fig.
+      3. The interesting feature of CAIs melt evaporation is the similarity of changes in the compositions of residual melts
+      of types A and B.
+    numeric_facts:
+    - name: SiO_vapor_presence_threshold_as_printed
+      value: '2500'
+      unit: K (source says exceeding 2500 K)
+      locator:
+        figure: '1'
+        page: 2
+        pdf_page_index: 1
+        section: Results and Discussion
+    - name: residual_composition_figure_temperature_low
+      value: '1800'
+      unit: K
+      locator:
+        figure: '3'
+        page: 2
+        pdf_page_index: 1
+    - name: residual_composition_figure_temperature_high
+      value: '2600'
+      unit: K
+      locator:
+        figure: '3'
+        page: 2
+        pdf_page_index: 1
+  context_id: shornikov-2023-natural-cai-evaporation::context::shornikov_2023_directional_and_qualifying_statements
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  source_id: shornikov-2023-natural-cai-evaporation
+  species: Ca
+- observation_id: shornikov_2023_experimental_context
+  type: experimental_context
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Experimental
+  units: ion species and author-stated reaction prose
+  values:
+    quantity: starting_material_ions_and_cell_reaction
+    method_class: measured_direct
+    starting_material_statement: The studied samples were natural inclusions in Efremovka chondrite (CV3) of types A and B
+      (Table 1). They contained also some oxides of potassium, sodium, sulfur, iron, titanium, chromium and nickel.
+    ions_detected_as_printed: Ca+, Mg+, Al+, AlO+, Al2O+, SiO+, SiO2+, O2+, K+, Na+, SO2+, Fe+, Ni+, Cr+, TiO+, TiO2+; WO2+
+      and WO3+; CaWO3+ and CaWO4+.
+    tungsten_oxide_statement: The WO2+ and WO3+ ions corresponded to gaseous tungsten oxide formed due to the interaction
+      of oxygen in the gas phase with the material of the tungsten effusion cell.
+    calcium_tungstate_statement: 'The presence of CaWO3+ and CaWO4+ ions in the mass spectra is due to the gas phase reaction:
+      CaO + WO_i = CaWO_(i+1).'
+  context_id: shornikov-2023-natural-cai-evaporation::context::shornikov_2023_experimental_context
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  source_id: shornikov-2023-natural-cai-evaporation
+  species: Ca
+- observation_id: shornikov_2023_hertz_knudsen_calculation_context
+  type: author_calculation_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Results and Discussion
+  units: equation and dimensionless coefficient
+  values:
+    quantity: vaporized_oxide_calculation
+    method_class: model_derived
+    equation_as_printed: Δq_i = α_i p_i / sqrt(2πRT/M_i), equation (9).
+    definition_as_printed: M_i is a molecular weight of oxide.
+    partial_evaporation_coefficient: '1'
+    coefficient_statement: The partial evaporation coefficients (α_i), characterizing the change in the structure of a molecules
+      during its transition to the gas phase, in this case are equal to 1 [5].
+    numeric_facts:
+    - name: partial_evaporation_coefficient_alpha_i
+      value: '1'
+      unit: dimensionless
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Results and Discussion
+  context_id: shornikov-2023-natural-cai-evaporation::context::shornikov_2023_hertz_knudsen_calculation_context
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  source_id: shornikov-2023-natural-cai-evaporation
+  species: Ca
+- observation_id: shornikov_2023_intro_context
+  type: author_context
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Introduction
+  units: source prose; numeric_facts units are stated per value
+  values:
+    quantity: introductory_claims
+    method_class: quoted_unattributed
+    statements:
+    - CAIs represent the most primitive substance of the Solar System with an age of 4.567 billion years.
+    - Most researchers believe that CAIs were formed by condensation of solar composition gas.
+    - According to modern concepts [1, 2], high-temperature evaporation processes also played a significant role in CAIs formation.
+    - 'There are two main stages in CAIs evolution: the stage of formation of CAIs primary condensates and the stage of heating,
+      melting and partial evaporation of substance.'
+    numeric_facts:
+    - name: Solar_System_age_as_printed
+      value: '4.567'
+      unit: billion years
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Introduction
+  context_id: shornikov-2023-natural-cai-evaporation::context::shornikov_2023_intro_context
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  source_id: shornikov-2023-natural-cai-evaporation
+  species: Ca
+- observation_id: shornikov_2023_oxygen_calculation_context
+  type: author_calculation_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Results and Discussion
+  units: equations and qualitative interpretation
+  values:
+    quantity: atomic_oxygen_pressure_reactions
+    method_class: model_derived
+    pO_basis_as_printed: pO was calculated based on WO2 + O = WO3, equation (3).
+    comparison_reactions_as_printed: Al + O = AlO (4); 2Al + O = Al2O (5); SiO + O = SiO2 (6); TiO + O = TiO2 (7); O2 = 2O
+      (8).
+    correspondence_statement: The obtained pO values (Fig. 2) satisfactorily corresponded to those determined on the basis
+      of similar reactions involving atomic oxygen.
+    interpretation_statement: The correspondence of the calculated pO values for reactions (3)–(8) testified to the molecular
+      origin of the recorded ions.
+  context_id: shornikov-2023-natural-cai-evaporation::context::shornikov_2023_oxygen_calculation_context
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  source_id: shornikov-2023-natural-cai-evaporation
+  species: Ca
+- observation_id: shornikov_2023_oxygen_figure_axes_context
+  type: figure_axes_context
+  locator:
+    figure: '2'
+    page: 2
+    pdf_page_index: 1
+  units: axis labels in K and log10 atm as printed
+  values:
+    quantity: oxygen_pressure_figure_axes
+    method_class: figure_only
+    x_axis: temperature_K
+    x_axis_tick_values_K:
+    - 2000
+    - 2200
+    - 2400
+    - 2600
+    y_axis: log10_atomic_oxygen_partial_pressure_atm
+    y_axis_tick_values_log10_atm:
+    - -5
+    - -6
+    - -7
+    - -8
+    - -9
+    note: Axis ticks are transcribed from the figure; no curve coordinates were digitized.
+    numeric_facts:
+    - name: figure_2_log10_pressure_ticks
+      values:
+      - -5
+      - -6
+      - -7
+      - -8
+      - -9
+      unit: log10 atm
+      locator:
+        figure: '2'
+        page: 2
+        pdf_page_index: 1
+  context_id: shornikov-2023-natural-cai-evaporation::context::shornikov_2023_oxygen_figure_axes_context
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  source_id: shornikov-2023-natural-cai-evaporation
+  species: Ca
+- observation_id: shornikov_2023_partial_pressure_figure_context
+  type: figure_axes_context
+  locator:
+    figure: '1'
+    page: 1
+    pdf_page_index: 0
+  units: axis labels in K and log10 atm as printed
+  values:
+    quantity: partial_pressure_figure_axes
+    method_class: figure_only
+    pressure_statement: Partial pressures of gaseous Ca, Mg, Al and SiO over CAI melts during evaporation were calculated
+      via equation (2) and are shown in Fig. 1.
+    x_axis: temperature_K
+    x_axis_tick_values_K:
+    - 1800
+    - 2000
+    - 2200
+    - 2400
+    - 2600
+    y_axis: log10_partial_pressure_atm
+    y_axis_tick_values_log10_atm:
+    - -5
+    - -6
+    - -7
+    note: Axis ticks are transcribed from the figure; no curve coordinates were digitized.
+    numeric_facts:
+    - name: figure_1_temperature_low
+      value: 1800
+      unit: K
+      locator:
+        figure: '1'
+        page: 1
+        pdf_page_index: 0
+    - name: figure_1_temperature_high
+      value: 2600
+      unit: K
+      locator:
+        figure: '1'
+        page: 1
+        pdf_page_index: 0
+    - name: figure_1_log10_pressure_ticks
+      values:
+      - -5
+      - -6
+      - -7
+      unit: log10 atm
+      locator:
+        figure: '1'
+        page: 1
+        pdf_page_index: 0
+  context_id: shornikov-2023-natural-cai-evaporation::context::shornikov_2023_partial_pressure_figure_context
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  source_id: shornikov-2023-natural-cai-evaporation
+  species: Ca
+- observation_id: shornikov_2023_pressure_conversion_context
+  type: pressure_calibration_context
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Results and Discussion
+  units: equation and calibration description
+  values:
+    quantity: ion_current_to_partial_pressure_relation
+    method_class: quoted_unattributed
+    equation_as_printed: p_i = (I_i T_i / I_s T_s) p_s × (σ_s η_s / σ_i η_i) = K (I_i T_i)/(σ_i η_i), equation (2).
+    definitions_as_printed: I_i and I_s are ion-current intensities of studied and standard substances; σ_i and η_i are the
+      effective ionization cross-section and isotopic distribution coefficient of species i.
+    standard: Gold partial pressure p_s from reference [3].
+    cross_section_reference: Reference [4].
+    note: No numerical ion-current, cross-section, isotope-correction, or pressure values are tabulated in this abstract.
+  context_id: shornikov-2023-natural-cai-evaporation::context::shornikov_2023_pressure_conversion_context
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  source_id: shornikov-2023-natural-cai-evaporation
+  species: Ca
+- observation_id: shornikov_2023_publication_and_affiliation_context
+  type: source_metadata_context
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Running header and author affiliation
+  units: publication and address identifiers as printed
+  values:
+    quantity: publication_and_affiliation_metadata
+    method_class: quoted_unattributed
+    publication_as_printed: 54th Lunar and Planetary Science Conference 2023 (LPI Contrib. No. 2806); 1983.pdf
+    affiliation_as_printed: Vernadsky Institute of Geochemistry & Analytical Chemistry of RAS, Kosygin st., 19, Moscow, 119991
+  context_id: shornikov-2023-natural-cai-evaporation::context::shornikov_2023_publication_and_affiliation_context
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  source_id: shornikov-2023-natural-cai-evaporation
+  species: Ca
+- observation_id: shornikov_2023_references_context
+  type: source_metadata_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: References
+  units: bibliographic identifiers as printed
+  values:
+    quantity: printed_references
+    method_class: quoted_unattributed
+    references:
+    - '[1] Grossman L. et al. (2000) GCA, 64, 2879–2894.'
+    - '[2] Grossman L. et al. (2008) GCA, 72, 3001–3021.'
+    - '[3] Paule R. C. and Mandel J. (1972) J. Pure Appl. Chem., 31, 371–394.'
+    - '[4] Semenov et al. (1976) Application of Mass Spectrometry in Inorganic Chemistry, Leningrad, Khimiya [in Russian].'
+    - '[5] Shornikov S. I. (2015) Geochem. Int., 53, 1080–1089.'
+  context_id: shornikov-2023-natural-cai-evaporation::context::shornikov_2023_references_context
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  source_id: shornikov-2023-natural-cai-evaporation
+  species: Ca
+- observation_id: shornikov_2023_table1_initial_compositions
+  type: initial_sample_composition_table
+  locator:
+    table: '1'
+    page: 1
+    pdf_page_index: 0
+    note: Table 1, CAIs initial compositions (wt %).
+  units: wt % as printed
+  values:
+    quantity: initial_CAIs_composition_A_and_B
+    method_class: measured_tabulated
+    attribution: Initial compositions reported for the natural CAIs in this work.
+    row_count: 4
+    numeric_cell_count: 8
+    rows:
+    - row_number: 1
+      oxide: CaO
+      type_A_wt_pct: '36.2'
+      type_B_wt_pct: '27.6'
+      method_class: measured_tabulated
+      locator:
+        table: '1'
+        page: 1
+        pdf_page_index: 0
+    - row_number: 2
+      oxide: MgO
+      type_A_wt_pct: '5'
+      type_B_wt_pct: '11.4'
+      method_class: measured_tabulated
+      locator:
+        table: '1'
+        page: 1
+        pdf_page_index: 0
+    - row_number: 3
+      oxide: Al2O3
+      type_A_wt_pct: '38.3'
+      type_B_wt_pct: '32.3'
+      method_class: measured_tabulated
+      locator:
+        table: '1'
+        page: 1
+        pdf_page_index: 0
+    - row_number: 4
+      oxide: SiO2
+      type_A_wt_pct: '20.5'
+      type_B_wt_pct: '28.7'
+      method_class: measured_tabulated
+      locator:
+        table: '1'
+        page: 1
+        pdf_page_index: 0
+  context_id: shornikov-2023-natural-cai-evaporation::context::shornikov_2023_table1_initial_compositions
+  work_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099
+  source_id: shornikov-2023-natural-cai-evaporation
+  species: Ca

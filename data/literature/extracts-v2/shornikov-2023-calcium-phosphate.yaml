@@ -1,0 +1,186 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2023-calcium-phosphate.yaml
+observations:
+- observation_id: shornikov-2023-calcium-phosphate::shornikov_2023_cao_activity_figure2
+  experiment_id: 33909ebb02e49e8305049cd22e1c95f184a37df70e1d0584e345356411291040::experiment::shornikov_2023_cao_p4o10_model
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CaO activity'
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1923'
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-calcium-phosphate
+  locator:
+    page: 56
+    published_page: 56
+    pdf_page_index: 3
+    figure: 2A
+    note: 'CaO activity curves at 1923 K: present study, Hudon and Jung (2015), and experimental Schwerdtfeger and Engell
+      (1963); coordinates not digitized.'
+  read_from: pdf:shornikov-2023-calcium-phosphate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 56
+        published_page: 56
+        pdf_page_index: 3
+        figure: 2A
+        note: 'CaO activity curves at 1923 K: present study, Hudon and Jung (2015), and experimental Schwerdtfeger and Engell
+          (1963); coordinates not digitized.'
+- observation_id: shornikov-2023-calcium-phosphate::shornikov_2023_p4o10_activity_figure2
+  experiment_id: 33909ebb02e49e8305049cd22e1c95f184a37df70e1d0584e345356411291040::experiment::shornikov_2023_cao_p4o10_model
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'P4O10 activity'
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1900, 1923]; no midpoint invented
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-calcium-phosphate
+  locator:
+    page: 56
+    published_page: 56
+    pdf_page_index: 3
+    figure: 2B
+    note: P4O10 activity curves at 1923 K (present study and Hudon and Jung, 2015) and 1900 K (Lopatin and Semenov, 1989);
+      coordinates not digitized.
+  read_from: pdf:shornikov-2023-calcium-phosphate
+- observation_id: shornikov-2023-calcium-phosphate::shornikov_2023_p4o10_pressure_figure3
+  experiment_id: 33909ebb02e49e8305049cd22e1c95f184a37df70e1d0584e345356411291040::experiment::shornikov_2023_cao_p4o10_model
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'P4O10 partial pressure'
+    species:
+      formula: P4O10
+      phase:
+        tag: unknown
+        reason: phase string 'CaP2O6' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-calcium-phosphate
+  locator:
+    page: 56
+    published_page: 56
+    pdf_page_index: 3
+    figure: 3A
+    note: P4O10 pressure over CaP2O6; model curve and cited KEMS measurements, without digitized coordinates.
+  read_from: pdf:shornikov-2023-calcium-phosphate
+- observation_id: shornikov-2023-calcium-phosphate::shornikov_2023_po2_pressure_figure3
+  experiment_id: 33909ebb02e49e8305049cd22e1c95f184a37df70e1d0584e345356411291040::experiment::shornikov_2023_cao_p4o10_model
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'PO2 partial pressure'
+    species:
+      formula: PO2
+      phase:
+        tag: unknown
+        reason: phase string 'Ca2P2O7' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-calcium-phosphate
+  locator:
+    page: 56
+    published_page: 56
+    pdf_page_index: 3
+    figure: 3B
+    note: PO2 pressure over Ca2P2O7; model curve and cited KEMS measurements, without digitized coordinates.
+  read_from: pdf:shornikov-2023-calcium-phosphate

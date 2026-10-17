@@ -1,0 +1,621 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  citation: Di Donato, A. and Granati, P. (2000), “Experimental Determination of Activity of FeO, MnO and Cr2O3 in Slags”,
+    Centro Sviluppo Materiali research manuscript.
+  source_ids:
+  - di-donato-granati-2000
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: unknown:di-donato-granati-2000
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c::experiment::sta409-equilibrium-1600c
+  kind: literature
+  method:
+    tag: value
+    value: tga
+  sample:
+    characterization:
+      state:
+        tag: value
+        value: analytical-grade pure oxides and metals
+      locator:
+        page: 3
+        paragraph: experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: 1600 °C; converted using T_K = T_C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 3
+              paragraph: experimental procedure
+              note: 1600 °C; converted using T_K = T_C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              paragraph: experimental procedure
+              note: 1600 °C; converted using T_K = T_C + 273.15
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: Flowing-gas thermobalance; chamber pressure is not reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: CO2/H2 composition and individual run flow setpoints are not stated numerically; the published maximum flow
+          for equilibrium is 0.5 cm3/s.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  locator:
+    page: 3
+    paragraph: experimental procedure
+  bench_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c::bench::sta409-tga
+  equipment_context_id: di-donato-granati-2000::context::di_donato_2000_sta409_method_and_absences
+benches:
+- id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c::bench::sta409-tga
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Netzsch STA 409 thermobalance
+    locator:
+      page: 3
+      paragraph: experimental procedure
+  method:
+    state:
+      tag: value
+      value: thermogravimetry
+    locator:
+      page: 3
+      paragraph: experimental procedure
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_applicable
+    locator:
+      page: 3
+      paragraph: experimental procedure
+      note: Thermobalance and platinum crucible are described; no effusion cell or liner is used.
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: No effusion orifice is used in this thermogravimetry method.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: No effusion orifice is used in this thermogravimetry method.
+  detector:
+    state:
+      tag: value
+      value: thermogravimetric balance
+    locator:
+      page: 3
+      paragraph: experimental procedure
+  ionization:
+    method:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: No mass spectrometry is used.
+    ionization_energy_eV:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: No mass spectrometry is used.
+    cross_sections:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: No mass spectrometry is used.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: Temperature sensor is not identified.
+  temperature_calibration:
+    calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: Temperature calibration is not described.
+  other_facts:
+  - name: crucible_material
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: platinum
+          approximate: false
+      locator:
+        page: 3
+        paragraph: experimental procedure
+    unit: categorical
+  - name: starting_materials
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: analytical-grade pure oxides and metals
+          approximate: false
+      locator:
+        page: 3
+        paragraph: experimental procedure
+    unit: categorical
+  - name: oxygen_potential_sensor
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: yttria-stabilized zirconia electrochemical sensor
+          approximate: false
+      locator:
+        page: 4
+        paragraph: experimental procedure
+        note: references [2, 3]
+    unit: categorical
+  - name: intensity_to_pressure_calibration
+    value:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: Activities are determined by equilibrium and thermogravimetry; no ion-current to pressure conversion is used.
+    unit: categorical
+  - name: maximum_gas_flow_for_equilibrium
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.5'
+          approximate: false
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: Maximum flow used to achieve equilibrium.
+    unit: cm3/s
+  - name: multiplier_and_isotope_corrections
+    value:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        page: 3
+        paragraph: experimental procedure
+        note: No mass spectrometry is used.
+    unit: categorical
+context:
+- observation_id: di_donato_2000_equilibrium_method
+  type: laboratory_conditions
+  locator:
+    page: 3
+    paragraph: Steps 1 and 2
+    equation: '1'
+  units: as printed
+  experiment: sta409-equilibrium-1600c
+  values:
+    method_class: quoted_unattributed
+    dissociation_reaction: X_mO_n (activity 1) → mX (in X/Pt alloy; activity to be calculated) + n/2 O2 (fixed activity)
+    equilibrium_relation: K = (a_X)^m * (P_O2)^(n/2) / a_XmOn
+    step_2_reduction: The concentration of X in X/Pt gives its activity using the relationship obtained in Step 1; knowing
+      this activity and gas oxygen activity (defined by gas composition and temperature), the equilibrium constant gives the
+      oxide activity in slag.
+  context_id: di-donato-granati-2000::context::di_donato_2000_equilibrium_method
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO
+- observation_id: di_donato_2000_figures_1_to_10_figure_only
+  type: experiment_series
+  locator:
+    page: 7
+    figure: '1'
+  units: figure-only context; curves not digitized
+  values:
+    method_class: figure_only
+    semantics: qualitative_and_graphical_context_only
+  context_id: di-donato-granati-2000::context::di_donato_2000_figures_1_to_10_figure_only
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO
+- observation_id: di_donato_2000_method_references
+  type: laboratory_conditions
+  locator:
+    page: 6
+    section: References
+  units: bibliographic context as printed
+  values:
+    method_class: quoted_unattributed
+    references:
+    - reference: '1'
+      entry: J. Elliot, M. Gleiser, V. Ramakrishna, Thermochemistry for steelmaking - Addison Wesley publishing company inc.
+        1963
+      role: source of the ternary diagram in Figure 1
+    - reference: '2'
+      entry: B. Krafthefer et al.; “Life and performance of ZrO2-Based Oxygen sensors” Proceedings of the Second International
+        Conference on the Science and Technology of Zirconia (Zirconi ‘83) Stuttgard, Germany, June 21–23 (1983) pp. 607–617
+      role: oxygen-sensor background
+    - reference: '3'
+      entry: J. Fouletier, E. Siebert and A. Caneiro; “Accurate Monitoring of Low Oxygen Activity in Gses with Conventional
+        Oxygen Gauges and Pumps” Proceedings of the Second International Conference on the Science and Technology of Zirconia
+        (Zirconi ‘83) Stuttgard, Germany, June 21–23 (1983) pp. 618–626
+      role: oxygen-sensor background
+    note: Source spellings Gses and Stuttgard retained as printed.
+  context_id: di-donato-granati-2000::context::di_donato_2000_method_references
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO
+- observation_id: di_donato_2000_qualifying_statements_and_directional_claims
+  type: laboratory_conditions
+  locator:
+    page: 1
+    paragraph: Abstract
+  units: verbatim statements and located context
+  values:
+    method_class: quoted_unattributed
+    abstract_findings:
+    - quote: 'The results show a clear difference in the behaviour of the different oxides: FeO, MnO and Cr2O3.'
+      locator:
+        page: 1
+        paragraph: Abstract
+    - quote: In the range of composition studied it is found that the MnO activity increases nearly linearly with MnO concentration
+        and is not significantly affected by base slag composition.
+      locator:
+        page: 1
+        paragraph: Abstract
+    - quote: FeO and Cr2O3 activities does not vary linearly with concentration and the dependence is different for different
+        base slag composition and SiO2 content affects activity of FeO and Cr2O3 in a different way for the different base
+        slags.
+      locator:
+        page: 1
+        paragraph: Abstract
+    method_qualifiers:
+    - quote: Activity measurements were performed by an equilibration method, the equilibrium was realised between the reducible
+        oxides FeO, MnO and Cr2O3 (pure or in slag phase) with the corresponding metal in solid platinum under fixed oxygen
+        potential.
+      locator:
+        page: 2
+        section: '3.1'
+    - quote: the X concentration in X/Pt alloy is determined by the mass loss of the sample, during the experiment, under
+        the assumption that oxygen only is lost; this assumption is reasonable being in general the vapour pressure of X at
+        1600 °C negligible.
+      locator:
+        page: 3
+        paragraph: Step 1
+    - quote: Chemical analysis of both platinum crucible and material contained in it after the experiments confirmed that
+        the mass loss is consistent with amount of metal dissolved in platinum and that no separate metal remains in the crucible.
+      locator:
+        page: 3
+        paragraph: Step 1
+    - quote: experimental determination of activity of X in platinum was performed only when data were not available in literature.
+      locator:
+        page: 3
+        paragraph: Step 1
+    - quote: A set of trials, with different gas flow rates, permitted to define a flow rate of 0.5 cm3/s as the maximum value
+        to be used for achieving the equilibrium.
+      locator:
+        page: 3
+        paragraph: experimental procedure
+    - quote: The equilibrium gas/metal/oxide/platinum at the furnace temperature is reached if the gas is allowed to remain
+        inside the furnace for the necessary time.
+      locator:
+        page: 3
+        paragraph: experimental procedure
+    - quote: The residence time depends on the gas flow rate.
+      locator:
+        page: 3
+        paragraph: experimental procedure
+    - quote: From the initial masses of slag, X and XmOn, and the mass variation during the experiment, the X content in X/Pt
+        and XmOn concentration in slag are determined.
+      locator:
+        page: 3
+        paragraph: Step 2
+    - quote: Also in this case, chemical analysis of slag and platinum confirmed the concentration values obtained by the
+        mass losses.
+      locator:
+        page: 3
+        paragraph: Step 2
+    - quote: On line monitoring of the O2 activity in the gas in contact with the sample has been performed during the experiments
+        is possible.
+      locator:
+        page: 4
+        paragraph: experimental procedure
+      note: Source grammar reproduced as printed.
+    numeric_results_context:
+    - quote: FeO activity was measured in master slags with FeO concentration ranging up to about 5% by mass.
+      locator:
+        page: 4
+        section: '4.1'
+    - quote: 'The reason for choosing this low concentration range is twofold: the data are relevant for secondary metallurgy
+        treatments using synthetic slags and are scarce in this range.'
+      locator:
+        page: 4
+        section: '4.1'
+    - quote: In Table 10 activity of FeO at about 1% by mass is reported, measured for all the eight master slags, showing
+        the effect of master slag composition on FeO activity.
+      locator:
+        page: 4
+        section: '4.1'
+      note: Manuscript cross-reference is printed “Table 10”; the corresponding eight-slag measurements are in Table 2. Preserved
+        as printed rather than silently corrected.
+    - quote: In this figure (and in similarly in what follows) polynomial least square fitting of experimental data has been
+        used to emphasise the trend.
+      locator:
+        page: 4
+        section: '4.1'
+    - quote: Master slag 3 is representative of target slag to be used in carbon steel secondary refining.
+      locator:
+        page: 4
+        section: '4.1'
+    - quote: The influence of slag composition on Cr2O3 activity for concentration of 5%, 10%, and 15% is shown in Figure
+        7; the values at the exact concentration 5%, 10%, and 15% have been obtained interpolating the experimental values
+        of Table 5.
+      locator:
+        page: 4
+        section: '4.3'
+    conclusion_claims:
+    - quote: MnO activity increases nearly linearly with MnO concentration
+      locator:
+        page: 5
+        section: Conclusions, bullet 1
+    - quote: activity of MnO is not significantly affected by base slag composition
+      locator:
+        page: 5
+        section: Conclusions, bullet 2
+    - quote: FeO and Cr2O3 activities does not vary linearly with concentration and the dependence is different for different
+        base slag composition and
+      locator:
+        page: 5
+        section: Conclusions, bullet 3
+    - quote: SiO2 content affects activity of FeO and Cr2O3 in a different way for the different base slags
+      locator:
+        page: 5
+        section: Conclusions, bullet 4
+  context_id: di-donato-granati-2000::context::di_donato_2000_qualifying_statements_and_directional_claims
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO
+- observation_id: di_donato_2000_sta409_method_and_absences
+  type: apparatus
+  locator:
+    page: 3
+    paragraph: experimental procedure
+  units: as printed
+  experiment: sta409-equilibrium-1600c
+  values:
+    quantity: experiment_and_method_facts
+    method_class: quoted_unattributed
+    apparatus: Netzsch STA 409 thermobalance equipped with gas flow meters
+    crucible: platinum
+    cell_material: not an effusion cell; platinum crucible is the printed container
+    orifice_diameter: absent; not applicable to the thermobalance method
+    channel_length: absent; not applicable to the thermobalance method
+    pressure_calibration: absent; no vapor pressure conversion is described
+    ionization_cross_sections: absent; no mass spectrometry is used
+    ionization_energy_eV: absent; no mass spectrometry is used
+    multiplier_or_isotope_corrections: absent; no mass spectrometry is used
+    chamber_background_pressure: absent; not reported for the flowing-gas thermobalance
+    temperature_measurement: absent; not reported
+    temperature_calibration: absent; not reported
+    starting_materials: analytical-grade pure oxides and metals
+    master_slag_preparation: master slag melted in a platinum crucible with pure oxide and pure metal
+    atmosphere: directly mixed CO2/H2 in appropriate proportions; gas reaction produces CO, CO2, H2 and H2O
+    oxygen_potential_check: yttria-stabilized zirconia electrochemical sensor; references [2, 3]
+    oxygen_potential_check_locator:
+      page: 4
+      paragraph: experimental procedure
+    gas_flow_cm3_s: '0.5'
+    gas_flow_qualifier: maximum used for achieving equilibrium
+    reported_temperature_C: 1600
+    activity_reference_states: FeO pure oxide; MnO pure oxide; Cr2O3 pure oxide
+  context_id: di-donato-granati-2000::context::di_donato_2000_sta409_method_and_absences
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO
+- observation_id: di_donato_2000_t1_master_slag_1
+  type: composition
+  locator:
+    page: 14
+    table: '1'
+    row: '1'
+  units: mass percent
+  values:
+    method_class: measured_tabulated
+    slag_id: 1
+    CaO: 62
+    SiO2: 3
+    Al2O3: 35
+  context_id: di-donato-granati-2000::context::di_donato_2000_t1_master_slag_1
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO
+- observation_id: di_donato_2000_t1_master_slag_2
+  type: composition
+  locator:
+    page: 14
+    table: '1'
+    row: '2'
+  units: mass percent
+  values:
+    method_class: measured_tabulated
+    slag_id: 2
+    CaO: 62
+    SiO2: 5
+    Al2O3: 33
+  context_id: di-donato-granati-2000::context::di_donato_2000_t1_master_slag_2
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO
+- observation_id: di_donato_2000_t1_master_slag_3
+  type: composition
+  locator:
+    page: 14
+    table: '1'
+    row: '3'
+  units: mass percent
+  values:
+    method_class: measured_tabulated
+    slag_id: 3
+    CaO: 59
+    SiO2: 1
+    Al2O3: 40
+  context_id: di-donato-granati-2000::context::di_donato_2000_t1_master_slag_3
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO
+- observation_id: di_donato_2000_t1_master_slag_4
+  type: composition
+  locator:
+    page: 14
+    table: '1'
+    row: '4'
+  units: mass percent
+  values:
+    method_class: measured_tabulated
+    slag_id: 4
+    CaO: 62
+    SiO2: 9
+    Al2O3: 29
+  context_id: di-donato-granati-2000::context::di_donato_2000_t1_master_slag_4
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO
+- observation_id: di_donato_2000_t1_master_slag_5
+  type: composition
+  locator:
+    page: 14
+    table: '1'
+    row: '5'
+  units: mass percent
+  values:
+    method_class: measured_tabulated
+    slag_id: 5
+    CaO: 58
+    SiO2: 5
+    Al2O3: 37
+  context_id: di-donato-granati-2000::context::di_donato_2000_t1_master_slag_5
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO
+- observation_id: di_donato_2000_t1_master_slag_6
+  type: composition
+  locator:
+    page: 14
+    table: '1'
+    row: '6'
+  units: mass percent
+  values:
+    method_class: measured_tabulated
+    slag_id: 6
+    CaO: 59
+    SiO2: 7
+    Al2O3: 34
+  context_id: di-donato-granati-2000::context::di_donato_2000_t1_master_slag_6
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO
+- observation_id: di_donato_2000_t1_master_slag_7
+  type: composition
+  locator:
+    page: 14
+    table: '1'
+    row: '7'
+  units: mass percent
+  values:
+    method_class: measured_tabulated
+    slag_id: 7
+    CaO: 60
+    SiO2: 9
+    Al2O3: 31
+  context_id: di-donato-granati-2000::context::di_donato_2000_t1_master_slag_7
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO
+- observation_id: di_donato_2000_t1_master_slag_8
+  type: composition
+  locator:
+    page: 14
+    table: '1'
+    row: '8'
+  units: mass percent
+  values:
+    method_class: measured_tabulated
+    slag_id: 8
+    CaO: 60
+    SiO2: 15
+    Al2O3: 25
+  context_id: di-donato-granati-2000::context::di_donato_2000_t1_master_slag_8
+  work_id: a5640693e61573a84f1df89c3aff5c96215ff7821ad05c140407ab00328c0d4c
+  source_id: di-donato-granati-2000
+  species: FeO

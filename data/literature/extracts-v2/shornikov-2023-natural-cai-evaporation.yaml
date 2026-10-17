@@ -1,0 +1,722 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2023-natural-cai-evaporation.yaml
+observations:
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig1_type_a_al_pressure
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 1
+    pdf_page_index: 0
+    figure: '1'
+    note: Type A Al pressure curve; coordinates not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig1_type_a_ca_pressure
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 1
+    pdf_page_index: 0
+    figure: '1'
+    note: Type A Ca partial-pressure curve; numeric curve values not tabulated and not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig1_type_a_mg_pressure
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 1
+    pdf_page_index: 0
+    figure: '1'
+    note: Type A Mg pressure curve; coordinates not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig1_type_a_sio_pressure
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 1
+    pdf_page_index: 0
+    figure: '1'
+    note: Type A SiO pressure curve; coordinates not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig1_type_b_al_pressure
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_b
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 1
+    pdf_page_index: 0
+    figure: '1'
+    note: Type B Al pressure curve; coordinates not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig1_type_b_ca_pressure
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_b
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 1
+    pdf_page_index: 0
+    figure: '1'
+    note: Type B Ca partial-pressure curve; numeric curve values not tabulated and not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig1_type_b_mg_pressure
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_b
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 1
+    pdf_page_index: 0
+    figure: '1'
+    note: Type B Mg pressure curve; coordinates not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig1_type_b_sio_pressure
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_b
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 1
+    pdf_page_index: 0
+    figure: '1'
+    note: Type B SiO pressure curve; coordinates not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig2_type_a_atomic_oxygen_pressure
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'author_calculated_atomic_oxygen_pressure_figure_only'
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '2'
+    note: Type A atomic-oxygen pressure curve; authors calculate pO from reactions (3)–(8); coordinates not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig2_type_b_atomic_oxygen_pressure
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_b
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'author_calculated_atomic_oxygen_pressure_figure_only'
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '2'
+    note: Type B atomic-oxygen pressure curve; authors calculate pO from reactions (3)–(8); coordinates not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig3_type_a_cao_residue_composition
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'residual_melt_composition_figure_only'
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'residual CAI melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '3'
+    note: Type A calculated residual-melt CaO composition curve versus Al2O3 mole percent; not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig3_type_a_mgo_residue_composition
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'residual_melt_composition_figure_only'
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'residual CAI melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '3'
+    note: Type A calculated residual-melt MgO composition curve versus Al2O3 mole percent; not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig3_type_a_sio2_residue_composition
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'residual_melt_composition_figure_only'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual CAI melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '3'
+    note: Type A calculated residual-melt SiO2 composition curve versus Al2O3 mole percent; not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig3_type_b_cao_residue_composition
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_b
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'residual_melt_composition_figure_only'
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'residual CAI melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '3'
+    note: Type B calculated residual-melt CaO composition curve versus Al2O3 mole percent; not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig3_type_b_mgo_residue_composition
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_b
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'residual_melt_composition_figure_only'
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'residual CAI melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '3'
+    note: Type B calculated residual-melt MgO composition curve versus Al2O3 mole percent; not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation
+- observation_id: shornikov-2023-natural-cai-evaporation::shornikov_2023_fig3_type_b_sio2_residue_composition
+  experiment_id: 8b2af9783a1b5a81786e66b679693b135cdc66e45c331c31318b69bccbac6099::experiment::shornikov_2023_type_b
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'residual_melt_composition_figure_only'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual CAI melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1800.0, 2600.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1800.0, 2600.0] is a temperature
+      domain, not the observable
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2023-natural-cai-evaporation
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '3'
+    note: Type B calculated residual-melt SiO2 composition curve versus Al2O3 mole percent; not digitized.
+  read_from: pdf:shornikov-2023-natural-cai-evaporation

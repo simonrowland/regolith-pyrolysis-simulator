@@ -1,0 +1,4336 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ostrovski-2000-cao-tio2-sio2.yaml
+observations:
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, description,
+      unavailable_inputs'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    section: Results and Discussion
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, description,
+      unavailable_inputs'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    section: Results and Discussion
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s1_o_calculated
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0001155105'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s1_o_calculated
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+  derivation:
+    relation: p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections
+      print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s1_sio_ioncurrent
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.28674975'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s1_sio_ioncurrent
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s1_sio_isothermal
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.469134750000000060795'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s1_sio_isothermal
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s2_o_calculated
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00017326575'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s2_o_calculated
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+  derivation:
+    relation: p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections
+      print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s2_sio_ioncurrent
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.6991425'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s2_sio_ioncurrent
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s2_sio_isothermal
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.71028825'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s2_sio_isothermal
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s3_o_calculated
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000263445'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s3_o_calculated
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+  derivation:
+    relation: p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections
+      print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s3_sio_ioncurrent
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.8896335'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s3_sio_ioncurrent
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s3_sio_isothermal
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.8409975'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s3_sio_isothermal
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s4_o_calculated
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0001053780000000000101325'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s4_o_calculated
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+  derivation:
+    relation: p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections
+      print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s4_sio_ioncurrent
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.30296175'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s4_sio_ioncurrent
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s4_sio_isothermal
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.3728760000000000303975'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s4_sio_isothermal
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s5_o_calculated
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0001965705'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s5_o_calculated
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+  derivation:
+    relation: p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections
+      print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s5_sio_ioncurrent
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.725487'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s5_sio_ioncurrent
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s5_sio_isothermal
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.544115250000000101325'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s5_sio_isothermal
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s6_o_calculated
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00021379575'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s6_o_calculated
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+  derivation:
+    relation: p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections
+      print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s6_sio_ioncurrent
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1.509742500000000101325'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s6_sio_ioncurrent
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s6_sio_isothermal
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1.033515'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s6_sio_isothermal
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s7_o_calculated
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00037186275000000004053'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s7_o_calculated
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+  derivation:
+    relation: p_O = K_o10 [I_MoO3+ * sigma(MoO2) / (I_MoO2+ * sigma(MoO2))]; K_o10 is calculated using Ref. 40. Both cross-sections
+      print MoO2; apparent source error preserved. Raw I_MoO3+, I_MoO2+, numerical K_o10 and cross-sections are not published.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_oxygen_raw_inputs_not_published
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s7_sio_ioncurrent
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '2.80670250000000020265'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s7_sio_ioncurrent
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s7_sio_isothermal
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::experiment::cao-tio2-sio2-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'gas over CaO-TiO2-SiO2 sample' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1.8542475'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s7_sio_isothermal
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 7
+    published_page: 351
+    pdf_page_index: 6
+    table: '3'
+    section: Table 3
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 7
+        published_page: 351
+        pdf_page_index: 6
+        table: '3'
+        section: Table 3
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_binary_s2_quoted
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'binary CaO-SiO2 system' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Unknown detailed binary standard state; pure-SiO2 comparison inferred from
+        general discussion'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.035'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_binary_s2_quoted
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_binary_s3_quoted
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'binary CaO-SiO2 system' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Unknown detailed binary standard state; pure-SiO2 comparison inferred from
+        general discussion'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.455'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_binary_s3_quoted
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_binary_s7_quoted
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'binary CaO-SiO2 system' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Unknown detailed binary standard state; pure-SiO2 comparison inferred from
+        general discussion'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '1.49'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_binary_s7_quoted
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s1_activity
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.07'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s1_activity
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s1_o_calculated
+  derivation:
+    relation: a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding
+      ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs.
+      The paper does not identify which Table 3 SiO method enters Table 4.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s1_o_calculated
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s1_activity_coefficient
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.189'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s1_activity_coefficient
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s1_activity
+  derivation:
+    relation: 'gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition
+      SiO2 mole fraction, printed in Tables 1/4. Source internally inconsistent: printed 0.189 differs from printed 0.07/0.388
+      = 0.180412; preserve 0.189.'
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s1_activity
+    parameters:
+    - - x_SiO2
+      - state:
+          tag: value
+          value: '0.388'
+        locator:
+          page: 2
+          published_page: 346
+          pdf_page_index: 1
+          table: '1'
+          note: Sample 1 SiO2 mole fraction; also printed in Table 4.
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s2_activity
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s2_activity
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s2_o_calculated
+  derivation:
+    relation: a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding
+      ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs.
+      The paper does not identify which Table 3 SiO method enters Table 4.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s2_o_calculated
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s2_activity_coefficient
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.348'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s2_activity_coefficient
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s2_activity
+  derivation:
+    relation: 'gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition
+      SiO2 mole fraction, printed in Tables 1/4. '
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s2_activity
+    parameters:
+    - - x_SiO2
+      - state:
+          tag: value
+          value: '0.431'
+        locator:
+          page: 2
+          published_page: 346
+          pdf_page_index: 1
+          table: '1'
+          note: Sample 2 SiO2 mole fraction; also printed in Table 4.
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s3_activity
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.27'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s3_activity
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s3_o_calculated
+  derivation:
+    relation: a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding
+      ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs.
+      The paper does not identify which Table 3 SiO method enters Table 4.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s3_o_calculated
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s3_activity_coefficient
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.552'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s3_activity_coefficient
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s3_activity
+  derivation:
+    relation: 'gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition
+      SiO2 mole fraction, printed in Tables 1/4. '
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s3_activity
+    parameters:
+    - - x_SiO2
+      - state:
+          tag: value
+          value: '0.489'
+        locator:
+          page: 2
+          published_page: 346
+          pdf_page_index: 1
+          table: '1'
+          note: Sample 3 SiO2 mole fraction; also printed in Table 4.
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s4_activity
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.05'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s4_activity
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s4_o_calculated
+  derivation:
+    relation: a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding
+      ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs.
+      The paper does not identify which Table 3 SiO method enters Table 4.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s4_o_calculated
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s4_activity_coefficient
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.137'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s4_activity_coefficient
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s4_activity
+  derivation:
+    relation: 'gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition
+      SiO2 mole fraction, printed in Tables 1/4. '
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s4_activity
+    parameters:
+    - - x_SiO2
+      - state:
+          tag: value
+          value: '0.365'
+        locator:
+          page: 2
+          published_page: 346
+          pdf_page_index: 1
+          table: '1'
+          note: Sample 4 SiO2 mole fraction; also printed in Table 4.
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s5_activity
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.13'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s5_activity
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s5_o_calculated
+  derivation:
+    relation: a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding
+      ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs.
+      The paper does not identify which Table 3 SiO method enters Table 4.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s5_o_calculated
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s5_activity_coefficient
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.324'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s5_activity_coefficient
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s5_activity
+  derivation:
+    relation: 'gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition
+      SiO2 mole fraction, printed in Tables 1/4. '
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s5_activity
+    parameters:
+    - - x_SiO2
+      - state:
+          tag: value
+          value: '0.401'
+        locator:
+          page: 2
+          published_page: 346
+          pdf_page_index: 1
+          table: '1'
+          note: Sample 5 SiO2 mole fraction; also printed in Table 4.
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s6_activity
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.27'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s6_activity
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s6_o_calculated
+  derivation:
+    relation: a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding
+      ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs.
+      The paper does not identify which Table 3 SiO method enters Table 4.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s6_o_calculated
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s6_activity_coefficient
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.59'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s6_activity_coefficient
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s6_activity
+  derivation:
+    relation: 'gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition
+      SiO2 mole fraction, printed in Tables 1/4. '
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s6_activity
+    parameters:
+    - - x_SiO2
+      - state:
+          tag: value
+          value: '0.458'
+        locator:
+          page: 2
+          published_page: 346
+          pdf_page_index: 1
+          table: '1'
+          note: Sample 6 SiO2 mole fraction; also printed in Table 4.
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s7_activity
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.84'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s7_activity
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s7_o_calculated
+  derivation:
+    relation: a_SiO2 = (p_SiO/p_SiO^o) * (p_O/p_O^o); sample p_SiO, p_O and pure-SiO2 p_SiO^o, p_O^o are experimental pressures/corresponding
+      ion currents. Raw currents and exact reference pressures are not published; Table 2 fits are not asserted as inputs.
+      The paper does not identify which Table 3 SiO method enters Table 4.
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_activity_raw_inputs_not_published
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table3_s7_o_calculated
+    parameters: []
+    output_unit: as_published
+- observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s7_activity_coefficient
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 slag; physical phase not specified' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Pure SiO2 vapour-pressure reference; condensed polymorph not stated'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '1.615'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s7_activity_coefficient
+  source_id: ostrovski-2000-cao-tio2-sio2
+  locator:
+    page: 10
+    published_page: 354
+    pdf_page_index: 9
+    table: '4'
+    section: Table 4
+  read_from: pdf:ostrovski-2000-cao-tio2-sio2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 10
+        published_page: 354
+        pdf_page_index: 9
+        table: '4'
+        section: Table 4
+  derived_from:
+  - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s7_activity
+  derivation:
+    relation: 'gamma_SiO2 = a_SiO2 / x_SiO2; both inputs come from the parent activity row: values.activity and point_conditions.composition
+      SiO2 mole fraction, printed in Tables 1/4. '
+    inputs:
+    - ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s7_activity
+    parameters:
+    - - x_SiO2
+      - state:
+          tag: value
+          value: '0.52'
+        locator:
+          page: 2
+          published_page: 346
+          pdf_page_index: 1
+          table: '1'
+          note: Sample 7 SiO2 mole fraction; also printed in Table 4.
+    output_unit: as_published

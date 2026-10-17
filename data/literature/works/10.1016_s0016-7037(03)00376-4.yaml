@@ -1,0 +1,2628 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/s0016-7037(03)00376-4
+  citation: Gaillard, F., Pichavant, M. & Scaillet, B. (2003). Experimental determination of activities of FeO and Fe2O3 components
+    in hydrous silicic melts under oxidizing conditions. Geochimica et Cosmochimica Acta 67(22), 4389–4409. HAL author manuscript
+    hal-00069333.
+  source_ids:
+  - gaillard-2003-hydrous-silicic-melt-activity
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: unknown:gaillard-2003-hydrous-silicic-melt-activity
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/s0016-7037(03)00376-4
+experiments:
+- experiment_id: 10.1016/s0016-7037(03)00376-4::experiment::gaillard-2003-run-1
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 13
+        pdf_page_index: 12
+        section: 4.1. Starting materials
+        note: Only the sample/Pt mass ratio (~10) is printed for 1 atm charges
+    printed_composition:
+      state:
+        tag: value
+        value: Starting glasses as listed per charge in Table 4 (Table 2 compositions); see Table 4 starting-products column
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Per-charge starting glass and Fe/Fe2O3 additions vary within the run
+    pretreatment:
+      state:
+        tag: value
+        value: Glasses from gels (Pichavant, 1987) melted at ~1400 °C in air and quenched; Fe metal and/or Fe2O3 added, homogenized
+          and ground in an agate mortar; ~1 wt.% Ir powder (~10 μm) premixed for Ir-bearing charges; Ir-free mixtures run
+          in parallel
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: 4.1. Starting materials
+        note: Gel synthesis on PDF p10; Ir-bearing and parallel Ir-free preparation on PDF p13
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1483.15'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 1210°C; K = °C + 273.15
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: 'Printed 0.001 Kb (text: "1 atm"); 0.001 kbar x 1e8 Pa/kbar = 1e5 Pa. Run pressure, not a vacuum background.'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+          components:
+          - species: CO2
+            mole_fraction:
+              tag: unknown
+              reason: not_published
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+          - species: CO
+            mole_fraction:
+              tag: unknown
+              reason: not_published
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: CO2-CO gas mixtures with proportions calculated from Deines et al. (1974); proportions and flow not printed
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+  work_id: 10.1016/s0016-7037(03)00376-4
+  locator:
+    page: 14
+    pdf_page_index: 13
+    table: '4'
+    note: 'Run 1 block header as printed: "1210°C, 0.001 Kb, NNO-1.28, 25 days"'
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: CO2-CO gas mixture, fO2 measured by yttria-stabilized zirconia probe; printed NNO-1.28
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Run block "1210°C, 0.001 Kb, NNO-1.28, 25 days"
+  bench_id: 10.1016/s0016-7037(03)00376-4::bench::gaillard-2003-1atm-vertical-sic-gas-mixing-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2160000'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 25 days; x 86400 s/day
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Drop quench
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+- experiment_id: 10.1016/s0016-7037(03)00376-4::experiment::gaillard-2003-run-2
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 13
+        pdf_page_index: 12
+        section: 4.1. Starting materials
+        note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001 kg,
+          unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              page: 13
+              pdf_page_index: 12
+              section: 4.1. Starting materials
+              note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001
+                kg, unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 13
+              pdf_page_index: 12
+              section: 4.1. Starting materials
+              note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001
+                kg, unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: Starting glasses as listed per charge in Table 4 (Table 2 compositions); see Table 4 starting-products column
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Per-charge starting glass and Fe/Fe2O3 additions vary within the run
+    pretreatment:
+      state:
+        tag: value
+        value: Glasses from gels (Pichavant, 1987) melted at ~1400 °C in air and quenched; Fe metal and/or Fe2O3 added, homogenized
+          and ground in an agate mortar; Ir as 75 μm wire or ~10 μm powder for Ir-bearing charges; parallel Ir-free mixtures;
+          loaded with distilled water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: 4.1. Starting materials
+        note: Gel synthesis on PDF p10; Ir-bearing and parallel Ir-free preparation on PDF p13
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1433.15'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 1160°C; K = °C + 273.15
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '200000000'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 2 Kb; 2 kbar x 1e8 Pa/kbar = 2e8 Pa. Ar-H2 pressure medium; total run pressure, not a background pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: Sealed capsules in an Ar-H2 pressure medium; no sweep gas over the charge
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+  work_id: 10.1016/s0016-7037(03)00376-4
+  locator:
+    page: 14
+    pdf_page_index: 13
+    table: '4'
+    note: 'Run 2 block header as printed: "1160°C, 2 Kb, fH2^b = 105 bar, water saturated, 4 days"'
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fH2 imposed by Ar-H2 pressure medium and measured by Co-Ni-Pd sensors; fO2 calculated with fH2O (Burnham et
+          al., 1969 for water saturation; Silver et al., 1989 otherwise); printed fH2 = 105 bar, water saturated
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Run block "1160°C, 2 Kb, fH2^b = 105 bar, water saturated, 4 days"
+  bench_id: 10.1016/s0016-7037(03)00376-4::bench::gaillard-2003-2kbar-ihpv
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '345600'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 4 days; x 86400 s/day
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Rapid quench device
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+- experiment_id: 10.1016/s0016-7037(03)00376-4::experiment::gaillard-2003-run-3
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 13
+        pdf_page_index: 12
+        section: 4.1. Starting materials
+        note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001 kg,
+          unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              page: 13
+              pdf_page_index: 12
+              section: 4.1. Starting materials
+              note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001
+                kg, unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 13
+              pdf_page_index: 12
+              section: 4.1. Starting materials
+              note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001
+                kg, unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: Starting glasses as listed per charge in Table 4 (Table 2 compositions); see Table 4 starting-products column
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Per-charge starting glass and Fe/Fe2O3 additions vary within the run
+    pretreatment:
+      state:
+        tag: value
+        value: Glasses from gels (Pichavant, 1987) melted at ~1400 °C in air and quenched; Fe metal and/or Fe2O3 added, homogenized
+          and ground in an agate mortar; Ir as 75 μm wire or ~10 μm powder for Ir-bearing charges; parallel Ir-free mixtures;
+          loaded with distilled water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: 4.1. Starting materials
+        note: Gel synthesis on PDF p10; Ir-bearing and parallel Ir-free preparation on PDF p13
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1273.15'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 1000°C; K = °C + 273.15
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '200000000'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 2 Kb; 2 kbar x 1e8 Pa/kbar = 2e8 Pa. Ar-H2 pressure medium; total run pressure, not a background pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: Sealed capsules in an Ar-H2 pressure medium; no sweep gas over the charge
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+  work_id: 10.1016/s0016-7037(03)00376-4
+  locator:
+    page: 14
+    pdf_page_index: 13
+    table: '4'
+    note: 'Run 3 block header as printed: "1000°C, 2 Kb, fH2^b = 125 bar, 6 days"'
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fH2 imposed by Ar-H2 pressure medium and measured by Co-Ni-Pd sensors; fO2 calculated with fH2O (Burnham et
+          al., 1969 for water saturation; Silver et al., 1989 otherwise); printed fH2 = 125 bar
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Run block "1000°C, 2 Kb, fH2^b = 125 bar, 6 days"
+  bench_id: 10.1016/s0016-7037(03)00376-4::bench::gaillard-2003-2kbar-ihpv
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '518400'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 6 days; x 86400 s/day
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Rapid quench device
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+- experiment_id: 10.1016/s0016-7037(03)00376-4::experiment::gaillard-2003-run-4
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 13
+        pdf_page_index: 12
+        section: 4.1. Starting materials
+        note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001 kg,
+          unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              page: 13
+              pdf_page_index: 12
+              section: 4.1. Starting materials
+              note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001
+                kg, unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 13
+              pdf_page_index: 12
+              section: 4.1. Starting materials
+              note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001
+                kg, unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: Starting glasses as listed per charge in Table 4 (Table 2 compositions); see Table 4 starting-products column
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Per-charge starting glass and Fe/Fe2O3 additions vary within the run
+    pretreatment:
+      state:
+        tag: value
+        value: Glasses from gels (Pichavant, 1987) melted at ~1400 °C in air and quenched; Fe metal and/or Fe2O3 added, homogenized
+          and ground in an agate mortar; Ir as 75 μm wire or ~10 μm powder for Ir-bearing charges; parallel Ir-free mixtures;
+          loaded with distilled water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: 4.1. Starting materials
+        note: Gel synthesis on PDF p10; Ir-bearing and parallel Ir-free preparation on PDF p13
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1273.15'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 1000°C; K = °C + 273.15
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '200000000'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 2 Kb; 2 kbar x 1e8 Pa/kbar = 2e8 Pa. Ar-H2 pressure medium; total run pressure, not a background pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: Sealed capsules in an Ar-H2 pressure medium; no sweep gas over the charge
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+  work_id: 10.1016/s0016-7037(03)00376-4
+  locator:
+    page: 14
+    pdf_page_index: 13
+    table: '4'
+    note: 'Run 4 block header as printed: "1000°C, 2 Kb, fH2^b = 31 bar, water saturated, 16 days"'
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fH2 imposed by Ar-H2 pressure medium and measured by Co-Ni-Pd sensors; fO2 calculated with fH2O (Burnham et
+          al., 1969 for water saturation; Silver et al., 1989 otherwise); printed fH2 = 31 bar, water saturated
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Run block "1000°C, 2 Kb, fH2^b = 31 bar, water saturated, 16 days"
+  bench_id: 10.1016/s0016-7037(03)00376-4::bench::gaillard-2003-2kbar-ihpv
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1382400'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 16 days; x 86400 s/day
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Rapid quench device
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+- experiment_id: 10.1016/s0016-7037(03)00376-4::experiment::gaillard-2003-run-5
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 13
+        pdf_page_index: 12
+        section: 4.1. Starting materials
+        note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001 kg,
+          unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              page: 13
+              pdf_page_index: 12
+              section: 4.1. Starting materials
+              note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001
+                kg, unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 13
+              pdf_page_index: 12
+              section: 4.1. Starting materials
+              note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001
+                kg, unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: Starting glasses as listed per charge in Table 4 (Table 2 compositions); see Table 4 starting-products column
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Per-charge starting glass and Fe/Fe2O3 additions vary within the run
+    pretreatment:
+      state:
+        tag: value
+        value: Glasses from gels (Pichavant, 1987) melted at ~1400 °C in air and quenched; Fe metal and/or Fe2O3 added, homogenized
+          and ground in an agate mortar; Ir as 75 μm wire or ~10 μm powder for Ir-bearing charges; parallel Ir-free mixtures;
+          loaded with distilled water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: 4.1. Starting materials
+        note: Gel synthesis on PDF p10; Ir-bearing and parallel Ir-free preparation on PDF p13
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1273.15'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 1000°C; K = °C + 273.15
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '200000000'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 2 Kb; 2 kbar x 1e8 Pa/kbar = 2e8 Pa. Ar-H2 pressure medium; total run pressure, not a background pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: Sealed capsules in an Ar-H2 pressure medium; no sweep gas over the charge
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+  work_id: 10.1016/s0016-7037(03)00376-4
+  locator:
+    page: 14
+    pdf_page_index: 13
+    table: '4'
+    note: 'Run 5 block header as printed: "1000°C, 2 Kb, fH2^b = 22 bar, water saturated, 6 days"'
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fH2 imposed by Ar-H2 pressure medium and measured by Co-Ni-Pd sensors; fO2 calculated with fH2O (Burnham et
+          al., 1969 for water saturation; Silver et al., 1989 otherwise); printed fH2 = 22 bar, water saturated
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Run block "1000°C, 2 Kb, fH2^b = 22 bar, water saturated, 6 days"
+  bench_id: 10.1016/s0016-7037(03)00376-4::bench::gaillard-2003-2kbar-ihpv
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '518400'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 6 days; x 86400 s/day. Table 5 prints this block as 10 days (conflict kept in context row gaillard_2003_run5_duration_conflict).
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Rapid quench device
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+- experiment_id: 10.1016/s0016-7037(03)00376-4::experiment::gaillard-2003-run-6
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 13
+        pdf_page_index: 12
+        section: 4.1. Starting materials
+        note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001 kg,
+          unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              page: 13
+              pdf_page_index: 12
+              section: 4.1. Starting materials
+              note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001
+                kg, unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 13
+              pdf_page_index: 12
+              section: 4.1. Starting materials
+              note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001
+                kg, unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: Starting glasses as listed per charge in Table 4 (Table 2 compositions); see Table 4 starting-products column
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Per-charge starting glass and Fe/Fe2O3 additions vary within the run
+    pretreatment:
+      state:
+        tag: value
+        value: Glasses from gels (Pichavant, 1987) melted at ~1400 °C in air and quenched; Fe metal and/or Fe2O3 added, homogenized
+          and ground in an agate mortar; Ir as 75 μm wire or ~10 μm powder for Ir-bearing charges; parallel Ir-free mixtures;
+          loaded with distilled water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: 4.1. Starting materials
+        note: Gel synthesis on PDF p10; Ir-bearing and parallel Ir-free preparation on PDF p13
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1273.15'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 1000°C; K = °C + 273.15
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '200000000'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 2 Kb; 2 kbar x 1e8 Pa/kbar = 2e8 Pa. Ar-H2 pressure medium; total run pressure, not a background pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: Sealed capsules in an Ar-H2 pressure medium; no sweep gas over the charge
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+  work_id: 10.1016/s0016-7037(03)00376-4
+  locator:
+    page: 14
+    pdf_page_index: 13
+    table: '4'
+    note: 'Run 6 block header as printed: "1000°C, 2 Kb, fH2 = 2.4 bar, water saturated, 6 days"'
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: fH2 imposed by Ar-H2 pressure medium and measured by Co-Ni-Pd sensors; fO2 calculated with fH2O (Burnham et
+          al., 1969 for water saturation; Silver et al., 1989 otherwise); printed fH2 = 2.4 bar, water saturated
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Run block "1000°C, 2 Kb, fH2 = 2.4 bar, water saturated, 6 days"
+  bench_id: 10.1016/s0016-7037(03)00376-4::bench::gaillard-2003-2kbar-ihpv
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '518400'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 6 days; x 86400 s/day
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Rapid quench device
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+- experiment_id: 10.1016/s0016-7037(03)00376-4::experiment::gaillard-2003-run-7
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 13
+        pdf_page_index: 12
+        section: 4.1. Starting materials
+        note: Only the sample/Pt mass ratio (~10) is printed for 1 atm charges
+    printed_composition:
+      state:
+        tag: value
+        value: Starting glasses as listed per charge in Table 4 (Table 2 compositions); see Table 4 starting-products column
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Per-charge starting glass and Fe/Fe2O3 additions vary within the run
+    pretreatment:
+      state:
+        tag: value
+        value: Glasses from gels (Pichavant, 1987) melted at ~1400 °C in air and quenched; Fe metal and/or Fe2O3 added, homogenized
+          and ground in an agate mortar; ~1 wt.% Ir powder (~10 μm) premixed for Ir-bearing charges; Ir-free mixtures run
+          in parallel
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: 4.1. Starting materials
+        note: Gel synthesis on PDF p10; Ir-bearing and parallel Ir-free preparation on PDF p13
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1518.15'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 1245°C; K = °C + 273.15
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: 'Printed 0.001 Kb (text: "1 atm"); 0.001 kbar x 1e8 Pa/kbar = 1e5 Pa. Run pressure, not a vacuum background.'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: air
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Run block printed "air"; flow not printed
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+  work_id: 10.1016/s0016-7037(03)00376-4
+  locator:
+    page: 14
+    pdf_page_index: 13
+    table: '4'
+    note: 'Run 7 block header as printed: "1245°C, 0.001 Kb, air, 25 days"'
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Air; printed ΔNNO +7.3
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Run block "1245°C, 0.001 Kb, air, 25 days"
+  bench_id: 10.1016/s0016-7037(03)00376-4::bench::gaillard-2003-1atm-vertical-sic-gas-mixing-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2160000'
+          approximate: false
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '4'
+        note: Printed 25 days; x 86400 s/day
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Drop quench
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+- experiment_id: 10.1016/s0016-7037(03)00376-4::experiment::gaillard-2003-run-8
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 13
+        pdf_page_index: 12
+        section: 4.1. Starting materials
+        note: Only the sample/Pt mass ratio (~10) is printed for 1 atm charges
+    printed_composition:
+      state:
+        tag: value
+        value: Run-product glasses and hematites in Table 5; starting-glass recipe not tabulated in Table 4 for this run
+      locator:
+        page: 20
+        pdf_page_index: 19
+        table: '5'
+        note: 'Run header as printed: 1300°C, 0.001 Kb, air, 25 days'
+    pretreatment:
+      state:
+        tag: value
+        value: Glasses from gels (Pichavant, 1987) melted at ~1400 °C in air and quenched; Fe metal and/or Fe2O3 added, homogenized
+          and ground in an agate mortar; ~1 wt.% Ir powder (~10 μm) for Ir-bearing charges; parallel Ir-free mixtures
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: 4.1. Starting materials
+        note: Gel synthesis p10; Ir-bearing and Ir-free protocols p13
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 20
+        pdf_page_index: 19
+        table: '5'
+        note: Printed 1300°C; K = °C + 273.15
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 20
+        pdf_page_index: 19
+        table: '5'
+        note: 'Run header as printed: 1300°C, 0.001 Kb, air, 25 days'
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: air
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 20
+        pdf_page_index: 19
+        table: '5'
+        note: 'Run header as printed: 1300°C, 0.001 Kb, air, 25 days'
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+  work_id: 10.1016/s0016-7037(03)00376-4
+  locator:
+    page: 20
+    pdf_page_index: 19
+    table: '5'
+    note: 'Run header as printed: 1300°C, 0.001 Kb, air, 25 days'
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Air; no numeric ΔNNO is printed in this Table 5 header
+      locator:
+        page: 20
+        pdf_page_index: 19
+        table: '5'
+        note: 'Run header as printed: 1300°C, 0.001 Kb, air, 25 days'
+  bench_id: 10.1016/s0016-7037(03)00376-4::bench::gaillard-2003-1atm-vertical-sic-gas-mixing-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2160000'
+          approximate: false
+      locator:
+        page: 20
+        pdf_page_index: 19
+        table: '5'
+        note: 'Run header as printed: 1300°C, 0.001 Kb, air, 25 days'
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Drop quench
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+- experiment_id: 10.1016/s0016-7037(03)00376-4::experiment::gaillard-2003-run-9
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 13
+        pdf_page_index: 12
+        section: 4.1. Starting materials
+        note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001 kg,
+          unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              page: 13
+              pdf_page_index: 12
+              section: 4.1. Starting materials
+              note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001
+                kg, unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 13
+              pdf_page_index: 12
+              section: 4.1. Starting materials
+              note: Printed "typically consisted of 10 mg of H2O for 100 mg of the solid materials"; 100 mg solid -> 0.0001
+                kg, unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: Run-product glasses and hematites in Table 5; starting-glass recipe not tabulated in Table 4 for this run
+      locator:
+        page: 20
+        pdf_page_index: 19
+        table: '5'
+        note: 'Run header as printed: 1160°C, 2 Kb, fH2^b = 0.1 bar, water saturated, 4 days'
+    pretreatment:
+      state:
+        tag: value
+        value: Glasses from gels (Pichavant, 1987) melted at ~1400 °C in air and quenched; Fe metal and/or Fe2O3 added, homogenized
+          and ground in an agate mortar; Ir as 75 μm wire or ~10 μm powder for Ir-bearing charges; parallel Ir-free mixtures;
+          loaded with distilled water
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: 4.1. Starting materials
+        note: Gel synthesis p10; Ir-bearing and Ir-free protocols p13
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1433.15'
+          approximate: false
+      locator:
+        page: 20
+        pdf_page_index: 19
+        table: '5'
+        note: Printed 1160°C; K = °C + 273.15
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '200000000'
+          approximate: false
+      locator:
+        page: 20
+        pdf_page_index: 19
+        table: '5'
+        note: 'Run header as printed: 1160°C, 2 Kb, fH2^b = 0.1 bar, water saturated, 4 days'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: Sealed capsules in an Ar-H2 pressure medium; no sweep gas over the charge
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+  work_id: 10.1016/s0016-7037(03)00376-4
+  locator:
+    page: 20
+    pdf_page_index: 19
+    table: '5'
+    note: 'Run header as printed: 1160°C, 2 Kb, fH2^b = 0.1 bar, water saturated, 4 days'
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: Co-Ni-Pd sensors; printed fH2^b = 0.1 bar, water saturated
+      locator:
+        page: 20
+        pdf_page_index: 19
+        table: '5'
+        note: 'Run header as printed: 1160°C, 2 Kb, fH2^b = 0.1 bar, water saturated, 4 days'
+  bench_id: 10.1016/s0016-7037(03)00376-4::bench::gaillard-2003-2kbar-ihpv
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '345600'
+          approximate: false
+      locator:
+        page: 20
+        pdf_page_index: 19
+        table: '5'
+        note: 'Run header as printed: 1160°C, 2 Kb, fH2^b = 0.1 bar, water saturated, 4 days'
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Rapid quench device
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+benches:
+- id: 10.1016/s0016-7037(03)00376-4::bench::gaillard-2003-1atm-vertical-sic-gas-mixing-furnace
+  work_id: 10.1016/s0016-7037(03)00376-4
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Vertical SiC resistance furnace, 1 atm gas-mixing (CO2-CO), drop quench
+    locator:
+      page: 15
+      pdf_page_index: 14
+      section: 4.2. Experimental techniques
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Charges suspended on Pt wires (sample/Pt mass ratio approximately 10); no crucible, cell or liner
+    locator:
+      page: 13
+      pdf_page_index: 12
+      section: 4.1. Starting materials
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: Open gas-mixing furnace at 1 atm; no effusion orifice
+    orifice_channel_length_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: No effusion orifice
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Type S thermocouple
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+    uncertainty:
+      state:
+        tag: value
+        value: '{''kind'': ''point'', ''point'': ''5''}'
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: Printed "known to within ± 5 °C"; a 5 °C interval equals 5 K. Not a calibration uncertainty.
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: No thermocouple calibration procedure is printed.
+  heating_method:
+    state:
+      tag: value
+      value: SiC resistance furnace
+    locator:
+      page: 15
+      pdf_page_index: 14
+      section: 4.2. Experimental techniques
+  other_facts:
+  - name: oxygen_fugacity_sensor
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: yttria-stabilized zirconia probe
+          approximate: false
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+    unit: as_printed
+  - name: oxygen_fugacity_sensor_uncertainty
+    value:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.02'
+          interval_high: '0.05'
+          approximate: false
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: Printed "uncertainty of 0.02–0.05 log unit"
+    unit: log unit
+  - name: probe_vs_gas_flow_fO2_crosscheck_max_departure
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.05'
+          approximate: false
+      locator:
+        page: 9
+        pdf_page_index: 8
+        section: 3.2. Standard states and calculation of activities
+        note: Printed "maximum departures of ~0.05 log units" between zircon-probe fO2 and gas-flow fO2; approximate maximum,
+          not an exact upper bound
+    unit: log unit
+- id: 10.1016/s0016-7037(03)00376-4::bench::gaillard-2003-2kbar-ihpv
+  work_id: 10.1016/s0016-7037(03)00376-4
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Internally heated pressure vessel with rapid quench device modified after Roux and Lefèvre (1992); two-windings
+        furnace adapted from Roux et al. (1994)
+    locator:
+      page: 15
+      pdf_page_index: 14
+      section: 4.2. Experimental techniques
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: 'Noble-metal capsules: Au, Au-Pd or Pt, "depending on the experimental temperature"; length 15–20 mm, internal
+        diameter 2.5 mm, wall thickness 0.1 or 0.2 mm'
+    locator:
+      page: 13
+      pdf_page_index: 12
+      section: 4.1. Starting materials
+      note: Per-run capsule assignment is not printed except where Table 4 names a Pt capsule (run 2) and Fig. 8 names an
+        Au capsule (sample 3/3).
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: Sealed capsules in a pressure vessel; no effusion orifice
+    orifice_channel_length_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: No effusion orifice
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Three type B thermocouples
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+    uncertainty:
+      state:
+        tag: value
+        value: '{''kind'': ''categorical'', ''categorical'': ''± 10°C at 1000°C and ± 15°C at 1160°C (including thermal gradients)''}'
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: No thermocouple calibration procedure is printed.
+  heating_method:
+    state:
+      tag: value
+      value: Two-windings furnace inside the pressure vessel
+    locator:
+      page: 15
+      pdf_page_index: 14
+      section: 4.2. Experimental techniques
+  other_facts:
+  - name: pressure_medium
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Ar-H2 mixtures
+          approximate: false
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+    unit: as_printed
+  - name: hydrogen_fugacity_sensor
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Co-Ni-Pd redox sensors (Taylor et al., 1992; Pownceby and O'Neill, 1994); no Shaw membrane
+          approximate: false
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+    unit: as_printed
+  - name: fH2_sensor_uncertainty
+    value:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1'
+          interval_high: '5'
+          approximate: false
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: '"1–5% depending on fH2 value"'
+    unit: percent
+  - name: fO2_uncertainty_water_saturated
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '0.1'
+          approximate: false
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: '"accurate to within 0.1 log units" at water saturation'
+    unit: log unit
+  - name: fO2_uncertainty_water_undersaturated
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.3'
+          approximate: false
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: 4.2. Experimental techniques
+        note: '"uncertainties rose to 0.3 log units"'
+    unit: log unit
+context:
+- observation_id: gaillard_2003_abstract_scope
+  type: statement
+  locator:
+    page: 2
+    pdf_page_index: 1
+  units: as printed
+  values:
+    method_class: author_estimate
+    statement: 1000–1300°C; fO2 from air to 3 log units below NNO; anhydrous and hydrous melts with up to 6 wt.% water.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_abstract_scope
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_activity_equations
+  type: method
+  locator:
+    page: 7
+    pdf_page_index: 6
+    section: 3.2. Standard states and calculation of activities
+    note: Expressions continue on PDF p9; checked against page images
+  units: as printed; T in K; unit of P not printed; R gas constant
+  values:
+    method_class: method_only
+    aFeO_from_alloy_as_printed: aFeOliq = aFe (fO2)1/2 exp ((−226244 + 42.49T + P. (0.483 + 8.633. 10−5T − 3.784.10−6P))/RT)
+    aFe2O3_from_alloy_as_printed: aFe2O3liq = a_Fe^2 (fO2)1.5 exp((−0.0562 T2 + 374.59 T − 846564 + P (1.334 + 0.8.10− 4 T
+      − 0.24510− 4 P))/RT)
+    aFeO_from_hematite_as_printed: aFeOliq = aFe2O3Hm fO21/2 exp((−342.43 T + 998615 + P (−1.242 + 0.00046 T − 7.537.10− 6
+      P))/RT)
+    aFe2O3_from_hematite_as_printed: aFe2O3liq = aFe2O3Hm exp((−0.0562 T2 + 128.59 T − 38275+P (−0.3027 + 0.00079 T − 2.284
+      10−5 P)/RT)
+    inputs: aFe from X_Fe in Fe-Ir alloys (Schwartzendruber, 1984; Woodland and O'Neill, 1997); molar volumes from Lange and
+      Carmichael (1990) and Woodland and O'Neill (1997); Pt-wire/Pt-capsule aFe from X_Fe(Pt) using Heald (1967), as attributed
+      in the Pt/Ir comparison on PDF p17; hematite from Ghiorso and Sack (1991)
+    alloy_calibration_locator:
+      page: 17
+      pdf_page_index: 16
+      section: 5.1.1
+    route_switch: Fe-Ir alloy equilibria for fO2 < NNO+2; hematite-liquid equilibria above NNO+2 (Fe detection limit in alloy
+      about 500 ppm) (PDF p6, p16)
+    pressure_unit_note: The unit of P is not printed with these expressions.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_activity_equations
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_additional_control_and_probe_facts
+  type: statement
+  locator:
+    page: 15
+    pdf_page_index: 14
+  units: as printed
+  values:
+    method_class: method_only
+    statement: H2 + 1/2 O2 ⇔ H2O. Melt fH2O uncertainty 10%; alloy beam 1–2 μm; Fe-Ir grains ≤~10 μm. fH2 set per run by Co-Ni-Pd
+      sensors, not continuously monitored.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_additional_control_and_probe_facts
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_analytical_methods
+  type: characterization
+  locator:
+    page: 15
+    pdf_page_index: 14
+    section: 4.3. Analytical methods
+    note: Continues on PDF p16
+  units: as printed
+  values:
+    method_class: method_only
+    empa: Cameca SX-50 (BRGM-CNRS Orléans); glasses and oxides 15 kV, 6 nA, 10 s on peak; beam 1-2 μm oxides, defocused 10
+      μm glasses; alloys 20 kV, 20 nA, 20 s peak / 10 s background, standards pure metal Fe and Ir; Fe detection limit in
+      alloy about 500 ppm; minimum 6-7 satisfactory alloy analyses per sample
+    h2o_calibration: H2O by difference (Devine et al., 1995), calibrated against internal hydrous glass standards each session;
+      cross-checked with FTIR (Nicolet 760 Magna; Newman et al., 1986 extinction coefficients; bands 4500 and 5200 cm−1)
+    feo_wet_chemistry: Potassium dichromate titration; ± 0.02 at 0.3 wt.% FeO and ± 0.15 at 7 wt.% FeO; Fe2O3 wt% = (FeOtot
+      − FeO) 1.1113
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_analytical_methods
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_calcium_comparison
+  type: statement
+  locator:
+    page: 29
+    pdf_page_index: 28
+  units: as printed
+  values:
+    method_class: author_estimate
+    statement: Ca = K + Na substitution compared at NNO+4.9/+7.3, hydrous 2 kbar versus anhydrous 1 atm; FeOtotal decreases
+      with Ca in hydrous hematite-saturated run9 and increases in anhydrous runs7–8. Run9 excluded from Fig.16 to preserve
+      its scale.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_calcium_comparison
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_charge_preparation
+  type: statement
+  locator:
+    page: 13
+    pdf_page_index: 12
+  units: as printed
+  values:
+    method_class: method_only
+    statement: '1 atm: about 1 wt.% Ir powder, grain size ~10 μm, and parallel Ir-free mixtures; Pt-wire suspension sample/Pt
+      mass ratio ~10. 2 kbar: 75 μm Ir wires initially, ≥25 d required; later ~10 μm powder and parallel Ir-free mixtures.
+      Typically ~10 mg H2O per ~100 mg solids; undersaturated water charges 2–10 mg. Au/Au-Pd/Pt capsules 15–20 mm long, 2.5
+      mm internal diameter, 0.1 or 0.2 mm walls. Fig.3 schematic labels wire ~25 d versus powder 5–6 d.'
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_charge_preparation
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_conclusion_gamma
+  type: statement
+  locator:
+    page: 30
+    pdf_page_index: 29
+  units: as printed
+  values:
+    method_class: author_estimate
+    statement: Conclusion prints γFeO changing from ideality at QFM to ~4 at NNO+1.5; this is retained separately from p28
+      NNO+1.4. Effects in metaluminous melts cannot be extrapolated to peralkaline melts.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_conclusion_gamma
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_cover_access
+  type: statement
+  locator:
+    page: 1
+    pdf_page_index: 0
+  units: as printed
+  values:
+    method_class: method_only
+    statement: HAL open-access archive; hal-00069333v1; submitted 7 Aug 2006; cover prints HAL Authorization. This records
+      the archive/access statement, not a named redistribution licence.
+    archive_url: https://insu.hal.science/hal-00069333v1
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_cover_access
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_density_and_reduction_limit
+  type: statement
+  locator:
+    page: 16
+    pdf_page_index: 15
+  units: as printed
+  values:
+    method_class: method_only
+    statement: Calculated glass density agrees within less than 10% with measurements on similar glasses. Wet FeO is measured
+      only on Ir-free starting mixtures; Ir-bearing and oxide-bearing glass FeO is empirical-fit reduced, with Fe2O3 by difference.
+      FTIR uses calculated, not measured, density.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_density_and_reduction_limit
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_equilibrium_checks_1atm
+  type: statement
+  locator:
+    page: 17
+    pdf_page_index: 16
+  units: as printed
+  values:
+    method_class: method_only
+    statement: No formal reversals; Fe50Ir50 is a hypothetical example of reversal starting alloy, not an experimental composition.
+      At ~1200°C equilibration needs weeks; 1210°C run1 and each 1-atm run last 25 d. Independent Pt/Ir activities agree within
+      error, using Pt–Fe calibration Heald (1967) alongside Fe–Ir calibration Schwartzendruber (1984). Runs7–8 in air cannot
+      be metal-crosschecked because Fe in alloy is below detection.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_equilibrium_checks_1atm
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_feo_henry_gamma_statements
+  type: statement
+  locator:
+    page: 24
+    pdf_page_index: 23
+    section: '5.2'
+  units: as printed
+  values:
+    method_class: author_estimate
+    printed_statement_p24: very close to the activities determined by [Doyle, 1988] (straight line in Fig. 10) with γFeOliq
+      = 0.7 (γFeOliq = aFeOliq/XFeOliq.
+    printed_statement_p25: Activities of FeOliq follow Henry's law but aFeOliq is higher in the hydrous than in the anhydrous
+      samples at a given XFeOliq (with γFeOliq = 0.7 for anhydrous samples against 1 for the hydrous series).
+    locator_p25:
+      page: 25
+      pdf_page_index: 24
+      section: '5.2'
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_feo_henry_gamma_statements
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig10_figure_only
+  type: figure_only
+  locator:
+    page: 25
+    pdf_page_index: 24
+    figure: '10'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: aFeO-X relations, anhydrous and hydrous, runs 1-2
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig10_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig11_figure_only
+  type: figure_only
+  locator:
+    page: 26
+    pdf_page_index: 25
+    figure: '11'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: aFe2O3-X relations, runs 1-2
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig11_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig12_figure_only
+  type: figure_only
+  locator:
+    page: 26
+    pdf_page_index: 25
+    figure: '12'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: Excess chemical potential of FeO vs water content, runs 1-3, with polynomial fit
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig12_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig13_figure_only
+  type: figure_only
+  locator:
+    page: 27
+    pdf_page_index: 26
+    figure: '13'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: Excess chemical potential of FeO vs Ca, runs 7-9
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig13_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig14_figure_only
+  type: figure_only
+  locator:
+    page: 27
+    pdf_page_index: 26
+    figure: '14'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: Excess chemical potential of Fe2O3 vs Ca, runs 7-9
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig14_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig15_figure_only
+  type: figure_only
+  locator:
+    page: 28
+    pdf_page_index: 27
+    figure: '15'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: Effect of fO2 on aFeO-X in H2O-saturated melts at 2 kb, runs 2-4-6-9; best-fit a-X lines given on
+      the figure
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig15_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig16_figure_only
+  type: figure_only
+  locator:
+    page: 29
+    pdf_page_index: 28
+    figure: '16'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: Effect of fO2 on aFe2O3-X, runs 2-4-6
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig16_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig1_figure_only
+  type: figure_only
+  locator:
+    page: 5
+    pdf_page_index: 4
+    figure: '1'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: T-fO2 field of application of metal-liquid and hematite-liquid equilibria
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig1_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig2_figure_only
+  type: figure_only
+  locator:
+    page: 8
+    pdf_page_index: 7
+    figure: '2'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: Gibbs free energy of formation of liquid FeO, liquid and solid wustite (A) and liquid Fe2O3 and hematite
+      (B) at 1 bar
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig2_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig3_figure_only
+  type: figure_only
+  locator:
+    page: 13
+    pdf_page_index: 12
+    figure: '3'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: Protocols for Ir addition
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig3_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig4_figure_only
+  type: figure_only
+  locator:
+    page: 18
+    pdf_page_index: 17
+    figure: '4'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: 'Melt-Pt-Ir equilibria at 1 atm: profiles and Fe-Ir histogram'
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig4_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig5_figure_only
+  type: figure_only
+  locator:
+    page: 20
+    pdf_page_index: 19
+    figure: '5'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: Fe-metal activities from Pt-Fe and Ir-Fe alloys vs melt total iron, run 1
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig5_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig6_figure_only
+  type: figure_only
+  locator:
+    page: 21
+    pdf_page_index: 20
+    figure: '6'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: Melt-Ir chemical profiles at 2 kb, 1000 °C (4, 10, 25 days)
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig6_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig7_figure_only
+  type: figure_only
+  locator:
+    page: 22
+    pdf_page_index: 21
+    figure: '7'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: Histogram of Fe in 23 Fe-Ir grains, charge 3/8
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig7_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig8_figure_only
+  type: figure_only
+  locator:
+    page: 22
+    pdf_page_index: 21
+    figure: '8'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: Melt-Au capsule equilibrium after 6 days, sample 3/3
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig8_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_fig9_figure_only
+  type: figure_only
+  locator:
+    page: 24
+    pdf_page_index: 23
+    figure: '9'
+  units: plotted; not digitized
+  values:
+    method_class: figure_only
+    figure_description: Non-equilibrated Fe-Ir-Pt alloys (aFeO 0.081 Ir-Fe, 0.077 Pt-Fe; Table 3)
+    reason: Curves and points not digitized; numeric content only on the figure.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_fig9_figure_only
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_figure4_validation_caption
+  type: statement
+  locator:
+    page: 18
+    pdf_page_index: 17
+  units: as printed
+  values:
+    method_class: method_only
+    statement: Non-equilibrated 10-day non-tabulated comparator; equilibrated profiles at 25 d; 18 analysed Fe-Ir grains in
+      sample1/3.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_figure4_validation_caption
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_generic_feo_mass_action
+  type: statement
+  locator:
+    page: 5
+    pdf_page_index: 4
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    statement: aFeOliq = exp(ΔG°(1)/RT) aFe (fO2)^(1/2); aFe of pure metal = 1; prior Henry-law FeO concentration range 0
+      to 17–18 wt.% at 1 bar. Fig.1 caption Hm-Liq curve aFeOliq = 0.02.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_generic_feo_mass_action
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_generic_ferric_mass_action
+  type: statement
+  locator:
+    page: 8
+    pdf_page_index: 7
+  units: as printed
+  values:
+    method_class: method_only
+    statement: 2 Fe + 3/2 O2 ⇔ Fe2O3; aFe2O3liq = a_Fe^2 (fO2)^1.5 exp(ΔG°(5)/RT). Table 1 prints different stoichiometry
+      [sic]; retain each located form.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_generic_ferric_mass_action
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_hematite_reactions
+  type: statement
+  locator:
+    page: 9
+    pdf_page_index: 8
+  units: as printed
+  values:
+    method_class: method_only
+    statement: Fe2O3 (hematite) ⇔ 2 FeO (liquid) + 1/2 O2; Fe2O3 (hematite) ⇔ Fe2O3 (liquid). Pressure units are not printed
+      beside the activity expressions.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_hematite_reactions
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_independent_sensors_magnetite
+  type: statement
+  locator:
+    page: 22
+    pdf_page_index: 21
+  units: as printed
+  values:
+    method_class: method_only
+    statement: 'Sample2/7 Pt-capsule and Ir-powder sensors differ by ~1400 J. Fe3O4 ⇔ 3 FeO + 1/2 O2; liquid FeO standard
+      properties use Table1 and Lange/Carmichael (1990), magnetite properties/mixing Ghiorso/Sack (1991). Fig.7: 23 grains,
+      6 d, sample3/8; Fig.8: Au capsule sample3/3 after 6 d.'
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_independent_sensors_magnetite
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_melt_component_basis
+  type: statement
+  locator:
+    page: 24
+    pdf_page_index: 23
+  units: as printed
+  values:
+    method_class: method_only
+    statement: Mole fractions use Si4O8, KAlO2, NaAlO2, CaAl2O4, Al2O3, CaO, H2O, OH, FeO, Fe2O3. All but 1 or 2 Ca-free glasses
+      are peraluminous. Moderately reducing range NNO−1 to NNO−1.5. Runs4–5 have local metal-melt equilibrium only.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_melt_component_basis
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_optimization_constraints
+  type: statement
+  locator:
+    page: 35
+    pdf_page_index: 34
+  units: as printed
+  values:
+    method_class: model_derived
+    statement: 61 prior metal-silicate equilibria constrain molten iron oxides 60–100 wt.%, Fe2O3 increasing ~0–13 wt.% as
+      total iron oxides rise 60–100%. Three SiO2–FeO interaction parameters and symmetric FeO–Fe2O3 interaction; SiO2–Fe2O3
+      interactions ignored. Enthalpy and entropy of liquid FeO formation each allowed to vary within 20%.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_optimization_constraints
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_oxidizing_range_interpretation
+  type: statement
+  locator:
+    page: 27
+    pdf_page_index: 26
+  units: as printed
+  values:
+    method_class: author_estimate
+    statement: NNO+4.9 < fO2 < NNO+7.3; FeOtotal 2.45–3.15 wt.%; hydrous hematite saturation at 1160°C versus anhydrous 1245°C;
+      water 5.55–6.06 wt.%; XFe2O3/XFeO 1.55–1.85. Sample9/1 is hematite-undersaturated.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_oxidizing_range_interpretation
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_partial_equilibrium
+  type: statement
+  locator:
+    page: 23
+    pdf_page_index: 22
+  units: as printed
+  values:
+    method_class: method_only
+    statement: Independent activities within 10% in samples6/5–6/6; Fe3O4 ⇔ 3 Fe + 2 O2. Equilibrium of iron components suffices
+      for activities; global equilibrium of all noble metals is explicitly not claimed. Ternary validation at 1380°C, 1 atm,
+      10 d, FMQ; 8.04 wt.% FeOtotal, ~50 μm ternary zone; aFeO 0.077/0.081.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_partial_equilibrium
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_powder_kinetics_and_sensor_failure
+  type: statement
+  locator:
+    page: 21
+    pdf_page_index: 20
+  units: as printed
+  values:
+    method_class: method_only
+    statement: 'At 1000°C and 2 kbar water saturation, powder alloy equilibrium after 6 d; ferric/ferrous equilibrium takes
+      hours at 800–1000°C. About 50% Fe loss at highest capsule/melt ratios. Fig.6: 4 d and 10 d non-equilibrated; 25 d nearly
+      equilibrated run omitted because its redox sensor was sulfide-polluted and unusable.'
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_powder_kinetics_and_sensor_failure
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_previous_pure_metal_method
+  type: statement
+  locator:
+    page: 3
+    pdf_page_index: 2
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    statement: Prior experiments equilibrated pure metallic iron with silicate melt at 1 atm, below IW; Fe + 1/2 O2 ⇔ FeO.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_previous_pure_metal_method
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_prior_methods_and_alloy_domain
+  type: statement
+  locator:
+    page: 6
+    pdf_page_index: 5
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    statement: 'Prior Fe-Ni/Fe-Ni-Co experiments at 1 atm to ~5 log units above IW: Fe2O3 <1 wt.%; 450 available points; prior
+      ferric fraction <10% of total Fe. Fe-Ir stability limited near NNO+9; continuous solution 0–100 at.% Fe at ~900–1400°C;
+      Ir solubility <100 ppb; Fe alloy detection about 500 ppm, limiting method near NNO+2.'
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_prior_methods_and_alloy_domain
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_run5_duration_conflict
+  type: completeness_note
+  locator:
+    page: 19
+    pdf_page_index: 18
+    table: '5'
+    note: Compare Table 4 (PDF p14)
+  units: days as printed
+  values:
+    method_class: method_only
+    table4_as_printed: 1000°C, 2 Kb, fH2^b = 22 bar, water saturated, 6 days
+    table5_as_printed: 1000°C, 2 Kb, fH2^b = 22 bar, water saturated, 10 days
+    note: 'Kept both; the experiment registry uses the Table 4 value with this conflict noted. Fig. 6 caption also names "10
+      days (B, sample #5/9 ...)", a sample not printed in Table 4.'
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_run5_duration_conflict
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_runs_8_9_absent_from_table4
+  type: completeness_note
+  locator:
+    page: 28
+    pdf_page_index: 27
+    section: '5.3'
+    note: 'Also PDF p17 ("runs # 1, 7, 8"), p27 Figs. 13-14 ("Runs 7-8-9"), p29'
+  units: as printed
+  values:
+    method_class: method_only
+    printed_statement: 'The point at NNO+4.9 (run # 9, Table 4) plots well outside Figure 16 (aFe2O3liq = 0.069–0.070 for
+      XFe2O3liq = 0.02).'
+    finding: 'The text cites runs # 8 and # 9 in Table 4, but Table 4 in this HAL manuscript copy prints runs 1-7 only. Conditions
+      and compositions for runs8–9 are carried from Table 5 p20; no unprinted Table 4 activities are invented.'
+    aFe2O3_run9_prose_interval:
+      low: '0.069'
+      high: '0.070'
+      X_Fe2O3_liq: '0.02'
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_runs_8_9_absent_from_table4
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_solubility_and_redox_interpretation
+  type: statement
+  locator:
+    page: 28
+    pdf_page_index: 27
+  units: as printed
+  values:
+    method_class: author_estimate
+    statement: Water solubility decreases 5.2→4.5 wt.% as FeO increases 0.6→7.2 wt.%; effect of iron on IR extinction unknown,
+      independent confirmation needed. Four oxygen isobars NNO−1.25 to NNO+4.9, two temperatures 1000/1160°C. γFeO ~1 at NNO−1.25
+      to ~4 at NNO+1.4; three nearly identical run9 measurements at NNO+4.9 show turnover, maximum between NNO+1.4 and NNO+4.9.
+      Ferric activity nearly ideal at NNO+1.4, strongly negative at NNO−1.25, nonlinear at NNO−0.8/+1.4; run9 aFe2O3 0.069–0.070
+      at XFe2O3 0.02.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_solubility_and_redox_interpretation
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_standard_state_domain
+  type: statement
+  locator:
+    page: 7
+    pdf_page_index: 6
+  units: as printed
+  values:
+    method_class: model_derived
+    statement: Molten Fe0.947O wustite contains ≥13 wt.% Fe2O3 at IW; FeO standard-state optimization uses SiO2–FeO±Fe2O3
+      at 1 atm.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_standard_state_domain
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_starting_composition_domain
+  type: statement
+  locator:
+    page: 10
+    pdf_page_index: 9
+  units: as printed
+  values:
+    method_class: author_estimate
+    statement: '15 glasses; SiO2 ~69–78 wt.%, FeOtotal ~0.5–9 wt.%, Si4O8 56–63 mol.%; glasses #2,4,6,8,9 previously used
+      in Gaillard et al. (2001); gels melted at ~1400°C in air.'
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_starting_composition_domain
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_table1_fe2o3_liq_formation_this_study
+  type: model_fit_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: Row "This study", Fe-Ir alloy equilibration
+  phase: condensed_liquid
+  standard_state: Fe2O3 liquid, 1 bar
+  units: J/mol; T in K
+  values:
+    quantity: delta_fG
+    method_class: model_derived
+    evidence_class: model_derived
+    reaction_as_printed: Fe +⅔ O2 ⇔ Fe2O3^liq
+    reaction_note: Printed stoichiometry kept [sic]; the text writes equilibrium (5) as 2Fe + 3/2O2 = Fe2O3 (PDF p8).
+    expression_as_printed: −0.0562. T²+374.59. T−846564
+    coefficients:
+      C_J_mol_K2: '-0.0562'
+      B_J_mol_K: '374.59'
+      A_J_mol: -846564
+    form: ΔG° = C·T² + B·T + A
+    derived_from:
+    - gaillard_2003_activity_equations
+    - gaillard_2003_optimization_constraints
+    derivation:
+      relation: Liquid Fe2O3 formation Gibbs energy from hematite melting thermodynamics and liquid heat capacity
+      inputs:
+      - gaillard_2003_activity_equations
+      - gaillard_2003_optimization_constraints
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_table1_fe2o3_liq_formation_this_study
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: Fe2O3
+- observation_id: gaillard_2003_table1_feo_liq_formation_this_study
+  type: model_fit_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: Row "This study", Fe-Ir alloy equilibration
+  phase: condensed_liquid
+  standard_state: FeO liquid, 1 bar
+  units: J/mol; T in K
+  values:
+    quantity: delta_fG
+    method_class: model_derived
+    evidence_class: model_derived
+    reaction_as_printed: Fe +½ O2 ⇔ FeO^liq
+    expression_as_printed: −226244 + 42.49. T
+    coefficients:
+      A_J_mol: -226244
+      B_J_mol_K: '42.49'
+    form: ΔG° = A + B·T
+    derived_from:
+    - gaillard_2003_optimization_constraints
+    - gaillard_2003_tableA1_feo_liq_optimization
+    derivation:
+      relation: Fit of the liquid FeO standard-state Gibbs energy using the optimization constraints and Table A1 parameters
+      inputs:
+      - gaillard_2003_optimization_constraints
+      - gaillard_2003_tableA1_feo_liq_optimization
+    table_a1_crosscheck: Table A1 lower block prints ΔH = −226244 and ΔS = −42.49 (PDF p36).
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_table1_feo_liq_formation_this_study
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_table1_hematite_to_fe2o3_liq_this_study
+  type: model_fit_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: Row "This study", Hematite equilibration
+  phase: condensed_liquid
+  standard_state: Fe2O3 liquid, 1 bar; hematite solid
+  units: J/mol; T in K
+  values:
+    quantity: delta_fusG
+    method_class: model_derived
+    evidence_class: model_derived
+    reaction_as_printed: Fe2O3^sol ⇔ Fe2O3^liq
+    expression_as_printed: −0.0562. T²+128.59. T−38275
+    coefficients:
+      C_J_mol_K2: '-0.0562'
+      B_J_mol_K: '128.59'
+      A_J_mol: -38275
+    form: ΔG° = C·T² + B·T + A
+    derived_from:
+    - gaillard_2003_table1_fe2o3_liq_formation_this_study
+    - gaillard_2003_activity_equations
+    derivation:
+      relation: Hematite-to-liquid Fe2O3 fusion Gibbs energy from the liquid formation properties and hematite thermodynamic
+        data
+      inputs:
+      - gaillard_2003_table1_fe2o3_liq_formation_this_study
+      - gaillard_2003_activity_equations
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_table1_hematite_to_fe2o3_liq_this_study
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: Fe2O3
+- observation_id: gaillard_2003_table1_hematite_to_feo_liq_this_study
+  type: model_fit_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: Row "This study", Hematite equilibration
+  phase: condensed_liquid
+  standard_state: FeO liquid, 1 bar; hematite solid
+  units: J/mol; T in K
+  values:
+    quantity: delta_rG
+    method_class: model_derived
+    evidence_class: model_derived
+    reaction_as_printed: Fe2O3^sol ⇔ 2 FeO^liq + ½ O2
+    expression_as_printed: 998615−342.43.T
+    coefficients:
+      A_J_mol: 998615
+      B_J_mol_K: '-342.43'
+    form: ΔG° = A + B·T
+    derived_from:
+    - gaillard_2003_table1_feo_liq_formation_this_study
+    - gaillard_2003_activity_equations
+    derivation:
+      relation: Hematite-to-liquid FeO equilibrium from this study's liquid FeO standard state and hematite thermodynamic
+        data
+      inputs:
+      - gaillard_2003_table1_feo_liq_formation_this_study
+      - gaillard_2003_activity_equations
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_table1_hematite_to_feo_liq_this_study
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_table1_prior_determinations
+  type: compilation_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '1'
+    note: Rows other than "This study"
+  units: J/mol as printed (ΔG° at 1 bar)
+  values:
+    method_class: quoted_attributed
+    table_csv: tables/gaillard-2003-hydrous-silicic-melt-activity/t1.csv
+    attribution: Schumann and Ensio (1951), Bodsworth (1959) | Roeder (1974) | Doyle and Naldrett (1986) | Doyle (1988; 1989)
+      | Holzheid et al. (1997) | Snyder and Carmichael (1991) | Matsuzaki et al (1998) | O'Neill and Eggins (2002)
+    row_count: 10
+    note: Standard states and ΔG° expressions used by earlier studies; recalculation to the liquid standard states of this
+      study is stated (PDF p7) but recalculated activities are not tabulated.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_table1_prior_determinations
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_table2_starting_glasses
+  type: composition
+  locator:
+    page: 11
+    pdf_page_index: 10
+    table: '2'
+  units: oxide values as printed (wt% per text PDF p10); Total = original EMPA total; A1/CNK molar
+  values:
+    method_class: measured_direct
+    table_csv: tables/gaillard-2003-hydrous-silicic-melt-activity/t2.csv
+    glasses:
+      '1':
+        SiO2: '75.84'
+        Al2O3: '11.93'
+        FeO*: '0.56'
+        CaO: '0.01'
+        Na2O: '4.07'
+        K2O: '5.46'
+        Total**: '97.88'
+        A1/CNK***: '0.95'
+      '2':
+        SiO2: '78.33'
+        Al2O3: '11.77'
+        FeO*: '0.83'
+        CaO: '0.03'
+        Na2O: '4.05'
+        K2O: '4.97'
+        Total**: '99.90'
+        A1/CNK***: '0.98'
+      '3':
+        SiO2: '75.77'
+        Al2O3: '12.31'
+        FeO*: '1.08'
+        CaO: '0.00'
+        Na2O: '4.24'
+        K2O: '5.34'
+        Total**: '98.75'
+        A1/CNK***: '0.97'
+      '4':
+        SiO2: '77.17'
+        Al2O3: '12.07'
+        FeO*: '1.55'
+        CaO: '0.01'
+        Na2O: '4.02'
+        K2O: '4.72'
+        Total**: '99.85'
+        A1/CNK***: '1.06'
+      '5':
+        SiO2: '75.57'
+        Al2O3: '12.64'
+        FeO*: '1.85'
+        CaO: '0.01'
+        Na2O: '3.84'
+        K2O: '4.97'
+        Total**: '98.88'
+        A1/CNK***: '1.08'
+      '6':
+        SiO2: '77.08'
+        Al2O3: '11.79'
+        FeO*: '2.58'
+        CaO: '0.02'
+        Na2O: '3.74'
+        K2O: '4.76'
+        Total**: '99.90'
+        A1/CNK***: '1.04'
+      '7':
+        SiO2: '75.66'
+        Al2O3: '11.92'
+        FeO*: '2.86'
+        CaO: '0.03'
+        Na2O: '3.50'
+        K2O: '4.84'
+        Total**: '98.79'
+        A1/CNK***: '1.08'
+      '8':
+        SiO2: '76.77'
+        Al2O3: '11.45'
+        FeO*: '3.38'
+        CaO: '0.04'
+        Na2O: '3.71'
+        K2O: '4.67'
+        Total**: '99.98'
+        A1/CNK***: '1.03'
+      '9':
+        SiO2: '76.2'
+        Al2O3: '11.50'
+        FeO*: '4.25'
+        CaO: '0.03'
+        Na2O: '3.67'
+        K2O: '4.36'
+        Total**: '100.06'
+        A1/CNK***: '1.07'
+      '10':
+        SiO2: '73.44'
+        Al2O3: '11.11'
+        FeO*: '6.07'
+        CaO: '0.03'
+        Na2O: '3.00'
+        K2O: '4.05'
+        Total**: '97.71'
+        A1/CNK***: '1.19'
+      '11':
+        SiO2: '70.45'
+        Al2O3: '12.26'
+        FeO*: '7.32'
+        CaO: '0.00'
+        Na2O: '3.45'
+        K2O: '4.60'
+        Total**: '98.08'
+        A1/CNK***: '1.15'
+      '12':
+        SiO2: '69.29'
+        Al2O3: '11.70'
+        FeO*: '9.28'
+        CaO: '0.02'
+        Na2O: '3.16'
+        K2O: '4.20'
+        Total**: '97.65'
+        A1/CNK***: '1.20'
+      Ca1:
+        SiO2: '76.32'
+        Al2O3: '11.96'
+        FeO*: '2.08'
+        CaO: '0.86'
+        Na2O: '3.22'
+        K2O: '4.27'
+        Total**: '98.72'
+        A1/CNK***: '1.04'
+      Ca2:
+        SiO2: '74.17'
+        Al2O3: '13.29'
+        FeO*: '2.39'
+        CaO: '1.87'
+        Na2O: '2.99'
+        K2O: '3.73'
+        Total**: '98.45'
+        A1/CNK***: '1.08'
+      Ca3:
+        SiO2: '76.33'
+        Al2O3: '11.92'
+        FeO*: '1.97'
+        CaO: '2.51'
+        Na2O: '2.40'
+        K2O: '2.81'
+        Total**: '97.95'
+        A1/CNK***: '1.03'
+    footnotes_as_printed:
+    - '* FeO total analyzed on EMPA is reported.'
+    - '** Original total on EMPA.'
+    - '*** Al2O3/(CaO + Na2O + K2O) in mole.'
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_table2_starting_glasses
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: Fe
+- observation_id: gaillard_2003_table3_pt_ir_test
+  type: method_validation
+  locator:
+    page: 12
+    pdf_page_index: 11
+    table: '3'
+  units: wt% (glasses); mole fraction (alloys); activity dimensionless; parenthetical values two-sigma
+  values:
+    method_class: measured_reduced
+    title_as_printed: 'Test of Pt-Ir interaction: Runs performed at 1380°C, QFM, 1 atm, 10 days.'
+    table_csv: tables/gaillard-2003-hydrous-silicic-melt-activity/t3.csv
+    a_FeO_Fe_Ir_powders_as_printed: 0.081 (0.007)
+    a_FeO_Fe_Pt_wire_as_printed: 0.077 (0.005)
+    a_FeO_ternary_as_printed: '?'
+    note: Basaltic test glass (49.58 wt% SiO2), not one of the Table 2 starting glasses; not in the Table 4 run registry.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_table3_pt_ir_test
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_tableA1_feo_liq_optimization
+  type: model_fit_context
+  locator:
+    page: 36
+    pdf_page_index: 35
+    table: A1
+  units: J/mol (upper block, as printed); lower-block units not printed
+  values:
+    method_class: model_derived
+    table_csv: tables/gaillard-2003-hydrous-silicic-melt-activity/tA1.csv
+    standard_state_FeO_liq:
+      delta_H_as_printed: −226244
+      delta_S_as_printed: −42.49
+    margules_as_printed:
+      W13: −125350
+      W1234: '57419'
+      W1223: −16259
+      W1112: −10128
+    gxs_as_printed: Gxs = X_FeO^3.X_SiO2.W1112 + X_FeO^2.X_SiO2^2.W1223 + X_FeO.X_SiO2^3.W1234 + X_FeO.X_Fe2O3.W13
+    fit_quality_as_printed: 'Average difference between measured-calculated chemical potentials (μFeO^liq, μSiO2^liq): 645
+      J/mol.'
+    attribution: Coughlin (1954) | Robie et al (1978) | Berman et Brown (1987) | DeCapitani et Kirschen (1998) | O'Neill (1987)
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_tableA1_feo_liq_optimization
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: Fe
+- observation_id: gaillard_2003_water_chemical_potential
+  type: statement
+  locator:
+    page: 26
+    pdf_page_index: 25
+  units: as printed
+  values:
+    method_class: author_estimate
+    statement: μFeOliq^xs = RT ln γFeOliq. Negative deviation from ideality becomes slightly positive above ~5 wt.% H2O.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_water_chemical_potential
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO
+- observation_id: gaillard_2003_wire_local_equilibrium
+  type: statement
+  locator:
+    page: 20
+    pdf_page_index: 19
+  units: as printed
+  values:
+    method_class: method_only
+    statement: At 1000°C, 2 kbar and water saturation, nearly flat bulk Ir-wire Fe profiles at 25 d; shorter runs4–5 attain
+      reproducible local metal-melt equilibrium at the interface, not bulk wire equilibration.
+  context_id: gaillard-2003-hydrous-silicic-melt-activity::context::gaillard_2003_wire_local_equilibrium
+  work_id: 10.1016/s0016-7037(03)00376-4
+  source_id: gaillard-2003-hydrous-silicic-melt-activity
+  species: FeO

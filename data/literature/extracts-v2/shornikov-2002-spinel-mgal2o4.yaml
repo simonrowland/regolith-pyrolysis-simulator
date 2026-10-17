@@ -1,0 +1,103 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2002-spinel-mgal2o4.yaml
+observations:
+- observation_id: shornikov-2002-spinel-mgal2o4::shornikov_2002_spinel_formation_enthalpy_estimate
+  experiment_id: ca288d0885966c61c9574878790a52f2dae2e5185c17a0352360cecd2600f7bc::experiment::shornikov_2002_mgal2o4_kems_runs
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4 spinel' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1851.0, 2089.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-13.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Authors estimated ΔfH from the temperature dependence of ΔfGT; printed uncertainty ±1.2 kJ/mol.
+      delta_f_H_kJ_per_mol:
+      - '-14.5'
+      - '-12.1'
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-92271-1791207706
+      date: '2026-10-05'
+      evidence:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Results
+  notices: []
+  source_id: shornikov-2002-spinel-mgal2o4
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Results
+  read_from: pdf:shornikov-2002-spinel-mgal2o4

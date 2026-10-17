@@ -1,0 +1,1405 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/978-3-030-05728-2_23
+  citation: Shornikov, S. (2019), "High-Temperature Study of Perovskite Evaporation," in Materials Processing Fundamentals
+    2019, The Minerals, Metals & Materials Series, pp. 253–263.
+  source_ids:
+  - shornikov-2019-perovskite-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:shornikov-2019-perovskite-evaporation
+      role: pdf
+      path: raw/shornikov-2019-perovskite-evaporation/shornikov-2019-perovskite-evaporation.pdf
+      sha256:
+        tag: value
+        value: 925a4c0786aaaa45522001352be29d483c74c5bd13bcd678aefddb3d05ba00af
+    - asset_id: unknown:shornikov-2019-perovskite-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/978-3-030-05728-2_23
+experiments:
+- experiment_id: 10.1007/978-3-030-05728-2_23::experiment::shornikov_2019_mo_cell_kems
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 257
+        pdf_page_index: 4
+        section: Experimental
+        note: The CaCO3:TiO2 batch ratio and analyzed starting composition are not reported.
+    printed_composition:
+      state:
+        tag: value
+        value: Calcium titanate CaTiO3 (perovskite).
+      locator:
+        published_page: 253
+        pdf_page_index: 0
+        section: Introduction
+    form:
+      state:
+        tag: value
+        value: CaTiO3 perovskite
+      locator:
+        published_page: 253
+        pdf_page_index: 0
+        section: Abstract
+    characterization:
+      state:
+        tag: value
+        value: X-ray and chemical analyses of the samples are stated; results are not provided in the chapter.
+      locator:
+        published_page: 257
+        pdf_page_index: 4
+        section: Experimental
+    pretreatment:
+      state:
+        tag: value
+        value: CaCO3 and TiO2 starting materials were mixed in a Jasper ball mill in acetone for 24 h; after drying, the mixture
+          was calcined in air in a silite furnace for 24 h at up to 1300 K; after secondary grinding, the sample was fired
+          for 24 h at 1530 K.
+      locator:
+        published_page: 257
+        pdf_page_index: 4
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1700'
+          interval_high: '2200'
+          approximate: false
+      locator:
+        published_page: 257
+        pdf_page_index: 4
+        section: Experimental
+        note: The abstract and conclusion give the study range as 1700–2200 K.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 257
+        pdf_page_index: 4
+        section: Experimental
+        note: The chamber background or residual pressure is not reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 257
+        pdf_page_index: 4
+        section: Experimental
+        note: No sweep or carrier gas is stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1007/978-3-030-05728-2_23
+  locator:
+    published_page: 257
+    pdf_page_index: 4
+    section: Experimental
+    note: Perovskite evaporation from a molybdenum effusion cell was studied by mass spectrometry.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 257
+          pdf_page_index: 4
+          section: Experimental
+          note: The effusion-orifice diameter is not stated.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 257
+          pdf_page_index: 4
+          section: Experimental
+          note: The effusion-orifice channel length is not stated.
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Hertz–Knudsen equation (21), using Kα as defined by equation (22); partial evaporation coefficients are cited
+            to reference [25].
+        locator:
+          published_page: 258
+          pdf_page_index: 5
+          section: Experimental
+      pressure_reference_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 258
+          pdf_page_index: 5
+          section: Experimental
+          note: No standard substance for partial-pressure calibration is stated for this study.
+      appearance_energy_reference:
+        state:
+          tag: value
+          value: Silver ion
+        locator:
+          published_page: 258
+          pdf_page_index: 5
+          section: Experimental
+          note: Silver ion is stated as the appearance-energy standard; this is not identified as a pressure standard.
+      multiplier_correction:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 261
+          pdf_page_index: 8
+          section: Results and Discussion
+          note: No numeric multiplier correction is reported.
+      isotope_correction:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 257
+          pdf_page_index: 4
+          section: Experimental
+          note: No isotope correction is reported for this study.
+  bench_id: 10.1007/978-3-030-05728-2_23::bench::shornikov_2019_mi1201_mo
+benches:
+- id: 10.1007/978-3-030-05728-2_23::bench::shornikov_2019_mi1201_mo
+  work_id: 10.1007/978-3-030-05728-2_23
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MI-1201 mass spectrometer with a modified ion source for high-temperature studies (up to 3000 K)
+    locator:
+      published_page: 257
+      pdf_page_index: 4
+      section: Experimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum effusion cell; no separate liner is stated.
+    locator:
+      published_page: 257
+      pdf_page_index: 4
+      section: Experimental
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 257
+      pdf_page_index: 4
+      section: Experimental
+      note: The paper says evaporation was studied from a molybdenum effusion cell.
+  detector:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      published_page: 261
+      pdf_page_index: 8
+      section: Results and Discussion
+      note: The electron-multiplier sentence discusses possible errors in Lopatin and Semenov [18] pressure calculations using
+        equation (14); it does not identify the detector in the present experiment.
+  ionization:
+    electron_energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20'
+          approximate: false
+      locator:
+        published_page: 257
+        pdf_page_index: 4
+        section: Experimental
+    molecular_ion_cross_sections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 257
+        pdf_page_index: 4
+        section: Experimental
+        note: No ionization cross-section values for this study are reported.
+    cross_section_source:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 257
+        pdf_page_index: 4
+        section: Experimental
+        note: No source for ionization cross-sections used in this study is reported.
+    electron_multiplier_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 261
+        pdf_page_index: 8
+        section: Results and Discussion
+        note: Detection-efficiency uncertainty is discussed, but no multiplier correction is stated.
+    isotope_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 257
+        pdf_page_index: 4
+        section: Experimental
+        note: No isotope-abundance correction to the reported partial pressures is stated.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 257
+        pdf_page_index: 4
+        section: Experimental
+        note: The sensor used to measure sample temperature is not identified.
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 257
+        pdf_page_index: 4
+        section: Experimental
+        note: No temperature-calibration procedure or uncertainty is stated.
+  other_facts: []
+context:
+- observation_id: shornikov_2019_atomic_oxygen_calculation
+  type: method
+  locator:
+    published_page: 259
+    pdf_page_index: 6
+    section: Experimental
+    equation: 23–27
+  units: as printed
+  experiment: shornikov_2019_mo_cell_kems
+  values:
+    quantity: atomic_oxygen_pressure_calculation
+    method_class: model_derived
+    relations_as_printed: Equations (23)–(27) derive p_O from partial-pressure ratios and K_r(T) equilibrium constants; no
+      numeric atomic-oxygen row is printed in Table 1.
+    derived_curve: figure_only
+    note: Figure 2 curves were not digitized.
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_atomic_oxygen_calculation
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_background_numeric_statements
+  type: literature_context
+  locator:
+    published_page: 255
+    pdf_page_index: 2
+    section: Introduction
+  units: as printed in cited-literature discussion
+  values:
+    quantity: attributed_numeric_context
+    statements:
+    - attribution: Balducci et al. (1985), reference [8]
+      method_class: quoted_attributed
+      temperature_range_K:
+      - 2210
+      - 2393
+      quote: 'Balducci et al. [8] using Knudsen effusion mass spectrometry found (Ti2O3) and (Ti2O4) vapor species in the
+        gas phase over CoTiO3 at 2210–2393 K. They can participate in the following equilibria:'
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        section: Introduction
+    - attribution: Banon et al. (1981), reference [9]
+      method_class: quoted_attributed
+      sample_count: 24
+      temperature_range_K:
+      - 1900
+      - 2200
+      ionization_energy_eV: 13
+      quote: Using the differential mass spectrometry, Banon et al. [9] investigated the evaporation of 24 samples of CaTiO3–Ti2O3–TiO2
+        system from Knudsen molybdenum effusion cell at 1900–2200 K. Mass spectra were recorded at low ionizing voltage of
+        13 eV in order to avoid the possible fragmentation of TiO2+ molecular ion to Ti+ and TiO+ ions, which are also molecular.
+      locator:
+        published_page: 255
+        pdf_page_index: 2
+        section: Introduction
+    - attribution: Banon et al. (1981), reference [9]
+      method_class: quoted_attributed
+      temperature_K: 2150
+      quote: The partial pressure values of (Ca), (TiO), (TiO2) and (O) over perovskite at 2150 K was calculated using thermochemical
+        data [7].
+      locator:
+        published_page: 255
+        pdf_page_index: 2
+        section: Introduction
+    - attribution: Zhang et al. (2014), reference [4]
+      method_class: quoted_attributed
+      temperature_K: 2278
+      quote: Zhang et al. [4] studied the isotopic fractionation during evaporation of perovskite melt suspended on iridium
+        wire in a vacuum furnace at 2278 K (according to Langmuir).
+      locator:
+        published_page: 256
+        pdf_page_index: 3
+        section: Introduction
+    - method_class: quoted_unattributed
+      quote: For the first time, the partial pressure of vapor species in the gas phase over perovskite are compared with
+        those corresponding to simple oxides, showing the predominant effect of the calcium component of perovskite on evaporation
+        character.
+      locator:
+        published_page: 253
+        pdf_page_index: 0
+        section: Abstract
+    - attribution: Lopatin and Semenov (2001), reference [18]
+      method_class: quoted_attributed
+      temperature_range_K:
+      - 2100
+      - 2500
+      appearance_energy_CaTiO3_plus_eV: 9
+      appearance_energy_uncertainty_eV: 1
+      quote: 'Lopatin and Semenov [18] studied the evaporation of a mixture of calcium carbonate and titanium dioxide from
+        tungsten cells by Knudsen effusion mass spectrometric method at 2100–2500 K. The following ions were found in the
+        mass spectra of vapor over the mixture: Ca+, CaO+, Ti+, TiO+, TiO2+ and CaTiO3+. The appearance energies of the ions
+        in the mass spectra of vapor over the mixture allowed to establish the molecular nature of the origin of Ca+, CaO+,
+        TiO+, TiO2+ and CaTiO3+ ions. Ti+ ion also contained a fragmentary component from TiO2+ ion. According to the authors,
+        Ti+ ion was completely fragmentary. The appearance energy of CaTiO3+ molecular ion was determined to be 9 ± 1 eV (the
+        appearance energy of a gold ion in the mass spectrum of vapor was used as a standard).'
+      locator:
+        published_page: 255
+        pdf_page_index: 2
+        section: Introduction
+    - attribution: Samoilova and Kazenas (1995), reference [10], and Semenov (1969), reference [20]
+      method_class: quoted_attributed
+      temperature_note: same temperature range as cited study
+      quote: It corresponded to that observed by Samoilova and Kazenas [10] in the same temperature range at evaporation of
+        CaO from alundum cell and by Semenov [20] at evaporation of TiO2 from a tungsten cell.
+      locator:
+        published_page: 258
+        pdf_page_index: 5
+        section: Experimental
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_background_numeric_statements
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_clausing_coefficient_bound
+  type: method
+  locator:
+    published_page: 259
+    pdf_page_index: 6
+    section: Experimental
+    equation: '22'
+  units: as printed
+  values:
+    quantity: Clausing_coefficient_bound
+    quote: Its value does not exceed one and depends on the ratio of the diameter of the effusion hole to its thickness.
+    clausing_coefficient_upper_bound: 1
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_clausing_coefficient_bound
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_equation_relations_as_printed
+  type: method
+  locator:
+    published_page: 254
+    pdf_page_index: 1
+    section: Introduction
+    note: Equation-specific locators below identify each printed relation.
+  units: relations as printed; condensed phases in square brackets and gas phases in round brackets
+  values:
+    quantity: printed_equation_relations
+    relations:
+    - equation: 1
+      relation_as_printed: '[CaO] = (CaO)'
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        equation: '1'
+    - equation: 2
+      relation_as_printed: (CaO) = (Ca) + (O)
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        equation: '2'
+    - equation: 3
+      relation_as_printed: 2(Ca) = (Ca2)
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        equation: '3'
+    - equation: 4
+      relation_as_printed: 2(O) = (O2)
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        equation: '4'
+    - equation: 5
+      relation_as_printed: 3(O) = (O3)
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        equation: '5'
+    - equation: 6
+      relation_as_printed: 4(O) = (O4)
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        equation: '6'
+    - equation: 7
+      relation_as_printed: '[TiO2] = (TiO2)'
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        equation: '7'
+    - equation: 8
+      relation_as_printed: (TiO2) = (TiO) + (O)
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        equation: '8'
+    - equation: 9
+      relation_as_printed: (TiO) = (Ti) + (O)
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        equation: '9'
+    - equation: 10
+      relation_as_printed: 2(Ti) = (Ti2)
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        equation: '10'
+    - equation: 11
+      relation_as_printed: 3(Ti) = (Ti3)
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        equation: '11'
+    - equation: 12
+      relation_as_printed: 2(TiO2) = (Ti2O4)
+      locator:
+        published_page: 255
+        pdf_page_index: 2
+        equation: '12'
+    - equation: 13
+      relation_as_printed: (Ti2O4) = (Ti2O3) + (O)
+      locator:
+        published_page: 255
+        pdf_page_index: 2
+        equation: '13'
+    - equation: 14
+      relation_as_printed: p_i = (I_i T_i)/(I_s T_s) × p_s × (σ_s γ_s η_s)/(σ_i γ_i η_i)
+      locator:
+        published_page: 255
+        pdf_page_index: 2
+        equation: '14'
+    - equation: 16
+      relation_as_printed: '[Mo] = (Mo)'
+      locator:
+        published_page: 258
+        pdf_page_index: 5
+        equation: '16'
+    - equation: 17
+      relation_as_printed: (Mo) + (O) = (MoO)
+      locator:
+        published_page: 258
+        pdf_page_index: 5
+        equation: '17'
+    - equation: 18
+      relation_as_printed: (MoO) + (O) = (MoO2)
+      locator:
+        published_page: 258
+        pdf_page_index: 5
+        equation: '18'
+    - equation: 19
+      relation_as_printed: (MoO2) + (O) = (MoO3)
+      locator:
+        published_page: 258
+        pdf_page_index: 5
+        equation: '19'
+    - equation: 22
+      relation_as_printed: K_alpha = 1/C_or + s_or * (1 - C_c * alpha_i)/(S_v * alpha_i * C_c)
+      locator:
+        published_page: 259
+        pdf_page_index: 6
+        equation: '22'
+    - equation: 23
+      relation_as_printed: p_O = (p_CaO/p_Ca) * K_2(T)
+      locator:
+        published_page: 259
+        pdf_page_index: 6
+        equation: '23'
+    - equation: 24
+      relation_as_printed: p_O = sqrt(p_O2^2/K_4(T))
+      locator:
+        published_page: 259
+        pdf_page_index: 6
+        equation: '24'
+      note: The printed numerator is p_O2 squared. Preserve it as printed; it appears physically inconsistent and is not silently
+        corrected.
+    - equation: 25
+      relation_as_printed: p_O = (p_TiO2/p_TiO) * K_8(T)
+      locator:
+        published_page: 259
+        pdf_page_index: 6
+        equation: '25'
+    - equation: 26
+      relation_as_printed: p_O = (p_TiO/p_Ti) * K_9(T)
+      locator:
+        published_page: 259
+        pdf_page_index: 6
+        equation: '26'
+    - equation: 27
+      relation_as_printed: p_O = (p_MoO3/p_MoO2) * K_19(T)
+      locator:
+        published_page: 259
+        pdf_page_index: 6
+        equation: '27'
+    - equation: 28
+      relation_as_printed: lg p_i = a_i/T + b_i
+      locator:
+        published_page: 260
+        pdf_page_index: 7
+        equation: '28'
+    - equation: 29
+      relation_as_printed: R ln K_r(T) = -Δ_rG_T/T = -Δ_rH_T/T + Δ_rS_T
+      locator:
+        published_page: 260
+        pdf_page_index: 7
+        equation: '29'
+    retained_relations: Equations 15 and 20 are the Table 2 reactions; equation 21 remains in the pressure-method context.
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_equation_relations_as_printed
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_figure_1_context
+  type: figure_only
+  locator:
+    published_page: 254
+    pdf_page_index: 1
+    figure: '1'
+  units: as plotted; not digitized
+  values:
+    quantity: phase_diagram_context
+    method_class: figure_only
+    digitized: false
+    caption_as_printed: 'The phase diagram of CaO–TiO2 system [5]: 1—CaO + Ca3Ti2O7; 2—CaO + liquid; 3—Ca3Ti2O7 + Ca4Ti3O10;
+      4—Ca4Ti3O10 + CaTiO3; 5—Ca3Ti2O7 + liquid; 6—Ca4Ti3O10 + liquid; 7 and 8—CaTiO3 + liquid; 9—CaTiO3 + TiO2; 10—TiO2 +
+      liquid; 11—liquid.'
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_figure_1_context
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_figure_2_context
+  type: figure_only
+  locator:
+    published_page: 256
+    pdf_page_index: 3
+    figure: '2'
+  units: as plotted; not digitized
+  values:
+    quantity: partial_pressure_curves_context
+    method_class: figure_only
+    digitized: false
+    caption_as_printed: 'Partial pressure of vapor species of Ca (a), TiO (b), TiO2 (c) and O (d) over perovskite (1–3) and
+      oxides of calcium (4, 5, 9) and titanium (6–8, 10) versus the inverse temperature, determined by Knudsen mass spectrometric
+      effusion method: 1—at the present study; 2—Banon et al. [9]; 4—Samoilova and Kazenas [10]; 5—Shornikov [11]; 6—Groves
+      et al. [12]; 7—Berkowitz et al. [13]; 8—Kazenas and Tsvetkov [6]; and using the vacuum furnace by Langmuir method: 3—Zhang
+      et al. [4]; and calculated: 9 and 10—at the present study according to the thermochemical data [7]; the vertical dashed
+      lines (11) and (12) indicate melting points of titanium oxide and perovskite, respectively.'
+    note: No figure values were digitized; Table 1 supplies the current-study tabulated pressures.
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_figure_2_context
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_figure_3_context
+  type: figure_only
+  locator:
+    published_page: 257
+    pdf_page_index: 4
+    figure: '3'
+  units: as plotted; not digitized
+  values:
+    quantity: reaction_equilibrium_constant_curve_context
+    method_class: figure_only
+    digitized: false
+    reaction_as_printed: (CaTiO3) = (CaO) + (TiO2)
+    caption_as_printed: 'The reaction equilibrium constant (CaTiO3) = (CaO) + (TiO2) versus the inverse temperature determined
+      by Knudsen mass spectrometric effusion method: 1—at the present study; 2—Lopatin and Semenov [18]; the vertical dashed
+      line (3) denotes the melting point of perovskite.'
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_figure_3_context
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_hk_pressure_method
+  type: method
+  locator:
+    published_page: 259
+    pdf_page_index: 6
+    section: Experimental
+    equation: 21–22
+  units: as printed
+  experiment: shornikov_2019_mo_cell_kems
+  values:
+    quantity: partial_pressure_reduction_method
+    method_class: measured_tabulated
+    relation: p_i = K_alpha * q_i / (s_or * C_or * t) * sqrt(2*pi*R*T/M_i), equation (21); K_alpha is defined by equation
+      (22).
+    input_definition: q_i is the amount of component i evaporated through the effusion hole during time t at temperature T;
+      M_i is molecular weight; s_or is effusion-hole area; C_or and C_c are Clausing coefficients; S_v is vaporizing surface
+      area; alpha_i is the evaporation coefficient.
+    coefficient_source: Partial evaporation coefficients from reference [25].
+    note: The paper does not provide the numeric q_i series or the orifice dimensions in this chapter.
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_hk_pressure_method
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_ion_currents_2182k
+  type: characterization
+  locator:
+    published_page: 257
+    pdf_page_index: 4
+    section: Experimental
+  units: relative ion-current intensity as printed
+  experiment: shornikov_2019_mo_cell_kems
+  values:
+    quantity: relative_ion_current_intensities
+    method_class: measured_direct
+    temperature_K: 2182
+    ion_current_ratio_order: 'I_Ca : I_CaO : I_Ti : I_TiO : I_TiO2 : I_CaTiO3 : I_O : I_O2'
+    ion_current_ratio_values:
+    - 80
+    - '0.04'
+    - '0.1'
+    - 75
+    - 100
+    - '0.02'
+    - 40
+    - '0.3'
+    ratio_as_printed: '80 : 0.04 : 0.1 : 75 : 100 : 0.02 : 40 : 0.3'
+    CaTiO3_fragment_ions:
+    - CaTi
+    - CaTiO
+    - CaTiO2
+    - CaTiO3
+    CaTiO3_fragment_ratio_values:
+    - 6
+    - 10
+    - 13
+    - 100
+    CaTiO3_approximate_fragmented_fraction: '0.25'
+    note: 'The paper also states that a small amount of CaTiO3+ fragmented by about one quarter into CaTi+, CaTiO+, and CaTiO2+;
+      intensity ratio I_CaTi : I_CaTiO : I_CaTiO2 : I_CaTiO3 = 6 : 10 : 13 : 100.'
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_ion_currents_2182k
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_no_oxide_activities
+  type: method
+  locator:
+    published_page: 257
+    pdf_page_index: 4
+    section: Experimental
+    note: Checked through the Results and Discussion section, published pp. 259–262.
+  units: as stated
+  values:
+    quantity: oxide_activity_measurements
+    activity_measurements:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+    ions_defining_activity:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+    standard_states:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+    note: This chapter reports perovskite vapor partial pressures and reaction thermochemistry; it does not report oxide activities
+      for this study.
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_no_oxide_activities
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_phase_notation
+  type: method
+  locator:
+    published_page: 254
+    pdf_page_index: 1
+  units: as printed
+  values:
+    quantity: phase_notation
+    quote: (here and further—the condensed phase is designated by square brackets, the gas phase is designated by round brackets).
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_phase_notation
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_qualifying_statements
+  type: literature_context
+  locator:
+    published_page: 255
+    pdf_page_index: 2
+    section: Introduction
+    note: Individual quote locators are retained in values.statements.
+  units: verbatim statements as printed
+  values:
+    quantity: data_qualifications_and_comparisons
+    statements:
+    - method_class: quoted_unattributed
+      quote: Two calcium titanates—Ca3Ti2O7 and Ca4Ti3O10, melting incongruently, were also found in the CaO–TiO2 system (Fig.
+        1).
+      locator:
+        published_page: 253
+        pdf_page_index: 0
+        section: Introduction
+    - method_class: quoted_unattributed
+      quote: 'The gas phase over calcium oxide consists of vapor species: (O), (O2), (O3), (O4), (Ca), (Ca2) and (CaO), which
+        can be formed by the following reactions:'
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        section: Introduction
+    - method_class: quoted_unattributed
+      quote: 'In the gas phase over titanium oxide, similar vapor species are present: (O), (O2), (O3), (O4), (Ti), (Ti2),
+        (Ti3), (TiO) and (TiO2), which are formed by similar reactions'
+      locator:
+        published_page: 254
+        pdf_page_index: 1
+        section: Introduction
+    - method_class: quoted_unattributed
+      quote: Note that, predominant vapor species in the gas phase over these oxides are (Ca), (CaO), (TiO), (TiO2), (O),
+        and (O2), the total amount of the remaining vapor species does not exceed 1% at 1700–2200 K.
+      locator:
+        published_page: 255
+        pdf_page_index: 2
+        section: Introduction
+    - method_class: quoted_unattributed
+      quote: The properties of the gas phase over perovskite are not studied in detail.
+      locator:
+        published_page: 255
+        pdf_page_index: 2
+        section: Introduction
+    - method_class: quoted_attributed
+      attribution: references [14–17]
+      quote: The gaseous CaTiO3 was not detected in mass spectrometric studies during high-temperature evaporation of CaO–TiO2–SiO2
+        melts using Knudsen effusion molybdenum and tungsten cells at 1700–2500 K [14–17]. This might be due to either low
+        sensitivity of the equipment used to determine the CaTiO3+ ion [14, 17], or it was not the purpose of research [15,
+        16].
+      locator:
+        published_page: 255
+        pdf_page_index: 2
+        section: Introduction
+    - method_class: quoted_attributed
+      attribution: Banon et al. (1981), reference [9]
+      quote: The predominant vapor species of the gas phase over the compositions studied was atomic calcium. The (CaTiO3)
+        complex gaseous oxide was not found.
+      locator:
+        published_page: 255
+        pdf_page_index: 2
+        section: Introduction
+    - method_class: quoted_attributed
+      attribution: Zhang et al. (2014), reference [4]
+      quote: The compositional changes of the residual melt during perovskite evaporation indicated the predominant evaporation
+        of calcium components of the melt. It was possible to estimate the total vapor pressure over perovskite from the obtained
+        data, which is also shown in Fig. 2.
+      locator:
+        published_page: 256
+        pdf_page_index: 3
+        section: Introduction
+    - method_class: quoted_unattributed
+      quote: Thus, the available information on the evaporation processes of perovskite is rather scarce and is limited to
+        the established gas phase composition and the separate definitions of the partial pressure values of vapor species
+        and the total vapor pressure over perovskite at different temperatures.
+      locator:
+        published_page: 256
+        pdf_page_index: 3
+        section: Introduction
+    - method_class: quoted_unattributed
+      quote: The presence of MoO+i (i = 0–3) ions in the mass spectra of vapor over perovskite were due to the evaporation
+        of molybdenum cell at high temperature.
+      locator:
+        published_page: 258
+        pdf_page_index: 5
+        section: Experimental
+    - method_class: quoted_unattributed
+      quote: 'as well as the interaction of perovskite with the cell material (I_TiO2 : I_Mo : I_MoO : I_MoO2 : I_MoO3 = 100
+        : 0.8 : 2.6 : 7.3 : 0.6) that was detected according to the following equilibria:'
+      cell_reaction_intensity_order:
+      - TiO2
+      - Mo
+      - MoO
+      - MoO2
+      - MoO3
+      cell_reaction_intensity_ratio_values:
+      - 100
+      - '0.8'
+      - '2.6'
+      - '7.3'
+      - '0.6'
+      locator:
+        published_page: 258
+        pdf_page_index: 5
+        section: Experimental
+    - method_class: quoted_attributed
+      attribution: Berkowitz et al. (1957), reference [13]
+      quote: Note that, Berkowitz et al. [13] found that during evaporation of titanium oxide from a molybdenum liner inserted
+        into a tantalum crucible at 1881 K, p_MoO2 was initially 10–10^2 times higher than p_TiO2. The value of p_MoO2 then
+        gradually decreased and became comparable with p_TiO2 which is significantly different from the results of the present
+        study.
+      locator:
+        published_page: 258
+        pdf_page_index: 5
+        section: Experimental
+    - method_class: quoted_attributed
+      attribution: Berkowitz et al. (1957), reference [13]
+      quote: The high p_MoO2 observed in [13] probably was due to poor quality of the molybdenum liner material (or its alloy).
+        Possibly it was made using powder technology from MoO3 reduced to metallic molybdenum at temperatures of ~1300 K,
+        which could lead to such an excess of partial pressure of (MoO3) and its subsequent decrease as it evaporates from
+        the surface layers of the liner material.
+      locator:
+        published_page: 258
+        pdf_page_index: 5
+        section: Experimental
+    - method_class: quoted_unattributed
+      quote: The appearance energies of ions in the mass spectra of vapor over perovskite were determined by the Warren method
+        [21] and corresponded to the accepted values of the ionization energies of atoms and molecules typical for simple
+        oxides [22].
+      locator:
+        published_page: 258
+        pdf_page_index: 5
+        section: Experimental
+    - method_class: quoted_unattributed
+      quote: The appearance energy of CaTiO3+ ion in the mass spectra of vapor over perovskite was equal to 8.5 ± 0.6 eV (the
+        appearance energy of silver ion in the mass spectrum of vapor was used as a standard) and corresponded to that obtained
+        by Lopatin and Semenov [18].
+      locator:
+        published_page: 258
+        pdf_page_index: 5
+        section: Experimental
+    - method_class: quoted_unattributed
+      quote: 'The established molecular composition of the gas phase over perovskite indicated on the predominant evaporation
+        of perovskite according to the reactions (1), (2), (4), (7), (8) and (9), typical for evaporation of simple oxides
+        [6, 7, 10, 20]. The presence of a small amount of (CaTiO3) molecules in the gas phase over perovskite is probably
+        due to the reaction:'
+      locator:
+        published_page: 258
+        pdf_page_index: 5
+        section: Experimental
+    - method_class: quoted_unattributed
+      quote: The partial pressures of vapor species over perovskite calculated using the relationships (22) and (23) with
+        an error not exceeding 8% are shown in Table 1.
+      locator:
+        published_page: 259
+        pdf_page_index: 6
+        section: Experimental
+    - method_class: quoted_unattributed
+      quote: 'The partial pressure of atomic oxygen determined using these relationships agrees satisfactorily with those
+        calculated using the thermochemical data [7] on K_r(T) equilibrium constants of possible reactions (2), (4), (8),
+        (9) and (20) in the gas phase over perovskite in the following relations:'
+      locator:
+        published_page: 259
+        pdf_page_index: 6
+        section: Experimental
+    - method_class: quoted_attributed
+      attribution: Banon et al. (1981), reference [9]
+      quote: In the case of [9], the partial pressure values of vapor species over the perovskite at a temperature of 2150
+        K were calculated using TiO and TiO2 activities and the Gibbs energy of perovskite (ΔG^m_2150) and thermochemical
+        data [9] on equilibria (1), (2), (7) and (8).
+      locator:
+        published_page: 261
+        pdf_page_index: 8
+        section: Results and Discussion
+    - method_class: quoted_unattributed
+      quote: It should be noted that the established correspondence of p_O values calculated according to the independent
+        reactions in the gas phase over perovskite confirms the assumption about the molecular origin of the identified ions
+        in the mass spectrum of vapor over perovskite.
+      locator:
+        published_page: 259
+        pdf_page_index: 6
+        section: Experimental
+    - method_class: quoted_unattributed
+      quote: 'Thus the defined partial pressures of vapor species over perovskite, as it follows from Fig. 2, can be represented
+        as linear logarithmic dependence versus the inverse temperature as follows:'
+      locator:
+        published_page: 259
+        pdf_page_index: 6
+        section: Experimental
+    - method_class: quoted_attributed
+      attribution: Banon et al. (1981), reference [9]
+      quote: Therefore, the obtained values characterize the evaporation of perovskite not in reducing conditions (from molybdenum
+        cell), but, in contrary, in chemically neutral conditions (in the absence of interaction of perovskite with the cell
+        material).
+      locator:
+        published_page: 261
+        pdf_page_index: 8
+        section: Results and Discussion
+    - method_class: quoted_unattributed
+      quote: 'By comparing the experimental data obtained in [6, 10–13] and in this study, and the calculated results, one
+        can see the effect of reducing properties of cell materials on gas phase speciation: tantalum [12], molybdenum [11,
+        13], tungsten [6] and alundum [10]. As we noted earlier [26], the greatest effect of cell materials on the vapor speciation
+        is observed with the oxygen “deficient” species such as atomic calcium (Fig. 2a), titanium monoxide (Fig. 2b) and
+        atomic oxygen itself (Fig. 2d).'
+      locator:
+        published_page: 261
+        pdf_page_index: 8
+        section: Results and Discussion
+    - method_class: quoted_unattributed
+      quote: In the case of gaseous titanium dioxide (Fig. 2c), there are no differences in the values determined in evaporation
+        experiments using molybdenum [13] and tungsten [6] cells.
+      locator:
+        published_page: 261
+        pdf_page_index: 8
+        section: Results and Discussion
+    - method_class: quoted_attributed
+      attribution: Zhang et al. (2014), reference [4]
+      quote: The total vapor pressure over the perovskite melt at 2278 K obtained by Zhang et al. [4] is consistent with the
+        extrapolated values of partial pressures of the predominant vapor species of the gas phase—atomic calcium and titanium
+        dioxide (Fig. 2a, c)—found in the present study.
+      locator:
+        published_page: 261
+        pdf_page_index: 8
+        section: Results and Discussion
+    - method_class: quoted_unattributed
+      quote: It is interesting to note slight changes in the slope of lg p_TiO2 versus the inverse temperature in Fig. 2c
+        at the melting points of titanium oxide (2185 ± 10 K) and perovskite (2244 ± 10 K), obtained in the present study
+        and [4]. It suggests insignificant differences in the values of the enthalpy of melting of TiO2 and perovskite.
+      locator:
+        published_page: 261
+        pdf_page_index: 8
+        section: Results and Discussion
+    - method_class: quoted_unattributed
+      quote: Similar slopes of lg p_Ca and lg p_O versus the inverse temperature for calcium oxide and perovskite in Fig.
+        2a and 2d (lines 1, 5 and 9, respectively) indicate a predominant effect of calcium component on evaporation of calcium
+        from perovskite. This also can explain the difference in the slope of lg p_TiO in Fig. 2b in the case of perovskite
+        (line 1) and rutile (line 10) according to the equilibriums (2) and (8).
+      locator:
+        published_page: 261
+        pdf_page_index: 8
+        section: Results and Discussion
+    - method_class: quoted_attributed
+      attribution: Lopatin and Semenov (2001), reference [18] (prior pressure calculations using equation (14) under discussion)
+      quote: Figure 3 shows that the slope of the temperature dependences of the equilibrium constant of reaction (15) obtained
+        in the present study is the same as determined by Lopatin and Semenov [18]. Some discrepancy between the absolute
+        values of K_15(T), which are within the calculation errors, is probably due to systematic deviations in calculations
+        of partial pressures via relationship (14) used by the authors [18]. The possible cause of these deviations is approximate
+        of estimation of the effective CaTiO3+ ionization cross section calculated on the additivity rule, and the uncertainty
+        in the detecting efficiency of CaTiO3+ by the electron multiplier. The isotopic fractionation of perovskite [4] also
+        accompanies the evaporation process and it will impact, although insignificantly, on the isotope distribution value
+        used in relation (14).
+      locator:
+        published_page: 261
+        pdf_page_index: 8
+        section: Results and Discussion
+    - method_class: quoted_unattributed
+      quote: The enthalpy and entropy of reactions involving (CaTiO3) gaseous complex oxide calculated by the relationship
+        (29) are given in Table 2. They are in agreement with those found by Lopatin and Semenov [18] and our earlier estimates
+        [26].
+      locator:
+        published_page: 262
+        pdf_page_index: 9
+        section: Results and Discussion
+    - method_class: quoted_unattributed
+      quote: Vapor species typical for simple oxides were identified in the gas phase over perovskite along with small amount
+        of CaTiO3 complex gaseous oxide. For the first time, the partial pressures of vapor species in the gas phase over
+        perovskite were determined. The comparison of these values with the available experimental literature data and those
+        of simple oxides shows the predominant effect of the calcium component of perovskite on its evaporation behavior.
+      locator:
+        published_page: 262
+        pdf_page_index: 9
+        section: Conclusion
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_qualifying_statements
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_sample_absences
+  type: characterization
+  locator:
+    published_page: 257
+    pdf_page_index: 4
+    section: Experimental
+  units: as stated
+  values:
+    quantity: unreported_sample_details
+    batch_ratio_CaCO3_to_TiO2:
+      state:
+        tag: unknown
+        reason: not_published
+    starting_material_purity:
+      state:
+        tag: unknown
+        reason: not_published
+    post_run_composition:
+      state:
+        tag: unknown
+        reason: not_published
+    note: No reagent purities, batch ratio, or post-run composition analyses are printed.
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_sample_absences
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_table2_rxn1_current
+  type: thermodynamic_example
+  locator:
+    published_page: 262
+    pdf_page_index: 9
+    table: '2'
+  T_range_K:
+  - 1956
+  - 2182
+  experiment: shornikov_2019_mo_cell_kems
+  units: kJ/mol for reaction enthalpy; J/(K mol) for reaction entropy
+  values:
+    quantity: reaction_thermochemistry
+    method_class: model_derived
+    derivation:
+      relation: The log-pressure temperature dependence in equation (28) and reaction thermodynamic relation (29).
+      inputs:
+      - shornikov_2019_t1_p_cao
+      - shornikov_2019_t1_p_tio2
+      - shornikov_2019_t1_p_catio3
+    reaction_as_printed: (CaTiO3) = (CaO) + (TiO2)
+    temperature_as_printed: 1956–2182 K
+    delta_r_H298_kJ_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+    delta_r_HT_kJ_mol: 287
+    delta_r_HT_uncertainty_kJ_mol: 12
+    delta_r_HT_as_printed: 287 ± 12
+    delta_r_ST_J_K_mol: 18
+    delta_r_ST_uncertainty_J_K_mol: 6
+    delta_r_ST_as_printed: 18 ± 6
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_table2_rxn1_current
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_table2_rxn1_ref18
+  type: thermodynamic_example
+  locator:
+    published_page: 262
+    pdf_page_index: 9
+    table: '2'
+  T_range_K:
+  - 2287
+  - 2466
+  units: kJ/mol for reaction enthalpy; J/(K mol) for reaction entropy
+  values:
+    quantity: reaction_thermochemistry
+    method_class: quoted_attributed
+    attribution: Lopatin and Semenov (2001), reference [18]
+    reaction_as_printed: (CaTiO3) = (CaO) + (TiO2)
+    temperature_as_printed: 2287–2466 K
+    delta_r_H298_kJ_mol: 545
+    delta_r_H298_uncertainty_kJ_mol: 8
+    delta_r_H298_as_printed: 545 ± 8
+    delta_r_HT_kJ_mol: 284
+    delta_r_HT_uncertainty_kJ_mol: 44
+    delta_r_HT_as_printed: 284 ± 44
+    delta_r_ST_J_K_mol: 28
+    delta_r_ST_uncertainty_J_K_mol: 19
+    delta_r_ST_as_printed: 28 ± 19
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_table2_rxn1_ref18
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_table2_rxn1_ref26
+  type: thermodynamic_example
+  locator:
+    published_page: 262
+    pdf_page_index: 9
+    table: '2'
+  T_range_K:
+  - 2000
+  - 2000
+  units: kJ/mol for reaction enthalpy; J/(K mol) for reaction entropy
+  values:
+    quantity: reaction_thermochemistry
+    method_class: quoted_attributed
+    attribution: Shornikov and Yakovlev (2015), reference [26]
+    reaction_as_printed: (CaTiO3) = (CaO) + (TiO2)
+    temperature_as_printed: 2000 K
+    delta_r_H298_kJ_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+    delta_r_HT_kJ_mol: 298
+    delta_r_HT_uncertainty_kJ_mol: 30
+    delta_r_HT_as_printed: 298 ± 30
+    delta_r_ST_J_K_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_table2_rxn1_ref26
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_table2_rxn2_current
+  type: thermodynamic_example
+  locator:
+    published_page: 262
+    pdf_page_index: 9
+    table: '2'
+  T_range_K:
+  - 1956
+  - 2182
+  experiment: shornikov_2019_mo_cell_kems
+  units: kJ/mol for reaction enthalpy; J/(K mol) for reaction entropy
+  values:
+    quantity: reaction_thermochemistry
+    method_class: model_derived
+    derivation:
+      relation: The log-pressure temperature dependence in equation (28) and reaction thermodynamic relation (29).
+      inputs:
+      - shornikov_2019_t1_p_ca
+      - shornikov_2019_t1_p_ti
+      - shornikov_2019_t1_p_o2
+      - shornikov_2019_t1_p_catio3
+    reaction_as_printed: '[Ca] + [Ti] + 3/2(O2) = (CaTiO3)'
+    temperature_as_printed: 1956–2182 K
+    delta_r_H298_kJ_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+    delta_r_HT_kJ_mol: -760
+    delta_r_HT_uncertainty_kJ_mol: 10
+    delta_r_HT_as_printed: −760 ± 10
+    delta_r_ST_J_K_mol: -242
+    delta_r_ST_uncertainty_J_K_mol: 5
+    delta_r_ST_as_printed: −242 ± 5
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_table2_rxn2_current
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_table2_rxn2_ref18
+  type: thermodynamic_example
+  locator:
+    published_page: 262
+    pdf_page_index: 9
+    table: '2'
+  T_range_K:
+  - 2287
+  - 2466
+  units: kJ/mol for reaction enthalpy; J/(K mol) for reaction entropy
+  values:
+    quantity: reaction_thermochemistry
+    method_class: quoted_attributed
+    attribution: Lopatin and Semenov (2001), reference [18]
+    reaction_as_printed: '[Ca] + [Ti] + 3/2(O2) = (CaTiO3)'
+    temperature_as_printed: 2287–2466 K
+    delta_r_H298_kJ_mol: -826
+    delta_r_H298_uncertainty_kJ_mol: 26
+    delta_r_H298_as_printed: −826 ± 26
+    delta_r_HT_kJ_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+    delta_r_ST_J_K_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_table2_rxn2_ref18
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_table2_rxn3_current
+  type: thermodynamic_example
+  locator:
+    published_page: 262
+    pdf_page_index: 9
+    table: '2'
+  T_range_K:
+  - 1956
+  - 2182
+  experiment: shornikov_2019_mo_cell_kems
+  units: kJ/mol for reaction enthalpy; J/(K mol) for reaction entropy
+  values:
+    quantity: reaction_thermochemistry
+    method_class: model_derived
+    derivation:
+      relation: The log-pressure temperature dependence in equation (28) and reaction thermodynamic relation (29).
+      inputs:
+      - shornikov_2019_t1_p_catio3
+      - shornikov_2019_t1_p_ca
+      - shornikov_2019_t1_p_ti
+    reaction_as_printed: (CaTiO3) = (Ca) + (Ti) + 3(O)
+    temperature_as_printed: 1956–2182 K
+    delta_r_H298_kJ_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+    delta_r_HT_kJ_mol: 1993
+    delta_r_HT_uncertainty_kJ_mol: 15
+    delta_r_HT_as_printed: 1993 ± 15
+    delta_r_ST_J_K_mol: 396
+    delta_r_ST_uncertainty_J_K_mol: 7
+    delta_r_ST_as_printed: 396 ± 7
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_table2_rxn3_current
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_table2_rxn3_ref18
+  type: thermodynamic_example
+  locator:
+    published_page: 262
+    pdf_page_index: 9
+    table: '2'
+  T_range_K:
+  - 2287
+  - 2466
+  units: kJ/mol for reaction enthalpy; J/(K mol) for reaction entropy
+  values:
+    quantity: reaction_thermochemistry
+    method_class: quoted_attributed
+    attribution: Lopatin and Semenov (2001), reference [18]
+    reaction_as_printed: (CaTiO3) = (Ca) + (Ti) + 3(O)
+    temperature_as_printed: 2287–2466 K
+    delta_r_H298_kJ_mol: 2225
+    delta_r_H298_uncertainty_kJ_mol: 26
+    delta_r_H298_as_printed: 2225 ± 26
+    delta_r_HT_kJ_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+    delta_r_ST_J_K_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_table2_rxn3_ref18
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_table2_rxn3_ref26
+  type: thermodynamic_example
+  locator:
+    published_page: 262
+    pdf_page_index: 9
+    table: '2'
+  T_range_K:
+  - 2000
+  - 2000
+  units: kJ/mol for reaction enthalpy; J/(K mol) for reaction entropy
+  values:
+    quantity: reaction_thermochemistry
+    method_class: quoted_attributed
+    attribution: Shornikov and Yakovlev (2015), reference [26]
+    reaction_as_printed: (CaTiO3) = (Ca) + (Ti) + 3(O)
+    temperature_as_printed: 2000 K
+    delta_r_H298_kJ_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+    delta_r_HT_kJ_mol: 1983
+    delta_r_HT_uncertainty_kJ_mol: 81
+    delta_r_HT_as_printed: 1983 ± 81
+    delta_r_ST_J_K_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_table2_rxn3_ref26
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_table2_rxn4_current
+  type: thermodynamic_example
+  locator:
+    published_page: 262
+    pdf_page_index: 9
+    table: '2'
+  T_range_K:
+  - 1956
+  - 2182
+  experiment: shornikov_2019_mo_cell_kems
+  units: kJ/mol for reaction enthalpy; J/(K mol) for reaction entropy
+  values:
+    quantity: reaction_thermochemistry
+    method_class: model_derived
+    derivation:
+      relation: The log-pressure temperature dependence in equation (28) and reaction thermodynamic relation (29).
+      inputs:
+      - shornikov_2019_t1_p_catio3
+    reaction_as_printed: '[CaTiO3] = (CaTiO3)'
+    temperature_as_printed: 1956–2182 K
+    delta_r_H298_kJ_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+    delta_r_HT_kJ_mol: 1027
+    delta_r_HT_uncertainty_kJ_mol: 10
+    delta_r_HT_as_printed: 1027 ± 10
+    delta_r_ST_J_K_mol: 297
+    delta_r_ST_uncertainty_J_K_mol: 5
+    delta_r_ST_as_printed: 297 ± 5
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_table2_rxn4_current
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3
+- observation_id: shornikov_2019_table2_rxn4_ref26
+  type: thermodynamic_example
+  locator:
+    published_page: 262
+    pdf_page_index: 9
+    table: '2'
+  T_range_K:
+  - 2000
+  - 2000
+  units: kJ/mol for reaction enthalpy; J/(K mol) for reaction entropy
+  values:
+    quantity: reaction_thermochemistry
+    method_class: quoted_attributed
+    attribution: Shornikov and Yakovlev (2015), reference [26]
+    reaction_as_printed: '[CaTiO3] = (CaTiO3)'
+    temperature_as_printed: 2000 K
+    delta_r_H298_kJ_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+    delta_r_HT_kJ_mol: 1030
+    delta_r_HT_uncertainty_kJ_mol: 22
+    delta_r_HT_as_printed: 1030 ± 22
+    delta_r_ST_J_K_mol:
+      state:
+        tag: unknown
+        reason: not_published
+      printed: —
+  context_id: shornikov-2019-perovskite-evaporation::context::shornikov_2019_table2_rxn4_ref26
+  work_id: 10.1007/978-3-030-05728-2_23
+  source_id: shornikov-2019-perovskite-evaporation
+  species: CaTiO3

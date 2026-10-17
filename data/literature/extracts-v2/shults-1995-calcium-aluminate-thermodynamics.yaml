@@ -1,0 +1,70 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shults-1995-calcium-aluminate-thermodynamics.yaml
+observations:
+- observation_id: shults-1995-calcium-aluminate-thermodynamics::shults_1995_vapor_species_identified
+  experiment_id: 4bc7818c3ed1ac486b55b7546444ba4997395e03107cd74da66fa9a47c1246fe::shults-1995-calcium-aluminate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'vapor_species'
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1933'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'vapor_species'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: Table 1 lists detected ions and relative currents; it does not report partial pressures.
+    decided_by:
+      worker: x-shults-1995-calcium-aluminate-thermodynamics
+      date: '2026-10-05'
+      evidence:
+        page: 1
+        published_page: 17
+        pdf_page_index: 0
+        table: '1'
+        section: Results
+        note: Right-column evaporation paragraph lists ten ions; Table 1 contains six ion rows.
+  notices: []
+  source_id: shults-1995-calcium-aluminate-thermodynamics
+  locator:
+    page: 1
+    published_page: 17
+    pdf_page_index: 0
+    table: '1'
+    section: Results
+    note: Right-column evaporation paragraph lists ten ions; Table 1 contains six ion rows.
+  read_from: pdf:shults-1995-calcium-aluminate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 1
+        published_page: 17
+        pdf_page_index: 0
+        table: '1'
+        section: Results
+        note: Right-column evaporation paragraph lists ten ions; Table 1 contains six ion rows.

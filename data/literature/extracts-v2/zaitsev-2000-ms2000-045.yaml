@@ -1,0 +1,4700 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/zaitsev-2000-ms2000-045.yaml
+observations:
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Table 1 activity-calculation input signals'
+    species:
+      formula: MnO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Table 1 activity-calculation input signals'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 5
+    pdf_page_index: 4
+    section: Experimental realisation and assignment of mass spectra
+  read_from: unknown:zaitsev-2000-ms2000-045
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=20fc0271d0dd
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.327'
+        - - MnO
+          - '0.673'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.608'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.327'
+          - - MnO
+            - '0.673'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=4c016d372c0f
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.515'
+        - - MnO
+          - '0.485'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.138'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.515'
+          - - MnO
+            - '0.485'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=5108850dbeb7
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.49'
+        - - MnO
+          - '0.51'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.147'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.49'
+          - - MnO
+            - '0.51'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=90e76c6edfb8
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.302'
+        - - MnO
+          - '0.698'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.756'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.302'
+          - - MnO
+            - '0.698'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=a36f9df6164d
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.273'
+        - - MnO
+          - '0.727'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.919'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.273'
+          - - MnO
+            - '0.727'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=ae7cb2e7ec78
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.405'
+        - - MnO
+          - '0.595'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.254'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.405'
+          - - MnO
+            - '0.595'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=e249f2236716
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.368'
+        - - MnO
+          - '0.632'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.394'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.368'
+          - - MnO
+            - '0.632'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn11::T=1773.0:h=fb11ac14b869
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.457'
+        - - MnO
+          - '0.543'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.166'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.457'
+          - - MnO
+            - '0.543'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=1b814ba9fb0d
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.368'
+        - - MnO
+          - '0.632'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.396'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.368'
+          - - MnO
+            - '0.632'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=3ad00abc408c
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.327'
+        - - MnO
+          - '0.673'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.611'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.327'
+          - - MnO
+            - '0.673'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=3b5f8700c0db
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.273'
+        - - MnO
+          - '0.727'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.922'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.273'
+          - - MnO
+            - '0.727'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=520798e6f978
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.405'
+        - - MnO
+          - '0.595'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.254'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.405'
+          - - MnO
+            - '0.595'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=7ea65e1ba510
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.515'
+        - - MnO
+          - '0.485'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.137'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.515'
+          - - MnO
+            - '0.485'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=7ec3aa337a82
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.49'
+        - - MnO
+          - '0.51'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.148'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.49'
+          - - MnO
+            - '0.51'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=aa2d60de8080
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.457'
+        - - MnO
+          - '0.543'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.165'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.457'
+          - - MnO
+            - '0.543'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_mno_activities_eqn5::T=1773.0:h=edaebfd932d9
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.302'
+        - - MnO
+          - '0.698'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.754'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.302'
+          - - MnO
+            - '0.698'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=18e6402eecd7
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.457'
+        - - MnO
+          - '0.543'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.813'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.457'
+          - - MnO
+            - '0.543'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=3c409b6ef138
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.273'
+        - - MnO
+          - '0.727'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0391'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.273'
+          - - MnO
+            - '0.727'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=52fda4d6e386
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.515'
+        - - MnO
+          - '0.485'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.992'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.515'
+          - - MnO
+            - '0.485'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=6a2538f665d9
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.302'
+        - - MnO
+          - '0.698'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0635'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.302'
+          - - MnO
+            - '0.698'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=c6cdf52d8717
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.49'
+        - - MnO
+          - '0.51'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.928'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.49'
+          - - MnO
+            - '0.51'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=d1c1df522d80
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.368'
+        - - MnO
+          - '0.632'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.23'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.368'
+          - - MnO
+            - '0.632'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=e8bf4fa92902
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.405'
+        - - MnO
+          - '0.595'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.463'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.405'
+          - - MnO
+            - '0.595'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn11::T=1773.0:h=f96565551f5b
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.327'
+        - - MnO
+          - '0.673'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.102'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.327'
+          - - MnO
+            - '0.673'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (11), p. 5: composition-weighted log Mn+/SiO+ current-ratio integration from x(MnO)=1; analogous SiO2 relation
+      stated in prose. Full printed chain and its ratio inconsistency in equations_page_5 context; numerical trajectories
+      unpublished.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=004f00751eef
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.405'
+        - - MnO
+          - '0.595'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.462'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.405'
+          - - MnO
+            - '0.595'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=07be1f423a23
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.327'
+        - - MnO
+          - '0.673'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.102'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.327'
+          - - MnO
+            - '0.673'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=4b09b46326b4
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.49'
+        - - MnO
+          - '0.51'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.93'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.49'
+          - - MnO
+            - '0.51'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=bd0898644f07
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.302'
+        - - MnO
+          - '0.698'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.063'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.302'
+          - - MnO
+            - '0.698'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=e4afb5ff4817
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.368'
+        - - MnO
+          - '0.632'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.23'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.368'
+          - - MnO
+            - '0.632'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=ec35df3820af
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.515'
+        - - MnO
+          - '0.485'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.983'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.515'
+          - - MnO
+            - '0.485'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=ec416a0630af
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.273'
+        - - MnO
+          - '0.727'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0391'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.273'
+          - - MnO
+            - '0.727'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published
+- observation_id: zaitsev-2000-ms2000-045::zaitsev_2000_table1_sio2_activities_eqn5::T=1773.0:h=ef64a161a603
+  experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.457'
+        - - MnO
+          - '0.543'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.805'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zaitsev-2000-ms2000-045
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+  read_from: unknown:zaitsev-2000-ms2000-045
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.457'
+          - - MnO
+            - '0.543'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  derived_from:
+  - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+  derivation:
+    relation: 'Eq. (5), p. 4: activity^n is the unsaturated reductant-oxide current times Mn+ (or SiO+) current^n divided
+      by the corresponding saturated product. Currents normalized to the reference sensitivity, pp. 5-6; numerical input currents
+      unpublished. Full printed relation in equations_page_4 context.'
+    inputs:
+    - zaitsev-2000-ms2000-045::zaitsev_2000_table1_measured_ion_signals
+    parameters: []
+    output_unit: as_published

@@ -1,0 +1,322 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/costa-2016-lpsc-forsterite-olivine-vaporization.yaml
+observations:
+- observation_id: costa-2016-lpsc-forsterite-olivine-vaporization::costa_2016_fig1_fe_pressure_figure_only
+  experiment_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde::experiment::costa-2016-olivine-kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    figure: '1'
+  read_from: pdf:costa-2016-lpsc-forsterite-olivine-vaporization
+- observation_id: costa-2016-lpsc-forsterite-olivine-vaporization::costa_2016_fig1_mg_pressure_figure_only
+  experiment_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde::experiment::costa-2016-olivine-kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    figure: '1'
+  read_from: pdf:costa-2016-lpsc-forsterite-olivine-vaporization
+- observation_id: costa-2016-lpsc-forsterite-olivine-vaporization::costa_2016_fig1_o2_pressure_figure_only
+  experiment_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde::experiment::costa-2016-olivine-kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    figure: '1'
+  read_from: pdf:costa-2016-lpsc-forsterite-olivine-vaporization
+- observation_id: costa-2016-lpsc-forsterite-olivine-vaporization::costa_2016_fig1_o_pressure_figure_only
+  experiment_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde::experiment::costa-2016-olivine-kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    figure: '1'
+  read_from: pdf:costa-2016-lpsc-forsterite-olivine-vaporization
+- observation_id: costa-2016-lpsc-forsterite-olivine-vaporization::costa_2016_fig1_sio_pressure_figure_only
+  experiment_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde::experiment::costa-2016-olivine-kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    figure: '1'
+  read_from: pdf:costa-2016-lpsc-forsterite-olivine-vaporization
+- observation_id: costa-2016-lpsc-forsterite-olivine-vaporization::costa_2016_fig9_feo_activity_figure_only
+  experiment_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde::experiment::costa-2016-olivine-kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not activity
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    figure: '9'
+    note: The Results text refers to Fig. 2; the printed graph caption identifies Figure 9.
+  read_from: pdf:costa-2016-lpsc-forsterite-olivine-vaporization
+- observation_id: costa-2016-lpsc-forsterite-olivine-vaporization::costa_2016_fig9_mgo_activity_figure_only
+  experiment_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde::experiment::costa-2016-olivine-kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    figure: '9'
+    note: The Results text refers to Fig. 2; the printed graph caption identifies Figure 9.
+  read_from: pdf:costa-2016-lpsc-forsterite-olivine-vaporization
+- observation_id: costa-2016-lpsc-forsterite-olivine-vaporization::costa_2016_fig9_sio2_activity_figure_only
+  experiment_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde::experiment::costa-2016-olivine-kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    figure: '9'
+    note: The Results text refers to Fig. 2; the printed graph caption identifies Figure 9.
+  read_from: pdf:costa-2016-lpsc-forsterite-olivine-vaporization

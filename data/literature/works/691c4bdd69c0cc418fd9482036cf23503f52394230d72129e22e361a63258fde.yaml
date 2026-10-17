@@ -1,0 +1,772 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  citation: Costa, G. C. C., Jacobson, N. S. & Fegley, B. (2016), "Vaporization and Thermodynamics of Forsterite-Rich Olivine",
+    47th Lunar and Planetary Science Conference, abstract 1454.
+  source_ids:
+  - costa-2016-lpsc-forsterite-olivine-vaporization
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:costa-2016-lpsc-forsterite-olivine-vaporization
+      role: pdf
+      path: raw/costa-2016-lpsc-forsterite-olivine-vaporization/costa-2016-lpsc-forsterite-olivine-vaporization.pdf
+      sha256:
+        tag: value
+        value: d47d37034fab2c5dfa06cb62d01280db3cc8cdc943160872088d201102c74dab
+    - asset_id: pdftotext:costa-2016-lpsc-forsterite-olivine-vaporization
+      role: pdftotext
+      path: text/costa-2016-lpsc-forsterite-olivine-vaporization
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:costa-2016-lpsc-forsterite-olivine-vaporization
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde::experiment::costa-2016-olivine-kems
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fo0.93Fa0.07
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        figure: '1'
+        note: Caption spelling; Summary prints Fo93Fa0.07, carried separately with the source inconsistency.
+    characterization:
+      state:
+        tag: value
+        value: XRD, ICP-OES, and electron microprobe analysis before and after KEMS experiments.
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental methods
+    pretreatment:
+      state:
+        tag: value
+        value: Impurities in the mineral could be removed by heating in a vacuum at 1853 K for 10 h; the paper does not explicitly
+          state that every measured sample received this treatment.
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental methods
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental methods
+        note: No chamber or residual background pressure is stated.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental methods
+        note: No sweep gas is stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Experimental methods
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          published_page: 1
+          pdf_page_index: 0
+          section: Experimental methods
+          note: No orifice diameter is stated.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          published_page: 1
+          pdf_page_index: 0
+          section: Experimental methods
+          note: No orifice-channel length is stated.
+    calibration:
+      method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          published_page: 1
+          pdf_page_index: 0
+          section: Experimental methods
+          note: The abstract does not state how ion intensities were converted to pressure.
+      reference_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          published_page: 1
+          pdf_page_index: 0
+          section: Experimental methods
+          note: No calibration substance is stated.
+  bench_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde::bench::costa-2016-iridium-kems
+benches:
+- id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde::bench::costa-2016-iridium-kems
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Nuclide/MAAS/PATCO 12-90-HT single-focus 90° magnetic-sector mass spectrometer
+    locator:
+      page: 1
+      published_page: 1
+      pdf_page_index: 0
+      section: Experimental methods
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: iridium cell; liner not stated
+    locator:
+      page: 1
+      published_page: 1
+      pdf_page_index: 0
+      section: Summary and Experimental methods
+  cell_materials:
+  - state:
+      tag: value
+      value: Ir
+    locator:
+      page: 1
+      published_page: 1
+      pdf_page_index: 0
+      section: Summary
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental methods
+        note: No orifice diameter is stated.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental methods
+        note: No orifice-channel length is stated.
+  ionization:
+    cross_sections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental methods
+        note: No ionization cross-sections are stated.
+    cross_section_source:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental methods
+        note: No source for ionization cross-sections is stated.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental methods
+        note: No temperature sensor is identified.
+  temperature_calibration:
+    calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental methods
+        note: No temperature calibration or uncertainty is reported.
+  other_facts:
+  - name: ionizing_electron_energy_eV
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '16.5'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        figure: '1'
+        note: 'Figure 1 caption: energy of ionizing electron 16.5 eV.'
+    unit: eV
+  - name: cell_liner
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Summary
+        note: Iridium cells are stated; liner material is not stated.
+    unit: as printed
+  - name: multiplier_and_isotope_corrections
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1
+        pdf_page_index: 0
+        section: Experimental methods
+        note: No multiplier or isotope corrections are stated.
+    unit: as printed
+context:
+- observation_id: costa_2016_affiliation_identifiers
+  type: characterization
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: affiliation block
+  units: source metadata as printed
+  values:
+    method_class: quoted_unattributed
+    affiliations:
+    - 1 NASA Glenn Research Center, 21000 Brookpark Road, MS 106-1, Cleveland, OH, 44135.
+    - 2 Planetary Chemistry Laboratory, McDonnell Center for the Space Sciences & Department of Earth and Planetary Sciences,
+      Washington University in St. Louis, Campus Box 1169, 1 Brookings Dr, Saint Louis, MO, 63130-4899.
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_affiliation_identifiers
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_background_scope_numeric_context
+  type: thermodynamic_example
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Background
+  units: as printed
+  values:
+    quantity: background_numeric_context
+    method_class: quoted_unattributed
+    hot_rocky_exoplanets_count_as_printed: over 100
+    peridotite_solidus_threshold_K_as_printed: T ≥ 1473 K
+    background_olivine_composition_as_printed: (Mg0.9Fe0.1)2SiO4; Fo90Fa10
+    comparative_statements:
+    - “Many of these planets orbit stars with solar or near-solar composition.”
+    - “Olivine is also one of the most abundant silicate minerals in the solar system. Its ubiquity is due to its high thermodynamic
+      stability and the large solar elemental abundances of its constituent elements (O, Mg, Si, Fe) [1,2].”
+    background_claims_as_printed: Fo-rich olivine is a major constituent of peridotite rock, plausibly the major rock on hot
+      rocky exoplanets such as Kepler-10b, and among the most abundant silicate minerals in the solar system.
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_background_scope_numeric_context
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_data_qualifications_and_comparisons
+  type: characterization
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Summary
+  units: verbatim statement excerpts
+  values:
+    quantity: data_qualifications
+    method_class: quoted_unattributed
+    statements:
+    - “Our results confirm preferential evaporation of fayalite (Fa) relative to forsterite (Fo) reported by [1]”
+    - “near-equilibrium vaporization”
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_data_qualifications_and_comparisons
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_discussion_qualifications
+  type: characterization
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    section: Discussion
+  units: verbatim statements
+  values:
+    method_class: quoted_unattributed
+    statements:
+    - “These are constructed with all available thermodynamic and phase data at the time of the assessment and provide a self-consistent
+      thermodynamic description of this system.”
+    - “A comparison of the data from this study to the assessments indicates that the data is consistent with previous measurements
+      and allows inferences about the exact phase composition of the olivine.”
+    - “It also suggests improvements for future assessments.”
+    - “Table 1 compares the measured partial molar enthalpies of each component to those calculated from the two databases
+      discussed above.”
+    - “Agreement between our measurements and the database of Fabrichnaya [6] is reasonable.”
+    - “The relatively low partial enthalpy of MgO and high partial enthalpy of SiO2 are important and need to be included
+      in future assessments.”
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_discussion_qualifications
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_experimental_sample_and_characterization
+  type: characterization
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Experimental methods
+  units: as printed
+  experiment: costa-2016-olivine-kems
+  values:
+    quantity: starting_material_and_characterization
+    method_class: quoted_unattributed
+    starting_material: Olivine mined from the west coast of Norway by Nor Mineral and provided by Miller & Co., Chicago, IL.
+    purity: not stated
+    composition_as_prepared: Fa0.07Fo0.93
+    overall_study_temperature_range_K_as_printed: 1750-2250 K; overall study interval, not endpoints for the Figure 1 below-melting
+      series.
+    composition_after_runs: characterized, but no composition result is stated in this abstract
+    characterization_methods: X-ray diffraction (XRD); inductively coupled plasma optical emission spectroscopy (ICP-OES);
+      electron microprobe analysis
+    characterization_timing: before and after KEMS experiments
+    pretreatment: Impurities could be removed by heating in a vacuum at 1853 K for 10 h.
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_experimental_sample_and_characterization
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_fig9_feo_fit_annotation
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    figure: '9'
+  units: coefficients as printed on Figure 9
+  values:
+    quantity: FeO_activity_fit_annotation
+    method_class: figure_only
+    component_as_printed: “FeO”
+    fit_intercept_as_printed: '0.3268'
+    fit_intercept_uncertainty_as_printed: '0.1136'
+    fit_slope_as_printed: '-2493.4'
+    fit_slope_uncertainty_as_printed: '213.3'
+    fit_equation_as_printed: y = 0.3268 ± 0.1136 - 2493.4 ± 213.3
+    note: Fit annotation printed on Figure 9; activity curve coordinates were not digitized.
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_fig9_feo_fit_annotation
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_fig9_mgo_fit_annotation
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    figure: '9'
+  units: coefficients as printed on Figure 9
+  values:
+    quantity: MgO_activity_fit_annotation
+    method_class: figure_only
+    component_as_printed: MgO
+    fit_intercept_as_printed: '2.2295'
+    fit_intercept_uncertainty_as_printed: '0.133'
+    fit_slope_as_printed: '-5088.7'
+    fit_slope_uncertainty_as_printed: '249.7'
+    fit_equation_as_printed: y = 2.2295 ± 0.1330 - 5088.7 ± 249.7
+    note: Fit annotation printed on Figure 9; activity curve coordinates were not digitized.
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_fig9_mgo_fit_annotation
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_fig9_sio2_fit_annotation
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    figure: '9'
+  units: coefficients as printed on Figure 9
+  values:
+    quantity: SiO2_activity_fit_annotation
+    method_class: figure_only
+    component_as_printed: SiO2
+    fit_intercept_as_printed: '-3.1418'
+    fit_intercept_uncertainty_as_printed: '0.1005'
+    fit_slope_as_printed: '5118.9'
+    fit_slope_uncertainty_as_printed: '188.6'
+    fit_equation_as_printed: y = -3.1418 ± 0.1005 + 5118.9 ± 188.6
+    note: Fit annotation printed on Figure 9; activity curve coordinates were not digitized.
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_fig9_sio2_fit_annotation
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_grant_identifier
+  type: characterization
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    section: Acknowledgments
+  units: source metadata as printed
+  values:
+    method_class: quoted_unattributed
+    grant: NASA EPSCOR Program, NNX13AE52A
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_grant_identifier
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_methods_qualifications
+  type: characterization
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Experimental methods
+  units: verbatim statements
+  values:
+    method_class: quoted_unattributed
+    statements:
+    - “An iridium cell was fairly inert to olivine below the melting point; however there was some reaction above the melting
+      point.”
+    - “The onset of melting was observed at ~2050K, consistent with the literature.”
+    - “It was also observed that significant losses of FeO occurred at the melting point.”
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_methods_qualifications
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_reference_numeric_metadata
+  type: characterization
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    section: References
+  units: bibliographic metadata as printed
+  values:
+    method_class: quoted_unattributed
+    references:
+    - '[1] Ozawa, K. & Nagahara, H. (2000) GCA 64, 939-955.'
+    - '[2] Schaefer, L. & Fegley, B., Jr. (2009) ApJ 703, L113-L118.'
+    - '[3] Ito, Y. et al. (2015) ApJ 801:144 (15pp).'
+    - '[4] Canup, R. et al. (2015) Nat Geo 8, 918.'
+    - '[5] Visscher, C. & Fegley, B., Jr. (2013) ApJ 767:L12 (6 pp).'
+    - '[6] Fabrichnaya O. (1998) Calphad, 22, 85-125.'
+    - '[7] Jung I.-H. (2004) Metall. Mater. Trans. B, 35, 877-889.'
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_reference_numeric_metadata
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_results_qualifications
+  type: characterization
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Results
+  units: verbatim statements
+  values:
+    method_class: quoted_unattributed
+    statements:
+    - “Vapor pressure measurements below the melting point are shown in Fig. 1.”
+    - “Comparing the measured partial pressure over olivine to those over pure materials lead to thermodynamic activities
+      as a function of inverse temperature.”
+    - “Partial molar enthalpies are determined from the slope of this plot and listed in Table 1.”
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_results_qualifications
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_summary_page2_qualifications
+  type: characterization
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    section: Summary
+  units: verbatim statements
+  values:
+    method_class: quoted_unattributed
+    statements:
+    - “Thermodynamic data was taken on this composition below the melting point.”
+    - “The equilibrium constant for each component’s (MgO, Fe/FeO, and SiO2) were compared to the equilibrium constant for
+      the pure material.”
+    - “Thermodynamic activities and partial molar enthalpies were derived for these components in olivine.”
+    - “Our data were compared to activities calculated from two thermodynamic databases in the literature.”
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_summary_page2_qualifications
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_summary_spelling_and_examples
+  type: characterization
+  locator:
+    page: 1
+    published_page: 1
+    pdf_page_index: 0
+    section: Summary
+  units: source wording as printed
+  values:
+    method_class: quoted_unattributed
+    composition_as_printed: Fo93Fa0.07
+    note: Summary prints Fo93Fa0.07 without a decimal before 93; Experimental methods prints Fa0.07Fo0.93 and Figure 1 caption
+      prints Fo0.93Fa0.07. Source spellings are internally inconsistent.
+    exoplanets_as_printed: Kepler 10-b and CoRoT-7b
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_summary_spelling_and_examples
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_t1_feo_fabrichnaya_comparison
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    table: '1'
+  units: as printed; unit not stated in caption
+  values:
+    quantity: partial_molar_enthalpy
+    method_class: quoted_attributed
+    attribution: Fabrichnaya (1998), reference [6], Calculated from Fabrichnaya Database column.
+    component_as_printed: “FeO”
+    value: '-44.92'
+    composition_as_printed: Fo0.93Fa0.07 olivine
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_t1_feo_fabrichnaya_comparison
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_t1_feo_pelton_comparison
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    table: '1'
+  units: as printed; unit not stated in caption
+  values:
+    quantity: partial_molar_enthalpy
+    method_class: quoted_attributed
+    attribution: Pelton Database column; this abstract does not identify the specific database citation.
+    component_as_printed: “FeO”
+    value: '-22.44'
+    composition_as_printed: Fo0.93Fa0.07 olivine
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_t1_feo_pelton_comparison
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_t1_feo_this_study
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    table: '1'
+  units: as printed; unit not stated in caption
+  experiment: costa-2016-olivine-kems
+  derived_from:
+  - costa_2016_fig9_feo_activity_figure_only
+  derivation:
+    relation: Partial molar enthalpy determined from the slope of activity versus inverse temperature, as stated by the authors.
+    inputs:
+    - costa_2016_fig9_feo_activity_figure_only
+  values:
+    quantity: partial_molar_enthalpy
+    method_class: measured_reduced
+    component_as_printed: “FeO”
+    value: '-47.7'
+    uncertainty_as_printed: '4.1'
+    composition_as_printed: Fo0.93Fa0.07 olivine
+    temperature_context: Below the melting point (~2050 K); fit interval not stated.
+    table_csv: tables/costa-2016-lpsc-forsterite-olivine-vaporization/t1.csv
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_t1_feo_this_study
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_t1_mgo_fabrichnaya_comparison
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    table: '1'
+  units: as printed; unit not stated in caption
+  values:
+    quantity: partial_molar_enthalpy
+    method_class: quoted_attributed
+    attribution: Fabrichnaya (1998), reference [6], Calculated from Fabrichnaya Database column.
+    component_as_printed: MgO
+    value: '-74.29'
+    composition_as_printed: Fo0.93Fa0.07 olivine
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_t1_mgo_fabrichnaya_comparison
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_t1_mgo_pelton_comparison
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    table: '1'
+  units: as printed; unit not stated in caption
+  values:
+    quantity: partial_molar_enthalpy
+    method_class: quoted_attributed
+    attribution: Pelton Database column; this abstract does not identify the specific database citation.
+    component_as_printed: MgO
+    value: '-26.21'
+    composition_as_printed: Fo0.93Fa0.07 olivine
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_t1_mgo_pelton_comparison
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_t1_mgo_this_study
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    table: '1'
+  units: as printed; unit not stated in caption
+  experiment: costa-2016-olivine-kems
+  derived_from:
+  - costa_2016_fig9_mgo_activity_figure_only
+  derivation:
+    relation: Partial molar enthalpy determined from the slope of activity versus inverse temperature, as stated by the authors.
+    inputs:
+    - costa_2016_fig9_mgo_activity_figure_only
+  values:
+    quantity: partial_molar_enthalpy
+    method_class: measured_reduced
+    component_as_printed: MgO
+    value: '-97.4'
+    uncertainty_as_printed: '4.8'
+    composition_as_printed: Fo0.93Fa0.07 olivine
+    temperature_context: Below the melting point (~2050 K); fit interval not stated.
+    table_csv: tables/costa-2016-lpsc-forsterite-olivine-vaporization/t1.csv
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_t1_mgo_this_study
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_t1_sio2_fabrichnaya_comparison
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    table: '1'
+  units: as printed; unit not stated in caption
+  values:
+    quantity: partial_molar_enthalpy
+    method_class: quoted_attributed
+    attribution: Fabrichnaya (1998), reference [6], Calculated from Fabrichnaya Database column.
+    component_as_printed: SiO2
+    value: '89.07'
+    composition_as_printed: Fo0.93Fa0.07 olivine
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_t1_sio2_fabrichnaya_comparison
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_t1_sio2_pelton_comparison
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    table: '1'
+  units: as printed; unit not stated in caption
+  values:
+    quantity: partial_molar_enthalpy
+    method_class: quoted_attributed
+    attribution: Pelton Database column; this abstract does not identify the specific database citation.
+    component_as_printed: SiO2
+    value: '6.15'
+    composition_as_printed: Fo0.93Fa0.07 olivine
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_t1_sio2_pelton_comparison
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment
+- observation_id: costa_2016_t1_sio2_this_study
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 1
+    table: '1'
+  units: as printed; unit not stated in caption
+  experiment: costa-2016-olivine-kems
+  derived_from:
+  - costa_2016_fig9_sio2_activity_figure_only
+  derivation:
+    relation: Partial molar enthalpy determined from the slope of activity versus inverse temperature, as stated by the authors.
+    inputs:
+    - costa_2016_fig9_sio2_activity_figure_only
+  values:
+    quantity: partial_molar_enthalpy
+    method_class: measured_reduced
+    component_as_printed: SiO2
+    value: '98'
+    uncertainty_as_printed: '3.6'
+    composition_as_printed: Fo0.93Fa0.07 olivine
+    temperature_context: Below the melting point (~2050 K); fit interval not stated.
+    table_csv: tables/costa-2016-lpsc-forsterite-olivine-vaporization/t1.csv
+  context_id: costa-2016-lpsc-forsterite-olivine-vaporization::context::costa_2016_t1_sio2_this_study
+  work_id: 691c4bdd69c0cc418fd9482036cf23503f52394230d72129e22e361a63258fde
+  source_id: costa-2016-lpsc-forsterite-olivine-vaporization
+  species: OlivineExperiment

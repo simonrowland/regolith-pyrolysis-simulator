@@ -1,0 +1,4881 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2000-aluminosilicate-vaporization.yaml
+observations:
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_mullite_congruent_melting
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2180'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+    attribution: Shornikov et al. (2000), this work
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r19; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r19; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2180'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r19; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_mullite_corundum_liquid_eutectic
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2160'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+    attribution: Shornikov et al. (2000), this work
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r40; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r40; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r40; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_01
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1986'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      source_uncertainty: Temperature uncertainty printed as ± 5 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [11] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r01; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r01; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1986'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r01; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_02
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1996'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      source_uncertainty: Temperature uncertainty printed as ± 5 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [22] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r02; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r02; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1996'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r02; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_03
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1998'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [40] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r03; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r03; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1998'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r03; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_04
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1999'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      source_uncertainty: Temperature uncertainty printed as ± 5 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [26] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r04; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r04; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1999'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r04; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_05
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2007'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [37] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r05; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r05; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2007'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r05; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_06
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1819'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [37] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r06; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r06; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1819'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r06; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_07
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1822'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      source_uncertainty: Temperature uncertainty printed as ± 5 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [28] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r07; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r07; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1822'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r07; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_08
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1823'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [25] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r08; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r08; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r08; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_09
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1857'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [11] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r09; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r09; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1857'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r09; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_10
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1860'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [24] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r10; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r10; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1860'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r10; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_11
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1860'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [26, 41] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r11; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r11; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1860'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r11; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_12
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1868'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [42] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r12; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r12; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1868'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r12; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_13
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1883'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [40] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r13; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r13; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1883'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r13; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_15
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2089'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 20
+      source_uncertainty: Temperature uncertainty printed as ± 20 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [40] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r15; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r15; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2089'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r15; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_16
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2123'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [42] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r16; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r16; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r16; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_17
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2173'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [38] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r17; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r17; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r17; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_18
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2173'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 20
+      source_uncertainty: Temperature uncertainty printed as ± 20 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [12] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r18; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r18; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r18; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_20
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2183'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [11] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r20; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r20; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2183'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r20; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_21
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2207'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [37] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r21; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r21; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2207'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r21; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_22
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2083'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [28] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r22; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r22; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2083'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r22; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_23
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2083'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [35] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r23; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r23; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2083'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r23; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_24
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2098'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [43] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r24; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r24; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2098'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r24; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_25
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2101'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [26, 41] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r25; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r25; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2101'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r25; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_26
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2103'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [30] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r26; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r26; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2103'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r26; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_27
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2160'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [25] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r27; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r27; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r27; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_28
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2163'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 2
+      source_uncertainty: Temperature uncertainty printed as ± 2 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [24] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r28; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r28; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2163'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r28; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_29
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2163'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      source_uncertainty: Temperature uncertainty printed as ± 5 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [44] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r29; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r29; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2163'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r29; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_30
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2101'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [26] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r30; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r30; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2101'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r30; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_31
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2101'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [27] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r31; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r31; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2101'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r31; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_32
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2113'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [45] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r32; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r32; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2113'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r32; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_33
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2160'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [25] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r33; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r33; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r33; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_34
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2163'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      source_uncertainty: Temperature uncertainty printed as ± 5 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [44] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r34; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r34; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2163'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r34; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_35
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2163'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [24] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r35; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r35; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2163'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r35; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_36
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2083'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 20
+      source_uncertainty: Temperature uncertainty printed as ± 20 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [40] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r36; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r36; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2083'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r36; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_37
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2113'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [42] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r37; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r37; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2113'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r37; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_38
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2123'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [11] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r38; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r38; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r38; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_39
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2143'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 20
+      source_uncertainty: Temperature uncertainty printed as ± 20 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [12] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r39; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r39; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2143'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r39; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_41
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2161'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [38] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r41; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r41; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2161'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r41; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_42
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2185'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [37] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r42; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r42; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2185'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r42; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_43
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2311'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      source_uncertainty: Temperature uncertainty printed as ± 5 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [44] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r43; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r43; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2311'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r43; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_44
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2323'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 10
+      source_uncertainty: Temperature uncertainty printed as ± 10 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [37] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r44; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r44; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2323'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r44; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_45
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2323'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 20
+      source_uncertainty: Temperature uncertainty printed as ± 20 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [12] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r45; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r45; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2323'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r45; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_46
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2327'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 6
+      source_uncertainty: Temperature uncertainty printed as ± 6 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [26, 41] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r46; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r46; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2327'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r46; title printed without table number
+- observation_id: shornikov-2000-aluminosilicate-vaporization::shornikov_2000_table1_row_47
+  experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2327'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 3
+      source_uncertainty: Temperature uncertainty printed as ± 3 K
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [39] as cited by Shornikov et al. (2000)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: x-2000-as-vap
+      date: '2026-10-05'
+      evidence:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r47; title printed without table number
+  notices: []
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    table: Nonvariant points
+    note: Table row t1-r47; title printed without table number
+  read_from: pdf:shornikov-2000-aluminosilicate-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2327'
+      locator:
+        published_page: 681
+        pdf_page_index: 4
+        table: Nonvariant points
+        note: Table row t1-r47; title printed without table number

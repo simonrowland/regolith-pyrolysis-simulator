@@ -1,0 +1,4624 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2475/ajs.s5-13.73.1
+  citation: J. W. Greig, "Immiscibility in Silicate Melts" (Part I), American Journal of Science, 5th series, Vol. XIII, No.
+    73, pp. 1-44 (January 1927).
+  source_ids:
+  - greig-1927-ajs-immiscibility-silicate-melts-part1
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: unknown:greig-1927-ajs-immiscibility-silicate-melts-part1
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2475/ajs.s5-13.73.1
+experiments:
+- experiment_id: 10.2475/ajs.s5-13.73.1::experiment::cristobalite-melting-t2a
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: '"Small charges"; no mass printed'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: 8
+        table: II A
+        section: Quenching experiments
+        note: 'Starting silica materials: (a) laboratory stock quartz, (b) Hot Springs, Arkansas quartz crystal, (c) quartz
+          crystal of unknown origin; no chemical analysis printed beyond the HF residue of a (0.0056 g from 10 g).'
+    form:
+      state:
+        tag: value
+        value: Charges about 4 x 4 x 1 mm of cristobalite or quartz prepared from three quartz lots a, b, c (p. 8)
+      locator:
+        page: 8
+        published_page: 8
+        table: II A
+        section: Quenching experiments
+    container:
+      state:
+        tag: value
+        value: Platinum foil wrapping
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: 8
+        table: II A
+        section: Quenching experiments
+        note: Temperature varies by row; each run row carries its printed °C. No single series setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: Furnace atmosphere and pressure not stated
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: No gas flow described
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2475/ajs.s5-13.73.1
+  locator:
+    page: 8
+    published_page: 8
+    table: II A
+    section: Quenching experiments
+  bench_id: 10.2475/ajs.s5-13.73.1::bench::greig-pt-rh-cascade-quench-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Charges placed in the furnace a few degrees below the run temperature, raised to the run temperature and held
+          constant for the tabulated time; temperature held constant to better than ± 0.4°.
+      locator:
+        page: 8
+        published_page: 8
+        table: II A
+        section: Quenching experiments
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: 8
+        table: II A
+        section: Quenching experiments
+        note: Hold time varies by row (Time, min column); total duration including heat-up is not printed.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Quenched; phases determined by microscopic examination
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+- experiment_id: 10.2475/ajs.s5-13.73.1::experiment::cristobalite-melting-t2b
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: '"Small charges"; no mass printed'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 10
+        table: II B
+        note: Laboratory stock quartz; no analysis printed for this series.
+    form:
+      state:
+        tag: value
+        value: Finely ground laboratory stock quartz
+      locator:
+        page: 10
+        published_page: 10
+        table: II B
+    container:
+      state:
+        tag: value
+        value: Platinum foil wrapping
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 10
+        table: II B
+        note: Temperature varies by row; each run row carries its printed °C. No single series setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: Furnace atmosphere and pressure not stated
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: No gas flow described
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2475/ajs.s5-13.73.1
+  locator:
+    page: 10
+    published_page: 10
+    table: II B
+  bench_id: 10.2475/ajs.s5-13.73.1::bench::greig-earlier-pt-rh-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Earlier series made two years before Table II A; temperature held constant to ± 0.4° during each run.
+      locator:
+        page: 10
+        published_page: 10
+        table: II B
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        published_page: 10
+        table: II B
+        note: Hold time varies by row (Time, min column); total duration including heat-up is not printed.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Quenched; phases determined by microscopic examination
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+- experiment_id: 10.2475/ajs.s5-13.73.1::experiment::cristobalite-two-liquids-t3
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: '"Small charges"; no mass printed'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 14
+        published_page: 14
+        table: III
+        section: Quenching experiments
+        note: Nominal mixture compositions are the column heads (wt%); each row carries its own composition.
+    form:
+      state:
+        tag: value
+        value: Mixtures of quartz and oxide or carbonate ground in agate and heated in platinum crucibles in a Meeker furnace
+          at 1600-1650°, three times; uniform mixture of cristobalite crystals and glass
+      locator:
+        page: 14
+        published_page: 14
+        table: III
+        section: Quenching experiments
+    container:
+      state:
+        tag: value
+        value: Platinum foil wrapping
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 14
+        published_page: 14
+        table: III
+        section: Quenching experiments
+        note: Temperature varies by row; each run row carries its printed °C. No single series setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: Furnace atmosphere and pressure not stated
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: No gas flow described
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2475/ajs.s5-13.73.1
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    section: Quenching experiments
+  bench_id: 10.2475/ajs.s5-13.73.1::bench::greig-pt-rh-cascade-quench-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Small charges run in the quenching furnace for the tabulated time.
+      locator:
+        page: 14
+        published_page: 14
+        table: III
+        section: Quenching experiments
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 14
+        published_page: 14
+        table: III
+        section: Quenching experiments
+        note: Hold time varies by row (Time, min column); total duration including heat-up is not printed.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Quenched; phases determined by microscopic examination
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+- experiment_id: 10.2475/ajs.s5-13.73.1::experiment::critical-quenches-binary
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: '"Small charges"; no mass printed'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 16
+        published_page: 16
+        table: IV
+        section: Immiscibility in the binary systems
+        note: Each row carries its own printed wt% composition.
+    form:
+      state:
+        tag: value
+        value: Mixtures melting to one liquid were completely melted in the gas furnace, crushed, three times; two-liquid
+          mixtures prepared as for Table III
+      locator:
+        page: 16
+        published_page: 16
+        table: IV
+        section: Immiscibility in the binary systems
+    container:
+      state:
+        tag: value
+        value: Platinum foil wrapping
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 16
+        published_page: 16
+        table: IV
+        section: Immiscibility in the binary systems
+        note: Temperature varies by row; each run row carries its printed °C. No single series setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: Furnace atmosphere and pressure not stated
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: No gas flow described
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2475/ajs.s5-13.73.1
+  locator:
+    page: 16
+    published_page: 16
+    table: IV
+    section: Immiscibility in the binary systems
+  bench_id: 10.2475/ajs.s5-13.73.1::bench::greig-pt-rh-cascade-quench-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Critical quenches for the tabulated time.
+      locator:
+        page: 16
+        published_page: 16
+        table: IV
+        section: Immiscibility in the binary systems
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 16
+        published_page: 16
+        table: IV
+        section: Immiscibility in the binary systems
+        note: Hold time varies by row (Time, min column); total duration including heat-up is not printed.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Quenched; phases determined by microscopic examination
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+- experiment_id: 10.2475/ajs.s5-13.73.1::experiment::critical-quenches-ternary
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: '"Small charges"; no mass printed'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 36
+        published_page: 36
+        table: VII
+        note: Each row carries its own printed wt% composition.
+    form:
+      state:
+        tag: value
+        value: Ternary mixtures (Table VII A-E)
+      locator:
+        page: 36
+        published_page: 36
+        table: VII
+    container:
+      state:
+        tag: value
+        value: Platinum foil wrapping
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 36
+        published_page: 36
+        table: VII
+        note: Temperature varies by row; each run row carries its printed °C. No single series setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: Furnace atmosphere and pressure not stated
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+        note: No gas flow described
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2475/ajs.s5-13.73.1
+  locator:
+    page: 36
+    published_page: 36
+    table: VII
+  bench_id: 10.2475/ajs.s5-13.73.1::bench::greig-pt-rh-cascade-quench-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Critical quenches for the tabulated time.
+      locator:
+        page: 36
+        published_page: 36
+        table: VII
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 36
+        published_page: 36
+        table: VII
+        note: Hold time varies by row (Time, min column); total duration including heat-up is not printed.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Quenched; phases determined by microscopic examination
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+benches:
+- id: 10.2475/ajs.s5-13.73.1::bench::greig-earlier-pt-rh-furnace
+  work_id: 10.2475/ajs.s5-13.73.1
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Platinum-rhodium furnace used for the earlier (Table II B) series of quenches, "entirely different apparatus"
+    locator:
+      page: 8
+      published_page: 8
+      note: Footnote 10
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: 'Pt: 90Pt 10Rh thermoelement'
+      locator:
+        page: 8
+        published_page: 8
+        note: Footnote 10
+    controller:
+      state:
+        tag: value
+        value: White potentiometer
+      locator:
+        page: 8
+        published_page: 8
+        note: Footnote 10
+  temperature_calibration:
+    procedure:
+      state:
+        tag: value
+        value: Element compared immediately after the last run with a standard element calibrated at the melting points of
+          platinum 1755° ± 5°, anorthite 1550° ± 2° and diopside 1391.5° ± 1.5°
+      locator:
+        page: 10
+        published_page: 10
+        table: II B
+        note: Note under Table II B
+  other_facts: []
+- id: 10.2475/ajs.s5-13.73.1::bench::greig-pt-rh-cascade-quench-furnace
+  work_id: 10.2475/ajs.s5-13.73.1
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Electric quenching furnace (cascade type) for silicate phase equilibria
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+  method:
+    state:
+      tag: value
+      value: 'Method of quenching: small charges wrapped in platinum foil suspended in the furnace, held at constant temperature
+        until equilibrium, quenched, phases determined with the petrographic microscope'
+    locator:
+      page: 4
+      published_page: 4
+      section: Methods and apparatus
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Charges wrapped in platinum foil; windings on a special very dense "alundum" tube (Norton Company); purest grain
+        alundum packing in the central part of the furnace
+    locator:
+      page: 5
+      published_page: 5
+      figure: '1'
+      section: The furnace
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: 'Pt: 90Pt 10Rh thermoelement (working element No. 4)'
+      locator:
+        page: 5
+        published_page: 5
+        section: Temperature measurements
+    measuring_positions:
+      state:
+        tag: value
+        value: Junction of the thermoelement almost touching the center of the charge
+      locator:
+        page: 4
+        published_page: 4
+        section: Methods and apparatus
+    controller:
+      state:
+        tag: value
+        value: Feussner type Wolff potentiometer fitted with an eliminating switch; heating current reversible by a 4-pole
+          snap switch to read leakage
+      locator:
+        page: 5
+        published_page: 5
+        section: Temperature measurements
+        note: Potentiometer sentence continues p. 6, where reversing four-pole switch and leakage procedure are described.
+  temperature_calibration:
+    procedure:
+      state:
+        tag: value
+        value: Two standard elements (No. 5 and No. 7) calibrated at the melting points of ice, gold, palladium and platinum
+          (Table I) and compared frequently with the working element in the furnace with junctions within 0.5 mm; the cristobalite
+          + two liquids temperatures of MgO-SiO2, CaO-SiO2 and SrO-SiO2 mixtures were used later as check points
+      locator:
+        page: 6
+        published_page: 6
+        table: I
+        section: Temperature measurements
+  heating_method:
+    state:
+      tag: value
+      value: 'Resistance windings: inner winding of 60Pt 40Rh and outer winding of platinum (purified wire)'
+    locator:
+      page: 4
+      published_page: 4
+      figure: '1'
+      section: The furnace
+  other_facts:
+  - name: hot_zone_temperature_variation_C
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '1'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 6
+        section: Temperature measurements
+        note: 'Printed: at 1700° the temperature variation over 1.5 cm of the tube was less than 1°.'
+    unit: °C
+  - name: hot_zone_explored_length_mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '15'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 6
+        section: Temperature measurements
+        note: Printed 1.5 cm; converted 1.5 cm × 10 = 15 mm.
+    unit: mm
+  - name: charge_length_mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '5'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 7
+        section: Temperature measurements
+        note: Printed "never over ½ cm. in length"; converted 0.5 cm × 10 = 5 mm.
+    unit: mm
+context:
+- observation_id: greig1927_alumina_purity
+  type: method
+  locator:
+    page: 33
+    published_page: 33
+    section: MgO-Al2O3-SiO2
+  units: wt%; text
+  values:
+    method_class: method_only
+    preparation: C.P. precipitated alumina purified by boiling with ammonium chloride in platinum; ternary mixtures made as
+      before.
+    alkali_mass_percent_as_printed:
+      Na2O: '.15'
+      K2O: '.09'
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_alumina_purity
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_bao_high_temperature_glasses
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    note: Sentence below Table VI
+  units: wt%; °C
+  values:
+    method_class: measured_text
+    BaO_mass_percent_as_printed:
+    - 15
+    - 20
+    - 25
+    temperature_C_as_printed: 1745
+    run_products_as_published: Homogeneous glass in each case
+    duration_min:
+      state:
+        tag: unknown
+        reason: not_published
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_bao_high_temperature_glasses
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_baria_material_purity
+  type: method
+  locator:
+    page: 25
+    published_page: 25
+    section: Material used
+  units: mass percent; text
+  values:
+    method_class: method_only
+    preparation: J. T. Baker C.P. BaCl2 dissolved in water and precipitated with concentrated HCl to remove other group members;
+      chloride washed with concentrated acid and procedure repeated. Double precipitation with ammonia and ammonium carbonate.
+      Very pure carbonate mixed with laboratory stock quartz.
+    spectroscopic_analysis: E. G. Zies found calcium not detectable, strontium possibly trace but certainly less than 0.05
+      per cent, lead absent.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_baria_material_purity
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_baria_quench_treatments
+  type: method
+  locator:
+    page: 44
+    published_page: 44
+    note: Final paragraph
+  units: text
+  values:
+    method_class: method_only
+    procedure: Crystal-free baria-silica liquids easily quench clear even in large charges. Holding just below liquidus produces
+      large cristobalite crystals; rapid cooling into a blast of air yields clear glass but higher-index glass film around
+      crystals. Dropping charge under mercury usually removes that film.
+    atmosphere_note: Blast of air is a cooling treatment; it does not specify furnace operating atmosphere.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_baria_quench_treatments
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_baria_relative_temperature
+  type: characterization
+  locator:
+    page: 26
+    published_page: 26
+    section: Discussion
+  units: °C relative to liquidus
+  values:
+    method_class: measured_text
+    statement: Only one liquid in runs indicated by crosses, 60° above liquidus. No absolute temperatures read from Fig. 13.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_baria_relative_temperature
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_binary_materials
+  type: method
+  locator:
+    page: 13
+    published_page: 13
+    section: Materials used
+    note: Mixture preparation continues p. 14
+  units: °C; text
+  values:
+    method_class: method_only
+    magnesia: Two carbonate lots; one prepared by H. S. Roberts and E. W. Posnjak by suspending C.P. light calcined MgO in
+      cold water, bubbling CO2, filtering, boiling to precipitate carbonate, filtering and carefully washing. Other lot purified
+      carbonate of unknown earlier history. Both gave identical quench results. Fired near 1650° to sinter oxide, then desiccated.
+    lime: Very pure Baker and Adamson CaCO3 prepared for the laboratory; thoroughly dried and desiccated. Analysis by E. G.
+      Zies carried separately.
+    strontia: J. T. Baker C.P. Special SrCl2 dissolved and double-precipitated with NH4OH and ammonium carbonate to remove
+      alkali. No reaction for Al or Fe; spectroscopy by E. G. Zies found baria certainly below 0.1 per cent. Carbonate dried
+      and desiccated.
+    mixture_preparation: Laboratory stock quartz weighed with oxide or carbonate and ground in agate mortar; heated in Pt
+      crucibles in Meeker furnace at 1600–1650°. Grinding and heating repeated three times, yielding uniform cristobalite
+      and glass.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_binary_materials
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_binary_sintering
+  type: characterization
+  locator:
+    page: 15
+    published_page: 15
+  units: °C; text
+  values:
+    method_class: measured_text
+    statement: Two degrees below two-liquid appearance, charges still essentially powder and poorly sintered after cooling,
+      crumbling between fingers. At onset they flow together; liquids collect within a few minutes but cristobalite persists
+      in the viscous siliceous phase until prolonged holding or temperature increase.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_binary_sintering
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_calibration_and_melting_comparison
+  type: method
+  locator:
+    page: 12
+    published_page: 12
+    section: Discussion
+  units: °C
+  values:
+    method_class: author_statement
+    comparison: Present 1713° ± 5° versus Ferguson and Merwin 1710° ± 10°. Prior result extrapolated calibration from palladium
+      melting; present result interpolated two elements calibrated at platinum 1755°, palladium 1549.5°, gold 1062.6°, ice
+      0°, and another element at platinum 1755°, anorthite 1550°, diopside 1391.5°.
+    phase_rule: Cristobalite plus two liquids plus vapor are four phases in a binary invariant system, allowing only one equilibrium
+      temperature.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_calibration_and_melting_comparison
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_cao_sio2_27p5_liquid_liquidus_text
+  type: thermodynamic_example
+  locator:
+    page: 44
+    published_page: 44
+    note: Prose on a Pt-Rh ribbon melt (Fig. 12 discussion)
+  units: wt%; °C
+  values:
+    method_class: author_estimate
+    evidence_class: author_estimate
+    system: CaO-SiO2
+    statement_as_printed: The composition of the liquid in the case just cited is about 27.5CaO, 72.5SiO2, and the temperature
+      of the liquidus 1698°.
+    composition_mass_percent_approximate:
+      CaO: '27.5'
+      SiO2: '72.5'
+    liquidus_temperature_C_as_printed: 1698
+    approximation_note: Composition printed with "about"; the ribbon was raised to "about 1725°".
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_cao_sio2_27p5_liquid_liquidus_text
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_cao_sio2_high_T_siliceous_glass_index
+  type: characterization
+  locator:
+    page: 20
+    published_page: 20
+    note: Prose continuing from p. 18 "Extent of immiscibility at higher temperatures"
+  units: refractive index; °C
+  values:
+    method_class: measured_text
+    evidence_class: measured_text
+    system: CaO-SiO2
+    statement_as_printed: Mixtures of lime and silica were fired in a gas furnace to a temperature between 1825° and 1850°.
+      The index of the siliceous glass was then much higher than before, being 1.470-1.475. These results show that in each
+      system this liquid becomes less siliceous with increase of temperature.
+    method_as_printed: Gas-furnace firing; container, furnace construction and holding time are not stated for this experiment.
+    firing_temperature_C_low: 1825
+    firing_temperature_C_high: 1850
+    refractive_index_low: '1.470'
+    refractive_index_high: '1.475'
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_cao_sio2_high_T_siliceous_glass_index
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_cao_soda_single_liquid
+  type: phase_equilibrium_run_products
+  locator:
+    page: 39
+    published_page: 39
+    section: CaO-Na2O-SiO2
+  units: composition wt%
+  values:
+    method_class: measured_text
+    composition_mass_percent:
+      CaO: 13
+      Na2O: 2
+      SiO2: 85
+    run_products_as_published: Single liquid when just melted
+    temperature_C:
+      state:
+        tag: unknown
+        reason: not_published
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_cao_soda_single_liquid
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_constructed_isotherm
+  type: thermodynamic_example
+  locator:
+    page: 32
+    published_page: 32
+    note: Continues p. 33
+  units: °C
+  values:
+    method_class: hypothetical
+    statement: Constructed 1696° isotherm starts just below the CaO-SiO2 endpoint marked 1698°, crosses the two-liquid field
+      as a straight line, then finally intersects the MgO-SiO2 side just above 1695°. Theoretical geometric example, not a
+      measured quench.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_constructed_isotherm
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_cristobalite_microscopy
+  type: characterization
+  locator:
+    page: 41
+    published_page: 41
+    note: Continued p. 42–43
+  units: magnification; count; text
+  values:
+    method_class: measured_text
+    microscopy: At magnification 600–1200 dots usually form clusters; larger ones can be rods radiating from a common center.
+      In a few favorable cases rods counted as six; in others more and complex. Orientation not definitely determined, apparently
+      octahedron-corner axes. Skeletons grade through fir-tree forms into well-shaped cube/octahedron cristobalite.
+    x_ray_method: R. W. G. Wyckoff powder-method X-ray photographs show faint sharp cristobalite lines for larger dots; finer
+      dots give lines too faint to see. Microscopy and X-rays identify cristobalite, not metastable second liquid.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_cristobalite_microscopy
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_earlier_calibration_footnote
+  type: method
+  locator:
+    page: 8
+    published_page: 8
+    note: Footnote 10; compare precise calibration values on p. 10
+  units: °C
+  values:
+    method_class: method_only
+    calibration_as_printed: Diopside 1391°, anorthite 1550°, platinum 1755°; Pt-Rh furnace, Pt:90Pt10Rh thermoelement, White
+      potentiometer. Earlier series made two years before Table II A.
+    discrepancy_note: Footnote prints 1391°; p. 10 prints 1391.5° ± 1.5°. Both retained at their own locators.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_earlier_calibration_footnote
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_equilibrium_premise
+  type: method
+  locator:
+    page: 10
+    published_page: 10
+    section: Discussion
+  units: text
+  values:
+    method_class: author_statement
+    premise: Melting at 1713° assumes cristobalite in equilibrium with liquid at completion of critical runs, without superheating;
+      considerable liquid formed below 1713° but crystals persisted to that temperature and disappeared above it. Table II
+      B used laboratory stock quartz without previous heat treatment.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_equilibrium_premise
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_figures_context
+  type: figure_only
+  locator:
+    page: 15
+    published_page: 15
+    figure: 3, 4, 19-24
+    note: Fig. 3 p. 15; Fig. 4 p. 18; Fig. 19 p. 34; Fig. 20 p. 37; Fig. 21 p. 38; Fig. 22 p. 39; Fig. 23 p. 41; Fig. 24 p.
+      42
+  units: figure-only context
+  values:
+    method_class: figure_only
+    evidence_class: figure_only
+    figures:
+    - 3 (SiO2-2MgO.SiO2)
+    - 4 (SiO2-2CaO.SiO2)
+    - 19 (CaO-MgO-SiO2)
+    - 20 (MgO-Al2O3-SiO2 mixtures)
+    - 21 (MgO-Al2O3-SiO2)
+    - 22 (CaO-Al2O3-SiO2 mixtures)
+    - 23 (CaO-Al2O3-SiO2 corrected after Rankin and Wright)
+    - 24 (MgO-Na2O-SiO2)
+    full_figure_page_inventory:
+      '1': 5
+      '2': 11
+      '3': 15
+      '4': 18
+      '5': 19
+      '6': 21
+      '7': 22
+      '8': 22
+      '9': 23
+      '10': 23
+      '11': 25
+      '12': 26
+      '13': 27
+      '14': 29
+      '15': 29
+      '16': 30
+      '17': 31
+      '18': 32
+      '19': 34
+      '20': 37
+      '21': 38
+      '22': 39
+      '23': 41
+      '24': 42
+      '25': 43
+    coverage_note: All 25 figures inventoried; diagram/curve coordinates and micrograph-only magnifications are figure-only.
+      Printed caption experiment conditions carried with their prose experiments. Fig. 2 is a hypothetical soda-impurity diagram,
+      not a measured melting curve.
+    digitization_status: No curves digitized. Fig. 3 right-hand portion after Bowen and Andersen (1914); Fig. 4 right-hand
+      portion after Rankin and Wright (1915) and Ferguson and Merwin (1919); Fig. 23 is Rankin and Wright with corrected silica
+      and mullite fields.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_figures_context
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_hypothetical_soda_impurity
+  type: thermodynamic_example
+  locator:
+    page: 12
+    published_page: 12
+    note: Fig. 2 explanatory prose
+  units: wt%; °C; liquid fraction
+  values:
+    method_class: hypothetical
+    statement: Assuming a straight liquidus from the cristobalite melting point to the Morey 4.09Na2O/95.91SiO2 mixture at
+      1596°, and assuming all quartz impurity were soda, it would amount to 0.025 per cent; 3° below melting such a mixture
+      would be about ¼ liquid. The author considers all-soda impurity extremely unlikely and attributes much or all premelting
+      liquid to impurities.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_hypothetical_soda_impurity
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_initial_binary_results
+  type: characterization
+  locator:
+    page: 3
+    published_page: 3
+  units: text
+  values:
+    method_class: measured_text
+    method: Pt-Rh furnace designed and built by H. S. Roberts
+    result: Silica-rich MgO-SiO2 and CaO-SiO2 mixtures formed two immiscible liquids when all crystals disappeared; SrO-SiO2
+      behaved similarly; BaO-SiO2 melted to a single liquid.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_initial_binary_results
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_initial_fletcher_gas_furnace
+  type: characterization
+  locator:
+    page: 2
+    published_page: 2
+    note: Continues on p. 3
+  units: composition wt%; °C
+  values:
+    method_class: author_estimate
+    composition_mass_percent:
+      CaO: 28
+      SiO2: 72
+    apparatus: Fletcher gas furnace; platinum crucible
+    temperature_statement: Charge could not be far short of 1700° when the crucible commenced to melt; a homogeneous liquid
+      could not be prepared without melting the crucible.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_initial_fletcher_gas_furnace
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_leakage_and_calibration_procedure
+  type: method
+  locator:
+    page: 6
+    published_page: 6
+    note: Charge-length and furnace exploration continuation p. 7
+  units: μV; text
+  values:
+    method_class: method_only
+    leakage_statement: Leakage very rarely as much as 15 μV and always steady; carefully shielded measuring system. Reversing
+      heating current reversed leakage sign without changing furnace temperature. DC readings corrected for leakage; much
+      work used the sufficiently constant nighttime AC supply, which avoided leakage trouble.
+    calibration: Working element 4 compared frequently with standards 5 and 7 at constant temperature to obtain its correction;
+      standards inserted only for comparisons and remained practically constant. After standard calibration the MgO, CaO and
+      SrO two-liquid temperatures were determined and later used as fixed points.
+    furnace_check: Furnace frequently repacked and explored to check hottest-point position; central charges never over ½
+      cm long had negligible temperature gradient.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_leakage_and_calibration_procedure
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_less_siliceous_liquid_method
+  type: method
+  locator:
+    page: 16
+    published_page: 16
+    section: Immiscibility in the binary systems
+  units: text
+  values:
+    method_class: method_only
+    less_siliceous_liquid_as_printed: By extrapolating the liquidus curve so obtained until it intersects the horizontal determined
+      by the quenches of Table III, the composition of the less siliceous of the two liquids which can coexist in equilibrium
+      with cristobalite is found. In each case the extrapolation is short.
+    more_siliceous_liquid_as_printed: In the case of lime and of magnesia the liquid must contain over 98 per cent SiO2 ...
+      the index of refraction of the siliceous glass, from charges held at a temperature just above that of the appearance
+      of the second liquid, was measured by the method of immersion.
+    numeric_less_siliceous_compositions:
+      state:
+        tag: unknown
+        reason: not_numeric
+    numeric_note: The locally described extrapolated coexistence compositions are not explicitly numerically tabulated on
+      p. 16. Figs. 3 and 4 are not digitized. The approximate liquid example on p. 44 is carried separately and is not expressly
+      identified as a measured conjugate composition.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_less_siliceous_liquid_method
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_lime_impurity_analysis
+  type: composition
+  locator:
+    page: 13
+    published_page: 13
+    note: Unnumbered E. G. Zies analysis; 10 gram analytical sample
+  units: mass percent; g
+  values:
+    method_class: measured_tabulated
+    analytical_sample_mass_g: 10
+    impurities_mass_percent_as_printed:
+      SiO2: '0.002'
+      Fe2O3 + Al2O3: '0.006'
+      MgO: '0.003'
+      Na2O: < .03
+      K2O: < .006
+    mass_note: Analytical sample mass, not an aggregate quench-series charge.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_lime_impurity_analysis
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_magnesia_liquid_separation
+  type: characterization
+  locator:
+    page: 21
+    published_page: 21
+    note: Continued pp. 22–24; Figs. 7–11
+  units: wt%; °C; min; mm
+  values:
+    method_class: measured_text
+    composition_mass_percent:
+      MgO: 15
+      SiO2: 85
+    method: Three powder charges in platinum crucibles heated in quenching furnace at 1715° for 10, 30 and 180 minutes respectively;
+      thin sections examined microscopically.
+    result_10_min: Viscous siliceous cylinder with intimately mixed phases; more fluid magnesian phase drains or is squeezed
+      out, collecting below. Cristobalite formed in drained phase on cooling.
+    result_30_min: More magnesian phase drained than first charge; irregular masses about 1 mm diameter and much smaller spherical
+      globules distributed through siliceous phase.
+    result_180_min: Irregular masses collected into larger ones, some probably drained out; small globules remained as thickly
+      distributed. Separation initially fairly rapid, then slows; very long heating would be needed to complete separation.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_magnesia_liquid_separation
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_morey_soda_glass
+  type: characterization
+  locator:
+    page: 12
+    published_page: 12
+    section: Discussion
+  units: composition wt%; °C
+  values:
+    method_class: measured_text
+    material_provenance: Mixture prepared and analyzed by G. W. Morey
+    composition_mass_percent:
+      Na2O: '4.09'
+      SiO2: '95.91'
+    last_crystals_disappeared_C_as_printed: 1596
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_morey_soda_glass
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_other_prior_melting_points
+  type: quoted_context
+  locator:
+    page: 12
+    published_page: 12
+    note: Footnote 16
+  units: °C
+  values:
+    method_class: quoted
+    endell_rieke_hoffmann_1912: 1685° ± 10°
+    wietzel_1921: 1696° ± 10°
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_other_prior_melting_points
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_own_potash_glasses
+  type: characterization
+  locator:
+    page: 28
+    published_page: 28
+    note: In the course of the present work
+  units: wt%; °C
+  values:
+    method_class: measured_text
+    glasses_mass_percent:
+    - K2O: '5.5'
+      SiO2: '94.5'
+    - K2O: 10
+      SiO2: 90
+    result: Homogeneous glasses; former completely liquid in neighborhood of 1500°, latter at a very much lower temperature.
+      No sign of immiscibility.
+    second_temperature_C:
+      state:
+        tag: unknown
+        reason: not_numeric
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_own_potash_glasses
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_potash_ternary_complete_melting
+  type: phase_equilibrium_run_products
+  locator:
+    page: 40
+    published_page: 40
+    note: Opening paragraph; prose distinct from Table VII E
+  units: composition wt%; °C
+  values:
+    method_class: author_statement
+    composition_mass_percent:
+      K2O: '4.4'
+      MgO: '10.6'
+      SiO2: 85
+    complete_melting_temperature_C_as_printed: 1541
+    run_products_as_published: Completely melted to a single liquid
+    comparison: About the temperature for complete melting with Na2O in place of K2O in the same proportions; inferred similar
+      extent of immiscibility. Table VII E's 1550° and 1533° runs retained separately.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_potash_ternary_complete_melting
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_prior_alkali_silica_work
+  type: quoted_context
+  locator:
+    page: 28
+    published_page: 28
+    note: Na2O and K2O binary discussion; Figs. 16–17
+  units: text
+  values:
+    method_class: quoted
+    statement: Morey and Bowen sodium metasilicate-silica study showed no immiscibility. Potassium metasilicate-silica diagram
+      constructed from Morey and Fenner H2O-K2O.SiO2-SiO2 data by extrapolating eutectics; no silica-liquidus points determined.
+      Greig's own K glasses are carried separately.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_prior_alkali_silica_work
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_prior_alumina_silica_work
+  type: quoted_context
+  locator:
+    page: 27
+    published_page: 27
+    note: Continues p. 28; Bowen and Greig 1924
+  units: wt%
+  values:
+    method_class: quoted
+    statement: Prior investigation ranged from pure silica to 90 per cent Al2O3, completely melting mixtures up to 75 per
+      cent Al2O3. No immiscibility; exact cristobalite liquidus not determined throughout because equilibrium took too long.
+      Homogeneous glasses prepared at 1¼, 2½ and 5 per cent Al2O3 and investigated enough to show no abnormal liquidus shape.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_prior_alumina_silica_work
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_prior_cristobalite_melting
+  type: quoted_context
+  locator:
+    page: 2
+    published_page: 2
+    note: Repeated p. 3 (1710°) and p. 7 (1710° ± 10°); Ferguson and Merwin 1918
+  units: °C
+  values:
+    method_class: quoted
+    melting_temperature_C_as_printed: 1710
+    uncertainty_C_plus_minus_as_printed: 10
+    method: Prior Pt-Rh furnace determination by Ferguson and Merwin; used as comparator, not a new Greig measurement.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_prior_cristobalite_melting
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_prior_low_temperature_melting
+  type: quoted_context
+  locator:
+    page: 11
+    published_page: 11
+    section: Discussion
+  units: °C
+  values:
+    method_class: quoted
+    fenner: Traces of melting as low as 1625°, attributed by Fenner to variable molecular constitution and melting point.
+    ferguson_merwin: Cristobalite formed at 1350° melted like that formed at higher temperatures; impurity suggested as cause
+      of Fenner's result.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_prior_low_temperature_melting
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_quartz_1691_prior_experiment
+  type: quoted_context
+  locator:
+    page: 10
+    published_page: 10
+    note: Footnote 11; Ferguson and Merwin
+  units: °C
+  values:
+    method_class: quoted
+    statement: Quartz heated at 1691° had a central unaltered quartz portion surrounded by glass and an outer cristobalite
+      layer.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_quartz_1691_prior_experiment
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_ribbon_quench_details
+  type: method
+  locator:
+    page: 44
+    published_page: 44
+    note: Opening paragraph continuing p. 43; Fig. 12 preparation from p. 20
+  units: mm; °C
+  values:
+    method_class: method_only
+    droplet_greatest_diameter_mm_as_printed: < 1
+    ribbon_thickness_mm_as_printed: '0.01'
+    method: Narrow Pt-Rh ribbon electrically heated to about 1725°; beaker of water dumped over ribbon to chill droplet. Not
+      perfectly quenched; central small globules formed enough cristobalite to appear brown microscopically.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_ribbon_quench_details
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_ribbon_two_liquids
+  type: characterization
+  locator:
+    page: 20
+    published_page: 20
+    note: Fig. 12 experiment; further methods on p. 44 carried separately
+  units: wt%; text
+  values:
+    method_class: measured_text
+    composition_mass_percent:
+      CaO: 5
+      SiO2: 95
+    method: Small amount melted on Pt-Rh ribbon heated by electric current.
+    result: Drop of resulting liquids photographed in Fig. 12; two liquids.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_ribbon_two_liquids
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_silica_lots_preparation
+  type: method
+  locator:
+    page: 8
+    published_page: 8
+    section: Materials used
+  units: g; mm; hours; °C
+  values:
+    method_class: method_only
+    lot_a: Laboratory stock quartz crushed and purified with HCl; evaporation with HF and H2SO4 followed by ammonium carbonate
+      left 0.0056 g residue from a 10-g analytical sample. Sparse inclusions, the larger approximately 0.005 mm and almost
+      full of liquid.
+    lot_b: Quartz crystal from Hot Springs, Arkansas; no microscopically visible inclusions.
+    lot_c: Quartz of unknown origin; no microscopically visible inclusions.
+    preparation: Ground quartz from all three lots heated in a gas furnace for 3 hours near 1600°. Lots a and b completely
+      converted to cristobalite with numerous voids (b almost opaque). Lot c less than half cristobalite with remaining quartz;
+      its cristobalite homogeneous and void-free. Lot c subsequently converted first to silica glass, then crystallized to
+      homogeneous cristobalite.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_silica_lots_preparation
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_soda_impurity_analysis
+  type: composition
+  locator:
+    page: 35
+    published_page: 35
+    note: Unnumbered impurity analysis by E. G. Zies
+  units: mass percent
+  values:
+    method_class: measured_tabulated
+    material: Very pure sodium carbonate monohydrate
+    impurities_mass_percent_as_printed:
+      SO3: < 0.001
+      Cl: < 0.002
+      SiO2: < 0.002
+      Al2O3 + Fe2O3: < 0.003
+      CaO: < 0.008
+      MgO: nil
+    nil_note: Published MgO nil retained as qualitative statement, not converted to a measured zero.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_soda_impurity_analysis
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_soda_source_glass_preparation
+  type: method
+  locator:
+    page: 38
+    published_page: 38
+    note: Preparation and weighing paragraphs above/below Fig. 21
+  units: hours; °C; wt%
+  values:
+    method_class: method_only
+    preparation: Carbonate and quartz carefully weighed and heated 48 hours at 1100°; crushed and heating repeated; crushed
+      again and heated ½ hour at 1500°. Weight loss measured in each case; soda calculated assuming no silica volatilized.
+      No weighable loss during final heating.
+    source_glass_mass_percent:
+      Na2O: '16.5'
+      SiO2: '83.5'
+    use: Source of soda in mixtures; no further soda-content check considered necessary.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_soda_source_glass_preparation
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_sro_silica_bound
+  type: composition
+  locator:
+    page: 16
+    published_page: 16
+    section: The more siliceous liquid
+  units: wt%
+  values:
+    method_class: author_statement
+    system: SrO-SiO2
+    silica_mass_percent_as_printed: < 98
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_sro_silica_bound
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t1_calibration_materials
+  type: method
+  locator:
+    page: 7
+    published_page: 7
+    table: I
+    note: Table notes; standard melting points/e.m.f. reference Day and Sosman 1911 and Adams 1914
+  units: text
+  values:
+    method_class: method_only
+    procedure: Both determinations printed when two runs were made. Gold was Heraeus pure gold; palladium was used in establishing
+      the nitrogen thermometer scale; platinum was that of the thermoelement. Metal melting e.m.f. determined by heating curves;
+      small gold/palladium pieces formed the thermoelement wire junction.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t1_calibration_materials
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t1_gold
+  type: calibration
+  locator:
+    page: 7
+    published_page: 7
+    table: I
+    note: Gold
+  units: °C; μV
+  values:
+    method_class: measured_tabulated
+    melting_point_C_as_printed: 1062.6 ± .8
+    standard_emf_uV_as_printed: '10296'
+    element_5_emf_uV_as_printed:
+    - '10280'
+    correction_5_uV_as_printed: '+16'
+    element_7_emf_uV_as_printed:
+    - '10329'
+    - '10330'
+    correction_7_uV_as_printed: −33
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t1_gold
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t1_ice
+  type: calibration
+  locator:
+    page: 7
+    published_page: 7
+    table: I
+    note: Ice
+  units: °C; μV
+  values:
+    method_class: measured_tabulated
+    melting_point_C_as_printed: '0'
+    standard_emf_uV_as_printed: '0'
+    element_5_emf_uV_as_printed:
+    - −4
+    correction_5_uV_as_printed: '+4'
+    element_7_emf_uV_as_printed:
+    - '+1'
+    correction_7_uV_as_printed: −1
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t1_ice
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t1_palladium
+  type: calibration
+  locator:
+    page: 7
+    published_page: 7
+    table: I
+    note: Palladium
+  units: °C; μV
+  values:
+    method_class: measured_tabulated
+    melting_point_C_as_printed: 1549.5 ± 2
+    standard_emf_uV_as_printed: '16144'
+    element_5_emf_uV_as_printed:
+    - '16122'
+    - '16122'
+    correction_5_uV_as_printed: '+22'
+    element_7_emf_uV_as_printed:
+    - '16215'
+    - '16218'
+    correction_7_uV_as_printed: −72
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t1_palladium
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t1_platinum
+  type: calibration
+  locator:
+    page: 7
+    published_page: 7
+    table: I
+    note: Platinum
+  units: °C; μV
+  values:
+    method_class: measured_tabulated
+    melting_point_C_as_printed: 1755 ± 5
+    standard_emf_uV_as_printed: '18608'
+    element_5_emf_uV_as_printed:
+    - '18525'
+    - '18530'
+    correction_5_uV_as_printed: '+71'
+    element_7_emf_uV_as_printed:
+    - '18710'
+    correction_7_uV_as_printed: −102
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t1_platinum
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t2a_run10
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-melting-t2a
+  locator:
+    page: 9
+    published_page: 9
+    table: II A
+    note: Run 10; page printed rotated 90 degrees
+  units: temperature °C; time min; results as printed
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    table_part: II A (more recent series of quenches)
+    run_number_as_printed: 10
+    temperature_C_as_printed: 1713
+    duration_min_as_printed: 30
+    results_by_starting_material_as_printed:
+      silica_glass_from_c: All glass
+      quartz_from_b: (dotted leader printed; no result)
+      cristobalite_from_c: A minute amount of cristobalite, essentially all glass
+      cristobalite_from_a: All glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t2a_run10
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t2a_run11
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-melting-t2a
+  locator:
+    page: 9
+    published_page: 9
+    table: II A
+    note: Run 11; page printed rotated 90 degrees
+  units: temperature °C; time min; results as printed
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    table_part: II A (more recent series of quenches)
+    run_number_as_printed: 11
+    temperature_C_as_printed: 1712
+    duration_min_as_printed: 45
+    results_by_starting_material_as_printed:
+      silica_glass_from_c: (dotted leader printed; no result)
+      quartz_from_b: Almost all glass, trace of cristobalite
+      cristobalite_from_c: A small amount of cristobalite, almost all glass
+      cristobalite_from_a: A small amount of cristobalite, almost all glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t2a_run11
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t2a_run15
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-melting-t2a
+  locator:
+    page: 9
+    published_page: 9
+    table: II A
+    note: Run 15; page printed rotated 90 degrees
+  units: temperature °C; time min; results as printed
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    table_part: II A (more recent series of quenches)
+    run_number_as_printed: 15
+    temperature_C_as_printed: 1692
+    duration_min_as_printed: 20
+    results_by_starting_material_as_printed:
+      silica_glass_from_c: (dotted leader printed; no result)
+      quartz_from_b: Cristobalite + glass
+      cristobalite_from_c: Cristobalite + trace of glass
+      cristobalite_from_a: Cristobalite + trace of glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t2a_run15
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t2a_run9
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-melting-t2a
+  locator:
+    page: 9
+    published_page: 9
+    table: II A
+    note: Run 9; page printed rotated 90 degrees
+  units: temperature °C; time min; results as printed
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    table_part: II A (more recent series of quenches)
+    run_number_as_printed: 9
+    temperature_C_as_printed: 1710
+    duration_min_as_printed: 30
+    results_by_starting_material_as_printed:
+      silica_glass_from_c: Silica glass, a very little cristobalite
+      quartz_from_b: (dotted leader printed; no result)
+      cristobalite_from_c: A fair amount of silica glass, but largely cristobalite
+    blank_cells:
+    - cristobalite_from_a
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t2a_run9
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t2b_r1
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-melting-t2b
+  locator:
+    page: 10
+    published_page: 10
+    table: II B
+    note: Table II B printed row 1 (no run numbers printed)
+  units: temperature °C; time min; results as printed
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    table_part: II B (earlier series of quenches)
+    starting_material_as_printed: Finely ground laboratory stock quartz used in each case
+    temperature_C_as_printed: 1713
+    duration_min_as_printed: 40
+    run_products_as_published: All glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t2b_r1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t2b_r2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-melting-t2b
+  locator:
+    page: 10
+    published_page: 10
+    table: II B
+    note: Table II B printed row 2 (no run numbers printed)
+  units: temperature °C; time min; results as printed
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    table_part: II B (earlier series of quenches)
+    starting_material_as_printed: Finely ground laboratory stock quartz used in each case
+    temperature_C_as_printed: 1709
+    duration_min_as_printed: 40
+    run_products_as_published: Charge slightly sintered, each grain consists of cristobalite oriented in different directions
+      and separated by glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t2b_r2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t2b_r3
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-melting-t2b
+  locator:
+    page: 10
+    published_page: 10
+    table: II B
+    note: Table II B printed row 3 (no run numbers printed)
+  units: temperature °C; time min; results as printed
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    table_part: II B (earlier series of quenches)
+    starting_material_as_printed: Finely ground laboratory stock quartz used in each case
+    temperature_C_as_printed: 1709
+    duration_min_as_printed: 25
+    run_products_as_published: Glass > cristobalite
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t2b_r3
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t2b_r4
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-melting-t2b
+  locator:
+    page: 10
+    published_page: 10
+    table: II B
+    note: Table II B printed row 4 (no run numbers printed)
+  units: temperature °C; time min; results as printed
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    table_part: II B (earlier series of quenches)
+    starting_material_as_printed: Finely ground laboratory stock quartz used in each case
+    temperature_C_as_printed: 1712
+    duration_min_as_printed: 15
+    run_products_as_published: Glass > cristobalite
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t2b_r4
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t2b_r5
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-melting-t2b
+  locator:
+    page: 10
+    published_page: 10
+    table: II B
+    note: Table II B printed row 5 (no run numbers printed)
+  units: temperature °C; time min; results as printed
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    table_part: II B (earlier series of quenches)
+    starting_material_as_printed: Finely ground laboratory stock quartz used in each case
+    temperature_C_as_printed: 1712
+    duration_min_as_printed: 30
+    run_products_as_published: Glass > cristobalite
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t2b_r5
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t2b_r6
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-melting-t2b
+  locator:
+    page: 10
+    published_page: 10
+    table: II B
+    note: Table II B printed row 6 (no run numbers printed)
+  units: temperature °C; time min; results as printed
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    table_part: II B (earlier series of quenches)
+    starting_material_as_printed: Finely ground laboratory stock quartz used in each case
+    temperature_C_as_printed: 1714
+    duration_min_as_printed: 30
+    run_products_as_published: All glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t2b_r6
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t2b_r7
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-melting-t2b
+  locator:
+    page: 10
+    published_page: 10
+    table: II B
+    note: Table II B printed row 7 (no run numbers printed)
+  units: temperature °C; time min; results as printed
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    table_part: II B (earlier series of quenches)
+    starting_material_as_printed: Finely ground laboratory stock quartz used in each case
+    temperature_C_as_printed: 1705
+    duration_min_as_printed: 45
+    run_products_as_published: Cristobalite and glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t2b_r7
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run12_15cao_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 12, column 15CaO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 12
+    temperature_C_as_printed: 1698
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      CaO: 15
+      SiO2: 85
+    composition_as_printed: 15CaO, 85SiO2
+    run_products_as_published: 2 glasses not well separated
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run12_15cao_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run12_15mgo_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 12, column 15MgO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 12
+    temperature_C_as_printed: 1698
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      MgO: 15
+      SiO2: 85
+    composition_as_printed: 15MgO, 85SiO2
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run12_15mgo_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run12_15sro_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 12; SrO column
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    run_number_as_printed: 12
+    composition_mass_percent:
+      SrO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1698
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run12_15sro_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run13_15cao_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 13, column 15CaO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 13
+    temperature_C_as_printed: 1696
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      CaO: 15
+      SiO2: 85
+    composition_as_printed: 15CaO, 85SiO2
+    run_products_as_published: Not sintered. Cristobalite + CaO—rich glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run13_15cao_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run13_15mgo_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 13, column 15MgO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 13
+    temperature_C_as_printed: 1696
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      MgO: 15
+      SiO2: 85
+    composition_as_printed: 15MgO, 85SiO2
+    run_products_as_published: 2 glasses not well separated
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run13_15mgo_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run13_15sro_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 13; SrO column
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    run_number_as_printed: 13
+    composition_mass_percent:
+      SrO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1696
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run13_15sro_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run14_15mgo_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 14, column 15MgO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 14
+    temperature_C_as_printed: 1694
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      MgO: 15
+      SiO2: 85
+    composition_as_printed: 15MgO, 85SiO2
+    run_products_as_published: Cristobalite + MgO-rich glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run14_15mgo_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run14_15sro_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 14; SrO column
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    run_number_as_printed: 14
+    composition_mass_percent:
+      SrO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1694
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run14_15sro_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run15_15sro_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 15; SrO column
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    run_number_as_printed: 15
+    composition_mass_percent:
+      SrO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1692
+    duration_min_as_printed: 20
+    run_products_as_published: Cristobalite + SrO-rich glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run15_15sro_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run2_15cao_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 2, column 15CaO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 2
+    temperature_C_as_printed: 1703
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      CaO: 15
+      SiO2: 85
+    composition_as_printed: 15CaO, 85SiO2
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run2_15cao_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run2_15mgo_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 2, column 15MgO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 2
+    temperature_C_as_printed: 1703
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      MgO: 15
+      SiO2: 85
+    composition_as_printed: 15MgO, 85SiO2
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run2_15mgo_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run3_15cao_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 3, column 15CaO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 3
+    temperature_C_as_printed: 1701
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      CaO: 15
+      SiO2: 85
+    composition_as_printed: 15CaO, 85SiO2
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run3_15cao_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run3_15mgo_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 3, column 15MgO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 3
+    temperature_C_as_printed: 1701
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      MgO: 15
+      SiO2: 85
+    composition_as_printed: 15MgO, 85SiO2
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run3_15mgo_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run4_15cao_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 4, column 15CaO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 4
+    temperature_C_as_printed: 1697
+    duration_min_as_printed: 15
+    composition_mass_percent:
+      CaO: 15
+      SiO2: 85
+    composition_as_printed: 15CaO, 85SiO2
+    run_products_as_published: CaO—rich glass + cristobalite. Not well sintered together
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run4_15cao_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run4_15mgo_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 4, column 15MgO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 4
+    temperature_C_as_printed: 1697
+    duration_min_as_printed: 15
+    composition_mass_percent:
+      MgO: 15
+      SiO2: 85
+    composition_as_printed: 15MgO, 85SiO2
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run4_15mgo_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run5_15cao_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 5, column 15CaO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 5
+    temperature_C_as_printed: 1697
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      CaO: 15
+      SiO2: 85
+    composition_as_printed: 15CaO, 85SiO2
+    run_products_as_published: As in run 4
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run5_15cao_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run5_15mgo_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 5, column 15MgO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 5
+    temperature_C_as_printed: 1697
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      MgO: 15
+      SiO2: 85
+    composition_as_printed: 15MgO, 85SiO2
+    run_products_as_published: A good deal of cristobalite and 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run5_15mgo_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run6_15cao_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 6, column 15CaO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 6
+    temperature_C_as_printed: 1700
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      CaO: 15
+      SiO2: 85
+    composition_as_printed: 15CaO, 85SiO2
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run6_15cao_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run7_15mgo_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 7, column 15MgO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 7
+    temperature_C_as_printed: 1700
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      MgO: 15
+      SiO2: 85
+    composition_as_printed: 15MgO, 85SiO2
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run7_15mgo_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run7_5cao_95sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 7, column 5CaO, 95SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 7
+    temperature_C_as_printed: 1700
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      CaO: 5
+      SiO2: 95
+    composition_as_printed: 5CaO, 95SiO2
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run7_5cao_95sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run8_15mgo_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 8, column 15MgO, 85SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 8
+    temperature_C_as_printed: 1699
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      MgO: 15
+      SiO2: 85
+    composition_as_printed: 15MgO, 85SiO2
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run8_15mgo_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run8_15sro_85sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 8; SrO column
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    run_number_as_printed: 8
+    composition_mass_percent:
+      SrO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1699
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run8_15sro_85sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_run8_5cao_95sio2
+  type: phase_equilibrium_run_products
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Run 8, column 5CaO, 95SiO2
+  units: temperature °C; time min; composition wt% as printed in column head
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    run_number_as_printed: 8
+    temperature_C_as_printed: 1699
+    duration_min_as_printed: 20
+    composition_mass_percent:
+      CaO: 5
+      SiO2: 95
+    composition_as_printed: 5CaO, 95SiO2
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_run8_5cao_95sio2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t3_sro_equilibrium
+  type: thermodynamic_example
+  experiment: cristobalite-two-liquids-t3
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: SrO equilibrium summary
+  units: °C
+  values:
+    method_class: measured_tabulated
+    system: SrO-SiO2
+    temperature_C_as_printed: 1693
+    phase_assemblage_as_printed: cristobalite + two liquids
+    blank_cells: SrO results in runs 2–7 are blank; populated cells are runs 8, 12, 13, 14 and 15.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t3_sro_equilibrium
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4a_15mgo_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV A
+    note: Composition 15/85 (MgO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-SiO2
+    composition_mass_percent:
+      MgO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1697
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4a_15mgo_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4a_15mgo_85sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV A
+    note: Composition 15/85 (MgO-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-SiO2
+    composition_mass_percent:
+      MgO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1694
+    duration_min_as_printed: 20
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4a_15mgo_85sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4a_26mgo_74sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV A
+    note: Composition 26/74 (MgO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-SiO2
+    composition_mass_percent:
+      MgO: 26
+      SiO2: 74
+    temperature_C_as_printed: 1694
+    duration_min_as_printed: 30
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4a_26mgo_74sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4a_26mgo_74sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV A
+    note: Composition 26/74 (MgO-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-SiO2
+    composition_mass_percent:
+      MgO: 26
+      SiO2: 74
+    temperature_C_as_printed: 1710
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4a_26mgo_74sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4a_2mgo_98sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV A
+    note: Composition 2/98 (MgO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-SiO2
+    composition_mass_percent:
+      MgO: 2
+      SiO2: 98
+    temperature_C_as_printed: 1710
+    duration_min_as_printed: 30
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4a_2mgo_98sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4a_30mgo_70sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV A
+    note: Composition 30/70 (MgO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-SiO2
+    composition_mass_percent:
+      MgO: 30
+      SiO2: 70
+    temperature_C_as_printed: 1700
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4a_30mgo_70sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4a_31mgo_69sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV A
+    note: Composition 31/69 (MgO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-SiO2
+    composition_mass_percent:
+      MgO: 31
+      SiO2: 69
+    temperature_C_as_printed: 1692
+    duration_min_as_printed: 20
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4a_31mgo_69sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4a_31mgo_69sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV A
+    note: Composition 31/69 (MgO-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-SiO2
+    composition_mass_percent:
+      MgO: 31
+      SiO2: 69
+    temperature_C_as_printed: 1696
+    duration_min_as_printed: 15
+    run_products_as_published: 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4a_31mgo_69sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4a_32mgo_68sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV A
+    note: Composition 32/68 (MgO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-SiO2
+    composition_mass_percent:
+      MgO: 32
+      SiO2: 68
+    temperature_C_as_printed: 1667
+    duration_min_as_printed: 40
+    run_products_as_published: Glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4a_32mgo_68sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4a_32mgo_68sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV A
+    note: Composition 32/68 (MgO-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-SiO2
+    composition_mass_percent:
+      MgO: 32
+      SiO2: 68
+    temperature_C_as_printed: 1654
+    duration_min_as_printed: 40
+    run_products_as_published: Cristobalite in fair amount + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4a_32mgo_68sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_10cao_90sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 10/90 (CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: 10
+      SiO2: 90
+    temperature_C_as_printed: 1700
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_10cao_90sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_15cao_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 15/85 (CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1697
+    duration_min_as_printed: 20
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_15cao_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_15cao_85sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 15/85 (CaO-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1700
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_15cao_85sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_20cao_80sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 20/80 (CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: 20
+      SiO2: 80
+    temperature_C_as_printed: 1702
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_20cao_80sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_26p5cao_73p5sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 26.5/73.5 (CaO-SiO2) quench 1; see p.18 prose
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: '26.5'
+      SiO2: '73.5'
+    temperature_C_as_printed: 1700
+    duration_min_as_printed: 30
+    run_products_as_published: 2 glasses
+    text_discrepancy_note: Page 18 prose says runs on 26.5CaO, 73.5SiO2 "show that at 1710° it forms two liquids but at 1740°
+      it forms a single homogeneous liquid"; Table IV B prints 1700 (30 min) for the two-glass run. Both kept; not resolved.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_26p5cao_73p5sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_26p5cao_73p5sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 26.5/73.5 (CaO-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: '26.5'
+      SiO2: '73.5'
+    temperature_C_as_printed: 1740
+    duration_min_as_printed: 20
+    run_products_as_published: 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_26p5cao_73p5sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_28cao_72sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 28/72 (CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: 28
+      SiO2: 72
+    temperature_C_as_printed: 1693
+    duration_min_as_printed: 40
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_28cao_72sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_28cao_72sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 28/72 (CaO-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: 28
+      SiO2: 72
+    temperature_C_as_printed: 1700
+    duration_min_as_printed: 20
+    run_products_as_published: 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_28cao_72sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_2cao_98sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 2/98 (CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: 2
+      SiO2: 98
+    temperature_C_as_printed: 1710
+    duration_min_as_printed: 30
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_2cao_98sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_31p8cao_68p2sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 31.8/68.2 (CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: '31.8'
+      SiO2: '68.2'
+    temperature_C_as_printed: 1650
+    duration_min_as_printed: 30
+    run_products_as_published: All glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_31p8cao_68p2sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_31p8cao_68p2sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 31.8/68.2 (CaO-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: '31.8'
+      SiO2: '68.2'
+    temperature_C_as_printed: 1627
+    duration_min_as_printed: 30
+    run_products_as_published: Rare crystals of cristobalite in glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_31p8cao_68p2sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_35cao_65sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 35/65 (CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: 35
+      SiO2: 65
+    temperature_C_as_printed: 1459
+    duration_min_as_printed: 30
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_35cao_65sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_35cao_65sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 35/65 (CaO-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: 35
+      SiO2: 65
+    temperature_C_as_printed: 1471
+    duration_min_as_printed: 30
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_35cao_65sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_35cao_65sio2_q3
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 35/65 (CaO-SiO2) quench 3
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: 35
+      SiO2: 65
+    temperature_C_as_printed: 1480
+    duration_min_as_printed: 30
+    run_products_as_published: Scattering of cristobalite in glass. Liquidus about 5° higher
+    liquidus_note_as_printed: Liquidus about 5° higher
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_35cao_65sio2_q3
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4b_5cao_95sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV B
+    note: Composition 5/95 (CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-SiO2
+    composition_mass_percent:
+      CaO: 5
+      SiO2: 95
+    temperature_C_as_printed: 1699
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4b_5cao_95sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4c_r1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV C
+    note: Row 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      SrO: 2
+      SiO2: 98
+    temperature_C_as_printed: 1710
+    duration_min_as_printed: 30
+    run_products_as_published: 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4c_r1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4c_r2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV C
+    note: Row 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      SrO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1692
+    duration_min_as_printed: 20
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4c_r2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4c_r3
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV C
+    note: Row 3
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      SrO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1694
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4c_r3
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4c_r4
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV C
+    note: Row 4
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      SrO: 30
+      SiO2: 70
+    temperature_C_as_printed: 1692
+    duration_min_as_printed: 20
+    run_products_as_published: Very rare cristobalite + glass; liquidus 1692°
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4c_r4
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4c_r5
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV C
+    note: Row 5
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      SrO: 38
+      SiO2: 62
+    temperature_C_as_printed: 1611
+    duration_min_as_printed: 20
+    run_products_as_published: All glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4c_r5
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4c_r6
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV C
+    note: Row 6
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      SrO: 38
+      SiO2: 62
+    temperature_C_as_printed: 1564
+    duration_min_as_printed: 20
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4c_r6
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t4c_r7
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-binary
+  locator:
+    page: 17
+    published_page: 17
+    table: IV C
+    note: Row 7
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      SrO: 38
+      SiO2: 62
+    temperature_C_as_printed: 1603
+    duration_min_as_printed: 20
+    run_products_as_published: Rare cristobalite + glass; liquidus 1605°
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t4c_r7
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t5_cao_siliceous_glass
+  type: composition
+  experiment: critical-quenches-binary
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: CaO-SiO2 row; footnote 2
+  units: composition wt% (by interpolation); refractive index sodium light; temperature °C
+  values:
+    quantity: conjugate_siliceous_liquid_composition
+    method_class: author_derived
+    evidence_class: author_derived
+    derivation_as_printed: Composition of siliceous glass by interpolation; page 16 states the composition was obtained on
+      the assumption that the index of refraction is a linear function of the composition, and page 18 states the result gives
+      the silica content to better than 0.5 per cent.
+    system: CaO-SiO2
+    temperature_C_as_printed: 1710
+    composition_mass_percent:
+      CaO: '0.6'
+      SiO2: '99.4'
+    refractive_index_sodium_light_as_printed:
+      '1710': 1.460+
+      '1744': 1.462—
+    reference_glass_refractive_index_as_printed: '1.589'
+    reference_glass_footnote_as_printed: N. L. Bowen. Unpublished data. Glass of composition 37.0CaO 63.0SiO2.
+    silica_glass_refractive_index_as_printed: '1.4584'
+    table_note_as_printed: The method is not sufficiently sensitive to decide whether the liquid formed from magnesia silica
+      or from lime silica is the richer in silica.
+    row_alignment_note: The interpolated composition is printed on the 1710 °C line; no composition is printed for the 1744
+      °C index.
+  uncertainty:
+    note: 'Page 18: silica content of the glass to better than 0.5 per cent.'
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t5_mgo_siliceous_glass
+  type: composition
+  experiment: critical-quenches-binary
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: MgO-SiO2 row; footnote 1
+  units: composition wt% (by interpolation); refractive index sodium light; temperature °C
+  values:
+    quantity: conjugate_siliceous_liquid_composition
+    method_class: author_derived
+    evidence_class: author_derived
+    derivation_as_printed: Composition of siliceous glass by interpolation; page 16 states the composition was obtained on
+      the assumption that the index of refraction is a linear function of the composition, and page 18 states the result gives
+      the silica content to better than 0.5 per cent.
+    system: MgO-SiO2
+    temperature_C_as_printed: 1710
+    composition_mass_percent:
+      MgO: '0.8'
+      SiO2: '99.2'
+    refractive_index_sodium_light_as_printed:
+      '1710': '1.461'
+      '1744': '1.462'
+    reference_glass_refractive_index_as_printed: '1.580'
+    reference_glass_footnote_as_printed: E. S. Larsen. This Journal 28, 263-274. 1909. Glass of composition 40.15MgO 59.85SiO2.
+    silica_glass_refractive_index_as_printed: '1.4584'
+    table_note_as_printed: The method is not sufficiently sensitive to decide whether the liquid formed from magnesia silica
+      or from lime silica is the richer in silica.
+    row_alignment_note: The interpolated composition is printed on the 1710 °C line; no composition is printed for the 1744
+      °C index.
+  uncertainty:
+    note: 'Page 18: silica content of the glass to better than 0.5 per cent.'
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t5_sro_siliceous_glass
+  type: composition
+  experiment: critical-quenches-binary
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: SrO-SiO2 row and footnote 3
+  units: composition wt% by interpolation; refractive index sodium light; °C
+  values:
+    method_class: author_derived
+    system: SrO-SiO2
+    temperature_C_as_printed: 1710
+    composition_mass_percent:
+      SrO: '2.4'
+      SiO2: '97.6'
+    refractive_index_sodium_light_as_printed:
+      '1710': '1.464'
+      '1744': '1.465'
+    reference_glass_refractive_index_as_printed: '1.584'
+    reference_glass_footnote_as_printed: P. Eskola. Op. cit. Glass of composition 46.2SrO 53.8SiO2.
+    silica_glass_refractive_index_as_printed: '1.4584'
+    derivation_as_printed: Index assumed linear in composition (p. 16); immersion measurements; silica content better than
+      0.5 per cent (p. 18). Measured indices and quoted reference glass are inputs to the interpolated composition.
+    row_alignment_note: Reference index and interpolated composition cells blank on the 1744°C line; no new composition inferred.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_sro_siliceous_glass
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r1
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 5
+      SiO2: 95
+    temperature_C_as_printed: 1690
+    duration_min_as_printed: 25
+    run_products_as_published: All glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r10
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 10
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 25
+      SiO2: 75
+    temperature_C_as_printed: 1670
+    duration_min_as_printed: 20
+    run_products_as_published: Cristobalite + glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+    liquidus_temperature_C_as_printed: 1674
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r10
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r11
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 11
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 35
+      SiO2: 65
+    temperature_C_as_printed: 1627
+    duration_min_as_printed: 15
+    run_products_as_published: Cristobalite + glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r11
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r12
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 12
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 35
+      SiO2: 65
+    temperature_C_as_printed: 1636
+    duration_min_as_printed: 20
+    run_products_as_published: Very rare crystals in glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+    liquidus_temperature_C_as_printed: 1636
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r12
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r13
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 13
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 40
+      SiO2: 60
+    temperature_C_as_printed: 1594
+    duration_min_as_printed: 20
+    run_products_as_published: All glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r13
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r14
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 14
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 40
+      SiO2: 60
+    temperature_C_as_printed: 1583
+    duration_min_as_printed: 20
+    run_products_as_published: Rare crystals in glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r14
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r15
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 15
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 40
+      SiO2: 60
+    temperature_C_as_printed: 1570
+    duration_min_as_printed: 20
+    run_products_as_published: Cristobalite + glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+    liquidus_temperature_C_as_printed: 1583
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r15
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r16
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 16
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 45
+      SiO2: 55
+    temperature_C_as_printed: 1492
+    duration_min_as_printed: 25
+    run_products_as_published: All glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r16
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r17
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 17
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 45
+      SiO2: 55
+    temperature_C_as_printed: 1487
+    duration_min_as_printed: 30
+    run_products_as_published: Cristobalite in glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+    liquidus_temperature_C_as_printed: 1489
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r17
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r2
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 5
+      SiO2: 95
+    temperature_C_as_printed: 1886
+    duration_min_as_printed: 25
+    run_products_as_published: Cristobalite + glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+    liquidus_temperature_C_as_printed: 1688
+    discrepancy_note: Printed 1886° retained; inconsistent with nearby 1690° all-glass run and printed liquidus 1688°. No
+      substitution of 1686°.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r3
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 3
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 10
+      SiO2: 90
+    temperature_C_as_printed: 1681
+    duration_min_as_printed: 25
+    run_products_as_published: Cristobalite + glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r3
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r4
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 4
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 10
+      SiO2: 90
+    temperature_C_as_printed: 1686
+    duration_min_as_printed: 25
+    run_products_as_published: All glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+    liquidus_temperature_C_as_printed: 1683
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r4
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r5
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 5
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1682
+    duration_min_as_printed: 20
+    run_products_as_published: All glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r5
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r6
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 6
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1679
+    duration_min_as_printed: 25
+    run_products_as_published: Very rare crystals + glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r6
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r7
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 7
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 15
+      SiO2: 85
+    temperature_C_as_printed: 1677
+    duration_min_as_printed: 20
+    run_products_as_published: Cristobalite + glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+    liquidus_temperature_C_as_printed: 1679
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r7
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r8
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 8
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 25
+      SiO2: 75
+    temperature_C_as_printed: 1682
+    duration_min_as_printed: 20
+    run_products_as_published: All glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r8
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t6_r9
+  type: phase_equilibrium_run_products
+  locator:
+    page: 24
+    published_page: 24
+    table: VI
+    note: Row 9
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    composition_mass_percent:
+      BaO: 25
+      SiO2: 75
+    temperature_C_as_printed: 1674
+    duration_min_as_printed: 20
+    run_products_as_published: Rare cristobalite + glass
+    method_as_printed: Critical quench; products determined microscopically; in each case one glass only.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t6_r9
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7a_13mgo_13cao_74sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII A
+    note: Composition 13/13/74 (MgO-CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-CaO-SiO2
+    composition_mass_percent:
+      MgO: 13
+      CaO: 13
+      SiO2: 74
+    temperature_C_as_printed: 1694
+    duration_min_as_printed: 15
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7a_13mgo_13cao_74sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7a_13mgo_13cao_74sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII A
+    note: Composition 13/13/74 (MgO-CaO-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-CaO-SiO2
+    composition_mass_percent:
+      MgO: 13
+      CaO: 13
+      SiO2: 74
+    temperature_C_as_printed: 1701
+    duration_min_as_printed: 15
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7a_13mgo_13cao_74sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7a_14mgo_14cao_72sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII A
+    note: Composition 14/14/72 (MgO-CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-CaO-SiO2
+    composition_mass_percent:
+      MgO: 14
+      CaO: 14
+      SiO2: 72
+    temperature_C_as_printed: 1694
+    duration_min_as_printed: 15
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7a_14mgo_14cao_72sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7a_14mgo_14cao_72sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII A
+    note: Composition 14/14/72 (MgO-CaO-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-CaO-SiO2
+    composition_mass_percent:
+      MgO: 14
+      CaO: 14
+      SiO2: 72
+    temperature_C_as_printed: 1701
+    duration_min_as_printed: 17
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7a_14mgo_14cao_72sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7a_15mgo_15cao_70sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII A
+    note: Composition 15/15/70 (MgO-CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-CaO-SiO2
+    composition_mass_percent:
+      MgO: 15
+      CaO: 15
+      SiO2: 70
+    temperature_C_as_printed: 1701
+    duration_min_as_printed: 17
+    run_products_as_published: 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7a_15mgo_15cao_70sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7a_15mgo_15cao_70sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII A
+    note: Composition 15/15/70 (MgO-CaO-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-CaO-SiO2
+    composition_mass_percent:
+      MgO: 15
+      CaO: 15
+      SiO2: 70
+    temperature_C_as_printed: 1694
+    duration_min_as_printed: 15
+    run_products_as_published: 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7a_15mgo_15cao_70sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7a_5p6mgo_22p4cao_72sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII A
+    note: Composition 5.6/22.4/72 (MgO-CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-CaO-SiO2
+    composition_mass_percent:
+      MgO: '5.6'
+      CaO: '22.4'
+      SiO2: 72
+    temperature_C_as_printed: 1701
+    duration_min_as_printed: 17
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7a_5p6mgo_22p4cao_72sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7a_6mgo_24cao_70sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII A
+    note: Composition 6/24/70 (MgO-CaO-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-CaO-SiO2
+    composition_mass_percent:
+      MgO: 6
+      CaO: 24
+      SiO2: 70
+    temperature_C_as_printed: 1697
+    duration_min_as_printed: 15
+    run_products_as_published: 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7a_6mgo_24cao_70sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_10mgo_5al2o3_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 10/5/85 (MgO-Al2O3-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 10
+      Al2O3: 5
+      SiO2: 85
+    temperature_C_as_printed: 1653
+    duration_min_as_printed: 20
+    run_products_as_published: Homogeneous glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_10mgo_5al2o3_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_10mgo_5al2o3_85sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 10/5/85 (MgO-Al2O3-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 10
+      Al2O3: 5
+      SiO2: 85
+    temperature_C_as_printed: 1652
+    duration_min_as_printed: 20
+    run_products_as_published: Sparse cristobalite in glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_10mgo_5al2o3_85sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_11mgo_4al2o3_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 11/4/85 (MgO-Al2O3-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 11
+      Al2O3: 4
+      SiO2: 85
+    temperature_C_as_printed: 1669
+    duration_min_as_printed: 15
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_11mgo_4al2o3_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_11mgo_4al2o3_85sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 11/4/85 (MgO-Al2O3-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 11
+      Al2O3: 4
+      SiO2: 85
+    temperature_C_as_printed: 1661
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses + rare cristobalite
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_11mgo_4al2o3_85sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_11mgo_4al2o3_85sio2_q3
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 11/4/85 (MgO-Al2O3-SiO2) quench 3
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 11
+      Al2O3: 4
+      SiO2: 85
+    temperature_C_as_printed: 1653
+    duration_min_as_printed: 20
+    run_products_as_published: A good deal of cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_11mgo_4al2o3_85sio2_q3
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_12mgo_3al2o3_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 12/3/85 (MgO-Al2O3-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 12
+      Al2O3: 3
+      SiO2: 85
+    temperature_C_as_printed: 1673
+    duration_min_as_printed: 30
+    run_products_as_published: 2 glasses + rare cristobalite
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_12mgo_3al2o3_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_12mgo_3al2o3_85sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 12/3/85 (MgO-Al2O3-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 12
+      Al2O3: 3
+      SiO2: 85
+    temperature_C_as_printed: 1681
+    duration_min_as_printed: 17
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_12mgo_3al2o3_85sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_20mgo_5al2o3_75sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 20/5/75 (MgO-Al2O3-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 20
+      Al2O3: 5
+      SiO2: 75
+    temperature_C_as_printed: 1653
+    duration_min_as_printed: 20
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_20mgo_5al2o3_75sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_20mgo_5al2o3_75sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 20/5/75 (MgO-Al2O3-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 20
+      Al2O3: 5
+      SiO2: 75
+    temperature_C_as_printed: 1661
+    duration_min_as_printed: 20
+    run_products_as_published: 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_20mgo_5al2o3_75sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_21mgo_4al2o3_75sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 21/4/75 (MgO-Al2O3-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 21
+      Al2O3: 4
+      SiO2: 75
+    temperature_C_as_printed: 1673
+    duration_min_as_printed: 30
+    run_products_as_published: 2 glasses, rare cristobalite
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_21mgo_4al2o3_75sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_21mgo_4al2o3_75sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 21/4/75 (MgO-Al2O3-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 21
+      Al2O3: 4
+      SiO2: 75
+    temperature_C_as_printed: 1670
+    duration_min_as_printed: 15
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_21mgo_4al2o3_75sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_23mgo_2al2o3_75sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 23/2/75 (MgO-Al2O3-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 23
+      Al2O3: 2
+      SiO2: 75
+    temperature_C_as_printed: 1689
+    duration_min_as_printed: 15
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_23mgo_2al2o3_75sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_23mgo_2al2o3_75sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 23/2/75 (MgO-Al2O3-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 23
+      Al2O3: 2
+      SiO2: 75
+    temperature_C_as_printed: 1681
+    duration_min_as_printed: 17
+    run_products_as_published: 2 glasses + cristobalite
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_23mgo_2al2o3_75sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7b_23mgo_2al2o3_75sio2_q3
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII B
+    note: Composition 23/2/75 (MgO-Al2O3-SiO2) quench 3
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Al2O3-SiO2
+    composition_mass_percent:
+      MgO: 23
+      Al2O3: 2
+      SiO2: 75
+    temperature_C_as_printed: 1673
+    duration_min_as_printed: 30
+    run_products_as_published: 1 glass + cristobalite
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7b_23mgo_2al2o3_75sio2_q3
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7c_10cao_5al2o3_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII C
+    note: Composition 10/5/85 (CaO-Al2O3-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-Al2O3-SiO2
+    composition_mass_percent:
+      CaO: 10
+      Al2O3: 5
+      SiO2: 85
+    temperature_C_as_printed: 1636
+    duration_min_as_printed: 25
+    run_products_as_published: Glass with a very little cristobalite
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7c_10cao_5al2o3_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7c_11cao_4al2o3_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII C
+    note: Composition 11/4/85 (CaO-Al2O3-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-Al2O3-SiO2
+    composition_mass_percent:
+      CaO: 11
+      Al2O3: 4
+      SiO2: 85
+    temperature_C_as_printed: 1652
+    duration_min_as_printed: 20
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7c_11cao_4al2o3_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7c_11cao_4al2o3_85sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII C
+    note: Composition 11/4/85 (CaO-Al2O3-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-Al2O3-SiO2
+    composition_mass_percent:
+      CaO: 11
+      Al2O3: 4
+      SiO2: 85
+    temperature_C_as_printed: 1661
+    duration_min_as_printed: 25
+    run_products_as_published: 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7c_11cao_4al2o3_85sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7c_12cao_3al2o3_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII C
+    note: Composition 12/3/85 (CaO-Al2O3-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-Al2O3-SiO2
+    composition_mass_percent:
+      CaO: 12
+      Al2O3: 3
+      SiO2: 85
+    temperature_C_as_printed: 1669
+    duration_min_as_printed: 25
+    run_products_as_published: 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7c_12cao_3al2o3_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7c_12cao_3al2o3_85sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII C
+    note: Composition 12/3/85 (CaO-Al2O3-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-Al2O3-SiO2
+    composition_mass_percent:
+      CaO: 12
+      Al2O3: 3
+      SiO2: 85
+    temperature_C_as_printed: 1661
+    duration_min_as_printed: 25
+    run_products_as_published: Cristobalite + 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7c_12cao_3al2o3_85sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7c_13cao_2al2o3_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII C
+    note: Composition 13/2/85 (CaO-Al2O3-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-Al2O3-SiO2
+    composition_mass_percent:
+      CaO: 13
+      Al2O3: 2
+      SiO2: 85
+    temperature_C_as_printed: 1681
+    duration_min_as_printed: 17
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7c_13cao_2al2o3_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7c_13cao_2al2o3_85sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII C
+    note: Composition 13/2/85 (CaO-Al2O3-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-Al2O3-SiO2
+    composition_mass_percent:
+      CaO: 13
+      Al2O3: 2
+      SiO2: 85
+    temperature_C_as_printed: 1677
+    duration_min_as_printed: 25
+    run_products_as_published: Cristobalite + 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7c_13cao_2al2o3_85sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7c_14cao_1al2o3_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII C
+    note: Composition 14/1/85 (CaO-Al2O3-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-Al2O3-SiO2
+    composition_mass_percent:
+      CaO: 14
+      Al2O3: 1
+      SiO2: 85
+    temperature_C_as_printed: 1686
+    duration_min_as_printed: 25
+    run_products_as_published: Cristobalite + 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7c_14cao_1al2o3_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7c_14cao_1al2o3_85sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 36
+    published_page: 36
+    table: VII C
+    note: Composition 14/1/85 (CaO-Al2O3-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-Al2O3-SiO2
+    composition_mass_percent:
+      CaO: 14
+      Al2O3: 1
+      SiO2: 85
+    temperature_C_as_printed: 1694
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7c_14cao_1al2o3_85sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7c_19cao_3al2o3_78sio2_q1
+  type: phase_equilibrium_run_products
+  locator:
+    page: 36
+    published_page: 36
+    table: VII C
+    note: Composition 19/3/78 (CaO-Al2O3-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: CaO-Al2O3-SiO2
+    composition_mass_percent:
+      CaO: 19
+      Al2O3: 3
+      SiO2: 78
+    temperature_C_as_printed:
+      state:
+        tag: unknown
+        reason: not_published
+    run_note: Row prints no temperature or time; the result cell reads "run in gas furnace gave 1 glass".
+    method_as_printed: Gas-furnace run; container and thermal schedule are not stated for this row.
+    run_products_as_published: run in gas furnace gave 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7c_19cao_3al2o3_78sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7d_12mgo_3na2o_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 37
+    published_page: 37
+    table: VII D
+    note: Composition 12/3/85 (MgO-Na2O-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Na2O-SiO2
+    composition_mass_percent:
+      MgO: 12
+      Na2O: 3
+      SiO2: 85
+    temperature_C_as_printed: 1594
+    duration_min_as_printed: 20
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7d_12mgo_3na2o_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7d_12mgo_3na2o_85sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 37
+    published_page: 37
+    table: VII D
+    note: Composition 12/3/85 (MgO-Na2O-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Na2O-SiO2
+    composition_mass_percent:
+      MgO: 12
+      Na2O: 3
+      SiO2: 85
+    temperature_C_as_printed: 1605
+    duration_min_as_printed: 15
+    run_products_as_published: 1 glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7d_12mgo_3na2o_85sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7d_13p5mgo_1p5na2o_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 37
+    published_page: 37
+    table: VII D
+    note: Composition 13.5/1.5/85 (MgO-Na2O-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Na2O-SiO2
+    composition_mass_percent:
+      MgO: '13.5'
+      Na2O: '1.5'
+      SiO2: 85
+    temperature_C_as_printed: 1646
+    duration_min_as_printed: 15
+    run_products_as_published: Cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7d_13p5mgo_1p5na2o_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7d_13p5mgo_1p5na2o_85sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 37
+    published_page: 37
+    table: VII D
+    note: Composition 13.5/1.5/85 (MgO-Na2O-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-Na2O-SiO2
+    composition_mass_percent:
+      MgO: '13.5'
+      Na2O: '1.5'
+      SiO2: 85
+    temperature_C_as_printed: 1660
+    duration_min_as_printed: 20
+    run_products_as_published: 2 glasses, on edge of field
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7d_13p5mgo_1p5na2o_85sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7e_10p6mgo_4p4k2o_85sio2_q1
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 37
+    published_page: 37
+    table: VII E
+    note: Composition 10.6/4.4/85 (MgO-K2O-SiO2) quench 1
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-K2O-SiO2
+    composition_mass_percent:
+      MgO: '10.6'
+      K2O: '4.4'
+      SiO2: 85
+    temperature_C_as_printed: 1550
+    duration_min_as_printed: 20
+    run_products_as_published: All glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7e_10p6mgo_4p4k2o_85sio2_q1
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_t7e_10p6mgo_4p4k2o_85sio2_q2
+  type: phase_equilibrium_run_products
+  experiment: critical-quenches-ternary
+  locator:
+    page: 37
+    published_page: 37
+    table: VII E
+    note: Composition 10.6/4.4/85 (MgO-K2O-SiO2) quench 2
+  units: temperature °C; time min; composition wt%
+  values:
+    method_class: measured_tabulated
+    evidence_class: measured_tabulated
+    system: MgO-K2O-SiO2
+    composition_mass_percent:
+      MgO: '10.6'
+      K2O: '4.4'
+      SiO2: 85
+    temperature_C_as_printed: 1533
+    duration_min_as_printed: 20
+    run_products_as_published: Considerable cristobalite + glass
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t7e_10p6mgo_4p4k2o_85sio2_q2
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_ten_gram_quench_comparison
+  type: characterization
+  locator:
+    page: 44
+    published_page: 44
+    note: Second paragraph; distinct comparison charge
+  units: composition wt%; g; °C
+  values:
+    method_class: measured_text
+    composition_mass_percent:
+      CaO: 37
+      SiO2: 63
+    charge_mass_g_as_printed: 10
+    mass_as_printed: ten-gram charge
+    method: Completely quenched by plunging under water.
+    author_comparison: At 1700° this liquid would have less viscosity than the approximate 27.5CaO/72.5SiO2 liquid, but its
+      much lower liquidus increases viscosity at quench. The 1700° is a viscosity-comparison condition, not an asserted quench
+      setpoint.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_ten_gram_quench_comparison
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_ternary_monotectic_range_text
+  type: thermodynamic_example
+  locator:
+    page: 30
+    published_page: 30
+    note: Prose on MgO-CaO-SiO2 (Fig. 19 discussion)
+  units: °C
+  values:
+    method_class: author_statement
+    evidence_class: author_statement
+    statement_as_printed: This temperature in the binary system CaO-SiO2 is 1698°; in the system MgO-SiO2 it is 1695°. In
+      the ternary system the temperatures lie between these.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_ternary_monotectic_range_text
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_ternary_refractive_indices
+  type: characterization
+  locator:
+    page: 33
+    published_page: 33
+    note: Siliceous glass index measurements and rough tie-line check
+  units: composition wt%; refractive index
+  values:
+    method_class: measured_text
+    glasses:
+    - composition_mass_percent:
+        MgO: 12
+        Al2O3: 3
+        SiO2: 85
+      refractive_index_as_printed: 1.463+
+    - composition_mass_percent:
+        MgO: 21
+        Al2O3: 4
+        SiO2: 75
+      refractive_index_as_printed: '1.465'
+    - composition_mass_percent:
+        MgO: 10
+        Al2O3: 5
+        SiO2: 85
+      refractive_index_as_printed: '1.490'
+    reference_glass:
+      composition_mass_percent:
+        Al2O3: '22.5'
+        SiO2: '77.5'
+      refractive_index_as_printed: '1.490'
+    interpretation: Author states refractive index of more siliceous alumina-silica glasses is linear in composition; joins
+      two glasses with index 1.490 and draws parallel lines at 1.463 and 1.465 to obtain approximate compositions at boundary
+      intersections. No intersections digitized. First two starting mixtures become completely liquid at same temperature
+      and form pairs of liquids of same composition.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_ternary_refractive_indices
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_ternary_tie_line_absence
+  type: method
+  locator:
+    page: 30
+    published_page: 30
+  units: text
+  values:
+    method_class: author_statement
+    statement: Exact tie-line positions not determined and not feasible to determine; essential directions inferred from diagram.
+      No numeric conjugate compositions digitized.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_ternary_tie_line_absence
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2
+- observation_id: greig1927_wire_and_refractory_preparation
+  type: method
+  locator:
+    page: 4
+    published_page: 4
+    note: Continues p. 5 and Fig. 1 caption
+  units: text
+  values:
+    method_class: method_only
+    wire: Pt-Rh purified and drawn by Heraeus; Pt purified by E. Wichers of the United States Bureau of Standards. Commercial
+      Pt iridium contaminates the thermoelement and reduces its e.m.f.; all Pt introduced into the furnace was to be as pure
+      as possible.
+    refractory: Norton dense alundum tube with very little bond shrank only slightly; pre-firing above operating temperature
+      was desirable but could not be done. Purest grain alundum central packing shrinks much less than magnesia and avoids
+      repacking between windings.
+  context_id: greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_wire_and_refractory_preparation
+  work_id: 10.2475/ajs.s5-13.73.1
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  species: SiO2

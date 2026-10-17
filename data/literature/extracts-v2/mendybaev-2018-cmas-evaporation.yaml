@@ -1,0 +1,574 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/mendybaev-2018-cmas-evaporation.yaml
+observations:
+- observation_id: mendybaev-2018-cmas-evaporation::mendybaev_2018_richter_caib_mg_evaporation_rates::T=1873.15:h=bcaec53ece59
+  experiment_id: 94123439cd55c4c9a26ef78a97260a218672c1554a0d8ccfd1e695fc579487c3::mendybaev-2018-cmas-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.000000002'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: The source uses approximate signs for the first two rates and ranges for the latter two; it gives no separate
+        measurement uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richter et al. (2007), reference [1]
+  admission:
+    status: rejected
+    reason: The printed molar flux unit is incompatible with the evaporation_rate quantity unit; no conversion is made.
+    decided_by:
+      worker: x-mendybaev-2018-cmas-evaporation
+      date: '2026-10-05'
+      evidence:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+        note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007);
+          they are not new measurements in this abstract.
+  notices: []
+  source_id: mendybaev-2018-cmas-evaporation
+  locator:
+    published_page: 1
+    pdf_page_index: 0
+    section: Results and Discussion
+    note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007); they
+      are not new measurements in this abstract.
+  read_from: pdf:mendybaev-2018-cmas-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+        note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007);
+          they are not new measurements in this abstract.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 1
+              pdf_page_index: 0
+              section: Results and Discussion
+              note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al.
+                (2007); they are not new measurements in this abstract.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1
+              pdf_page_index: 0
+              section: Results and Discussion
+              note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al.
+                (2007); they are not new measurements in this abstract.
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:mendybaev-2018-cmas-evaporation
+    parameters: []
+    output_unit: mol cm^-2 s^-1
+- observation_id: mendybaev-2018-cmas-evaporation::mendybaev_2018_richter_caib_mg_evaporation_rates::T=1973.15:h=6d7a190d6381
+  experiment_id: 94123439cd55c4c9a26ef78a97260a218672c1554a0d8ccfd1e695fc579487c3::mendybaev-2018-cmas-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1973.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.00000001'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: The source uses approximate signs for the first two rates and ranges for the latter two; it gives no separate
+        measurement uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richter et al. (2007), reference [1]
+  admission:
+    status: rejected
+    reason: The printed molar flux unit is incompatible with the evaporation_rate quantity unit; no conversion is made.
+    decided_by:
+      worker: x-mendybaev-2018-cmas-evaporation
+      date: '2026-10-05'
+      evidence:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+        note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007);
+          they are not new measurements in this abstract.
+  notices: []
+  source_id: mendybaev-2018-cmas-evaporation
+  locator:
+    published_page: 1
+    pdf_page_index: 0
+    section: Results and Discussion
+    note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007); they
+      are not new measurements in this abstract.
+  read_from: pdf:mendybaev-2018-cmas-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+        note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007);
+          they are not new measurements in this abstract.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 1
+              pdf_page_index: 0
+              section: Results and Discussion
+              note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al.
+                (2007); they are not new measurements in this abstract.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1
+              pdf_page_index: 0
+              section: Results and Discussion
+              note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al.
+                (2007); they are not new measurements in this abstract.
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:mendybaev-2018-cmas-evaporation
+    parameters: []
+    output_unit: mol cm^-2 s^-1
+- observation_id: mendybaev-2018-cmas-evaporation::mendybaev_2018_richter_caib_mg_evaporation_rates::T=2073.15:h=3eb3835704bc
+  experiment_id: 94123439cd55c4c9a26ef78a97260a218672c1554a0d8ccfd1e695fc579487c3::mendybaev-2018-cmas-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: interval
+    interval_low: '0.00000002'
+    interval_high: '0.00000006'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: The source uses approximate signs for the first two rates and ranges for the latter two; it gives no separate
+        measurement uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richter et al. (2007), reference [1]
+  admission:
+    status: rejected
+    reason: The printed molar flux unit is incompatible with the evaporation_rate quantity unit; no conversion is made.
+    decided_by:
+      worker: x-mendybaev-2018-cmas-evaporation
+      date: '2026-10-05'
+      evidence:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+        note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007);
+          they are not new measurements in this abstract.
+  notices: []
+  source_id: mendybaev-2018-cmas-evaporation
+  locator:
+    published_page: 1
+    pdf_page_index: 0
+    section: Results and Discussion
+    note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007); they
+      are not new measurements in this abstract.
+  read_from: pdf:mendybaev-2018-cmas-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+        note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007);
+          they are not new measurements in this abstract.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 1
+              pdf_page_index: 0
+              section: Results and Discussion
+              note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al.
+                (2007); they are not new measurements in this abstract.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1
+              pdf_page_index: 0
+              section: Results and Discussion
+              note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al.
+                (2007); they are not new measurements in this abstract.
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:mendybaev-2018-cmas-evaporation
+    parameters: []
+    output_unit: mol cm^-2 s^-1
+- observation_id: mendybaev-2018-cmas-evaporation::mendybaev_2018_richter_caib_mg_evaporation_rates::T=2173.15:h=372666f98ec2
+  experiment_id: 94123439cd55c4c9a26ef78a97260a218672c1554a0d8ccfd1e695fc579487c3::mendybaev-2018-cmas-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: interval
+    interval_low: '0.0000002'
+    interval_high: '0.0000003'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: The source uses approximate signs for the first two rates and ranges for the latter two; it gives no separate
+        measurement uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richter et al. (2007), reference [1]
+  admission:
+    status: rejected
+    reason: The printed molar flux unit is incompatible with the evaporation_rate quantity unit; no conversion is made.
+    decided_by:
+      worker: x-mendybaev-2018-cmas-evaporation
+      date: '2026-10-05'
+      evidence:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+        note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007);
+          they are not new measurements in this abstract.
+  notices: []
+  source_id: mendybaev-2018-cmas-evaporation
+  locator:
+    published_page: 1
+    pdf_page_index: 0
+    section: Results and Discussion
+    note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007); they
+      are not new measurements in this abstract.
+  read_from: pdf:mendybaev-2018-cmas-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Results and Discussion
+        note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al. (2007);
+          they are not new measurements in this abstract.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              published_page: 1
+              pdf_page_index: 0
+              section: Results and Discussion
+              note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al.
+                (2007); they are not new measurements in this abstract.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1
+              pdf_page_index: 0
+              section: Results and Discussion
+              note: Rates are summarized from the Type B CAI-like melt experiments cited as reference [1], Richter et al.
+                (2007); they are not new measurements in this abstract.
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:mendybaev-2018-cmas-evaporation
+    parameters: []
+    output_unit: mol cm^-2 s^-1

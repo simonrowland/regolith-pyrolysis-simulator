@@ -1,0 +1,2374 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shimaoka-nakamura-1991-iau-colloq126-79.yaml
+observations:
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_86a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-86a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '235'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_86a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=86A; column=K (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=86A; column=K (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_86a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-86a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.102658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=86A; column=k K
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=86A; column=k K
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=86A; column=k K
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_86a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_86a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_87a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-87a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.0102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '238'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_87a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=87A; column=K (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=87A; column=K (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_87a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-87a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0102658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=87A; column=k K
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=87A; column=k K
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=87A; column=k K
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_87a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_87a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_88a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-88a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '1.02658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '315'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_88a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=88A; column=K (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=88A; column=K (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_88a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-88a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '1.02658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=88A; column=k K
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=88A; column=k K
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=88A; column=k K
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_88a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_88a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_89a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-89a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '10.2658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '454'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_89a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=89A; column=K (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=89A; column=K (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_89a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-89a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '10.2658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=89A; column=k K
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=89A; column=k K
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=89A; column=k K
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_89a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_89a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_90a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-90a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '286'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_90a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=90A; column=K (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=90A; column=K (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_90a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-90a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=90A; column=k K
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=90A; column=k K
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=90A; column=k K
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_90a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_90a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_86a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-86a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '239'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_86a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=86A; column=Na (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=86A; column=Na (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_86a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-86a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.102658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=86A; column=k Na
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=86A; column=k Na
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=86A; column=k Na
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_86a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_86a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_87a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-87a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.0102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '384'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_87a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=87A; column=Na (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=87A; column=Na (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_87a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-87a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0102658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=87A; column=k Na
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=87A; column=k Na
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=87A; column=k Na
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_87a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_87a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_88a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-88a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '1.02658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '790'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_88a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=88A; column=Na (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=88A; column=Na (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_88a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-88a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '1.02658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=88A; column=k Na
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=88A; column=k Na
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=88A; column=k Na
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_88a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_88a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_89a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-89a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '10.2658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '2074'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_89a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=89A; column=Na (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=89A; column=Na (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_89a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-89a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '10.2658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=89A; column=k Na
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=89A; column=k Na
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=89A; column=k Na
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_89a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_89a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_90a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-90a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '548'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_90a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=90A; column=Na (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=90A; column=Na (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_90a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-90a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=90A; column=k Na
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=90A; column=k Na
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=90A; column=k Na
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_90a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_90a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_86a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-86a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '0.836'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_86a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=86A; column=Rb (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=86A; column=Rb (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_86a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-86a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.102658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=86A; column=k Rb
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=86A; column=k Rb
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=86A; column=k Rb
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_86a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_86a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_87a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-87a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.0102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '0.822'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_87a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=87A; column=Rb (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=87A; column=Rb (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_87a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-87a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0102658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=87A; column=k Rb
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=87A; column=k Rb
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=87A; column=k Rb
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_87a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_87a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_88a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-88a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '1.02658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '0.962'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_88a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=88A; column=Rb (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=88A; column=Rb (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_88a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-88a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '1.02658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=88A; column=k Rb
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=88A; column=k Rb
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=88A; column=k Rb
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_88a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_88a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_89a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-89a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '10.2658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '1.32'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_89a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=89A; column=Rb (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=89A; column=Rb (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_89a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-89a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '10.2658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=89A; column=k Rb
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=89A; column=k Rb
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=89A; column=k Rb
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_89a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_89a_concentration
+    parameters: []
+    output_unit: as_published
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_90a_concentration
+  experiment_id: 10.1017/s0252921100066513::experiment::run-90a
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: phase string 'run product' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+  value:
+    kind: point
+    point: '0.979'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_90a_concentration
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=90A; column=Rb (ppm)
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=90A; column=Rb (ppm)
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:shimaoka-nakamura-1991-iau-colloq126-79
+    parameters: []
+    output_unit: Pa
+- observation_id: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_90a_vaporization_rate
+  experiment_id: 10.1017/s0252921100066513::experiment::run-90a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'per_area_volumetric_rate'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: phase string 'alkali vaporization' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.00102658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'per_area_volumetric_rate'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated by the authors from equation (1); Table 1 footnote *2 states f=1.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: The printed cm3 min-1 cm-2 rate is not a mass evaporation rate; no conversion basis is published.
+    decided_by:
+      worker: codex-resume-78187-1791233874
+      date: '2026-10-05'
+      evidence:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=90A; column=k Rb
+  notices: []
+  source_id: shimaoka-nakamura-1991-iau-colloq126-79
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: row=90A; column=k Rb
+  read_from: unknown:shimaoka-nakamura-1991-iau-colloq126-79
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: row=90A; column=k Rb
+  derived_from:
+  - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_90a_concentration
+  derivation:
+    relation: ln(C/C0) = -k(f S_tot/Vp)t; table rates calculated using equation (1) with f=1, as printed in Table 1 footnote
+      *2.
+    inputs:
+    - shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_90a_concentration
+    parameters: []
+    output_unit: as_published

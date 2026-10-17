@@ -1,0 +1,1570 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  citation: Shornikov, S. I. (2013). Thermodynamic properties of the K2O–SiO2 melts. The article citation line prints “Vestn.
+    Otd. nauk Zemle, 4” with an empty DOI; the running footer on printed pages 109–111 reads “Experiment in Geosciences 2013
+    Volume 19 N 1”. The venue metadata conflict is unresolved in the supplied copy.
+  source_ids:
+  - shornikov-2013-potassium-silicate-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:shornikov-2013-potassium-silicate-thermodynamics
+      role: pdf
+      path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: 3ae7836d890f178c01a04a2b3cf927cf6c0c99ffd358bdbd594982d552d84f33
+    - asset_id: unknown:shornikov-2013-potassium-silicate-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=3
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+context:
+- observation_id: shornikov_2013_abstract_scope_context
+  type: author_statement
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 0
+    published_page: 108
+    note: Abstract at the start of the K2O–SiO2 article; preceding page content belongs to another article.
+    section: Abstract
+  values:
+    quantity: abstract_scope
+    temperature_range_K:
+    - 800
+    - 1800
+    outputs:
+    - oxide activities
+    - mixing energies
+    statement_as_printed: Within the framework of the developed semi-empirical model, the thermodynamic properties of the
+      K2O–SiO2 melts were calculated in the temperature region 800–1800 K. The calculated values of the oxide activities and
+      the mixing energies of potassium silicate melts are compared with available experimental information.
+  units: as printed; numeric fields use the named units where present
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_abstract_scope_context
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_calculation_method_context
+  type: model_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    note: The article describes a calculation and gives no new experimental run set.
+    section: Introduction
+  values:
+    quantity: thermodynamic_calculation_method
+    model_family: semi-empirical simplified lattice model
+    thermodynamic_framework: ideal associated solutions theory
+    intermolecular_interaction_parameters: semi-phenomenological parameters
+    parameter_basis_experimental_sources:
+    - Kozhina, 1990
+    - Borisova & Ushakov, 1998
+    - Zaitsev et al., 2000
+    parameter_basis_reference_sources:
+    - Glushko et al., 1978–1982
+    - Barin et al., 1993
+    - Chase, 1998
+    calculation_temperature_range_K:
+    - 800
+    - 1800
+    equilibrium_solver: Gibbs energy minimization
+    calculated_outputs:
+    - oxide activities
+    - mixing energies
+    - equilibrium conditions
+    experiment_performed_in_this_paper: false
+    apparatus_or_run_conditions: not applicable; no new experiment is reported
+  units: as printed; numeric fields use the named units where present
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_calculation_method_context
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_conclusion_data_correspondence_claim
+  type: author_statement
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 3
+    published_page: 111
+    note: Verbatim comparative or data-qualifying statement; checked against page image.
+    section: Conclusion
+  values:
+    quantity: author_qualitative_data_claim
+    statement_as_printed: The calculation results are corresponding to available experimental data [Kozhina, 1990; Zaitsev
+      et al., 2000].
+    qualification: Authors state correspondence to available experimental data.
+  units: as printed; numeric fields use the named units where present
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_conclusion_data_correspondence_claim
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_figure_1_phase_diagram
+  type: phase_diagram_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    note: Phase diagram attributed to Kracek et al. (1937); phase boundaries are not digitized.
+    figure: '1'
+  values:
+    quantity: phase_diagram_figure_only
+    method_class: figure_only
+    reference_as_printed: '[Kracek et al., 1937]'
+    x_axis_as_printed: x(SiO2), mole %
+    x_axis_range_mole_percent:
+    - 50
+    - 100
+    temperature_axis_as_printed: T, K
+    temperature_axis_range_K:
+    - 950
+    - 1500
+    phase_symbols_as_printed:
+      '1': liquid
+      '2': K2SiO3 + liquid
+      3_and_5: K2Si2O5 + liquid
+      '4': K2SiO3 + K2Si2O5
+      '6': K2Si2O5 + K2Si4O9
+      7_and_8: K2Si4O9 + liquid
+      '9': K2Si4O9 + SiO2 (quartz) + liquid
+      '10': SiO2 (quartz) + SiO2 (tridymite) + liquid
+      '11': SiO2 (tridymite) + SiO2 (cristobalite) + liquid
+    digitization_status: not_digitized
+    activity_standard_state_status: not_applicable
+  units: 'x axis: mole percent; temperature axis: K; phase labels as printed'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_figure_1_phase_diagram
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_figure_2_k2o_activity
+  type: figure_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    note: Figure 2 curves are retained as figure-only context; no curve points are digitized.
+    figure: '2'
+  values:
+    quantity: K2O_activity_comparison_figure_only
+    method_class: figure_only
+    component_as_printed: K2O
+    x_axis_as_printed: x(SiO2), mole %
+    y_axis_as_printed: lg a(K2O)
+    emf_temperatures_K:
+    - 973
+    - 1273
+    emf_source_as_printed: '[Kozhina, 1990]'
+    knudsen_effusion_temperature_K: 1473
+    knudsen_effusion_source_as_printed: '[Zaitsev et al., 2000]'
+    model_curve_temperatures_K:
+    - 973
+    - 1273
+    - 1473
+    model_line_description: present-study semi-empirical model; lines in same colors as the corresponding data
+    activity_standard_state_status: not stated in the figure caption or plotted axes
+    digitization_status: not_digitized
+    uncertainty_status: not stated for these curves
+  units: log10 activity (dimensionless)
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_figure_2_k2o_activity
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_figure_2_sio2_activity
+  type: figure_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    note: Figure 2 curves are retained as figure-only context; no curve points are digitized.
+    figure: '2'
+  values:
+    quantity: SiO2_activity_comparison_figure_only
+    method_class: figure_only
+    component_as_printed: SiO2
+    x_axis_as_printed: x(SiO2), mole %
+    y_axis_as_printed: lg a(SiO2)
+    emf_temperatures_K:
+    - 973
+    - 1273
+    emf_source_as_printed: '[Kozhina, 1990]'
+    knudsen_effusion_temperature_K: 1473
+    knudsen_effusion_source_as_printed: '[Zaitsev et al., 2000]'
+    model_curve_temperatures_K:
+    - 973
+    - 1273
+    - 1473
+    model_line_description: present-study semi-empirical model; lines in same colors as the corresponding data
+    activity_standard_state_status: not stated in the figure caption or plotted axes
+    digitization_status: not_digitized
+    uncertainty_status: not stated for these curves
+  units: log10 activity (dimensionless)
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_figure_2_sio2_activity
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: SiO2
+- observation_id: shornikov_2013_figure_3_mixing_energy
+  type: figure_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 3
+    published_page: 111
+    note: Figure 3 curves are retained as figure-only context; no curve points are digitized.
+    figure: '3'
+  values:
+    quantity: mixing_energy_comparison_figure_only
+    method_class: figure_only
+    x_axis_as_printed: x(SiO2), mole %
+    y_axis_as_printed: ΔG_T/RT
+    emf_temperatures_K:
+    - 973
+    - 1273
+    emf_source_as_printed: '[Kozhina, 1990]'
+    knudsen_effusion_temperature_K: 1473
+    knudsen_effusion_source_as_printed: '[Zaitsev et al., 2000]'
+    model_curve_temperatures_K:
+    - 973
+    - 1273
+    - 1473
+    model_line_description: present-study semi-empirical model; lines in same colors as the corresponding data
+    digitization_status: not_digitized
+    uncertainty_status: not stated for these curves
+  units: dimensionless ΔG_T/RT as plotted
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_figure_3_mixing_energy
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_initial_species_count_context
+  type: model_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    note: Printed counts of model components.
+    section: Introduction
+  values:
+    quantity: model_species_inventory
+    condensed_phase_count: 12
+    solid_phase_count: 6
+    liquid_phase_count: 6
+    gas_species_count: 14
+    temperature_K_table_3: 1500
+  units: as printed; numeric fields use the named units where present
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_initial_species_count_context
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_intro_qualification_context
+  type: author_statement
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 0
+    published_page: 108
+    note: Opening paragraph of the K2O–SiO2 article.
+    section: Introduction
+  values:
+    quantity: literature_data_qualification
+    statement_as_printed: In spite of numerous investigations [Glushko et al., 1978–1982], the thermodynamic properties of
+      these compounds are contradictory that was considered earlier [Shornikov, 2005].
+    qualification: The cited thermodynamic properties are described as contradictory.
+  units: as printed; numeric fields use the named units where present
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_intro_qualification_context
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_kozhina_973_exclusion_claim
+  type: author_statement
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    note: Verbatim comparative or data-qualifying statement; checked against page image.
+    section: Results and discussion
+  values:
+    quantity: author_qualitative_data_claim
+    statement_as_printed: The results of Kozhina [Kozhina, 1990] obtained at the temperature of 973 K not considered as they
+      correspond to homogeneous area that contradicts to the phase relations represented on the fig. 1.
+    qualification: Authors exclude the cited 973 K results because of a stated phase-relation inconsistency.
+  units: as printed; numeric fields use the named units where present
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_kozhina_973_exclusion_claim
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_mixing_energy_closeness_claim
+  type: author_statement
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    note: Verbatim comparative or data-qualifying statement; checked against page image.
+    section: Results and discussion
+  values:
+    quantity: author_qualitative_data_claim
+    statement_as_printed: At the same time the mixing energy values are close to the calculated in the present study in this
+      case (fig. 3).
+    qualification: Authors describe the mixing energy values as close to the present-study calculation.
+  units: as printed; numeric fields use the named units where present
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_mixing_energy_closeness_claim
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_model_description_context
+  type: author_statement
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    note: Paragraph describing parameter basis and equilibrium calculation.
+    section: Introduction
+  values:
+    quantity: model_and_parameter_basis
+    model_family: simplified lattice model
+    theory: ideal associated solutions
+    temperature_range_K:
+    - 800
+    - 1800
+    experimental_parameter_sources:
+    - Kozhina, 1990
+    - Borisova & Ushakov, 1998
+    - Zaitsev et al., 2000
+    reference_thermodynamic_sources:
+    - Glushko et al., 1978–1982
+    - Barin et al., 1993
+    - Chase, 1998
+    equilibrium_solver: Gibbs energy minimization method
+    statement_as_printed: The required equation solution for the total Gibbs energy for the system studied was found by the
+      widely used approach, namely the Gibbs energy minimization method.
+  units: as printed; numeric fields use the named units where present
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_model_description_context
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_results_correspondence_claim
+  type: author_statement
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    note: Verbatim comparative or data-qualifying statement; checked against page image.
+    section: Results and discussion
+  values:
+    quantity: author_qualitative_data_claim
+    statement_as_printed: According to fig. 2 and 3, the calculated values of oxide activities a(i) and mixing energies (ΔG_T)
+      of the K2O–SiO2 melts are well correspond to the experimental data [Kozhina, 1990; Zaitsev et al., 2000].
+    qualification: Authors state that calculated activities and mixing energies correspond to the cited experimental data.
+  units: as printed; numeric fields use the named units where present
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_results_correspondence_claim
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_table1_formation_reference_basis
+  type: thermochemical_table_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: Caption; applies to all 23 Table 1 rows.
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K)'
+  values:
+    quantity: potassium_silicate_formation_reference_basis
+    statement_as_printed: The enthalpies (ΔH_T) and the entropies (ΔS_T) of formation of potassium silicates from the simple
+      oxides
+    formation_basis: from the simple oxides
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_formation_reference_basis
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table1_row_01_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 1
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Zaitsev et al., 2000]'
+    table_row: 1
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: K2SiO3
+    temperature_as_published: 879–1050
+    delta_H_T_kJ_per_mol_as_printed: −145.94±0.57
+    delta_H_T_kJ_per_mol: '-145.94'
+    delta_S_T_J_per_mol_K_as_printed: 5.24±0.57
+    reference_as_printed: '[Zaitsev et al., 2000]'
+    T_range_K:
+    - '879'
+    - '1050'
+    uncertainty_delta_H_T_kJ_per_mol: '0.57'
+    delta_S_T_J_per_mol_K: '5.24'
+    uncertainty_delta_S_T_J_per_mol_K: '0.57'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_01_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table1_row_02_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 2
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Kozhina, 1990]'
+    table_row: 2
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: –"–
+    temperature_as_published: '973'
+    delta_H_T_kJ_per_mol_as_printed: −144.20±4.60
+    delta_H_T_kJ_per_mol: '-144.2'
+    delta_S_T_J_per_mol_K_as_printed: −5.44±2.93
+    reference_as_printed: '[Kozhina, 1990]'
+    T_K: '973'
+    uncertainty_delta_H_T_kJ_per_mol: '4.6'
+    delta_S_T_J_per_mol_K: '-5.44'
+    uncertainty_delta_S_T_J_per_mol_K: '2.93'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_02_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table1_row_03_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 3
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Borisova & Ushakov, 1998]'
+    table_row: 3
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: –"–
+    temperature_as_published: '973'
+    delta_H_T_kJ_per_mol_as_printed: −145.80±4.50
+    delta_H_T_kJ_per_mol: '-145.8'
+    delta_S_T_J_per_mol_K_as_printed: —
+    reference_as_printed: '[Borisova & Ushakov, 1998]'
+    T_K: '973'
+    uncertainty_delta_H_T_kJ_per_mol: '4.5'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_03_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table1_row_04_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 4
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Barin et al., 1993]'
+    table_row: 4
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: –"–
+    temperature_as_published: 1000–1249
+    delta_H_T_kJ_per_mol_as_printed: −148.02±0.72
+    delta_H_T_kJ_per_mol: '-148.02'
+    delta_S_T_J_per_mol_K_as_printed: −7.59±0.65
+    reference_as_printed: '[Barin et al., 1993]'
+    T_range_K:
+    - '1000'
+    - '1249'
+    uncertainty_delta_H_T_kJ_per_mol: '0.72'
+    delta_S_T_J_per_mol_K: '-7.59'
+    uncertainty_delta_S_T_J_per_mol_K: '0.65'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_04_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table1_row_05_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 5
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Barin et al., 1993]'
+    table_row: 5
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: –"–
+    temperature_as_published: 1249–1800
+    delta_H_T_kJ_per_mol_as_printed: −123.86±0.01
+    delta_H_T_kJ_per_mol: '-123.86'
+    delta_S_T_J_per_mol_K_as_printed: 11.68±0.01
+    reference_as_printed: '[Barin et al., 1993]'
+    T_range_K:
+    - '1249'
+    - '1800'
+    uncertainty_delta_H_T_kJ_per_mol: '0.01'
+    delta_S_T_J_per_mol_K: '11.68'
+    uncertainty_delta_S_T_J_per_mol_K: '0.01'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_05_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table1_row_06_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 6
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Zaitsev et al., 2000]'
+    table_row: 6
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: –"–
+    temperature_as_published: 1249–1730
+    delta_H_T_kJ_per_mol_as_printed: −159.66±1.03
+    delta_H_T_kJ_per_mol: '-159.66'
+    delta_S_T_J_per_mol_K_as_printed: −17.85±0.74
+    reference_as_printed: '[Zaitsev et al., 2000]'
+    T_range_K:
+    - '1249'
+    - '1730'
+    uncertainty_delta_H_T_kJ_per_mol: '1.03'
+    delta_S_T_J_per_mol_K: '-17.85'
+    uncertainty_delta_S_T_J_per_mol_K: '0.74'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_06_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table1_row_07_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 7
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Shornikov, 2005]'
+    table_row: 7
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: –"–
+    temperature_as_published: 1249–1800
+    delta_H_T_kJ_per_mol_as_printed: −137.15
+    delta_H_T_kJ_per_mol: '-137.15'
+    delta_S_T_J_per_mol_K_as_printed: '12.28'
+    reference_as_printed: '[Shornikov, 2005]'
+    T_range_K:
+    - '1249'
+    - '1800'
+    delta_S_T_J_per_mol_K: '12.28'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_07_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table1_row_08_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 8
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Kozhina, 1990]'
+    table_row: 8
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: –"–
+    temperature_as_published: '1273'
+    delta_H_T_kJ_per_mol_as_printed: −144.79±4.60
+    delta_H_T_kJ_per_mol: '-144.79'
+    delta_S_T_J_per_mol_K_as_printed: −0.84±2.93
+    reference_as_printed: '[Kozhina, 1990]'
+    T_K: '1273'
+    uncertainty_delta_H_T_kJ_per_mol: '4.6'
+    delta_S_T_J_per_mol_K: '-0.84'
+    uncertainty_delta_S_T_J_per_mol_K: '2.93'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_08_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table1_row_09_k2si2o5
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 9
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Zaitsev et al., 2000]'
+    table_row: 9
+    formula_as_published: K2Si2O5
+    compound_cell_as_printed: K2Si2O5
+    temperature_as_published: 869–1014
+    delta_H_T_kJ_per_mol_as_printed: −112.56±0.54
+    delta_H_T_kJ_per_mol: '-112.56'
+    delta_S_T_J_per_mol_K_as_printed: 3.47±0.50
+    reference_as_printed: '[Zaitsev et al., 2000]'
+    T_range_K:
+    - '869'
+    - '1014'
+    uncertainty_delta_H_T_kJ_per_mol: '0.54'
+    delta_S_T_J_per_mol_K: '3.47'
+    uncertainty_delta_S_T_J_per_mol_K: '0.5'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_09_k2si2o5
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si2O5
+- observation_id: shornikov_2013_table1_row_10_k2si2o5
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 10
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Kozhina, 1990]'
+    table_row: 10
+    formula_as_published: K2Si2O5
+    compound_cell_as_printed: –"–
+    temperature_as_published: '973'
+    delta_H_T_kJ_per_mol_as_printed: −109.27±4.60
+    delta_H_T_kJ_per_mol: '-109.27'
+    delta_S_T_J_per_mol_K_as_printed: −0.46±2.93
+    reference_as_printed: '[Kozhina, 1990]'
+    T_K: '973'
+    uncertainty_delta_H_T_kJ_per_mol: '4.6'
+    delta_S_T_J_per_mol_K: '-0.46'
+    uncertainty_delta_S_T_J_per_mol_K: '2.93'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_10_k2si2o5
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si2O5
+- observation_id: shornikov_2013_table1_row_11_k2si2o5
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 11
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Borisova & Ushakov, 1998]'
+    table_row: 11
+    formula_as_published: K2Si2O5
+    compound_cell_as_printed: –"–
+    temperature_as_published: '973'
+    delta_H_T_kJ_per_mol_as_printed: −101.60±2.50
+    delta_H_T_kJ_per_mol: '-101.6'
+    delta_S_T_J_per_mol_K_as_printed: —
+    reference_as_printed: '[Borisova & Ushakov, 1998]'
+    T_K: '973'
+    uncertainty_delta_H_T_kJ_per_mol: '2.5'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_11_k2si2o5
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si2O5
+- observation_id: shornikov_2013_table1_row_12_k2si2o5
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 12
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Barin et al., 1993]'
+    table_row: 12
+    formula_as_published: K2Si2O5
+    compound_cell_as_printed: –"–
+    temperature_as_published: 1000–1318
+    delta_H_T_kJ_per_mol_as_printed: −113.48±0.19
+    delta_H_T_kJ_per_mol: '-113.48'
+    delta_S_T_J_per_mol_K_as_printed: −3.83±0.16
+    reference_as_printed: '[Barin et al., 1993]'
+    T_range_K:
+    - '1000'
+    - '1318'
+    uncertainty_delta_H_T_kJ_per_mol: '0.19'
+    delta_S_T_J_per_mol_K: '-3.83'
+    uncertainty_delta_S_T_J_per_mol_K: '0.16'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_12_k2si2o5
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si2O5
+- observation_id: shornikov_2013_table1_row_13_k2si2o5
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 13
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Kozhina, 1990]'
+    table_row: 13
+    formula_as_published: K2Si2O5
+    compound_cell_as_printed: –"–
+    temperature_as_published: '1273'
+    delta_H_T_kJ_per_mol_as_printed: −99.11±4.60
+    delta_H_T_kJ_per_mol: '-99.11'
+    delta_S_T_J_per_mol_K_as_printed: 6.49±2.93
+    reference_as_printed: '[Kozhina, 1990]'
+    T_K: '1273'
+    uncertainty_delta_H_T_kJ_per_mol: '4.6'
+    delta_S_T_J_per_mol_K: '6.49'
+    uncertainty_delta_S_T_J_per_mol_K: '2.93'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_13_k2si2o5
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si2O5
+- observation_id: shornikov_2013_table1_row_14_k2si2o5
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 14
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Barin et al., 1993]'
+    table_row: 14
+    formula_as_published: K2Si2O5
+    compound_cell_as_printed: –"–
+    temperature_as_published: 1318–1800
+    delta_H_T_kJ_per_mol_as_printed: −97.23±0.12
+    delta_H_T_kJ_per_mol: '-97.23'
+    delta_S_T_J_per_mol_K_as_printed: 8.47±0.07
+    reference_as_printed: '[Barin et al., 1993]'
+    T_range_K:
+    - '1318'
+    - '1800'
+    uncertainty_delta_H_T_kJ_per_mol: '0.12'
+    delta_S_T_J_per_mol_K: '8.47'
+    uncertainty_delta_S_T_J_per_mol_K: '0.07'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_14_k2si2o5
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si2O5
+- observation_id: shornikov_2013_table1_row_15_k2si2o5
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 15
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Zaitsev et al., 2000]'
+    table_row: 15
+    formula_as_published: K2Si2O5
+    compound_cell_as_printed: –"–
+    temperature_as_published: 1318–1730
+    delta_H_T_kJ_per_mol_as_printed: −117.59±0.51
+    delta_H_T_kJ_per_mol: '-117.59'
+    delta_S_T_J_per_mol_K_as_printed: −8.36±0.35
+    reference_as_printed: '[Zaitsev et al., 2000]'
+    T_range_K:
+    - '1318'
+    - '1730'
+    uncertainty_delta_H_T_kJ_per_mol: '0.51'
+    delta_S_T_J_per_mol_K: '-8.36'
+    uncertainty_delta_S_T_J_per_mol_K: '0.35'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_15_k2si2o5
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si2O5
+- observation_id: shornikov_2013_table1_row_16_k2si2o5
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 16
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Shornikov, 2005]'
+    table_row: 16
+    formula_as_published: K2Si2O5
+    compound_cell_as_printed: –"–
+    temperature_as_published: 1318–1800
+    delta_H_T_kJ_per_mol_as_printed: −101.89
+    delta_H_T_kJ_per_mol: '-101.89'
+    delta_S_T_J_per_mol_K_as_printed: '11.57'
+    reference_as_printed: '[Shornikov, 2005]'
+    T_range_K:
+    - '1318'
+    - '1800'
+    delta_S_T_J_per_mol_K: '11.57'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_16_k2si2o5
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si2O5
+- observation_id: shornikov_2013_table1_row_17_k2si4o9
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 17
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Barin et al., 1993]'
+    table_row: 17
+    formula_as_published: K2Si4O9
+    compound_cell_as_printed: K2Si4O9
+    temperature_as_published: 800–1041
+    delta_H_T_kJ_per_mol_as_printed: −60.45±0.25
+    delta_H_T_kJ_per_mol: '-60.45'
+    delta_S_T_J_per_mol_K_as_printed: 3.38±0.28
+    reference_as_printed: '[Barin et al., 1993]'
+    T_range_K:
+    - '800'
+    - '1041'
+    uncertainty_delta_H_T_kJ_per_mol: '0.25'
+    delta_S_T_J_per_mol_K: '3.38'
+    uncertainty_delta_S_T_J_per_mol_K: '0.28'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_17_k2si4o9
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si4O9
+- observation_id: shornikov_2013_table1_row_18_k2si4o9
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 18
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Zaitsev et al., 2000]'
+    table_row: 18
+    formula_as_published: K2Si4O9
+    compound_cell_as_printed: –"–
+    temperature_as_published: 891–1041
+    delta_H_T_kJ_per_mol_as_printed: −64.90±0.50
+    delta_H_T_kJ_per_mol: '-64.9'
+    delta_S_T_J_per_mol_K_as_printed: −1.18±0.41
+    reference_as_printed: '[Zaitsev et al., 2000]'
+    T_range_K:
+    - '891'
+    - '1041'
+    uncertainty_delta_H_T_kJ_per_mol: '0.5'
+    delta_S_T_J_per_mol_K: '-1.18'
+    uncertainty_delta_S_T_J_per_mol_K: '0.41'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_18_k2si4o9
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si4O9
+- observation_id: shornikov_2013_table1_row_19_k2si4o9
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 19
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Kozhina, 1990]'
+    table_row: 19
+    formula_as_published: K2Si4O9
+    compound_cell_as_printed: –"–
+    temperature_as_published: '973'
+    delta_H_T_kJ_per_mol_as_printed: −62.45±4.60
+    delta_H_T_kJ_per_mol: '-62.45'
+    delta_S_T_J_per_mol_K_as_printed: 3.85±2.93
+    reference_as_printed: '[Kozhina, 1990]'
+    T_K: '973'
+    uncertainty_delta_H_T_kJ_per_mol: '4.6'
+    delta_S_T_J_per_mol_K: '3.85'
+    uncertainty_delta_S_T_J_per_mol_K: '2.93'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_19_k2si4o9
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si4O9
+- observation_id: shornikov_2013_table1_row_20_k2si4o9
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 20
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Borisova & Ushakov, 1998]'
+    table_row: 20
+    formula_as_published: K2Si4O9
+    compound_cell_as_printed: –"–
+    temperature_as_published: '973'
+    delta_H_T_kJ_per_mol_as_printed: −61.40±2.20
+    delta_H_T_kJ_per_mol: '-61.4'
+    delta_S_T_J_per_mol_K_as_printed: —
+    reference_as_printed: '[Borisova & Ushakov, 1998]'
+    T_K: '973'
+    uncertainty_delta_H_T_kJ_per_mol: '2.2'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_20_k2si4o9
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si4O9
+- observation_id: shornikov_2013_table1_row_21_k2si4o9
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 21
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Barin et al., 1993]'
+    table_row: 21
+    formula_as_published: K2Si4O9
+    compound_cell_as_printed: –"–
+    temperature_as_published: 1043–1800
+    delta_H_T_kJ_per_mol_as_printed: −55.59±0.32
+    delta_H_T_kJ_per_mol: '-55.59'
+    delta_S_T_J_per_mol_K_as_printed: 7.99±0.22
+    reference_as_printed: '[Barin et al., 1993]'
+    T_range_K:
+    - '1043'
+    - '1800'
+    uncertainty_delta_H_T_kJ_per_mol: '0.32'
+    delta_S_T_J_per_mol_K: '7.99'
+    uncertainty_delta_S_T_J_per_mol_K: '0.22'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_21_k2si4o9
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si4O9
+- observation_id: shornikov_2013_table1_row_22_k2si4o9
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 22
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Zaitsev et al., 2000]'
+    table_row: 22
+    formula_as_published: K2Si4O9
+    compound_cell_as_printed: –"–
+    temperature_as_published: 1050–1730
+    delta_H_T_kJ_per_mol_as_printed: −70.01±0.29
+    delta_H_T_kJ_per_mol: '-70.01'
+    delta_S_T_J_per_mol_K_as_printed: −1.75±0.21
+    reference_as_printed: '[Zaitsev et al., 2000]'
+    T_range_K:
+    - '1050'
+    - '1730'
+    uncertainty_delta_H_T_kJ_per_mol: '0.29'
+    delta_S_T_J_per_mol_K: '-1.75'
+    uncertainty_delta_S_T_J_per_mol_K: '0.21'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_22_k2si4o9
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si4O9
+- observation_id: shornikov_2013_table1_row_23_k2si4o9
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 1
+    published_page: 109
+    table: '1'
+    note: row 23
+  units: 'delta_H_T: kJ/mole; delta_S_T: J/(mole K); T: K, as printed'
+  values:
+    quantity: quoted_potassium_silicate_formation_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Kozhina, 1990]'
+    table_row: 23
+    formula_as_published: K2Si4O9
+    compound_cell_as_printed: –"–
+    temperature_as_published: '1273'
+    delta_H_T_kJ_per_mol_as_printed: −57.00±4.60
+    delta_H_T_kJ_per_mol: '-57'
+    delta_S_T_J_per_mol_K_as_printed: 7.62±2.93
+    reference_as_printed: '[Kozhina, 1990]'
+    T_K: '1273'
+    uncertainty_delta_H_T_kJ_per_mol: '4.6'
+    delta_S_T_J_per_mol_K: '7.62'
+    uncertainty_delta_S_T_J_per_mol_K: '2.93'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table1_row_23_k2si4o9
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si4O9
+- observation_id: shornikov_2013_table2_row_01_k2o
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 1
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Glushko et al., 1978–1982]'
+    table_row: 1
+    formula_as_published: K2O
+    compound_cell_as_printed: K2O
+    T_m_as_published: 1013±10
+    T_m_K: '1013'
+    delta_H_T_kJ_per_mol_as_printed: 27.00±3.00
+    delta_H_T_kJ_per_mol: '27'
+    delta_S_T_J_per_mol_K_as_printed: 26.65±2.96
+    delta_S_T_J_per_mol_K: '26.65'
+    reference_as_printed: '[Glushko et al., 1978–1982]'
+    uncertainty_T_m_K: '10'
+    uncertainty_delta_H_T_kJ_per_mol: '3'
+    uncertainty_delta_S_T_J_per_mol_K: '2.96'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_01_k2o
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_table2_row_02_k2o
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 2
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Barin et al., 1993]'
+    table_row: 2
+    formula_as_published: K2O
+    compound_cell_as_printed: –"–
+    T_m_as_published: '1013'
+    T_m_K: '1013'
+    delta_H_T_kJ_per_mol_as_printed: 27.20±1.50
+    delta_H_T_kJ_per_mol: '27.2'
+    delta_S_T_J_per_mol_K_as_printed: 26.85±1.50
+    delta_S_T_J_per_mol_K: '26.85'
+    reference_as_printed: '[Barin et al., 1993]'
+    uncertainty_delta_H_T_kJ_per_mol: '1.5'
+    uncertainty_delta_S_T_J_per_mol_K: '1.5'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_02_k2o
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O
+- observation_id: shornikov_2013_table2_row_03_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 3
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Takahashi & Yoshio, 1970]'
+    table_row: 3
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: K2SiO3
+    T_m_as_published: '1249'
+    T_m_K: '1249'
+    delta_H_T_kJ_per_mol_as_printed: 5.50±3.00
+    delta_H_T_kJ_per_mol: '5.5'
+    delta_S_T_J_per_mol_K_as_printed: 4.40±2.40
+    delta_S_T_J_per_mol_K: '4.4'
+    reference_as_printed: '[Takahashi & Yoshio, 1970]'
+    uncertainty_delta_H_T_kJ_per_mol: '3'
+    uncertainty_delta_S_T_J_per_mol_K: '2.4'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_03_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table2_row_04_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 4
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Glushko et al., 1978–1982]'
+    table_row: 4
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: –"–
+    T_m_as_published: 1249±2
+    T_m_K: '1249'
+    delta_H_T_kJ_per_mol_as_printed: 10.00±5.00
+    delta_H_T_kJ_per_mol: '10'
+    delta_S_T_J_per_mol_K_as_printed: 8.01±4.00
+    delta_S_T_J_per_mol_K: '8.01'
+    reference_as_printed: '[Glushko et al., 1978–1982]'
+    uncertainty_T_m_K: '2'
+    uncertainty_delta_H_T_kJ_per_mol: '5'
+    uncertainty_delta_S_T_J_per_mol_K: '4'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_04_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table2_row_05_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 5
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Barin et al., 1993]'
+    table_row: 5
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: –"–
+    T_m_as_published: '1249'
+    T_m_K: '1249'
+    delta_H_T_kJ_per_mol_as_printed: 25.10±1.50
+    delta_H_T_kJ_per_mol: '25.1'
+    delta_S_T_J_per_mol_K_as_printed: 20.10±1.20
+    delta_S_T_J_per_mol_K: '20.1'
+    reference_as_printed: '[Barin et al., 1993]'
+    uncertainty_delta_H_T_kJ_per_mol: '1.5'
+    uncertainty_delta_S_T_J_per_mol_K: '1.2'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_05_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table2_row_06_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 6
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Chase, 1998]'
+    table_row: 6
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: –"–
+    T_m_as_published: '1249'
+    T_m_K: '1249'
+    delta_H_T_kJ_per_mol_as_printed: 25.10±6.28
+    delta_H_T_kJ_per_mol: '25.1'
+    delta_S_T_J_per_mol_K_as_printed: 20.10±5.02
+    delta_S_T_J_per_mol_K: '20.1'
+    reference_as_printed: '[Chase, 1998]'
+    uncertainty_delta_H_T_kJ_per_mol: '6.28'
+    uncertainty_delta_S_T_J_per_mol_K: '5.02'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_06_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table2_row_07_k2sio3
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 7
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Bale et al., 2002]'
+    table_row: 7
+    formula_as_published: K2SiO3
+    compound_cell_as_printed: –"–
+    T_m_as_published: '1250'
+    T_m_K: '1250'
+    delta_H_T_kJ_per_mol_as_printed: 7.44±1.50
+    delta_H_T_kJ_per_mol: '7.44'
+    delta_S_T_J_per_mol_K_as_printed: 5.95±1.20
+    delta_S_T_J_per_mol_K: '5.95'
+    reference_as_printed: '[Bale et al., 2002]'
+    uncertainty_delta_H_T_kJ_per_mol: '1.5'
+    uncertainty_delta_S_T_J_per_mol_K: '1.2'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_07_k2sio3
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2SiO3
+- observation_id: shornikov_2013_table2_row_08_k2si2o5
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 8
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Takahashi & Yoshio, 1970]'
+    table_row: 8
+    formula_as_published: K2Si2O5
+    compound_cell_as_printed: K2Si2O5
+    T_m_as_published: '1318'
+    T_m_K: '1318'
+    delta_H_T_kJ_per_mol_as_printed: 10.60±1.00
+    delta_H_T_kJ_per_mol: '10.6'
+    delta_S_T_J_per_mol_K_as_printed: 8.04±0.76
+    delta_S_T_J_per_mol_K: '8.04'
+    reference_as_printed: '[Takahashi & Yoshio, 1970]'
+    uncertainty_delta_H_T_kJ_per_mol: '1'
+    uncertainty_delta_S_T_J_per_mol_K: '0.76'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_08_k2si2o5
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si2O5
+- observation_id: shornikov_2013_table2_row_09_k2si2o5
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 9
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Glushko et al., 1978–1982]'
+    table_row: 9
+    formula_as_published: K2Si2O5
+    compound_cell_as_printed: –"–
+    T_m_as_published: 1318±5
+    T_m_K: '1318'
+    delta_H_T_kJ_per_mol_as_printed: 11.73±0.33
+    delta_H_T_kJ_per_mol: '11.73'
+    delta_S_T_J_per_mol_K_as_printed: 8.90±0.25
+    delta_S_T_J_per_mol_K: '8.9'
+    reference_as_printed: '[Glushko et al., 1978–1982]'
+    uncertainty_T_m_K: '5'
+    uncertainty_delta_H_T_kJ_per_mol: '0.33'
+    uncertainty_delta_S_T_J_per_mol_K: '0.25'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_09_k2si2o5
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si2O5
+- observation_id: shornikov_2013_table2_row_10_k2si2o5
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 10
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Barin et al., 1993]'
+    table_row: 10
+    formula_as_published: K2Si2O5
+    compound_cell_as_printed: –"–
+    T_m_as_published: '1318'
+    T_m_K: '1318'
+    delta_H_T_kJ_per_mol_as_printed: 13.67±1.50
+    delta_H_T_kJ_per_mol: '13.67'
+    delta_S_T_J_per_mol_K_as_printed: 10.37±1.13
+    delta_S_T_J_per_mol_K: '10.37'
+    reference_as_printed: '[Barin et al., 1993]'
+    uncertainty_delta_H_T_kJ_per_mol: '1.5'
+    uncertainty_delta_S_T_J_per_mol_K: '1.13'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_10_k2si2o5
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si2O5
+- observation_id: shornikov_2013_table2_row_11_k2si2o5
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 11
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Bale et al., 2002]'
+    table_row: 11
+    formula_as_published: K2Si2O5
+    compound_cell_as_printed: –"–
+    T_m_as_published: '1319'
+    T_m_K: '1319'
+    delta_H_T_kJ_per_mol_as_printed: 15.82±1.50
+    delta_H_T_kJ_per_mol: '15.82'
+    delta_S_T_J_per_mol_K_as_printed: 11.99±1.13
+    delta_S_T_J_per_mol_K: '11.99'
+    reference_as_printed: '[Bale et al., 2002]'
+    uncertainty_delta_H_T_kJ_per_mol: '1.5'
+    uncertainty_delta_S_T_J_per_mol_K: '1.13'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_11_k2si2o5
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si2O5
+- observation_id: shornikov_2013_table2_row_12_k2si4o9
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 12
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Barin et al., 1993]'
+    table_row: 12
+    formula_as_published: K2Si4O9
+    compound_cell_as_printed: K2Si4O9
+    T_m_as_published: 1043±10
+    T_m_K: '1043'
+    delta_H_T_kJ_per_mol_as_printed: 9.79±1.50
+    delta_H_T_kJ_per_mol: '9.79'
+    delta_S_T_J_per_mol_K_as_printed: 9.39±1.50
+    delta_S_T_J_per_mol_K: '9.39'
+    reference_as_printed: '[Barin et al., 1993]'
+    uncertainty_T_m_K: '10'
+    uncertainty_delta_H_T_kJ_per_mol: '1.5'
+    uncertainty_delta_S_T_J_per_mol_K: '1.5'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_12_k2si4o9
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si4O9
+- observation_id: shornikov_2013_table2_row_13_k2si4o9
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 13
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Bale et al., 2002]'
+    table_row: 13
+    formula_as_published: K2Si4O9
+    compound_cell_as_printed: –"–
+    T_m_as_published: '1044'
+    T_m_K: '1044'
+    delta_H_T_kJ_per_mol_as_printed: 6.88±1.50
+    delta_H_T_kJ_per_mol: '6.88'
+    delta_S_T_J_per_mol_K_as_printed: 6.59±1.50
+    delta_S_T_J_per_mol_K: '6.59'
+    reference_as_printed: '[Bale et al., 2002]'
+    uncertainty_delta_H_T_kJ_per_mol: '1.5'
+    uncertainty_delta_S_T_J_per_mol_K: '1.5'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_13_k2si4o9
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2Si4O9
+- observation_id: shornikov_2013_table2_row_14_sio2
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 14
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Glushko et al., 1978–1982]'
+    table_row: 14
+    formula_as_published: SiO2
+    compound_cell_as_printed: SiO2
+    T_m_as_published: 1996±5
+    T_m_K: '1996'
+    delta_H_T_kJ_per_mol_as_printed: 9.80±0.50
+    delta_H_T_kJ_per_mol: '9.8'
+    delta_S_T_J_per_mol_K_as_printed: 4.81±0.50
+    delta_S_T_J_per_mol_K: '4.81'
+    reference_as_printed: '[Glushko et al., 1978–1982]'
+    uncertainty_T_m_K: '5'
+    uncertainty_delta_H_T_kJ_per_mol: '0.5'
+    uncertainty_delta_S_T_J_per_mol_K: '0.5'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_14_sio2
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: SiO2
+- observation_id: shornikov_2013_table2_row_15_sio2
+  type: thermochemical_table_row_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '2'
+    note: row 15
+  units: 'T_m: K; delta_H_T: kJ/mole; delta_S_T: J/(mole K), as printed'
+  values:
+    quantity: quoted_potassium_silicate_melting_thermochemistry
+    method_class: quoted_attributed
+    attribution: '[Barin et al., 1993]'
+    table_row: 15
+    formula_as_published: SiO2
+    compound_cell_as_printed: –"–
+    T_m_as_published: '1996'
+    T_m_K: '1996'
+    delta_H_T_kJ_per_mol_as_printed: 9.57±0.50
+    delta_H_T_kJ_per_mol: '9.57'
+    delta_S_T_J_per_mol_K_as_printed: 4.79±0.50
+    delta_S_T_J_per_mol_K: '4.79'
+    reference_as_printed: '[Barin et al., 1993]'
+    uncertainty_delta_H_T_kJ_per_mol: '0.5'
+    uncertainty_delta_S_T_J_per_mol_K: '0.5'
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table2_row_15_sio2
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: SiO2
+- observation_id: shornikov_2013_table3_reference_state_context
+  type: thermochemical_table_context
+  locator:
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+    pdf_page_index: 2
+    published_page: 110
+    table: '3'
+    note: Caption states formation from elements at 1500 K.
+  units: kJ/mole; temperature in K
+  values:
+    quantity: table_3_reference_state_and_scope
+    method_class: model_derived
+    temperature_K: 1500
+    formation_reference_as_printed: from elements
+    phase_columns_as_printed:
+    - solid phases
+    - liquid phases
+    - vapor species
+    data_sources_as_printed:
+    - Glushko et al., 1978–1982
+    - Kozhina, 1990
+    - Zaitsev et al., 2000
+    standard_pressure_or_elemental_polymorphs: not further specified in the supplied pages
+    statement_as_printed: The Gibbs energy of formation from elements of condensed phases and vapor species over the K2O–SiO2
+      system at 1500 K, calculated in the present study according to data [Glushko et al., 1978–1982; Kozhina, 1990; Zaitsev
+      et al., 2000].
+  context_id: shornikov-2013-potassium-silicate-thermodynamics::context::shornikov_2013_table3_reference_state_context
+  work_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  species: K2O

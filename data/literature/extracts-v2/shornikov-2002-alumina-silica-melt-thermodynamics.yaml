@@ -1,0 +1,2522 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2002-alumina-silica-melt-thermodynamics.yaml
+observations:
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_III_alumina_activity::T=1879:h=262817de4a95
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1879'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.34'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method III, calculations from the Gibbs energy of formation of Al6Si2O13 [48], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method III row 3; a(Al2O3).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1879'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method III row 3; a(Al2O3).
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 method III has no printed x_e coordinate in eutectic system SiO2–Al6Si2O13.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_III_alumina_activity::T=2160:h=351282f0c1a5
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2160'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method III, calculations from the Gibbs energy of formation of Al6Si2O13 [48], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method III row 8; a(Al2O3).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method III row 8; a(Al2O3).
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 method III has no printed x_e coordinate in eutectic system Al6Si2O13–Al2O3.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_III_sio2_activity::T=1879:h=50954ce7fc53
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1879'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method III, calculations from the Gibbs energy of formation of Al6Si2O13 [48], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method III row 3; a(SiO2).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1879'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method III row 3; a(SiO2).
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 method III has no printed x_e coordinate in eutectic system SiO2–Al6Si2O13.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_III_sio2_activity::T=2160:h=575db212f16e
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2160'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method III, calculations from the Gibbs energy of formation of Al6Si2O13 [48], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method III row 8; a(SiO2).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method III row 8; a(SiO2).
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 method III has no printed x_e coordinate in eutectic system Al6Si2O13–Al2O3.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_II_alumina_activity::T=2160:h=6cf24f327a44
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2160'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.64'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method II, calculations from eutectic data [2], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method II row 7; a(Al2O3).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method II row 7; a(Al2O3).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.6763'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_II_mullite_activity::T=1879:h=c2f03434f4e7
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al6Si2O13
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1879'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.037'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method II, calculations from eutectic data [2], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method II row 2; a(Al6Si2O13).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1879'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method II row 2; a(Al6Si2O13).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.0545'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_II_mullite_activity::T=2160:h=a7e21c0ac160
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al6Si2O13
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2160'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.83'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method II, calculations from eutectic data [2], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method II row 7; a(Al6Si2O13).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method II row 7; a(Al6Si2O13).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.6763'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_II_sio2_activity::T=1879:h=86ebd12e55d7
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1879'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.97'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method II, calculations from eutectic data [2], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method II row 2; a(SiO2).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1879'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method II row 2; a(SiO2).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.0545'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_IV_alumina_activity::T=1879:h=6850db99b868
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1879'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.37'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method IV, mass-spectrometric determination of component activities in solid Al2O3–SiO2 system phases
+      [1], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method IV row 4; a(Al2O3).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1879'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method IV row 4; a(Al2O3).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.0545'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_IV_alumina_activity::T=2160:h=8a854e46753b
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2160'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method IV, mass-spectrometric determination of component activities in solid Al2O3–SiO2 system phases
+      [1], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method IV row 9; a(Al2O3).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method IV row 9; a(Al2O3).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.6763'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_IV_sio2_activity::T=1879:h=b2173673741c
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1879'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method IV, mass-spectrometric determination of component activities in solid Al2O3–SiO2 system phases
+      [1], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method IV row 4; a(SiO2).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1879'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method IV row 4; a(SiO2).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.0545'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_IV_sio2_activity::T=2160:h=4998e1893f05
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2160'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.19'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method IV, mass-spectrometric determination of component activities in solid Al2O3–SiO2 system phases
+      [1], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method IV row 9; a(SiO2).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method IV row 9; a(SiO2).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.6763'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_I_alumina_activity::T=2123:h=d5724b333d16
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2123'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.58'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method I, calculations from eutectic data [12], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method I row 6; a(Al2O3).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method I row 6; a(Al2O3).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.6891'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=68.91 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_I_mullite_activity::T=1857:h=9da5f4c4665d
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al6Si2O13
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1857'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.055'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method I, calculations from eutectic data [12], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method I row 1; a(Al6Si2O13).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1857'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method I row 1; a(Al6Si2O13).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.0332'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=3.32 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_I_mullite_activity::T=2123:h=d5a4c4c49fbc
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al6Si2O13
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2123'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.63'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method I, calculations from eutectic data [12], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method I row 6; a(Al6Si2O13).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method I row 6; a(Al6Si2O13).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.6891'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=68.91 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_I_sio2_activity::T=1857:h=daf5044261bb
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1857'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.96'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method I, calculations from eutectic data [12], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method I row 1; a(SiO2).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1857'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method I row 1; a(SiO2).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.0332'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=3.32 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_V_alumina_activity::T=1879:h=f6777b7ee8e4
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1879'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.36'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method V, extrapolation of Al2O3–SiO2 melt component activities [3], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method V row 5; a(Al2O3).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1879'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method V row 5; a(Al2O3).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.0545'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_V_alumina_activity::T=2160:h=6c396bd9a472
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2160'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.95'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method V, extrapolation of Al2O3–SiO2 melt component activities [3], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method V row 10; a(Al2O3).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method V row 10; a(Al2O3).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.6763'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_V_mullite_activity::T=1879:h=1006949039d7
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al6Si2O13
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1879'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.037'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method V, extrapolation of Al2O3–SiO2 melt component activities [3], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method V row 5; a(Al6Si2O13).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1879'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method V row 5; a(Al6Si2O13).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.0545'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_V_mullite_activity::T=2160:h=200f5698044c
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al6Si2O13
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2160'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.86'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method V, extrapolation of Al2O3–SiO2 melt component activities [3], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method V row 10; a(Al6Si2O13).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method V row 10; a(Al6Si2O13).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.6763'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_V_sio2_activity::T=1879:h=dc43802c4baf
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1879'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.98'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method V, extrapolation of Al2O3–SiO2 melt component activities [3], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method V row 5; a(SiO2).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1879'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method V row 5; a(SiO2).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.0545'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=5.45 mol% in eutectic system SiO2–Al6Si2O13; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shornikov-2002-alumina-silica-melt-thermodynamics::shornikov_2002_t2_method_V_sio2_activity::T=2160:h=417e6aaa7020
+  experiment_id: 2071cbe2d2abea9fe5bcc087a9cc4e7b442d2cbf4c0a0a05cb4285fee4ec816a::shornikov-2002-alumina-silica-melt-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2160'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_published
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 2 method V, extrapolation of Al2O3–SiO2 melt component activities [3], as stated in the footnote.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2002-alumina-silica-melt-thermodynamics
+  locator:
+    published_page: 1058
+    pdf_page_index: 4
+    table: '2'
+    note: Method V row 10; a(SiO2).
+  read_from: pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2160'
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Method V row 10; a(SiO2).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_e_Al2O3_mol_percent_axis
+          components:
+          - - Al2O3
+            - '0.6763'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1058
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_e(Al2O3)=67.63 mol% in eutectic system Al6Si2O13–Al2O3; no complementary oxide fraction inferred.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2002-alumina-silica-melt-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity as printed

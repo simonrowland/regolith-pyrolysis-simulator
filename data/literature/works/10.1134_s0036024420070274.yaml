@@ -1,0 +1,3373 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0036024420070274
+  citation: Shornikov, S. I. (2020), “Study of CaO–TiO2 Melts by Knudsen Effusion Mass Spectrometry,” Russian Journal of Physical
+    Chemistry A 94(7), 1289–1299 (English translation).
+  source_ids:
+  - shornikov-2020-cao-tio2-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:shornikov-2020-cao-tio2-melts
+      role: pdf
+      path: raw/shornikov-2020-cao-tio2-melts/shornikov-2020-cao-tio2-melts.pdf
+      sha256:
+        tag: value
+        value: 42dd8caf6f00d3051e2809646eb6278e77905c896f6c653d13a86ddc38d3bf49
+    - asset_id: unknown:shornikov-2020-cao-tio2-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s0036024420070274
+experiments:
+- experiment_id: 10.1134/s0036024420070274::experiment::shornikov-2020-table-2278k
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+        note: More than 200 compositions; no single initial composition applies.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+        note: A single composition does not apply; points carry each printed composition.
+    form:
+      state:
+        tag: value
+        value: CaO–TiO2–SiO2 melt prepared by ceramic technology
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis and X-ray diffraction; composition-estimation error less than 0.15 mol %.
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+    pretreatment:
+      state:
+        tag: value
+        value: Powders mixed 24 h in acetone in jasper ball mill; dried; calcined 24 h in air in SiC furnace up to 1300 K;
+          reground; annealed 24 h at 1530 K.
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2278'
+      locator:
+        published_page: 1294
+        pdf_page_index: 5
+        section: Results
+        note: 2278 ± 10 K for tables 3–5.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0000101325'
+          approximate: false
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+        note: Residual-gas pressure in cell zone <10^-10 atm throughout; converted with 1 atm=101325 Pa.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000001'
+            locator:
+              published_page: 1293
+              pdf_page_index: 4
+              section: Experimental
+              note: Residual-gas pressure in cell zone <10^-10 atm throughout; converted with 1 atm=101325 Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1293
+              pdf_page_index: 4
+              section: Experimental
+              note: Residual-gas pressure in cell zone <10^-10 atm throughout; converted with 1 atm=101325 Pa.
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+        note: No sweep gas reported.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1293
+          pdf_page_index: 4
+          section: Experimental
+          note: Base pressure not separately reported.
+  work_id: 10.1134/s0036024420070274
+  locator:
+    published_page: 1293
+    pdf_page_index: 4
+    section: Experimental
+    note: Molybdenum cell; Tables 3–5 are the 2278 K composition series.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1294
+          pdf_page_index: 5
+          section: Results
+          note: Vent diameter discussed but no numeric diameter reported.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1294
+          pdf_page_index: 5
+          section: Results
+          note: Vent channel thickness/length discussed but no numeric length reported.
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Hertz–Knudsen Eq. (11) applied to integrated ion currents; coefficients account for total Ca and TiO2 currents.
+            The structural-transformation evaporation coefficient is Kα = 1 and is ignored [61].
+        locator:
+          published_page: 1294
+          pdf_page_index: 5
+          section: Results
+      reference_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1294
+          pdf_page_index: 5
+          section: Results
+          note: No pressure calibration substance reported.
+      ionization_cross_sections:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1294
+          pdf_page_index: 5
+          section: Results
+          note: No cross-section calibration stated.
+      isotope_or_multiplier_correction:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1294
+          pdf_page_index: 5
+          section: Results
+          note: No isotope or multiplier correction is stated; Kα is an evaporation coefficient.
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+  bench_id: 10.1134/s0036024420070274::bench::shornikov-2020-mi1201-mo-kems
+benches:
+- id: 10.1134/s0036024420070274::bench::shornikov-2020-mi1201-mo-kems
+  work_id: 10.1134/s0036024420070274
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MI-1201 mass spectrometer with modified high-temperature ion source
+    locator:
+      published_page: 1293
+      pdf_page_index: 4
+      section: Experimental
+      note: Source says up to 3000 K.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum effusion cell; liner not stated
+    locator:
+      published_page: 1293
+      pdf_page_index: 4
+      section: Experimental
+      note: No liner is described.
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 1293
+      pdf_page_index: 4
+      section: Experimental
+      note: Molybdenum effusion cell
+  detector:
+    state:
+      tag: value
+      value: MI-1201 mass spectrometer
+    locator:
+      published_page: 1293
+      pdf_page_index: 4
+      section: Experimental
+  ionization:
+    electron_energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '25'
+          approximate: false
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+        note: Ionizing electron energy 25 eV.
+    ion_appearance_energy_source:
+      state:
+        tag: value
+        value: Warren [58]; accepted ionization energies [59]; CaTiO3+ energy from perovskite [41]
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+    ionization_cross_sections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1294
+        pdf_page_index: 5
+        section: Results
+        note: No ionization cross sections stated.
+    multiplier_or_isotope_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1294
+        pdf_page_index: 5
+        section: Results
+        note: No isotope or multiplier correction is stated; Kα is an evaporation coefficient.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: EOP-66 optical pyrometer
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+    reported_error:
+      state:
+        tag: value
+        value: Less than 10 K at 2400 K
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+        note: No separate calibration error stated.
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+        note: No pyrometer calibration method/reference reported.
+  heating_method:
+    state:
+      tag: value
+      value: Alternating current passed through the cell body
+    locator:
+      published_page: 1293
+      pdf_page_index: 4
+      section: Experimental
+  other_facts:
+  - name: pyrometer_error_at_2400K
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '10'
+          approximate: false
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+        note: Error less than 10 K at 2400 K.
+    unit: K
+  - name: cell_liner
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental
+        note: No liner is identified for the molybdenum effusion cell.
+  - name: isotope_correction
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1294
+        pdf_page_index: 5
+        section: Results
+        note: No isotope-specific correction is stated; Kα = 1 is recorded separately.
+  - name: table_temperature_uncertainty
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        published_page: 1294
+        pdf_page_index: 5
+        section: Results
+        note: 'Tables 3–5: 2278 ± 10 K; numeric magnitude retained.'
+    unit: K
+context:
+- observation_id: shornikov_2020_activity_standard_states
+  type: thermodynamic_example
+  locator:
+    published_page: 1294
+    pdf_page_index: 5
+    section: Results
+  units: as printed
+  values:
+    quantity: activity_standard_states
+    CaO: Pure individual oxide component in Lewis Eq. (17), through pCaO° and pCa°; physical phase is not stated.
+    TiO2: Pure individual oxide component in Lewis Eq. (18), through pTiO2° and pTiO°; physical phase is not stated.
+    CaTiO3: Figure 3 has a CaTiO3 activity curve, but this paper does not identify its ion or reference phase in prose.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_activity_standard_states
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_cell_reactions
+  type: method
+  locator:
+    published_page: 1294
+    pdf_page_index: 5
+    section: Results
+  units: as printed
+  values:
+    quantity: cell_evaporation_and_gas_reactions
+    reaction_equations:
+    - '[Mo] = (Mo)'
+    - (Mo) + (O) = (MoO)
+    - (MoO) + (O) = (MoO2)
+    - (MoO2) + (O) = (MoO3)
+    qualification: Molybdenum cell evaporates naturally at high temperature and interacts with the melt, forming gaseous molybdenum
+      oxides.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_cell_reactions
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_composition_error
+  type: composition
+  locator:
+    published_page: 1293
+    pdf_page_index: 4
+    section: Experimental
+    note: Eq. (6) discussion.
+  units: as printed
+  values:
+    quantity: composition_estimation_error
+    error_mol_percent: '0.15'
+    operator: less than
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_composition_error
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_current_ion_ratio
+  type: mass_spectrum
+  locator:
+    published_page: 1294
+    pdf_page_index: 5
+    section: Results
+  units: as printed
+  values:
+    quantity: relative_ion_current_ratio
+    composition_TiO2_mol_percent_as_printed: 57.81 ± 0.15
+    temperature_K_as_printed: 2278 ± 10
+    ions:
+    - Ca
+    - CaO
+    - Ti
+    - TiO
+    - TiO2
+    - CaTiO3
+    - O
+    - O2
+    relative_currents_as_printed:
+    - '25'
+    - '0.02'
+    - '0.1'
+    - '56'
+    - '100'
+    - '0.13'
+    - '0.44'
+    - '0.012'
+    difference_from_perovskite: differs slightly from the one found for perovskite in [41]
+    CaTiO3_fragmentation_ions:
+    - CaTi+
+    - CaTiO+
+    - CaTiO2+
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_current_ion_ratio
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_current_ratio
+  type: mass_spectrum
+  locator:
+    published_page: 1294
+    pdf_page_index: 5
+    section: Results
+  units: as printed
+  values:
+    quantity: relative_ion_current_ratio
+    composition_TiO2_mol_percent_as_printed: 57.81 ± 0.15
+    temperature_K_as_printed: 2278 ± 10
+    ions:
+    - Ca
+    - CaO
+    - Ti
+    - TiO
+    - TiO2
+    - CaTiO3
+    - O
+    - O2
+    relative_currents_as_printed:
+    - '25'
+    - '0.02'
+    - '0.1'
+    - '56'
+    - '100'
+    - '0.13'
+    - '0.44'
+    - '0.012'
+    note: Differs slightly from perovskite [41]; CaTiO3+ intensity includes CaTi+, CaTiO+, and CaTiO2+ fragments.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_current_ratio
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_equations_missing_relations
+  type: literature_context
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    section: Introduction and Results
+    note: Printed mathematical relations from Eqs. (1)–(6), (11), and (17)–(31), pp. 1292–1296. Eqs. (7)–(10) and (12)–(16)
+      are transcribed in their existing reaction and pressure relation records.
+  units: as printed
+  values:
+    quantity: printed_equation_relations
+    equations:
+    - number: 1
+      page: 1292
+      relation: (CaO) = (Ca) + (O)
+    - number: 2
+      page: 1292
+      relation: (TiO2) = (TiO) + (O)
+    - number: 3
+      page: 1292
+      relation: (TiO2) = (Ti) + (O2)
+    - number: 4
+      page: 1292
+      relation: (SiO2) = (SiO) + (O)
+    - number: 5
+      page: 1292
+      relation: (O2) = 2(O)
+    - number: 6
+      page: 1293
+      relation: (mt/m0)i = integral(t0 to t) Iij dt / integral(0 to t0) Iij dt
+    - number: 11
+      page: 1294
+      relation: pi = Kα mi/(Sor Cor t) sqrt(2πRT/Mi)
+    - number: 17
+      page: 1294
+      relation: aCaO = pCaO/pCaO° = pCa pO/(pCa° pO°)
+    - number: 18
+      page: 1294
+      relation: aTiO2 = pTiO2/pTiO2° = pTiO pO/(pTiO° pO°)
+    - number: 19
+      page: 1294
+      relation: ln ai = -integral xj d ln(aj/ai)
+    - number: 20
+      page: 1294
+      relation: ln aTiO2 = -integral xCaO d ln(pCaO/pTiO2)
+    - number: 21
+      page: 1295
+      relation: ln aTiO2 = -integral xCaO d ln(pCa pO/(pTiO pO)) = -integral xCaO d ln(pCa/pTiO)
+    - number: 22
+      page: 1295
+      relation: ln aTiO2 = -integral xCaO d ln(ICa/ITiO)
+    - number: 23
+      page: 1295
+      relation: ln aCaO = -integral (xTiO2/xCaO) d ln(aTiO2)
+    - number: 24
+      page: 1295
+      relation: Δμi = RT ln ai
+    - number: 25
+      page: 1295
+      relation: Δμi = ΔHi - TΔSi
+    - number: 26
+      page: 1295
+      relation: ΔHi = d(Δμi/T)/d(1/T) = R d ln ai/d(1/T)
+    - number: 27
+      page: 1296
+      relation: ΔSi = -dΔμi/dT
+    - number: 28
+      page: 1296
+      relation: ΔGT = sum xi Δμi
+    - number: 29
+      page: 1296
+      relation: ΔHT = sum xi ΔHi
+    - number: 30
+      page: 1296
+      relation: ΔST = sum xi ΔSi
+    - number: 31
+      page: 1296
+      relation: ΔGT = ΔHT - TΔST
+    attribution: Shornikov (2020)
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_equations_missing_relations
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_figure_1_only
+  type: figure_only
+  locator:
+    published_page: 1290
+    pdf_page_index: 1
+    section: Figure
+  units: as printed
+  values:
+    quantity: figure_only_curves
+    method_class: figure_only
+    figure: '1'
+    title: CaO–TiO2 phase diagram
+    plotted_values: not_digitized
+    note: No boundaries digitized.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_figure_1_only
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_figure_2_only
+  type: figure_only
+  locator:
+    published_page: 1290
+    pdf_page_index: 1
+    section: Figure
+  units: as printed
+  values:
+    quantity: figure_only_curves
+    method_class: figure_only
+    figure: '2'
+    title: studied compositions
+    plotted_values: not_digitized
+    note: No markers digitized.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_figure_2_only
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_figure_3_only
+  type: figure_only
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    section: Figure
+  units: as printed
+  values:
+    quantity: figure_only_curves
+    method_class: figure_only
+    figure: '3'
+    title: oxide activities
+    plotted_values: not_digitized
+    note: Curves at 2057, 2150, 2250 K not digitized.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_figure_3_only
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_figure_4_only
+  type: figure_only
+  locator:
+    published_page: 1297
+    pdf_page_index: 8
+    section: Figure
+  units: as printed
+  values:
+    quantity: figure_only_curves
+    method_class: figure_only
+    figure: '4'
+    title: thermodynamic functions
+    plotted_values: not_digitized
+    note: Curves at 2278 K not digitized.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_figure_4_only
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_figure_5_only
+  type: figure_only
+  locator:
+    published_page: 1297
+    pdf_page_index: 8
+    section: Figure
+  units: as printed
+  values:
+    quantity: figure_only_curves
+    method_class: figure_only
+    figure: '5'
+    title: mixing-energy comparison
+    plotted_values: not_digitized
+    note: Curves at 2300 K not digitized.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_figure_5_only
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_integral_inputs_and_anchors
+  type: method
+  locator:
+    published_page: 1295
+    pdf_page_index: 6
+    section: Results
+    note: Eqs. (22) and (23), Table 5. The paper gives the relations and output series but does not tabulate the Ca/TiO ion-current-ratio
+      series or numerical integration inputs.
+  units: as printed
+  values:
+    quantity: integral_input_series_and_accepted_anchors
+    eq22_input: Composition-dependent Ca/TiO ion-current ratio; numeric values not published.
+    eq22_composition_points_mol_percent_tio2:
+    - '37.91'
+    - '40.02'
+    - '43.15'
+    - '46.66'
+    - '50'
+    - '53.75'
+    - '57.81'
+    - '62.38'
+    - '65.18'
+    - '69.28'
+    - '75.18'
+    - '79.64'
+    - '83.14'
+    - '87.16'
+    - '93.15'
+    eq22_relation: ln(aTiO2) = - integral xCaO d ln(ICa/ITiO), integrated over the composition series and anchored at the
+      accepted pure TiO2 endpoint aTiO2=1.00 at xTiO2=100 mol %.
+    eq23_relation: ln(aCaO) = - integral (xTiO2/xCaO) d ln(aTiO2), integrated across the Eq. (22) TiO2 activity/composition
+      series.
+    eq23_input_observation_ids:
+    - shornikov_2020_table5_tio2_eq22_2278k
+    - shornikov_2020_table5_tio2_eq22_2278k_x40_02
+    - shornikov_2020_table5_tio2_eq22_2278k_x43_15
+    - shornikov_2020_table5_tio2_eq22_2278k_x46_66
+    - shornikov_2020_table5_tio2_eq22_2278k_x50_0
+    - shornikov_2020_table5_tio2_eq22_2278k_x53_75
+    - shornikov_2020_table5_tio2_eq22_2278k_x57_81
+    - shornikov_2020_table5_tio2_eq22_2278k_x62_38
+    - shornikov_2020_table5_tio2_eq22_2278k_x65_18
+    - shornikov_2020_table5_tio2_eq22_2278k_x69_28
+    - shornikov_2020_table5_tio2_eq22_2278k_x75_18
+    - shornikov_2020_table5_tio2_eq22_2278k_x79_64
+    - shornikov_2020_table5_tio2_eq22_2278k_x83_14
+    - shornikov_2020_table5_tio2_eq22_2278k_x87_16
+    - shornikov_2020_table5_tio2_eq22_2278k_x93_15
+    accepted_eq23_cao_anchor:
+      composition_TiO2_mol_percent: '50'
+      activity_as_printed: 2.60 × 10^-2
+      locator: Table 5, row 5, Eq. (23), p. 1296
+    attribution: Shornikov (2020)
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_integral_inputs_and_anchors
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_major_minor_ions
+  type: mass_spectrum
+  locator:
+    published_page: 1293
+    pdf_page_index: 4
+    section: Experimental
+  units: as printed
+  values:
+    quantity: ion_abundance_qualification
+    ionizing_electron_energy_eV: 25
+    predominant_ions:
+    - TiO2+
+    - Ca+
+    - TiO+
+    - O+
+    negligible_ions:
+    - CaO+
+    - Ti+
+    - O2+
+    - CaTiO3+
+    note: CaTiO3+ intensity was accounted for using its reported fragmentation.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_major_minor_ions
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_mo_current_ratio
+  type: mass_spectrum
+  locator:
+    published_page: 1294
+    pdf_page_index: 5
+    section: Results
+  units: as printed
+  values:
+    quantity: molybdenum_oxide_ion_current_ratio
+    ions:
+    - TiO2
+    - Mo
+    - MoO
+    - MoO2
+    - MoO3
+    relative_currents_as_printed:
+    - '100'
+    - '0.35'
+    - '1.6'
+    - '1.8'
+    - '5.4'
+    note: Mo oxide ions attributed to natural evaporation of the Mo cell at high temperature and cell–melt interaction.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_mo_current_ratio
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_molybdenum_ion_ratio
+  type: mass_spectrum
+  locator:
+    published_page: 1294
+    pdf_page_index: 5
+    section: Results
+  units: as printed
+  values:
+    quantity: molybdenum_cell_oxide_ion_signals
+    ions:
+    - TiO2
+    - Mo
+    - MoO
+    - MoO2
+    - MoO3
+    relative_currents_as_printed:
+    - '100'
+    - '0.35'
+    - '1.6'
+    - '1.8'
+    - '5.4'
+    small_molybdenum_oxide_ions: MoOi+ where i=0–3
+    origin_as_attributed: natural evaporation of the molybdenum cell at high temperature; interaction between melt and cell
+      material
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_molybdenum_ion_ratio
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_numeric_context_01
+  type: literature_context
+  locator:
+    published_page: 1290
+    pdf_page_index: 1
+    section: Introduction
+  units: as printed
+  values:
+    quantity: numeric_or_comparative_background_statement
+    quote: Suito et al. [46, 47] studied the equilibria in CaO–TiOx (or CaO–TiOx–Al2O3) slags containing liquid nickel with
+      respect to oxygen, nitrogen, and sulfur, depending on the Ti (or Al) content in the metal, using CaO or Al2O3 crucibles
+      at 1873 K.
+    attribution: Shornikov (2020)
+    note: Introduction; prior-study conditions.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_numeric_context_01
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_numeric_context_02
+  type: literature_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    section: Introduction
+  units: as printed
+  values:
+    quantity: numeric_or_comparative_background_statement
+    quote: Banon et al. [48] studied the vaporization of 24 CaTiO3–Ti2O3–TiO2 system compositions from molybdenum cells at
+      2150 K; the synthesized compositions contained up to 90.2 mol % Ti2O3 and 42 mol % TiO2.
+    attribution: Shornikov (2020)
+    note: Summary, not a verbatim quotation; prior-study numeric scope.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_numeric_context_02
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_numeric_context_03
+  type: literature_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    section: Introduction
+  units: as printed
+  values:
+    quantity: numeric_or_comparative_background_statement
+    quote: Shornikov et al. [49–51] studied 17 CaO–TiO2–SiO2 compositions from molybdenum cells at 1582–2529 K; the synthesized
+      compositions were 25.60–50.00 mol % CaO, up to 60.67 mol % SiO2, and 5.05–50.00 mol % TiO2.
+    attribution: Shornikov (2020)
+    note: Summary, not a verbatim quotation; prior-study numeric scope.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_numeric_context_03
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_numeric_context_04
+  type: literature_context
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    section: Introduction
+  units: as printed
+  values:
+    quantity: numeric_or_comparative_background_statement
+    quote: Stolyarova et al. [54] studied the gas phase over 14 CaO–TiO2–SiO2 compositions in tungsten cells at 1800–2200
+      K; compositions reached 70 mol % CaO, 69 mol % SiO2, and 40 mol % TiO2.
+    attribution: Shornikov (2020)
+    note: Summary, not a verbatim quotation; prior-study numeric scope.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_numeric_context_04
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_numeric_context_05
+  type: literature_context
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    section: Introduction
+  units: as printed
+  values:
+    quantity: numeric_or_comparative_background_statement
+    quote: Figure 3 compares activity values at 2057 K in [54], 2150 K in [48], and 2250 K in this work.
+    attribution: Shornikov (2020)
+    note: Summary of the caption, not a verbatim quotation; figure-only data not digitized.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_numeric_context_05
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_numeric_context_06
+  type: literature_context
+  locator:
+    published_page: 1297
+    pdf_page_index: 8
+    section: Results and discussion
+  units: as printed
+  values:
+    quantity: numeric_or_comparative_background_statement
+    quote: The energies of mixing of CaO–TiO2, CaO–SiO2, and CaO–Al2O3 melts are compared at 2300 K.
+    attribution: Shornikov (2020)
+    note: Summary of the caption, not a verbatim quotation; figure-only data not digitized.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_numeric_context_06
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_numeric_context_07
+  type: literature_context
+  locator:
+    published_page: 1298
+    pdf_page_index: 9
+    section: Funding
+    note: Funding statement begins on p. 1297; project number continues on p. 1298.
+  units: as printed
+  values:
+    quantity: numeric_or_comparative_background_statement
+    quote: This work was supported by Program No. 7 of the Presidium of the Russian Academy of Sciences and Russian Foundation
+      for Basic Research project no. 19-05-00801A.
+    attribution: Shornikov (2020)
+    note: Summary, not a verbatim quotation; funding acknowledgement spanning pp. 1297–1298.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_numeric_context_07
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_numeric_context_08
+  type: literature_context
+  locator:
+    published_page: 1297
+    pdf_page_index: 8
+    section: Conclusions
+    note: Conclusions; experimental temperature range.
+  units: as printed
+  values:
+    quantity: numeric_or_comparative_background_statement
+    method_class: quoted_unattributed
+    quote: The activities of oxides in CaO–TiO2 melts were determined in the temperature region of 2241–2441 K via high-temperature
+      Knudsen effusion mass spectrometry using two independent approaches.
+    attribution: Shornikov (2020)
+    note: Printed conclusion scope statement; Tables 3–5 use 2278 ± 10 K.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_numeric_context_08
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_numeric_context_09
+  type: literature_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    section: Introduction
+    note: Summary spanning pp. 1290–1291; the activity comparison sentence continues below Table 1, followed by a separate
+      sentence about 24 compositions.
+  units: as printed
+  values:
+    quantity: numeric_or_comparative_background_statement
+    quote: Suito et al. [46, 47] activities correlate with Banon et al. [48] values measured by Knudsen effusion mass spectrometry
+      at 1900–2200 K (Table 2). Separately, Banon et al. studied 24 CaTiO3–Ti2O3–TiO2 system compositions vaporizing from
+      molybdenum cells.
+    note: Summary, not a verbatim quotation; two distinct printed sentences.
+    attribution: Shornikov (2020)
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_numeric_context_09
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_numeric_context_10
+  type: literature_context
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    section: Introduction
+    note: Paragraph discussing Shornikov et al. [42] perovskite vaporization.
+  units: as printed
+  values:
+    quantity: numeric_or_comparative_background_statement
+    quote: Table 2 also contains data measured by Shornikov [42] when studying the vaporization of perovskite via Knudsen
+      effusion mass spectrometry in the temperature region of 1791–2398 K.
+    attribution: Shornikov (2020)
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_numeric_context_10
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_numeric_context_11
+  type: literature_context
+  locator:
+    published_page: 1293
+    pdf_page_index: 4
+    section: Introduction
+    note: Zhang et al. [55] prior-work statement.
+  units: as printed
+  values:
+    quantity: numeric_or_comparative_background_statement
+    quote: Zhang et al. [55] recently studied the isotopic fractionation of calcium and titanium during the vaporization of
+      a perovskite melt hanging on an iridium wire inside a vacuum furnace at 2278 K (according to Langmuir).
+    attribution: Shornikov (2020)
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_numeric_context_11
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_01
+  type: data_qualification
+  locator:
+    published_page: 1289
+    pdf_page_index: 0
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: 'One of the first phase diagrams plotted for the calcium titanate system by Umezu and Kakiuchi [2] on the basis
+      of visual observations contained a single component: perovskite CaTiO3, which has a melting temperature of 2013 ± 10
+      K.'
+    attribution: Shornikov (2020)
+    note: Background temperature; Table 1 includes the cited transition.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_01
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_02
+  type: data_qualification
+  locator:
+    published_page: 1289
+    pdf_page_index: 0
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: Wartenberg et al. [5] discovered new calcium titanates Ca2TiO4 and Ca3TiO5 with melting temperatures of 2073 ±
+      20 and 2148 ± 20 K, respectively.
+    attribution: Shornikov (2020)
+    note: Background values; cited in Table 1.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_02
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_03
+  type: data_qualification
+  locator:
+    published_page: 1289
+    pdf_page_index: 0
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: 'Meanwhile, Roth [11] identified another new compound: Ca4Ti3O10, which decomposes into perovskite and a liquid
+      at a temperature of 2028 ± 10 K. Jongejan and Wilkins [12] later reported a higher temperature of Ca4Ti3O10 decomposition,
+      based on data from high-temperature microscopy: 2143 ± 10 K.'
+    attribution: Shornikov (2020)
+    note: Conflicting literature values; both appear in Table 1.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_03
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_04
+  type: data_qualification
+  locator:
+    published_page: 1289
+    pdf_page_index: 0
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: However, Imlach and Glasser [13] did not confirm the existence of Ca4Ti3O10 in X-ray diffraction studies, due probably
+      to the conditions used in annealing their samples.
+    attribution: Shornikov (2020)
+    note: Phase-identification qualification.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_04
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_05
+  type: data_qualification
+  locator:
+    published_page: 1289
+    pdf_page_index: 0
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: 'The hypotheses of Kimura and Muan [14] and Shultz [15] about the existence of a region of Ca3Ti2O7–Ca4Ti3O10 solid
+      solutions was disproven by the results from X-ray diffraction studies performed by Tulgar [16], who discovered yet another
+      new component: Ca5Ti4O13, which decomposes at 2113 ± 20 K.'
+    attribution: Shornikov (2020)
+    note: Phase interpretation as printed.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_05
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_06
+  type: data_qualification
+  locator:
+    published_page: 1289
+    pdf_page_index: 0
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: 'who discovered yet another new component: Ca5Ti4O13, which decomposes at 2113 ± 20 K.'
+    attribution: Shornikov (2020)
+    note: Verbatim continuation excerpt; the subject is Tulgar [16] in the preceding clause. Table 1 includes the cited value.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_06
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_07
+  type: data_qualification
+  locator:
+    published_page: 1289
+    pdf_page_index: 0
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: Limar’ and Kisel’ [17, 18] and Pfaff [19] synthesized and studied metastable CaTi4O9 and CaTi2O5, which decomposed
+      at 993 ± 20 and 1123 ± 20 K, respectively, into rutile and other calcium titanates.
+    attribution: Shornikov (2020)
+    note: Background temperatures; Table 1 includes the values.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_07
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_08
+  type: data_qualification
+  locator:
+    published_page: 1289
+    pdf_page_index: 0
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: Savenko and Sakharov [20] found that the products of thermolysis contain Ca2Ti5O12, which is stable in the temperature
+      range of 1023–1273 K and decomposes into rutil and perovskite.
+    attribution: Shornikov (2020)
+    note: The English translation prints “rutil” here; preserved verbatim, apparently a translation typo for rutile.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_08
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_09
+  type: data_qualification
+  locator:
+    published_page: 1289
+    pdf_page_index: 0
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: Difficulties in synthesizing and identifying components of the CaO–TiO2 system could be due to reductive conditions
+      that can lead in particular to the formation of Ca3Ti2O6 [21] or CaTi2O4 [22–25].
+    attribution: Shornikov (2020)
+    note: Conditional qualification.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_09
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_10
+  type: data_qualification
+  locator:
+    published_page: 1289
+    pdf_page_index: 0
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: In studying CaO inclusions in perovskite via electron microscopy, Ceh and Kolar [26] discovered the formation of
+      homological Ca6Ti5O16, Ca8Ti7O22, and Ca9Ti8O25 oxides that grew along with CaTiO3 in its lattice faults.
+    attribution: Shornikov (2020)
+    note: Comparative phase statement.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_10
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_11
+  type: data_qualification
+  locator:
+    published_page: 1290
+    pdf_page_index: 1
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: Note that studies of the thermodynamic properties of other calcium titanates (Ca3Ti2O7 and Ca4Ti3O10) were limited
+      by the results from several works [37, 43–45] performed at temperatures below 1250 K.
+    attribution: Shornikov (2020)
+    note: Numeric scope statement.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_11
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_12
+  type: data_qualification
+  locator:
+    published_page: 1290
+    pdf_page_index: 1
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: Thermodynamic information about the CaO–TiO2 system’s properties in the region of temperatures above 1700 K is
+      quite scarce and limited by the results from only several experimental studies (Fig. 2).
+    attribution: Shornikov (2020)
+    note: Numeric scope statement.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_12
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_13
+  type: data_qualification
+  locator:
+    published_page: 1290
+    pdf_page_index: 1
+    section: Introduction
+    note: Sentence begins on p. 1290 and continues below Table 1 on p. 1291.
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: Activities aTiO2 calculated by Suito et al. [46, 47] correlated with their values measured by Banon et al. [48]
+      via Knudsen effusion mass spectrometry in the temperature range of 1900–2200 K (Table 2).
+    attribution: Shornikov (2020)
+    note: Comparative claim.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_13
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_14
+  type: data_qualification
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: In the authors’ opinion, this made them imprecise, which is why they do not correspond to different variants of
+      the CaO–TiO2 phase diagram [5, 10, 12, 16].
+    attribution: Shornikov (2020)
+    note: Earlier extrapolations were qualified as imprecise.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_14
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_15
+  type: data_qualification
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: Nevertheless, Banon et al. [48] assumed the CaO–TiO2 melt was immiscible in the region close to TiO2 when interpreting
+      the high activities aTiO2 obtained in a range of concentrations close to this region (Fig. 3).
+    attribution: Shornikov (2020)
+    note: Attributed immiscibility interpretation.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_15
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_16
+  type: data_qualification
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: As follows from Table 2, the Belton–Fruehan [53] values calculated in [50, 51] for the activities of the oxides
+      in perovskite at 2100 K with regard to the pseudo-binary CaTiO3–CaSiO3 and CaTiO3–SiO2 systems, respectively, were close
+      to those estimated by Banon et al. in [48].
+    attribution: Shornikov (2020)
+    note: Comparative activity statement; 2100 K.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_16
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_17
+  type: data_qualification
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: Figure 2 shows that at 2057 K, one of the two studied CaO–TiO2 compositions lies in the CaO + liquid region, so
+      its activity aCaO must be close to unity.
+    attribution: Shornikov (2020)
+    note: Phase/activity inference.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_17
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_18
+  type: data_qualification
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The second composition lies in the Ca4Ti3O10 + liquid region according to the data from [10, 11] or in the Ca3Ti2O7
+      + liquid region, as follows from those of Tulgar [16].
+    attribution: Shornikov (2020)
+    note: Competing phase assignment.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_18
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_19
+  type: data_qualification
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: However, calculated activities aCaO are fairly close to each other (Table 2), thus contradicting the CaO–TiO2 phase
+      diagram (Fig. 2).
+    attribution: Shornikov (2020)
+    note: Comparative contradiction.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_19
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_20
+  type: data_qualification
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: A possible reason for these discrepancies would seem to be the considerable error when measuring the CaO activities
+      in a melt, which we believe could be more than 50%.
+    attribution: Shornikov (2020)
+    note: Authors’ uncertainty estimate.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_20
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_21
+  type: data_qualification
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    section: Introduction
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: We can see that the thermodynamic data obtained in [42, 46–51] is consistent, but for the only composition corresponding
+      to perovskite.
+    attribution: Shornikov (2020)
+    note: Comparative claim and limitation.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_21
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_22
+  type: data_qualification
+  locator:
+    published_page: 1293
+    pdf_page_index: 4
+    section: Experimental or results
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The change in the composition of the residual perovskite melt during evaporation testified to the predominant vaporization
+      of the calcium component from the melt.
+    attribution: Shornikov (2020)
+    note: Prior Langmuir study [55]; non-congruent evaporation/composition drift.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_22
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_23
+  type: data_qualification
+  locator:
+    published_page: 1293
+    pdf_page_index: 4
+    section: Experimental or results
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: Although the estimated value of the total vapor pressure over the perovskite melt corresponded to our data in [41],
+      the other thermodynamic information obtained by Zhang et al. [55] was not confirmed experimentally.
+    attribution: Shornikov (2020)
+    note: Prior-study qualification.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_23
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_24
+  type: data_qualification
+  locator:
+    published_page: 1293
+    pdf_page_index: 4
+    section: Experimental or results
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The information about the phase diagram of the calcium titanate system is contradictory (Figs. 1 and 2) and must
+      be refined with regard to the presence (or absence) of calcium titanates and the positions of invariant points, including
+      the melting temperatures of individual oxides (Table 1).
+    attribution: Shornikov (2020)
+    note: Authors’ phase-diagram qualification.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_24
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_25
+  type: data_qualification
+  locator:
+    published_page: 1293
+    pdf_page_index: 4
+    section: Experimental or results
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The preliminary estimates obtained for the activities of oxides in the CaO–TiO2 system at different temperatures
+      and compositions (predominantly in the solid phase) do not give a full picture of the physicochemical properties of
+      the melts of this system (Table 2), which is required for their theoretical description.
+    attribution: Shornikov (2020)
+    note: Authors’ limitation.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_25
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_26
+  type: data_qualification
+  locator:
+    published_page: 1293
+    pdf_page_index: 4
+    section: Experimental or results
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: As shown in [49], the first stage of the evaporation of calcium–titanate–silicate melts was characterized by the
+      predominant vaporization of the silicon dioxide contained in a melt at a constant concentration of calcium titanate
+      component.
+    attribution: Shornikov (2020)
+    note: Prior work [49]; evaporation sequence.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_26
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_27
+  type: data_qualification
+  locator:
+    published_page: 1293
+    pdf_page_index: 4
+    section: Experimental or results
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: At the second stage of the evaporation of melts of CaO–TiO2–SiO2 depleted of silicon dioxide down to concentrations
+      close to the field of calcium oxide (∼70 to 80 mol % CaO), the calcium silicate component of each melt was evaporated
+      until the removal of SiO2 was nearly complete.
+    attribution: Shornikov (2020)
+    note: Prior work [49]; numeric composition range.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_27
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_28
+  type: data_qualification
+  locator:
+    published_page: 1293
+    pdf_page_index: 4
+    section: Experimental or results
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: Subsequent evaporation of the residual CaO–TiO2 melt was conducted with the predominant vaporization of calcium
+      oxide down to the region of concentrations close to the rutil TiO2 field.
+    attribution: Shornikov (2020)
+    note: The English translation prints “rutil” here; preserved verbatim, apparently a translation typo for rutile.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_28
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_29
+  type: data_qualification
+  locator:
+    published_page: 1294
+    pdf_page_index: 5
+    section: Experimental or results
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: 'The ratio between the intensities of ion currents in the mass spectra of vapor over the CaO–TiO2 melt that was
+      57.81 ± 0.15 mol % TiO2 at 2278 ± 10 K was I_Ca : I_CaO : I_Ti : I_TiO : I_TiO2 : I_CaTiO3 : I_O : I_O2 = 25 : 0.02
+      : 0.1 : 56 : 100 : 0.13 : 0.44 : 0.012, which differs slightly from the one found for perovskite in [41].'
+    attribution: Shornikov (2020)
+    note: Comparative current-ratio statement.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_29
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_30
+  type: data_qualification
+  locator:
+    published_page: 1294
+    pdf_page_index: 5
+    section: Experimental or results
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The partial pressures calculated for the components of gas phase over a CaO–TiO2 melt at 2278 ± 10 K with an error
+      less than 10% are given in Table 3.
+    attribution: Shornikov (2020)
+    note: Stated uncertainty bound.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_30
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_31
+  type: data_qualification
+  locator:
+    published_page: 1294
+    pdf_page_index: 5
+    section: Experimental or results
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The partial pressures determined for atomic oxygen (Table 4) using Eq. (11) were in satisfactory agreement with
+      the values calculated with the thermochemical data in [39] on equilibrium constants Kr(T) of possible reactions (1)–(3),
+      (5), and (10) occurring in the gas phase over a melt, according to the equations
+    attribution: Shornikov (2020)
+    note: Verbatim prose excerpt preceding Eqs. (12)–(16); the equations are retained in the pressure-relation context.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_31
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_32
+  type: data_qualification
+  locator:
+    published_page: 1294
+    pdf_page_index: 5
+    section: Experimental or results
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The Clausing factor represents the collisions between the gas phase components inside the channel of the vent (effusion
+      container) and their rebounding off the channel walls. Its value is less than unity and depends on the ratio between
+      the diameter and the thickness of the vent.
+    attribution: Shornikov (2020)
+    note: Geometry relation; actual dimensions absent.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_32
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_33
+  type: data_qualification
+  locator:
+    published_page: 1295
+    pdf_page_index: 6
+    section: Experimental or results
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The activities determined for the oxides in CaO–TiO2 melts using Eqs. (22) and (23) at 2278 K are compared in Table
+      5. We can see they are in satisfactory agreement with the values determined independently with Eqs. (17) and (18).
+    attribution: Shornikov (2020)
+    note: This broad agreement statement coexists with inconsistent Table 5 CaO values at 43.15 and 83.14 mol % TiO2.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_33
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_34
+  type: data_qualification
+  locator:
+    published_page: 1296
+    pdf_page_index: 7
+    section: Results and discussion
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The results [48] correlate with the data of this work.
+    attribution: Shornikov (2020)
+    note: Comparative statement.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_34
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_35
+  type: data_qualification
+  locator:
+    published_page: 1296
+    pdf_page_index: 7
+    section: Results and discussion
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: As mentioned above, the difference between activities aTiO2 is likely due to the procedures for extrapolating the
+      information in [48] for CaTiO3–Ti2O3–TiO2 ternary system compositions with a possible loss of precision.
+    attribution: Shornikov (2020)
+    note: Authors’ explanation.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_35
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_36
+  type: data_qualification
+  locator:
+    published_page: 1296
+    pdf_page_index: 7
+    section: Results and discussion
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The behavior observed for the activity of TiO2 in melts for the region of concentrations close to rutile [48] could
+      be evidence of some immiscibility in a melt, as follows from the observed kink in the concentration dependence of aTiO2
+      (Fig. 3, line 3), and the proximity to the constant values obtained for the concentration dependences of pTi, pTiO,
+      pTiO2, pO, and pO2 (Table 3) in this work.
+    attribution: Shornikov (2020)
+    note: Conditional interpretation.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_36
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_37
+  type: data_qualification
+  locator:
+    published_page: 1296
+    pdf_page_index: 7
+    section: Results and discussion
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: In our opinion, however, the behavior of the TiO2 and CaTiO3 activities (Fig. 3, curves 4 and 6) is closer to ideal.
+    attribution: Shornikov (2020)
+    note: Comparative interpretation; Fig. 3 not digitized.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_37
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_38
+  type: data_qualification
+  locator:
+    published_page: 1296
+    pdf_page_index: 7
+    section: Results and discussion
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The maximum value of aCaTiO3 corresponds to the region of compositions close to perovskite (Fig. 3, curves 5 and
+      6).
+    attribution: Shornikov (2020)
+    note: Maximum/composition statement; Fig. 3 not digitized.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_38
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_39
+  type: data_qualification
+  locator:
+    published_page: 1296
+    pdf_page_index: 7
+    section: Results and discussion
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The differences from activities aCaO in [54] (Fig. 3, points 1) would seem to be due to their low precision.
+    attribution: Shornikov (2020)
+    note: Authors’ interpretation.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_39
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_40
+  type: data_qualification
+  locator:
+    published_page: 1296
+    pdf_page_index: 7
+    section: Results and discussion
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The partial and integral thermodynamic dependences of CaO–TiO2 melts in Fig. 4 are of a symbate character.
+    attribution: Shornikov (2020)
+    note: Translation wording “symbate” retained.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_40
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_41
+  type: data_qualification
+  locator:
+    published_page: 1296
+    pdf_page_index: 7
+    section: Results and discussion
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The enthalpies of formation and entropies of these melts are positive.
+    attribution: Shornikov (2020)
+    note: Sign statement; Fig. 4 not digitized.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_41
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_42
+  type: data_qualification
+  locator:
+    published_page: 1296
+    pdf_page_index: 7
+    section: Results and discussion
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The extremal values of the integral thermodynamic properties of these melts belong to the region of concentrations
+      close to the composition of perovskite, confirming its stability in a melt.
+    attribution: Shornikov (2020)
+    note: Extremum and stability interpretation.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_42
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_43
+  type: data_qualification
+  locator:
+    published_page: 1296
+    pdf_page_index: 7
+    section: Results and discussion
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: As with the CaO–SiO2 melts, the shift of the extremum in the integral thermodynamic functions of CaO–TiO2 melts
+      [65] could be due to the presence of oxide compounds with higher amounts of CaO in a melt, relative to perovskite CaTiO3.
+    attribution: Shornikov (2020)
+    note: Comparative composition interpretation.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_43
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_44
+  type: data_qualification
+  locator:
+    published_page: 1296
+    pdf_page_index: 7
+    section: Results and discussion
+    note: Sentence begins on p. 1296 and continues on p. 1297.
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The comparison presented in Fig. 5 for the energies of mixing of CaO–TiO2 melts and their values for CaO–SiO2 [65]
+      and CaO–Al2O3 [66] melts at 2300 K indicates that the chemical interaction in the CaO–TiO2 melt was stronger than in
+      the CaO–Al2O3 melt, but weaker than in the CaO–SiO2 melt, as exhibited by its higher energies of mixing.
+    attribution: Shornikov (2020)
+    note: Comparative statement at 2300 K; Fig. 5 not digitized.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_44
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_45
+  type: data_qualification
+  locator:
+    published_page: 1297
+    pdf_page_index: 8
+    section: Conclusions
+    note: Complete sentence; no figure curve digitized.
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The obtained experimental information testifies to the symbate behavior of the determined thermodynamic functions
+      that characterize the melts of this system and the possible immiscibility of CaO–TiO2 melts in the region close to TiO2,
+      as mentioned earlier.
+    attribution: Shornikov (2020)
+    note: Conclusion repeats conditional immiscibility.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_45
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_46
+  type: data_qualification
+  locator:
+    published_page: 1297
+    pdf_page_index: 8
+    section: Conclusions
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The experimental values of the integral thermodynamic properties of these melts belong to the region of concentrations
+      close to the composition of perovskite, thus confirming its stability in a melt.
+    attribution: Shornikov (2020)
+    note: Conclusion repeats stability interpretation.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_46
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_qualifier_47
+  type: data_qualification
+  locator:
+    published_page: 1297
+    pdf_page_index: 8
+    section: Conclusions
+  units: as printed
+  values:
+    quantity: verbatim_data_qualification_or_comparison
+    quote: The shift of the extremum in the integral thermodynamic functions of the CaO–TiO2 melts could be due to the presence
+      of oxide compounds with higher amounts of CaO, relative to perovskite.
+    attribution: Shornikov (2020)
+    note: Printed conclusion sentence; no [65] citation or CaO–SiO2 comparison appears here.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_qualifier_47
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_starting_materials
+  type: characterization
+  locator:
+    published_page: 1293
+    pdf_page_index: 4
+    section: Experimental
+  units: as printed
+  values:
+    quantity: sample_preparation
+    starting_materials: CaCO3 extra pure; TiO2 extra pure; rock-crystal powder 99.90 wt % SiO2
+    sample_series: More than 200 CaO–TiO2 compositions with 38 to 95 mol % TiO2 were prepared at 2241–2441 K.
+    residual_composition_quote: Residual CaO–TiO2–SiO2 melts with up to 1 mol % of SiO2 lost by evaporation.
+    preparation: Powders mixed 24 h in acetone in jasper ball mill; dried; calcined 24 h in air in silicon-carbide furnace
+      up to 1300 K; reground; annealed 24 h at 1530 K.
+    translation_note: The English wording about “up to 1 mol % of SiO2 lost by evaporation” is retained without interpretation.
+    post_run_composition_as_analysed:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1293
+        pdf_page_index: 4
+        section: Experimental or results
+        note: The paper describes composition drift and residual melt qualitatively but gives no quantified post-run analysis
+          for each table composition.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_starting_materials
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_t1_ca2ti5o12_row_24
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 24; reference [19, 20]
+  T_range_K:
+  - '1273'
+  - '1273'
+  phase: Ca2Ti5O12
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [19, 20] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: Ca2Ti5O12
+    x_TiO2_mol_percent_as_printed: '77.78'
+    transition_temperature_K: '1273'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 1273 ± 20
+    phases_as_printed: CaTiO3 + TiO2
+    reference_as_printed: '[19, 20]'
+    accepted_component_bold: false
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_ca2ti5o12_row_24
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: Ca2Ti5O12
+- observation_id: shornikov_2020_t1_ca2tio4_row_07
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 7; reference [5]
+  T_range_K:
+  - '2073'
+  - '2073'
+  phase: Ca2TiO4
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [5] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: Ca2TiO4
+    x_TiO2_mol_percent_as_printed: '33.33'
+    transition_temperature_K: '2073'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 2073 ± 20
+    phases_as_printed: Liquid
+    reference_as_printed: '[5]'
+    accepted_component_bold: false
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_ca2tio4_row_07
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: Ca2TiO4
+- observation_id: shornikov_2020_t1_ca2tio4_row_08
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 8; reference [9]
+  T_range_K:
+  - '2043'
+  - '2043'
+  phase: Ca2TiO4
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [9] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: Ca2TiO4
+    x_TiO2_mol_percent_as_printed: '33.33'
+    transition_temperature_K: '2043'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 2043 ± 20
+    phases_as_printed: Ca3Ti2O7 + liquid
+    reference_as_printed: '[9]'
+    accepted_component_bold: false
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_ca2tio4_row_08
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: Ca2TiO4
+- observation_id: shornikov_2020_t1_ca3ti2o7_row_09
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 9; reference [8]
+  T_range_K:
+  - '2023'
+  - '2023'
+  phase: Ca3Ti2O7
+  units: K
+  uncertainty:
+    note: Printed ±10 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [8] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: Ca3Ti2O7
+    x_TiO2_mol_percent_as_printed: '40'
+    transition_temperature_K: '2023'
+    uncertainty_K: '10'
+    T_tr_K_as_printed: 2023 ± 10
+    phases_as_printed: CaTiO3 + liquid
+    reference_as_printed: '[8]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_ca3ti2o7_row_09
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: Ca3Ti2O7
+- observation_id: shornikov_2020_t1_ca3ti2o7_row_10
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 10; reference [9]
+  T_range_K:
+  - '2073'
+  - '2073'
+  phase: Ca3Ti2O7
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [9] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: Ca3Ti2O7
+    x_TiO2_mol_percent_as_printed: '40'
+    transition_temperature_K: '2073'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 2073 ± 20
+    phases_as_printed: Liquid
+    reference_as_printed: '[9]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_ca3ti2o7_row_10
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: Ca3Ti2O7
+- observation_id: shornikov_2020_t1_ca3ti2o7_row_11
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 11; reference [11]
+  T_range_K:
+  - '2013'
+  - '2013'
+  phase: Ca3Ti2O7
+  units: K
+  uncertainty:
+    note: Printed ±10 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [11] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: Ca3Ti2O7
+    x_TiO2_mol_percent_as_printed: '40'
+    transition_temperature_K: '2013'
+    uncertainty_K: '10'
+    T_tr_K_as_printed: 2013 ± 10
+    phases_as_printed: Ca4Ti3O10 + liquid
+    reference_as_printed: '[11]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_ca3ti2o7_row_11
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: Ca3Ti2O7
+- observation_id: shornikov_2020_t1_ca3ti2o7_row_12
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 12; reference [16]
+  T_range_K:
+  - '2023'
+  - '2023'
+  phase: Ca3Ti2O7
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [16] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: Ca3Ti2O7
+    x_TiO2_mol_percent_as_printed: '40'
+    transition_temperature_K: '2023'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 2023 ± 20
+    phases_as_printed: Ca5Ti4O13 + liquid
+    reference_as_printed: '[16]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_ca3ti2o7_row_12
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: Ca3Ti2O7
+- observation_id: shornikov_2020_t1_ca3tio5_row_05
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 5; reference [5]
+  T_range_K:
+  - '2148'
+  - '2148'
+  phase: Ca3TiO5
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [5] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: Ca3TiO5
+    x_TiO2_mol_percent_as_printed: '25'
+    transition_temperature_K: '2148'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 2148 ± 20
+    phases_as_printed: Liquid
+    reference_as_printed: '[5]'
+    accepted_component_bold: false
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_ca3tio5_row_05
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: Ca3TiO5
+- observation_id: shornikov_2020_t1_ca4ti3o10_row_13
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 13; reference [11]
+  T_range_K:
+  - '2028'
+  - '2028'
+  phase: Ca4Ti3O10
+  units: K
+  uncertainty:
+    note: Printed ±10 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [11] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: Ca4Ti3O10
+    x_TiO2_mol_percent_as_printed: '42.86'
+    transition_temperature_K: '2028'
+    uncertainty_K: '10'
+    T_tr_K_as_printed: 2028 ± 10
+    phases_as_printed: CaTiO3 + liquid
+    reference_as_printed: '[11]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_ca4ti3o10_row_13
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: Ca4Ti3O10
+- observation_id: shornikov_2020_t1_ca4ti3o10_row_14
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 14; reference [12]
+  T_range_K:
+  - '2143'
+  - '2143'
+  phase: Ca4Ti3O10
+  units: K
+  uncertainty:
+    note: Printed ±10 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [12] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: Ca4Ti3O10
+    x_TiO2_mol_percent_as_printed: '42.86'
+    transition_temperature_K: '2143'
+    uncertainty_K: '10'
+    T_tr_K_as_printed: 2143 ± 10
+    phases_as_printed: CaTiO3 + liquid
+    reference_as_printed: '[12]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_ca4ti3o10_row_14
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: Ca4Ti3O10
+- observation_id: shornikov_2020_t1_ca5ti4o13_row_15
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 15; reference [16]
+  T_range_K:
+  - '2113'
+  - '2113'
+  phase: Ca5Ti4O13
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [16] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: Ca5Ti4O13
+    x_TiO2_mol_percent_as_printed: '44.44'
+    transition_temperature_K: '2113'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 2113 ± 20
+    phases_as_printed: CaTiO3 + liquid
+    reference_as_printed: '[16]'
+    accepted_component_bold: false
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_ca5ti4o13_row_15
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: Ca5Ti4O13
+- observation_id: shornikov_2020_t1_cao_row_01
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 1; reference [5]
+  T_range_K:
+  - '2853'
+  - '2853'
+  phase: CaO
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [5] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '0'
+    transition_temperature_K: '2853'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 2853 ± 20
+    phases_as_printed: Liquid
+    reference_as_printed: '[5]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_cao_row_01
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t1_cao_row_02
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 2; reference [39]
+  T_range_K:
+  - '2900'
+  - '2900'
+  phase: CaO
+  units: K
+  uncertainty:
+    note: Printed ±150 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [39] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '0'
+    transition_temperature_K: '2900'
+    uncertainty_K: '150'
+    T_tr_K_as_printed: 2900 ± 150
+    phases_as_printed: Liquid
+    reference_as_printed: '[39]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_cao_row_02
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t1_cao_row_03
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 3; reference [40]
+  T_range_K:
+  - '3222'
+  - '3222'
+  phase: CaO
+  units: K
+  uncertainty:
+    note: Printed ±25 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [40] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '0'
+    transition_temperature_K: '3222'
+    uncertainty_K: '25'
+    T_tr_K_as_printed: 3222 ± 25
+    phases_as_printed: Liquid
+    reference_as_printed: '[40]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_cao_row_03
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t1_cati2o5_row_22
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 22; reference [18, 19]
+  T_range_K:
+  - '1123'
+  - '1123'
+  phase: CaTi2O5
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [18, 19] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: CaTi2O5
+    x_TiO2_mol_percent_as_printed: '66.67'
+    transition_temperature_K: '1123'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 1123 ± 20
+    phases_as_printed: CaTiO3 + Ca2Ti5O12
+    reference_as_printed: '[18, 19]'
+    accepted_component_bold: false
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_cati2o5_row_22
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaTi2O5
+- observation_id: shornikov_2020_t1_cati4o9_row_25
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 25; reference [17, 19]
+  T_range_K:
+  - '993'
+  - '993'
+  phase: CaTi4O9
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [17, 19] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: CaTi4O9
+    x_TiO2_mol_percent_as_printed: '80'
+    transition_temperature_K: '993'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 993 ± 20
+    phases_as_printed: Ca2Ti5O12 + TiO2
+    reference_as_printed: '[17, 19]'
+    accepted_component_bold: false
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_cati4o9_row_25
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaTi4O9
+- observation_id: shornikov_2020_t1_catio3_row_16
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 16; reference [2]
+  T_range_K:
+  - '2013'
+  - '2013'
+  phase: CaTiO3
+  units: K
+  uncertainty:
+    note: Printed ±10 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [2] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: CaTiO3
+    x_TiO2_mol_percent_as_printed: '50'
+    transition_temperature_K: '2013'
+    uncertainty_K: '10'
+    T_tr_K_as_printed: 2013 ± 10
+    phases_as_printed: Liquid
+    reference_as_printed: '[2]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_catio3_row_16
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaTiO3
+- observation_id: shornikov_2020_t1_catio3_row_17
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 17; reference [5]
+  T_range_K:
+  - '2253'
+  - '2253'
+  phase: CaTiO3
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [5] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: CaTiO3
+    x_TiO2_mol_percent_as_printed: '50'
+    transition_temperature_K: '2253'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 2253 ± 20
+    phases_as_printed: Liquid
+    reference_as_printed: '[5]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_catio3_row_17
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaTiO3
+- observation_id: shornikov_2020_t1_catio3_row_18
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 18; reference [8, 11]
+  T_range_K:
+  - '2188'
+  - '2188'
+  phase: CaTiO3
+  units: K
+  uncertainty:
+    note: Printed ±10 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [8, 11] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: CaTiO3
+    x_TiO2_mol_percent_as_printed: '50'
+    transition_temperature_K: '2188'
+    uncertainty_K: '10'
+    T_tr_K_as_printed: 2188 ± 10
+    phases_as_printed: Liquid
+    reference_as_printed: '[8, 11]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_catio3_row_18
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaTiO3
+- observation_id: shornikov_2020_t1_catio3_row_19
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 19; reference [16]
+  T_range_K:
+  - '2233'
+  - '2233'
+  phase: CaTiO3
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [16] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: CaTiO3
+    x_TiO2_mol_percent_as_printed: '50'
+    transition_temperature_K: '2233'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 2233 ± 20
+    phases_as_printed: Liquid
+    reference_as_printed: '[16]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_catio3_row_19
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaTiO3
+- observation_id: shornikov_2020_t1_catio3_row_20
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 20; reference [42]
+  T_range_K:
+  - '2241'
+  - '2241'
+  phase: CaTiO3
+  units: K
+  uncertainty:
+    note: Printed ±10 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [42] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: CaTiO3
+    x_TiO2_mol_percent_as_printed: '50'
+    transition_temperature_K: '2241'
+    uncertainty_K: '10'
+    T_tr_K_as_printed: 2241 ± 10
+    phases_as_printed: Liquid
+    reference_as_printed: '[42]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_catio3_row_20
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaTiO3
+- observation_id: shornikov_2020_t1_tio2_row_26
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 26; reference [5]
+  T_range_K:
+  - '2128'
+  - '2128'
+  phase: TiO2
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [5] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '100'
+    transition_temperature_K: '2128'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 2128 ± 20
+    phases_as_printed: Liquid
+    reference_as_printed: '[5]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_tio2_row_26
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t1_tio2_row_27
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 27; reference [9]
+  T_range_K:
+  - '2103'
+  - '2103'
+  phase: TiO2
+  units: K
+  uncertainty:
+    note: Printed ±20 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [9] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '100'
+    transition_temperature_K: '2103'
+    uncertainty_K: '20'
+    T_tr_K_as_printed: 2103 ± 20
+    phases_as_printed: Liquid
+    reference_as_printed: '[9]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_tio2_row_27
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t1_tio2_row_28
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 28; reference [39]
+  T_range_K:
+  - '2185'
+  - '2185'
+  phase: TiO2
+  units: K
+  uncertainty:
+    note: Printed ±10 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [39] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '100'
+    transition_temperature_K: '2185'
+    uncertainty_K: '10'
+    T_tr_K_as_printed: 2185 ± 10
+    phases_as_printed: Liquid
+    reference_as_printed: '[39]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_tio2_row_28
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t1_tio2_row_29
+  type: transition_point_context
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+    note: Row 29; reference [38]
+  T_range_K:
+  - '2143'
+  - '2143'
+  phase: TiO2
+  units: K
+  uncertainty:
+    note: Printed ±15 K retained.
+  values:
+    quantity: transition_temperature
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [38] as cited in Shornikov (2020), Table 1
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '100'
+    transition_temperature_K: '2143'
+    uncertainty_K: '15'
+    T_tr_K_as_printed: 2143 ± 15
+    phases_as_printed: Liquid
+    reference_as_printed: '[38]'
+    accepted_component_bold: true
+  context_role: attributed transition-temperature table row; cited total pressure not printed
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t1_tio2_row_29
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t2_cao_row_01
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 1; CaO; reference [54]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: (6.11 ± 3.06) × 10^-1'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [54], 2004, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '30'
+    temperature_K: '2057'
+    activity: '0.611'
+    activity_as_printed: (6.11 ± 3.06) × 10^-1
+    activity_scale_as_printed: a_CaO
+    uncertainty_activity: '0.306'
+    composition_mol:
+      CaO: '0.7'
+      TiO2: '0.3'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_cao_row_01
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t2_cao_row_02
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 2; CaO; reference [54]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: (5.56 ± 2.78) × 10^-1'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [54], 2004, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '40'
+    temperature_K: '2057'
+    activity: '0.556'
+    activity_as_printed: (5.56 ± 2.78) × 10^-1
+    activity_scale_as_printed: a_CaO
+    uncertainty_activity: '0.278'
+    composition_mol:
+      CaO: '0.6'
+      TiO2: '0.4'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_cao_row_02
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t2_cao_row_03
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 3; CaO; reference [42]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: (2.06 ± 0.08) × 10^-2'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [42], 2019, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '1791'
+    activity: '0.0206'
+    activity_as_printed: (2.06 ± 0.08) × 10^-2
+    activity_scale_as_printed: a_CaO
+    uncertainty_activity: '0.0008'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_cao_row_03
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t2_cao_row_08
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 8; CaO; reference [42]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: (2.19 ± 0.08) × 10^-2'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [42], 2019, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '1875'
+    activity: '0.0219'
+    activity_as_printed: (2.19 ± 0.08) × 10^-2
+    activity_scale_as_printed: a_CaO
+    uncertainty_activity: '0.0008'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_cao_row_08
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t2_cao_row_09
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 9; CaO; reference [50]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: (2.63 ± 0.22) × 10^-2'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [50], 2000, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '2100'
+    activity: '0.0263'
+    activity_as_printed: (2.63 ± 0.22) × 10^-2
+    activity_scale_as_printed: a_CaO
+    uncertainty_activity: '0.0022'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_cao_row_09
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t2_cao_row_10
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 10; CaO; reference [51]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: (2.54 ± 0.12) × 10^-2'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [51], 2003, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '2100'
+    activity: '0.0254'
+    activity_as_printed: (2.54 ± 0.12) × 10^-2
+    activity_scale_as_printed: a_CaO
+    uncertainty_activity: '0.0012'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_cao_row_10
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t2_cao_row_11
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 11; CaO; reference [48]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: (2.39 ± 0.36) × 10^-2'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [48], 1981, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '2150'
+    activity: '0.0239'
+    activity_as_printed: (2.39 ± 0.36) × 10^-2
+    activity_scale_as_printed: a_CaO
+    uncertainty_activity: '0.0036'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_cao_row_11
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t2_cao_row_12
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 12; CaO; reference [42]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: (2.59 ± 0.08) × 10^-2'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [42], 2019, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '2182'
+    activity: '0.0259'
+    activity_as_printed: (2.59 ± 0.08) × 10^-2
+    activity_scale_as_printed: a_CaO
+    uncertainty_activity: '0.0008'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_cao_row_12
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t2_cao_row_14
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 14; CaO; reference [42]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: (2.61 ± 0.25) × 10^-2'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [42], 2019, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '2291'
+    activity: '0.0261'
+    activity_as_printed: (2.61 ± 0.25) × 10^-2
+    activity_scale_as_printed: a_CaO
+    uncertainty_activity: '0.0025'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_cao_row_14
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t2_cao_row_15
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 15; CaO; reference [42]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: (2.62 ± 0.25) × 10^-2'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [42], 2019, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: CaO
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '2315'
+    activity: '0.0262'
+    activity_as_printed: (2.62 ± 0.25) × 10^-2
+    activity_scale_as_printed: a_CaO
+    uncertainty_activity: '0.0025'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_cao_row_15
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO
+- observation_id: shornikov_2020_t2_tio2_row_03
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 3; TiO2; reference [42]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: 1.09 ± 0.06'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [42], 2019, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '1791'
+    activity: '0.109'
+    activity_as_printed: 1.09 ± 0.06
+    activity_scale_as_printed: a_TiO2 × 10
+    uncertainty_activity: '0.006'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_tio2_row_03
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t2_tio2_row_04
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 4; TiO2; reference [46]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: 1.05 ± 0.35'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [46], 1994, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '1873'
+    activity: '0.105'
+    activity_as_printed: 1.05 ± 0.35
+    activity_scale_as_printed: a_TiO2 × 10
+    uncertainty_activity: '0.035'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_tio2_row_04
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t2_tio2_row_05
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 5; TiO2; reference [47]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: 1.80 ± 0.25'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [47], 1994, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '1873'
+    activity: '0.18'
+    activity_as_printed: 1.80 ± 0.25
+    activity_scale_as_printed: a_TiO2 × 10
+    uncertainty_activity: '0.025'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_tio2_row_05
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t2_tio2_row_06
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 6; TiO2; reference [47]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: 1.50 ± 0.35'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [47], 1994, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '1873'
+    activity: '0.15'
+    activity_as_printed: 1.50 ± 0.35
+    activity_scale_as_printed: a_TiO2 × 10
+    uncertainty_activity: '0.035'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_tio2_row_06
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t2_tio2_row_07
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 7; TiO2; reference [47]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: 1.50 ± 0.30'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [47], 1994, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '1873'
+    activity: '0.15'
+    activity_as_printed: 1.50 ± 0.30
+    activity_scale_as_printed: a_TiO2 × 10
+    uncertainty_activity: '0.03'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_tio2_row_07
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t2_tio2_row_08
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 8; TiO2; reference [42]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: 1.26 ± 0.06'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [42], 2019, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '1875'
+    activity: '0.126'
+    activity_as_printed: 1.26 ± 0.06
+    activity_scale_as_printed: a_TiO2 × 10
+    uncertainty_activity: '0.006'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_tio2_row_08
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t2_tio2_row_09
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 9; TiO2; reference [50]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: 2.46 ± 0.25'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [50], 2000, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '2100'
+    activity: '0.246'
+    activity_as_printed: 2.46 ± 0.25
+    activity_scale_as_printed: a_TiO2 × 10
+    uncertainty_activity: '0.025'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_tio2_row_09
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t2_tio2_row_10
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 10; TiO2; reference [51]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: 2.21 ± 0.10'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [51], 2003, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '2100'
+    activity: '0.221'
+    activity_as_printed: 2.21 ± 0.10
+    activity_scale_as_printed: a_TiO2 × 10
+    uncertainty_activity: '0.01'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_tio2_row_10
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t2_tio2_row_11
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 11; TiO2; reference [48]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: 2.10 ± 0.32'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [48], 1981, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '2150'
+    activity: '0.21'
+    activity_as_printed: 2.10 ± 0.32
+    activity_scale_as_printed: a_TiO2 × 10
+    uncertainty_activity: '0.032'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_tio2_row_11
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t2_tio2_row_12
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 12; TiO2; reference [42]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: 2.29 ± 0.07'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [42], 2019, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '2182'
+    activity: '0.229'
+    activity_as_printed: 2.29 ± 0.07
+    activity_scale_as_printed: a_TiO2 × 10
+    uncertainty_activity: '0.007'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_tio2_row_12
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t2_tio2_row_14
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 14; TiO2; reference [42]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: 2.43 ± 0.22'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [42], 2019, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '2291'
+    activity: '0.243'
+    activity_as_printed: 2.43 ± 0.22
+    activity_scale_as_printed: a_TiO2 × 10
+    uncertainty_activity: '0.022'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_tio2_row_14
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_t2_tio2_row_15
+  type: literature_activity_comparator
+  locator:
+    published_page: 1292
+    pdf_page_index: 3
+    table: '2'
+    note: row 15; TiO2; reference [42]
+  units: dimensionless activity
+  uncertainty:
+    note: 'Printed uncertainty retained: 2.44 ± 0.22'
+  values:
+    quantity: activity
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Reference [42], 2019, as printed in Shornikov (2020), Table 2
+    component_formula_as_printed: TiO2
+    x_TiO2_mol_percent_as_printed: '50'
+    temperature_K: '2315'
+    activity: '0.244'
+    activity_as_printed: 2.44 ± 0.22
+    activity_scale_as_printed: a_TiO2 × 10
+    uncertainty_activity: '0.022'
+    composition_mol:
+      CaO: '0.5'
+      TiO2: '0.5'
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_t2_tio2_row_15
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_table1_unreported_rows
+  type: compilation_scope
+  locator:
+    published_page: 1291
+    pdf_page_index: 2
+    table: '1'
+  units: as printed
+  values:
+    quantity: unreported_transition_temperature_rows
+    rows:
+    - component: Ca4TiO6
+      x_TiO2_mol_percent: '20'
+      T_tr_K_as_printed: —
+      phase_as_printed: —
+      reference: '[33]'
+    - component: Ca8Ti3O14
+      x_TiO2_mol_percent: '27.27'
+      T_tr_K_as_printed: —
+      phase_as_printed: —
+      reference: '[33, 34]'
+    - component: Ca2Ti3O8
+      x_TiO2_mol_percent: '60'
+      T_tr_K_as_printed: —
+      phase_as_printed: —
+      reference: '[3]'
+    - component: CaTi3O7
+      x_TiO2_mol_percent: '75'
+      T_tr_K_as_printed: —
+      phase_as_printed: —
+      reference: '[35]'
+    note: Dashes are missing values, not zero.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_table1_unreported_rows
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system
+- observation_id: shornikov_2020_table5_tio2_accepted_pure_endmember_value
+  type: reported_pure_endmember_activity
+  locator:
+    published_page: 1296
+    pdf_page_index: 7
+    table: '5'
+    note: row 16; xTiO2=100.00 mol %; starred accepted value
+  units: dimensionless activity
+  context_role: Table 5 authors’ accepted pure TiO2 endpoint; no Table 3 oxygen pressure is printed at xTiO2=100 mol %
+  values:
+    quantity: activity
+    method_class: author_estimate
+    evidence_class: author_estimate
+    activity: '1'
+    activity_as_printed: 1.00*
+    x_TiO2_mol_percent_as_printed: '100'
+    temperature_K: 2278
+    attribution: Accepted value, Table 5 footnote
+    standard_state_as_printed: Pure TiO2 endpoint; physical phase not specified.
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_table5_tio2_accepted_pure_endmember_value
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: TiO2
+- observation_id: shornikov_2020_unpublished_ion_current_ratio_series
+  type: method
+  locator:
+    published_page: 1295
+    pdf_page_index: 6
+    section: Results
+    note: Equation (22) and its discussion.
+  units: dimensionless
+  values:
+    quantity: ion_current_ratio
+    ion_current_ratio:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1295
+        pdf_page_index: 6
+        section: Results
+        note: Eq. (22); the numerical Ca/TiO ion-current input series is not tabulated.
+    note: Summary of Eq. (22); the Ca/TiO input ratio series is not published, so its value is unavailable. Unavailable source
+      input retained as located context; Table 5 lineage on the Eq. (22) observations identifies the publication of the reduced
+      outputs, not a numerical ion-current input.
+    method_class: quoted_unattributed
+    quote: Equation (22) integrates the Ca/TiO ion-current ratio across composition; the paper does not tabulate the numerical
+      ratio series.
+    attribution: Shornikov (2020)
+  context_id: shornikov-2020-cao-tio2-melts::context::shornikov_2020_unpublished_ion_current_ratio_series
+  work_id: 10.1134/s0036024420070274
+  source_id: shornikov-2020-cao-tio2-melts
+  species: CaO_TiO2_system

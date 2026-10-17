@@ -1,0 +1,587 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/green-1971-apollo12-basalt-petrology.yaml
+observations:
+- observation_id: green-1971-apollo12-basalt-petrology::green1971_12022_ilmenite_plagioclase_in
+  experiment_id: 2dc18ba6d470a5c94cae15ddf97eff93d43883b8b918da562994a3894f48a5a4::experiment::green1971-12022-one-atm-prose-series
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Apollo12_12022
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: phase_appearance
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1403.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: green-1971-apollo12-basalt-petrology::green1971_12022_ilmenite_plagioclase_in
+  source_id: green-1971-apollo12-basalt-petrology
+  locator:
+    page: 6
+    published_page: 606
+    paragraph: Results
+  read_from: unknown:green-1971-apollo12-basalt-petrology
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1403.15'
+      locator:
+        page: 6
+        published_page: 606
+        paragraph: Results
+- observation_id: green-1971-apollo12-basalt-petrology::green1971_12022_liquidus_figure_read
+  experiment_id: 2dc18ba6d470a5c94cae15ddf97eff93d43883b8b918da562994a3894f48a5a4::experiment::green1971-12022-one-bar-figure-series
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Apollo12_12022
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: interval
+    interval_low: '1553.15'
+    interval_high: '1563.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: No experimental uncertainty is stated; the 1280–1290°C visual reading interval expresses the Figure 2 reading
+      precision.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: green-1971-apollo12-basalt-petrology::green1971_12022_liquidus_figure_read
+  source_id: green-1971-apollo12-basalt-petrology
+  locator:
+    page: 4
+    published_page: 604
+    figure: '2'
+    note: Visual reading from Figure 2; the 1280–1290°C interval reflects reading precision, not plotted grid spacing
+  read_from: unknown:green-1971-apollo12-basalt-petrology
+- observation_id: green-1971-apollo12-basalt-petrology::green1971_12022_pigeonite_in
+  experiment_id: 2dc18ba6d470a5c94cae15ddf97eff93d43883b8b918da562994a3894f48a5a4::experiment::green1971-12022-one-atm-prose-series
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Apollo12_12022
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: phase_appearance
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1423.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: green-1971-apollo12-basalt-petrology::green1971_12022_pigeonite_in
+  source_id: green-1971-apollo12-basalt-petrology
+  locator:
+    page: 6
+    published_page: 606
+    paragraph: Results
+  read_from: unknown:green-1971-apollo12-basalt-petrology
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 6
+        published_page: 606
+        paragraph: Results
+- observation_id: green-1971-apollo12-basalt-petrology::green1971_12065_liquidus
+  experiment_id: 2dc18ba6d470a5c94cae15ddf97eff93d43883b8b918da562994a3894f48a5a4::experiment::green1971-12065-one-atm-series
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Apollo12_12065
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1453.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: green-1971-apollo12-basalt-petrology::green1971_12065_liquidus
+  source_id: green-1971-apollo12-basalt-petrology
+  locator:
+    page: 5
+    published_page: 605
+    paragraph: Results
+  read_from: unknown:green-1971-apollo12-basalt-petrology
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1453.15'
+      locator:
+        page: 5
+        published_page: 605
+        paragraph: Results
+- observation_id: green-1971-apollo12-basalt-petrology::green1971_12065_olivine_reacts_out
+  experiment_id: 2dc18ba6d470a5c94cae15ddf97eff93d43883b8b918da562994a3894f48a5a4::experiment::green1971-12065-one-atm-series
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Apollo12_12065
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: phase_disappearance
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1423.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: green-1971-apollo12-basalt-petrology::green1971_12065_olivine_reacts_out
+  source_id: green-1971-apollo12-basalt-petrology
+  locator:
+    page: 5
+    published_page: 605
+    paragraph: Results
+  read_from: unknown:green-1971-apollo12-basalt-petrology
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 5
+        published_page: 605
+        paragraph: Results
+- observation_id: green-1971-apollo12-basalt-petrology::green1971_12065_plagioclase_in
+  experiment_id: 2dc18ba6d470a5c94cae15ddf97eff93d43883b8b918da562994a3894f48a5a4::experiment::green1971-12065-one-atm-series
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Apollo12_12065
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: phase_appearance
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1403.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: green-1971-apollo12-basalt-petrology::green1971_12065_plagioclase_in
+  source_id: green-1971-apollo12-basalt-petrology
+  locator:
+    page: 5
+    published_page: 605
+    paragraph: Results
+  read_from: unknown:green-1971-apollo12-basalt-petrology
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1403.15'
+      locator:
+        page: 5
+        published_page: 605
+        paragraph: Results

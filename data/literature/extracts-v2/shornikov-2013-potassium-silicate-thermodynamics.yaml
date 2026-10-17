@@ -1,0 +1,2993 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2013-potassium-silicate-thermodynamics.yaml
+observations:
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_liquid_k2o
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-174.367'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_liquid_k2o
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=7
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=7
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_liquid_k2si2o5
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1776.017'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_liquid_k2si2o5
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=10
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=10
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_liquid_k2si4o9
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K2Si4O9
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-3086.088'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_liquid_k2si4o9
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=11
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=11
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_liquid_k2sio3
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K2SiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1099.514'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_liquid_k2sio3
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=9
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=9
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_liquid_k4sio4
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K4SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1420.342'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_liquid_k4sio4
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=8
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=8
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_liquid_sio2
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-644.903'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_liquid_sio2
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=12
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=12
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_solid_k2o
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-161.387'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_solid_k2o
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=1
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=1
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_solid_k2si2o5
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1769.285'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_solid_k2si2o5
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=4
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=4
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_solid_k2si4o9
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K2Si4O9
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-3077.325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_solid_k2si4o9
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=5
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=5
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_solid_k2sio3
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1089.318'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_solid_k2sio3
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=3
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=3
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_solid_k4sio4
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K4SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1399.608'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_solid_k4sio4
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=2
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=2
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_solid_sio2
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-649.708'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_solid_sio2
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=6
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=6
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_k
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-33.956'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_k
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=13
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=13
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_k2
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2.918'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_k2
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=14
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=14
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_k2o
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-113.676'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_k2o
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=16
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=16
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_k2o2
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K2O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-111.814'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_k2o2
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=17
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=17
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_ko
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: KO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-25.891'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_ko
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=15
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=15
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_o
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '154.92'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_o
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=24
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=24
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_o2
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '0'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_o2
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=25
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=25
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_o3
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: O3
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '243.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_o3
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=26
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=26
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_si
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '229.272'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_si
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=18
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=18
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_si2
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Si2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '286.08'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_si2
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=19
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=19
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_si2o2
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Si2O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-620.459'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_si2o2
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=23
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=23
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_si3
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Si3
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '332.834'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_si3
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=20
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=20
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_sio
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-225.709'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_sio
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=21
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=21
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_sio2
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-324.873'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 3 prints no uncertainty for these calculated values.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_t3_vapor_sio2
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: row=22
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 110
+        pdf_page_index: 2
+        table: '3'
+        note: row=22
+        source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  derived_from:
+  - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  derivation:
+    relation: The authors calculate this Table 3 Gibbs-energy value at 1500 K from thermodynamic data; the supplied pages
+      give cited data sources but no row-specific equation or source cell.
+    inputs:
+    - shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+    parameters: []
+    output_unit: as_published
+- observation_id: shornikov-2013-potassium-silicate-thermodynamics::shornikov_2013_table3_calculation_basis
+  experiment_id: ff951bdd82a69343da12acc4ab7321721e7e9eeed3ae83b418bfe83cfa94b897::shornikov-2013-potassium-silicate-thermodynamics
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'table_3_calculation_data_sources'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'table_3_calculation_data_sources'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Citation-basis record; no numerical value or uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[Glushko et al., 1978–1982; Kozhina, 1990; Zaitsev et al., 2000]'
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2013-potassium-silicate-thermodynamics
+  locator:
+    published_page: 110
+    pdf_page_index: 2
+    table: '3'
+    note: Table 3 caption states its calculation data sources.
+    source_path: raw/shornikov-2013-potassium-silicate-thermodynamics/shornikov-2013-potassium-silicate-thermodynamics.pdf
+  read_from: pdf:shornikov-2013-potassium-silicate-thermodynamics
