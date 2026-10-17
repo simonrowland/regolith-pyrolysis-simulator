@@ -10,11 +10,12 @@ source:
     - source_id: shornikov-2000-titania-melts
       relation: adjacent_proceedings_companion
       note: >-
-        The companion extract in corpus origin/main reports study-wide composition ranges but no
-        individual charge compositions. Table 1's 17 sample compositions are retained here once and
-        are not duplicated as companion observations. The published figure windows differ: this
-        paper's residue trajectories cover 1700–2500 K, while the companion assigns activity curves
-        to 2100 K and liquidus interpretation to 2400–2500 K (both state 1700–2500 K overall).
+        The companion extract in corpus origin/main reports study-wide ranges of 30–50 mole % CaO,
+        16–60 mole % SiO2, and 5–50 mole % TiO2, without individual charge compositions. Table 1's
+        17 samples span 25.60–50.60 mole % CaO, 0.00–60.67 mole % SiO2, and 5.05–50.00 mole % TiO2,
+        extending below the companion's CaO and SiO2 minima and slightly above its maxima. The
+        sample sets therefore cannot be assumed identical; Table 1 is retained here once and is not
+        duplicated as companion observations.
 extraction:
   method: >-
     Table 1 transcribed from MinerU table HTML and pdftotext-layout. The PDF render (page 2, printed
@@ -39,7 +40,7 @@ fidelity_samples:
       table: '1'
       note: Table 1 has 17 starting-composition rows
 species:
-  CaO:
+  CaTiSiO5-CaTiO3:
     observations:
       - observation_id: archakov_1999_melting_point_tio2_37_60
         type: transition_point
@@ -57,6 +58,7 @@ species:
         values:
           quantity: transition_temperature
           method_class: measured_direct
+          property_kind: liquidus
           T_m_uncertainty_K: 15
           points:
             - T_K: 1643
@@ -69,6 +71,9 @@ species:
                     tag: unknown
                     reason: Only the TiO2 mole percentage is printed, not a complete composition.
                   locator: {page: 3, published_page: 1466, pdf_page_index: 2, section: Results and discussion}
+                printed_composition:
+                  state: {tag: value, value: {TiO2: '37.60 mole %'}}
+                  locator: {page: 3, published_page: 1466, pdf_page_index: 2, section: Results and discussion}
                 atmosphere:
                   state: {tag: value, value: air}
                   locator: {page: 3, published_page: 1466, pdf_page_index: 2, section: Results and discussion}
@@ -78,6 +83,7 @@ species:
               tag: unknown
               reason: No numeric total pressure is printed for the microscopy measurement.
             locator: {page: 3, published_page: 1466, pdf_page_index: 2, section: Results and discussion}
+  CaO:
     context:
       - observation_id: archakov_1999_table1_initial_melt_compositions
         type: composition

@@ -2,6 +2,10 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import IdentityEqualKind
+from simulator.battery.identity import identity_equal, profile_for
+from tests.battery.test_migrate import _migrate_real_extract
+
 
 EXTRACT_PATH = (
     Path(__file__).resolve().parents[2]
@@ -38,17 +42,40 @@ def test_table1_initial_compositions_match_rendered_rows() -> None:
     assert "T. Yu." in extract["source"]["citation"]
 
 
-def test_melting_point_uses_text_layer_value_and_printed_conditions() -> None:
+def test_melting_point_migrates_on_section_with_partial_printed_composition(
+    tmp_path: Path,
+) -> None:
     extract = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
-    point = extract["species"]["CaO"]["observations"][0]
+    system = "CaTiSiO5-CaTiO3"
+    point = extract["species"][system]["observations"][0]
     row = point["values"]["points"][0]
 
     assert point["type"] == "transition_point"
+    assert point["values"]["property_kind"] == "liquidus"
     assert row["T_m_K"] == 1643
     assert row["T_K"] == 1643
     assert point["values"]["T_m_uncertainty_K"] == 15
     assert row["composition_as_printed"] == "37.60 mole % TiO2"
+    assert row["point_conditions"]["printed_composition"]["state"]["value"] == {
+        "TiO2": "37.60 mole %"
+    }
     assert point["uncertainty"]["T_m_uncertainty_K"] == 15
     assert "confidence level not stated" in point["uncertainty"]["note"]
     assert row["point_conditions"]["composition"]["state"]["tag"] == "unknown"
     assert row["point_conditions"]["atmosphere"]["state"]["value"] == "air"
+
+    migrated = _migrate_real_extract(tmp_path, EXTRACT_PATH.name)
+    observation = next(
+        observation
+        for observation in migrated.observations.values()
+        if "::archakov_1999_melting_point_tio2_37_60" in observation.observation_id
+    )
+    assert observation.identity.species.formula == system
+    assert observation.identity.composition.is_unknown
+    assert "composition" in profile_for(observation.identity).required
+    assert observation.point_conditions["printed_composition"].state.value == {
+        "TiO2": "37.60 mole %"
+    }
+    assert identity_equal(observation.identity, observation.identity).kind is (
+        IdentityEqualKind.IDENTITY_UNKNOWN
+    )

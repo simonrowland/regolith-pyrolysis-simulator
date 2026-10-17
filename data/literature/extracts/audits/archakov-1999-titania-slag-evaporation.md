@@ -43,11 +43,14 @@ The melting-point cell on PDF page 3 (printed page 1466) is a separate text-laye
 reconciliation: `pdftotext-layout` places the ± glyph on the following line and
 reads 1643 ± 15 K for the composition stated as 37.60 mole % TiO2. MinerU's
 1643.15 K is rejected as a decimal reading. The page render appears decimal-like;
-this fix follows the review ruling to retain the text-layer value. The point is
-recorded for air, with only the printed TiO2 percentage and no inferred balance.
-The current composition schema cannot express a lone mole-percent component as
-a complete composition, so the printed phrase is retained verbatim and the
-point-condition composition remains unknown; no Table 1 balance is borrowed.
+this fix follows the review ruling to retain the text-layer value. The text says
+the sample was heated until complete melting, so the transition is recorded as a
+liquidus on the CaTiSiO5-CaTiO3 section. The identity composition remains unknown:
+the schema has no partial mole-percent composition form for the single printed
+TiO2 value. The emitted point condition retains `TiO2: 37.60 mole %` and air;
+neither the missing balance nor Table 1 row 15's CaO and SiO2 values are inferred.
+The liquidus subtype requires composition for identity comparison, so this record
+is refused as identity incomplete rather than scored as pure CaO.
 
 ## Scope and migration
 
@@ -65,19 +68,21 @@ point-condition composition remains unknown; no Table 1 balance is borrowed.
 - The named predominant vapour species SiO, Ca, TiO, and TiO2 are recorded as
   context, with the text's 25 eV mass-spectrometry condition and no pressures.
 - The adjacent `shornikov-2000-titania-melts` companion extract in corpus
-  `origin/main` gives study-wide composition ranges but no per-charge
-  assignments. It does not establish whether these exact 17 samples were
-  reused; the 1999 Table 1 values are retained here once and are not duplicated
-  as companion observations. Their published figure windows differ: the 1999
-  residue trajectories cover 1700–2500 K, while the companion assigns activity
-  curves to 2100 K and liquidus interpretation to 2400–2500 K (both state
-  1700–2500 K overall).
+  `origin/main` gives study-wide composition windows of 30–50 mole % CaO,
+  16–60 mole % SiO2, and 5–50 mole % TiO2, without per-charge assignments.
+  Table 1's 17 compositions span 25.60–50.60 mole % CaO, 0.00–60.67 mole %
+  SiO2, and 5.05–50.00 mole % TiO2. The 1999 table extends below the
+  companion's CaO and SiO2 minima and slightly above its maxima, so it does not
+  establish that these exact 17 samples were reused; the table is retained here
+  once and is not duplicated as companion observations.
 - Isolated real-migrator result after this fix: 1 work, 1 experiment, 2 context
   rows, 1 transition-temperature observation, 0 hard issues, and 1 unavailable
   queue item (`source does not state method`). The observation value is 1643 K;
   its printed uncertainty is retained as `T_m_uncertainty_K: 15` with confidence
-  level not stated. Migrated point conditions carry temperature 1643 K, air,
-  and the located unknown full composition.
+  level not stated. The emitted species is the CaTiSiO5-CaTiO3 section, its
+  identity composition is unknown, and point conditions carry the printed
+  `TiO2: 37.60 mole %` and air. Its liquidus identity is incomplete and is
+  refused by identity comparison; the 1643.15 K MinerU reading is not stored.
 - `mineru_table_draft.py compare` reports 0 matched, 0 no-match, 0 mismatch,
   0 total because it compares numeric table-draft cells; Table 1 is context and
   the transition point is prose rather than a MinerU table cell. The command's
