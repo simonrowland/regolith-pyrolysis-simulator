@@ -2030,6 +2030,54 @@ def test_repo_extracts_validate_green():
     assert errors == [], "\n".join(errors[:20])
 
 
+def test_richter_2007_table1_residues_link_to_their_runs() -> None:
+    from simulator.battery.enums import Quantity
+    from simulator.battery.migrate import Migrator
+
+    path = EXTRACTS / "kems-010-richter-2007.yaml"
+    migrator = Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+
+    residues = [
+        row for row in migrator.result.observations.values()
+        if "richter_2007_residue_table1_" in row.observation_id
+    ]
+    assert len(residues) == 51 * 4
+    assert not migrator.result.dedupe_aliases
+    assert not [
+        issue for issue in migrator.result.validation.hard_issues
+        if "richter_2007_residue_table1_" in issue.path
+    ]
+
+    mass_loss_pins = {"r2-21": "11.1", "r3-2": "0.0"}
+    for sample, value in mass_loss_pins.items():
+        observation = _repo_observation(
+            "kems-010-richter-2007.yaml",
+            f"richter_2007_residue_table1_{sample}",
+        )
+        assert observation["point_conditions"]["mass_loss_pct"]["state"] == {
+            "tag": "value",
+            "value": value,
+        }
+
+    pins = {
+        "r3-10": ("9.13", "cai-r3-10", "2173.15", "15"),
+        "r3-12": ("11.37", "cai-r3-12", "2173.15", "0"),
+    }
+    for sample, (value, experiment, temperature, duration) in pins.items():
+        row = next(
+            row for row in residues
+            if f"residue_table1_{sample}" in row.observation_id
+            and row.identity.species.formula == "MgO"
+        )
+        assert row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        assert row.value.point == Decimal(value)
+        assert row.experiment_id.endswith(f"::experiment::{experiment}")
+        assert row.point_conditions["temperature_K"].state.value == Decimal(temperature)
+        assert row.point_conditions["time_min"].state.value == Decimal(duration)
+
+
 def _repo_observation(filename: str, observation_id: str) -> dict:
     doc = load_cached_safe_yaml((EXTRACTS / filename).read_text())
     for species in doc["species"].values():
