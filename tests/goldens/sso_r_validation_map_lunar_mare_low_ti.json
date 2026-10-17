@@ -24,8 +24,8 @@
   "grid_scope": "36-smoke",
   "manual_fO2_anchors": [
     {
-      "band_lower_dex": 2.4026551376054424,
-      "band_upper_dex": 2.0191062968351496,
+      "band_lower_dex": 0.0,
+      "band_upper_dex": 0.0,
       "diagnostic_only": true,
       "fO2_log": -9.0,
       "feedstock": "lunar_mare_low_ti",
@@ -35,12 +35,12 @@
       "native_fe_frac": 0.0,
       "reference_abs_tolerance": 1e-12,
       "reference_native_fe_frac": 0.0,
-      "reference_note": "d-166 measured melt seed; inverse band leaves saturation indeterminate",
+      "reference_note": "d-160/d-166 imposed fO2 above IW(a_FeO), zero declared uncertainty",
       "reference_source": "docs-private/research/2026-10-15-b899-one-redox-state/b899-r12.md; d-166 measured-seed and gas-boundary diagnostics",
       "saturation_gap_dex": 0.4408801471260446,
-      "saturation_status": "INDETERMINATE",
+      "saturation_status": "ABOVE",
       "seed_authority": "measured",
-      "seed_method": "predicted_kress91_split",
+      "seed_method": "imposed_fO2",
       "temperature_C": 1600.0
     },
     {
@@ -64,23 +64,23 @@
       "temperature_C": 1600.0
     },
     {
-      "band_lower_dex": 3.1753914262910117,
-      "band_upper_dex": 2.487713700377915,
+      "band_lower_dex": 0.0,
+      "band_upper_dex": 0.0,
       "diagnostic_only": true,
       "fO2_log": -9.5,
       "feedstock": "lunar_mare_low_ti",
       "iw_bound_log": -9.437433110881324,
       "melt_inventory_fO2_log": -9.499999134311334,
       "mode": "melt_seeded",
-      "native_fe_frac": 0.0,
+      "native_fe_frac": 0.025411731592740065,
       "reference_abs_tolerance": 1e-12,
-      "reference_native_fe_frac": 0.0,
-      "reference_note": "d-166 measured melt seed; inverse band leaves saturation indeterminate",
+      "reference_native_fe_frac": 0.025411731592740065,
+      "reference_note": "d-160/d-166 imposed fO2 below IW(a_FeO), inventory-root extent",
       "reference_source": "docs-private/research/2026-10-15-b899-one-redox-state/b899-r12.md; d-166 measured-seed and gas-boundary diagnostics",
       "saturation_gap_dex": -0.06256602343001028,
-      "saturation_status": "INDETERMINATE",
+      "saturation_status": "BELOW",
       "seed_authority": "measured",
-      "seed_method": "predicted_kress91_split",
+      "seed_method": "imposed_fO2",
       "temperature_C": 1600.0
     },
     {
@@ -139,5 +139,5 @@
     }
   ],
   "schema_version": "sso-r-validation-map-golden-v2",
-  "source_commit": "721ce680652e"
+  "source_commit": "b965a21e9a6d"
 }

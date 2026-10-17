@@ -76,12 +76,12 @@ ANCHOR_REFERENCE_BY_FO2 = {
     -9.0: {
         "native_fe_frac": 0.0,
         "abs_tolerance": 1.0e-12,
-        "note": "d-166 measured melt seed; inverse band leaves saturation indeterminate",
+        "note": "d-160/d-166 imposed fO2 above IW(a_FeO), zero declared uncertainty",
     },
     -9.5: {
-        "native_fe_frac": 0.0,
+        "native_fe_frac": 0.025411731592740065,
         "abs_tolerance": 1.0e-12,
-        "note": "d-166 measured melt seed; inverse band leaves saturation indeterminate",
+        "note": "d-160/d-166 imposed fO2 below IW(a_FeO), inventory-root extent",
     },
 }
 ROW_UNITS = {
@@ -882,6 +882,7 @@ def manual_fO2_anchors(
                 T_K=sim.melt.temperature_C + 273.15,
                 pressure_bar=sim.melt.p_total_mbar / 1000.0,
                 gas_fO2_log=lambda _n: fO2_log, open_sink=True,
+                iron_seed=sim._feedstock_iron_initialization,
             )
             state = split['native_fe_state']
             seed = sim._feedstock_iron_initialization

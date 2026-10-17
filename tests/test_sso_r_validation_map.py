@@ -85,6 +85,32 @@ def _owner_recipe_row(payload):
     return next(row for row in payload["rows"] if _is_owner_recipe_row(row))
 
 
+def test_imposed_fO2_seed_below_iw_precipitates(monkeypatch):
+    original_build = validation_map._build_sim
+    sims = []
+
+    def capture_sim(*args, **kwargs):
+        sim = original_build(*args, **kwargs)
+        sims.append(sim)
+        return sim
+
+    monkeypatch.setattr(validation_map, '_build_sim', capture_sim)
+    anchor = next(
+        row for row in validation_map.manual_fO2_anchors()
+        if row['mode'] == 'melt_seeded' and row['fO2_log'] == -9.5
+    )
+    assert anchor['saturation_status'] == 'BELOW'
+    assert anchor['native_fe_frac'] > 0.0
+    assert anchor['band_lower_dex'] == anchor['band_upper_dex'] == 0.0
+    sim = sims[2]  # The -9.5 melt-seeded row precedes its gas-boundary row.
+    sim._current_melt_redox_fO2_log()
+    assert sim._last_intrinsic_redox_state['saturation_status'] == 'BELOW'
+    assert sim._last_intrinsic_redox_state['band_lower_dex'] == 0.0
+    assert sim._compute_native_fe_saturation_extent()[
+        'native_fe_state'
+    ]['saturation_status'] == 'BELOW'
+
+
 def test_manual_fO2_anchors_match_seeded_and_gas_boundary_contracts():
     anchors = {
         (anchor["mode"], anchor["fO2_log"]): anchor
@@ -95,7 +121,7 @@ def test_manual_fO2_anchors_match_seeded_and_gas_boundary_contracts():
         seeded = anchors['melt_seeded', fO2_log]
         gas = anchors['gas_boundary', fO2_log]
         assert seeded['seed_authority'] == 'measured'
-        assert seeded['seed_method'] == 'predicted_kress91_split'
+        assert seeded['seed_method'] == 'imposed_fO2'
         # The existing initializer seeds at its vacuum pressure; the inverse
         # below reports that same inventory at the diagnostic's 0.01 bar.
         assert seeded['melt_inventory_fO2_log'] == pytest.approx(fO2_log, abs=1e-5)
@@ -106,9 +132,15 @@ def test_manual_fO2_anchors_match_seeded_and_gas_boundary_contracts():
                 anchor['reference_native_fe_frac'], rel=0.0,
                 abs=anchor['reference_abs_tolerance'],
             )
-            assert anchor['native_fe_frac'] == 0.0
-            assert anchor['saturation_status'] == 'INDETERMINATE'
             assert anchor['diagnostic_only'] is True
+        assert seeded['band_lower_dex'] == seeded['band_upper_dex'] == 0.0
+        assert seeded['saturation_status'] == ('ABOVE' if fO2_log == -9.0 else 'BELOW')
+        if fO2_log == -9.0:
+            assert seeded['native_fe_frac'] == 0.0
+        else:
+            assert seeded['native_fe_frac'] > 0.0
+        assert gas['native_fe_frac'] == 0.0
+        assert gas['saturation_status'] == 'INDETERMINATE'
     assert anchors['gas_boundary', -9.0]['melt_inventory_fO2_log'] == (
         anchors['gas_boundary', -9.5]['melt_inventory_fO2_log']
     )

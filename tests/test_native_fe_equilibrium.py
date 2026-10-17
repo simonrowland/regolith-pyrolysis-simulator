@@ -71,6 +71,61 @@ def test_saturation_band_combines_jayasuriya_precision_and_held_out_residual(q, 
     assert band[1] == pytest.approx(upper, abs=0.001)
 
 
+@pytest.mark.parametrize('anchor, expected', [
+    ({}, (0.0, 0.0)),
+    ({'delta_iw': -1.0, 'interval': [-1.0, -1.0]}, (0.0, 0.0)),
+    ({'delta_iw': -1.0, 'interval': [-1.2, -0.7]}, (0.2, 0.3)),
+])
+def test_imposed_fO2_band_uses_only_declared_uncertainty(anchor, expected):
+    assert fe_redox._native_fe_saturation_band(
+        .039, iron_seed={'method': 'imposed_fO2', 'anchor': anchor},
+    ) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize('gap, interval, status', [
+    (-.06, [-1.01, -.90], 'INDETERMINATE'),
+    (-.06, [-1.10, -.99], 'BELOW'),
+    (.06, [-1.10, -.99], 'INDETERMINATE'),
+    (.06, [-1.01, -.90], 'ABOVE'),
+    (-.125, [-1.25, -.875], 'INDETERMINATE'),
+    (.125, [-1.125, -.75], 'INDETERMINATE'),
+])
+def test_imposed_fO2_interval_must_lie_wholly_on_one_side_of_iw(
+    monkeypatch, gap, interval, status,
+):
+    monkeypatch.setattr(fe_redox, 'calphad_ferrous_feo_activity_diagnostic',
+                        lambda **kw: {'a_FeO_authoritative': .3})
+    bound = fe_redox._feo_activity_saturation_log10_fO2_bar(1873.15, a_feo=.3)
+    comparison = fe_redox._native_fe_saturation_comparison(
+        {'FeO': 10., 'SiO2': 90.}, fe3_over_sigma_fe=.039,
+        T_K=1873.15, pressure_bar=.01, fO2_log=bound+gap,
+        iron_seed={'method': 'imposed_fO2',
+                   'anchor': {'delta_iw': -1., 'interval': interval}},
+    )
+    assert comparison['saturation_status'] == status
+
+
+@pytest.mark.parametrize('authority', ['measured', 'literature_typical'])
+def test_assay_seed_at_imposed_anchor_gap_remains_indeterminate(monkeypatch, authority):
+    from tests.test_feedstock_iron_seed import _observation
+
+    prepared, seed = fe_redox.initialize_feedstock_iron({
+        'composition_wt_pct': {'SiO2': 90.0, 'FeO': 10.0},
+        'iron_speciation': {'fe3_over_sum_fe': _observation(.039, authority=authority)},
+    })
+    assert seed['method'] == 'iron_speciation_split'
+    monkeypatch.setattr(fe_redox, 'calphad_ferrous_feo_activity_diagnostic',
+                        lambda **kw: {'a_FeO_authoritative': .3})
+    bound = fe_redox._feo_activity_saturation_log10_fO2_bar(1873.15, a_feo=.3)
+    comparison = fe_redox._native_fe_saturation_comparison(
+        prepared['composition_wt_pct'], fe3_over_sigma_fe=seed['fe3_over_sigma_fe'],
+        # Same measured gap as the -9.5 lunar anchor at the round-12 tip.
+        T_K=1873.15, pressure_bar=.01, fO2_log=bound-.06256602343001028, iron_seed=seed,
+    )
+    assert comparison['saturation_status'] == 'INDETERMINATE'
+    assert comparison['native_fe_saturation'] is False
+
+
 @pytest.mark.parametrize('q', [0., .005, .01, .02, .999])
 def test_saturation_notice_exposes_unbounded_edges_without_nonfinite_json(monkeypatch, q):
     import json

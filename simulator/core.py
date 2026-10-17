@@ -4369,6 +4369,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             prior_half_width_dex=getattr(self, '_feedstock_iron_initialization', {}).get(
                 'prior_half_width_dex', 0.0),
             seed_basis=getattr(self, '_feedstock_iron_initialization', {}).get('seed_basis'),
+            iron_seed=getattr(self, '_feedstock_iron_initialization', {}),
         )
         self._last_intrinsic_redox_state = state
         melt_potential = float(state['fO2_log'])
@@ -6583,6 +6584,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 mol_fractions=basis, T_K=T_K, pressure_bar=pressure,
                 exchange_fO2_log=gas_log,
                 composition_wt_pct=self._melt_oxide_wt_pct(),
+                iron_seed=getattr(self, '_feedstock_iron_initialization', {}),
             )
             diagnostic = self._apply_fe_redox_respeciation(
                 fO2_log_override=float(target['fO2_log']),
@@ -7310,6 +7312,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             prior_half_width_dex=getattr(self, '_feedstock_iron_initialization', {}).get(
                 'prior_half_width_dex', 0.0),
             seed_basis=getattr(self, '_feedstock_iron_initialization', {}).get('seed_basis'),
+            iron_seed=getattr(self, '_feedstock_iron_initialization', {}),
         )
         return {**result, 'feo_available_mol': feo,
                 'total_fe_mol': feo + 2.0*ferric}

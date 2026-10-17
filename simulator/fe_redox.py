@@ -972,7 +972,22 @@ def kress91_fe3_over_sigma_fe(
     return 2.0 * ratio / (2.0 * ratio + 1.0)
 
 
-def _native_fe_saturation_band(q: float) -> tuple[float, float]:
+def _native_fe_saturation_band(
+    q: float, *, iron_seed: Mapping[str, object] | None = None,
+) -> tuple[float, float]:
+    if (iron_seed or {}).get('method') == 'imposed_fO2':
+        # Given fO2 is not inferred from an assay: Kress^-1(Kress(fO2))
+        # returns the imposed potential, so neither q precision nor the
+        # held-out inverse residual belongs to its uncertainty. At fixed T,
+        # log fO2 = IW(T) + delta; subtracting the same IW from the declared
+        # endpoints leaves widths delta-lo and hi-delta, in dex. A point
+        # interval (or no declared uncertainty) has zero width.
+        anchor = iron_seed.get('anchor', {})
+        interval = anchor.get('interval')
+        if interval is None:
+            return 0.0, 0.0
+        delta = float(anchor['delta_iw'])
+        return delta - float(interval[0]), float(interval[1]) - delta
     # Jayasuriya et al. (2004), Am Mineral 89, 1597, abstract:
     # doi:10.2138/am-2004-11-1203, Mossbauer q=Fe3+/SumFe precision
     # +/-0.01 (1 sigma). Held-out near-IW Jayasuriya forward residuals
@@ -1037,6 +1052,7 @@ def _native_fe_saturation_comparison(
     fO2_log: float,
     prior_half_width_dex: float = 0.0,
     seed_basis: str | None = None,
+    iron_seed: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     from simulator.accounting.exceptions import AccountingError
 
@@ -1088,7 +1104,7 @@ def _native_fe_saturation_comparison(
         a_feo_saturation = 10.0 ** saturation_log10
     bound = _feo_activity_saturation_log10_fO2_bar(T_K, a_feo=a_feo)
     gap = float(fO2_log) - bound
-    lower, upper = _native_fe_saturation_band(fe3)
+    lower, upper = _native_fe_saturation_band(fe3, iron_seed=iron_seed)
     # A class prior is an epistemic interval, not an independent Gaussian.
     # With r=max(delta-lo, hi-delta), any prior error lies in [-r,+r].
     # Minkowski addition to the method+model interval [-L,+U] gives
@@ -1098,8 +1114,17 @@ def _native_fe_saturation_comparison(
     # All terms are dex; r=0 recovers the existing band, infinity stays open.
     lower += prior_half_width_dex
     upper += prior_half_width_dex
-    status = ('BELOW' if gap < -lower else
-              'ABOVE' if gap > upper else 'INDETERMINATE')
+    if (iron_seed or {}).get('method') == 'imposed_fO2':
+        # The declared potential interval is [f-L, f+U]. Relative to IW it
+        # is [gap-L, gap+U], so BELOW requires its upper endpoint <0 and
+        # ABOVE its lower endpoint >0 (all dex). Zero widths recover the
+        # point comparison; touching IW remains indeterminate. Preserve the
+        # existing assay/prior comparison below under d-166's scope.
+        status = ('BELOW' if gap + upper < 0.0 else
+                  'ABOVE' if gap - lower > 0.0 else 'INDETERMINATE')
+    else:
+        status = ('BELOW' if gap < -lower else
+                  'ABOVE' if gap > upper else 'INDETERMINATE')
     if seed_basis == 'class_prior' and status == 'BELOW':
         status = 'UNMEASURED_PRIOR_BELOW'
     band = {
@@ -1189,6 +1214,7 @@ def native_fe_equilibrium_extent(
     open_sink: bool = False,
     prior_half_width_dex: float = 0.0,
     seed_basis: str | None = None,
+    iron_seed: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     """Instantaneous FeO -> Fe + 0.5 O2 extent at the supplied gas boundary."""
     from scipy.optimize import brentq
@@ -1217,12 +1243,14 @@ def native_fe_equilibrium_extent(
             mol_fractions=melt_mol_fractions_for_kress91(comp),
             T_K=T_K, pressure_bar=pressure_bar,
             exchange_fO2_log=gas_fO2_log(n), composition_wt_pct=comp,
+            iron_seed=iron_seed,
         )['fO2_log'])
         comparison = _native_fe_saturation_comparison(
             comp, fe3_over_sigma_fe=2.0*fe2o3_mol/(total_fe-n), T_K=T_K,
             pressure_bar=pressure_bar, fO2_log=potential,
             prior_half_width_dex=prior_half_width_dex,
             seed_basis=seed_basis,
+            iron_seed=iron_seed,
         )
         return potential, comparison
 
@@ -1353,6 +1381,7 @@ def kress91_intrinsic_state(
     composition_wt_pct: Mapping[str, float] | None = None,
     prior_half_width_dex: float = 0.0,
     seed_basis: str | None = None,
+    iron_seed: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     """Derive the liquid oxygen potential from its actual iron inventory."""
     if redox_state is not None:
@@ -1424,6 +1453,7 @@ def kress91_intrinsic_state(
                 T_K=T_K, pressure_bar=pressure_bar, fO2_log=value,
                 prior_half_width_dex=prior_half_width_dex,
                 seed_basis=seed_basis,
+                iron_seed=iron_seed,
             )
             # Premise: Kress91's ferric/ferrous ratio is a fit, not an
             # Fe/FeO equilibrium, so a finite low-ferric inverse can undercut
@@ -1714,7 +1744,9 @@ def initialize_feedstock_iron(feedstock: Mapping[str, object]) -> tuple[dict, di
         **prior_diagnostic,
         **({'iron_speciation': spec} if spec else {}),
         'method': ('iron_speciation_split' if ferric_observation else
-                   'declared_split' if declared_split else 'predicted_kress91_split'),
+                   'declared_split' if declared_split else
+                   'imposed_fO2' if authority is IronSeedAuthority.MEASURED else
+                   'predicted_kress91_split'),
         'seed_authority': authority,
         'condition': ('condition_defaulted' if not ferric_observation and not declared_split
                       and anchor.get('estimated', True) else result['condition']),
