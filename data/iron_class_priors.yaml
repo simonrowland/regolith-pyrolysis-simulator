@@ -3,17 +3,25 @@
 # class proxy; the widened envelopes acknowledge transfer to an unassayed charge.
 # Uncited envelopes are wider still. No metal inventory is inferred from them.
 terrestrial_basalt:
+  # Sossi2018 p10921 places terrestrial magmatic liquids near FMQ. Existing
+  # Frost1991 Table1 FMQ at 1 bar is 8.735-25096.3/T; Sato1973 IW is
+  # 6.824-27470/T+log10(1.01325). At 1673.15 K their difference is
+  # +3.323985 dex, rounded to +3 for this broad class proxy. Both fits are
+  # extrapolated here. Subtracting log10 pressures in bar gives a unitless
+  # log ratio; identical buffers would give delta=0. This is not a lot assay.
   delta_iw: 3.0
   interval: [-9.0, 15.0]
   buffer: solid_iron_wustite_sato1973
-  source: class prior, no corpus citation
-  reasoning: Oxidized terrestrial basalt proxy; batch valence and weathering are unmeasured.
+  source: kems-045-sossi-2018-pnas-cr
+  locator: {published_page: 10921}
+  reasoning: Near-FMQ terrestrial magmatic proxy converted to rounded IW+3; batch valence and weathering remain unmeasured.
 terrestrial_anorthosite:
   delta_iw: 3.0
   interval: [-9.0, 15.0]
   buffer: solid_iron_wustite_sato1973
-  source: class prior, no corpus citation
-  reasoning: Terrestrial anorthosite aggregate is not reduced lunar material; batch valence is unknown.
+  source: kems-045-sossi-2018-pnas-cr
+  locator: {published_page: 10921}
+  reasoning: Assumed transfer of the terrestrial magmatic near-FMQ proxy above to anorthosite aggregate; no class-specific or batch valence assay.
 lunar_mare:
   delta_iw: -1.0
   interval: [-7.0, 5.0]
@@ -50,6 +58,11 @@ mars_regolith:
   locator: {published_page: 502}
   reasoning: Shergottite proxy only; alteration and terrestrial MGS-1 manufacture are unconstrained.
 s_type_ordinary_chondrite:
+  # At 1200 K, Sato Eq5 gives IW=6.824-27470/1200+log10(1.01325)
+  # ~= -16.062 (bar). The quoted -17.1 and -17.3 log10(fO2/bar)
+  # imply -1.04 and -1.24 dex relative to IW; -1 is a rounded class proxy.
+  # Subtracting equal pressure-reference logarithms cancels the units;
+  # an observation exactly at IW would give delta=0.
   delta_iw: -1.0
   interval: [-13.0, 11.0]
   buffer: solid_iron_wustite_sato1973
