@@ -104,7 +104,17 @@ SIO_ANCHOR_HOUR = 6
 # mass-balance artifact (AtomLedger closes). Pin = executed probe value;
 # never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
 # b-850: alkali composite vapour rows now use the parent-oxide activity.
-EXPECTED_SIO_DECADE_DRIFT = 0.2090602025512069
+# b-901: flowing species pressure and local capture change the retained-melt
+# trajectory. At the same 1595 C anchor, intrinsic comparator log10(fO2/bar)
+# rises -8.5818255082 -> -8.5269687366 while finite SiO stays nearly fixed.
+# Premise: SiO2 -> SiO + 1/2 O2 gives P_SiO proportional to pO2**(-1/2)
+# at fixed T/activity. Thus half the comparator's +0.05485677 dex shift
+# predicts +0.02742839 dex separation; observed +0.02740438 includes the
+# small activity/history change. Log pressure ratios are dimensionless;
+# with no redox or activity change this separation shift vanishes. Reverting
+# e87717cb6 reduces the drift; reverting 3428cf475 or b2731c2a9 leaves it
+# bit-identical. This pin records the traced physical trajectory.
+EXPECTED_SIO_DECADE_DRIFT = 0.23646458596678005
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
