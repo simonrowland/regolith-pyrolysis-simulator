@@ -1,4 +1,4 @@
-"""Mutation proof that removing the FeO reference conversion turns the tests red."""
+"""Mutation proof that removing the FeO source notice turns the tests red."""
 
 from __future__ import annotations
 
@@ -10,17 +10,17 @@ import pytest
 from simulator.battery import score
 
 
-source = textwrap.dedent(inspect.getsource(score.fusion_comparison_reference))
-needle = "iron_saturated = _iron_saturated_feo_comparison(reference, engine=engine)\n"
+source = textwrap.dedent(inspect.getsource(score._iron_saturated_feo_comparison))
+needle = "notices: tuple[Notice, ...] = (conversion_notice,)\n"
 assert source.count(needle) == 1
-mutated = source.replace(needle, "iron_saturated = None\n", 1)
+mutated = source.replace(needle, "notices: tuple[Notice, ...] = ()\n", 1)
 namespace: dict[str, object] = {}
 exec(
     compile(mutated, "<t1243-iron-saturated-feo>", "exec"),
     score.__dict__,
     namespace,
 )
-score.fusion_comparison_reference = namespace["fusion_comparison_reference"]
+score._iron_saturated_feo_comparison = namespace["_iron_saturated_feo_comparison"]
 
 result = pytest.main(
     [

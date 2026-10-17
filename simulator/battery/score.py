@@ -1828,7 +1828,13 @@ def _iron_saturated_feo_comparison(
         affected_quantities=(quantity,),
         reason=(
             "iron-saturated Fe(1-x)O(l) reference converted to stoichiometric "
-            f"FeO(l); source_value={reference.value.point}; "
+            "FeO(l); source_flagged_less_reliable: D&G 1945 direct "
+            "Fe/wustite pCO2/pCO ratios, flagged by D&G as less reliable on "
+            "p. 811; uncertainty ±0.035 dex in log f (credible-route spread: "
+            "1.792 vs Holzheid/Barin quoted 1.94 at 1400 C, 0.069 dex "
+            "end-to-end); Masson 1965 Temkin estimate 0.936 is EXCLUDED "
+            "from the band (stated validity N_Fe2+ 0.7-0.9; this case lies "
+            f"outside it); source_value={reference.value.point}; "
             f"converted_value={converted}; "
             f"factor={_display_decimal(factor, '0.001')}; "
             "jackknife sensitivity factor "

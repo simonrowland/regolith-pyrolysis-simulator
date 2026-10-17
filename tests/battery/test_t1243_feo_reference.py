@@ -220,6 +220,16 @@ def test_anchors_match_the_derivation_and_an_independent_recompute() -> None:
         assert converted is not row
         assert converted.value.point == _independent_factor(temperature)
         notice = _conversion_notice(converted.notices)
+        assert notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        assert (
+            "source_flagged_less_reliable: D&G 1945 direct Fe/wustite "
+            "pCO2/pCO ratios, flagged by D&G as less reliable on p. 811; "
+            "uncertainty ±0.035 dex in log f (credible-route spread: 1.792 "
+            "vs Holzheid/Barin quoted 1.94 at 1400 C, 0.069 dex "
+            "end-to-end); Masson 1965 Temkin estimate 0.936 is EXCLUDED "
+            "from the band (stated validity N_Fe2+ 0.7-0.9; this case lies "
+            "outside it)"
+        ) in notice.reason
         assert f"factor={factor}" in notice.reason
         jackknife_low, jackknife_high = _independent_jackknife(temperature)
         assert jackknife_low.quantize(Decimal("0.001")) == low
