@@ -4368,6 +4368,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             composition_wt_pct=comp,
             prior_half_width_dex=getattr(self, '_feedstock_iron_initialization', {}).get(
                 'prior_half_width_dex', 0.0),
+            seed_basis=getattr(self, '_feedstock_iron_initialization', {}).get('seed_basis'),
         )
         self._last_intrinsic_redox_state = state
         melt_potential = float(state['fO2_log'])
@@ -7308,6 +7309,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             open_sink=open_receiver,
             prior_half_width_dex=getattr(self, '_feedstock_iron_initialization', {}).get(
                 'prior_half_width_dex', 0.0),
+            seed_basis=getattr(self, '_feedstock_iron_initialization', {}).get('seed_basis'),
         )
         return {**result, 'feo_available_mol': feo,
                 'total_fe_mol': feo + 2.0*ferric}
@@ -7671,6 +7673,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'native_fe_event': 'native_fe_saturation_indeterminate',
                     'native_fe_event_reason': 'within_propagated_inverse_band',
                     'native_fe_event_status': 'INDETERMINATE',
+                    'saturation_notice': native_extent['native_fe_state']['saturation_notice'],
+                }
+            elif native_extent['native_fe_state'].get('saturation_status') == 'UNMEASURED_PRIOR_BELOW':
+                event = {
+                    'native_fe_event': 'native_fe_unmeasured_prior_below',
+                    'native_fe_event_reason': native_extent['native_fe_state']['saturation_notice']['reason'],
+                    'native_fe_event_status': 'UNMEASURED_PRIOR_BELOW',
                     'saturation_notice': native_extent['native_fe_state']['saturation_notice'],
                 }
             else:

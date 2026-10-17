@@ -134,13 +134,14 @@ def _post_removal(probe, n):
     return value, bound
 
 
-def _solve(probe, gas=lambda n: -300., *, open_sink=False):
+def _solve(probe, gas=lambda n: -300., *, open_sink=False, seed_basis=None):
     sim, controls, _ = probe
     inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
     return fe_redox.native_fe_equilibrium_extent(
         comp_wt=controls['comp'], feo_mol=inventory['FeO'],
         fe2o3_mol=inventory['Fe2O3'], T_K=controls['T_K'],
-        pressure_bar=controls['pressure_bar'], gas_fO2_log=gas, open_sink=open_sink)
+        pressure_bar=controls['pressure_bar'], gas_fO2_log=gas, open_sink=open_sink,
+        seed_basis=seed_basis)
 
 
 @pytest.fixture
@@ -153,6 +154,48 @@ def reducing_probe(probe):
     inventory['Fe2O3'] = ferric
     probe[1]['comp']['K2O'] = 80.
     return probe
+
+
+def test_unmeasured_prior_policy_reaches_diagnostic_and_solver(reducing_probe):
+    probe = reducing_probe
+    assert _solve(probe)['native_fe_mol'] > 0.
+    result = _solve(probe, seed_basis='class_prior')
+    assert result['native_fe_mol'] == result['melt_root_mol'] == 0.
+    assert result['native_fe_state']['saturation_status'] == 'UNMEASURED_PRIOR_BELOW'
+    inventory = probe[0].atom_ledger.mol_by_account('process.cleaned_melt')
+    state = fe_redox.kress91_intrinsic_state(
+        feo_mol=inventory['FeO'], fe2o3_mol=inventory['Fe2O3'],
+        mol_fractions=fe_redox.melt_mol_fractions_for_kress91(probe[1]['comp']),
+        T_K=probe[1]['T_K'], pressure_bar=probe[1]['pressure_bar'],
+        exchange_fO2_log=-300., composition_wt_pct=probe[1]['comp'],
+        seed_basis='class_prior')
+    assert state['saturation_status'] == result['native_fe_state']['saturation_status']
+    # The extent solver renormalizes the composition even at zero extent.
+    assert state['saturation_notice'] == pytest.approx(
+        result['native_fe_state']['saturation_notice'], rel=0., abs=1e-12)
+
+
+def test_unmeasured_prior_policy_is_preserved_in_step_event(monkeypatch):
+    sim = _reducing_sim()
+    monkeypatch.setattr(sim, '_vacuum_floor_bar', lambda: 1e-300)
+    monkeypatch.setattr(sim, '_headspace_transport_pO2_bar', lambda: 1e-300)
+    assert sim._compute_native_fe_saturation_extent()['native_fe_mol'] > 0.
+    sim._feedstock_iron_initialization['seed_basis'] = 'class_prior'
+    sim._current_melt_redox_fO2_log(sim.melt.temperature_C + 273.15)
+    diagnostic = sim._last_intrinsic_redox_state
+    extent = sim._compute_native_fe_saturation_extent()
+    assert diagnostic['saturation_status'] == 'UNMEASURED_PRIOR_BELOW'
+    assert extent['native_fe_state']['saturation_notice'] == pytest.approx(
+        diagnostic['saturation_notice'], rel=0., abs=1e-12)
+    assert extent['native_fe_mol'] == 0.
+    before = dict(sim.atom_ledger.mol_by_account('process.cleaned_melt'))
+    event = sim._apply_native_fe_saturation_split()
+    assert event['native_fe_event_status'] == 'UNMEASURED_PRIOR_BELOW'
+    assert event['saturation_notice'] == pytest.approx(
+        diagnostic['saturation_notice'], rel=0., abs=1e-12)
+    assert 'unmeasured' in event['native_fe_event_reason'].lower()
+    assert sim.atom_ledger.mol_by_account('process.cleaned_melt') == before
+    assert sim.atom_ledger.mol_by_account('process.metal_phase').get('Fe', 0.) == 0.
 
 
 def test_melt_root_matches_independent_bisection_and_stops_at_bound(reducing_probe):

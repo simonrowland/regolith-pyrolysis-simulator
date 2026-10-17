@@ -1009,7 +1009,7 @@ class NativeFeSaturationNotice:
     band_upper_dex: float | None
     band_lower_unbounded: bool
     band_upper_unbounded: bool
-    status: str
+    status: Literal['BELOW', 'ABOVE', 'INDETERMINATE', 'UNMEASURED_PRIOR_BELOW']
 
 
 @dataclass(frozen=True)
@@ -1036,6 +1036,7 @@ def _native_fe_saturation_comparison(
     pressure_bar: float,
     fO2_log: float,
     prior_half_width_dex: float = 0.0,
+    seed_basis: str | None = None,
 ) -> dict[str, object]:
     from simulator.accounting.exceptions import AccountingError
 
@@ -1091,12 +1092,16 @@ def _native_fe_saturation_comparison(
     # A class prior is an epistemic interval, not an independent Gaussian.
     # With r=max(delta-lo, hi-delta), any prior error lies in [-r,+r].
     # Minkowski addition to the method+model interval [-L,+U] gives
-    # [-L-r,+U+r], conservatively retaining asymmetry and unknown correlation.
+    # [-L-r,+U+r], conservative at a FIXED saturation bound only, retaining
+    # asymmetry without an independence assumption. This is not a nonlinear
+    # enclosure of the full gap: changing the seed also changes q and a_FeO.
     # All terms are dex; r=0 recovers the existing band, infinity stays open.
     lower += prior_half_width_dex
     upper += prior_half_width_dex
     status = ('BELOW' if gap < -lower else
               'ABOVE' if gap > upper else 'INDETERMINATE')
+    if seed_basis == 'class_prior' and status == 'BELOW':
+        status = 'UNMEASURED_PRIOR_BELOW'
     band = {
         'band_lower_dex': lower if math.isfinite(lower) else None,
         'band_upper_dex': upper if math.isfinite(upper) else None,
@@ -1105,11 +1110,14 @@ def _native_fe_saturation_comparison(
     }
     notice = (None if status == 'ABOVE' else asdict(NativeFeSaturationNotice(
         flag=('REDOX_BELOW_FE_FEO_SATURATION' if status == 'BELOW' else
+              'REDOX_UNMEASURED_PRIOR_BELOW' if status == 'UNMEASURED_PRIOR_BELOW' else
               'REDOX_FE_FEO_SATURATION_INDETERMINATE'),
         melt_potential=float(fO2_log), iw_bound=bound, a_feo=a_feo,
         saturation_gap_dex=gap, **band,
         status=status,
     )))
+    if status == 'UNMEASURED_PRIOR_BELOW':
+        notice['reason'] = 'Unmeasured class priors cannot authorize metallic Fe precipitation.'
     return {
         'native_fe_saturation': status == 'BELOW',
         'saturation_status': status,
@@ -1180,6 +1188,7 @@ def native_fe_equilibrium_extent(
     gas_fO2_log: Callable[[float], float],
     open_sink: bool = False,
     prior_half_width_dex: float = 0.0,
+    seed_basis: str | None = None,
 ) -> dict[str, object]:
     """Instantaneous FeO -> Fe + 0.5 O2 extent at the supplied gas boundary."""
     from scipy.optimize import brentq
@@ -1213,6 +1222,7 @@ def native_fe_equilibrium_extent(
             comp, fe3_over_sigma_fe=2.0*fe2o3_mol/(total_fe-n), T_K=T_K,
             pressure_bar=pressure_bar, fO2_log=potential,
             prior_half_width_dex=prior_half_width_dex,
+            seed_basis=seed_basis,
         )
         return potential, comparison
 
@@ -1342,6 +1352,7 @@ def kress91_intrinsic_state(
     redox_state: RedoxState | None = None,
     composition_wt_pct: Mapping[str, float] | None = None,
     prior_half_width_dex: float = 0.0,
+    seed_basis: str | None = None,
 ) -> dict[str, object]:
     """Derive the liquid oxygen potential from its actual iron inventory."""
     if redox_state is not None:
@@ -1412,6 +1423,7 @@ def kress91_intrinsic_state(
                 fe3_over_sigma_fe=2.0 * fe2o3_mol / (feo_mol + 2.0 * fe2o3_mol),
                 T_K=T_K, pressure_bar=pressure_bar, fO2_log=value,
                 prior_half_width_dex=prior_half_width_dex,
+                seed_basis=seed_basis,
             )
             # Premise: Kress91's ferric/ferrous ratio is a fit, not an
             # Fe/FeO equilibrium, so a finite low-ferric inverse can undercut
