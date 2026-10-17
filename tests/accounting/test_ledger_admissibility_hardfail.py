@@ -156,16 +156,57 @@ def test_positive_sub_tolerance_lot_retains_consistent_kg_and_mol(oxygen_kg) -> 
         assert retained.meta["species_mol"]["O2"] == oxygen_mol
 
 
-@pytest.mark.xfail(
-    reason="t-1238 kg-basis conservation behavior awaits physics approval",
-    strict=False,
-)
 def test_kg_basis_lot_preserves_nonzero_sub_tolerance_si_mass() -> None:
     si_kg = 3.226e-13
     lot = MaterialLot("process.cleaned_melt", {"Si": si_kg})
 
     assert lot.species_kg == {"Si": si_kg}
     assert lot.without_empty().species_kg == {"Si": si_kg}
+
+
+def test_sub_tolerance_kg_species_survives_move_and_conserves_mass() -> None:
+    si_kg = 3.226e-13
+    transition = LedgerTransition.move(
+        "tiny_si_transfer",
+        "process.cleaned_melt",
+        "process.overhead_gas",
+        {"Si": si_kg},
+    )
+
+    assert transition.debits[0].species_kg == {"Si": si_kg}
+    assert transition.credits[0].species_kg == {"Si": si_kg}
+    assert transition.debit_mass_kg() == si_kg
+    assert transition.credit_mass_kg() == si_kg
+
+
+def test_sub_tolerance_kg_species_survives_ledger_debit() -> None:
+    si_kg = 3.226e-13
+    debit = AtomLedger().debit("process.cleaned_melt", {"Si": si_kg})
+
+    assert debit.species_kg == {"Si": si_kg}
+    assert debit.total_mass_kg() == si_kg
+
+
+def test_sub_tolerance_kg_species_survives_ledger_credit() -> None:
+    si_kg = 3.226e-13
+    credit = AtomLedger().credit("process.overhead_gas", {"Si": si_kg})
+
+    assert credit.species_kg == {"Si": si_kg}
+    assert credit.total_mass_kg() == si_kg
+
+
+def test_sub_tolerance_negative_mol_basis_lot_still_refuses() -> None:
+    with pytest.raises(AccountingError, match="mol-basis lot mass.*non-negative"):
+        MaterialLot(
+            "process.cleaned_melt",
+            {"Si": -3.226e-13},
+            meta={"amount_basis": "mol", "species_mol": {"Si": -1e-20}},
+        )
+
+
+def test_sub_tolerance_negative_kg_basis_lot_refuses() -> None:
+    with pytest.raises(AccountingError, match="lot mass.*non-negative"):
+        MaterialLot("process.cleaned_melt", {"Si": -3.226e-13})
 
 
 def test_h190_fe_reduction_retains_tiny_oxygen_credit_and_closes() -> None:
