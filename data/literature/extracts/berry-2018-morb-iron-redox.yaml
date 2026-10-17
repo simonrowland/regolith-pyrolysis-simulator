@@ -393,12 +393,11 @@ species:
           admission_status: admitted
           method: Linear centroid calibration against Mössbauer-calibrated standards.
           points:
-            - &berry_2018_natural_unknowns
-              row: centroid_mean_n42
+            - row: centroid_mean_n42
               T_C: null
               fO2_log_as_published: null
               total_pressure_Pa: null
-              point_conditions:
+              point_conditions: &berry_2018_natural_conditions
                 quench_state: {state: {tag: value, value: not_stated}, locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}}
                 T_C: {state: {tag: unknown, reason: temperature_not_stated_for_natural_glass_result}, locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}}
                 fO2_log: {state: {tag: unknown, reason: fO2_not_stated_for_natural_glass_result}, locator: {page: 5, pdf_page_index: 4, published_page: 118, section: Results}}
@@ -427,7 +426,7 @@ species:
           admission_status: admitted
           method: Polynomial centroid calibration.
           points:
-            - {<<: *berry_2018_natural_unknowns, row: polynomial_mean_n42, sample: 'n=42 natural MORB glasses, polynomial calibration', n: 42, value: 0.10, sigma: 0.02, value_as_published: '0.10(2)'}
+            - {T_C: null, fO2_log_as_published: null, total_pressure_Pa: null, point_conditions: *berry_2018_natural_conditions, row: polynomial_mean_n42, sample: 'n=42 natural MORB glasses, polynomial calibration', n: 42, value: 0.10, sigma: 0.02, value_as_published: '0.10(2)'}
         derived_from: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
         derivation:
           relation: Natural-glass Fe3+/SumFe reduced from the measured XANES centroid using the polynomial calibration against Mössbauer standards.
@@ -446,7 +445,7 @@ species:
           admission_status: admitted
           method: Linear centroid calibration against Mössbauer-calibrated standards.
           points:
-            - {<<: *berry_2018_natural_unknowns, row: standard_VG2, sample: VG2, value: 0.11, sigma: 0.01, value_as_published: '0.11(1)'}
+            - {T_C: null, fO2_log_as_published: null, total_pressure_Pa: null, point_conditions: *berry_2018_natural_conditions, row: standard_VG2, sample: VG2, value: 0.11, sigma: 0.01, value_as_published: '0.11(1)'}
         derived_from: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
         derivation:
           relation: VG2 Fe3+/SumFe reduced from its measured XANES centroid using the calibration against Mössbauer standards.
@@ -465,7 +464,7 @@ species:
           admission_status: admitted
           method: Linear centroid calibration against Mössbauer-calibrated standards.
           points:
-            - {<<: *berry_2018_natural_unknowns, row: standard_JDF_D2, sample: JDF-D2, value: 0.124, sigma: 0.010, value_as_published: '0.124(10)'}
+            - {T_C: null, fO2_log_as_published: null, total_pressure_Pa: null, point_conditions: *berry_2018_natural_conditions, row: standard_JDF_D2, sample: JDF-D2, value: 0.124, sigma: 0.010, value_as_published: '0.124(10)'}
         derived_from: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
         derivation:
           relation: JDF-D2 Fe3+/SumFe reduced from its measured XANES centroid using the calibration against Mössbauer standards.
@@ -484,7 +483,7 @@ species:
           admission_status: admitted
           method: Linear absorption-edge calibration against Mössbauer-calibrated standards.
           points:
-            - {<<: *berry_2018_natural_unknowns, row: edge_mean_n19, sample: 'n=19 natural MORB glasses, edge calibration', n: 19, value: 0.138, sigma: 0.014, value_as_published: '0.138(14)'}
+            - {T_C: null, fO2_log_as_published: null, total_pressure_Pa: null, point_conditions: *berry_2018_natural_conditions, row: edge_mean_n19, sample: 'n=19 natural MORB glasses, edge calibration', n: 19, value: 0.138, sigma: 0.014, value_as_published: '0.138(14)'}
         derived_from: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
         derivation:
           relation: Natural-glass Fe3+/SumFe reduced from the measured XANES edge using the calibration against Mössbauer standards.
@@ -503,7 +502,7 @@ species:
           admission_status: admitted
           method: Linear centroid calibration against Mössbauer-calibrated standards.
           points:
-            - {<<: *berry_2018_natural_unknowns, row: centroid_mean_n19, sample: 'n=19 natural MORB glasses, centroid calibration', n: 19, value: 0.124, sigma: 0.016, value_as_published: '0.124(16)'}
+            - {T_C: null, fO2_log_as_published: null, total_pressure_Pa: null, point_conditions: *berry_2018_natural_conditions, row: centroid_mean_n19, sample: 'n=19 natural MORB glasses, centroid calibration', n: 19, value: 0.124, sigma: 0.016, value_as_published: '0.124(16)'}
         derived_from: [berry_2018_table2_mossbauer_295K_fe3_sumfe]
         derivation:
           relation: Natural-glass Fe3+/SumFe reduced from the measured XANES centroid using the calibration against Mössbauer standards.
