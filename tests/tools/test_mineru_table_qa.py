@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from io import StringIO
 from pathlib import Path
 
 from tools import mineru_table_qa as qa
@@ -103,20 +104,134 @@ def test_full_document_output_without_chunk_uses_page_one_origin(tmp_path: Path)
     assert _by_sid(rows, "unchunked")["chunk"] == "full-document"
 
 
-def test_multiple_numbers_in_one_cell_scores_high(tmp_path: Path) -> None:
+def test_uncertainty_and_parenthetical_uncertainty_are_not_multiple_numbers(
+    tmp_path: Path,
+) -> None:
     body = (
-        "<table><tr><th>Oxide</th><th>Values</th></tr>"
-        "<tr><td>SiO2</td><td>49.2 wt% 15.1</td></tr></table>"
+        "<table><tr><th>Values</th></tr>"
+        "<tr><td>1.23 ± 0.04</td></tr>"
+        "<tr><td>1.23 +/- 0.04</td></tr>"
+        "<tr><td>0.11(2)</td></tr></table>"
     )
     corpus = _write_corpus(
-        tmp_path, "merged", body, "Values 49.2 and 15.1 are printed. " * 4
+        tmp_path,
+        "uncertainties",
+        body,
+        "Values 1.23 ± 0.04, 1.23 +/- 0.04, and 0.11(2) are printed. " * 3,
     )
 
     rows, _ = qa.rank_corpus(corpus)
-    row = _by_sid(rows, "merged")
+    row = _by_sid(rows, "uncertainties")
 
-    assert "multiple_numbers=1" in str(row["flags"])
-    assert row["combined_score"] >= 8
+    assert "multiple_numbers" not in str(row["flags"])
+    assert row["combined_score"] == 0
+
+
+def test_range_column_does_not_count_range_endpoints_as_merged_values(
+    tmp_path: Path,
+) -> None:
+    body = (
+        "<table><tr><th>Range</th></tr>"
+        "<tr><td>0.1–0.2</td></tr><tr><td>1.1–1.4</td></tr></table>"
+    )
+    corpus = _write_corpus(
+        tmp_path, "ranges", body, "Ranges 0.1–0.2 and 1.1–1.4 are shown. " * 3
+    )
+
+    rows, _ = qa.rank_corpus(corpus)
+
+    assert "multiple_numbers" not in str(_by_sid(rows, "ranges")["flags"])
+
+
+def test_plain_numeric_latex_wrappers_are_formatting(tmp_path: Path) -> None:
+    body = (
+        "<table><tr><th>Reading</th></tr>"
+        "<tr><td>$1.23$</td></tr>"
+        "<tr><td>\\mathrm{1.24}</td></tr>"
+        "<tr><td>$1.25\\%$</td></tr></table>"
+    )
+    corpus = _write_corpus(
+        tmp_path, "plain-latex", body, "Readings 1.23 and 1.24 are printed. " * 4
+    )
+
+    rows, _ = qa.rank_corpus(corpus)
+
+    assert "latex" not in str(_by_sid(rows, "plain-latex")["flags"])
+
+
+def test_latex_exponents_and_multiplication_are_number_damage(
+    tmp_path: Path,
+) -> None:
+    body = (
+        "<table><tr><th>Reading</th></tr>"
+        "<tr><td>$10^{-5}$</td></tr>"
+        "<tr><td>$1.2 \\times 10^{-3}$</td></tr>"
+        "<tr><td>$\\text{-}1.23$</td></tr></table>"
+    )
+    corpus = _write_corpus(
+        tmp_path, "latex-math", body, "Readings 10 to minus 5 and 1.2 times 10 to minus 3. " * 3
+    )
+
+    rows, _ = qa.rank_corpus(corpus)
+    flags = str(_by_sid(rows, "latex-math")["flags"])
+
+    assert "latex=3" in flags
+    assert "multiple_numbers" not in flags
+
+
+def test_two_merged_quantity_cells_score_above_a_large_clean_table(
+    tmp_path: Path,
+) -> None:
+    clean_values = [str(1000 + index) for index in range(100)]
+    clean_body = (
+        "<table><tr><th>Reading</th></tr>"
+        + "".join(f"<tr><td>{value}</td></tr>" for value in clean_values)
+        + "</table>"
+    )
+    merged_body = (
+        "<table><tr><th>Values</th></tr>"
+        "<tr><td>49.2 wt% 15.1</td></tr>"
+        "<tr><td>43.7 wt% 12.8</td></tr></table>"
+    )
+    clean_corpus = _write_corpus(
+        tmp_path,
+        "large-clean",
+        clean_body,
+        "Readings " + " ".join(clean_values) + ". " + "Measured values. " * 6,
+    )
+    merged_corpus = _write_corpus(
+        tmp_path,
+        "small-merged",
+        merged_body,
+        "Values 49.2 wt% 15.1 and 43.7 wt% 12.8 are shown. " * 3,
+    )
+
+    clean_rows, _ = qa.rank_corpus(clean_corpus)
+    merged_rows, _ = qa.rank_corpus(merged_corpus)
+    clean = _by_sid(clean_rows, "large-clean")
+    merged = _by_sid(merged_rows, "small-merged")
+
+    assert clean["numeric_cells"] == 100
+    assert clean["combined_score"] == 0
+    assert "multiple_numbers=2" in str(merged["flags"])
+    assert "multiple_numbers=1.000" in str(merged["rates"])
+    assert merged["combined_score"] > clean["combined_score"]
+
+
+def test_one_odd_numeric_cell_does_not_clear_the_two_hit_score_floor(
+    tmp_path: Path,
+) -> None:
+    body = (
+        "<table><tr><th>Values</th></tr>"
+        "<tr><td>49.2 wt% 15.1</td></tr></table>"
+    )
+    corpus = _write_corpus(
+        tmp_path, "one-merged", body, "Values 49.2 wt% 15.1 are printed. " * 3
+    )
+
+    rows, _ = qa.rank_corpus(corpus)
+
+    assert _by_sid(rows, "one-merged")["combined_score"] == 0
 
 
 def test_numeric_cells_with_unit_suffix_are_included_in_agreement(tmp_path: Path) -> None:
@@ -136,25 +251,92 @@ def test_numeric_cells_with_unit_suffix_are_included_in_agreement(tmp_path: Path
 def test_dropped_plusminus_cell_scores_high(tmp_path: Path) -> None:
     body = (
         "<table><tr><th>Temperature °C</th></tr>"
-        "<tr><td>1643.15</td></tr></table>"
+        "<tr><td>1643.15</td></tr><tr><td>1700.25</td></tr></table>"
     )
     corpus = _write_corpus(
-        tmp_path, "dropped-pm", body, "Temperature 1643±15 degrees C. " * 4
+        tmp_path,
+        "dropped-pm",
+        body,
+        "Temperature 1643±15 and 1700±25 degrees C are printed. " * 4,
     )
 
     rows, _ = qa.rank_corpus(corpus)
     row = _by_sid(rows, "dropped-pm")
 
-    assert "dropped_plusminus=1" in str(row["flags"])
+    assert "dropped_plusminus=2" in str(row["flags"])
     assert row["numeric_agreement"] == "0.000"
     assert row["combined_score"] >= 15
+    assert row["_dropped_plusminus_hits"][0]["pdftotext_text"] == "1643±15"
+
+
+def test_plain_temperature_decimals_are_not_dropped_plusminus_hits(
+    tmp_path: Path,
+) -> None:
+    body = (
+        "<table><tr><th>Temperature °C</th></tr>"
+        "<tr><td>1000.00</td></tr><tr><td>1100.00</td></tr></table>"
+    )
+    corpus = _write_corpus(
+        tmp_path,
+        "plain-temperatures",
+        body,
+        "Temperatures 1000.00 and 1100.00 are printed. " * 4,
+    )
+
+    rows, _ = qa.rank_corpus(corpus)
+    row = _by_sid(rows, "plain-temperatures")
+
+    assert "dropped_plusminus" not in str(row["flags"])
+    assert row["_dropped_plusminus_hits"] == []
+
+
+def test_scan_temperature_without_pdftotext_evidence_is_not_a_hit(
+    tmp_path: Path,
+) -> None:
+    body = (
+        "<table><tr><th>Temperature K</th></tr>"
+        "<tr><td>1643.15</td></tr><tr><td>1700.25</td></tr></table>"
+    )
+    corpus = _write_corpus(tmp_path, "scan-temperatures", body, "scan")
+
+    rows, _ = qa.rank_corpus(corpus)
+    row = _by_sid(rows, "scan-temperatures")
+
+    assert "dropped_plusminus" not in str(row["flags"])
+    assert row["_dropped_plusminus_hits"] == []
+
+
+def test_output_places_all_dropped_hits_before_top_40_and_summary(
+    tmp_path: Path,
+) -> None:
+    body = (
+        "<table><tr><th>Temperature °C</th></tr>"
+        "<tr><td>1643.15</td></tr><tr><td>1700.25</td></tr></table>"
+    )
+    corpus = _write_corpus(
+        tmp_path,
+        "output-order",
+        body,
+        "Temperature 1643±15 and 1700±25 degrees C are printed. " * 4,
+    )
+    rows, summaries = qa.rank_corpus(corpus)
+    output = StringIO()
+
+    qa.write_tsv(rows, summaries, output)
+
+    rendered = output.getvalue()
+    assert rendered.index("# (a) every dropped_plusminus hit") < rendered.index(
+        "# (b) top 40"
+    ) < rendered.index("# (c) per-sid summary")
+    assert "1643.15\t1643±15" in rendered
 
 
 def test_ragged_body_row_scores_high(tmp_path: Path) -> None:
     body = (
         "<table><tr><th>Oxide</th><th>wt%</th><th>Notes</th></tr>"
         "<tr><td>SiO2</td><td>49.2</td><td>ok</td></tr>"
-        "<tr><td>Al2O3</td><td>15.1</td></tr></table>"
+        "<tr><td>Al2O3</td><td>15.1</td></tr>"
+        "<tr><td>FeO</td><td>8.4</td></tr></table>"
     )
     corpus = _write_corpus(
         tmp_path, "ragged", body, "SiO2 49.2 Al2O3 15.1. " * 5
@@ -163,9 +345,9 @@ def test_ragged_body_row_scores_high(tmp_path: Path) -> None:
     rows, _ = qa.rank_corpus(corpus)
     row = _by_sid(rows, "ragged")
 
-    assert row["ragged_score"] != "0.000"
-    assert "ragged_rows=1" in str(row["flags"])
-    assert row["combined_score"] >= 5
+    assert row["ragged_rate"] != "0.000"
+    assert "ragged_rows=2" in str(row["flags"])
+    assert row["combined_score"] >= 50
 
 
 def test_short_pdftotext_page_is_scan_and_does_not_fail(tmp_path: Path) -> None:
