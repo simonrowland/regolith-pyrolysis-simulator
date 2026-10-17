@@ -104,6 +104,74 @@ def test_full_document_output_without_chunk_uses_page_one_origin(tmp_path: Path)
     assert _by_sid(rows, "unchunked")["chunk"] == "full-document"
 
 
+def test_single_page_chunk_uses_its_absolute_start_page(tmp_path: Path) -> None:
+    corpus = tmp_path / "corpus"
+    chunk = corpus / "raw" / "robiew" / "ocr-mineru" / "chunk-p125-rot180"
+    chunk.mkdir(parents=True)
+    (chunk / "content_list.json").write_text(
+        json.dumps([{"type": "table", "page_idx": 0, "table_body":
+                     "<table><tr><th>Value</th></tr><tr><td>1.2</td></tr></table>"}]),
+        encoding="utf-8",
+    )
+    text_dir = corpus / "text" / "robiew"
+    text_dir.mkdir(parents=True)
+    (text_dir / "pdftotext-layout.txt").write_text("\f" * 124 + "values " + "1.2 " * 30)
+
+    rows, _ = qa.rank_corpus(corpus)
+
+    assert _by_sid(rows, "robiew")["absolute_page"] == 125
+
+
+def test_digit_matching_accepts_pdftotext_grouping_spaces(tmp_path: Path) -> None:
+    body = "<table><tr><th>Value</th></tr><tr><td>1234.5</td></tr></table>"
+    corpus = _write_corpus(tmp_path, "grouped", body, "Value 1 234.5. " * 10)
+
+    rows, _ = qa.rank_corpus(corpus)
+
+    assert _by_sid(rows, "grouped")["numeric_agreement"] == "1.000"
+    assert "numeric_mismatch" not in str(_by_sid(rows, "grouped")["flags"])
+
+
+def test_numeric_mismatch_is_not_scored_without_page_number_overlap(tmp_path: Path) -> None:
+    body = (
+        "<table><tr><th>Value</th></tr>"
+        "<tr><td>12.3</td></tr><tr><td>45.6</td></tr>"
+        "<tr><td>78.9</td></tr><tr><td>10.1</td></tr></table>"
+    )
+    corpus = _write_corpus(tmp_path, "unreliable-page-text", body, "Lots of prose, no table values. " * 10)
+
+    rows, _ = qa.rank_corpus(corpus)
+    row = _by_sid(rows, "unreliable-page-text")
+
+    assert "numeric_mismatch=" in str(row["flags"])
+    assert "numeric_mismatch=0.000" in str(row["rates"])
+    assert row["combined_score"] == 0
+
+
+def test_fused_reference_digit_and_run_together_columns_are_flagged(tmp_path: Path) -> None:
+    body = (
+        "<table><tr><th>Value</th><th>Reference</th></tr>"
+        "<tr><td>11.0</td><td>5</td></tr>"
+        "<tr><td>11.06</td><td>6</td></tr>"
+        "<tr><td>11.1</td><td>7</td></tr></table>"
+    )
+    fused = _write_corpus(tmp_path, "fused", body, "Values 11.0 11.06 11.1 references. " * 4)
+    rows, _ = qa.rank_corpus(fused)
+    fused_row = _by_sid(rows, "fused")
+
+    assert "fused_reference_decimal=1" in str(fused_row["flags"])
+    assert fused_row["combined_score"] > 0
+
+    merged_body = (
+        "<table><tr><th>Composition</th></tr>"
+        "<tr><td>47.147.549.2</td></tr><tr><td>40.1</td></tr></table>"
+    )
+    merged = _write_corpus(tmp_path, "run-together", merged_body, "Composition values. " * 10)
+    rows, _ = qa.rank_corpus(merged)
+
+    assert "run_together_columns=1" in str(_by_sid(rows, "run-together")["flags"])
+
+
 def test_uncertainty_and_parenthetical_uncertainty_are_not_multiple_numbers(
     tmp_path: Path,
 ) -> None:
