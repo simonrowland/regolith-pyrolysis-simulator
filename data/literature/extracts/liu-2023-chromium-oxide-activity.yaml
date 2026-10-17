@@ -12,17 +12,1883 @@ extraction:
   worker: wave3b-liu23
 review_status: draft
 fidelity_samples:
-  - path: species.Cr.context[liu23_table1_initial_compositions].values.rows[0].composition_mass_percent_as_published.CaF2
-    value: '4.98'
-    locator:
-      page: 2
-      published_page: 314
-      pdf_page_index: 1
-      table: '1'
-      row: '1'
-      note: Table 1 initial slag composition CaF2 cell.
-  - path: species.Cr.observations[liu23_table2_oxide_mass_pct].values.points[0].composition_wt_pct.MoO2
-    value: '32.39'
+  - species: Cr
+    observable: concentration_series
+    observation_id: liu23_table2_oxide_mass_pct
+    field: points
+    value:
+      - row: '1'
+        slag_number_as_published: '1'
+        oxide_species_as_published: CrO1.5
+        value: 0.94
+        value_as_printed: '0.94'
+        CO_CO2_ratio: '1'
+        oxygen_partial_pressure:
+          value: '6.38e-8'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '1'
+        composition_wt_pct:
+          CaO: '31.25'
+          CaF2: '1.66'
+          MgO: '0.00'
+          Al2O3: '5.98'
+          SiO2: '24.26'
+          MnO: '3.18'
+          CrO1.5: '0.94'
+          CrO: '0.34'
+          MoO2: '32.39'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '1'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '1'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '1'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '1'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-8'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '1'
+      - row: '1'
+        slag_number_as_published: '1'
+        oxide_species_as_published: CrO
+        value: 0.34
+        value_as_printed: '0.34'
+        CO_CO2_ratio: '1'
+        oxygen_partial_pressure:
+          value: '6.38e-8'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '1'
+        composition_wt_pct:
+          CaO: '31.25'
+          CaF2: '1.66'
+          MgO: '0.00'
+          Al2O3: '5.98'
+          SiO2: '24.26'
+          MnO: '3.18'
+          CrO1.5: '0.94'
+          CrO: '0.34'
+          MoO2: '32.39'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '1'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '1'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '1'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '1'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-8'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '1'
+      - row: '2'
+        slag_number_as_published: '1'
+        oxide_species_as_published: CrO1.5
+        value: 0.01
+        value_as_printed: '0.01'
+        CO_CO2_ratio: '20'
+        oxygen_partial_pressure:
+          value: '1.60e-10'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '2'
+        composition_wt_pct:
+          CaO: '44.33'
+          CaF2: '2.16'
+          MgO: '0.00'
+          Al2O3: '8.03'
+          SiO2: '37.58'
+          MnO: '5.35'
+          CrO1.5: '0.01'
+          CrO: '2.12'
+          MoO2: '0.42'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '2'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '2'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '2'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '1.60e-10'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '2'
+      - row: '2'
+        slag_number_as_published: '1'
+        oxide_species_as_published: CrO
+        value: 2.12
+        value_as_printed: '2.12'
+        CO_CO2_ratio: '20'
+        oxygen_partial_pressure:
+          value: '1.60e-10'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '2'
+        composition_wt_pct:
+          CaO: '44.33'
+          CaF2: '2.16'
+          MgO: '0.00'
+          Al2O3: '8.03'
+          SiO2: '37.58'
+          MnO: '5.35'
+          CrO1.5: '0.01'
+          CrO: '2.12'
+          MoO2: '0.42'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '2'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '2'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '2'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '1.60e-10'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '2'
+      - row: '3'
+        slag_number_as_published: '1'
+        oxide_species_as_published: CrO1.5
+        value: 0.01
+        value_as_printed: '0.01'
+        CO_CO2_ratio: '100'
+        oxygen_partial_pressure:
+          value: '6.38e-12'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '3'
+        composition_wt_pct:
+          CaO: '43.85'
+          CaF2: '2.17'
+          MgO: '0.00'
+          Al2O3: '8.94'
+          SiO2: '39.85'
+          MnO: '3.33'
+          CrO1.5: '0.01'
+          CrO: '1.54'
+          MoO2: '0.31'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '3'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '3'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '100'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '3'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-12'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '3'
+      - row: '3'
+        slag_number_as_published: '1'
+        oxide_species_as_published: CrO
+        value: 1.54
+        value_as_printed: '1.54'
+        CO_CO2_ratio: '100'
+        oxygen_partial_pressure:
+          value: '6.38e-12'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '3'
+        composition_wt_pct:
+          CaO: '43.85'
+          CaF2: '2.17'
+          MgO: '0.00'
+          Al2O3: '8.94'
+          SiO2: '39.85'
+          MnO: '3.33'
+          CrO1.5: '0.01'
+          CrO: '1.54'
+          MoO2: '0.31'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '3'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '3'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '100'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '3'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-12'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '3'
+      - row: '4'
+        slag_number_as_published: '2'
+        oxide_species_as_published: CrO1.5
+        value: 0.4
+        value_as_printed: '0.40'
+        CO_CO2_ratio: '1'
+        oxygen_partial_pressure:
+          value: '6.38e-8'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '4'
+        composition_wt_pct:
+          CaO: '27.97'
+          CaF2: '2.11'
+          MgO: '5.50'
+          Al2O3: '7.16'
+          SiO2: '22.21'
+          MnO: '3.13'
+          CrO1.5: '0.40'
+          CrO: '0.56'
+          MoO2: '30.96'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '4'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '4'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '1'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '4'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-8'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '4'
+      - row: '4'
+        slag_number_as_published: '2'
+        oxide_species_as_published: CrO
+        value: 0.56
+        value_as_printed: '0.56'
+        CO_CO2_ratio: '1'
+        oxygen_partial_pressure:
+          value: '6.38e-8'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '4'
+        composition_wt_pct:
+          CaO: '27.97'
+          CaF2: '2.11'
+          MgO: '5.50'
+          Al2O3: '7.16'
+          SiO2: '22.21'
+          MnO: '3.13'
+          CrO1.5: '0.40'
+          CrO: '0.56'
+          MoO2: '30.96'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '4'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '4'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '1'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '4'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-8'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '4'
+      - row: '5'
+        slag_number_as_published: '2'
+        oxide_species_as_published: CrO1.5
+        value: 1.22
+        value_as_printed: '1.22'
+        CO_CO2_ratio: '5'
+        oxygen_partial_pressure:
+          value: '2.55e-9'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '5'
+        composition_wt_pct:
+          CaO: '36.92'
+          CaF2: '1.92'
+          MgO: '8.21'
+          Al2O3: '8.49'
+          SiO2: '30.73'
+          MnO: '4.57'
+          CrO1.5: '1.22'
+          CrO: '0.95'
+          MoO2: '6.99'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '5'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '5'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '5'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '5'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '2.55e-9'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '5'
+      - row: '5'
+        slag_number_as_published: '2'
+        oxide_species_as_published: CrO
+        value: 0.95
+        value_as_printed: '0.95'
+        CO_CO2_ratio: '5'
+        oxygen_partial_pressure:
+          value: '2.55e-9'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '5'
+        composition_wt_pct:
+          CaO: '36.92'
+          CaF2: '1.92'
+          MgO: '8.21'
+          Al2O3: '8.49'
+          SiO2: '30.73'
+          MnO: '4.57'
+          CrO1.5: '1.22'
+          CrO: '0.95'
+          MoO2: '6.99'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '5'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '5'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '5'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '5'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '2.55e-9'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '5'
+      - row: '6'
+        slag_number_as_published: '2'
+        oxide_species_as_published: CrO1.5
+        value: 0.73
+        value_as_printed: '0.73'
+        CO_CO2_ratio: '20'
+        oxygen_partial_pressure:
+          value: '1.60e-10'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '6'
+        composition_wt_pct:
+          CaO: '40.43'
+          CaF2: '1.28'
+          MgO: '8.26'
+          Al2O3: '8.95'
+          SiO2: '34.42'
+          MnO: '4.52'
+          CrO1.5: '0.73'
+          CrO: '0.87'
+          MoO2: '0.54'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '6'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '6'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '6'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '1.60e-10'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '6'
+      - row: '6'
+        slag_number_as_published: '2'
+        oxide_species_as_published: CrO
+        value: 0.87
+        value_as_printed: '0.87'
+        CO_CO2_ratio: '20'
+        oxygen_partial_pressure:
+          value: '1.60e-10'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '6'
+        composition_wt_pct:
+          CaO: '40.43'
+          CaF2: '1.28'
+          MgO: '8.26'
+          Al2O3: '8.95'
+          SiO2: '34.42'
+          MnO: '4.52'
+          CrO1.5: '0.73'
+          CrO: '0.87'
+          MoO2: '0.54'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '6'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '6'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '6'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '1.60e-10'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '6'
+      - row: '7'
+        slag_number_as_published: '2'
+        oxide_species_as_published: CrO1.5
+        value: 0.04
+        value_as_printed: '0.04'
+        CO_CO2_ratio: '100'
+        oxygen_partial_pressure:
+          value: '6.38e-12'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '7'
+        composition_wt_pct:
+          CaO: '39.59'
+          CaF2: '3.43'
+          MgO: '9.43'
+          Al2O3: '9.60'
+          SiO2: '33.46'
+          MnO: '3.13'
+          CrO1.5: '0.04'
+          CrO: '1.07'
+          MoO2: '0.25'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '7'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '7'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '100'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '7'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-12'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '7'
+      - row: '7'
+        slag_number_as_published: '2'
+        oxide_species_as_published: CrO
+        value: 1.07
+        value_as_printed: '1.07'
+        CO_CO2_ratio: '100'
+        oxygen_partial_pressure:
+          value: '6.38e-12'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '7'
+        composition_wt_pct:
+          CaO: '39.59'
+          CaF2: '3.43'
+          MgO: '9.43'
+          Al2O3: '9.60'
+          SiO2: '33.46'
+          MnO: '3.13'
+          CrO1.5: '0.04'
+          CrO: '1.07'
+          MoO2: '0.25'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '7'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '7'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '100'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '7'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-12'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '7'
+      - row: '8'
+        slag_number_as_published: '3'
+        oxide_species_as_published: CrO1.5
+        value: 0.2
+        value_as_printed: '0.20'
+        CO_CO2_ratio: '20'
+        oxygen_partial_pressure:
+          value: '1.60e-10'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '8'
+        composition_wt_pct:
+          CaO: '35.68'
+          CaF2: '3.19'
+          MgO: '17.55'
+          Al2O3: '8.88'
+          SiO2: '29.37'
+          MnO: '4.09'
+          CrO1.5: '0.20'
+          CrO: '0.37'
+          MoO2: '0.67'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '8'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '8'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '8'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '1.60e-10'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '8'
+      - row: '8'
+        slag_number_as_published: '3'
+        oxide_species_as_published: CrO
+        value: 0.37
+        value_as_printed: '0.37'
+        CO_CO2_ratio: '20'
+        oxygen_partial_pressure:
+          value: '1.60e-10'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '8'
+        composition_wt_pct:
+          CaO: '35.68'
+          CaF2: '3.19'
+          MgO: '17.55'
+          Al2O3: '8.88'
+          SiO2: '29.37'
+          MnO: '4.09'
+          CrO1.5: '0.20'
+          CrO: '0.37'
+          MoO2: '0.67'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '8'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '8'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '8'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '1.60e-10'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '8'
+      - row: '9'
+        slag_number_as_published: '3'
+        oxide_species_as_published: CrO1.5
+        value: 0.23
+        value_as_printed: '0.23'
+        CO_CO2_ratio: '100'
+        oxygen_partial_pressure:
+          value: '6.38e-12'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '9'
+        composition_wt_pct:
+          CaO: '35.58'
+          CaF2: '3.92'
+          MgO: '17.46'
+          Al2O3: '8.84'
+          SiO2: '30.53'
+          MnO: '2.67'
+          CrO1.5: '0.23'
+          CrO: '0.42'
+          MoO2: '0.35'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '9'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '9'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '100'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '9'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-12'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '9'
+      - row: '9'
+        slag_number_as_published: '3'
+        oxide_species_as_published: CrO
+        value: 0.42
+        value_as_printed: '0.42'
+        CO_CO2_ratio: '100'
+        oxygen_partial_pressure:
+          value: '6.38e-12'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '9'
+        composition_wt_pct:
+          CaO: '35.58'
+          CaF2: '3.92'
+          MgO: '17.46'
+          Al2O3: '8.84'
+          SiO2: '30.53'
+          MnO: '2.67'
+          CrO1.5: '0.23'
+          CrO: '0.42'
+          MoO2: '0.35'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '9'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '9'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '100'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '9'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-12'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '9'
+      - row: '10'
+        slag_number_as_published: '3'
+        oxide_species_as_published: CrO1.5
+        value: 0.03
+        value_as_printed: '0.03'
+        CO_CO2_ratio: '500'
+        oxygen_partial_pressure:
+          value: '2.55e-13'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '10'
+        composition_wt_pct:
+          CaO: '35.73'
+          CaF2: '3.78'
+          MgO: '17.42'
+          Al2O3: '8.58'
+          SiO2: '31.28'
+          MnO: '2.27'
+          CrO1.5: '0.03'
+          CrO: '0.48'
+          MoO2: '0.43'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '10'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '10'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '500'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '10'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '2.55e-13'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '10'
+      - row: '10'
+        slag_number_as_published: '3'
+        oxide_species_as_published: CrO
+        value: 0.48
+        value_as_printed: '0.48'
+        CO_CO2_ratio: '500'
+        oxygen_partial_pressure:
+          value: '2.55e-13'
+          units: atm
+        crucible_as_published: Mo
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '10'
+        composition_wt_pct:
+          CaO: '35.73'
+          CaF2: '3.78'
+          MgO: '17.42'
+          Al2O3: '8.58'
+          SiO2: '31.28'
+          MnO: '2.27'
+          CrO1.5: '0.03'
+          CrO: '0.48'
+          MoO2: '0.43'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '10'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '10'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '500'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '10'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '2.55e-13'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '10'
+      - row: '11'
+        slag_number_as_published: '4'
+        oxide_species_as_published: CrO1.5
+        value: 0.06
+        value_as_printed: '0.06'
+        CO_CO2_ratio: '100'
+        oxygen_partial_pressure:
+          value: '6.38e-12'
+          units: atm
+        crucible_as_published: MgO
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '11'
+        composition_wt_pct:
+          CaO: '28.89'
+          CaF2: '2.96'
+          MgO: '20.19'
+          Al2O3: '10.87'
+          SiO2: '35.44'
+          MnO: '1.34'
+          CrO1.5: '0.06'
+          CrO: '0.25'
+          MoO2: '0.00'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '11'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '11'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '100'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '11'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-12'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '11'
+      - row: '11'
+        slag_number_as_published: '4'
+        oxide_species_as_published: CrO
+        value: 0.25
+        value_as_printed: '0.25'
+        CO_CO2_ratio: '100'
+        oxygen_partial_pressure:
+          value: '6.38e-12'
+          units: atm
+        crucible_as_published: MgO
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '11'
+        composition_wt_pct:
+          CaO: '28.89'
+          CaF2: '2.96'
+          MgO: '20.19'
+          Al2O3: '10.87'
+          SiO2: '35.44'
+          MnO: '1.34'
+          CrO1.5: '0.06'
+          CrO: '0.25'
+          MoO2: '0.00'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '11'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '11'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '100'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '11'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-12'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '11'
+      - row: '12'
+        slag_number_as_published: '4'
+        oxide_species_as_published: CrO1.5
+        value: 0.14
+        value_as_printed: '0.14'
+        CO_CO2_ratio: '500'
+        oxygen_partial_pressure:
+          value: '2.55e-13'
+          units: atm
+        crucible_as_published: MgO
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '12'
+        composition_wt_pct:
+          CaO: '23.52'
+          CaF2: '3.63'
+          MgO: '22.49'
+          Al2O3: '12.18'
+          SiO2: '36.60'
+          MnO: '1.12'
+          CrO1.5: '0.14'
+          CrO: '0.32'
+          MoO2: '0.00'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '12'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '12'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '500'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '12'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '2.55e-13'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '12'
+      - row: '12'
+        slag_number_as_published: '4'
+        oxide_species_as_published: CrO
+        value: 0.32
+        value_as_printed: '0.32'
+        CO_CO2_ratio: '500'
+        oxygen_partial_pressure:
+          value: '2.55e-13'
+          units: atm
+        crucible_as_published: MgO
+        crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '12'
+        composition_wt_pct:
+          CaO: '23.52'
+          CaF2: '3.63'
+          MgO: '22.49'
+          Al2O3: '12.18'
+          SiO2: '36.60'
+          MnO: '1.12'
+          CrO1.5: '0.14'
+          CrO: '0.32'
+          MoO2: '0.00'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '12'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '12'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '500'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '12'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '2.55e-13'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '12'
     locator:
       page: 3
       published_page: 315
@@ -30,8 +1896,86 @@ fidelity_samples:
       table: '2'
       row: '1'
       note: Table 2 first post-equilibration composition MoO2 cell.
-  - path: species.CrO1.5.observations[liu23_t3_a_cro15_row01].values.points[0].activity
-    value: 1.5519
+  - species: CrO1.5
+    observable: activity_coefficient
+    observation_id: liu23_t3_a_cro15_row01
+    field: points
+    value:
+      - row: '1'
+        slag_number_as_published: '1'
+        activity: 1.5519
+        value: 1.5519
+        value_as_printed: '1.5519'
+        CO_CO2_ratio: '1'
+        table2_crucible_as_published: Mo
+        table2_crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '1'
+        composition_wt_pct:
+          CaO: '31.25'
+          CaF2: '1.66'
+          MgO: '0.00'
+          Al2O3: '5.98'
+          SiO2: '24.26'
+          MnO: '3.18'
+          CrO1.5: '0.94'
+          CrO: '0.34'
+          MoO2: '32.39'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '1'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '1'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '1'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '1'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-8'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '1'
     locator:
       page: 5
       published_page: 317
@@ -39,8 +1983,86 @@ fidelity_samples:
       table: '3'
       row: '1'
       note: Table 3 aCrO1.5 row 1, printed above one.
-  - path: species.CrO1.5.observations[liu23_t3_a_cro15_row04].values.points[0].activity
-    value: 3.261
+  - species: CrO1.5
+    observable: activity_coefficient
+    observation_id: liu23_t3_a_cro15_row04
+    field: points
+    value:
+      - row: '4'
+        slag_number_as_published: '2'
+        activity: 3.261
+        value: 3.261
+        value_as_printed: '3.2610'
+        CO_CO2_ratio: '1'
+        table2_crucible_as_published: Mo
+        table2_crucible_locator:
+          page: 3
+          published_page: 315
+          pdf_page_index: 2
+          table: '2'
+          row: '4'
+        composition_wt_pct:
+          CaO: '27.97'
+          CaF2: '2.11'
+          MgO: '5.50'
+          Al2O3: '7.16'
+          SiO2: '22.21'
+          MnO: '3.13'
+          CrO1.5: '0.40'
+          CrO: '0.56'
+          MoO2: '30.96'
+          Total: '100'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1823'
+            locator:
+              page: 2
+              published_page: 314
+              pdf_page_index: 1
+              section: Experimental Procedure
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Source reports the gas ratio and P_O2 but no total gas pressure.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '4'
+          composition:
+            state:
+              tag: unknown
+              reason: Full printed composition includes CaF2, CrO1.5, CrO and MoO2, which the existing closed
+                composition map cannot bind.
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '4'
+          CO_CO2_ratio:
+            state:
+              tag: value
+              value: '1'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '4'
+          oxygen_partial_pressure:
+            state:
+              tag: value
+              value: '6.38e-8'
+            locator:
+              page: 3
+              published_page: 315
+              pdf_page_index: 2
+              table: '2'
+              row: '4'
     locator:
       page: 5
       published_page: 317
