@@ -3460,11 +3460,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if headspace_config is not None
             else self._resolve_overhead_headspace_config(campaign)
         )
-        self._overhead_condenser_geometry_config = copy.deepcopy(
+        resolved_geometry = copy.deepcopy(
             condenser_geometry_config
             if condenser_geometry_config is not None
             else self._resolve_condenser_geometry_config(campaign)
         )
+        if (
+            campaign is not None
+            and resolved_geometry != self._overhead_condenser_geometry_config
+        ):
+            # Initial fill may already have sized the base equipment. Its pipe
+            # must be rebuilt by _get_turbine_spec from the campaign geometry
+            # before it can be applied to the runtime overhead model again.
+            self._equipment = None
+        self._overhead_condenser_geometry_config = resolved_geometry
         if self._overhead_model is not None:
             self._overhead_model.configure_condenser_geometry(
                 self._overhead_condenser_geometry_config)
