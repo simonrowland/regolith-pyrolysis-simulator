@@ -15677,6 +15677,7 @@ class Migrator:
         point_map_declared = False
         point_composition_refusal: list[str] = []
         point_composition_located: Located[Composition] | None = None
+        point_printed_composition: Located[Mapping[str, Any]] | None = None
         point_catalogue: Located[Composition] | None = None
         malformed_composition_amount: str | None = None
         if isinstance(raw_item, Mapping):
@@ -15819,6 +15820,14 @@ class Migrator:
                 if point_composition is None
                 else Located(State.of(point_composition), locator=point_locator)
             )
+            if (
+                q_for_species is Quantity.FE3_FE2_RATIO
+                and point_oxide_map is not None
+                and point_composition_located is None
+            ):
+                point_printed_composition, point_composition_located = (
+                    _located_printed_and_initial(point_oxide_map, point_locator)
+                )
             point_catalogue = _catalogue_composition_located_from_values(
                 raw_item, point_locator
             )
@@ -16250,9 +16259,13 @@ class Migrator:
             fallback=(parent_values,) if isinstance(parent_values, Mapping) else (),
         )
         if point_oxide_map:
-            printed, residual = _located_printed_and_initial(
-                point_oxide_map, point_locator
-            )
+            if point_printed_composition is None:
+                printed, residual = _located_printed_and_initial(
+                    point_oxide_map, point_locator
+                )
+            else:
+                printed = point_printed_composition
+                residual = point_composition_located
             role, role_refusal = _declared_composition_role(raw_item, parent_values)
             if role_refusal is not None:
                 self.result.add_queue(

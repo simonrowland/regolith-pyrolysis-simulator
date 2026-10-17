@@ -41,6 +41,7 @@ from simulator.battery.migrate import (
     fe3_fe2_ratio_from_ferric_fraction,
     map_quantity,
     observation_from_plain,
+    oxide_molar_mass,
     to_plain,
     wt_pct_to_mole_fraction,
 )
@@ -74,6 +75,7 @@ SOSSI_CR = ROOT / "data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml"
 TRANELL_TI = ROOT / "data/literature/extracts/tranell-2002-titanium-valence.yaml"
 BERRY_CR = ROOT / "data/literature/extracts/berry-oneill-2004-chromium-xanes.yaml"
 JUGO_S = ROOT / "data/literature/extracts/jugo-2010-sulfur-xanes.yaml"
+JAYASURIYA_FE = ROOT / "data/literature/extracts/jayasuriya-2004-iron-mossbauer.yaml"
 
 
 def _identity(basis: ValenceBasis) -> Identity:
@@ -933,6 +935,147 @@ def test_tranell_2002_table_i_rows_migrate_with_render_pinned_values_and_conditi
         assert conditions["total_pressure_Pa"].state.is_unknown
         assert conditions["printed_composition"].state.is_value
         assert conditions["CaO_SiO2_mass_pct_ratio"].state.is_value
+def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
+    doc = yaml.safe_load(JAYASURIYA_FE.read_text(encoding="utf-8"))
+    observations = doc["species"]["Fe"]["observations"]
+    assert sum(len(obs["values"]["points"]) for obs in observations) == 38
+    assert [
+        point["gas_mix_as_printed"]
+        for obs in observations[:2]
+        for point in obs["values"]["points"]
+        if point["sample_as_published"] == "FeV9"
+    ] == ["O2 100.0 × 200 SCCM", "O2 100.0 × 200 SCCM"]
+    rt_fractions = [
+        observations[0]["values"]["points"][i]["Fe3_over_sum_Fe"] for i in (1, 15)
+    ]
+    assert rt_fractions == [
+        0.025,
+        0.851,
+    ]
+    high_fe_fractions = [
+        observations[2]["values"]["points"][i]["Fe3_over_sum_Fe"] for i in (0, 14)
+    ]
+    assert high_fe_fractions == [
+        0.846,
+        0.218,
+    ]
+    assert [
+        observations[0]["locator"]["published_page"],
+        observations[2]["locator"]["published_page"],
+    ] == [1602, 1603]
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(JAYASURIYA_FE)
+    migrator.finalize()
+    rows = [
+        row
+        for row in migrator.result.observations.values()
+        if "jayasuriya_2004" in row.observation_id
+    ]
+    assert len(rows) == 38
+    assert migrator.result.registry_issues == []
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.hard_issues == ()
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in rows) == 3
+    assert all(
+        row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.FE3_FE2_RATIO
+        and row.identity.temperature_K.is_value
+        and row.identity.fO2_Pa.is_value
+        and row.identity.composition.is_value
+        and isinstance(row.identity.composition.value, Composition)
+        and row.point_conditions["temperature_K"].state.is_value
+        and row.point_conditions["fO2_log"].state.is_value
+        for row in rows
+    )
+    fe_free_analysis = {
+        "SiO2": Decimal("50.47"),
+        "Al2O3": Decimal("15.12"),
+        "MgO": Decimal("10.46"),
+        "CaO": Decimal("23.94"),
+    }
+    table4 = [
+        (Decimal("1.75"), Decimal("0.0134"), Decimal("0.0002")),
+        (Decimal("3.67"), Decimal("0.0282"), Decimal("0.0006")),
+        (Decimal("6.44"), Decimal("0.0494"), Decimal("0.0010")),
+        (Decimal("9.81"), Decimal("0.0766"), Decimal("0.0005")),
+        (Decimal("18.75"), Decimal("0.1498"), Decimal("0.0011")),
+        (Decimal("27.06"), Decimal("0.2201"), Decimal("0.0009")),
+        (Decimal("1.49"), Decimal("0.0114"), Decimal("0.0004")),
+        (Decimal("2.79"), Decimal("0.0214"), Decimal("0.0007")),
+        (Decimal("5.36"), Decimal("0.0414"), Decimal("0.0007")),
+        (Decimal("7.96"), Decimal("0.0620"), Decimal("0.0010")),
+        (Decimal("16.36"), Decimal("0.1298"), Decimal("0.0009")),
+        (Decimal("3.52"), Decimal("0.0271"), Decimal("0.0008")),
+        (Decimal("5.83"), Decimal("0.0451"), Decimal("0.0006")),
+        (Decimal("7.96"), Decimal("0.0619"), Decimal("0.0007")),
+        (Decimal("26.82"), Decimal("0.2186"), Decimal("0.0011")),
+    ]
+    high_fe_source_points = observations[2]["values"]["points"]
+    assert len(high_fe_source_points) == len(table4)
+    high_fe_rows = [
+        row
+        for row in rows
+        if "jayasuriya_2004_rt_high_fe" in row.observation_id
+    ]
+    assert len(high_fe_rows) == len(table4)
+    for source_point, migrated_row, table_entry in zip(
+        high_fe_source_points, high_fe_rows, table4, strict=True
+    ):
+        feot, printed_x, printed_x_uncertainty = table_entry
+        closed = {
+            oxide: weight * (Decimal(100) - feot) / Decimal(100)
+            for oxide, weight in fe_free_analysis.items()
+        }
+        closed["FeO"] = feot
+        assert Decimal(str(source_point["FeOT_wt_percent"])) == feot
+        assert source_point["composition_wt_pct"] == {
+            **{oxide: float(weight) for oxide, weight in closed.items() if oxide != "FeO"},
+            "FeOT": float(feot),
+        }
+        composition = migrated_row.identity.composition.value
+        assert composition == wt_pct_to_mole_fraction(closed)
+        mole_amounts = {
+            oxide: fraction * oxide_molar_mass(oxide)
+            for oxide, fraction in composition.components
+        }
+        recovered_feo = Decimal(100) * mole_amounts["FeO"] / sum(mole_amounts.values())
+        assert abs(recovered_feo - feot) <= Decimal("0.002")
+        mole_fractions = composition.as_map()
+        single_cation_x = mole_fractions["FeO"] / (
+            mole_fractions["SiO2"]
+            + Decimal(2) * mole_fractions["Al2O3"]
+            + mole_fractions["MgO"]
+            + mole_fractions["CaO"]
+            + mole_fractions["FeO"]
+        )
+        assert abs(single_cation_x - printed_x) <= printed_x_uncertainty
+    low_fe = next(
+        row
+        for row in rows
+        if "jayasuriya_2004_rt_1pct" in row.observation_id
+    )
+    assert low_fe.identity.composition.value == wt_pct_to_mole_fraction(
+        {
+            "SiO2": Decimal("50.47"),
+            "Al2O3": Decimal("15.12"),
+            "MgO": Decimal("10.46"),
+            "CaO": Decimal("23.94"),
+            "Fe2O3": Decimal("1.0"),
+        }
+    )
+    d60 = [
+        row
+        for row in rows
+        if row.point_conditions.get("total_pressure_Pa") is not None
+    ]
+    assert len(d60) == 2
+    assert all(
+        row.identity.total_pressure_Pa.is_unknown
+        and row.point_conditions["total_pressure_Pa"].state.value.point
+        == Decimal("1100000000")
+        for row in d60
+    )
 
 
 def test_valence_ratio_scores_redox_and_counts_each_engine_refusal():

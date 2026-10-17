@@ -1,0 +1,126 @@
+schema_version: literature_extract.v1
+source_id: jayasuriya-2004-iron-mossbauer
+source:
+  citation: Jayasuriya, K.D., O'Neill, H.St.C., Berry, A.J. & Campbell, S.J. (2004) A Mössbauer study of the oxidation state of Fe in silicate melts. American Mineralogist 89, 1597–1609.
+  year: 2004
+extraction:
+  method: Manual transcription from Tables 1, 3, and 4; numeric cells checked against rendered PDF pages 1598, 1602, and 1603.
+  date: '2026-10-16'
+  worker: rdxw2-fe04
+  provenance_path: data/literature/extracts/jayasuriya-2004-iron-mossbauer.yaml
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[jayasuriya_2004_rt_1pct].values.points[1].Fe3_over_sum_Fe
+  value: 0.025
+  locator: {page: 6, published_page: 1602, table: '3', note: PDF page 6}
+- path: species.Fe.observations[jayasuriya_2004_rt_1pct].values.points[15].Fe3_over_sum_Fe
+  value: 0.851
+  locator: {page: 6, published_page: 1602, table: '3', note: PDF page 6}
+- path: species.Fe.observations[jayasuriya_2004_rt_high_fe].values.points[0].Fe3_over_sum_Fe
+  value: 0.846
+  locator: {page: 7, published_page: 1603, table: '4', note: PDF page 7}
+- path: species.Fe.observations[jayasuriya_2004_rt_high_fe].values.points[14].Fe3_over_sum_Fe
+  value: 0.218
+  locator: {page: 7, published_page: 1603, table: '4', note: PDF page 7}
+experiments:
+- experiment_id: jayasuriya_2004_adeu_1pct
+  series: ADeu with nominal ~1 wt% Fe2O3
+  locator: {page: 2, published_page: 1598, table: '1'}
+  conditions:
+    composition: {state: {tag: value, value: 'ADeu: nominally 42 wt% CaAl2Si2O8 + 58 wt% CaMgSi2O6; ~1 wt% Fe2O3 added'}, locator: {page: 2, published_page: 1598, section: Experimental Methods}}
+    temperature_C: {state: {tag: value, value: 1409}, locator: {page: 2, published_page: 1598, table: '1', note: 'D60 is 1400 °C nominal.'}}
+    total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 1598, table: '1', note: 'Uncertainty is stated as 0.02 bar; no setpoint is printed for gas-mixing runs.'}}
+- experiment_id: jayasuriya_2004_adeu_high_fe
+  series: ADeu with added Fe2O3; measured FeOT series
+  locator: {page: 7, published_page: 1603, table: '4'}
+  conditions:
+    composition: {state: {tag: value, value: 'ADeu; FeOT varies per Table 4 row'}, locator: {page: 7, published_page: 1603, table: '4'}}
+    temperature_C: {state: {tag: value, value: 1409}, locator: {page: 2, published_page: 1598, table: '1'}}
+    total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 1598, table: '1', note: 'Uncertainty is stated as 0.02 bar; no setpoint is printed for gas-mixing runs.'}}
+species:
+  Fe:
+    observations:
+    - observation_id: jayasuriya_2004_rt_1pct
+      experiment: jayasuriya_2004_adeu_1pct
+      type: concentration_series
+      locator: {page: 6, published_page: 1602, table: '3'}
+      phase: glass
+      units: fraction (Fe3+/sum Fe)
+      values:
+        quantity: fe3_fe2_ratio
+        method_class: measured_direct
+        analytical_method: Mössbauer spectroscopy, fitting method A, room temperature
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        reduction_note: Existing FE3_FE2_RATIO migration reduces printed fraction r to Fe3+/Fe2+ = r/(1-r); original fractions are retained per point.
+        uncertainty: '±0.01 (1σ) estimated precision for Fe3+/ΣFe, as stated in the abstract.'
+        composition_wt_pct: {SiO2: 50.47, Al2O3: 15.12, MgO: 10.46, CaO: 23.94, Fe2O3: 1.0}
+        composition_derivation: 'Fe-free microprobe basis from p. 2 renormalized to 100 wt%; nominal ~1 wt% Fe2O3 added as printed.'
+        points:
+        - {T_C: 1409, Fe3_over_sum_Fe: 0, log_fO2_as_published: '-12.9', sample_as_published: FeV19, gas_mix_as_printed: 'CO2 20.0 × 10 SCCM + H2 50.0 × 200 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-12.9'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.025, log_fO2_as_published: '-10.90', sample_as_published: FeV2, gas_mix_as_printed: 'CO2 60.0 × 10 SCCM + CO 47.0 × 200 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-10.90'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.022, log_fO2_as_published: '-9.91', sample_as_published: FeV20, gas_mix_as_printed: 'CO2 6.7 × 200 SCCM + CO 33.4 × 200 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-9.91'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.030, log_fO2_as_published: '-8.90', sample_as_published: FeV21, gas_mix_as_printed: 'CO2 20.0 × 200 SCCM + CO 31.0 × 200 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-8.90'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.043, log_fO2_as_published: '-7.88', sample_as_published: FeV5, gas_mix_as_printed: 'CO2 27.0 × 200 SCCM + CO 13.0 × 200 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-7.88'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.120, log_fO2_as_published: '-6.91', sample_as_published: FeV22, gas_mix_as_printed: 'CO2 40.0 × 200 SCCM + CO 6.3 × 200 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-6.91'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.171, log_fO2_as_published: '-5.91', sample_as_published: FeV12, gas_mix_as_printed: 'CO2 40.0 × 200 SCCM + CO 40.0 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-5.91'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.280, log_fO2_as_published: '-4.91', sample_as_published: FeV6, gas_mix_as_printed: 'CO2 51.0 × 200 SCCM + CO 16.0 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-4.91'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.399, log_fO2_as_published: '-3.91', sample_as_published: FeV15, gas_mix_as_printed: 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-3.91'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.558, log_fO2_as_published: '-3.01', sample_as_published: FeV8, gas_mix_as_printed: 'CO2 100.0 × 200 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-3.01'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.624, log_fO2_as_published: '-2.42', sample_as_published: FeV10, gas_mix_as_printed: 'CO2 150.0 × 200 SCCM + O2 10.0 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-2.42'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.667, log_fO2_as_published: '-1.98', sample_as_published: FeV11, gas_mix_as_printed: 'CO2 98.0 × 200 SCCM + O2 20.0 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-1.98'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.717, log_fO2_as_published: '-1.50', sample_as_published: FeV13, gas_mix_as_printed: 'CO2 95.0 × 200 SCCM + O2 62.0 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-1.50'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.784, log_fO2_as_published: '-1.01', sample_as_published: FeV14, gas_mix_as_printed: 'CO2 45.0 × 200 SCCM + O2 100.0 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-1.01'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.807, log_fO2_as_published: '-0.69', sample_as_published: FeV1, gas_mix_as_printed: air, locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-0.69'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.851, log_fO2_as_published: '-0.01', sample_as_published: FeV9, gas_mix_as_printed: 'O2 100.0 × 200 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-0.01'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1400, Fe3_over_sum_Fe: 1.00, log_fO2_as_published: '+4.8', sample_as_published: D60, pressure_kbar_as_published: 11, gas_mix_as_printed: 'O2 at 11 kbar', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '+4.8'}, locator: {page: 2, published_page: 1598, table: '1'}}, total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1100000000'}}, locator: {page: 2, published_page: 1598, table: '1', note: '11 kbar as printed; represented in Pa for the battery identity.'}}}}
+    - observation_id: jayasuriya_2004_42k_1pct
+      experiment: jayasuriya_2004_adeu_1pct
+      type: concentration_series
+      locator: {page: 6, published_page: 1602, table: '3'}
+      phase: glass
+      units: fraction (Fe3+/sum Fe)
+      values:
+        quantity: fe3_fe2_ratio
+        method_class: measured_direct
+        analytical_method: Mössbauer spectroscopy, fitting method A at 4.2 K
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        reduction_note: Existing FE3_FE2_RATIO migration reduces printed fraction r to Fe3+/Fe2+ = r/(1-r); original fractions are retained per point.
+        uncertainty: '±0.01 (1σ) estimated precision for Fe3+/ΣFe, as stated in the abstract.'
+        composition_wt_pct: {SiO2: 50.47, Al2O3: 15.12, MgO: 10.46, CaO: 23.94, Fe2O3: 1.0}
+        composition_derivation: 'Fe-free microprobe basis from p. 2 renormalized to 100 wt%; nominal ~1 wt% Fe2O3 added as printed.'
+        points:
+        - {T_C: 1409, analysis_temperature_K_as_published: 4.2, Fe3_over_sum_Fe: 0.021, log_fO2_as_published: '-10.90', sample_as_published: FeV2, gas_mix_as_printed: 'CO2 60.0 × 10 SCCM + CO 47.0 × 200 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-10.90'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, analysis_temperature_K_as_published: 4.2, Fe3_over_sum_Fe: 0.182, log_fO2_as_published: '-5.91', sample_as_published: FeV12, gas_mix_as_printed: 'CO2 40.0 × 200 SCCM + CO 40.0 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-5.91'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, analysis_temperature_K_as_published: 4.2, Fe3_over_sum_Fe: 0.389, log_fO2_as_published: '-3.91', sample_as_published: FeV15, gas_mix_as_printed: 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-3.91'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, analysis_temperature_K_as_published: 4.2, Fe3_over_sum_Fe: 0.657, log_fO2_as_published: '-1.98', sample_as_published: FeV11, gas_mix_as_printed: 'CO2 98.0 × 200 SCCM + O2 20.0 × 10 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-1.98'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1409, analysis_temperature_K_as_published: 4.2, Fe3_over_sum_Fe: 0.849, log_fO2_as_published: '-0.01', sample_as_published: FeV9, gas_mix_as_printed: 'O2 100.0 × 200 SCCM', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '-0.01'}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+        - {T_C: 1400, analysis_temperature_K_as_published: 4.2, Fe3_over_sum_Fe: 1.00, log_fO2_as_published: '+4.8', sample_as_published: D60, gas_mix_as_printed: 'O2 at 11 kbar', locator: {page: 6, published_page: 1602, table: '3'}, point_conditions: {fO2_log: {state: {tag: value, value: '+4.8'}, locator: {page: 2, published_page: 1598, table: '1'}}, total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1100000000'}}, locator: {page: 2, published_page: 1598, table: '1'}}}}
+    - observation_id: jayasuriya_2004_rt_high_fe
+      experiment: jayasuriya_2004_adeu_high_fe
+      type: concentration_series
+      locator: {page: 7, published_page: 1603, table: '4'}
+      phase: glass
+      units: fraction (Fe3+/sum Fe)
+      values:
+        quantity: fe3_fe2_ratio
+        method_class: measured_direct
+        analytical_method: Mössbauer spectroscopy, fitting method A, room temperature
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        reduction_note: Existing FE3_FE2_RATIO migration reduces printed fraction r to Fe3+/Fe2+ = r/(1-r); original fractions are retained per point.
+        uncertainty: 'σ(Fe3+/ΣFe) = 0.02 estimated from the fitting statistics for FeOT > 1 wt%, as stated in the text.'
+        points:
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.846, FeOT_wt_percent: 1.75, composition_wt_pct: {SiO2: 49.586775, Al2O3: 14.855400, MgO: 10.276950, CaO: 23.521050, FeOT: 1.75}, composition_derivation: 'Table 4 bulk closure: each Fe-free oxide from Table 1 (p. 1598), SiO2 50.47, Al2O3 15.12, MgO 10.46, CaO 23.94 wt%, is multiplied by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-0.01', sample_as_published: D31/7/01, gas_mix_as_printed: 'O2 100.0 × 200 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-0.01'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 1.75}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.832, FeOT_wt_percent: 3.67, composition_wt_pct: {SiO2: 48.617751, Al2O3: 14.565096, MgO: 10.076118, CaO: 23.061402, FeOT: 3.67}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-0.01', sample_as_published: D31/7/01, gas_mix_as_printed: 'O2 100.0 × 200 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-0.01'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 3.67}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.842, FeOT_wt_percent: 6.44, composition_wt_pct: {SiO2: 47.219732, Al2O3: 14.146272, MgO: 9.786376, CaO: 22.398264, FeOT: 6.44}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-0.01', sample_as_published: D31/7/01, gas_mix_as_printed: 'O2 100.0 × 200 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-0.01'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 6.44}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.826, FeOT_wt_percent: 9.81, composition_wt_pct: {SiO2: 45.518893, Al2O3: 13.636728, MgO: 9.433874, CaO: 21.591486, FeOT: 9.81}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-0.01', sample_as_published: D31/7/01, gas_mix_as_printed: 'O2 100.0 × 200 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-0.01'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 9.81}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.819, FeOT_wt_percent: 18.75, composition_wt_pct: {SiO2: 41.006875, Al2O3: 12.285000, MgO: 8.498750, CaO: 19.451250, FeOT: 18.75}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-0.01', sample_as_published: D31/7/01, gas_mix_as_printed: 'O2 100.0 × 200 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-0.01'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 18.75}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.825, FeOT_wt_percent: 27.06, composition_wt_pct: {SiO2: 36.812818, Al2O3: 11.028528, MgO: 7.629524, CaO: 17.461836, FeOT: 27.06}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-0.01', sample_as_published: D31/7/01, gas_mix_as_printed: 'O2 100.0 × 200 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-0.01'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 27.06}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.384, FeOT_wt_percent: 1.49, composition_wt_pct: {SiO2: 49.717997, Al2O3: 14.894712, MgO: 10.304146, CaO: 23.583294, FeOT: 1.49}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-3.91', sample_as_published: C14/12/01, gas_mix_as_printed: 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-3.91'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 1.49}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.375, FeOT_wt_percent: 2.79, composition_wt_pct: {SiO2: 49.061887, Al2O3: 14.698152, MgO: 10.168166, CaO: 23.272074, FeOT: 2.79}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-3.91', sample_as_published: C14/12/01, gas_mix_as_printed: 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-3.91'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 2.79}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.351, FeOT_wt_percent: 5.36, composition_wt_pct: {SiO2: 47.764808, Al2O3: 14.309568, MgO: 9.899344, CaO: 22.656816, FeOT: 5.36}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-3.91', sample_as_published: C14/12/01, gas_mix_as_printed: 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-3.91'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 5.36}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.348, FeOT_wt_percent: 7.96, composition_wt_pct: {SiO2: 46.452588, Al2O3: 13.916448, MgO: 9.627384, CaO: 22.034376, FeOT: 7.96}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-3.91', sample_as_published: C14/12/01, gas_mix_as_printed: 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-3.91'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 7.96}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.376, FeOT_wt_percent: 16.36, composition_wt_pct: {SiO2: 42.213108, Al2O3: 12.646368, MgO: 8.748744, CaO: 20.023416, FeOT: 16.36}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-3.91', sample_as_published: C14/12/01, gas_mix_as_printed: 'CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-3.91'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 16.36}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.102, FeOT_wt_percent: 3.52, composition_wt_pct: {SiO2: 48.693456, Al2O3: 14.587776, MgO: 10.091808, CaO: 23.097312, FeOT: 3.52}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-6.91', sample_as_published: C27/11/01, gas_mix_as_printed: 'CO2 40.0 × 200 SCCM + CO 6.3 × 200 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-6.91'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 3.52}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.091, FeOT_wt_percent: 5.83, composition_wt_pct: {SiO2: 47.527599, Al2O3: 14.238504, MgO: 9.850182, CaO: 22.544298, FeOT: 5.83}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-6.91', sample_as_published: C27/11/01, gas_mix_as_printed: 'CO2 40.0 × 200 SCCM + CO 6.3 × 200 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-6.91'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 5.83}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.087, FeOT_wt_percent: 7.96, composition_wt_pct: {SiO2: 46.452588, Al2O3: 13.916448, MgO: 9.627384, CaO: 22.034376, FeOT: 7.96}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-6.91', sample_as_published: C27/11/01, gas_mix_as_printed: 'CO2 40.0 × 200 SCCM + CO 6.3 × 200 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-6.91'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 7.96}, locator: {page: 7, published_page: 1603, table: '4'}}}}
+        - {T_C: 1409, Fe3_over_sum_Fe: 0.218, FeOT_wt_percent: 26.82, composition_wt_pct: {SiO2: 36.933946, Al2O3: 11.064816, MgO: 7.654628, CaO: 17.519292, FeOT: 26.82}, composition_derivation: 'Fe-free microprobe oxides from Table 1 (p. 1598) are diluted by (100 − FeOT)/100; FeOT is the Table 4 value (p. 1603), treated as FeO.', log_fO2_as_published: '-6.91', sample_as_published: C27/11/01, gas_mix_as_printed: 'CO2 40.0 × 200 SCCM + CO 6.3 × 200 SCCM', locator: {page: 7, published_page: 1603, table: '4'}, point_conditions: {fO2_log: {state: {tag: value, value: '-6.91'}, locator: {page: 2, published_page: 1598, table: '1'}}, FeOT_wt_percent: {state: {tag: value, value: 26.82}, locator: {page: 7, published_page: 1603, table: '4'}}}}
