@@ -7267,8 +7267,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 Atmosphere.PN2_SWEEP, Atmosphere.ARGON_FLOW,
                 Atmosphere.CONTROLLED_O2_FLOW,
             }
-            or (self._overhead_headspace_enabled()
-                and self._headspace_bleed_conductance_kg_s() > 0.0)
+            or not self._overhead_headspace_enabled()
+            or self._headspace_bleed_conductance_kg_s() > 0.0
         )
         if open_receiver:
             selected_pO2 = self._headspace_transport_pO2_bar()

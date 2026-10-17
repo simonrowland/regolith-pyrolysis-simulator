@@ -370,6 +370,20 @@ def test_closed_receiver_keeps_finite_holdup_veto(monkeypatch):
     assert result.get('removal_rate_notice') is None
 
 
+def test_drain_each_tick_is_an_open_receiver_with_rate_disclosure(monkeypatch):
+    sim = _reducing_sim()
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim._overhead_headspace_config['enabled'] = False
+    monkeypatch.setattr(sim, '_headspace_transport_pO2_bar', lambda: 1e-20)
+    # The closed-vessel callback must not supply the draining boundary.
+    monkeypatch.setattr(sim, '_headspace_ledger_pO2_bar_from_o2_mol', lambda n: 9.10)
+    result = sim._compute_native_fe_saturation_extent()
+    assert result['native_fe_mol'] > 0.
+    assert result['removal_rate_notice']['flag'] == 'removal_rate_unmodelled'
+    assert result['removal_rate_notice']['authority'] == 'equilibrium_assumed'
+    assert result['removal_rate_notice']['melt_root_mol'] == result['melt_root_mol']
+
+
 def test_finite_open_transport_can_limit_extent_without_ledger_veto(monkeypatch):
     sim = _reducing_sim()
     sim.melt.atmosphere = Atmosphere.PN2_SWEEP
