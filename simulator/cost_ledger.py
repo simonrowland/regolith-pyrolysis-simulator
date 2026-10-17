@@ -550,6 +550,10 @@ class CostLedger:
             if not _is_cost_bearing_account(lot.account):
                 continue
             for species, kg in lot.species_kg.items():
+                # CostLot quantities at or below VECTOR_TOLERANCE are zero;
+                # do not let such a debit key trigger a missing-cost warning.
+                if kg <= VECTOR_TOLERANCE:
+                    continue
                 saw_cost_bearing_debit = True
                 input_lots.extend(
                     self._debit_lots(lot.account, species, kg, strict=strict)
