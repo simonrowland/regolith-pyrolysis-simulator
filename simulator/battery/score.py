@@ -6480,28 +6480,10 @@ def compile_residual(
     )
     if figure_only:
         figure_only_notices = (_figure_only_notice(quantity, reference),)
-    peak_column_omission_notices: tuple[Notice, ...] = ()
-    locator_note = None if reference.locator is None else reference.locator.note
-    if (
-        quantity is Quantity.VALENCE_RATIO
-        and isinstance(reference.identity, Identity)
-        and reference.identity.species.formula == "Eu"
-        and locator_note is not None
-        and "Stored value is from the Eu3+ peak column only" in locator_note
-        and "Table 3 logK prime averages estimates from both Eu2+ and Eu3+ peak heights"
-        in locator_note
-    ):
-        peak_column_omission_notices = (
-            _omission_notice(
-                quantity,
-                "the Eu2+ peak-derived Eu3+/SumEu variant is omitted; only the Eu3+ peak-derived value is stored",
-            ),
-        )
     notices = union_notices(
         reference.notices,
         flagged_notices,
         figure_only_notices,
-        peak_column_omission_notices,
         _quench_notices(reference),
     )
     comparison_ids = comparison_ids or {reference.observation_id}

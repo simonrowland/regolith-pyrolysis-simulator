@@ -2,19 +2,16 @@ from decimal import Decimal
 from pathlib import Path
 
 from simulator.battery.enums import (
-    Engine,
     EvidenceClass,
     NoticeKind,
     Phase,
     Quantity,
     QuenchState,
-    Rail,
     ValenceDenominatorKind,
     ValenceValueForm,
 )
 from simulator.battery.identity import ValenceBasis
 from simulator.battery.migrate import Migrator, load_yaml, wt_pct_to_mole_fraction
-from simulator.battery.score import ScoreContext, score_store
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -260,32 +257,3 @@ def test_burnham_table2_render_pins_and_row_count():
         for row in rows
     )
     assert not result.registry_issues
-
-
-def test_burnham_eu3_peak_locator_caveat_is_a_scoring_notice():
-    result, rows = _migrate_burnham_table2()
-    row = next(
-        row
-        for row in rows
-        if row.observation_id.split("::", 2)[1]
-        == "burnham_2015_eu_glasses_ad_1300_f0p0"
-    )
-    context = ScoreContext(
-        result.works,
-        result.experiments,
-        {row.observation_id: row},
-        origins={row.observation_id: EXTRACT.name},
-        benches=result.benches,
-        root=ROOT,
-    )
-    residuals, _candidates = score_store(
-        context,
-        engines=(Engine.INTERNAL_ANALYTICAL,),
-        rail=Rail.REDOX,
-    )
-    assert len(residuals) == 1
-    assert any(
-        notice.kind is NoticeKind.INPUT_OMITTED
-        and "Eu2+ peak-derived Eu3+/SumEu variant is omitted" in notice.reason
-        for notice in residuals[0].notices
-    )
