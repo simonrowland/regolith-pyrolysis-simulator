@@ -284,9 +284,13 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
         ensure_ascii=False,
     ).encode()
 
-    # New-base pin includes t-1279's six joined-Aithala FeOT notices.
+    # Combined-base pin. The payload still includes t-1279's six joined-Aithala
+    # FeOT notices. Quench4 adds quench_state not_stated and the glass-to-melt
+    # identity compare, so the identity_equal conjunct passes. Printed
+    # uncertainty with an unmapped unit is printed_uncertainty_unit_unmapped
+    # and carries the source unit text.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "e96668c29b434c4c477afa11cf6e3510c8e2ebc29791f4631420feeb259aaf2d"
+        "690007627c3e104224bad710c8c406dc6c7c12548f044f6bb0f309952e5f42de"
     )
 
 
