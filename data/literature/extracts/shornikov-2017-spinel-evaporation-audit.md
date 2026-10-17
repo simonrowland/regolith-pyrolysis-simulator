@@ -19,10 +19,13 @@ The committed [MinerU comparison table](shornikov-2017-spinel-evaporation-mineru
 ## Extraction decisions and limits
 
 - Table 2 contains the authors’ KEMS pressure series and is stored as `measured_direct`, in atm. The rows are for stoichiometric solid MgAl2O4, 50 mol% MgO and 50 mol% Al2O3, evaporated from a molybdenum Knudsen container. Its tabulated temperatures are 1851–2089 K. The paper’s broader 1850–2250 K experiment includes higher-temperature measurements on Al2O3-enriched spinel solid solutions; those are not substituted for the tabulated stoichiometric rows.
+- The printed error bound (“with an error not exceeding 8%”) is retained on each of the seven numeric Table 2 pressure series and the Table 3 Eq. (8),(9) oxygen-pressure series as a relative bound of 8%, used as printed; the confidence level is not stated. Table 3’s caption identifies that column as calculated with Eqs. (8),(9), the relations named in the error statement. The bound is not carried to the separate Table 3 Eq. (14)–(17) model series, whose thermochemical calculation has no printed error bound.
 - Printed dashes remain unavailable values, never zero: 11 Table 2 cells and the two 1851/1859 K Eq. (16) cells. Table 3 Eq. (8),(9) rows are `measured_reduced`; the source does not tabulate the raw ion-count/time and apparatus inputs. Eq. (14)–(17) rows are `model_derived`, retain each equation number, cite thermochemical reference [10], and name their stored Table 2 pressure-series parents. Eq. (16)’s two unavailable rows retain its equation and the unavailable Table 2 pAl2O inputs as parents.
+- The Eq. (14)–(17) inputs use the printed K10(T)–K13(T) constants cited to Glushko handbook [10]. Shornikov does not print their numerical values, so the audit records the citation and does not supply numbers or fabricate parent observations. The stored Table 2 pressure series remain the model rows’ `derived_from` parents, consistent with `SCHEMA.md`'s derived-observation lineage rule.
 - No numeric total pressure or oxygen fugacity is printed for these runs, so both identity axes remain unknown. The experiment and every observation retain the printed composition and temperature conditions. The sample phase is solid spinel throughout the tabulated range, below the brief’s approximately 2378 K melting point; it is not stored as a melt.
 - Table 1 is preserved as eight `quoted_attributed` metadata context rows, including the printed apparatus/container and temperature ranges, composition, gas components, results, and reference numbers. No pressure point is inferred from those study summaries.
 - The paper discusses interaction of oxygen with W/Mo effusion-container materials and reports that a corundum film can slow spinel evaporation above about 2100 K. It provides no separately tabulated “Mg-crown” or “spinel-liner” series. Figure 2a’s pMg-over-MgO and pMg-over-spinel curves, the other Figure 2 spinel/simple-oxide pressure trends, and Figure 1’s composition trajectory remain figure-read candidates; no figure values were digitized.
+- Two other printed measurements do not feed this pressure rail. The 2046 K ion-current ratios (physical PDF page 3, published page 12) are uncalibrated mass-spectrometer signal intensities, not partial pressures; the paper says low intensities prevented ionization-efficiency curves in the 1851–2089 K range. The MgAlO ion appearance energy, 7.7 ± 0.6 eV (same page), characterizes ion emergence under electron impact, not a vapour pressure or redox condition.
 
 ## Verification
 
@@ -40,5 +43,7 @@ Three independent fidelity pins target rendered cells on physical PDF page 4. Mu
 python -m pytest -n 0 tests/test_shornikov_2017_spinel_evaporation_extract.py tests/tools/test_mineru_table_draft.py tests/test_yaml_flow_scalar_commas.py
 27 passed
 ```
+
+Fix-round verification reran the focused extract test and YAML comma guard: **19 passed**. A fresh isolated migration yielded **144 observations**, **8 context rows**, **13 unavailable values**, **0 hard validation issues**, and **0 registry issues**; the migrated 1851 K Table 2 Mg point carries the printed relative 8% bound and `confidence_level: not_stated`.
 
 The expected battery store delta is **+144 observations and +8 context rows**. No store regeneration or store-file commit was performed.

@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import UncertaintyKind, ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT, convert_pressure_to_pa
 
 TOOLS = REPO_ROOT / "tools"
@@ -43,6 +43,21 @@ def test_table_cells_and_render_pins_are_complete_and_mutation_sensitive() -> No
     assert sum(not row["values"].get("points") for row in table_2) == 11
     assert sum(len(row["values"].get("points", [])) for row in table_3) == 58
     assert sum(not row["values"].get("points") for row in table_3) == 2
+    eq14 = next(
+        row
+        for row in table_3
+        if row["observation_id"] == "shornikov_2017_table3_o_pressure_eq14"
+    )
+    assert "K10(T)" in eq14["derivation"]["inputs"][2]
+    assert "[10]" in eq14["derivation"]["inputs"][2]
+    assert "K14(T)" not in eq14["derivation"]["inputs"][2]
+    eq8_9 = next(
+        row
+        for row in table_3
+        if row["observation_id"] == "shornikov_2017_table3_o_pressure_eq8_9"
+    )
+    assert eq8_9["uncertainty"]["bound_value"] == "8%"
+    assert "uncertainty" not in eq14
 
     samples = document["fidelity_samples"]
     assert len(samples) == 3
@@ -112,3 +127,36 @@ def test_isolated_migration_keeps_table_conditions_identity_and_unavailable_rows
         assert record.identity.composition.is_value
         assert record.identity.total_pressure_Pa.is_unknown
         assert record.identity.fO2_Pa.is_unknown
+
+    table2_mg = next(
+        row
+        for row in records
+        if row.identity.species.formula == "Mg"
+        and row.identity.temperature_K.value == Decimal("1851")
+    )
+    assert table2_mg.uncertainty.kind is UncertaintyKind.PRINTED
+    assert table2_mg.uncertainty.verbatim["form"] == "relative_bound"
+    assert table2_mg.uncertainty.verbatim["bound_value"] == "8%"
+    assert table2_mg.uncertainty.verbatim["confidence_level"] == "not_stated"
+    assert table2_mg.uncertainty.verbatim["notice"] == "confidence level not stated"
+
+    eq8_9_pressure, _ = convert_pressure_to_pa("1.21e-8", "atm")
+    table3_reduced_o = next(
+        row
+        for row in records
+        if row.identity.species.formula == "O"
+        and row.identity.temperature_K.value == Decimal("1851")
+        and row.value.point == eq8_9_pressure
+    )
+    assert table3_reduced_o.uncertainty.kind is UncertaintyKind.PRINTED
+    assert table3_reduced_o.uncertainty.verbatim["bound_value"] == "8%"
+
+    eq14_pressure, _ = convert_pressure_to_pa("1.14e-8", "atm")
+    table3_eq14_o = next(
+        row
+        for row in records
+        if row.identity.species.formula == "O"
+        and row.identity.temperature_K.value == Decimal("1851")
+        and row.value.point == eq14_pressure
+    )
+    assert table3_eq14_o.uncertainty.kind is UncertaintyKind.NONE

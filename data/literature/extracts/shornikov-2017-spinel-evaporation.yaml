@@ -274,6 +274,13 @@ species:
       units: atm
       T_range_K: [1851.0, 2089.0]
       point_conditions: *spinel_point_conditions
+      uncertainty: &table_2_relative_uncertainty
+        form: relative_bound
+        bound_operator: '<='
+        bound_value: '8%'
+        as_printed: 'with an error not exceeding 8%'
+        confidence_level: not_stated
+        notice: 'confidence level not stated'
       values:
         quantity: partial_pressure
         method_class: measured_direct
@@ -310,6 +317,7 @@ species:
       units: atm
       T_range_K: [1851.0, 2089.0]
       point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
       values:
         quantity: partial_pressure
         method_class: measured_direct
@@ -346,6 +354,7 @@ species:
       units: atm
       T_range_K: [1851.0, 2089.0]
       point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
       values:
         quantity: partial_pressure
         method_class: measured_direct
@@ -382,6 +391,7 @@ species:
       units: atm
       T_range_K: [1851.0, 2089.0]
       point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
       values:
         quantity: partial_pressure
         method_class: measured_direct
@@ -418,6 +428,7 @@ species:
       units: atm
       T_range_K: [1851.0, 2089.0]
       point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
       values:
         quantity: partial_pressure
         method_class: measured_direct
@@ -502,6 +513,7 @@ species:
       units: atm
       T_range_K: [1851.0, 2089.0]
       point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
       values:
         quantity: partial_pressure
         method_class: measured_direct
@@ -538,6 +550,7 @@ species:
       units: atm
       T_range_K: [1851.0, 2089.0]
       point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
       values:
         quantity: partial_pressure
         method_class: measured_direct
@@ -790,6 +803,7 @@ species:
       units: atm
       T_range_K: [1851.0, 2089.0]
       point_conditions: *spinel_point_conditions
+      uncertainty: *table_2_relative_uncertainty
       derivation:
         relation: 'KEMS pressure reduction using Eqs. (8) and (9).'
         output_unit: atm
@@ -841,7 +855,7 @@ species:
         inputs:
           - 'Table 2 mgo pressure series at matching temperature.'
           - 'Table 2 mg pressure series at matching temperature.'
-          - 'K14(T) from thermochemical data cited as [10].'
+          - 'K10(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
       values:
         quantity: partial_pressure
         method_class: model_derived
@@ -887,7 +901,7 @@ species:
         inputs:
           - 'Table 2 alo pressure series at matching temperature.'
           - 'Table 2 al pressure series at matching temperature.'
-          - 'K15(T) from thermochemical data cited as [10].'
+          - 'K11(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
       values:
         quantity: partial_pressure
         method_class: model_derived
@@ -933,7 +947,7 @@ species:
         inputs:
           - 'Table 2 al2o pressure series at matching temperature.'
           - 'Table 2 al pressure series at matching temperature.'
-          - 'K16(T) from thermochemical data cited as [10].'
+          - 'K12(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
       values:
         quantity: partial_pressure
         method_class: model_derived
@@ -975,7 +989,7 @@ species:
         output_unit: atm
         inputs:
           - 'Table 2 o2 pressure series at matching temperature.'
-          - 'K17(T) from thermochemical data cited as [10].'
+          - 'K13(T), the thermochemical equilibrium constant cited from the Glushko handbook [10]; no numeric value is printed here.'
       values:
         quantity: partial_pressure
         method_class: model_derived
