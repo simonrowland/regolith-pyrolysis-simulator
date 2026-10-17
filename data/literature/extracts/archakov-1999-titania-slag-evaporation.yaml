@@ -1,0 +1,181 @@
+schema_version: literature_extract.v1
+source_id: archakov-1999-titania-slag-evaporation
+source:
+  citation: >-
+    Archakov, I. Yu., Shornikov, S. I., Tchemekova, T. M., and Shultz, M. M. (1999),
+    "The behaviour of the titanium dioxide in the slag melts", TITANIUM '99: Science and Technology,
+    volume 3, pages 1464–1468.
+  year: 1999
+  related_sources:
+    - source_id: shornikov-2000-titania-melts
+      relation: adjacent_proceedings_companion
+      note: >-
+        The companion extract in corpus origin/main reports study-wide composition ranges but no
+        individual charge compositions. Table 1's 17 sample compositions are retained here once and
+        are not duplicated as companion observations.
+extraction:
+  method: >-
+    Table 1 transcribed from MinerU table HTML and pdftotext-layout. The PDF render (page 2, printed
+    page 1465) confirms row and column placement; row 14's near-equimolar oxide values were checked
+    directly against the render. Table 1 is the initial sample-composition setup. Figures 1–3 show
+    evaporation-residue trajectories and are figure-read candidates only. The text names SiO, Ca, TiO,
+    and TiO2 as predominant vapour species; no pressures are extracted.
+  date: '2026-10-16'
+  worker: wave3b-ark99
+review_status: draft
+fidelity_samples:
+  - species: CaO
+    observable: composition
+    observation_id: archakov_1999_table1_initial_melt_compositions
+    field: sample_count
+    value: 17
+    locator:
+      page: 2
+      published_page: 1465
+      pdf_page_index: 1
+      table: '1'
+      note: Table 1 has 17 starting-composition rows
+species:
+  CaO:
+    observations: []
+    context:
+      - observation_id: archakov_1999_table1_initial_melt_compositions
+        type: composition
+        locator:
+          page: 2
+          published_page: 1465
+          pdf_page_index: 1
+          table: '1'
+          note: Table 1, all 17 initial ternary sample compositions; values kept as setup context
+        units: mole % as printed for oxides; dimensionless ratio for x(SiO2)/x(TiO2)
+        values:
+          quantity: initial_melt_sample_compositions
+          method_class: measured_direct
+          composition_basis: mole_percent_as_printed
+          sample_count: 17
+          ratio_header_as_printed: x(SiO2)/x(TiO2), mole %
+          ratio_quantity: dimensionless
+          ratio_note: Printed ratio values are retained without conversion or scaling.
+          points:
+            - sample_number: 1
+              CaO_mol_pct: 34.28
+              TiO2_mol_pct: 5.05
+              SiO2_mol_pct: 60.67
+              x_SiO2_over_TiO2_as_printed: 12.01
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 1'}
+            - sample_number: 2
+              CaO_mol_pct: 42.66
+              TiO2_mol_pct: 5.48
+              SiO2_mol_pct: 51.86
+              x_SiO2_over_TiO2_as_printed: 9.46
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 2'}
+            - sample_number: 3
+              CaO_mol_pct: 48.84
+              TiO2_mol_pct: 5.33
+              SiO2_mol_pct: 45.83
+              x_SiO2_over_TiO2_as_printed: 8.60
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 3'}
+            - sample_number: 4
+              CaO_mol_pct: 34.99
+              TiO2_mol_pct: 6.84
+              SiO2_mol_pct: 58.18
+              x_SiO2_over_TiO2_as_printed: 8.51
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 4'}
+            - sample_number: 5
+              CaO_mol_pct: 40.20
+              TiO2_mol_pct: 10.65
+              SiO2_mol_pct: 49.15
+              x_SiO2_over_TiO2_as_printed: 4.62
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 5'}
+            - sample_number: 6
+              CaO_mol_pct: 46.29
+              TiO2_mol_pct: 10.52
+              SiO2_mol_pct: 43.19
+              x_SiO2_over_TiO2_as_printed: 4.11
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 6'}
+            - sample_number: 7
+              CaO_mol_pct: 50.60
+              TiO2_mol_pct: 10.52
+              SiO2_mol_pct: 38.88
+              x_SiO2_over_TiO2_as_printed: 3.70
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 7'}
+            - sample_number: 8
+              CaO_mol_pct: 31.38
+              TiO2_mol_pct: 16.15
+              SiO2_mol_pct: 52.47
+              x_SiO2_over_TiO2_as_printed: 3.25
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 8'}
+            - sample_number: 9
+              CaO_mol_pct: 37.26
+              TiO2_mol_pct: 16.62
+              SiO2_mol_pct: 46.13
+              x_SiO2_over_TiO2_as_printed: 2.78
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 9'}
+            - sample_number: 10
+              CaO_mol_pct: 43.07
+              TiO2_mol_pct: 16.67
+              SiO2_mol_pct: 40.26
+              x_SiO2_over_TiO2_as_printed: 2.42
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 10'}
+            - sample_number: 11
+              CaO_mol_pct: 47.64
+              TiO2_mol_pct: 15.75
+              SiO2_mol_pct: 36.61
+              x_SiO2_over_TiO2_as_printed: 2.32
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 11'}
+            - sample_number: 12
+              CaO_mol_pct: 25.60
+              TiO2_mol_pct: 25.60
+              SiO2_mol_pct: 48.80
+              x_SiO2_over_TiO2_as_printed: 1.91
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 12'}
+            - sample_number: 13
+              CaO_mol_pct: 27.99
+              TiO2_mol_pct: 27.99
+              SiO2_mol_pct: 44.02
+              x_SiO2_over_TiO2_as_printed: 1.57
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 13'}
+            - sample_number: 14
+              CaO_mol_pct: 33.42
+              TiO2_mol_pct: 33.41
+              SiO2_mol_pct: 33.17
+              x_SiO2_over_TiO2_as_printed: 0.99
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 14'}
+            - sample_number: 15
+              CaO_mol_pct: 37.61
+              TiO2_mol_pct: 37.60
+              SiO2_mol_pct: 24.79
+              x_SiO2_over_TiO2_as_printed: 0.66
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 15'}
+            - sample_number: 16
+              CaO_mol_pct: 43.21
+              TiO2_mol_pct: 43.21
+              SiO2_mol_pct: 13.59
+              x_SiO2_over_TiO2_as_printed: 0.31
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 16'}
+            - sample_number: 17
+              CaO_mol_pct: 50.00
+              TiO2_mol_pct: 50.00
+              SiO2_mol_pct: 0.00
+              x_SiO2_over_TiO2_as_printed: 0.00
+              locator: {page: 2, published_page: 1465, pdf_page_index: 1, table: '1', note: 'Table 1 row 17'}
+  SiO:
+    observations: []
+    context:
+      - observation_id: archakov_1999_predominant_vapour_species
+        type: characterization
+        locator:
+          page: 3
+          published_page: 1466
+          pdf_page_index: 2
+          section: Results and discussion
+          note: Mass spectra and appearance-energy interpretation
+        units: species identities only
+        values:
+          quantity: named_predominant_vapour_species
+          method_class: authors_interpretation_of_mass_spectra
+          ionizing_energy_eV: 25
+          species_as_named: [SiO, Ca, TiO, TiO2]
+          note: >-
+            The text distinguishes the predominant neutral vapour species from the detected ion list.
+            No species pressures are recorded here.
