@@ -475,7 +475,7 @@ def _run_authoritative_alphamelts_equilibrium(
     if not allow_internal_analytical_fallback:
         sim._backend_allows_internal_analytical_fallback = lambda: False
 
-    def fail_backend_equilibrate(*_args, **_kwargs):
+    def fail_backend_equilibrate(*_args, composition_mol_by_account=None, **_kwargs):
         raise AssertionError(
             "authoritative SILICATE_EQUILIBRIUM used backend.equilibrate"
         )
@@ -590,14 +590,15 @@ def _run_capped_c2a_with_equilibrium_counter(
     original_equilibrate = sim.backend.equilibrate
     calls = 0
 
-    def counted_equilibrate(*args, **kwargs):
+    def counted_equilibrate(*args, composition_mol_by_account=None, **kwargs):
         nonlocal calls
         calls += 1
         if fail_live:
             raise AssertionError(
                 "PT-2 cached live run attempted backend.equilibrate"
             )
-        return original_equilibrate(*args, **kwargs)
+        return original_equilibrate(
+            *args, composition_mol_by_account=composition_mol_by_account, **kwargs)
 
     sim.backend.equilibrate = counted_equilibrate
     sim.backend.find_liquidus_solidus = lambda **_kwargs: SimpleNamespace(
