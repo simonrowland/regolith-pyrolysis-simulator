@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -14,15 +15,29 @@ from tools.generate_refractory_vapor_species import (
     CONDENSED_TABLES,
     GAS_TABLES,
     OUTPUT_PATH,
+    render_change_report,
     render_registry,
 )
 
 
 ROOT = Path(__file__).resolve().parents[1]
+CHANGE_REPORT_PATH = ROOT / "docs" / "refractory-vapor-species-generation.md"
+REPORT_BASELINE_REV = "c25691fb6c04b1fcb91c4328ad5948dd79d07aa5"
 
 
 def test_committed_registry_matches_fresh_compilation_regeneration() -> None:
     assert OUTPUT_PATH.read_text(encoding="utf-8") == render_registry()
+
+
+def test_committed_generation_report_matches_fresh_render() -> None:
+    previous = subprocess.check_output(
+        ["git", "show", f"{REPORT_BASELINE_REV}:data/refractory_vapor_species.yaml"],
+        cwd=ROOT,
+        text=True,
+    )
+    assert CHANGE_REPORT_PATH.read_text(encoding="utf-8") == render_change_report(
+        previous, render_registry()
+    )
 
 
 def test_every_thermochemical_row_carries_source_provenance() -> None:
@@ -83,10 +98,11 @@ def test_five_rows_match_janaf_printed_log_kf_at_2000_and_2500_K() -> None:
             assert data[section][species]["log10_kf"][temperature] == source[temperature]
 
 
-def test_alumina_gas_uses_nasa9_against_janaf_element_reference_phases() -> None:
+def test_alumina_vaporization_reaction_uses_only_nasa9_records() -> None:
     data = yaml.safe_load(OUTPUT_PATH.read_text(encoding="utf-8"))
-    row = data["gas_species"]["Al2O3"]
-    provenance = row["provenance"]
+    gas = data["gas_species"]["Al2O3"]
+    condensed = data["condensed_phases"]["Al2O3"]
+    provenance = gas["provenance"]
     assert provenance["source_tag"] == "nasa_glenn"
     assert provenance["record_id"] == "NG-0071"
     assert provenance["species_as_published"] == "AL2O3"
@@ -109,7 +125,11 @@ def test_alumina_gas_uses_nasa9_against_janaf_element_reference_phases() -> None
             "source_temperature_range_K": [200.0, 20000.0],
         },
     }
-    assert provenance["coefficient_intervals_K"] == [[300.0, 1000.0], [1000.0, 6000.0]]
+    assert condensed["provenance"]["source_tag"] == "nist_janaf"
+    assert condensed["provenance"]["table_id"] == "Al-101"
+    assert "NG-1286" in provenance["derivation"]
+    assert "NG-1287" in provenance["derivation"]
+    assert "1500 through 3500 K" in provenance["derivation"]
 
     def g_over_rt(record_id: str, temperature_K: int) -> float:
         document = load_record_document(
@@ -129,21 +149,48 @@ def test_alumina_gas_uses_nasa9_against_janaf_element_reference_phases() -> None
         )
         return segment.evaluate_ratios(float(temperature_K))[3]
 
-    for temperature in (2000, 2500):
-        expected = -(
+    for temperature in range(1500, 3501, 100):
+        condensed_record = "NG-1286" if temperature <= 2327 else "NG-1287"
+        expected_vaporization_log_k = -(
             g_over_rt("NG-0071", temperature)
-            - 2 * g_over_rt("NG-1273", temperature)
-            - 1.5 * g_over_rt("NG-0937", temperature)
+            - g_over_rt(condensed_record, temperature)
         ) / math.log(10.0)
-        assert row["log10_kf"][temperature] == pytest.approx(expected, abs=1e-12)
+        assert gas["log10_kf"][temperature] == pytest.approx(
+            condensed["log10_kf"][temperature] + expected_vaporization_log_k,
+            abs=1e-12,
+        )
+        assert gas["log10_kf"][temperature] - condensed["log10_kf"][temperature] == pytest.approx(
+            expected_vaporization_log_k, abs=1e-12
+        )
 
 
-def test_crystalline_only_row_stops_before_melting_and_flags_out_of_band_use() -> None:
+def test_spinel_uses_liquid_table_above_its_transition_without_extrapolation() -> None:
     data = yaml.safe_load(OUTPUT_PATH.read_text(encoding="utf-8"))
     row = data["condensed_phases"]["MgAl2O4"]
-    assert max(row["log10_kf"]) == 2400
-    assert row["out_of_band_notice"]["type"] == "liquid_table_unavailable_after_phase_boundary"
-    assert row["out_of_band_notice"]["temperature_K"] == 2408.0
+    transition_table = load_table_document(
+        ROOT / "data/literature/compilations/janaf/tables/Al-091.yaml"
+    )["table"]
+    liquid_table = load_table_document(
+        ROOT / "data/literature/compilations/janaf/tables/Al-090.yaml"
+    )["table"]
+    transition_value = next(
+        item["log10_formation_equilibrium_constant"]["value"]
+        for item in transition_table["values"]
+        if item.get("temperature", {}).get("value") == 2400
+        and item.get("log10_formation_equilibrium_constant", {}).get("value") is not None
+    )
+    liquid_value = next(
+        item["log10_formation_equilibrium_constant"]["value"]
+        for item in liquid_table["values"]
+        if item.get("temperature", {}).get("value") == 2500
+        and item.get("log10_formation_equilibrium_constant", {}).get("value") is not None
+    )
+    assert row["provenance"]["table_id"] == "Al-091"
+    assert row["phase_transitions_K"] == [2408.0]
+    assert row["log10_kf"][2400] == transition_value
+    assert row["log10_kf"][2500] == liquid_value
+    assert max(row["log10_kf"]) == 3500
+    assert "out_of_band_notice" not in row
     _, range_use = refractory_log10_kf("MgAl2O4", 2500.0, condensed=True)
-    assert range_use.source_temperature_max_K == 2400.0
-    assert range_use.status.startswith("extrapolated_")
+    assert range_use.source_temperature_max_K == 3500.0
+    assert range_use.status == "in_range"

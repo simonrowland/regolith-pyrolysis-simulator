@@ -21,10 +21,10 @@ kinetic_model:
 provenance:
   database: NIST-JANAF Thermochemical Tables, Fourth Edition, SRD 13; NASA Glenn / CEA thermo.inp
   doi: 10.18434/T42S31
-  note: JANAF rows copy compiled as_published log10(Kf) cells; Al2O3(g) is derived from NASA Glenn NASA-9 G/RT values
-    against Al(l) and O2(g) elemental reference states. All rows use the 100 K grid from 1500 through 3500 K. The
-    crystalline-only MgAl2O4 row stops below its 2408 K transition; its typed out-of-band notice records the missing
-    liquid table.
+  note: JANAF rows copy compiled as_published log10(Kf) cells. The Al2O3(g) row carries a NASA Glenn NG-0071/NG-1286/NG-1287
+    vaporization reaction translated onto the Al-101 condensed Kf basis; the generic solver cancels that basis,
+    leaving the NASA-only reaction at every temperature. All rows use the 100 K grid from 1500 through 3500 K. MgAl2O4
+    uses JANAF Al-091 across its 2408 K crystal/liquid transition.
 overlay_provenance:
   type: project_curated_nonthermochemical_metadata
   citation: Material applicability, carrier selection, and species-gap notes are project-curated; each literature-backed
@@ -970,7 +970,8 @@ gas_species:
       3500: -1.015
   Al2O3:
     formula: Al2O3
-    source: NASA Glenn NG-0071, AL2O3 (NASA-9)
+    source: NASA Glenn NG-0071 vaporization reaction with NG-1286/NG-1287, translated to the NIST-JANAF Al-101 Kf
+      basis
     source_url: https://www.grc.nasa.gov/www/CEAWeb/
     valid_temperature_K:
     - 1500.0
@@ -1008,30 +1009,32 @@ gas_species:
           - 20000.0
       derivation: For 2 Al(l) + 3/2 O2(g) -> Al2O3(g), evaluate the NASA-9 dimensionless G/RT for NG-0071, NG-1273
         and NG-0937. Form ΔG°/(RT) = G°(Al2O3,g)/(RT) - 2 G°(Al,l)/(RT) - 3/2 G°(O2,g)/(RT), then log10(Kf) = -ΔG°/(RT
-        ln 10). All ratios and log10(Kf) are dimensionless; T is in K. The Al(l)+O2(g) reference phases match JANAF's
-        elemental states.
+        ln 10). All ratios and log10(Kf) are dimensionless; T is in K. The direct reaction uses NG-1286 through
+        2327 K and NG-1287 above it, with NG-1273 and NG-0937 cancelling. The stored value adds the Al-101 condensed
+        Kf as a basis conversion; the solver then subtracts that same value, leaving the NASA-only reaction. Cross-checked
+        at each 100 K point from 1500 through 3500 K, including above the 2790.812 K Al boiling marker.
     log10_kf:
-      1500: 15.920440144263916
-      1600: 14.666586012486528
-      1700: 13.558658175310757
-      1800: 12.572393795267065
-      1900: 11.688628092011477
-      2000: 10.892021939049833
-      2100: 10.170152547897924
-      2200: 9.512851810203179
-      2300: 8.911716997707412
-      2400: 8.359743603890394
-      2500: 7.851046168042874
-      2600: 7.380643423926574
-      2700: 6.944291118187791
-      2800: 6.538350597284913
-      2900: 6.15968454117517
-      3000: 5.805573518484829
-      3100: 5.473648668256653
-      3200: 5.161836985644352
-      3300: 4.868316541815586
-      3400: 4.591479595691272
-      3500: 4.329902021370456
+      1500: 15.930738777611793
+      1600: 14.678136710660823
+      1700: 13.570480345427207
+      1800: 12.58494852187614
+      1900: 11.700572114155115
+      2000: 10.903772606249273
+      2100: 10.18117488655357
+      2200: 9.521925340852619
+      2300: 8.918665897482327
+      2400: 8.365802094984364
+      2500: 7.857255407535675
+      2600: 7.390542135062006
+      2700: 6.9595046955843465
+      2800: 6.523853508230756
+      2900: 5.776363425819426
+      3000: 5.080030704379217
+      3100: 4.432199450585394
+      3200: 3.8266642469324967
+      3300: 3.2587540258536176
+      3400: 2.727401067439315
+      3500: 2.227198107238376
 condensed_phases:
   Al2O3:
     formula: Al2O3
@@ -1242,18 +1245,18 @@ condensed_phases:
     - 2130.0
   MgAl2O4:
     formula: MgAl2O4
-    source: NIST-JANAF Al-089, Magnesium Aluminum Oxide (MgAl2O4)  |  Al2Mg1O4(cr)
-    source_url: https://janaf.nist.gov/tables/Al-089.html
+    source: NIST-JANAF Al-091, Magnesium Aluminum Oxide (MgAl2O4)  |  Al2Mg1O4(cr,l)
+    source_url: https://janaf.nist.gov/tables/Al-091.html
     valid_temperature_K:
     - 1500.0
-    - 2400.0
+    - 3500.0
     provenance:
       source_tag: nist_janaf
-      table_id: Al-089
+      table_id: Al-091
       source_temperature_range_K:
       - 100.0
-      - 2400.0
-      phase: cr
+      - 4000.0
+      phase: cr,l
       derivation: Use JANAF's printed, dimensionless log10(Kf) for formation from the elements in their reference
         states. The equivalent identity is log10(Kf) = -ΔfG°/(R T ln 10); ΔfG° is kJ/mol in the source and requires
         1000 J/kJ, R is J/(mol·K), and T is K. No fit or residual-based adjustment is applied.
@@ -1268,14 +1271,19 @@ condensed_phases:
       2200: 30.836
       2300: 28.358
       2400: 26.092
+      2500: 24.167
+      2600: 22.408
+      2700: 20.782
+      2800: 19.241
+      2900: 17.466
+      3000: 15.814
+      3100: 14.273
+      3200: 12.833
+      3300: 11.483
+      3400: 10.216
+      3500: 9.025
     phase_transitions_K:
     - 2408.0
-    out_of_band_notice:
-      type: liquid_table_unavailable_after_phase_boundary
-      temperature_K: 2408.0
-      source_table_id: Al-089
-      message: The JANAF crystal table ends at its crystal-liquid transition; no liquid table is available. The
-        stored grid stops at the last source point below Tm, and out-of-range use remains typed.
 materials:
   Al2O3:
     formula: Al2O3

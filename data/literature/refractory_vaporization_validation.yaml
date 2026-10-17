@@ -18,7 +18,7 @@ nist_janaf_named_nodes:
     SiO: {value: 7.181, table: O-012, url: https://janaf.nist.gov/tables/O-012.html}
     TiO2: {value: 9.589, table: O-046, url: https://janaf.nist.gov/tables/O-046.html}
   condensed_log10_kf:
-    Al2O3: {value: 31.888, table: Al-096, url: https://janaf.nist.gov/tables/Al-096.html}
+    Al2O3: {value: 31.888, table: Al-101, url: https://janaf.nist.gov/tables/Al-101.html}
 
 alumina_vacuum_screen:
   source: NASA/TM-2005-213625, Jacobson and Biering (2005), Figure 8
@@ -27,7 +27,6 @@ alumina_vacuum_screen:
   pressure_bar: 1.0e-10
   crossing_temperature_K: 1800.0
   plotted_temperature_tolerance_K: 50.0
-  known_missing_species: Al2O3
 
 cao_reducing_cell_kems:
   source: S. I. Shornikov, Thermodynamic Study of Calcium Oxide Evaporation under Various Redox Conditions (2025)

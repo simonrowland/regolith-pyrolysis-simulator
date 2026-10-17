@@ -112,8 +112,9 @@ def test_alumina_Al_bearing_vapor_crosses_nasa_screen(
         anchor["crossing_temperature_K"],
         abs=anchor["plotted_temperature_tolerance_K"],
     )
-    assert anchor["known_missing_species"] in refractory_vapor_species("Al2O3")
-    assert anchor["known_missing_species"] not in refractory_vapor_species_gaps("Al2O3")
+    assert "known_missing_species" not in anchor
+    assert "Al2O3" in refractory_vapor_species("Al2O3")
+    assert "Al2O3" not in refractory_vapor_species_gaps("Al2O3")
 
 
 def test_cao_kems_raw_points_are_preserved_and_fit_within_reported_uncertainty(

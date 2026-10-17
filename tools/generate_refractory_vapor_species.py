@@ -60,15 +60,15 @@ CONDENSED_TABLES = {
     "MgO": "Mg-010",
     "SiO2": "O-039",
     "TiO2": "O-045",
-    "MgAl2O4": "Al-089",
+    "MgAl2O4": "Al-091",
 }
 
 CONDENSED_FORMULAS = {"MgAl2O4": "MgAl2O4"}
-LIQUID_TABLES = {"Al2O3": "Al-101", "CaO": "Ca-029", "MgO": "Mg-010"}
+LIQUID_TABLES = {"CaO": "Ca-029", "MgO": "Mg-010"}
 
-# JANAF has no Al2O3(g) formation table. Its numeric carrier is derived from
-# NASA Glenn record NG-0071, using the same elemental reference phases as the
-# JANAF rows. No other JANAF-missing species is included as a numeric carrier.
+# JANAF has no Al2O3(g) table. Its vaporization reaction is computed from NASA
+# Glenn gas/condensed records, then translated onto Al-101's Kf basis for the
+# generic solver; subtracting the same Al-101 row leaves only the NASA reaction.
 
 # Premise -> algebra -> units -> sanity check:
 # JANAF's log Kf column is for formation from the table's elemental reference
@@ -79,17 +79,16 @@ LIQUID_TABLES = {"Al2O3": "Al-101", "CaO": "Ca-029", "MgO": "Mg-010"}
 # The freshness test compares every selected JANAF species' printed values at
 # both 2000 K and 2500 K; those checks are the per-species source sanity anchors.
 
-# NASA fallback derivation (premise -> algebra -> units -> sanity check):
-# Premise: NG-0071 is Al2O3(g); NG-1273 is Al(l), and NG-0937 is O2(g). These
-# are the same elemental reference phases used by JANAF for Al(g) formation
-# above Al's melting point and O2(g). Check that alignment independently with
-# NG-0005 (Al(g)): its NASA-9 log10(Kf) from Al(l) is -2.225958 at
-# 2000 K and -0.657470 at 2500 K, versus JANAF Al-005's printed -2.211 and
-# -0.644. Algebra: ΔG°/(RT) = G°(Al2O3,g)/(RT) - 2 G°(Al,l)/(RT)
-#   - 3/2 G°(O2,g)/(RT); log10(Kf) = -ΔG°/(RT ln(10)). Units: each NASA-9
-# G/RT and the resulting log10(Kf) are dimensionless; T is in K, so R and T
-# cancel in the formation ratio. Sanity: source-derived Al2O3(g) log10(Kf) is
-# 10.892022 at 2000 K.
+# NASA alumina derivation (premise -> algebra -> units -> sanity check):
+# NG-0071 is Al2O3(g); NG-1286 and NG-1287 are its crystalline and liquid
+# condensed phases; NG-1273 is Al(l); and NG-0937 is O2(g). For Al2O3(cond) ->
+# Al2O3(g), ΔG/(RT) = G(g)/(RT) - G(cond)/(RT) and log10(K) = -ΔG/(RT ln 10).
+# Equivalently, subtract the two NASA-9 log10(Kf) values formed against the
+# common NG-1273/NG-0937 references; those terms cancel at every T, including
+# above Al's JANAF boiling marker. The generic solver expects a gas Kf row
+# paired with Al-101, so store log10(Kf_gas) = log10(Kf_Al-101) + log10(K_vap).
+# Its subtraction of Al-101 then leaves the NASA-only reaction. Check every
+# 100 K registry point from 1500 through 3500 K.
 
 
 class RefractoryGenerationError(ValueError):
@@ -133,7 +132,7 @@ def _load_nasa9_record(
         interval.get("coefficient_count") != 9 for interval in intervals
     ):
         raise RefractoryGenerationError(f"{path}: expected NASA-9 coefficients")
-    if document.get("phase") not in {"gas", "L", "l", "liquid"}:
+    if document.get("phase") not in {"gas", "a", "L", "l", "liquid"}:
         raise RefractoryGenerationError(f"{path}: unsupported NASA reference phase")
     segments: list[Nasa9Segment] = []
     for interval in intervals:
@@ -183,22 +182,71 @@ def _nasa9_g_over_rt(
     return matching[0].evaluate_ratios(float(temperature_K))[3]
 
 
+def _nasa_alumina_log10_kf(
+    product_segments: tuple[Nasa9Segment, ...],
+    aluminum_segments: tuple[Nasa9Segment, ...],
+    oxygen_segments: tuple[Nasa9Segment, ...],
+    temperature_K: int,
+) -> float:
+    delta_g_over_rt = (
+        _nasa9_g_over_rt(product_segments, temperature_K)
+        - 2.0 * _nasa9_g_over_rt(aluminum_segments, temperature_K)
+        - 1.5 * _nasa9_g_over_rt(oxygen_segments, temperature_K)
+    )
+    return -delta_g_over_rt / math.log(10.0)
+
+
+def _nasa_alumina_element_reference_states(
+    aluminum_doc: Mapping[str, Any], oxygen_doc: Mapping[str, Any]
+) -> dict[str, Any]:
+    return {
+        "Al": {
+            "record_id": str(aluminum_doc["record_id"]),
+            "species_as_published": str(aluminum_doc["name_as_published"]),
+            "phase": str(aluminum_doc["phase"]),
+            "coefficient_set": "NASA-9",
+            "source_temperature_range_K": _source_temperature_range(aluminum_doc),
+        },
+        "O2": {
+            "record_id": str(oxygen_doc["record_id"]),
+            "species_as_published": str(oxygen_doc["name_as_published"]),
+            "phase": str(oxygen_doc["phase"]),
+            "coefficient_set": "NASA-9",
+            "source_temperature_range_K": _source_temperature_range(oxygen_doc),
+        },
+    }
+
+
 def _nasa_al2o3_gas_row() -> dict[str, Any]:
     product_doc, product_segments = _load_nasa9_record("NG-0071")
+    solid_doc, solid_segments = _load_nasa9_record("NG-1286")
+    liquid_doc, liquid_segments = _load_nasa9_record("NG-1287")
     aluminum_doc, aluminum_segments = _load_nasa9_record("NG-1273")
     oxygen_doc, oxygen_segments = _load_nasa9_record("NG-0937")
+    janaf_condensed_kf, _ = _printed_log_kf(_load_janaf_table("Al-101"))
+    transition = 2327.0
     log_kf = {
-        temperature: -(
-            _nasa9_g_over_rt(product_segments, temperature)
-            - 2.0 * _nasa9_g_over_rt(aluminum_segments, temperature)
-            - 1.5 * _nasa9_g_over_rt(oxygen_segments, temperature)
-        ) / math.log(10.0)
+        temperature: (
+            janaf_condensed_kf[temperature]
+            + _nasa_alumina_log10_kf(
+                product_segments, aluminum_segments, oxygen_segments, temperature
+            )
+            - _nasa_alumina_log10_kf(
+                solid_segments if temperature <= transition else liquid_segments,
+                aluminum_segments,
+                oxygen_segments,
+                temperature,
+            )
+        )
         for temperature in TEMPERATURE_GRID_K
     }
     intervals = product_doc["intervals"]
     return {
         "formula": str(product_doc["formula"]),
-        "source": "NASA Glenn NG-0071, AL2O3 (NASA-9)",
+        "source": (
+            "NASA Glenn NG-0071 vaporization reaction with NG-1286/NG-1287, "
+            "translated to the NIST-JANAF Al-101 Kf basis"
+        ),
         "source_url": str(product_doc["source"]["official_url"]),
         "valid_temperature_K": [
             float(TEMPERATURE_GRID_K[0]),
@@ -218,29 +266,21 @@ def _nasa_al2o3_gas_row() -> dict[str, Any]:
             ],
             "source_temperature_range_K": _source_temperature_range(product_doc),
             "phase": str(product_doc["phase"]),
-            "element_reference_states": {
-                "Al": {
-                    "record_id": str(aluminum_doc["record_id"]),
-                    "species_as_published": str(aluminum_doc["name_as_published"]),
-                    "phase": str(aluminum_doc["phase"]),
-                    "coefficient_set": "NASA-9",
-                    "source_temperature_range_K": _source_temperature_range(aluminum_doc),
-                },
-                "O2": {
-                    "record_id": str(oxygen_doc["record_id"]),
-                    "species_as_published": str(oxygen_doc["name_as_published"]),
-                    "phase": str(oxygen_doc["phase"]),
-                    "coefficient_set": "NASA-9",
-                    "source_temperature_range_K": _source_temperature_range(oxygen_doc),
-                },
-            },
+            "element_reference_states": _nasa_alumina_element_reference_states(
+                aluminum_doc, oxygen_doc
+            ),
             "derivation": (
                 "For 2 Al(l) + 3/2 O2(g) -> Al2O3(g), evaluate the NASA-9 "
                 "dimensionless G/RT for NG-0071, NG-1273 and NG-0937. Form "
                 "ΔG°/(RT) = G°(Al2O3,g)/(RT) - 2 G°(Al,l)/(RT) - "
                 "3/2 G°(O2,g)/(RT), then log10(Kf) = -ΔG°/(RT ln 10). "
                 "All ratios and log10(Kf) are dimensionless; T is in K. The "
-                "Al(l)+O2(g) reference phases match JANAF's elemental states."
+                "direct reaction uses NG-1286 through 2327 K and NG-1287 above "
+                "it, with NG-1273 and NG-0937 cancelling. The stored value adds "
+                "the Al-101 condensed Kf as a basis conversion; the solver then "
+                "subtracts that same value, leaving the NASA-only reaction. "
+                "Cross-checked at each 100 K point from 1500 through 3500 K, "
+                "including above the 2790.812 K Al boiling marker."
             ),
         },
         "log10_kf": log_kf,
@@ -394,12 +434,13 @@ def render_registry() -> str:
             ),
             "doi": "10.18434/T42S31",
             "note": (
-                "JANAF rows copy compiled as_published log10(Kf) cells; Al2O3(g) "
-                "is derived from NASA Glenn NASA-9 G/RT values against Al(l) and "
-                "O2(g) elemental reference states. All rows use the 100 K grid "
-                "from 1500 through 3500 K. "
-                "The crystalline-only MgAl2O4 row stops below its 2408 K transition; "
-                "its typed out-of-band notice records the missing liquid table."
+                "JANAF rows copy compiled as_published log10(Kf) cells. The "
+                "Al2O3(g) row carries a NASA Glenn NG-0071/NG-1286/NG-1287 "
+                "vaporization reaction translated onto the Al-101 condensed Kf "
+                "basis; the generic solver cancels that basis, leaving the "
+                "NASA-only reaction at every temperature. All rows use the 100 K "
+                "grid from 1500 through 3500 K. MgAl2O4 uses JANAF Al-091 across "
+                "its 2408 K crystal/liquid transition."
             ),
         },
         "overlay_provenance": overlay["overlay_citation"],
@@ -491,8 +532,9 @@ def render_change_report(previous_text: str, generated_text: str) -> str:
                 )
             if species == "MgAl2O4":
                 reason = (
-                    "include the JANAF source point below Tm=2408 K and exclude the "
-                    "crystalline-only continuation above Tm; retain a typed notice"
+                    "use JANAF Al-091's crystal/liquid transition at 2408 K: retain "
+                    "crystal values below Tm and liquid values above it across the "
+                    "full grid"
                 )
             deltas = "; ".join(
                 f"{temperature} K: "
@@ -513,7 +555,7 @@ def render_change_report(previous_text: str, generated_text: str) -> str:
             "## Summary",
             "",
             f"Changed species rows: {changed_row_count}; changed/new temperature cells: {changed_cell_count}.",
-            "Any changed shared-grid cells are listed with their old and new values above. NaO and KO were added from JANAF Na-008 and K-008. Al2O3(g) was added from NASA Glenn NG-0071 because JANAF has no species table; no other JANAF-missing species was needed as a numeric row. Other material metadata gaps remain CaAlO, MgAlO and Si2O2, for which no coefficient source is currently included in this registry.",
+            "Any changed shared-grid cells are listed with their old and new values above. NaO and KO were added from JANAF Na-008 and K-008. The Al2O3(g) Kf is aligned to the JANAF Al-101 condensed basis, but its Al2O3(cond) -> Al2O3(g) reaction is computed entirely from NASA Glenn NG-1286/NG-1287 and NG-0071 at every temperature. Other material metadata gaps remain CaAlO, MgAlO and Si2O2, for which no coefficient source is currently included in this registry.",
             "",
         ]
     )
