@@ -28,6 +28,7 @@ from simulator.battery.records import (
     State,
     Value,
 )
+from simulator.battery.residue import _initial_oxide_wt_percent
 from simulator.battery.score import (
     QUANTITY_METRIC,
     compile_residual,
@@ -50,13 +51,27 @@ def mass_loss_rows():
         and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
         and row.observation_id.endswith("R-11::T=2073.15:row=r-11:h=0d649fba8fb2")
     )
+    richter_r14 = next(
+        row
+        for row in observations.values()
+        if row.source_id == "kems-010-richter-2007"
+        and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+        and "R-14::T=2073.15:row=r-14:" in row.observation_id
+    )
     markova = next(
         row
         for row in observations.values()
         if row.source_id == "kems-026-markova-1984"
         and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
     )
-    return richter, experiments[richter.experiment_id], markova, experiments[markova.experiment_id]
+    return (
+        richter,
+        experiments[richter.experiment_id],
+        markova,
+        experiments[markova.experiment_id],
+        richter_r14,
+        experiments[richter_r14.experiment_id],
+    )
 
 
 def _richter_rep5_run(experiment):
@@ -100,7 +115,14 @@ def _extract_mass_loss_selection(source_id: str, observation_id: str):
 
 
 def test_pyrolysis_yield_mass_loss_uses_bulk_dispatch(mass_loss_rows) -> None:
-    _richter, _richter_experiment, markova, markova_experiment = mass_loss_rows
+    (
+        _richter,
+        _richter_experiment,
+        markova,
+        markova_experiment,
+        _r14,
+        _r14_experiment,
+    ) = mass_loss_rows
 
     prediction = predict_with_engine(
         Engine.OPENIMCC,
@@ -109,12 +131,32 @@ def test_pyrolysis_yield_mass_loss_uses_bulk_dispatch(mass_loss_rows) -> None:
     )
 
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert prediction.refusal_detail["reason"] == "duration_not_stated"
-    assert prediction.refusal_detail["missing_input"] == "thermal_schedule.total_duration_s"
+    assert "residual melts" in (
+        markova_experiment.sample.initial_composition.locator.note.lower()
+    )
+    assert prediction.refusal_detail["reason"] == "initial_composition_not_stated"
+    assert prediction.refusal_detail["missing_input"] == "sample.initial_composition"
+
+
+def test_richter_r14_mass_loss_uses_source_declared_initial_glass_not_final_residue(
+    mass_loss_rows,
+) -> None:
+    *_, _row, experiment = mass_loss_rows
+
+    starting_wt_percent = _initial_oxide_wt_percent(experiment.sample)
+
+    # R-14's starting glass is the shared Table 1 source composition. Its
+    # printed row composition (7.03/29.63/29.03/34.31 wt%) is the final residue.
+    assert starting_wt_percent == pytest.approx(
+        {"MgO": 11.48, "SiO2": 46.00, "Al2O3": 19.39, "CaO": 23.12},
+        abs=0.02,
+    )
 
 
 def test_richter_rep5_row_has_numeric_residual_and_domain_notice(mass_loss_rows) -> None:
-    richter, experiment, _markova, _markova_experiment = mass_loss_rows
+    richter, experiment, _markova, _markova_experiment, _r14, _r14_experiment = (
+        mass_loss_rows
+    )
 
     prediction = predict_with_engine(
         Engine.OPENIMCC,
@@ -199,7 +241,9 @@ def test_richter_rep5_table1_inputs_migrate_to_sample_mass_and_area() -> None:
 
 
 def test_richter_row_without_exposed_area_refuses(mass_loss_rows) -> None:
-    richter, experiment, _markova, _markova_experiment = mass_loss_rows
+    richter, experiment, _markova, _markova_experiment, _r14, _r14_experiment = (
+        mass_loss_rows
+    )
     enriched = _richter_rep5_run(experiment)
     apparatus = replace(
         enriched.apparatus,
@@ -219,7 +263,14 @@ def test_richter_row_without_exposed_area_refuses(mass_loss_rows) -> None:
 
 
 def test_engine_without_residue_capability_refuses_with_engine_name(mass_loss_rows) -> None:
-    _richter, _richter_experiment, markova, markova_experiment = mass_loss_rows
+    (
+        _richter,
+        _richter_experiment,
+        markova,
+        markova_experiment,
+        _r14,
+        _r14_experiment,
+    ) = mass_loss_rows
     engine = Engine.VAPOROCK
 
     prediction = predict_with_engine(
