@@ -276,6 +276,37 @@ def _source_data():
     )
 
 
+def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
+    pytest.importorskip("openimcc")
+    experiments, _measured_rows, preform_dimensions_mm = _source_data()
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+
+    predictions = _predict_hashimoto_residue_cohort(
+        (experiments[0],),
+        catalog,
+        preform_dimensions_mm=preform_dimensions_mm,
+        code_revision="pre-mass-loss-pin",
+        engine="openimcc",
+        _allow_partial_cohort_for_test=True,
+    )
+    primary = next(
+        row for row in predictions if row.alpha_arm == _HASHIMOTO_PRIMARY_ALPHA_ARM
+    )
+
+    assert primary.experiment_id == "hashimoto-1983-run-17c3-2"
+    assert primary.primary_geometry_policy_id == "sphere_shrinking"
+    assert primary.primary_oxide_wt_pct == pytest.approx(
+        {
+            "SiO2": 43.881276678821,
+            "Al2O3": 4.425579151545,
+            "FeO": 17.057673774718,
+            "MgO": 31.092219439303,
+            "CaO": 3.543250955613,
+        },
+        abs=1e-9,
+    )
+
+
 def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
