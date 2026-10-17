@@ -204,9 +204,13 @@ def test_sub_tolerance_negative_mol_basis_lot_still_refuses() -> None:
         )
 
 
-def test_sub_tolerance_negative_kg_basis_lot_refuses() -> None:
+def test_negative_kg_basis_lot_keeps_base_tolerance_behavior() -> None:
+    clipped = MaterialLot("process.cleaned_melt", {"Si": -5e-13})
+
+    assert clipped.species_kg == {"Si": 0.0}
+    assert clipped.without_empty().species_kg == {}
     with pytest.raises(AccountingError, match="lot mass.*non-negative"):
-        MaterialLot("process.cleaned_melt", {"Si": -3.226e-13})
+        MaterialLot("process.cleaned_melt", {"Si": -2e-12})
 
 
 def test_h190_fe_reduction_retains_tiny_oxygen_credit_and_closes() -> None:

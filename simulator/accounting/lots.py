@@ -223,14 +223,18 @@ class MaterialLot:
             value = float(kg)
             if not math.isfinite(value):
                 raise AccountingError(f"mass for species {name!r} must be finite")
+            if value < -EMPTY_KG_TOLERANCE:
+                raise AccountingError(f"lot mass for species {name!r} must be non-negative")
             if name in nonzero_mol_species and value < 0.0:
                 raise AccountingError(
                     f"mol-basis lot mass for species {name!r} must be non-negative"
                 )
-            if value < 0.0:
-                raise AccountingError(
-                    f"lot mass for species {name!r} must be non-negative"
-                )
+            if (
+                value <= 0.0
+                and abs(value) <= EMPTY_KG_TOLERANCE
+                and name not in nonzero_mol_species
+            ):
+                value = 0.0
             normalized[name] = normalized.get(name, 0.0) + value
 
         missing_mol_species = {

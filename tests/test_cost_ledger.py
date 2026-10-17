@@ -21,7 +21,12 @@ from simulator.cost_energy import (
     owner_ratify_cost_placeholders,
     unavailable_reason_of,
 )
-from simulator.cost_ledger import CostImportContext, CostLedger, CostVector
+from simulator.cost_ledger import (
+    VECTOR_TOLERANCE,
+    CostImportContext,
+    CostLedger,
+    CostVector,
+)
 from simulator.cost_ledger import build_cost_rollup_diagnostic, run_pumping_input_cost
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -112,7 +117,12 @@ def test_sub_tolerance_reagent_debit_is_below_cost_input_floor():
     )
 
     assert result is None
-    assert ledger.summary()["warnings"] == []
+    warnings = ledger.summary()["warnings"]
+    assert len(warnings) == 1
+    assert "cost_debit_below_quantity_floor" in warnings[0]
+    assert "skipped_keys=1" in warnings[0]
+    assert f"total_kg={tiny_kg:.12g}" in warnings[0]
+    assert f"floor_kg={VECTOR_TOLERANCE:.1e}" in warnings[0]
 
 
 def test_cost_ledger_mass_allocates_normal_coproducts_by_product_mass():

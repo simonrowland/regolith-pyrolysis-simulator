@@ -546,18 +546,33 @@ class CostLedger:
         )
         input_lots: list[CostLot] = []
         saw_cost_bearing_debit = False
+        skipped_floor_keys = 0
+        skipped_floor_kg = 0.0
         for lot in transition.debits:
             if not _is_cost_bearing_account(lot.account):
                 continue
             for species, kg in lot.species_kg.items():
-                # CostLot quantities at or below VECTOR_TOLERANCE are zero;
-                # do not let such a debit key trigger a missing-cost warning.
+                # VECTOR_TOLERANCE is the CostLot quantity floor (1e-12 kg).
+                # At the shipped maximum unit charge (LAUNCH_USD_PER_KG =
+                # $10,000/kg in cost_energy.py), one skipped key is at most
+                # $1e-8; the cost report displays USD to cents, so this per-key
+                # floor cannot move a reported cost.
                 if kg <= VECTOR_TOLERANCE:
+                    if kg > 0.0:
+                        skipped_floor_keys += 1
+                        skipped_floor_kg += float(kg)
                     continue
                 saw_cost_bearing_debit = True
                 input_lots.extend(
                     self._debit_lots(lot.account, species, kg, strict=strict)
                 )
+        if skipped_floor_keys:
+            self._warnings.append(
+                "cost_debit_below_quantity_floor: "
+                f"skipped_keys={skipped_floor_keys} "
+                f"total_kg={skipped_floor_kg:.12g} "
+                f"floor_kg={VECTOR_TOLERANCE:.1e}"
+            )
 
         outputs = _outputs_from_lots(transition.credits)
         if not outputs:
