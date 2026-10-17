@@ -192,19 +192,31 @@ def test_run_number_column_is_not_treated_as_reference_column(tmp_path: Path) ->
     assert "fused_reference_decimal" not in str(row["flags"])
 
 
+def test_reference_column_does_not_treat_run_no_as_citations() -> None:
+    assert qa._reference_column(["Run No."]) is False
+    assert qa._reference_column(["No."]) is True
+
+
 def test_calibration_tsv_matches_live_scores_and_ranks_mangled_tables(tmp_path: Path) -> None:
     repo_root = Path(__file__).resolve().parents[2]
     calibration = repo_root / "tests/tools/mineru_table_qa_calibration.tsv"
     output = tmp_path / "calibration.tsv"
     env = os.environ.copy()
     env.setdefault("MPLCONFIGDIR", "/private/tmp/claude-501/main-review/mplcache")
+    repo_path = str(repo_root)
+    env["PYTHONPATH"] = os.pathsep.join(
+        part for part in (repo_path, env.get("PYTHONPATH", "")) if part
+    )
+    corpus_root = Path(os.environ.get(
+        "REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"
+    )).expanduser()
 
     subprocess.run(
         [
             sys.executable,
             str(repo_root / "tests/tools/calibrate_mineru_table_qa.py"),
             str(calibration),
-            "/Users/simonrowland/Repos/regolith-corpus",
+            str(corpus_root),
             str(output),
         ],
         cwd=repo_root,

@@ -28,8 +28,9 @@ _NUMBER = re.compile(
     r"^[+\-−–—]?(?:\d+(?:\.\d+)?|\.\d+)(?:\(\d+\))?(?:[eE][+\-]?\d+)?$"
 )
 _COMMA_DECIMAL = re.compile(
-    r"(?<![\d.,])(?:\d{1,3}\.\d{3},\d+|\d{2,},\d{3})(?!\d)"
+    r"(?<![\d.,])(?:\d{1,3}\.\d{3},\d+|\d+,\d{1,2})(?!\d)"
 )
+_AMBIGUOUS_COMMA = re.compile(r"(?<![\d.,])\d{2,},\d{3}(?!\d)")
 _FOOTNOTE_MARK = re.compile(r"([*†‡§¶|]+)$")
 _NUMERIC_SUPERSCRIPT = re.compile(
     r"[+\-−–—]?\d+|[⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+"
@@ -266,9 +267,8 @@ def _header_row_count(grid: list[list[Cell]]) -> int:
         else:
             break
     axis_with_unit = re.compile(
-        r"\b(?:temperature|pressure|time|composition)\b"
-        r"[^\n]{0,24}(?:\b(?:K|°?C|bar|Pa|atm|mmHg|s|sec|min|h|hr)\b|"
-        r"(?:wt|mass|mol)\s*%|\bmole\s*fraction\b)",
+        r"\b(?:temperature|pressure|time)\b"
+        r"[^\n]{0,24}\b(?:K|°C|bar|Pa|atm|mmHg|s|sec|min|h|hr)\b",
         re.I,
     )
     count = tagged_count
@@ -393,6 +393,8 @@ def _add_cell_flags(
                 flags.append("missing_minus_suspect")
             if _COMMA_DECIMAL.search(cell.text):
                 flags.append("comma_decimal_suspect")
+            if _AMBIGUOUS_COMMA.search(cell.text):
+                flags.append("ambiguous_comma_separator")
             cell.flags = flags
             counts.update(flags)
     return counts

@@ -89,7 +89,8 @@ def test_each_mechanical_flag_fires_only_on_the_suspect_cell() -> None:
     draft._add_cell_flags(grid, header_count, numeric_columns)
 
     assert "unicode_minus" in grid[1][1].flags
-    assert "comma_decimal_suspect" in grid[1][2].flags
+    assert "ambiguous_comma_separator" in grid[1][2].flags
+    assert "comma_decimal_suspect" not in grid[1][2].flags
     assert "missing_minus_suspect" in grid[2][1].flags
     assert grid[2][2].value_text == "1.23"
     assert grid[2][2].mark == "*"
@@ -113,17 +114,24 @@ def test_each_mechanical_flag_fires_only_on_the_suspect_cell() -> None:
     assert not grid[3][2].flags
 
 
-def test_comma_decimal_suspect_is_european_comma_only() -> None:
+def test_comma_formats_distinguish_decimal_from_ambiguous_grouping() -> None:
     grid = draft.parse_table_html(
         "<table><tr><th>Value</th></tr><tr><td>123.456</td></tr>"
-        "<tr><td>1.234,56</td></tr><tr><td>25,540</td></tr>"
-        "<tr><td>1,234</td></tr></table>"
+        "<tr><td>1.234,56</td></tr><tr><td>12,5</td></tr>"
+        "<tr><td>3,14</td></tr><tr><td>25,540</td></tr>"
+        "<tr><td>123,456</td></tr><tr><td>1,234</td></tr></table>"
     )
     draft._add_cell_flags(grid, draft._header_row_count(grid), {0})
     assert "comma_decimal_suspect" not in grid[1][0].flags
     assert "comma_decimal_suspect" in grid[2][0].flags
     assert "comma_decimal_suspect" in grid[3][0].flags
-    assert "comma_decimal_suspect" not in grid[4][0].flags
+    assert "comma_decimal_suspect" in grid[4][0].flags
+    for cell in grid[5:7]:
+        assert "ambiguous_comma_separator" in cell[0].flags
+        assert "comma_decimal_suspect" not in cell[0].flags
+    assert "comma_decimal_suspect" not in grid[7][0].flags
+    assert "ambiguous_comma_separator" not in grid[7][0].flags
+    assert all(cell[0].numeric_value is None for cell in grid[2:8])
 
 
 def test_composition_header_without_unit_keeps_single_measurement_row() -> None:
@@ -137,6 +145,27 @@ def test_composition_header_without_unit_keeps_single_measurement_row() -> None:
 
     assert header_count == 1
     assert [cell.numeric_value for cell in grid[1]] == [25.4, 31.2]
+
+
+def test_composition_weight_percent_does_not_promote_measurements() -> None:
+    grid = draft.parse_table_html(
+        "<table><tr><th>Composition, wt%</th></tr>"
+        "<tr><td>50.1</td><td>12.3</td><td>8.4</td></tr>"
+        "<tr><td>SiO2</td><td>Al2O3</td><td>FeO</td></tr></table>"
+    )
+
+    assert draft._header_row_count(grid) == 1
+    assert [cell.text for cell in grid[1]] == ["50.1", "12.3", "8.4"]
+
+
+def test_composition_of_sample_c_does_not_match_a_celsius_unit() -> None:
+    grid = draft.parse_table_html(
+        "<table><tr><th>composition of sample C</th></tr>"
+        "<tr><td>50.1</td><td>12.3</td></tr>"
+        "<tr><td>SiO2</td><td>Al2O3</td></tr></table>"
+    )
+
+    assert draft._header_row_count(grid) == 1
 
 
 def test_axis_header_with_unit_promotes_following_numeric_axis_row() -> None:
