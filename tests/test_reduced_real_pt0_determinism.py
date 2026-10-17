@@ -2564,7 +2564,11 @@ def test_pt0_quantized_controls_fail_loudly_on_non_finite_melt_controls(
 ) -> None:
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
-    setattr(sim.melt, field, value)
+    if field == 'p_total_mbar':
+        # The physical pressure control is the achieved headspace projection.
+        sim._melt_headspace_composition_mbar = {'N2': value}
+    else:
+        setattr(sim.melt, field, value)
 
     with pytest.raises(PT0InvalidControls, match=message):
         store.quantized_controls(sim, fO2_log=0.0)
@@ -2617,7 +2621,10 @@ def test_pt0_cache_key_fails_loudly_on_non_finite_melt_controls(
     # fO2 fallback.
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
-    setattr(sim.melt, field, value)
+    if field == 'p_total_mbar':
+        sim._melt_headspace_composition_mbar = {'N2': value}
+    else:
+        setattr(sim.melt, field, value)
 
     with pytest.raises(PT0InvalidControls, match=message):
         canonical_replay_key(

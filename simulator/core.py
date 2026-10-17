@@ -2463,7 +2463,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if temperature_C_override is None
             else float(temperature_C_override)
         )
-        pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+        pressure_bar = self._melt_headspace_total_pressure_bar()
         store = _pt0_determinism_store_for(self)
         account_mol_overrides = None
         if store is not None and getattr(store, 'quantize_live_controls', False):
@@ -3573,6 +3573,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._install_upstream_projection(dict(initial_gas.composition))
 
     def _melt_headspace_total_pressure_bar(self) -> float:
+        # Silicate equilibrium/liquidus use confining P: d(mu)/(RT) = V*dP/(RT).
+        # For V=1-4e-5 m^3/mol, dP=(0.01-0.0001585)*1e5 Pa and T=1773 K,
+        # this is 6.7e-7 to 2.7e-6: (m^3/mol)*Pa/(J/mol) is dimensionless,
+        # and equal pressures give zero. Negligible does not mean commanded:
+        # MAGEMin's six-decimal kbar inputs are 0.000010 versus 0.000000.
         upstream_partials_mbar = getattr(
             self,
             '_melt_headspace_composition_mbar',
@@ -4922,7 +4927,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
         self._last_reduced_real_replay_notices = None
-        pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+        pressure_bar = self._melt_headspace_total_pressure_bar()
         fO2_log = float(self._current_melt_redox_fO2_log())
         fO2_log, redox_state = normalize_redox_state(
             fO2_log,
@@ -9517,7 +9522,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             intrinsic_fO2_log = float(
                 self.melt.oxygen_reservoir.melt_intrinsic_fO2_log)
             temperature_C = float(self.melt.temperature_C)
-            pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+            pressure_bar = self._melt_headspace_total_pressure_bar()
             canonicalize_pt0_inputs = store is not None and getattr(
                 store,
                 'quantize_live_controls',

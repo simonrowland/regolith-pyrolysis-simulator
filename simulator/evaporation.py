@@ -2084,7 +2084,7 @@ class EvaporationMixin:
 
         self._reduced_real_uncacheable_reasons = []
         self._last_reduced_real_replay_notices = None
-        pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+        pressure_bar = self._melt_headspace_total_pressure_bar()
         fO2_log = self._freeze_gate_liquidus_fO2_log(
             float(self._current_melt_redox_fO2_log())
         )
@@ -2685,7 +2685,7 @@ class EvaporationMixin:
                         else float(temperature_C)
                     ),
                     pressure_bar=(
-                        float(self.melt.p_total_mbar) / 1000.0
+                        self._melt_headspace_total_pressure_bar()
                         if pressure_bar is None
                         else float(pressure_bar)
                     ),

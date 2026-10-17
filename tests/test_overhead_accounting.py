@@ -2208,7 +2208,10 @@ def test_capture_iteration_reuses_unchanged_stage_inputs(monkeypatch):
                for alpha in route['Fe']['stage_alpha_records_by_stage'].values())
 
 
-@pytest.mark.parametrize('consumer', ['dispatch', 'liquidus_gate', 'freeze_curve', 'equilibrium'])
+@pytest.mark.parametrize('consumer', [
+    'dispatch', 'liquidus_request', 'freeze_request',
+    'liquidus_gate', 'freeze_curve', 'equilibrium',
+])
 def test_engine_request_pressure_uses_achieved_headspace(monkeypatch, consumer):
     from simulator.chemistry.kernel import ChemistryIntent
 
@@ -2223,10 +2226,15 @@ def test_engine_request_pressure_uses_achieved_headspace(monkeypatch, consumer):
         captured.update(kwargs)
         raise LookupError('pressure captured')
 
-    if consumer == 'dispatch':
+    if consumer in {'dispatch', 'liquidus_request', 'freeze_request'}:
         monkeypatch.setattr(sim._require_chem_kernel(), 'dispatch', capture)
+        intent = {
+            'dispatch': ChemistryIntent.SILICATE_EQUILIBRIUM,
+            'liquidus_request': ChemistryIntent.SILICATE_LIQUIDUS,
+            'freeze_request': ChemistryIntent.GATE_LIQUID_FRACTION,
+        }[consumer]
         invoke = lambda: sim._dispatch_only(
-            ChemistryIntent.SILICATE_EQUILIBRIUM, control_inputs={})
+            intent, control_inputs={})
     elif consumer in {'liquidus_gate', 'freeze_curve'}:
         monkeypatch.setattr(sim, '_freeze_gate_cache_key', capture)
         invoke = (sim._melt_redox_liquidus_gate_record if consumer == 'liquidus_gate'
