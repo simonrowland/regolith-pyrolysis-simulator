@@ -7,7 +7,7 @@ import math
 from collections import defaultdict
 from collections.abc import Mapping
 from numbers import Real
-from typing import Any
+from typing import Any, NamedTuple
 
 from simulator.alpha_kinetics import parse_alpha_contract
 from simulator.accounting import AccountingError, resolve_species_formula
@@ -426,6 +426,17 @@ _FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
     'MnO',
     'P2O5',
 ))
+
+
+class FreezeGateCurveCacheKey(NamedTuple):
+    schema: str
+    pressure_bar: float
+    fO2_log: float
+    composition_mol_fractions: tuple[tuple[str, float], ...]
+    water_mol_fraction: float
+    formula_registry_digest: str
+    inert_species: tuple[str, ...]
+    redox_state_identity: tuple[tuple[str, Any], ...] | None
 
 
 def _freeze_gate_notice_value(value: Any) -> float | str | None:
@@ -2441,7 +2452,9 @@ class EvaporationMixin:
         pressure_bar: float,
         fO2_log: float,
         redox_state: RedoxState | None = None,
-    ) -> tuple:
+    ) -> FreezeGateCurveCacheKey:
+        from simulator.reduced_real_determinism import _digest
+
         cleaned_mol = self.atom_ledger.project_account_mol(
             _FREEZE_GATE_ACCOUNT
         )
@@ -2458,10 +2471,10 @@ class EvaporationMixin:
         # states below liquidus are not interchangeable: their distinct curves
         # feed F_liquid, melt capacity, and native-Fe behavior.
         composition_key = []
-        total_mol = sum(relevant_mol.values())
-        if total_mol > _FREEZE_GATE_EPSILON:
+        oxide_total_mol = sum(relevant_mol.values())
+        if oxide_total_mol > _FREEZE_GATE_EPSILON:
             for species, mol in relevant_mol.items():
-                fraction = mol / total_mol
+                fraction = mol / oxide_total_mol
                 if fraction < _FREEZE_GATE_TRACE_FRACTION_CUTOFF:
                     continue
                 quantized_fraction = (
@@ -2471,6 +2484,26 @@ class EvaporationMixin:
                 if quantized_fraction <= 0.0:
                     continue
                 composition_key.append((species, round(quantized_fraction, 6)))
+        water_mol = max(float(cleaned_mol.get('H2O', 0.0)), 0.0)
+        tracked_total_mol = oxide_total_mol + water_mol
+        water_fraction = (
+            water_mol / tracked_total_mol
+            if tracked_total_mol > _FREEZE_GATE_EPSILON
+            else 0.0
+        )
+        water_bucket = (
+            round(water_fraction / _FREEZE_GATE_FRACTION_QUANTUM)
+            * _FREEZE_GATE_FRACTION_QUANTUM
+        )
+        inert_components = (
+            getattr(self.inventory, 'inert_melt_components_kg', {}) or {}
+        )
+        inert_species = tuple(sorted(
+            str(species)
+            for species in inert_components
+            if species in cleaned_mol
+            and float(cleaned_mol[species]) > _FREEZE_GATE_EPSILON
+        ))
         pressure_bucket = (
             round(float(pressure_bar) / _FREEZE_GATE_PRESSURE_BAR_QUANTUM)
             * _FREEZE_GATE_PRESSURE_BAR_QUANTUM
@@ -2488,18 +2521,25 @@ class EvaporationMixin:
         # components are omitted before this arithmetic. No physical-
         # equivalence error bound for these pressure/fO2 quanta is established
         # here.
-        key = (
-            'oxide_mol_fraction_p_fO2_v3',
-            round(pressure_bucket, 6),
-            round(fO2_bucket, 6),
-            tuple(sorted(composition_key)),
-        )
         redox_identity = (
             None if redox_state is None else redox_state.cache_identity()
         )
-        if redox_identity is None:
-            return key
-        return (*key, tuple(sorted(redox_identity.items())))
+        redox_identity_key = (
+            None if redox_identity is None
+            else tuple(sorted(redox_identity.items()))
+        )
+        return FreezeGateCurveCacheKey(
+            schema='oxide_mol_fraction_p_fO2_v4',
+            pressure_bar=round(pressure_bucket, 6),
+            fO2_log=round(fO2_bucket, 6),
+            composition_mol_fractions=tuple(sorted(composition_key)),
+            water_mol_fraction=round(water_bucket, 6),
+            formula_registry_digest=_digest(
+                getattr(self, 'species_formula_registry', {}) or {}
+            ),
+            inert_species=inert_species,
+            redox_state_identity=redox_identity_key,
+        )
 
     def _freeze_gate_curve_from_gate_dispatch(
         self,

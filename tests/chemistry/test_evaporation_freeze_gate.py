@@ -399,6 +399,73 @@ def test_freeze_gate_cache_key_ignores_corpus_version(
     assert before == after
 
 
+def test_freeze_gate_cache_key_distinguishes_provider_inputs(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.accounting.formulas import SpeciesFormula
+    from simulator.evaporation import _FREEZE_GATE_COMPOSITION_SPECIES
+
+    def build_sim():
+        return _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+
+    baseline_sim = build_sim()
+    baseline_key = _freeze_gate_key_for_current_state(baseline_sim)
+
+    water_sim = build_sim()
+    oxides_before = water_sim.atom_ledger.project_account_mol(
+        _CLEANED_MELT_ACCOUNT
+    )
+    water_sim.atom_ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        {'H2O': 500.0},
+        source='b-839 cache key water variant',
+        material_origin='feedstock',
+    )
+    oxides_after = water_sim.atom_ledger.project_account_mol(
+        _CLEANED_MELT_ACCOUNT
+    )
+    assert {
+        species: oxides_after.get(species, 0.0)
+        for species in _FREEZE_GATE_COMPOSITION_SPECIES
+    } == {
+        species: oxides_before.get(species, 0.0)
+        for species in _FREEZE_GATE_COMPOSITION_SPECIES
+    }
+    water_key = _freeze_gate_key_for_current_state(water_sim)
+    assert water_key != baseline_key
+    assert water_key._replace(
+        water_mol_fraction=baseline_key.water_mol_fraction
+    ) == baseline_key
+
+    formula_sim = build_sim()
+    formula_sim.species_formula_registry = dict(
+        formula_sim.species_formula_registry
+    )
+    formula_sim.species_formula_registry['SiO2'] = SpeciesFormula.from_atoms(
+        'SiO2', {'Si': 1, 'O': 1}
+    )
+    formula_key = _freeze_gate_key_for_current_state(formula_sim)
+    assert formula_key != baseline_key
+    assert formula_key._replace(
+        formula_registry_digest=baseline_key.formula_registry_digest
+    ) == baseline_key
+
+    inert_sim = build_sim()
+    inert_sim.inventory.inert_melt_components_kg['Na2O'] = 1.0
+    inert_key = _freeze_gate_key_for_current_state(inert_sim)
+    assert inert_key != baseline_key
+    assert inert_key._replace(inert_species=baseline_key.inert_species) == (
+        baseline_key
+    )
+
+
 def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     from simulator.core import PyrolysisSimulator
     from simulator.melt_backend.magemin import MAGEMinBackend
