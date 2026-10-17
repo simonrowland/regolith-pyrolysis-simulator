@@ -1003,10 +1003,28 @@ class ThermalSchedule:
 
 
 @dataclass(frozen=True)
+class GasRatio:
+    numerator_species: str
+    denominator_species: str
+    value: Located[Value]
+    basis: str
+
+    def __post_init__(self) -> None:
+        if not self.numerator_species.strip() or not self.denominator_species.strip():
+            raise ValueError("gas ratio species must be nonempty")
+        if self.numerator_species == self.denominator_species:
+            raise ValueError("gas ratio species must differ")
+        if self.basis not in {"volume", "mole", "partial_pressure"}:
+            raise ValueError("gas ratio basis must be volume, mole, or partial_pressure")
+        object.__setattr__(self, "value", _located_value(self.value))
+
+
+@dataclass(frozen=True)
 class FO2Control:
     channel: State[FO2Channel]
     buffer: Located[str] | None = None
     oxygen_partial_pressure_Pa: Located[Value] | None = None
+    gas_ratio: GasRatio | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
