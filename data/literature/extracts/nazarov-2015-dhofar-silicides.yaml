@@ -484,7 +484,48 @@ species:
           p_atm_as_printed: '8.87 × 10^-4'
           locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'SiO row, 2033 K column'}
       uncertainty:
-        note: No individual pressure uncertainty is printed.
+        note: Table 2 does not state per-point pressure uncertainty; Equation (1) reports fit-coefficient uncertainties on the separate SiO relation row.
+    - observation_id: nazarov_2015_sio_pressure_temperature_relation
+      type: partial_pressure
+      locator:
+        published_page: 171
+        pdf_page_index: 3
+        section: Vaporization of an Anorthitic Melt
+        equation: '1'
+        note: Equation (1) gives the SiO pressure-temperature fit.
+      T_range_K: [1833, 2033]
+      phase: gas
+      experiment: nazarov-2015-synthetic-anorthite-kems
+      regime: kems_effusion
+      units: log pressure in atm; T in K
+      uncertainty:
+        note: Printed ± widths on A and B; confidence level not stated.
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO(g)
+        formula: SiO
+        composition_mol:
+          basis: formula_derived_from_synthetic_anorthite
+          CaO: '0.25'
+          Al2O3: '0.25'
+          SiO2: '0.50'
+        temperature_range_K: [1833, 2033]
+        range_basis: Table 2 temperature range; Equation (1) states no separate validity range.
+        pressure_temperature_relation: &naz15_sio_fit
+          relation_as_printed: 'log p_SiO (atm) = −(21 250 ± 1265)/T + (7.414 ± 0.655)'
+          pressure_unit_as_printed: atm
+          temperature_unit_as_printed: K
+          A_as_printed: '21 250 ± 1265'
+          A: 21250
+          sigma_A: 1265
+          A_unit: K
+          B_as_printed: '7.414 ± 0.655'
+          B: 7.414
+          sigma_B: 0.655
+          B_unit: dimensionless
+        provenance:
+          pressure_temperature_relation: *naz15_sio_fit
   SiO2:
     observations:
     - observation_id: nazarov_2015_table2_sio2
@@ -699,7 +740,7 @@ species:
           raw_inputs:
             state: {tag: value, value: not_printed}
             locator: {table: '2', published_page: 172, pdf_page_index: 4, note: 'Footnote ** states the equilibrium used for O2**; numerical raw inputs are not tabulated.'}
-        cell_contamination_note: O2 is from the molybdenum-cell vapor; MoO2 and MoO3 are not pressure rows in Table 2.
+        cell_contamination_note: O2 is the calculated oxygen partial pressure from O2 = 2O (Table 2 footnote **); it is not molybdenum-cell vapor.
         points:
         - T_K: 1833
           composition_mol: {basis: formula_derived_from_synthetic_anorthite, CaO: '0.25', Al2O3: '0.25', SiO2: '0.50'}
