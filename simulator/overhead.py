@@ -1147,28 +1147,9 @@ class OverheadGasModel:
             )
             gas.pressure_mbar = self.last_stream_boundary['pressure_mbar']
         else:
-            carrier = self.last_stream_boundary['carrier_species']
-            inlet_pressure_mbar = self.last_stream_boundary['pressure_mbar']
-            carrier_mass = _species_molar_mass_g_mol(carrier, self.species_formula_registry) / 1000.0
-            molar_capacity = self._pipe_conductance(
-                inlet_pressure_mbar * 100.0, melt.temperature_C,
-                p_downstream_Pa=gas.p_downstream_bar * 1.0e5,
-                species_kg_for_M_avg={carrier: 1.0},
-            ) * 3600.0 / carrier_mass
-            if molar_capacity > 0.0:
-                # PIPE-1 has q=C_mol*(P_up²-P_down²). Its mass capacity
-                # divided by the same carrier M cancels M, so this molar
-                # coefficient needs no invented ambient_other mass. Therefore
-                # P_report²=P_down²+(q_report/q_capacity)*(P_in²-P_down²).
-                # Units are mbar²; no capture restores P_in at full capacity.
-                downstream_mbar = gas.p_downstream_bar * 1000.0
-                gas.pressure_mbar = math.sqrt(
-                    downstream_mbar ** 2
-                    + sum(flows.values()) / molar_capacity
-                    * (inlet_pressure_mbar ** 2 - downstream_mbar ** 2)
-                )
-            else:
-                gas.pressure_mbar = inlet_pressure_mbar
+            gas.pressure_mbar = self._flowing_pressure_mbar(
+                flows, melt.temperature_C, p_downstream_bar=gas.p_downstream_bar,
+            )
         if self._finite_headspace_enabled:
             self._update_finite_headspace(
                 gas, melt, overhead_holdup_mol or {},
@@ -1224,6 +1205,23 @@ class OverheadGasModel:
                 for species, molar_flow in flows.items()
             }
         return {}
+
+    def _flowing_pressure_mbar(
+        self, flows: Mapping[str, float], temperature_C: float, *, p_downstream_bar: float,
+    ) -> float:
+        # Premise: existing PIPE-1 uses composition-independent viscosity and
+        # mass flow F=M*Q/3600=C*M*(P_up²-P_down²). Divide by M to obtain
+        # P_up=sqrt(P_down²+Q/(3600*C)). The existing mass-law inverse can
+        # therefore use a known reference gas for BOTH F and M; its mass
+        # cancels, without assigning an invented mass to ambient_other.
+        # (mol/hr)*(kg/mol)/3600=kg/s; the inverse returns mbar. At zero
+        # throughput there is no flowing composition; at full pipe capacity
+        # this recovers the reference upstream pressure, independent of gas M.
+        reference_mass = _species_molar_mass_g_mol('N2', self.species_formula_registry) / 1000.0
+        return self._vapor_pressure_mbar_from_flux(
+            sum(flows.values()) * reference_mass / 3600.0, temperature_C,
+            p_downstream_bar=p_downstream_bar, species_kg_for_M_avg={'N2': 1.0},
+        )
 
     def flowing_stream_mol_hr(
         self, source_mol_hr: Mapping[str, float], melt: MeltState,
@@ -1454,13 +1452,10 @@ class OverheadGasModel:
             # than extra gas. Invert the existing outlet law using the complete
             # gas load: q_i*M_i is kg/hr, sum/3600 is kg/s. This determines
             # pressure for the given source; it does not recompute evaporation.
-            mass_rates = {s: q * _species_molar_mass_g_mol(s, self.species_formula_registry) / 1000.0
-                          for s, q in flows.items() if q > 0.0}
-            pressure_mbar = self._vapor_pressure_mbar_from_flux(
-                sum(mass_rates.values()) / 3600.0,
+            pressure_mbar = self._flowing_pressure_mbar(
+                flows,
                 temperature_K - CELSIUS_TO_KELVIN_OFFSET,
                 p_downstream_bar=transport['p_downstream_bar'],
-                species_kg_for_M_avg=mass_rates,
             )
             self.last_stream_boundary['pressure_mbar'] = pressure_mbar
         self.last_stream_mol_hr = dict(flows)
