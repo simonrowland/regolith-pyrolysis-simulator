@@ -4391,7 +4391,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mol_fractions=melt_mol_fractions_for_kress91(comp),
             T_K=T_K,
             pressure_bar=floor_vacuum_pressure_bar(
-                float(self.melt.p_total_mbar) / 1000.0,
+                self._melt_headspace_total_pressure_bar(),
                 floor_bar=self._vacuum_floor_bar(),
             ),
             exchange_fO2_log=math.log10(max(exchange_pO2, self._vacuum_floor_bar())),
@@ -5881,7 +5881,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             fO2_log=target_fO2_log,
             mol_fractions=melt_mol_fractions_for_kress91(self._melt_oxide_wt_pct()),
             T_K=T_K, pressure_bar=floor_vacuum_pressure_bar(
-                self.melt.p_total_mbar / 1000.0, floor_bar=self._vacuum_floor_bar(),
+                self._melt_headspace_total_pressure_bar(), floor_bar=self._vacuum_floor_bar(),
             ),
         )
         _char_basis, char_o2_per_c, _char_product = self._char_lance_basis()
@@ -6576,7 +6576,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ferric = float(inventory.get('Fe2O3', 0.0))
         basis = melt_mol_fractions_for_kress91(self._melt_oxide_wt_pct())
         pressure = floor_vacuum_pressure_bar(
-            self.melt.p_total_mbar / 1000.0, floor_bar=self._vacuum_floor_bar(),
+            self._melt_headspace_total_pressure_bar(), floor_bar=self._vacuum_floor_bar(),
         )
         def gas_log_fO2(remaining_o2_mol: float) -> float:
             ledger_pressure = self._headspace_ledger_pO2_bar_from_o2_mol(remaining_o2_mol)
@@ -7339,9 +7339,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         result = native_fe_equilibrium_extent(
             comp_wt=self._melt_oxide_wt_pct(), feo_mol=feo,
             fe2o3_mol=ferric, T_K=float(self.melt.temperature_C) + 273.15,
-            # Same pressure owner/control as _current_melt_redox_fO2_log.
+            # Same actual upstream pressure as the ledger inverse and forward solve.
             pressure_bar=floor_vacuum_pressure_bar(
-                float(self.melt.p_total_mbar) / 1000.0,
+                self._melt_headspace_total_pressure_bar(),
                 floor_bar=self._vacuum_floor_bar(),
             ),
             gas_fO2_log=gas_fO2_log,
