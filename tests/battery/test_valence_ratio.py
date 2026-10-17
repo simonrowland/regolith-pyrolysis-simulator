@@ -511,6 +511,43 @@ def test_average_oxidation_state_without_named_bounds_gets_no_range_notice(
     )
 
 
+def test_out_of_range_fraction_prediction_keeps_numeric_with_notice():
+    result = _migrate_sossi_cr()
+    template = next(
+        observation
+        for observation in result.observations.values()
+        if observation.value.kind is ValueKind.POINT
+        and observation.value.point == Decimal("0.32")
+    )
+    observation = _quench_row(
+        template,
+        observation_id=template.observation_id,
+        phase=Phase.L,
+        value=Decimal("0.32"),
+    )
+    calls = []
+    residuals, _candidates = score_store(
+        _quench_context(result, (observation,)),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+        predict=_numeric_quench_predictor(calls, value=Decimal("1.2")),
+    )
+
+    assert calls == [observation]
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.numeric is not None
+    assert float(residual.numeric.value) == pytest.approx(0.5740312677277188)
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.PREDICTION_OUTSIDE_PHYSICAL_RANGE
+    )
+    assert "prediction" in notice.reason
+    assert "range [0, 1]" in notice.reason
+    assert "by 0.2" in notice.reason
+
+
 def test_negative_ratio_valence_value_remains_a_typed_refusal(tmp_path: Path):
     migrator, observation = _migrate_valence_fixture(
         tmp_path, "Cr3plus_over_Cr2plus", "-0.1"
@@ -684,7 +721,7 @@ def _quench_context(result, rows):
     )
 
 
-def _numeric_quench_predictor(calls):
+def _numeric_quench_predictor(calls, *, value=Decimal("0.5")):
     def predict(engine, reference, **_kwargs):
         calls.append(reference)
         return EnginePrediction(
@@ -693,7 +730,7 @@ def _numeric_quench_predictor(calls):
             execution=Execution(
                 state=ExecutionState.PRODUCED, call_evidence="test:quench"
             ),
-            value=Decimal("0.5"),
+            value=value,
             unit="dimensionless",
             authority=Authority.CERTIFIED,
             identity=reference.identity,
@@ -769,14 +806,23 @@ def test_extract_quench_state_uses_the_typed_point_condition_key(tmp_path: Path)
     )
 
 
-def test_extract_malformed_quench_state_is_a_row_refusal(tmp_path: Path):
+@pytest.mark.parametrize(
+    ("condition_key", "invalid_value"),
+    (
+        ("quench_state", "assumed_preserved"),
+        ("quench_direction", "sideways"),
+    ),
+)
+def test_extract_malformed_quench_condition_is_a_row_refusal(
+    tmp_path: Path, condition_key: str, invalid_value: str
+):
     document = yaml.safe_load(SOSSI_CR.read_text(encoding="utf-8"))
     template = document["species"]["Cr"]["observations"][0]
     invalid = copy.deepcopy(template)
     invalid["observation_id"] = "quench_invalid_fixture"
     invalid["point_conditions"] = {
-        "quench_state": {
-            "state": {"tag": "value", "value": "assumed_preserved"},
+        condition_key: {
+            "state": {"tag": "value", "value": invalid_value},
             "locator": {"page": 12, "table": "3"},
         }
     }
@@ -807,8 +853,8 @@ def test_extract_malformed_quench_state_is_a_row_refusal(tmp_path: Path):
         if "quench_invalid_fixture" in issue.path
     )
     assert refusal.reason is RefusalReason.INVALID_SOURCE
-    assert refusal.path.endswith(".point_conditions.quench_state")
-    assert "quench_state must be one of" in refusal.detail
+    assert refusal.path.endswith(f".point_conditions.{condition_key}")
+    assert f"{condition_key} must be one of" in refusal.detail
 
 
 @pytest.mark.parametrize(

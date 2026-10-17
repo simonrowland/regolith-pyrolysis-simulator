@@ -6928,6 +6928,32 @@ def compile_residual(
             exclusions=("identity_equal",),
         )
 
+    if (
+        quantity is Quantity.VALENCE_RATIO
+        and isinstance(identity, Identity)
+        and identity.valence_basis is not None
+        and identity.valence_basis.is_value
+    ):
+        basis = identity.valence_basis.value
+        range_excess = basis._physical_range_excess(prediction.value)
+        if range_excess is not None:
+            lower, upper, excess = range_excess
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.PREDICTION_OUTSIDE_PHYSICAL_RANGE,
+                        affected_quantities=(Quantity.VALENCE_RATIO,),
+                        reason=(
+                            f"prediction fraction valence value {prediction.value} "
+                            f"is outside physical range [{lower}, {upper}] by {excess}"
+                        ),
+                        origin=prediction.engine.value,
+                        original=prediction.value,
+                    ),
+                ),
+            )
+
     ref_point = point_magnitude(reference.value)
     assert ref_point is not None
     printed = _PrintedBandResolution()

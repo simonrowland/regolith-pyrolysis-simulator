@@ -224,6 +224,7 @@ class NoticeKind(StrEnum):
     INPUT_OMITTED = "input_omitted"
     COMPARISON_METHOD_CELL_CONSTANT_CANCELS = "comparison_method_cell_constant_cancels"
     PROBABLE_SOURCE_MISPRINT = "probable_source_misprint"
+    PREDICTION_OUTSIDE_PHYSICAL_RANGE = "prediction_outside_physical_range"
     SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE = "source_value_outside_physical_range"
     UNVERIFIED_APPARATUS = "unverified_apparatus"
     CELL_MATERIAL_INFERRED = "cell_material_inferred"
