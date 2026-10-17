@@ -1,4 +1,10 @@
-"""Write loss-preserving CSV drafts from MinerU content-list tables."""
+"""Write loss-preserving CSV drafts from MinerU content-list tables.
+
+This parser retains spans, header tags, and cell origins for draft auditing;
+the Pankratz ingest parser intentionally returns plain cell text. They have
+different outputs and neither can replace the other without changing ingest
+or draft semantics.
+"""
 
 from __future__ import annotations
 
@@ -25,7 +31,10 @@ _LATEX_SCIENTIFIC = re.compile(
     r"^([+\-−–—]?(?:\d+(?:\.\d+)?|\.\d+))\s*\\times\s*"
     r"10\^\{?([+\-−–—]?\d+)\}?$"
 )
-_COMMA_DECIMAL = re.compile(r"(?<![\d.])\d{2,3}\.\d{3}(?!\d)")
+_COMMA_DECIMAL = re.compile(
+    r"(?<![\d.,])(?:\d{1,3}\.\d{3},\d+|\d+,\d{1,2})(?!\d)"
+)
+_AMBIGUOUS_COMMA = re.compile(r"(?<![\d.,])\d{2,},\d{3}(?!\d)")
 _FOOTNOTE_MARK = re.compile(r"([*†‡§¶|]+)$")
 _NUMERIC_SUPERSCRIPT = re.compile(
     r"[+\-−–—]?\d+|[⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+"
@@ -141,10 +150,18 @@ def _is_number(text: str) -> bool:
 
 def _number_decimal(text: str) -> Decimal | None:
     token = text.strip().strip("$").strip()
-    latex_scientific = _LATEX_SCIENTIFIC.fullmatch(token)
-    if latex_scientific:
-        token = f"{latex_scientific.group(1)}e{latex_scientific.group(2)}"
-    elif not _NUMBER.fullmatch(token):
+    token = re.sub(r"\\mathrm\s*\{([^{}]*)\}", r"\1", token)
+    token = token.replace(r"\,", "").replace("−", "-").replace("–", "-").replace("—", "-")
+    scientific = re.fullmatch(
+        r"([+\-]?\d+(?:\.\d+)?|[+\-]?\.\d+)\s*\\times\s*10\s*\^\s*\{?([+\-]?\d+)\}?",
+        token,
+    )
+    if scientific:
+        try:
+            return Decimal(scientific.group(1)) * (Decimal(10) ** int(scientific.group(2)))
+        except InvalidOperation:
+            return None
+    if not _is_number(token):
         return None
     token = re.sub(r"\(\d+\)", "", token)
     token = token.translate(str.maketrans({"−": "-", "–": "-", "—": "-"}))
@@ -254,8 +271,50 @@ def _header_row_count(grid: list[list[Cell]]) -> int:
             tagged_count += 1
         else:
             break
-    if tagged_count:
-        return tagged_count
+    axis_with_unit = re.compile(
+        r"\b(?:temperature|pressure|time)\b"
+        r"[^\n]{0,24}(?:\b(?:K|bar|Pa|atm|mmHg|s|sec|min|h|hr)\b|"
+        r"(?<![A-Za-z])°C(?![A-Za-z])|\bdeg(?:ree)?\s+C\b)",
+        re.I,
+    )
+    count = tagged_count
+    if not count and grid:
+        first_row = grid[0]
+        first_row_text = " ".join(cell.text for cell in first_row)
+        if axis_with_unit.search(first_row_text) and not any(
+            _number_value(_split_mark(cell.text, cell.superscript_text)[0]) is not None
+            for cell in first_row
+        ):
+            count = 1
+    if count:
+        while count < len(grid):
+            previous = " ".join(cell.text for cell in grid[count - 1])
+            # A rowspan cell is expanded into later grid rows but belongs to its
+            # origin row; it must not make an otherwise numeric axis row look mixed.
+            row = [cell for cell in grid[count] if cell.origin_row == count]
+            populated = [cell for cell in row if cell.text.strip()]
+            numeric_count = sum(
+                _number_value(_split_mark(cell.text, cell.superscript_text)[0]) is not None
+                for cell in populated
+            )
+            trailing_unit = bool(
+                populated
+                and populated[-1].text.strip() in {"K", "°C", "C"}
+            )
+            if (
+                axis_with_unit.search(previous)
+                and numeric_count >= 2
+                and all(
+                    _number_value(_split_mark(cell.text, cell.superscript_text)[0])
+                    is not None
+                    or (trailing_unit and index == len(populated) - 1)
+                    for index, cell in enumerate(populated)
+                )
+            ):
+                count += 1
+            else:
+                break
+        return count
 
     numeric_rows = [
         [
@@ -340,6 +399,8 @@ def _add_cell_flags(
                 flags.append("missing_minus_suspect")
             if _COMMA_DECIMAL.search(cell.text):
                 flags.append("comma_decimal_suspect")
+            if _AMBIGUOUS_COMMA.search(cell.text):
+                flags.append("ambiguous_comma_separator")
             cell.flags = flags
             counts.update(flags)
     return counts
@@ -357,6 +418,10 @@ def _sid_from_path(path: Path) -> str:
     parts = path.parts
     if "ocr-mineru" in parts:
         return parts[parts.index("ocr-mineru") - 1]
+    if "mineru" in parts:
+        mineru_index = parts.index("mineru")
+        if mineru_index >= 2 and parts[mineru_index - 2] == "text":
+            return parts[mineru_index - 1]
     if "raw" in parts and parts.index("raw") + 1 < len(parts):
         return parts[parts.index("raw") + 1]
     return path.stem.removesuffix("_content_list")
@@ -552,10 +617,38 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                             and str(locator["table"]).isdecimal()
                             else None
                         ),
+                        "phase": point.get(
+                            "phase", locator.get("phase", observation.get("phase"))
+                        ),
+                        "table_row_number": point.get(
+                            "table_row_number",
+                            locator.get(
+                                "table_row_number", observation.get("table_row_number")
+                            ),
+                        ),
+                        "table_phase_column": point.get(
+                            "table_phase_column",
+                            locator.get(
+                                "table_phase_column",
+                                observation.get("table_phase_column"),
+                            ),
+                        ),
                         "value": number,
                     }
                 )
     return points
+
+
+def _phase_matches_column(phase: Any, column_header: str) -> bool:
+    if phase is None:
+        return True
+    token = str(phase).strip().casefold()
+    if token not in {"gas", "liquid", "solid"}:
+        return False
+    return (
+        re.search(rf"(?<!\w){re.escape(token)}(?!\w)", column_header, re.I)
+        is not None
+    )
 
 
 def compare_extract_to_draft(
@@ -570,6 +663,10 @@ def compare_extract_to_draft(
     for table in index.get("tables") or []:
         page = int(table["pdf_page"])
         table_number = str(int(table["table_key"].rsplit("-t", 1)[1]))
+        column_headers = {
+            int(column["column"]): str(column.get("header") or "")
+            for column in table.get("columns") or []
+        }
         csv_path = index_path.parent / table["csv"]
         with csv_path.open(encoding="utf-8", newline="") as stream:
             for cell in csv.DictReader(stream):
@@ -590,13 +687,14 @@ def compare_extract_to_draft(
                         "table_key": table["table_key"],
                         "row": int(cell["row"]),
                         "column": int(cell["column"]),
+                        "column_header": column_headers.get(int(cell["column"]), ""),
                         "flags": json.loads(cell["flags"] or "[]"),
                     }
                     draft_by_page[page].append((candidate, number))
                     draft_by_table[(page, table_number)].append((candidate, number))
 
-    consumed: dict[tuple[int, str | None], set[int]] = defaultdict(set)
     results: list[dict[str, Any]] = []
+    consumed: dict[tuple[int | None, str | None], set[int]] = defaultdict(set)
     for point in _numeric_points(extract):
         page = point["pdf_page"]
         table_number = point["table_number"]
@@ -608,31 +706,39 @@ def compare_extract_to_draft(
         else:
             indexed_candidates = draft_by_table.get((page, table_number), [])
         point_value = Decimal(str(point["value"]))
-        match_index = next(
-            (
-                index
-                for index, (_, candidate_value) in enumerate(indexed_candidates)
-                if index not in consumed[location]
-                and point_value == candidate_value
-            ),
-            None,
+        has_location = any(
+            point.get(key) is not None
+            for key in ("table_number", "table_row_number", "phase", "table_phase_column")
         )
-        if match_index is not None:
-            consumed[location].add(match_index)
-            status = "matched"
+        matching_candidates = [
+            (index, candidate)
+            for index, (candidate, value) in enumerate(indexed_candidates)
+            if index not in consumed[location]
+            and point_value == value
+            and (
+                point.get("table_row_number") is None
+                or candidate["row"] == int(point["table_row_number"])
+            )
+            and (
+                point.get("table_phase_column") is None
+                or candidate["column"] == int(point["table_phase_column"])
+            )
+            and _phase_matches_column(point.get("phase"), candidate["column_header"])
+        ]
+        matched_index, matched = matching_candidates[0] if matching_candidates else (None, None)
+        if matched is not None:
+            consumed[location].add(matched_index)
+            status = "matched" if has_location else "presence-only"
         elif indexed_candidates:
             status = "mismatch"
         else:
             status = "no-match"
-        candidates = [candidate for candidate, _ in indexed_candidates]
         results.append(
             {
                 **point,
                 "status": status,
-                "draft_cells": candidates,
-                "matched_cell": (
-                    candidates[match_index] if match_index is not None else None
-                ),
+                "matched_cell": matched,
+                "draft_candidate_count": len(indexed_candidates),
             }
         )
     return results
@@ -655,8 +761,8 @@ def _compare_command(args: argparse.Namespace) -> int:
         "pdf_page",
         "value",
         "status",
-        "draft_cells",
         "matched_cell",
+        "draft_candidate_count",
         "path",
     )
     writer = csv.DictWriter(sys.stdout, fieldnames=fields, lineterminator="\n")
@@ -665,7 +771,7 @@ def _compare_command(args: argparse.Namespace) -> int:
         {
             key: (
                 json.dumps(row[key], ensure_ascii=False)
-                if key in {"draft_cells", "matched_cell"}
+                if key == "matched_cell"
                 else row[key]
             )
             for key in fields
@@ -675,7 +781,8 @@ def _compare_command(args: argparse.Namespace) -> int:
     counts = Counter(row["status"] for row in results)
     print(
         f"compare: matched={counts['matched']} no-match={counts['no-match']} "
-        f"mismatch={counts['mismatch']} total={len(results)}",
+        f"mismatch={counts['mismatch']} presence-only={counts['presence-only']} "
+        f"total={len(results)}",
         file=sys.stderr,
     )
     return 0
