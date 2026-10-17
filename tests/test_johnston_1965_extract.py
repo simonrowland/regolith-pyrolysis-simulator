@@ -82,6 +82,23 @@ def test_johnston_table_i_rows_conditions_and_render_pins() -> None:
 
     assert sum(row["values"]["method_class"] == "model_derived" for row in table_ii) == 6
     assert sum(row["values"]["method_class"] == "quoted_attributed" for row in table_ii) == 1
+    ce = observations["johnston_1965_t1_ce_r01"]
+    assert "NaSbO3" not in ce["quench_statement"]
+    assert "devitrified during quenching" in ce["quench_statement"]
+    for observation_id in (
+        "johnston_1965_t1_sb_r01",
+        "johnston_1965_t1_sb_r02",
+    ):
+        assert "NaSbO3" in observations[observation_id]["quench_statement"]
+    for observation_id in (
+        "johnston_1965_t1_v_r01",
+        "johnston_1965_t1_v_r02",
+        "johnston_1965_t1_v_r03",
+        "johnston_1965_t1_v_r04",
+    ):
+        assert observations[observation_id]["values"]["reason"] == (
+            "no_quantity_token_for_printed_v4_and_v5_wt_percent_pair"
+        )
     _assert_render_pins(doc)
 
 
@@ -125,6 +142,15 @@ def test_johnston_isolated_migration_preserves_point_conditions() -> None:
         assert expected_i <= set(row["point_conditions"])
     for row in table_ii:
         assert expected_ii <= set(row["point_conditions"])
+
+    context = next(
+        row
+        for rows in result.context_by_work.values()
+        for row in rows
+        if row["observation_id"] == "johnston_1965_alkali_shuttle_context"
+    )
+    assert context["species"] == "Na2O.2SiO2"
+    assert context["values"]["context_rail"] == "alkali_shuttle"
 
     sample_ids = (
         "johnston_1965_t1_ti_r01",
