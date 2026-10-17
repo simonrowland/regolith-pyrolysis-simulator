@@ -302,7 +302,8 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # regenerated 2026-08-02 under REPAIRED MAGEMin config per the train13
     # adjudication; prior value was generated against the broken-liquidus job
     # tree (0.10246923985526701). docs-private/research/2026-08-02-train13-adjudication.md
-    assert staged_silica == pytest.approx(0.10262754045813638, rel=1e-9)
+    # d-166, remeasured at 721ce6806 via _run_staged (2026-10-17).
+    assert staged_silica == pytest.approx(0.06931802798909051, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
     assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
     assert staged_sio_stage["Fe"] > 0.0
