@@ -810,6 +810,149 @@ def _hashimoto_point_value(record: Mapping[str, Any]) -> float:
     return numeric
 
 
+def _make_residue_pressure_model(
+    engine: str,
+    gas_channels: Sequence[tuple[str, Sequence[Any]]],
+    gas_pack: object,
+    *,
+    temperature_K: float,
+    total_pressure_Pa: float,
+    engine_metadata: dict[str, str],
+    engine_flags: set[str],
+    missing_channels_reason: str,
+    caller: str,
+) -> Callable[[Mapping[str, float], float], Mapping[str, float]]:
+    """Build the engine pressure closure shared by the residue cohorts."""
+    pressure_exponents = {
+        str(species): (
+            1.0
+            if str(species) == "O2"
+            else -float(reaction[2]) / float(reaction[1])
+        )
+        for species, reaction in gas_channels
+    }
+    if engine == "openimcc":
+        from openimcc import evaluate_gas
+        from openimcc.kernel import ImccNonconvergenceError
+
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            _ENGINE_OUTER_TIMEOUT_S,
+        )
+        from simulator.melt_backend import openimcc_bridge
+
+        pressure_state_cache: dict[
+            tuple[tuple[str, float], ...], Mapping[str, float]
+        ] = {}
+
+        def pressure_model(
+            inventory: Mapping[str, float], log10_pO2_bar: float
+        ) -> Mapping[str, float]:
+            key = tuple(
+                sorted((str(oxide), float(amount)) for oxide, amount in inventory.items())
+            )
+            base_pressure_bar = pressure_state_cache.get(key)
+            if base_pressure_bar is None:
+                current_composition = {
+                    oxide: amount for oxide, amount in key if amount > 0.0
+                }
+                try:
+                    state = _evaluate_openimcc_isolated(
+                        openimcc_bridge.evaluate,
+                        timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
+                        composition_mol=current_composition,
+                        temperature_K=temperature_K,
+                        allow_extrapolation=True,
+                        allow_out_of_envelope=True,
+                    )
+                except ImccNonconvergenceError as exc:
+                    raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
+                except TimeoutError as exc:
+                    raise ResidueEngineNonconvergence(
+                        "openimcc",
+                        f"{caller} OpenIMCC timeout: {exc}",
+                        reason=f"engine_timeout:openimcc:{caller.lower().replace(' ', '_')}",
+                    ) from exc
+                engine_flags.update(str(flag) for flag in state.flags)
+                if state.extrapolated:
+                    engine_flags.add("openimcc_extrapolated")
+                engine_metadata.update(
+                    {
+                        "model_id": state.pack_model_id,
+                        "datapack_version": state.pack_version,
+                        "pack_digest": state.pack_digest,
+                        "openimcc_version": state.openimcc_version,
+                    }
+                )
+                base_pressure_bar = evaluate_gas(
+                    state.parent_oxide_activities,
+                    temperature_K,
+                    1.0,
+                    gas_pack,
+                    parent_oxides=state.parent_oxides,
+                    allow_extrapolation=True,
+                )
+                pressure_state_cache[key] = base_pressure_bar
+            pO2_bar = 10.0**float(log10_pO2_bar)
+            return {
+                str(species): (
+                    float(base_pressure_bar.get(species, 0.0))
+                    * pO2_bar ** pressure_exponents[str(species)]
+                    * 100_000.0
+                )
+                for species, _reaction in gas_channels
+            }
+
+        return pressure_model
+
+    if engine == "internal-analytical":
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            PO2_COMMANDED,
+            Po2Request,
+            _internal_analytical_vapor_pressure_adapter,
+            _new_internal_analytical_core,
+        )
+
+        analytical_core = _new_internal_analytical_core()
+
+        def pressure_model(
+            inventory: Mapping[str, float], log10_pO2_bar: float
+        ) -> Mapping[str, float]:
+            response = _internal_analytical_vapor_pressure_adapter(
+                core=analytical_core,
+                temperature_C=temperature_K - 273.15,
+                pressure_bar=total_pressure_Pa / 100_000.0,
+                composition_kg=None,
+                composition_mol=inventory,
+                fO2_log=log10_pO2_bar,
+                po2_request=Po2Request(
+                    mode=PO2_COMMANDED,
+                    po2_bar=10.0**float(log10_pO2_bar),
+                ),
+                include_diagnostic_shadows=False,
+            )
+            pressures = response.vapor_pressures_Pa
+            missing = [
+                str(species)
+                for species, _reaction in gas_channels
+                if species not in pressures
+            ]
+            if missing:
+                raise ResidueInventoryRefusal(
+                    missing_channels_reason, ", ".join(missing)
+                )
+            return {
+                str(species): float(pressures[str(species)])
+                for species, _reaction in gas_channels
+            }
+
+        return pressure_model
+
+    raise ResidueInventoryRefusal(
+        "engine_capability_unsupported",
+        f"engine={engine}; capability=free_evaporation_residue_integrator",
+    )
+
+
 def _hashimoto_table_row(table: Any, key: str, temperature_K: float) -> Mapping[str, Any]:
     try:
         selected = table.loc[key]
@@ -1089,9 +1232,8 @@ def _predict_hashimoto_residue_cohort(
 
     try:
         import openimcc
-        from openimcc import evaluate_gas, load_gas_datapack
+        from openimcc import load_gas_datapack
         from openimcc.gas import _default_reactions
-        from openimcc.kernel import ImccNonconvergenceError
     except ImportError as exc:
         raise ResidueInventoryRefusal(
             "openimcc_not_importable", str(exc)
@@ -1137,15 +1279,6 @@ def _predict_hashimoto_residue_cohort(
         )
     if not gas_channels:
         raise ResidueInventoryRefusal("hashimoto_openimcc_channels_missing")
-    gas_pressure_exponents = {
-        str(species): (
-            1.0
-            if str(species) == "O2"
-            else -float(reaction[2]) / float(reaction[1])
-        )
-        for species, reaction in gas_channels
-    }
-
     engine_binding_identity = (
         openimcc_bridge.engine_binding_identity(
             openimcc_bridge._load_pack(
@@ -1334,112 +1467,17 @@ def _predict_hashimoto_residue_cohort(
         if not any(channel.parent_oxide for channel in runtime_channels):
             raise ResidueInventoryRefusal("hashimoto_runtime_alpha_channels_missing")
 
-        pressure_state_cache: dict[
-            tuple[tuple[str, float], ...], Mapping[str, float]
-        ] = {}
-
-        if engine == "openimcc":
-            from simulator.diagnostic_helpers.binary_pot_battery import (
-                _ENGINE_OUTER_TIMEOUT_S,
-            )
-
-            def pressure_model(
-                inventory: Mapping[str, float], log10_pO2_bar: float
-            ) -> Mapping[str, float]:
-                key = tuple(
-                    sorted((str(oxide), float(amount)) for oxide, amount in inventory.items())
-                )
-                base_pressure_bar = pressure_state_cache.get(key)
-                if base_pressure_bar is None:
-                    current_composition = {
-                        oxide: amount for oxide, amount in key if amount > 0.0
-                    }
-                    try:
-                        state = _evaluate_openimcc_isolated(
-                            openimcc_bridge.evaluate,
-                            timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
-                            composition_mol=current_composition,
-                            temperature_K=temperature_K,
-                            allow_extrapolation=True,
-                            allow_out_of_envelope=True,
-                        )
-                    except ImccNonconvergenceError as exc:
-                        raise ResidueEngineNonconvergence(
-                            "openimcc", str(exc)
-                        ) from exc
-                    except TimeoutError as exc:
-                        raise ResidueEngineNonconvergence(
-                            "openimcc",
-                            f"Hashimoto residue cohort OpenIMCC timeout: {exc}",
-                            reason="engine_timeout:openimcc:hashimoto_residue_cohort",
-                        ) from exc
-                    base_pressure_bar = evaluate_gas(
-                        state.parent_oxide_activities,
-                        temperature_K,
-                        1.0,
-                        gas_pack,
-                        parent_oxides=state.parent_oxides,
-                        allow_extrapolation=True,
-                    )
-                    pressure_state_cache[key] = base_pressure_bar
-                    melt_pack_identity.update(
-                        {
-                            "model_id": state.pack_model_id,
-                            "datapack_version": state.pack_version,
-                            "pack_digest": state.pack_digest,
-                            "openimcc_version": state.openimcc_version,
-                        }
-                    )
-                pO2_bar = 10.0**float(log10_pO2_bar)
-                return {
-                    str(species): (
-                        float(base_pressure_bar.get(species, 0.0))
-                        * pO2_bar ** gas_pressure_exponents[str(species)]
-                        * 100_000.0
-                    )
-                    for species, _reaction in gas_channels
-                }
-        else:
-            from simulator.diagnostic_helpers.binary_pot_battery import (
-                PO2_COMMANDED,
-                Po2Request,
-                _internal_analytical_vapor_pressure_adapter,
-                _new_internal_analytical_core,
-            )
-
-            analytical_core = _new_internal_analytical_core()
-
-            def pressure_model(
-                inventory: Mapping[str, float], log10_pO2_bar: float
-            ) -> Mapping[str, float]:
-                response = _internal_analytical_vapor_pressure_adapter(
-                    core=analytical_core,
-                    temperature_C=temperature_K - 273.15,
-                    pressure_bar=total_pressure_Pa / 100_000.0,
-                    composition_kg=None,
-                    composition_mol=inventory,
-                    fO2_log=log10_pO2_bar,
-                    po2_request=Po2Request(
-                        mode=PO2_COMMANDED,
-                        po2_bar=10.0**float(log10_pO2_bar),
-                    ),
-                    include_diagnostic_shadows=False,
-                )
-                pressures = response.vapor_pressures_Pa
-                missing = [
-                    str(species)
-                    for species, _reaction in gas_channels
-                    if species not in pressures
-                ]
-                if missing:
-                    raise ResidueInventoryRefusal(
-                        "hashimoto_internal_analytical_channels_missing",
-                        ", ".join(missing),
-                    )
-                return {
-                    str(species): float(pressures[str(species)])
-                    for species, _reaction in gas_channels
-                }
+        pressure_model = _make_residue_pressure_model(
+            engine,
+            gas_channels,
+            gas_pack,
+            temperature_K=temperature_K,
+            total_pressure_Pa=total_pressure_Pa,
+            engine_metadata=melt_pack_identity,
+            engine_flags=set(),
+            missing_channels_reason="hashimoto_internal_analytical_channels_missing",
+            caller="Hashimoto residue cohort",
+        )
 
         arm_channels = (
             ("alpha_common_unity_sensitivity", common_channels, common_alpha_records, "common"),
