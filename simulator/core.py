@@ -1584,6 +1584,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._overhead_model = None
         self._equipment = None
         self.melt.hour = 0
+        # Initial finite headspace needs the current batch's vessel volume.
+        # Establish its sizing inputs before the owner requests equipment.
+        self.record = BatchRecord(
+            feedstock_key=feedstock_key,
+            feedstock_label=fs.get('label', feedstock_key),
+            batch_mass_kg=mass_kg,
+            additives_kg=additives,
+        )
         self._configure_overhead_headspace()
         self._install_initial_upstream_projection({})
         base_intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
@@ -1644,18 +1652,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._c6_campaign_refused = False
         self._last_c3_na_hold_adjustment = {}
         self._c3_alkali_credit_drawn_kg_by_species = {}
-        self._equipment = None
         self._configure_overhead_headspace()
         self._configure_freeze_gate()
 
-        # Record
-        self.record = BatchRecord(
-            feedstock_key=feedstock_key,
-            feedstock_label=fs.get('label', feedstock_key),
-            batch_mass_kg=mass_kg,
-            additives_kg=additives,
-            initial_inventory=self.inventory.copy(),
-        )
+        self.record.initial_inventory = self.inventory.copy()
         self.energy_electrical_plus_evaporation_cumulative_kWh = 0.0
         self.energy_cumulative_breakdown_kWh = {}
         self._energy_tracker = None

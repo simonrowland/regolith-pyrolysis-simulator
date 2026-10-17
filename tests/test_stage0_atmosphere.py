@@ -50,6 +50,26 @@ def test_stage0_lunar_feedstock_uses_hard_vacuum():
     assert sim.melt.pO2_mbar == 0.0
 
 
+def test_initial_headspace_sizes_equipment_for_the_batch_being_loaded(monkeypatch):
+    sim = _sim({
+        "lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}},
+    })
+    sim.setpoints['overhead_headspace'] = {'enabled': True}
+    sizing_batches = []
+    original = sim._get_turbine_spec
+
+    def record_sizing_batch():
+        sizing_batches.append((sim.record.feedstock_key, sim.record.batch_mass_kg))
+        return original()
+
+    monkeypatch.setattr(sim, '_get_turbine_spec', record_sizing_batch)
+    for mass_kg in (1000.0, 10.0):
+        sizing_batches.clear()
+        sim.load_batch('lunar', mass_kg=mass_kg)
+        assert sizing_batches == [('lunar', mass_kg)]
+        assert sim._equipment is not None
+
+
 def test_stage0_mars_feedstock_uses_surface_co2_backpressure():
     sim = _sim(
         {
