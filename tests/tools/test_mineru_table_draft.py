@@ -74,7 +74,7 @@ def test_absolute_page_mapping_across_chunks(tmp_path: Path) -> None:
 def test_each_mechanical_flag_fires_only_on_the_suspect_cell() -> None:
     grid = draft.parse_table_html(
         "<table><tr><th>Sample</th><th>negative values</th><th>Result</th></tr>"
-        "<tr><td>A</td><td>−1.2</td><td>25.540</td></tr>"
+        "<tr><td>A</td><td>−1.2</td><td>25,540</td></tr>"
         "<tr><td>B</td><td>1.2</td><td>1.23*</td></tr>"
         "<tr><td>C</td><td>-2.3</td><td>0.540</td></tr>"
         "<tr><td>D</td><td>-3.4</td><td>invalid</td></tr>"
@@ -110,6 +110,63 @@ def test_each_mechanical_flag_fires_only_on_the_suspect_cell() -> None:
     assert "comma_decimal_suspect" not in grid[3][2].flags
     assert "superscript_or_footnote_mark" not in grid[3][2].flags
     assert not grid[3][2].flags
+
+
+def test_comma_decimal_suspect_is_european_comma_only() -> None:
+    grid = draft.parse_table_html(
+        "<table><tr><th>Value</th></tr><tr><td>123.456</td></tr>"
+        "<tr><td>123,456</td></tr></table>"
+    )
+    draft._add_cell_flags(grid, draft._header_row_count(grid), {0})
+    assert "comma_decimal_suspect" not in grid[1][0].flags
+    assert "comma_decimal_suspect" in grid[2][0].flags
+
+
+def test_latex_numeric_cells_convert_and_compare(tmp_path: Path) -> None:
+    html = ("<table><tr><th>Value</th></tr>"
+            "<tr><td>$1.2 \\times 10^{-5}$</td></tr>"
+            "<tr><td>$−3.4$</td></tr><tr><td>$\\mathrm{2.5}$</td></tr>"
+            "<tr><td>$\\cdot$</td></tr></table>")
+    grid = draft.parse_table_html(html)
+    draft._add_cell_flags(grid, draft._header_row_count(grid), {0})
+    assert [row[0].numeric_value for row in grid[1:]] == [1.2e-5, -3.4, 2.5, None]
+    assert draft._number_value("$1.2 \\times 10^{-5}$") == 1.2e-5
+    csv_path = tmp_path / "p001-t01.csv"
+    draft._add_cell_flags(grid, draft._header_row_count(grid), {0})
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        for row_number, cell in enumerate(grid, start=1):
+            writer.writerow({
+                "row": row_number, "column": 1,
+                "row_type": "header" if row_number == 1 else "body",
+                "text": cell[0].text, "value_text": cell[0].value_text,
+                "mark": cell[0].mark, "numeric_column": 1,
+                "origin_row": row_number, "origin_column": 1,
+                "rowspan": 1, "colspan": 1, "flags": json.dumps(cell[0].flags),
+            })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{"table_key": "p001-t01", "pdf_page": 1, "csv": csv_path.name}]}))
+    extract = {"species": {"Cr": {"observations": [{
+        "observation_id": "latex", "locator": {"pdf_page": 1},
+        "values": {"points": [{"value": 1.2e-5}, {"value": -3.4}, {"value": 2.5}]},
+    }]}}}
+    compared = draft.compare_extract_to_draft(extract, index_path)
+    assert [row["status"] for row in compared] == ["presence-only"] * 3
+
+
+def test_temperature_values_immediately_below_axis_label_are_header() -> None:
+    grid = draft.parse_table_html(
+        "<table><tr><th>Temperature, K</th></tr>"
+        "<tr><td>1833</td><td>1883</td><td>1933</td><td>1983</td><td>2033</td><td>K</td></tr>"
+        "<tr><td>Cr</td><td>1</td><td>2</td><td>3</td><td>4</td></tr></table>"
+    )
+    assert draft._header_row_count(grid) == 2
+
+
+def test_source_id_from_text_and_raw_mineru_layouts() -> None:
+    assert draft._sid_from_path(Path("/corpus/text/source-a/mineru/chunk-1/content_list.json")) == "source-a"
+    assert draft._sid_from_path(Path("/corpus/raw/source-b/ocr-mineru/chunk-1/content_list.json")) == "source-b"
 
 
 def test_superscript_exponent_is_not_split_or_compared_as_its_mantissa(
@@ -276,7 +333,7 @@ def test_barin_table_12_and_label_value_rows_are_comparable(tmp_path: Path) -> N
 
     result = draft.compare_extract_to_draft(extract, index_path)
 
-    assert [row["status"] for row in result] == ["matched"] * 4
+    assert [row["status"] for row in result] == ["presence-only"] * 4
     assert [row["matched_cell"]["value"] for row in result] == [
         925.0,
         936.0,
@@ -318,12 +375,12 @@ def test_compare_carries_flags_for_matched_cells(tmp_path: Path) -> None:
 
     result = draft.compare_extract_to_draft(extract, index_path)
 
-    assert [row["status"] for row in result] == ["matched"] * 6 + ["mismatch"] * 3
+    assert [row["status"] for row in result] == ["presence-only"] * 6 + ["mismatch"] * 3
     assert result[6]["matched_cell"] is None
     assert result[7]["matched_cell"] is None
     assert result[8]["matched_cell"] is None
     assert [row["matched_cell"]["flags"] for row in result[:6]] == [
-        ["comma_decimal_suspect"],
+            [],
         ["superscript_or_footnote_mark"],
         ["superscript_or_footnote_mark"],
         ["superscript_or_footnote_mark"],
@@ -373,7 +430,8 @@ def test_compare_reports_match_and_planted_mismatch(tmp_path: Path) -> None:
     index_path = tmp_path / "index.yaml"
     index_path.write_text(
         yaml.safe_dump(
-            {"tables": [{"table_key": "p002-t01", "pdf_page": 2, "csv": csv_path.name}]}
+            {"tables": [{"table_key": "p002-t01", "pdf_page": 2, "csv": csv_path.name,
+                         "columns": [{"column": 1, "header": "Value"}]}]}
         ),
         encoding="utf-8",
     )
@@ -399,7 +457,8 @@ def test_compare_reports_match_and_planted_mismatch(tmp_path: Path) -> None:
                     {
                         "observation_id": "exact-match",
                         "locator": {"pdf_page_index": 1},
-                        "values": {"points": [{"value": 0.871}]},
+                        "values": {"points": [{"value": 0.871, "table_row_number": 1,
+                                                   "phase": "Value", "table_phase_column": 1}]},
                     },
                     {
                         "observation_id": "expanded-copy-is-not-a-second-cell",
@@ -430,10 +489,26 @@ def test_compare_reports_match_and_planted_mismatch(tmp_path: Path) -> None:
         "matched",
         "mismatch",
         "mismatch",
-        "matched",
+        "presence-only",
     ]
     assert result[0]["matched_cell"] is None
     assert result[3]["matched_cell"]["value"] == 0.871
     assert result[3]["matched_cell"]["flags"] == []
+    assert result[3]["draft_candidate_count"] == 3
     assert result[5]["matched_cell"] is None
     assert result[6]["matched_cell"]["text"] == "9007199254740993"
+
+    wrong_row = {
+        "species": {
+            "Cr": {
+                "observations": [{
+                    "observation_id": "wrong-row",
+                    "locator": {"pdf_page": 2},
+                    "values": {"points": [{"value": 0.871, "table_row_number": 99}]},
+                }]
+            }
+        }
+    }
+    mutated = draft.compare_extract_to_draft(wrong_row, index_path)
+    assert mutated[0]["status"] == "mismatch"
+    assert mutated[0]["matched_cell"] is None
