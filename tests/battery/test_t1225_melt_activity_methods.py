@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -111,14 +112,21 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
         )
         assert converted.identity.reference_state is not None
         assert converted.identity.reference_state.is_value
-        assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
-        assert converted.value.point != observation.value.point
-        own_row = scored[observation.observation_id]
-        assert own_row.numeric is not None
-        assert own_row.refusal is None
+        # d-165: the paper specifies CaO(s), but not its polymorph. The former
+        # inferred-liquid pin was 0.00002451128698546067397078399944 from
+        # 0.000228; the comparison now keeps the printed value and refuses.
+        assert converted.identity.reference_state.value.endmember.phase.value is Phase.CR
+        assert converted.value.point == observation.value.point == Decimal("0.000228")
         assert any(
-            "reference-state conversion (not model error)" in notice.reason
-            for notice in own_row.notices
+            notice.reason == "fusion_source_reference_phase_unprinted"
+            for notice in converted.notices
+        )
+        own_row = scored[observation.observation_id]
+        assert own_row.numeric is None
+        assert own_row.refusal is not None
+        assert own_row.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+        assert own_row.refusal.detail["reason"] == (
+            "fusion_source_reference_phase_unprinted"
         )
 
 
@@ -144,7 +152,12 @@ def test_rein_chipman_quote_keeps_unknown_method_refusal(tmp_path: Path) -> None
     residual = next(row for row in residuals if row.reference == observation.observation_id)
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
-    assert residual.refusal.reason.value == "method_unknown"
+    # d-165 keeps the missing polymorph as a secondary refusal; measurement
+    # validity remains primary when the quoted source method is unknown.
+    assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
+    assert residual.refusal.detail["secondary_reasons"] == [
+        "fusion_source_reference_phase_unprinted"
+    ]
 
 
 def test_kume_own_experiments_keep_published_deoxidized_argon_control(

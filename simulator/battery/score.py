@@ -7393,6 +7393,39 @@ def compile_residual(
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
         )
 
+    unprinted_reference_phase = next(
+        (
+            notice
+            for notice in notices
+            if notice.reason == "fusion_source_reference_phase_unprinted"
+        ),
+        None,
+    )
+    if (
+        unprinted_reference_phase is not None
+        and engine is Engine.INTERNAL_ANALYTICAL
+    ):
+        if experiment is not None and experiment.method.is_unknown:
+            return _refused(
+                RefusalReason.METHOD_UNKNOWN,
+                {
+                    "reason": RefusalReason.METHOD_UNKNOWN.value,
+                    "method_reason": experiment.method.reason,
+                    "secondary_reasons": [unprinted_reference_phase.reason],
+                },
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                exclusions=("experiment_method_known", "source_polymorph_printed"),
+            )
+        return _refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {
+                "reason": unprinted_reference_phase.reason,
+                "formula": formula,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("source_reference_polymorph_printed",),
+        )
+
     missing_fusion_input = next(
         (
             notice
