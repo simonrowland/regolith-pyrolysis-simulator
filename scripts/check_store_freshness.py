@@ -127,6 +127,16 @@ CODE_INPUTS = (
 #     green ba62a746d (3dd98193c, studio-3) changed 0 files under data/.
 #     This acknowledges STORE outputs only; the scoring change (237 residual
 #     records, 94 new numeric candidates) is covered by the commits' tests.
+#   554fd0e07, b746bcf30, 3a27c5abd: t-1275 cell oxygen balance for every
+#     engine (d-142). These pass the requested oxygen to the alphaMELTS
+#     activity call in generators/bench.py, solve the vapour oxygen balance
+#     from engine pressures in score.py and oxygen_balance.py, and close the
+#     alphaMELTS oxygen-balance projection. The landing train's full regen of
+#     798c1b672 (gate b133, studio-3) produced no store change (rows_in=50497
+#     observations=126296 works=349 experiments=3823 queue=80926
+#     hard_issues=3334; j01 7/7). This acknowledges STORE outputs only; the
+#     scoring change (cell-balance residuals per engine) is covered by the
+#     commits' tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "80fad2bfa",
     "09c498b65",
@@ -136,6 +146,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "23df83343", "2bd2918e6", "34132a932",
     "8d90cc936",
     "f522e152c", "da3640753", "e84b44277",
+    "554fd0e07", "b746bcf30", "3a27c5abd",
 })
 
 
