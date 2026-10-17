@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import math
+from dataclasses import asdict
 
 import pytest
 
@@ -15,8 +18,10 @@ from simulator.state import (
 )
 
 
-def _stage3_unavailable_psat_model():
-    model = condensation.CondensationModel(CondensationTrain.create_default())
+def _stage3_unavailable_psat_model(vapor_pressure_data=None):
+    model = condensation.CondensationModel(
+        CondensationTrain.create_default(), vapor_pressure_data=vapor_pressure_data,
+    )
     model.configure_operating_conditions(
         wall_temperature_C=1500.0, overhead_pressure_mbar=1.0,
         species_partial_pressures_mbar={"SiO": 1.0},
@@ -25,6 +30,23 @@ def _stage3_unavailable_psat_model():
     )
     model.wall_species_partial_pressures_pa = {"SiO": 100.0}
     return model
+
+
+def test_fold15_coupled_route_exact_output_pin():
+    # Pin the entire pre-optimization result, including refusal/extrapolation
+    # telemetry and alpha provenance, before reusing invariant wall pressures.
+    model = _stage3_unavailable_psat_model(condensation.VAPOR_PRESSURE_DATA)
+    model.configure_operating_conditions(
+        species_partial_pressures_mbar={"SiO": 0.4, "Mg": 0.6},
+    )
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 0.4, "Mg": 0.6}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    )
+    digest = hashlib.sha256(json.dumps(
+        asdict(route), sort_keys=True, separators=(",", ":"), allow_nan=False,
+    ).encode()).hexdigest()
+    assert digest == "2ecc09b4f2bca4c5f9b1ad9cf7df15ac443cffdb94a63b5a7eeca6c4567f655c"
 
 
 def test_stage3_unavailable_psat_predicts_flagged_capture():
