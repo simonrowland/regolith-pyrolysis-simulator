@@ -13,6 +13,7 @@ import yaml
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    AmountBasis,
     Authority,
     Engine,
     EvidenceClass,
@@ -24,8 +25,20 @@ from simulator.battery.enums import (
     Quantity,
     SourceRelation,
     UncertaintyKind,
+    ValenceDenominatorKind,
+    ValenceValueForm,
 )
-from simulator.battery.records import DecisionBand, Execution, Locator, Notice, Uncertainty
+from simulator.battery.identity import Identity, ValenceBasis
+from simulator.battery.records import (
+    Composition,
+    DecisionBand,
+    Execution,
+    Locator,
+    Notice,
+    Species,
+    State,
+    Uncertainty,
+)
 from simulator.battery.score import (
     DECISION_BAND_POLICY_VERSION,
     DECISION_BAND_PERCENTILE,
@@ -382,6 +395,60 @@ def test_numeric_temperature_spellings_share_alignment_but_distinct_values_do_no
         distinct_rows[0], tier="compilation"
     ) != _source_alignment_group_key(distinct_rows[1], tier="compilation")
     assert _only_band(distinct, tier="compilation") is None
+
+
+def test_valence_basis_is_part_of_source_alignment_key() -> None:
+    first_basis = ValenceBasis(
+        numerator_oxidation_states=(2,),
+        denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+        denominator_oxidation_state=None,
+        value_form=ValenceValueForm.FRACTION,
+    )
+    second_basis = ValenceBasis(
+        numerator_oxidation_states=(3,),
+        denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+        denominator_oxidation_state=None,
+        value_form=ValenceValueForm.FRACTION,
+    )
+    common_identity = {
+        "quantity": Quantity.VALENCE_RATIO,
+        "species": Species("Cr", Phase.L),
+        "temperature_K": State.of(Decimal("1673.15")),
+        "total_pressure_Pa": State.of(Decimal("100000")),
+        "composition": State.of(
+            Composition(
+                "mole_fraction",
+                (("Cr", Decimal("1")),),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        "fO2_Pa": State.of(Decimal("1e-8")),
+    }
+    first = F.observation(
+        "valence-first",
+        "valence-exp",
+        Identity(
+            **common_identity,
+            valence_basis=State.of(first_basis),
+        ),
+        Decimal("0.2"),
+    )
+    second = F.observation(
+        "valence-second",
+        "valence-exp",
+        Identity(
+            **common_identity,
+            valence_basis=State.of(second_basis),
+        ),
+        Decimal("0.3"),
+    )
+
+    first_key = _source_alignment_group_key(first, tier="compilation")
+    second_key = _source_alignment_group_key(second, tier="compilation")
+    assert first_key is not None
+    assert second_key is not None
+    assert first_key != second_key
+    assert first_key["axes"]["valence_basis"] != second_key["axes"]["valence_basis"]
 
 
 def test_zero_mad_aligned_group_has_typed_no_band_reason(tmp_path: Path) -> None:

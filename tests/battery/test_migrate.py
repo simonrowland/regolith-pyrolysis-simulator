@@ -5274,6 +5274,9 @@ def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
     for spelling, token in (
         ("aq", Phase.AQ),
         ("glass", Phase.GLASS),
+        ("quenched silicate glass", Phase.GLASS),
+        ("quenched synthetic Martian basalt glass", Phase.GLASS),
+        ("quenched peridotite glass", Phase.GLASS),
         ("supercooled_l", Phase.SUPERCOOLED_L),
         ("g", Phase.G),
         ("cr", Phase.CR),
@@ -5284,6 +5287,14 @@ def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
         assert mapped.is_value and mapped.value is token and why is None
     mapped, why = map_phase("silicate_melt")
     assert mapped.is_unknown and why is not None
+
+    for spelling in (
+        "quenched_silicate_glass",
+        "quenched silicate glass; recalculated",
+    ):
+        assert spelling not in PHASE_MAP
+        mapped, why = map_phase(spelling)
+        assert mapped.is_unknown and why is not None
 
 
 def test_g01_map_phase_refuses_heuristics() -> None:

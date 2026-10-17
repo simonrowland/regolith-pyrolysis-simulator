@@ -86,18 +86,23 @@ from simulator.battery.enums import (
     StateTag,
     UncertaintyKind,
     ValueKind,
+    ValenceDenominatorKind,
+    ValenceValueForm,
 )
 from simulator.yaml_cache import YAML12SafeLoader
 from simulator.battery.identity import (
     Exposure,
     Identity,
+    IdentityRefusal,
     PA_PER_ATM_DEC,
     StandardState,
     SweepIdentity,
+    ValenceBasis,
     WallIdentity,
     atm_to_pa,
     bar_to_pa,
     celsius_to_kelvin,
+    parse_valence_basis,
     _uncompared_axes_for,
     identity_equal,
     profile_for,
@@ -368,10 +373,14 @@ PHASE_MAP: dict[str, Phase] = {
     "liquid sodium": Phase.L,
     "aq": Phase.AQ,
     "glass": Phase.GLASS,
+    "quenched silicate glass": Phase.GLASS,
+    "quenched synthetic Martian basalt glass": Phase.GLASS,
+    "quenched peridotite glass": Phase.GLASS,
     "supercooled_l": Phase.SUPERCOOLED_L,
     "solid_arsenolite": Phase.CR,
     "basaltic_silicate_melt": Phase.L,
     "silicate_melt_ferrobasalt_FCMAS": Phase.L,
+    "silicate_melt_terrestrial_FMQ_and_lunar_IW_minus_1": Phase.L,
     "cao-al2o3-sio2 liquid oxide melt": Phase.L,
     # Published parenthetical spellings (Kelley / Pankratz tables).
     "(g)": Phase.G,
@@ -397,6 +406,8 @@ UNIT_DECLARED_QUANTITY = {
 }
 
 QUANTITY_ALIASES = {
+    "Fe3plus_over_Fe2plus": Quantity.FE3_FE2_RATIO,
+    ValenceValueForm.AVERAGE_OXIDATION_STATE.value: Quantity.VALENCE_RATIO,
     "pure_Psat": Quantity.P_SAT,
     "vapor_pressure": Quantity.P_SAT,
     "pure_vapor_pressure": Quantity.P_SAT,
@@ -1155,6 +1166,8 @@ def _point_condition_from_plain(
 
     if isinstance(payload, Located):
         return payload
+    if key in {"quench_state", "quench_direction"}:
+        return _located_from_plain(payload, str)
     if key in {"fO2_control", "atmosphere"}:
         return _located_from_plain(
             payload,
@@ -1477,6 +1490,10 @@ def _identity_from_plain(payload: object) -> Identity:
         "quantity": _state_from_plain(payload["quantity"], lambda v: Quantity(str(v))),
         "species": _species_from_plain(payload["species"]),
     }
+    if payload.get("valence_basis") is not None:
+        kwargs["valence_basis"] = _state_from_plain(
+            payload["valence_basis"], _valence_basis_from_plain
+        )
     if payload.get("subtype") is not None:
         kwargs["subtype"] = _state_from_plain(payload["subtype"], str)
     if payload.get("per") is not None:
@@ -1526,6 +1543,52 @@ def _identity_from_plain(payload: object) -> Identity:
     if payload.get("wall") is not None:
         kwargs["wall"] = _state_from_plain(payload["wall"], _wall_from_plain)
     return Identity(**kwargs)
+
+
+def _valence_basis_from_plain(payload: object) -> ValenceBasis:
+    if isinstance(payload, ValenceBasis):
+        return payload
+    if not isinstance(payload, Mapping):
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "valence_basis",
+            "must be a mapping of typed basis fields",
+        )
+    numerator = payload.get("numerator_oxidation_states")
+    if not isinstance(numerator, (list, tuple)) or any(
+        type(value) is not int for value in numerator
+    ):
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "valence_basis.numerator_oxidation_states",
+            "must be a list of integer oxidation states",
+        )
+    try:
+        denominator = payload.get("denominator_oxidation_state")
+        if denominator is not None and type(denominator) is not int:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_SOURCE,
+                "valence_basis.denominator_oxidation_state",
+                "must be an integer oxidation state",
+            )
+        return ValenceBasis(
+            numerator_oxidation_states=tuple(numerator),
+            denominator_kind=ValenceDenominatorKind(
+                str(payload["denominator_kind"])
+            ),
+            denominator_oxidation_state=(
+                denominator
+            ),
+            value_form=ValenceValueForm(str(payload["value_form"])),
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        if isinstance(exc, IdentityRefusal):
+            raise
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "valence_basis",
+            f"malformed typed basis: {exc}",
+        ) from exc
 
 
 def _sweep_identity_from_plain(payload: object) -> SweepIdentity:
@@ -5480,6 +5543,13 @@ def map_quantity(
                 return State.unknown(contradiction), contradiction
             return State.of(inferred), None
         if isinstance(raw, str) and raw:
+            try:
+                parse_valence_basis(raw)
+            except IdentityRefusal:
+                pass
+            else:
+                return State.of(Quantity.VALENCE_RATIO), None
+        if isinstance(raw, str) and raw:
             qualified, _suffix = split_qualified_quantity(raw)
             if qualified is not None and _co_present_quantity_field(qualified, values):
                 contradiction = _quantity_contradiction(
@@ -8068,6 +8138,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.EVAPORATION_RATE: ("evaporation_rate",),
     Quantity.ION_INTENSITY: ("ion_intensity",),
     Quantity.ION_INTENSITY_RATIO: ("ion_intensity_ratio", "ion_current_ratio"),
+    Quantity.VALENCE_RATIO: ("value",),
     Quantity.O2_YIELD: (
         "o2_yield",
         "fraction_of_feedstock_oxygen_percent",
@@ -12573,6 +12644,84 @@ class Migrator:
         *,
         source_row_index: int | None = None,
     ) -> None:
+        identity = observation.identity
+        basis_state = (
+            identity.valence_basis
+            if isinstance(identity, Identity)
+            and identity.quantity.is_value
+            and identity.quantity.value is Quantity.VALENCE_RATIO
+            else None
+        )
+        basis = (
+            basis_state.value
+            if basis_state is not None and basis_state.is_value
+            else None
+        )
+        numeric_values: tuple[Decimal, ...] = ()
+        if (
+            observation.value.kind is ValueKind.POINT
+            and observation.value.point is not None
+        ):
+            numeric_values = (observation.value.point,)
+        elif (
+            observation.value.kind is ValueKind.SERIES
+            and observation.value.series
+        ):
+            numeric_values = tuple(value for _, value in observation.value.series)
+        refusal: IdentityRefusal | None = None
+        range_notices: list[Notice] = []
+        if basis is not None:
+            for value in numeric_values:
+                try:
+                    basis._validate_value(value)
+                except IdentityRefusal as exc:
+                    refusal = exc
+                    break
+                range_excess = basis._physical_range_excess(value)
+                if range_excess is None:
+                    continue
+                lower, upper, excess = range_excess
+                range_notices.append(
+                    Notice(
+                        kind=NoticeKind.SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE,
+                        affected_quantities=(Quantity.VALENCE_RATIO,),
+                        reason=(
+                            f"fraction valence value {value} is outside physical "
+                            f"range [{lower}, {upper}] by {excess}"
+                        ),
+                        origin=observation.observation_id,
+                        original=value,
+                    )
+                )
+        if refusal is None and range_notices:
+            observation = replace(
+                observation,
+                notices=observation.notices + tuple(range_notices),
+            )
+        if refusal is not None:
+            experiment = self.result.experiments.get(observation.experiment_id)
+            work_id = (
+                experiment.work_id
+                if experiment is not None and experiment.work_id
+                else observation.experiment_id.split("::", 1)[0]
+            )
+            self.result.add_queue(
+                work_id,
+                observation.locator,
+                ["value"],
+                f"{refusal.reason.value}: {refusal.detail}",
+                source=source_key,
+                observation_id=observation.observation_id,
+            )
+            observation = replace(
+                observation,
+                identity=replace(
+                    identity,
+                    quantity=State.unknown(str(refusal)),
+                    valence_basis=None,
+                ),
+                value=_unavailable_selection(str(refusal)).value,
+            )
         source_parts = Path(source_key).parts
         evidence_class = observation.evidence.class_
         if (
@@ -13171,19 +13320,42 @@ class Migrator:
                         raw_experiment,
                         path=f"observation[{source_id}::{raw_obs_id}].experiment",
                     )
-            self._migrate_extract_observation(
-                formula=formula,
-                obs=obs,
-                work=work,
-                source_id=source_id,
-                source_key=rel,
-                extraction=extraction or {},
-                local_ids=local_ids,
-                declared_experiment_id=declared_experiment_id,
-                source_context=pressure_identity_context,
-                provenance=extract_provenance,
-                fusion_transition_rows=fusion_transition_rows,
-            )
+            try:
+                self._migrate_extract_observation(
+                    formula=formula,
+                    obs=obs,
+                    work=work,
+                    source_id=source_id,
+                    source_key=rel,
+                    extraction=extraction or {},
+                    local_ids=local_ids,
+                    declared_experiment_id=declared_experiment_id,
+                    source_context=pressure_identity_context,
+                    provenance=extract_provenance,
+                    fusion_transition_rows=fusion_transition_rows,
+                )
+            except (TypeError, ValueError) as exc:
+                error = str(exc)
+                condition_key = next(
+                    (
+                        key
+                        for key in ("quench_state", "quench_direction")
+                        if error.startswith(f"Observation.point_conditions.{key} ")
+                    ),
+                    None,
+                )
+                if condition_key is None:
+                    raise
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=(
+                            f"observation[{source_id}::{obs['observation_id']}]"
+                            f".point_conditions.{condition_key}"
+                        ),
+                        reason=RefusalReason.INVALID_SOURCE,
+                        detail=f"row refused: {exc}",
+                    )
+                )
         # b-555: do not leave a silent extract — absence is fine, silence is not.
         self._record_silent_extract_if_needed(
             doc=doc, work=work, source_key=rel, path_stem=path.stem
@@ -13922,6 +14094,49 @@ class Migrator:
         if obs.get("equipment"):
             measured.equipment_payloads += 1
 
+        hold_reason = str(values.get("reason") or obs.get("reason") or "").strip()
+        if isinstance(values.get("series"), list) and values.get("series"):
+            measured.series += 1
+        if isinstance(values.get("tabulated_delta_fG_kJ_mol"), list) and values.get(
+            "tabulated_delta_fG_kJ_mol"
+        ):
+            measured.tabulated_lists += 1
+
+        ident_kwargs: dict[str, Any] = {}
+        q_token = quantity.value if quantity.is_value else None
+        if q_token is Quantity.VALENCE_RATIO:
+            raw_valence_quantity = values.get("quantity")
+            try:
+                if (
+                    isinstance(raw_valence_quantity, str)
+                    and raw_valence_quantity != Quantity.VALENCE_RATIO.value
+                ):
+                    valence_basis = parse_valence_basis(
+                        raw_valence_quantity, species_formula=formula
+                    )
+                elif isinstance(values.get("valence_basis"), Mapping):
+                    valence_basis = _valence_basis_from_plain(
+                        values["valence_basis"]
+                    )
+                else:
+                    raise IdentityRefusal(
+                        RefusalReason.INVALID_SOURCE,
+                        "valence_basis",
+                        "valence_ratio quantity requires a printed basis",
+                    )
+            except IdentityRefusal as refusal:
+                self.result.add_queue(
+                    work.work_id,
+                    locator,
+                    ["quantity"],
+                    f"{refusal.reason.value}: {refusal.detail}",
+                    source=source_key,
+                    observation_id=obs_id,
+                )
+                quantity = State.unknown(str(refusal))
+                q_token = None
+            else:
+                ident_kwargs["valence_basis"] = State.of(valence_basis)
         value, exploded, value_sel = empty_value_from_payload(
             values, obs_type, obs.get("units"), quantity=quantity
         )
@@ -13940,16 +14155,6 @@ class Migrator:
                 else f"source admission_status={raw_source_admission}"
             )
             admission = Admission(status=AdmissionStatus.PENDING, reason=reason)
-        hold_reason = str(values.get("reason") or obs.get("reason") or "").strip()
-        if isinstance(values.get("series"), list) and values.get("series"):
-            measured.series += 1
-        if isinstance(values.get("tabulated_delta_fG_kJ_mol"), list) and values.get(
-            "tabulated_delta_fG_kJ_mol"
-        ):
-            measured.tabulated_lists += 1
-
-        ident_kwargs: dict[str, Any] = {}
-        q_token = quantity.value if quantity.is_value else None
         value_derivation = source_derivation
         value_conversion: Derivation | None = None
         if (
@@ -14275,8 +14480,15 @@ class Migrator:
                                 )
                             )
         point_conditions = None
+        raw_point_conditions = obs.get("point_conditions")
+        if isinstance(raw_point_conditions, Mapping):
+            point_conditions = {
+                str(key): _point_condition_from_plain(value, key=str(key))
+                for key, value in raw_point_conditions.items()
+            }
         if t_known is not None:
             point_conditions = {
+                **(point_conditions or {}),
                 "temperature_K": _converted_temperature(
                     t_known,
                     t_sel.unit_trail,
@@ -15547,31 +15759,6 @@ class Migrator:
                 charge=species.charge,
             )
         identity = fill_identity(quantity, species, **ident_kwargs)
-        if (
-            q_token_point is Quantity.FE3_FE2_RATIO
-            and isinstance(raw_item, Mapping)
-        ):
-            row_oxygen = collect_printed_oxygen((raw_item,), point_locator)
-            if row_oxygen.rejected_log_fO2:
-                # Bounds and buffer-relative logs cannot be point identities.
-                identity = replace(
-                    identity,
-                    fO2_Pa=State.unknown(
-                        "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
-                    ),
-                )
-            elif row_oxygen.log_fO2 is not None:
-                # A printed point overrides series fO2; absence leaves the
-                # inherited series value unchanged.
-                identity = replace(
-                    identity,
-                    fO2_Pa=State.of(
-                        _log_fO2_to_pa(
-                            row_oxygen.log_fO2.state.value,
-                            row_oxygen.log_fO2_reference_Pa,
-                        )
-                    ),
-                )
         converted: Derivation | None = None
         if value_sel is not None and value_sel.available:
             emitted = value_sel.value
@@ -16063,6 +16250,104 @@ class Migrator:
                 **parent_point_conditions,
                 **(point_conditions or {}),
             }
+        if (
+            q_token_point in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
+            and isinstance(raw_item, Mapping)
+        ):
+            row_oxygen = collect_printed_oxygen((raw_item,), point_locator)
+            buffer_text = None
+            buffer_name_tokens = ("iw", "fmq", "qfm", "nno")
+            buffer_control = (point_conditions or {}).get("fO2_control")
+            if (
+                isinstance(buffer_control, Located)
+                and buffer_control.state.is_value
+                and isinstance(buffer_control.state.value, str)
+            ):
+                control_text = buffer_control.state.value
+                if any(
+                    token in control_text.casefold()
+                    for token in buffer_name_tokens
+                ):
+                    buffer_text = control_text
+            if buffer_text is None:
+                raw_buffer = raw_item.get("oxygen_buffer_as_published")
+                if isinstance(raw_buffer, str) and raw_buffer.strip():
+                    buffer_text = raw_buffer.strip()
+            if buffer_text is None:
+                for log_key in ("log_fO2", "log10_fO2"):
+                    raw_log = raw_item.get(log_key)
+                    if not isinstance(raw_log, Mapping):
+                        continue
+                    units = str(
+                        raw_log.get("units") or raw_log.get("unit") or ""
+                    )
+                    if any(
+                        token in units.casefold()
+                        for token in buffer_name_tokens
+                    ):
+                        buffer_text = units
+                        break
+            if row_oxygen.rejected_log_fO2 or (
+                q_token_point is Quantity.VALENCE_RATIO
+                and row_oxygen.log_fO2 is None
+                and buffer_text is not None
+                and row_oxygen.oxygen_partial_pressure_Pa is None
+            ):
+                reason = (
+                    f"buffer-relative fO2 ({buffer_text}) requires a "
+                    "temperature-dependent buffer model; no fO2_Pa assigned"
+                    if q_token_point is Quantity.VALENCE_RATIO
+                    and buffer_text is not None
+                    else "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
+                )
+                identity = replace(identity, fO2_Pa=State.unknown(reason))
+            elif row_oxygen.log_fO2 is not None:
+                # A printed absolute log takes precedence over a pO2 point.
+                identity = replace(
+                    identity,
+                    fO2_Pa=State.of(
+                        _log_fO2_to_pa(
+                            row_oxygen.log_fO2.state.value,
+                            row_oxygen.log_fO2_reference_Pa,
+                        )
+                    ),
+                )
+            elif identity.fO2_Pa is not None and identity.fO2_Pa.is_unknown:
+                # Printed pO2 is already converted by _merge_printed_oxygen.
+                # Copy its Pascal point into identity; do not convert twice.
+                oxygen_condition = (point_conditions or {}).get("fO2_Pa")
+                pressure = (
+                    oxygen_condition.state.value
+                    if isinstance(oxygen_condition, Located)
+                    and oxygen_condition.state.is_value
+                    else None
+                )
+                if (
+                    isinstance(pressure, Value)
+                    and pressure.kind is ValueKind.POINT
+                    and pressure.point is not None
+                ):
+                    identity = replace(
+                        identity, fO2_Pa=State.of(pressure.point)
+                    )
+            if q_token_point is Quantity.VALENCE_RATIO:
+                total_pressure = (point_conditions or {}).get("total_pressure_Pa")
+                if (
+                    isinstance(total_pressure, Located)
+                    and total_pressure.state.is_value
+                ):
+                    pressure_value = total_pressure.state.value
+                    if isinstance(pressure_value, Value):
+                        pressure_value = (
+                            pressure_value.point
+                            if pressure_value.kind is ValueKind.POINT
+                            else None
+                        )
+                    pressure_pa = _as_dec_or_none(pressure_value)
+                    if pressure_pa is not None:
+                        identity = replace(
+                            identity, total_pressure_Pa=State.of(pressure_pa)
+                        )
         if point_composition_refusal:
             child_printed_map = next(
                 (

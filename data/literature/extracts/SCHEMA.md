@@ -304,6 +304,28 @@ Rules:
   structured content (e.g. `semantics: bound_not_point_ordering`,
   `semantics: competing_observation_do_not_average`).
 
+### Observation point conditions
+
+An observation may carry `point_conditions` alongside its identity and value.
+Each entry uses the Located `{state, locator}` form. Quench statements are
+closed typed values and require their own source locator:
+
+```yaml
+point_conditions:
+  quench_state:
+    state: {tag: value, value: asserted_preserved} # or asserted_altered / not_stated
+    locator: {page: 12, table: '3'}
+  quench_direction:
+    state: {tag: value, value: oxidising}
+    locator: {page: 12, paragraph: 'The glass aliquot was quenched in air'}
+```
+
+`quench_state` records what the source says about preservation during quench;
+omission is reported by the scorer as `not_stated`. `quench_direction` is
+optional and records only a source-stated direction. For Cr glass valence
+fractions, an oxidising direction is reported as a notice and does not gate
+scoring.
+
 ### Uncertainty (first-class)
 
 Each observation **retains stated uncertainty verbatim** under `uncertainty`

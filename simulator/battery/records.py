@@ -47,6 +47,8 @@ from simulator.battery.enums import (
     Polymorph,
     PolymorphRejectionKind,
     Quantity,
+    QuenchDirection,
+    QuenchState,
     RawInputStatus,
     Rail,
     ReferenceStateConvention,
@@ -154,6 +156,30 @@ class Located(Generic[T]):
     state: State[T]
     locator: Locator | None = None
     inference: Derivation | None = None
+
+
+def _typed_quench_condition(
+    value: object,
+    *,
+    key: str,
+    token_type: type[QuenchState] | type[QuenchDirection],
+) -> Located[Any]:
+    if not isinstance(value, Located) or not isinstance(value.state, State):
+        raise TypeError(f"Observation.point_conditions.{key} must be a Located State")
+    if value.locator is None:
+        raise ValueError(f"Observation.point_conditions.{key} requires a source locator")
+    if not value.state.is_value:
+        raise ValueError(f"Observation.point_conditions.{key} must be a typed value")
+    try:
+        token = token_type(value.state.value)
+    except (TypeError, ValueError) as exc:
+        choices = ", ".join(item.value for item in token_type)
+        raise ValueError(
+            f"Observation.point_conditions.{key} must be one of: {choices}"
+        ) from exc
+    return Located(
+        State.of(token), locator=value.locator, inference=value.inference
+    )
 
 
 _CHARGE_SUFFIX_RE = re.compile(r"([+-])$")
@@ -1122,6 +1148,17 @@ class Observation:
             raise ValueError("Observation.observation_id is required")
         if not self.experiment_id:
             raise ValueError("Observation.experiment_id is required")
+        if self.point_conditions is not None:
+            point_conditions = dict(self.point_conditions)
+            for key, token_type in (
+                ("quench_state", QuenchState),
+                ("quench_direction", QuenchDirection),
+            ):
+                if key in point_conditions:
+                    point_conditions[key] = _typed_quench_condition(
+                        point_conditions[key], key=key, token_type=token_type
+                    )
+            object.__setattr__(self, "point_conditions", point_conditions)
         if self.certified_band is not None:
             object.__setattr__(
                 self,
@@ -1131,6 +1168,18 @@ class Observation:
                     for k, (lo, hi) in self.certified_band.items()
                 },
             )
+
+    @property
+    def quench_state(self) -> QuenchState:
+        condition = (self.point_conditions or {}).get("quench_state")
+        if condition is None:
+            return QuenchState.NOT_STATED
+        return condition.state.value
+
+    @property
+    def quench_direction(self) -> QuenchDirection | None:
+        condition = (self.point_conditions or {}).get("quench_direction")
+        return None if condition is None else condition.state.value
 
 
 @dataclass(frozen=True)
@@ -1196,6 +1245,7 @@ class Residual:
     candidate_request: CandidateRequest | None = None
     numeric: ResidualNumeric | None = None
     refusal: ResidualRefusal | None = None
+    quench_state: QuenchState | None = None
 
     def __post_init__(self) -> None:
         if not self.key:
