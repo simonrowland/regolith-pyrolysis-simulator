@@ -15557,12 +15557,59 @@ class Migrator:
                 numerator_wt_pct, denominator_wt_pct = amounts
 
         condition_fields = {}
+        ratio_point_conditions = dict(reference.point_conditions or {})
         for axis in ("fO2_Pa", "total_pressure_Pa"):
             located = (reference.point_conditions or {}).get(axis)
             condition_fields[axis] = (
                 located.state
                 if isinstance(located, Located)
                 else State.unknown(f"source does not state {axis}")
+            )
+        if points and isinstance(points[0], Mapping):
+            raw_conditions = points[0].get("point_conditions")
+            raw_composition = (
+                raw_conditions.get("composition")
+                if isinstance(raw_conditions, Mapping)
+                else None
+            )
+            if raw_composition is not None:
+                printed_composition = _point_condition_from_plain(
+                    raw_composition, key="composition"
+                )
+                if printed_composition.state.is_value:
+                    ratio_point_conditions["composition"] = printed_composition
+                    condition_fields["composition"] = printed_composition.state
+
+        quench_rank = {
+            "not_stated": 0,
+            "asserted_preserved": 1,
+            "asserted_altered": 2,
+        }
+        pair_quench: list[Located[Any]] = []
+        has_quench_evidence = False
+        for cell in cells:
+            quench = (cell.point_conditions or {}).get("quench_state")
+            if isinstance(quench, Located):
+                pair_quench.append(quench)
+                has_quench_evidence = True
+            else:
+                # A missing cell statement is not_stated and cannot strengthen
+                # the pair beyond the other cell's quench evidence.
+                pair_quench.append(
+                    Located(
+                        State.of("not_stated"),
+                        locator=cell.locator or reference.locator,
+                    )
+                )
+        if has_quench_evidence:
+            # Pair quench evidence takes the weaker cell claim: altered over
+            # preserved over not_stated, so one preserved cell cannot mask an
+            # altered or unstated companion cell.
+            ratio_point_conditions["quench_state"] = max(
+                pair_quench,
+                key=lambda located: quench_rank[
+                    getattr(located.state.value, "value", located.state.value)
+                ],
             )
         identity = replace(
             reference.identity,
@@ -15694,7 +15741,7 @@ class Migrator:
             source_id=source_id,
             locator=reference.locator,
             read_from=reference.read_from,
-            point_conditions=reference.point_conditions,
+            point_conditions=ratio_point_conditions,
             derived_from=derived_from,
             derivation=derivation,
             provenance=reference.provenance,

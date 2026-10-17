@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from decimal import Decimal
 from pathlib import Path
 
@@ -200,6 +201,35 @@ def test_johnston_isolated_migration_preserves_point_conditions() -> None:
     ti = ratio_by_source_row["johnston_1965_t1_ti_r01"]
     sn = ratio_by_source_row["johnston_1965_t1_sn_r01"]
     vanadium = ratio_by_source_row["johnston_1965_t1_v_r01"]
+    altered_rows = (
+        "johnston_1965_t1_ti_r06",
+        "johnston_1965_t1_ti_r07",
+        "johnston_1965_t1_sb_r01",
+        "johnston_1965_t1_sb_r02",
+        "johnston_1965_t1_ce_r01",
+    )
+    ratio_records = {
+        source_row: next(
+            observation
+            for observation in result.observations.values()
+            if observation.observation_id.endswith(f"{source_row}::valence_ratio")
+        )
+        for source_row in (*altered_rows, "johnston_1965_t1_ti_r01")
+    }
+    for source_row in altered_rows:
+        ratio_record = ratio_records[source_row]
+        assert ratio_record.quench_state.value == "asserted_altered"
+        expected_page = 186 if source_row.endswith("ce_r01") else 187
+        assert (
+            ratio_record.point_conditions["quench_state"].locator.published_page
+            == expected_page
+        )
+        for cell_id in ratio_record.derived_from:
+            assert (
+                result.observations[cell_id].quench_state.value
+                == "asserted_altered"
+            )
+    assert ratio_records["johnston_1965_t1_ti_r01"].quench_state.value == "not_stated"
     assert Decimal(ti["value"]["point"]) == Decimal("0.014")
     assert Decimal(sn["value"]["point"]).quantize(
         Decimal("0.000000000001")
@@ -225,6 +255,10 @@ def test_johnston_isolated_migration_preserves_point_conditions() -> None:
     )
     for row in (ti, sn, vanadium):
         assert row["identity"]["composition"]["tag"] == "value"
+        components = row["identity"]["composition"]["value"]["components"]
+        assert sum(
+            (Decimal(amount) for _name, amount in components), Decimal("0")
+        ) == Decimal("1")
         assert row["identity"]["fO2_Pa"] == {
             "tag": "unknown",
             "reason": "no_row_level_numeric_pO2_printed",
@@ -233,6 +267,51 @@ def test_johnston_isolated_migration_preserves_point_conditions() -> None:
         assert len(row["derived_from"]) == 2
         assert row["derivation"]["inputs"] == row["derived_from"]
         assert row["uncertainty"]["kind"] == "none"
+
+
+@pytest.mark.parametrize(
+    ("first_state", "second_state", "expected_state"),
+    (
+        ("asserted_altered", "asserted_preserved", "asserted_altered"),
+        ("asserted_preserved", "not_stated", "asserted_preserved"),
+    ),
+)
+def test_mass_fraction_pair_keeps_weaker_cell_quench_claim(
+    tmp_path: Path,
+    first_state: str,
+    second_state: str,
+    expected_state: str,
+) -> None:
+    document = _load_extract()
+    row = _observations(document)["johnston_1965_t1_ti_r06"]
+    base_conditions = row["point_conditions"]
+    locator = base_conditions["quench_state"]["locator"]
+    for point, state in zip(row["values"]["points"], (first_state, second_state)):
+        conditions = copy.deepcopy(base_conditions)
+        conditions["quench_state"] = {
+            "state": {"tag": "value", "value": state},
+            "locator": locator,
+        }
+        point["point_conditions"] = conditions
+    row["point_conditions"] = copy.deepcopy(
+        row["values"]["points"][0]["point_conditions"]
+    )
+
+    extract = tmp_path / EXTRACT.name
+    extract.write_text(
+        yaml.safe_dump(document, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+    migrator = Migrator(root=REPO)
+    migrator._migrate_extract(extract)
+    ratio = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith(
+            "johnston_1965_t1_ti_r06::valence_ratio"
+        )
+    )
+    assert ratio.quench_state.value == expected_state
 
 
 def test_mass_fraction_pair_uses_cation_stoichiometry() -> None:
