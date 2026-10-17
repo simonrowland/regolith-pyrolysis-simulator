@@ -6,7 +6,7 @@ source:
   sha256: ec6b2f1bc4e3f9202e31aa35dc4cd966d76c30a420ea29afbfac68eb5ecc8434
 extraction:
   method: >-
-    Manual transcription using MinerU OCR, with every Table 2 and Table 3 cell checked against its scanned page image. Table 2: 310 cells checked (300 data cells + 10 headers), 0 corrected; image 229637962ec20ee6dd91c4c97c9900d9b63fa91343550ca7e08e13e500f5c603.jpg, published p.20 / PDF index 5. Table 3: 217 cells checked (210 data cells + 7 headers), 0 corrected; image 6ad776523b6c7a39107f5a87ac649e5a0395a3bc44ccacc568cdb473528e69f7.jpg, published p.23 / PDF index 8. Image is authoritative where OCR differs; no disagreement found. Raw pressure scales and printed composition axes are retained; normalized pressure and composition fields declare formulas. Table 2 atomic oxygen estimates are model-derived. Figures 1 and 2 activity plots are figure_only placeholders; no figures digitized.
+    Manual transcription using MinerU OCR, with every Table 2 and Table 3 cell checked against its scanned page image. Table 2: 310 cells checked (300 data cells + 10 headers), 0 corrected; image 229637962ec20ee6dd91c4c97c9900d9b63fa91343550ca7e08e13e500f5c603.jpg, published p.20 / PDF index 5. Table 3: 217 cells checked (210 data cells + 7 headers), 0 corrected; image 6ad776523b6c7a39107f5a87ac649e5a0395a3bc44ccacc568cdb473528e69f7.jpg, published p.23 / PDF index 8. Image is authoritative where OCR differs; no disagreement found. Raw pressure scales and printed composition axes are retained; normalized pressure and composition fields declare formulas. Table 2 atomic oxygen columns are author-calculated by Eqs. (7)–(9); their outputs are quoted as attributed because the complete row-wise ion-current inputs and numerical equilibrium constants are not printed. Figures 1 and 2 activity plots are figure_only placeholders; no figures digitized.
   date: '2026-09-30'
   worker: codex
 review_status: draft
@@ -4754,8 +4754,10 @@ species:
       units: "atm as printed (column P_O · 10^8; pressure_atm = printed value × 10^-8 atm)"
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Stolyarova, Shornikov, and Shultz (1996), Eqs. (7–9) and Table 2
+        generator: author-calculated atomic-oxygen pressure from MoO3/MoO2 equilibrium
         admission_status: admitted
         method: "thermodynamic equilibrium calculation"
         method_as_printed: "Author-calculated atomic oxygen partial-pressure estimate from Eq. (7), p_O = K2^o [I_MoO3+ × σ(MoO2) / (I_MoO2+ × σ(MoO3))] (MoO3 = MoO2 + O), printed p. 19; Table 2 prints this result, it is not a measured direct pressure."
@@ -5690,8 +5692,10 @@ species:
       units: "atm as printed (column P_O_prime · 10^8; pressure_atm = printed value × 10^-8 atm)"
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Stolyarova, Shornikov, and Shultz (1996), Eqs. (8) and Table 2
+        generator: author-calculated atomic-oxygen pressure from AlO/Al equilibrium
         admission_status: admitted
         method: "thermodynamic equilibrium calculation"
         method_as_printed: "Author-calculated atomic oxygen partial-pressure estimate from Eq. (8), p'_O = K3^o [I_AlO+ × σ(Al) / (I_Al+ × σ(AlO))] (AlO = Al + O), printed p. 19; Table 2 prints this result, it is not a measured direct pressure."
@@ -6026,8 +6030,10 @@ species:
       units: "atm as printed (column P_O_double_prime · 10^8; pressure_atm = printed value × 10^-8 atm)"
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Stolyarova, Shornikov, and Shultz (1996), Eqs. (9) and Table 2
+        generator: author-calculated atomic-oxygen pressure from SiO2/SiO equilibrium
         admission_status: admitted
         method: "thermodynamic equilibrium calculation"
         method_as_printed: "Author-calculated atomic oxygen partial-pressure estimate from Eq. (9), p''_O = K4^o [I_SiO+ × σ(SiO) / (I_SiO2+ × σ(SiO2))] (SiO2 = SiO + O), printed p. 19; Table 2 prints this result, it is not a measured direct pressure."
