@@ -2947,6 +2947,8 @@ def convert_pressure_to_pa(
     if lowered in {"gpa"}:
         # Premise: 1 GPa = 1e9 Pa exactly (SI).
         return amount * Decimal("1000000000"), "GPa_to_Pa"
+    if lowered == "mpa":
+        return amount * _CONVERSION_META["MPa_to_Pa"][0], "MPa_to_Pa"
     if lowered in {"bar"}:
         return bar_to_pa(amount), "bar_to_Pa"
     if lowered in {"atm", "atmosphere", "atmospheres"}:
@@ -9173,6 +9175,7 @@ def _selection_from_named_field(
             Quantity.MASS_LOSS_FRACTION_VS_T,
             Quantity.YIELD_FRACTION,
             Quantity.O2_YIELD,
+            Quantity.VALENCE_RATIO,
         } and _percent_named_fraction_field(key, units):
             amount = amount / Decimal("100")
             trail = "percent_to_fraction"
@@ -9222,6 +9225,7 @@ def _selection_from_named_field(
             Quantity.MASS_LOSS_FRACTION_VS_T,
             Quantity.YIELD_FRACTION,
             Quantity.O2_YIELD,
+            Quantity.VALENCE_RATIO,
         } and _percent_named_fraction_field(key, units):
             amount /= Decimal("100")
             trail = "percent_to_fraction"
@@ -16730,6 +16734,45 @@ class Migrator:
                     locator=point_locator,
                 ),
             }
+        if q_token_point is Quantity.VALENCE_RATIO and (
+            identity.composition is None or not identity.composition.is_value
+        ):
+            located_composition = (point_conditions or {}).get("composition")
+            if (
+                isinstance(located_composition, Located)
+                and located_composition.state.is_value
+            ):
+                raw_composition = located_composition.state.value
+                converted_composition = (
+                    Located(State.of(raw_composition))
+                    if isinstance(raw_composition, Composition)
+                    else _composition_located_from_plain(
+                        {
+                            "amount_basis": AmountBasis.MASS_PERCENT.value,
+                            "components": raw_composition,
+                        }
+                    )
+                )
+                if converted_composition.state.is_value:
+                    identity = replace(
+                        identity, composition=converted_composition.state
+                    )
+        if q_token_point is Quantity.VALENCE_RATIO and (
+            identity.total_pressure_Pa is None
+            or not identity.total_pressure_Pa.is_value
+        ):
+            pressure_condition = (point_conditions or {}).get("pressure_MPa")
+            if (
+                isinstance(pressure_condition, Located)
+                and pressure_condition.state.is_value
+            ):
+                pressure, _trail = convert_pressure_to_pa(
+                    pressure_condition.state.value, "MPa"
+                )
+                if pressure is not None:
+                    identity = replace(
+                        identity, total_pressure_Pa=State.of(pressure)
+                    )
         if printed_phase_kind is not None and (
             identity.composition is None or not identity.composition.is_value
         ):

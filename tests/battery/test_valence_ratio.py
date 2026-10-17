@@ -42,6 +42,7 @@ from simulator.battery.migrate import (
     map_quantity,
     observation_from_plain,
     to_plain,
+    wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import (
     Composition,
@@ -72,6 +73,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SOSSI_CR = ROOT / "data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml"
 TRANELL_TI = ROOT / "data/literature/extracts/tranell-2002-titanium-valence.yaml"
 BERRY_CR = ROOT / "data/literature/extracts/berry-oneill-2004-chromium-xanes.yaml"
+JUGO_S = ROOT / "data/literature/extracts/jugo-2010-sulfur-xanes.yaml"
 
 
 def _identity(basis: ValenceBasis) -> Identity:
@@ -243,6 +245,109 @@ def test_sulfur_valence_forms_are_recognized_and_migrated_as_printed(tmp_path: P
         is Quantity.VALENCE_RATIO
         for i in range(3)
     )
+
+
+def test_jugo_2010_table4_values_and_conditions_match_render():
+    extract = yaml.safe_load(JUGO_S.read_text(encoding="utf-8"))
+    table4 = next(
+        observation
+        for observation in extract["species"]["S"]["observations"]
+        if observation["observation_id"] == "jugo_2010_table4_xanes_s6_fraction"
+    )
+    assert table4["units"] == "percent"
+    assert (
+        Decimal(str(table4["values"]["points"][0]["value"]))
+        == Decimal("100.83")
+    )
+    assert table4["locator"]["pdf_page_index"] == 7
+    raw_inputs_note = table4["derivation"]["raw_inputs"]["locator"][
+        "note"
+    ]
+    assert raw_inputs_note.startswith(
+        "Only the underlying spectra are not digitised"
+    )
+    eq10 = next(
+        observation
+        for observation in extract["species"]["S"]["observations"]
+        if observation["observation_id"]
+        == "jugo_2010_eq10_sulfate_fraction_vs_delta_fmq_fit"
+    )
+    assert eq10["units"] == "fraction; ΔFMQ"
+    assert eq10["derivation"]["output_unit"] == "fraction"
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(JUGO_S)
+    migrator.finalize()
+    rows = [
+        row
+        for row in migrator.result.observations.values()
+        if "jugo_2010_table4_xanes_s6_fraction" in row.observation_id
+    ]
+
+    expected = {
+        "SB-5": Decimal("1.0083"),
+        "SB-15": Decimal("0.9444"),
+        "SB-19": Decimal("0.9133"),
+        "SB-35": Decimal("0.7187"),
+        "SB-6": Decimal("0.4041"),
+        "SB-36": Decimal("0.0019"),
+        "SB-41": Decimal("-0.0024"),
+    }
+    assert len(rows) == 7  # Table 4, PDF index 7 (published page 5933)
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in rows) == 0
+    assert {row.value.point for row in rows} == set(expected.values())
+    assert migrator.result.validation is not None
+    assert not migrator.result.validation.hard_issues
+    sb5 = next(
+        row
+        for row in rows
+        if row.point_conditions["composition"].state.value["SiO2"]
+        == Decimal("47.48")
+    )
+    sb41 = next(
+        row
+        for row in rows
+        if row.point_conditions["composition"].state.value["S"]
+        == Decimal("0.07")
+    )
+    assert sb5.value.point == expected["SB-5"]
+    assert sb5.point_conditions["fO2_control"].state.value == "FMQ+2.7"
+    assert sb5.point_conditions["pressure_MPa"].state.value == Decimal("200")
+    assert sb5.point_conditions["composition"].state.value["SiO2"] == Decimal("47.48")
+    assert sb41.value.point == expected["SB-41"]
+    assert all(
+        row.identity.quantity.value is Quantity.VALENCE_RATIO
+        and row.admission.status is AdmissionStatus.ADMITTED
+        and row.identity.temperature_K.value == Decimal("1323.15")
+        and row.identity.composition is not None
+        and row.identity.composition.is_value
+        and row.identity.composition.value
+        == wt_pct_to_mole_fraction(
+            row.point_conditions["composition"].state.value
+        )
+        and row.identity.total_pressure_Pa is not None
+        and row.identity.total_pressure_Pa.is_value
+        and row.identity.total_pressure_Pa.value == Decimal("200000000")
+        and row.identity.fO2_Pa is not None
+        and row.identity.fO2_Pa.is_unknown
+        and row.identity.fO2_Pa.reason.startswith("buffer-relative fO2 (")
+        and row.point_conditions["temperature_K"].state.value == Decimal("1323.15")
+        and row.point_conditions["temperature_K"].locator.pdf_page_index == 7
+        and row.point_conditions["pressure_MPa"].state.value == Decimal("200")
+        and row.point_conditions["fO2_control"].locator.published_page == 5928
+        and row.point_conditions["composition"].locator.published_page == 5928
+        for row in rows
+    )
+    fit = migrator.result.observations[
+        "jugo-2010-sulfur-xanes::jugo_2010_eq10_sulfate_fraction_vs_delta_fmq_fit"
+    ]
+    assert fit.value.kind is ValueKind.UNAVAILABLE
+    assert fit.admission.status is AdmissionStatus.REJECTED
+    assert set(fit.derived_from) == {row.observation_id for row in rows}
+    assert sum(
+        row.value.kind is ValueKind.UNAVAILABLE
+        for row in migrator.result.observations.values()
+    ) == 1
 
 
 def test_fe_plus_spelling_stays_on_existing_fe_ratio_quantity():
