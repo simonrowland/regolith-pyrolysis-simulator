@@ -499,6 +499,9 @@ def test_c2a_recipe_free_molecular_transport_is_continuous(monkeypatch):
     def low_pressure_transport(evap_flux, melt, **kwargs):
         state = dict(original_estimate(evap_flux, melt, **kwargs))
         state["pressure_mbar"] = 1.0e-6
+        # The low-pressure fixture also lowers the real supply boundary;
+        # otherwise the N2 regulator correctly restores its 10 mbar command.
+        melt.p_total_mbar = state["pressure_mbar"]
         state["vapor_pressure_mbar"] = min(
             float(state["vapor_pressure_mbar"]),
             state["pressure_mbar"],
