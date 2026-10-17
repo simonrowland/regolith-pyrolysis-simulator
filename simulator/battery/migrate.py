@@ -15452,12 +15452,19 @@ class Migrator:
                 wt_pct_to_mole_fraction(point_oxide_map)
             )
         elif (
-            q_token_point in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
-            and point_oxide_map
+            point_oxide_map
+            and (
+                q_token_point in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+                or source_id == "liu-2023-chromium-oxide-activity"
+            )
+            and not (
+                ident_kwargs.get("composition") is not None
+                and ident_kwargs["composition"].is_value
+            )
         ):
-            # Activity points may print the composition for this exact row;
-            # bind that local map to the identity rather than only retaining it
-            # as a non-identity condition on the exploded point.
+            # A row-local printed map supplies identity composition when the
+            # identity has no value; keep an already declared composition (for
+            # example Guo Table 5's printed mole fractions) authoritative.
             ident_kwargs["composition"] = State.of(
                 wt_pct_to_mole_fraction(point_oxide_map)
             )
@@ -16096,6 +16103,22 @@ class Migrator:
                     State.unknown(
                         composition_unknown_reason(point_composition_refusal)
                     ),
+                    locator=point_locator,
+                ),
+            }
+        elif (
+            source_id == "liu-2023-chromium-oxide-activity"
+            and point_oxide_map
+            and identity.composition is not None
+            and identity.composition.is_value
+        ):
+            # Explicit point conditions may carry an older typed unknown for
+            # this same printed map. Once the owner converted the row-local
+            # map, expose that composition to condition consumers as well.
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": Located(
+                    identity.composition,
                     locator=point_locator,
                 ),
             }

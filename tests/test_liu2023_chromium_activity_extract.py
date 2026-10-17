@@ -21,6 +21,7 @@ from simulator.state import MOLAR_MASS
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/liu-2023-chromium-oxide-activity.yaml"
+GUO_EXTRACT = ROOT / "data/literature/extracts/guo-2021-mgo-activity-cmas-slag.yaml"
 SLAG_NUMBER_BY_TABLE_ROW = [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4]
 
 
@@ -174,6 +175,97 @@ def test_real_migrator_receives_each_rows_conditions_and_lineage():
     ]
     assert len(bound) == 24
     assert all(o.identity.composition.is_value for o in bound)
+
+
+def test_row_local_slag_maps_bind_to_identity_and_point_conditions():
+    migrator = Migrator(root=ROOT)
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+    observations = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == EXTRACT.stem
+    ]
+    table2 = [o for o in observations if o.locator and o.locator.table == "2"]
+    assert len(table2) == 24
+    assert all(o.identity.composition is not None for o in table2)
+    assert all(o.identity.composition.is_value for o in table2)
+
+    # Independent paper conversions from the reviewer's six-decimal pins.
+    row_pins = {
+        "1": {
+            "MoO2": Decimal("0.187502"),
+            "CaF2": Decimal("0.015748"),
+            "Cr2O3": Decimal("0.004581"),
+        },
+        "4": {
+            "MoO2": Decimal("0.172948"),
+            "CaF2": Decimal("0.019316"),
+            "Cr2O3": Decimal("0.001881"),
+        },
+    }
+    for row, expected in row_pins.items():
+        first_index = (int(row) - 1) * 2
+        representative = table2[first_index]
+        composition = representative.identity.composition.value
+        assert composition.basis == "printed_oxides"
+        axes = composition.as_map()
+        assert {
+            axis: axes[axis].quantize(Decimal("0.000001")) for axis in expected
+        } == expected
+
+    table3_oxides = [
+        o for o in observations
+        if o.locator and o.locator.table == "3"
+        and o.identity.species.formula in {"CrO", "CrO1.5", "CrOx"}
+    ]
+    assert len(table3_oxides) == 36
+    for observation in table3_oxides:
+        identity_composition = observation.identity.composition
+        point_composition = observation.point_conditions["composition"].state
+        assert identity_composition is not None and identity_composition.is_value
+        assert point_composition.is_value
+        assert point_composition.value == identity_composition.value
+
+    table3_acr = [
+        o for o in observations
+        if o.locator and o.locator.table == "3"
+        and o.identity.species.formula == "Cr"
+    ]
+    assert len(table3_acr) == 12
+    assert all(o.identity.composition.is_unknown for o in table3_acr)
+    assert all(
+        o.point_conditions["composition"].state.is_unknown for o in table3_acr
+    )
+
+
+def test_guo_table5_keeps_declared_mole_compositions():
+    migrator = Migrator(root=ROOT)
+    migrator._migrate_extract(GUO_EXTRACT)
+    migrator.finalize()
+    observations = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == GUO_EXTRACT.stem
+        and observation.locator
+        and observation.locator.table == "5"
+        and observation.identity.species.formula == "MgO"
+    ]
+    source = yaml.safe_load(GUO_EXTRACT.read_text(encoding="utf-8"))
+    declared_rows = source["species"]["MgO"]["observations"][0]["values"]["points"]
+    assert len(observations) == len(declared_rows) == 8
+    by_row = {
+        observation.locator.note.split("Row ")[1].split(";")[0]: observation
+        for observation in observations
+    }
+    for index, row in enumerate(declared_rows, start=1):
+        composition = by_row[str(index)].identity.composition
+        assert composition is not None and composition.is_value
+        assert composition.value.basis == "printed_mole_fraction"
+        assert composition.value.as_map() == {
+            axis: Decimal(amount)
+            for axis, amount in row["composition_mol"].items()
+        }
 
 
 def test_cr_oxide_formula_unit_mapping_and_component_mutation():
