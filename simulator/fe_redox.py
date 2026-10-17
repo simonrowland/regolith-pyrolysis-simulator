@@ -1780,6 +1780,12 @@ def _feedstock_anchor_state(
     value = iw + delta
     return RedoxState.absolute(value), {'buffer_conversion': {
         'buffer': buffer, 'source': CONVENTIONAL_IW_SOURCE,
+        'reference_uncertainty_note': (
+            'Conventional IW expressions span about 0.14 dex at 1673 K '
+            '(Sato-Frost; Sato-O\'Neill & Pownceby 1993 about 0.13 dex; '
+            'see Hirschmann 2021, GCA 313:74-84). This is comparable to the '
+            '0.15 dex solid-to-liquid reference shift and much smaller than '
+            'the cited 1.5 dex lunar proxy interval; no buffer value is adjusted.'),
         'literature_iw_log': iw, 'liquid_iw_log': feo_iw_log10_fO2_bar(T_K),
         'delta_iw_liquid': value - feo_iw_log10_fO2_bar(T_K),
         'fO2_interval_log': [iw + interval[0], iw + interval[1]],
