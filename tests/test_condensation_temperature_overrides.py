@@ -750,6 +750,7 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
         model.stage_area_m2_by_stage = {"sio_stage3": area_m2}
         return model._condensation_efficiency(
             stage=stage,
+            flowing_pressure_pa=100.0,
             species="SiO",
             T_cond_C=1050.0,
             residence_s=1.0,
@@ -787,6 +788,7 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
 
     missing_area_efficiency = model._condensation_efficiency(
         stage=stage,
+        flowing_pressure_pa=100.0,
         species="SiO",
         T_cond_C=1050.0,
         residence_s=10.0,
@@ -796,6 +798,7 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
     model.stage_area_m2_by_stage = {"sio_stage3": 1.0}
     configured_area_efficiency = model._condensation_efficiency(
         stage=stage,
+        flowing_pressure_pa=100.0,
         species="SiO",
         T_cond_C=1050.0,
         residence_s=1.0,

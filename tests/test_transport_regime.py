@@ -346,6 +346,46 @@ def test_mixture_mean_free_path_fixture_m3():
     assert result.carriers[1].collision_diameter_m == pytest.approx(3.542e-10)
 
 
+def test_mars_unknown_minority_predicts_kn_with_a_certified_carrier_bound():
+    from simulator.thermal_train import knudsen_anchor
+
+    pure = tr.carrier_mixture_mean_free_path(
+        "CO2", {"CO2": 1.0}, 600.0, HOT_TEMPERATURE_K, DIAMETER_M,
+    )
+    mixture = tr.carrier_mixture_mean_free_path(
+        "CO2", {"CO2": 0.96, "ambient_other": 0.04},
+        600.0, HOT_TEMPERATURE_K, DIAMETER_M,
+    )
+    assert mixture.knudsen_number == pytest.approx(pure.knudsen_number)
+    assert [(c.species, c.mole_fraction) for c in mixture.carriers] == [("CO2", 1.0)]
+    notice = mixture.excluded_carrier_notice
+    assert notice.reason == "uncertified_collision_diameter"
+    assert notice.status == "extrapolated"
+    assert notice.excluded_mole_fraction == pytest.approx(0.04)
+    assert notice.excluded_species == ("ambient_other",)
+    # Removing collisions against the minority at its actual partial pressure
+    # gives the largest possible Kn; unknown collisions can only shorten it.
+    known_partial_only = tr.carrier_mixture_mean_free_path(
+        "CO2", {"CO2": 1.0}, 576.0, HOT_TEMPERATURE_K, DIAMETER_M,
+    )
+    assert notice.knudsen_number_upper_bound == pytest.approx(known_partial_only.knudsen_number)
+    assert notice.knudsen_number_lower_bound == 0.0
+    anchor = knudsen_anchor(
+        location="throat", pressure_pa=600.0, temperature_K=HOT_TEMPERATURE_K,
+        characteristic_length_m=DIAMETER_M, threshold=0.01,
+        carrier_mole_fractions={"CO2": 0.96, "ambient_other": 0.04},
+        test_species="CO2",
+    )
+    assert anchor["excluded_carrier_notice"]["excluded_mole_fraction"] == pytest.approx(0.04)
+
+
+def test_unknown_carrier_cannot_replace_all_certified_input():
+    with pytest.raises(tr.TransportRegimeRefusal, match="uncertified_collision_diameter"):
+        tr.carrier_mixture_mean_free_path(
+            "CO2", {"ambient_other": 1.0}, 600.0, HOT_TEMPERATURE_K, DIAMETER_M,
+        )
+
+
 @pytest.mark.parametrize(
     ("species", "sigma_m", "molar_mass"),
     [
@@ -439,6 +479,12 @@ def test_knudsen_classifier_domain_contract(knudsen_number, expected):
                 1300.0,
                 HOT_TEMPERATURE_K,
                 DIAMETER_M,
+            ),
+            "missing_carrier_state",
+        ),
+        (
+            lambda: tr.carrier_mixture_mean_free_path(
+                "N2", None, 1300.0, HOT_TEMPERATURE_K, DIAMETER_M,
             ),
             "missing_carrier_state",
         ),

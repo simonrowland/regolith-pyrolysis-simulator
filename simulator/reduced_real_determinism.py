@@ -415,16 +415,16 @@ class PT0DeterminismStore:
                 "non-finite melt temperature passed to PT-0 quantization: "
                 f"{melt_temperature_C!r}"
             )
-        melt_pressure_mbar = float(sim.melt.p_total_mbar)
+        melt_pressure_bar = sim._melt_headspace_total_pressure_bar()
         pressure_bar = _quantize(
-            melt_pressure_mbar / 1000.0,
+            melt_pressure_bar,
             self._control_quantization.pressure_bar_quantum,
             self._control_quantization.pressure_bar_decimals,
         )
         if pressure_bar is None:
             raise PT0InvalidControls(
                 "non-finite melt pressure passed to PT-0 quantization: "
-                f"{melt_pressure_mbar!r} mbar"
+                f"{melt_pressure_bar!r} bar"
             )
         if fO2_log is None:
             fO2_log = _authoritative_melt_fO2_log(sim)
@@ -2702,8 +2702,9 @@ def canonical_replay_key(
         )
     else:
         T_K = live_T_K
+    melt_pressure_bar = sim._melt_headspace_total_pressure_bar()
     pressure_bar = _quantize(
-        float(sim.melt.p_total_mbar) / 1000.0,
+        melt_pressure_bar,
         quantization.pressure_bar_quantum,
         quantization.pressure_bar_decimals,
     )
@@ -2721,7 +2722,7 @@ def canonical_replay_key(
     if pressure_bar is None:
         raise PT0InvalidControls(
             "non-finite melt pressure passed to PT-0 cache key "
-            f"quantization: {sim.melt.p_total_mbar!r}"
+            f"quantization: {melt_pressure_bar!r} bar"
         )
     if fO2_log is None:
         fO2_log = _authoritative_melt_fO2_log(sim)

@@ -6,6 +6,7 @@ from collections import Counter
 import json
 from pathlib import Path
 import subprocess
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 SCOPE = ("simulator/", "engines/", "web/", "tools/", "scripts/")
@@ -508,3 +509,22 @@ def test_stale_dynamic_import_site_fails(tmp_path: Path) -> None:
     assert _check_dynamic_sites(sites, {f"{path}:load": 1}) == [
         f"STALE dynamic import site {path}:load: count dropped from 1 to 0; lower the count / delete the entry in the same commit that removes the call"
     ]
+
+
+def test_builtin_and_simulator_import_in_either_order() -> None:
+    for imports in (
+        "import engines.evaporation_oxygen",
+        "import engines.builtin\nimport simulator",
+        "import simulator\nimport engines.builtin",
+    ):
+        completed = subprocess.run(
+            [sys.executable, "-c", imports],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        assert completed.returncode == 0, (
+            f"fresh process failed for {imports!r}:\n"
+            f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
+        )

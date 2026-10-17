@@ -368,19 +368,11 @@ def _configure_gas_state(sim: PyrolysisSimulator, gas: GasPoint) -> None:
     if gas.gas_regime == "vacuum":
         sim.melt.atmosphere = Atmosphere.HARD_VACUUM
         sim.melt.p_total_mbar = 0.0
-        sim.overhead.composition = {}
-        sim.overhead.pressure_mbar = 0.0
-        return
-    if gas.pN2_mbar > 0.0:
+    elif gas.pN2_mbar > 0.0:
         sim.melt.atmosphere = Atmosphere.PN2_SWEEP
-        sim.overhead.composition = {
-            "N2": float(gas.pN2_mbar),
-            "O2": float(gas.pO2_mbar),
-        }
     else:
         sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
-        sim.overhead.composition = {"O2": float(gas.pO2_mbar)}
-    sim.overhead.pressure_mbar = float(gas.total_pressure_mbar)
+    sim._install_initial_upstream_projection(sim._overhead_holdup_mol())
 
 
 def _transport_property_basis(gas: GasPoint) -> str:
@@ -715,6 +707,8 @@ def run_owner_live_step_probe(
     sim.melt.target_temperature_C = OWNER_RECIPE_T_C
     sim.melt.hour = owner_stage_hour
     sim.melt.campaign_hour = owner_stage_hour
+    sim.campaign_mgr.apply_c2a_staged_gas_controls(sim.melt)
+    sim._install_initial_upstream_projection(sim._overhead_holdup_mol())
     sim._update_temperature = lambda: None
 
     terminal_stored_before = float(

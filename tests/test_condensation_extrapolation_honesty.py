@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import math
+from collections import Counter
+from dataclasses import asdict
 
 import pytest
 
@@ -15,8 +19,10 @@ from simulator.state import (
 )
 
 
-def _stage3_unavailable_psat_model():
-    model = condensation.CondensationModel(CondensationTrain.create_default())
+def _stage3_unavailable_psat_model(vapor_pressure_data=None):
+    model = condensation.CondensationModel(
+        CondensationTrain.create_default(), vapor_pressure_data=vapor_pressure_data,
+    )
     model.configure_operating_conditions(
         wall_temperature_C=1500.0, overhead_pressure_mbar=1.0,
         species_partial_pressures_mbar={"SiO": 1.0},
@@ -25,6 +31,102 @@ def _stage3_unavailable_psat_model():
     )
     model.wall_species_partial_pressures_pa = {"SiO": 100.0}
     return model
+
+
+@pytest.fixture
+def _isolated_route_pressure_views():
+    from simulator.vapour_rail.catalog import clear_vapor_pressure_view_caches
+
+    # Owned frozen projections must not leak through the process-wide view
+    # memo into later tests that deliberately mutate their legacy coefficients.
+    clear_vapor_pressure_view_caches()
+    try:
+        yield
+    finally:
+        clear_vapor_pressure_view_caches()
+
+
+@pytest.mark.usefixtures("_isolated_route_pressure_views")
+def test_fold15_coupled_route_exact_output_pin():
+    # Pin the entire pre-optimization result, including refusal/extrapolation
+    # telemetry and alpha provenance, before reusing invariant wall pressures.
+    model = _stage3_unavailable_psat_model(condensation.VAPOR_PRESSURE_DATA)
+    model.configure_operating_conditions(
+        species_partial_pressures_mbar={"SiO": 0.4, "Mg": 0.6},
+    )
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 0.4, "Mg": 0.6}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    )
+    digest = hashlib.sha256(json.dumps(
+        asdict(route), sort_keys=True, separators=(",", ":"), allow_nan=False,
+    ).encode()).hexdigest()
+    assert digest == "2ecc09b4f2bca4c5f9b1ad9cf7df15ac443cffdb94a63b5a7eeca6c4567f655c"
+
+
+@pytest.mark.usefixtures("_isolated_route_pressure_views")
+def test_coupled_route_reuses_invariant_wall_pressure_work(monkeypatch):
+    model = _stage3_unavailable_psat_model(condensation.VAPOR_PRESSURE_DATA)
+    evaluate = condensation._antoine_psat_pa
+    lookup = condensation._try_antoine_psat_pa
+    evaluations = Counter()
+    empty_collectors = False
+
+    def tracked_lookup(*args, **kwargs):
+        nonlocal empty_collectors
+        notices, warnings = condensation._resolve_antoine_telemetry(
+            kwargs.get("antoine_extrapolations"),
+            kwargs.get("antoine_extrapolation_warnings"),
+        )
+        previous = empty_collectors
+        empty_collectors = not notices and not warnings
+        try:
+            return lookup(*args, **kwargs)
+        finally:
+            empty_collectors = previous
+
+    def tracked_evaluation(species, temperature, **kwargs):
+        if empty_collectors:
+            evaluations[species, temperature] += 1
+        return evaluate(species, temperature, **kwargs)
+
+    monkeypatch.setattr(condensation, "_try_antoine_psat_pa", tracked_lookup)
+    monkeypatch.setattr(condensation, "_antoine_psat_pa", tracked_evaluation)
+    model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    )
+    assert model.last_wall_capture_fixed_point_iterations > 1
+    assert evaluations
+    assert max(evaluations.values()) == 1
+    assert not hasattr(model.vapor_pressure_data, "_route_wall_pressures")
+
+
+@pytest.mark.parametrize(("species", "temperature"), [
+    ("Mg", 1000.0), ("Mg", 500.0), ("SiO", 1000.0),
+])
+@pytest.mark.usefixtures("_isolated_route_pressure_views")
+def test_route_pressure_reuse_preserves_each_telemetry_channel(
+    monkeypatch, species, temperature,
+):
+    model = _stage3_unavailable_psat_model(condensation.VAPOR_PRESSURE_DATA)
+
+    def lookups(_flux=None, _melt=None):
+        outputs = []
+        for notices, warnings in ((None, None), ({}, None), (None, []), ({}, [])):
+            result = condensation._try_antoine_psat_pa(
+                species, temperature, vapor_pressure_data=model.vapor_pressure_data,
+                antoine_extrapolations=notices,
+                antoine_extrapolation_warnings=warnings,
+            )
+            outputs.append((result, notices, warnings))
+        return outputs
+
+    expected = lookups()
+    monkeypatch.setattr(model, "_route", lookups)
+    assert model.route(None, None) == expected
+    assert model.route(None, None) == expected
+    assert not hasattr(model.vapor_pressure_data, "_route_wall_pressures")
 
 
 def test_stage3_unavailable_psat_predicts_flagged_capture():
@@ -42,6 +144,25 @@ def test_stage3_unavailable_psat_predicts_flagged_capture():
     assert flag["original_reason"]
     assert flag["valid_range_K"]
     assert flag["eta"] == eta
+
+
+@pytest.mark.parametrize('species,stage_number,policy', [
+    ('SiO', 3, 'reactive_product_backstop'),
+    ('Na2', 4, 'declared_pressure_isolated_stage_efficiency'),
+])
+def test_stage_local_pressure_preserves_declared_sink_routes(species, stage_number, policy):
+    model = _stage3_unavailable_psat_model()
+    stage = next(s for s in model.train.stages if s.stage_number == stage_number)
+    outcomes = []
+    eta = model._condensation_efficiency(
+        stage=stage, species=species, T_cond_C=1000.0, residence_s=1.0,
+        available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+        flowing_pressure_pa=25.0,
+    )
+    assert 0.0 < eta <= 1.0
+    flag = next(item for item in outcomes if item['status'] == 'extrapolated')
+    assert flag['flowing_pressure_pa'] == 25.0
+    assert flag['saturation_pressure_policy'] == policy
 
 
 def test_stage3_unavailable_psat_missing_flow_refuses():

@@ -69,6 +69,7 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
+from engines.evaporation_oxygen import reaction_oxygen_destination
 from engines.builtin._common import (
     build_atom_balance_proof,
     diagnostic_control_audit,
@@ -85,6 +86,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.accounting.exceptions import AccountingError
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -182,17 +184,16 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         sp_data = dict(controls.get("sp_data") or {})
         available_kg = float(controls.get("available_kg") or 0.0)
         oxygen_destination = str(sp_data.get("oxygen_destination") or "")
-        if oxygen_destination and oxygen_destination not in {
-            "process.overhead_gas",
-            "reservoir.fo2_buffer",
-        }:
+        try:
+            reaction_oxygen_destination(0.0, 0.0, oxygen_destination)
+        except AccountingError as exc:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="unsupported",
                 control_audit=control_audit,
                 diagnostic={
                     "reason": (
-                        f"unsupported oxygen_destination {oxygen_destination!r}"
+                        str(exc)
                     ),
                 },
             )
@@ -335,13 +336,9 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         if O2_kg > 0.0:
             o2_formula = resolve_species_formula("O2", registry)
             o2_mol = O2_kg / o2_formula.molar_mass_kg_per_mol()
-            if (
-                oxygen_destination == "reservoir.fo2_buffer"
-                or (
-                    not oxygen_destination
-                    and vapor_oxygen_atoms <= 0.0
-                )
-            ):
+            if reaction_oxygen_destination(
+                O2_kg, vapor_oxygen_atoms, oxygen_destination,
+            ) == "reservoir.fo2_buffer":
                 credits["reservoir.fo2_buffer"] = {"O2": o2_mol}
             else:
                 overhead_credit["O2"] = o2_mol

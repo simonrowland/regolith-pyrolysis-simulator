@@ -25,6 +25,33 @@ def _configured_model() -> condensation.CondensationModel:
     return model
 
 
+def test_normal_stage_capture_uses_stream_feed_pressure(monkeypatch):
+    model = _configured_model()
+    monkeypatch.setattr(condensation, '_try_antoine_psat_pa', lambda *a, **k: (100.0, False))
+    incoming = []
+
+    def deposition(_species, pressure, *_args, **_kwargs):
+        incoming.append(pressure)
+        return max(0.0, pressure - 5.0) * 1e-5
+
+    monkeypatch.setattr(condensation, '_series_resistance_deposition_flux_mol_m2_s', deposition)
+    stage = _efficiency_stage(model)
+
+    def eta(pressure):
+        model.wall_species_partial_pressures_pa = {"Fe": pressure}
+        return model._condensation_efficiency(
+            stage=stage, species="Fe", T_cond_C=1250.0, residence_s=5.0,
+            available_kg=1.0, alpha_s_value=0.5,
+        )
+
+    concentrated = eta(20.0)
+    assert incoming and set(incoming) == {20.0}
+    incoming.clear()
+    assert eta(2.0) == 0.0
+    assert set(incoming) == {2.0}
+    assert concentrated > 0.0
+
+
 @pytest.mark.parametrize("value", [math.nan, math.inf, -math.inf])
 def test_minimum_knudsen_pressure_refuses_nonfinite_temperature(value):
     with pytest.raises(
@@ -387,6 +414,23 @@ def test_required_record_alpha_s_refuses_unparseable_marked_record():
     ):
         condensation._required_record_alpha_s(
             record, species="Fe", site="test_site"
+        )
+
+
+def test_area_less_stage_keeps_causal_alpha_refusal(monkeypatch):
+    model = _configured_model()
+    model.stage_area_m2_by_stage = {}
+    record = condensation._alpha_record(
+        species="Fe", entry={"status": "CITED", "source": "missing measurement"},
+        source="test",
+    )
+    monkeypatch.setattr(condensation, '_stage_alpha_record', lambda *args: dict(record))
+    with pytest.raises(condensation.DepositionInputRefusal,
+                       match="unparseable sticking coefficient spec"):
+        model._resolve_wall_deposit_candidates_by_species_segment_kg(
+            evap_flux=EvaporationFlux(species_kg_hr={'Fe': 1.0}, total_kg_hr=1.0),
+            melt=MeltState(),
+            stage_route_by_species={'Fe': {'T_cond_C': 1250.0, 'capture_budget_kg': 0.1}},
         )
 
 

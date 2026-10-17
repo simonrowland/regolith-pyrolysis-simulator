@@ -895,7 +895,6 @@ def test_non_mre_step_clears_prior_c5_ellingham_ladder_diagnostic(monkeypatch):
         lambda *_args, **_kwargs: False,
     )
     for name in (
-        "_sync_c2a_staged_overhead_gas_control",
         "validate_lab_surface_temperature_resolver",
         "_update_temperature",
         "_apply_oxygen_reservoir_exchange",

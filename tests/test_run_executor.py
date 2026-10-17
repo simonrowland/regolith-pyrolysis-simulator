@@ -953,6 +953,8 @@ def test_c4_transitional_flux_refusal_is_visible_and_preserves_ledger_closure():
     run = _c4_point_two_mbar_transitional_run()
     session = run._start_session()
     sim = session.simulator
+    assert sim._melt_headspace_total_pressure_bar() == pytest.approx(0.0002)
+    assert sim._melt_headspace_composition_mbar == pytest.approx({"O2": 0.2})
     sim.melt.temperature_C = 1200.0
 
     payload = run._run_session(session)

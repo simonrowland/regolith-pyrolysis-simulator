@@ -646,6 +646,59 @@ def test_condensation_campaign_pool_withdrawal_uses_input_ratio(
     assert payload["closure"]["maximum_residual_fraction"] == pytest.approx(0.0)
 
 
+@pytest.mark.parametrize("retained_factor", (0.25, 1.0, 1.02))
+@pytest.mark.parametrize("feedstock_fraction", (0.5, 1.0))
+def test_condensation_retained_tio2_keeps_elemental_origin_below_allocation_band(
+    retained_factor: float,
+    feedstock_fraction: float,
+) -> None:
+    captured_ti_mol = 5.14319721817e-11
+    retained_mol = retained_factor * captured_ti_mol
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"O": captured_ti_mol / (0.99 * ledger.relative_tolerance)},
+        source="charged atom scale",
+        material_origin="feedstock",
+    )
+    for origin, fraction in (
+        ("feedstock", feedstock_fraction),
+        ("reagent", 1.0 - feedstock_fraction),
+    ):
+        if fraction > 0.0:
+            ledger.load_external_mol(
+                "process.condensation_train",
+                {"TiO2": retained_mol * fraction},
+                source="cleanup titanium oxide",
+                material_origin=origin,
+            )
+    sim = _sim(ledger)
+    capture_ledger_snapshot(
+        sim,
+        SimpleNamespace(hour=0, campaign="C0", campaign_hour=0),
+    )
+
+    payload = build_yield_disposition(sim, ledger_snapshots_from_sim(sim))
+
+    allocation_band = payload["closure"]["origin_dust_limit_mol_atoms"]
+    assert captured_ti_mol < allocation_band < 1.02 * captured_ti_mol
+    stream = next(
+        row
+        for row in payload["terminal_species_streams"]
+        if row["species"] == "TiO2"
+    )
+    assert stream["destination"] == "cleanup_volatile_product"
+    assert stream["terminal_mol"] == pytest.approx(retained_mol, abs=0.0)
+    for element, atom_count in (("Ti", 1), ("O", 2)):
+        assert _row(payload, element)["destination_mol_atoms"][
+            "cleanup_volatile_product"
+        ] == pytest.approx(
+            atom_count * retained_mol * feedstock_fraction,
+            abs=0.0,
+        )
+    assert payload["reagent_cycle"]["closure_residual_fraction"] == 0.0
+
+
 def test_condensation_dust_edge_ratio_allocation_stays_pool_ratio() -> None:
     ledger = AtomLedger()
     ledger.load_external_mol(

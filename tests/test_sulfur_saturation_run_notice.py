@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from types import SimpleNamespace
 
+import pytest
+
 from simulator.optimize.evaluate import _run_reference
 from simulator.optimize.objective import compute_objectives
 from simulator.optimize.profiles import load_profile
@@ -61,6 +63,8 @@ def test_in_range_sulfsat_leaves_run_notice_absent() -> None:
     )
     session = run._start_session()
     sim = session.simulator
+    # Stage 0 can flag actual vacuum; isolate the in-range recorder probe.
+    sim._sulfur_saturation_steps = []
     assert sim.sulfur_saturation_run_notice() is None
     sim._note_sulfur_saturation_step(_sulfur_result("in_range"))
     assert sim.sulfur_saturation_run_notice() is None
@@ -133,6 +137,41 @@ def test_out_of_range_sulfsat_accumulates_and_does_not_change_numbers() -> None:
     assert "sulfur_saturation_notice" not in sim.product_ledger()
 
 
+def test_stage0_sulfsat_uses_actual_headspace_pressure(monkeypatch) -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    sim = run._start_session().simulator
+    sim.melt.p_total_mbar = 10.0
+    sim._install_upstream_projection({
+        "Fe": 0.00042416384640343613,
+    })
+    monkeypatch.setattr(sim, "_stage0_sulfur_input_ppm", lambda: 500.0)
+    monkeypatch.setattr(sim, "_melt_oxide_wt_pct", lambda: {"SiO2": 45.0})
+    monkeypatch.setattr(sim, "_current_melt_redox_fO2_log", lambda: -10.0)
+    monkeypatch.setattr(sim, "_sync_oxygen_reservoir_mirror", lambda: None)
+    seen_pressures_bar: list[float] = []
+
+    def capture_sulfur_request(**kwargs):
+        seen_pressures_bar.append(float(kwargs["P_bar"]))
+        return _sulfur_result("in_range")
+
+    monkeypatch.setattr(
+        sim._sulfsat_gate,
+        "compute_sulfur_saturation",
+        capture_sulfur_request,
+    )
+    sim._run_stage0_sulfsat_gate()
+
+    # Confirm-4's actual Fe partial is mbar; summing and dividing by 1000
+    # gives bar. An empty actual vector remains 0 bar, with no command floor.
+    assert seen_pressures_bar == pytest.approx([4.241638464034361e-7])
+
+
 def test_attach_post_equilibrium_sulfsat_notes_out_of_range(monkeypatch) -> None:
     """Mutation proof: the post-eq hook must feed the run rollup."""
     run = PyrolysisRun(
@@ -143,18 +182,31 @@ def test_attach_post_equilibrium_sulfsat_notes_out_of_range(monkeypatch) -> None
         allow_unmeasured_alpha_fallback=True,
     )
     sim = run._start_session().simulator
+    # Count only this post-equilibrium hook, independently of Stage 0 notices.
+    sim._sulfur_saturation_steps = []
+    sim.melt.p_total_mbar = 10.0
+    sim._install_upstream_projection({
+        "Fe": 0.00042416384640343613,
+    })
     monkeypatch.setattr(sim, "_stage0_sulfur_input_ppm", lambda: 500.0)
     monkeypatch.setattr(sim, "_melt_oxide_wt_pct", lambda: {"SiO2": 45.0, "FeO": 10.0})
     monkeypatch.setattr(sim, "_current_melt_redox_fO2_log", lambda: -10.0)
     monkeypatch.setattr(sim, "_sync_oxygen_reservoir_mirror", lambda: None)
+    seen_pressures_bar: list[float] = []
+
+    def capture_sulfur_request(**kwargs):
+        seen_pressures_bar.append(float(kwargs["P_bar"]))
+        return _sulfur_result("out_of_range")
+
     monkeypatch.setattr(
         sim._sulfsat_gate,
         "compute_sulfur_saturation",
-        lambda **kwargs: _sulfur_result("out_of_range"),
+        capture_sulfur_request,
     )
     result = SimpleNamespace(warnings=[])
     sim.melt.hour = 0
     sim._attach_post_equilibrium_sulfsat(result)
+    assert seen_pressures_bar == pytest.approx([4.241638464034361e-7])
     notice = sim.sulfur_saturation_run_notice()
     assert notice is not None
     assert notice["count"] == 1

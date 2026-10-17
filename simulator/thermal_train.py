@@ -12,7 +12,7 @@ from __future__ import annotations
 import copy
 import math
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any
@@ -1276,6 +1276,10 @@ def knudsen_anchor(
         "threshold_interpretation": "minimum_Kn_for_rarefaction",
         "rarefaction_threshold_met": result.knudsen_number >= selected_threshold,
         "formula_id": result.formula_id,
+        **(
+            {"excluded_carrier_notice": asdict(result.excluded_carrier_notice)}
+            if result.excluded_carrier_notice is not None else {}
+        ),
     }
 
 

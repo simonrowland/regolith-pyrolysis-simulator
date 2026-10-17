@@ -158,6 +158,17 @@ class CarrierCollision:
 
 
 @dataclass(frozen=True)
+class ExcludedCarrierNotice:
+    excluded_species: tuple[str, ...]
+    excluded_mole_fraction: float
+    knudsen_number_lower_bound: float
+    knudsen_number_upper_bound: float
+    reason: str = 'uncertified_collision_diameter'
+    status: str = 'extrapolated'
+    authority_level: str = 'extrapolated'
+
+
+@dataclass(frozen=True)
 class MeanFreePathResult:
     lambda_m: float
     knudsen_number: float
@@ -166,6 +177,7 @@ class MeanFreePathResult:
     test_species: str
     carriers: tuple[CarrierCollision, ...]
     collision_diameter_source: str
+    excluded_carrier_notice: ExcludedCarrierNotice | None = None
 
 
 def _refuse(
@@ -985,6 +997,29 @@ def carrier_mixture_mean_free_path(
         name="characteristic_length_m",
         category="invalid_characteristic_length",
     )
+    excluded = tuple(
+        species for species in carrier_mole_fractions
+        if species not in COLLISION_DIAMETERS_M or species not in MOLAR_MASSES_KG_PER_MOL
+    ) if carrier_mole_fractions else ()
+    excluded_fraction = 0.0
+    if excluded:
+        fractions = {
+            species: _require_positive(
+                fraction, name=f'{species} mole fraction',
+                category='invalid_carrier_mole_fraction',
+            )
+            for species, fraction in carrier_mole_fractions.items()
+        }
+        if not math.isclose(sum(fractions.values()), 1.0, rel_tol=0.0, abs_tol=1e-9):
+            _refuse('carrier_mole_fractions_not_normalized', 'carrier mole fractions must sum to 1.0')
+        certified = {species: fraction for species, fraction in fractions.items() if species not in excluded}
+        if not certified:
+            _refuse('uncertified_collision_diameter', 'no certified carrier remains')
+        certified_fraction = sum(certified.values())
+        excluded_fraction = sum(fractions[species] for species in excluded)
+        carrier_mole_fractions = {
+            species: fraction / certified_fraction for species, fraction in certified.items()
+        }
     lambda_m = mixture_mean_free_path_m(
         test_species,
         carrier_mole_fractions,
@@ -1001,6 +1036,20 @@ def carrier_mixture_mean_free_path(
         for species, fraction in carrier_mole_fractions.items()
     )
     knudsen_number = lambda_m / characteristic_length_m
+    # Let f be the excluded mole fraction and A the certified collision sum
+    # after renormalization. Actual collisions are P*((1-f)*A + f*A_unknown),
+    # with A_unknown >= 0. Thus 0 <= Kn_actual <= Kn_prediction/(1-f).
+    # Both Kn and f are dimensionless. At f=0 the bound is the prediction;
+    # no finite lower bound follows without inventing minority properties.
+    notice = (
+        ExcludedCarrierNotice(
+            excluded_species=excluded,
+            excluded_mole_fraction=excluded_fraction,
+            knudsen_number_lower_bound=0.0,
+            knudsen_number_upper_bound=knudsen_number / certified_fraction,
+        )
+        if excluded else None
+    )
     return MeanFreePathResult(
         lambda_m=lambda_m,
         knudsen_number=knudsen_number,
@@ -1009,4 +1058,5 @@ def carrier_mixture_mean_free_path(
         test_species=test_species,
         carriers=carriers,
         collision_diameter_source=COLLISION_DIAMETER_SOURCE,
+        excluded_carrier_notice=notice,
     )

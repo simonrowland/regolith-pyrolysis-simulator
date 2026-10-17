@@ -72,6 +72,51 @@ def _dispatch_bound_proposal(kernel, proposal):
 # "magemin_fullrun_serial" scope that co-runs against the real group.
 pytestmark = [pytest.mark.serial]
 
+
+@pytest.mark.parametrize(('species', 'parent', 'destination', 'expected_o2'), [
+    ('Fe', 'FeO', 'process.overhead_gas', 0.5),
+    ('SiO', 'SiO2', 'process.overhead_gas', 0.5),
+    ('Na', 'Na2O', 'process.overhead_gas', 0.25),
+    ('SiO', 'SiO2', 'reservoir.fo2_buffer', 0.0),
+    ('Fe', 'FeO', '', 0.0),
+    ('CrO3', 'Cr2O3', 'process.overhead_gas', -0.75),
+])
+def test_projected_reaction_oxygen_matches_transition_destination(
+    species, parent, destination, expected_o2,
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.accounting.formulas import resolve_species_formula
+    sim = _build_sim('lunar_mare_low_ti', vapor_pressure_data, feedstocks_data, setpoints_data)
+    registry = sim.species_formula_registry
+    product = resolve_species_formula(species, registry)
+    parent_formula = resolve_species_formula(parent, registry)
+    oxygen = resolve_species_formula('O2', registry)
+    # Balanced reaction per product mole, independently from atom counts.
+    element = next(e for e in product.elements if e != 'O')
+    parent_mol = product.elements[element] / parent_formula.elements[element]
+    o2_mol = (parent_mol * parent_formula.elements['O'] - product.elements.get('O', 0)) / 2
+    rate = product.molar_mass_kg_per_mol()
+    metadata = {'parent_oxide': parent, 'oxygen_destination': destination,
+                'stoich_oxide_per_vapor': parent_mol * parent_formula.molar_mass_kg_per_mol() / rate,
+                'stoich_O2_per_vapor': o2_mol * oxygen.molar_mass_kg_per_mol() / rate}
+    stoich = sim._evaporation_stoich(species, metadata)
+    projected = sim._project_evaporation_overhead_source_mol_hr({species: rate}, {species: stoich})
+    result = BuiltinEvaporationTransitionProvider().dispatch(IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_TRANSITION,
+        account_view=ProviderAccountView(accounts={}, species_formula_registry=registry),
+        temperature_C=1500.0, pressure_bar=1e-6,
+        control_inputs={'species': species, 'stoich': stoich, 'sp_data': metadata,
+                        'rate_kg_hr': rate, 'remaining_kg_hr': rate,
+                        'dt_hr': 1.0, 'available_kg': 100.0},
+    ))
+    assert result.status == 'ok'
+    proposal = result.transition
+    assert proposal is not None
+    net_o2 = (proposal.credits.get('process.overhead_gas', {}).get('O2', 0.0)
+              - proposal.debits.get('process.overhead_gas', {}).get('O2', 0.0))
+    assert net_o2 == pytest.approx(expected_o2)
+    assert projected.get('O2', 0.0) == pytest.approx(net_o2)
+
 # ---------------------------------------------------------------------------
 # 1. Capability profile
 # ---------------------------------------------------------------------------

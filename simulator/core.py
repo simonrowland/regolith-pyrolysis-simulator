@@ -1297,7 +1297,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.inventory = ProcessInventory()
         self.train = CondensationTrain.create_default()
         self.overhead = OverheadGas()
-        self._melt_headspace_composition_mbar: Dict[str, float] = {}
+        self._install_upstream_projection({})
 
         # --- Batch record ---
         self.record = BatchRecord()
@@ -1575,6 +1575,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         self._apply_stage0_carbon_reductant_reactions(fs, ledger_additives)
         self._apply_stage0_perchlorate_reactions(fs)
+        # Stage 0 reads these conditions and reservoir while seeding the ledger.
+        self.melt.temperature_C = 25.0
+        self.melt.atmosphere = Atmosphere.HARD_VACUUM
+        environment = fs.get('environment', {}) or {}
+        self.melt.ambient_pressure_mbar = _feedstock_surface_pressure_mbar(fs)
+        self.melt.ambient_atmosphere = str(
+            fs.get('atmosphere')
+            or environment.get('atmosphere')
+            or '')
+        self.melt.body = feedstock_body(fs)
+        self.melt.p_total_mbar = self.melt.ambient_pressure_mbar
+        self.melt.pO2_mbar = 0.0
+        if self.melt.ambient_pressure_mbar > 0.0:
+            self.melt.atmosphere = Atmosphere.CO2_BACKPRESSURE
+        self.train = CondensationTrain.create_default()
+        self.overhead = OverheadGas()
+        self._overhead_model = None
+        self._equipment = None
+        self.melt.hour = 0
+        # Initial finite headspace needs the current batch's vessel volume.
+        # Establish its sizing inputs before the owner requests equipment.
+        self.record = BatchRecord(
+            feedstock_key=feedstock_key,
+            feedstock_label=fs.get('label', feedstock_key),
+            seed_authority=self._feedstock_iron_initialization['seed_authority'],
+            batch_mass_kg=mass_kg,
+            additives_kg=additives,
+        )
+        self._configure_overhead_headspace()
+        self._install_initial_upstream_projection({})
+        self._sulfur_saturation_steps = []
         self._seed_atom_ledger(feedstock_key, fs, ledger_additives)
         self._project_cleaned_melt_from_atom_ledger()
         # NOTE: ``_seed_atom_ledger`` now rebuilds ``self._chem_kernel``
@@ -1590,34 +1621,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_backend_diagnostics = {}
         self._last_out_of_domain_diagnostics = {}
         self._engine_commissioning_steps = []
-        self._sulfur_saturation_steps = []
         self._backend_failed = False
 
-        self.melt.temperature_C = 25.0
-        self.melt.atmosphere = Atmosphere.HARD_VACUUM
-        environment = fs.get('environment', {}) or {}
-        self.melt.ambient_pressure_mbar = _feedstock_surface_pressure_mbar(fs)
-        self.melt.ambient_atmosphere = str(
-            fs.get('atmosphere')
-            or environment.get('atmosphere')
-            or '')
-        self.melt.body = feedstock_body(fs)
-        self.melt.p_total_mbar = self.melt.ambient_pressure_mbar
-        self.melt.pO2_mbar = 0.0
         formation_T_K = self._feedstock_iron_initialization.get(
             'formation_temperature_K', KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15)
         base_intrinsic_fO2_log = self._compute_intrinsic_melt_fO2(formation_T_K)
         self.melt.fO2_log = base_intrinsic_fO2_log
         self.melt.melt_fO2_log = base_intrinsic_fO2_log
         self.melt.campaign = CampaignPhase.IDLE
-        self.melt.hour = 0
         self.melt.campaign_hour = 0
         self.melt.update_total_mass()
 
-        # Reset condensation train
-        self.train = CondensationTrain.create_default()
-        self.overhead = OverheadGas()
-        self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
         self._last_vapour_batch = None
@@ -1646,7 +1660,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._c6_campaign_refused = False
         self._last_c3_na_hold_adjustment = {}
         self._c3_alkali_credit_drawn_kg_by_species = {}
-        self._equipment = None
         self._configure_overhead_headspace()
         self._configure_freeze_gate()
         self._refresh_oxygen_reservoir_without_exchange(
@@ -1654,15 +1667,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             reference_T_K=formation_T_K,
         )
 
-        # Record
-        self.record = BatchRecord(
-            feedstock_key=feedstock_key,
-            feedstock_label=fs.get('label', feedstock_key),
-            seed_authority=self._feedstock_iron_initialization['seed_authority'],
-            batch_mass_kg=mass_kg,
-            additives_kg=additives,
-            initial_inventory=self.inventory.copy(),
-        )
+        self.record.initial_inventory = self.inventory.copy()
         self.energy_electrical_plus_evaporation_cumulative_kWh = 0.0
         self.energy_cumulative_breakdown_kWh = {}
         self._energy_tracker = None
@@ -2469,7 +2474,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if temperature_C_override is None
             else float(temperature_C_override)
         )
-        pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+        pressure_bar = self._melt_headspace_total_pressure_bar()
         store = _pt0_determinism_store_for(self)
         account_mol_overrides = None
         if store is not None and getattr(store, 'quantize_live_controls', False):
@@ -3443,11 +3448,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if headspace_config is not None
             else self._resolve_overhead_headspace_config(campaign)
         )
-        self._overhead_condenser_geometry_config = copy.deepcopy(
+        resolved_geometry = copy.deepcopy(
             condenser_geometry_config
             if condenser_geometry_config is not None
             else self._resolve_condenser_geometry_config(campaign)
         )
+        if (
+            campaign is not None
+            and resolved_geometry != self._overhead_condenser_geometry_config
+        ):
+            # Initial fill may already have sized the base equipment. Its pipe
+            # must be rebuilt by _get_turbine_spec from the campaign geometry
+            # before it can be applied to the runtime overhead model again.
+            self._equipment = None
+        self._overhead_condenser_geometry_config = resolved_geometry
         if self._overhead_model is not None:
             self._overhead_model.configure_condenser_geometry(
                 self._overhead_condenser_geometry_config)
@@ -3535,7 +3549,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return max(1.0, melt_T_K - 100.0)
         return max(1.0, melt_T_K)
 
+    def _install_upstream_projection(
+        self, vector_mbar: Optional[Dict[str, float]],
+    ) -> None:
+        """Install actual upstream partials, the source of the derived total."""
+        self._melt_headspace_composition_mbar = vector_mbar
+
+    def _install_initial_upstream_projection(
+        self, holdup_mol: Mapping[str, float],
+    ) -> None:
+        # Before the first evaporation solve, the regulator/ambient has already
+        # filled the headspace. Use the same owner closure as the hourly report;
+        # a pressure command alone does not establish gas in hard vacuum.
+        initial_gas = self.overhead_model.update(
+            EvaporationFlux(), self.melt, self.train,
+            overhead_holdup_mol=holdup_mol,
+            headspace_volume_m3=self._headspace_volume_m3(),
+            p_downstream_bar=self._headspace_downstream_pressure_bar(),
+        )
+        self._install_upstream_projection(dict(initial_gas.composition))
+
     def _melt_headspace_total_pressure_bar(self) -> float:
+        # Silicate equilibrium/liquidus use confining P: d(mu)/(RT) = V*dP/(RT).
+        # For V=1-4e-5 m^3/mol, dP=(0.01-0.0001585)*1e5 Pa and T=1773 K,
+        # this is 6.7e-7 to 2.7e-6: (m^3/mol)*Pa/(J/mol) is dimensionless,
+        # and equal pressures give zero. Negligible does not mean commanded:
+        # MAGEMin's six-decimal kbar inputs are 0.000010 versus 0.000000.
         upstream_partials_mbar = getattr(
             self,
             '_melt_headspace_composition_mbar',
@@ -3546,15 +3585,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'authoritative melt-headspace pressure requires '
                 '_melt_headspace_composition_mbar projection'
             )
+        # Preserve invalid actual controls for the downstream typed validator;
+        # max(0, NaN/-inf) would silently turn them into numerical vacuum.
         partial_sum_mbar = sum(
-            max(0.0, float(value))
-            for value in upstream_partials_mbar.values()
+            max(0.0, value) if math.isfinite(value) else value
+            for value in map(float, upstream_partials_mbar.values())
         )
-        commanded_mbar = max(
-            0.0,
-            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0),
-        )
-        return max(partial_sum_mbar, commanded_mbar) / 1000.0
+        return partial_sum_mbar / 1000.0
 
     @staticmethod
     def _normalize_condensation_carrier_gas(
@@ -3614,6 +3651,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _configure_condensation_operating_conditions(
         self,
         evap_flux: EvaporationFlux,
+        *,
+        source_mol_hr: Mapping[str, float] | None = None,
+        already_credited_mol: Mapping[str, float] | None = None,
     ) -> None:
         effective_transport_capacity = getattr(
             self,
@@ -3630,20 +3670,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.melt,
             **transport_kwargs,
         )
-        species_formula_registry = getattr(
-            self, "species_formula_registry", {}
-        )
-        partial_pressure_args = (
-            (evap_flux, transport['vapor_pressure_mbar'], species_formula_registry)
-            if species_formula_registry
-            else (evap_flux, transport['vapor_pressure_mbar'])
+        prior_holdup = self._overhead_holdup_mol()
+        for species, mol in (already_credited_mol or {}).items():
+            prior_holdup[species] = max(0.0, prior_holdup.get(species, 0.0) - mol)
+        partials = self._flowing_stream_partial_pressures(
+            evap_flux, transport, source_mol_hr=source_mol_hr, holdup_mol=prior_holdup,
         )
         self.condensation_model.configure_operating_conditions(
             wall_temperature_C=transport['pipe_temperature_C'],
-            overhead_pressure_mbar=transport['pressure_mbar'],
-            species_partial_pressures_mbar=(
-                self.overhead_model.species_partial_pressures(*partial_pressure_args)
-            ),
+            overhead_pressure_mbar=self.overhead_model.last_stream_boundary['pressure_mbar'],
+            species_partial_pressures_mbar=partials,
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
             # The upstream vapor is evaluated at the melt-side temperature used
             # by the conductance model; the independently scheduled pipe and
@@ -3704,6 +3740,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             campaign_hour=float(self.melt.campaign_hour),
         )
 
+    def _flowing_stream_partial_pressures(
+        self, evap_flux: EvaporationFlux, transport: Mapping[str, Any], *,
+        source_mol_hr: Mapping[str, float] | None = None,
+        holdup_mol: Mapping[str, float] | None = None,
+    ) -> dict[str, float]:
+        source = (dict(source_mol_hr) if source_mol_hr is not None else
+                  self._project_evaporation_overhead_source_mol_hr(evap_flux.species_kg_hr, {}))
+        flows = self.overhead_model.flowing_stream_mol_hr(
+            source, self.melt, transport,
+            holdup_mol=self._overhead_holdup_mol() if holdup_mol is None else holdup_mol,
+            effective_transport_capacity=getattr(self, '_effective_transport_capacity_this_tick', None),
+            headspace_volume_m3=self._headspace_volume_m3(),
+        )
+        partials = self.overhead_model.species_partial_pressures(
+            evap_flux, self.overhead_model.last_stream_boundary['pressure_mbar'], self.species_formula_registry,
+            molar_flow_by_species=flows,
+        )
+        self._last_backend_diagnostics['stream_pressure'] = {
+            'boundary': dict(self.overhead_model.last_stream_boundary),
+            'flows_mol_hr': dict(flows), 'partials_mbar': dict(partials),
+            'notices': list(self.overhead_model.stream_physics_notices),
+        }
+        from simulator.wall_deposition import _record_wall_pressure_notice
+        for notice in self.overhead_model.stream_physics_notices:
+            for species in evap_flux.species_kg_hr:
+                _record_wall_pressure_notice(
+                    self.condensation_model, 'evaporation_transport_notices_by_species',
+                    species, 'melt_to_train_stream', notice,
+                )
+        return partials
+
     def _apply_c2a_knudsen_pressure_adjustment(self) -> None:
         if self.melt.campaign not in (
             CampaignPhase.C2A,
@@ -3736,11 +3803,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.p_total_mbar = applied_total_mbar
         self.melt.background_gas_species = carrier_gas
         self.melt.background_gas_mole_fraction = 1.0
-        self.overhead.composition[carrier_gas] = applied_pN2_mbar
-        self.overhead.pressure_mbar = max(
-            float(self.overhead.pressure_mbar),
-            applied_total_mbar,
-        )
         staged_control = self.campaign_mgr.last_c2a_staged_gas_control
         if isinstance(staged_control, dict):
             staged_control['pN2_mbar'] = applied_pN2_mbar
@@ -3891,38 +3953,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 None,
             )
         return 0.0
-
-    def _sync_c2a_staged_overhead_gas_control(self) -> None:
-        control = getattr(
-            self.campaign_mgr, 'last_c2a_staged_gas_control', None)
-        if self.melt.campaign != CampaignPhase.C2A_STAGED:
-            return
-        if not isinstance(control, Mapping):
-            return
-
-        pO2_mbar = max(0.0, float(control.get('pO2_mbar', 0.0) or 0.0))
-        p_total_mbar = max(
-            0.0, float(control.get('p_total_mbar', 0.0) or 0.0))
-        pN2_mbar = max(
-            0.0,
-            float(control.get('pN2_mbar', p_total_mbar - pO2_mbar) or 0.0),
-        )
-
-        composition: Dict[str, float] = {}
-        if pN2_mbar > 0.0:
-            # Kr audit follow-through (NOT-FIXED lens, 2026-07-25): this
-            # write is a dead transient today (_reset_gas wipes it before
-            # the honest overhead write, no intra-step reader), but a
-            # literal 'N2' here is a re-divergence trap — key it off the
-            # stamped carrier like every other sweep write.
-            _sweep_key = (
-                getattr(self.melt, 'background_gas_species', '') or 'N2'
-            )
-            composition[_sweep_key] = pN2_mbar
-        if pO2_mbar > 0.0:
-            composition['O2'] = pO2_mbar
-        self.overhead.composition = composition
-        self.overhead.pressure_mbar = p_total_mbar
 
     def _headspace_bleed_conductance_kg_s(
         self,
@@ -4303,7 +4333,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return 0.0
         comp = self._melt_oxide_wt_pct()
         pressure_bar = floor_vacuum_pressure_bar(
-            float(self.melt.p_total_mbar) / 1000.0,
+            self._melt_headspace_total_pressure_bar(),
             floor_bar=self._vacuum_floor_bar(),
         )
         eps_log10 = 0.001
@@ -4936,7 +4966,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
         self._last_reduced_real_replay_notices = None
-        pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+        pressure_bar = self._melt_headspace_total_pressure_bar()
         fO2_log = float(self._current_melt_redox_fO2_log())
         fO2_log, redox_state = normalize_redox_state(
             fO2_log,
@@ -5388,10 +5418,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # N2-sweep passive exchange uses actual headspace pO2 below this bound;
         # the ceiling does not mean equilibrium with pure O2. As P -> 0 the
         # vacuum floor is numerical pressure resolution, not physics.
-        return math.log10(floor_vacuum_pressure_bar(
-            float(self.melt.p_total_mbar) / 1000.0,
+        pressure_bar = floor_vacuum_pressure_bar(
+            self._melt_headspace_total_pressure_bar(),
             floor_bar=self._vacuum_floor_bar(),
-        ))
+        )
+        if not math.isfinite(pressure_bar):
+            raise AccountingError(
+                'melt redox ceiling requires finite actual headspace pressure; '
+                f'got {pressure_bar!r} bar'
+            )
+        return math.log10(pressure_bar)
 
     def _record_redox_pressure_ceiling_hit(
         self, *, site: str, unclamped_fO2_log: float, applied_fO2_log: float,
@@ -6924,8 +6960,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return dict(rates_cache[cache_key])
             iteration_controls = dict(controls)
             iteration_controls['overhead_partials_Pa'] = dict(partials_Pa)
+            # The Picard map contains species backpressures, not regulator
+            # stock. The installed owner state supplies the absolute pressure
+            # for the gas-resistance/Kn gate, including the initial fill.
             iteration_controls['overhead_pressure_pa'] = (
-                self._evaporation_overhead_total_pressure_Pa(partials_Pa)
+                self._melt_headspace_total_pressure_bar() * 1.0e5
             )
             request = IntentRequest(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
@@ -7419,17 +7458,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if callable(carrier_resolver)
             else 'N2'
         )
-        overhead_pressure_mbar = float(
-            getattr(self.melt, 'p_total_mbar', 0.0) or 0.0
-        )
-        pressure_source = 'melt.p_total_mbar'
-        if overhead_pressure_mbar <= 0.0:
-            overhead_pressure_mbar = sum(
-                max(0.0, float(value))
-                for value in self._melt_headspace_composition_mbar.values()
-            )
-            pressure_source = '_melt_headspace_composition_mbar'
-        overhead_pressure_pa = max(0.0, overhead_pressure_mbar) * 100.0
+        overhead_pressure_pa = self._melt_headspace_total_pressure_bar() * 1.0e5
+        pressure_source = '_melt_headspace_composition_mbar'
         P_bulk_Pa = max(0.0, self._evaporation_bulk_partial_pressure_pa('Fe'))
         gas_temperature_K = float(
             getattr(self.overhead, 'headspace_temperature_K', 0.0) or T_K
@@ -8781,8 +8811,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         without re-running the gate. The result never mutates the atom
         ledger; Stage 0 keeps its builtin sulfate / sulfide bucketing
         authoritative. When the gate reports ``out_of_range`` the
-        warning is preserved on the result; the caller is expected to
-        log it but not redirect inventory.
+        warning is preserved on the result and in the run notice ledger
+        without redirecting inventory.
         """
         s_input_ppm = self._stage0_sulfur_input_ppm()
         if s_input_ppm <= 0.0:
@@ -8800,7 +8830,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # reached. Post-equilibrium calls override this with the actual
         # melt T.
         T_K = 1473.0
-        P_bar = max(self.melt.p_total_mbar / 1000.0, 1.0e-6)
+        P_bar = self._melt_headspace_total_pressure_bar()
         fO2_log = self._current_melt_redox_fO2_log()
         self._sync_oxygen_reservoir_mirror()
         self._last_sulfur_saturation_result = (
@@ -8812,6 +8842,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 S_input_ppm=s_input_ppm,
             )
         )
+        self._note_sulfur_saturation_step(self._last_sulfur_saturation_result)
 
     def _attach_post_equilibrium_sulfsat(
         self, result: 'Any'
@@ -8839,7 +8870,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         T_K = float(self.melt.temperature_C) + 273.15
         if T_K <= 0.0:
             return
-        P_bar = max(self.melt.p_total_mbar / 1000.0, 1.0e-6)
+        P_bar = self._melt_headspace_total_pressure_bar()
         fO2_log = self._current_melt_redox_fO2_log()
         self._sync_oxygen_reservoir_mirror()
         sulfur_result = self._sulfsat_gate.compute_sulfur_saturation(
@@ -9204,7 +9235,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             intrinsic_fO2_log = float(
                 self.melt.oxygen_reservoir.melt_intrinsic_fO2_log)
             temperature_C = float(self.melt.temperature_C)
-            pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+            pressure_bar = self._melt_headspace_total_pressure_bar()
             canonicalize_pt0_inputs = store is not None and getattr(
                 store,
                 'quantize_live_controls',
@@ -12514,6 +12545,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             condenser_geometry_config=condenser_geometry_config,
         )
         self._configure_freeze_gate(campaign, freeze_gate_config=freeze_gate_config)
+        if self.melt.hour == 0:
+            self._install_initial_upstream_projection(self._overhead_holdup_mol())
         self._refresh_oxygen_reservoir_without_exchange(
             exchange_direction='none:campaign_start',
         )
@@ -13597,6 +13630,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_native_fe_saturation_event = {}
         self._native_fe_vapor_residual_capacity_mol_this_hr = None
         self._last_partial_melt_offgassing_diagnostic = {}
+        self._stream_source_pressures_Pa = {}
         self._silent_zero_notes = []
         self._last_extraction_completeness_diagnostic = {}
         self._last_target_inventory_diagnostic = {}
@@ -13618,7 +13652,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             sample_time_h=sample_time_h,
         )
         self.campaign_mgr.apply_c2a_staged_gas_controls(self.melt)
-        self._sync_c2a_staged_overhead_gas_control()
         self.melt.validate_melt_pressures()
 
         # --- 2. Temperature ramp and carried-in passive exchange ---
@@ -13788,6 +13821,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._effective_transport_capacity_this_tick = (
             effective_transport_capacity
         )
+        self._stream_inlet_holdup_this_tick = self._overhead_holdup_mol()
 
         # --- 5. Condensation routing ---
         # Send evaporated species through the 8-stage train.
@@ -13901,13 +13935,39 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             effective_transport_capacity=effective_transport_capacity,
         )
-        self._melt_headspace_composition_mbar = (
-            self.overhead_model.species_partial_pressures(
-                evap_flux,
-                upstream_transport['vapor_pressure_mbar'],
-                self.species_formula_registry,
+        self._install_upstream_projection(
+            self.overhead_model._melt_surface_partial_pressures(
+                self.overhead,
+                self._flowing_stream_partial_pressures(
+                    evap_flux, upstream_transport,
+                    holdup_mol=self._stream_inlet_holdup_this_tick,
+                ),
             )
         )
+        # This chunk diagnoses the uncoupled source bound; no clamp or flux
+        # change. The same-tick source/backpressure solve belongs to chunk 2.
+        source_pressures = getattr(self, '_stream_source_pressures_Pa', {})
+        for species, partial_mbar in self._melt_headspace_composition_mbar.items():
+            source_pa = source_pressures.get(species)
+            if source_pa is not None and partial_mbar * 100.0 > float(source_pa):
+                self.overhead_model.stream_physics_notices.append({
+                    'reason': 'source_backpressure_inconsistent', 'status': 'extrapolated',
+                    'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                    'species': species, 'hour': self.melt.hour,
+                    'campaign': self.melt.campaign.name, 'location': 'melt_to_train',
+                    'source_equilibrium_pressure_pa': float(source_pa),
+                    'source_identity': 'vapour_batch_flux_pressures_Pa',
+                    'candidate_partial_pa': partial_mbar * 100.0,
+                    'pressure_command_mbar': self.melt.p_total_mbar,
+                    'flows_mol_hr': dict(self.overhead_model.last_stream_mol_hr),
+                })
+                from simulator.wall_deposition import _record_wall_pressure_notice
+                _record_wall_pressure_notice(
+                    self.condensation_model, 'evaporation_transport_notices_by_species',
+                    species, 'melt_to_train_stream', self.overhead_model.stream_physics_notices[-1],
+                )
+        self._last_backend_diagnostics['stream_pressure']['notices'] = list(
+            self.overhead_model.stream_physics_notices)
         if capacity_result is not None and effective_transport_capacity is None:
             self.overhead.transport_saturation_pct = (
                 capacity_result.saturation.combined * 100.0

@@ -9,6 +9,7 @@ from collections.abc import Mapping
 from numbers import Real
 from typing import Any
 
+from engines.evaporation_oxygen import reaction_oxygen_destination
 from simulator.alpha_kinetics import parse_alpha_contract
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
@@ -875,6 +876,7 @@ class EvaporationMixin:
             temperature_K=T_K,
         )
         batch_report = serialize_vapour_batch(vapour_batch)
+        self._stream_source_pressures_Pa = dict(vapor_pressures)
         if isinstance(batch_report, Mapping):
             channels = batch_report.get('channels_by_species')
             if isinstance(channels, Mapping):
@@ -1152,11 +1154,10 @@ class EvaporationMixin:
         )
 
         # Overhead backpressure (Pa)                       [LOOP-1]
-        # Uses the previous hour's upstream melt-headspace/duct partials as
-        # backpressure. ``overhead.composition`` is the physically distinct
-        # post-condensation report, so near-total capture must not erase P_bulk
-        # above the melt. Gas pO2 has already been applied once upstream in
-        # the equilibrium vapor pressures consumed here.
+        # The overhead owner supplies the previous hour's melt-surface state:
+        # achieved nRT/V stock in finite mode, inlet stream partials in flowing
+        # mode. A zero outlet flow cannot erase finite gas over the melt.
+        # Gas pO2 has already been applied once in the equilibrium pressures.
         overhead_partials_Pa = (
             {
                 str(species): max(0.0, float(value))
@@ -1164,8 +1165,8 @@ class EvaporationMixin:
             }
             if overhead_partials_override_Pa is not None
             else {
-                species: self._evaporation_bulk_partial_pressure_pa(species)
-                for species in vapor_pressures
+                species: max(0.0, EvaporationMixin._evaporation_bulk_partial_pressure_pa(self, species))
+                for species in self._melt_headspace_composition_mbar
             }
         )
         for species in vapor_pressures:
@@ -1181,6 +1182,9 @@ class EvaporationMixin:
                 equilibrium,
                 overhead_partials_Pa=overhead_partials_Pa,
                 overhead_pressure_pa=(
+                    self._melt_headspace_total_pressure_bar() * 1.0e5
+                    if overhead_partials_override_Pa is not None
+                    else
                     EvaporationMixin._evaporation_overhead_total_pressure_Pa(
                         self,
                         overhead_partials_Pa,
@@ -2079,7 +2083,7 @@ class EvaporationMixin:
 
         self._reduced_real_uncacheable_reasons = []
         self._last_reduced_real_replay_notices = None
-        pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+        pressure_bar = self._melt_headspace_total_pressure_bar()
         fO2_log = self._freeze_gate_liquidus_fO2_log(
             float(self._current_melt_redox_fO2_log())
         )
@@ -2679,7 +2683,7 @@ class EvaporationMixin:
                         else float(temperature_C)
                     ),
                     pressure_bar=(
-                        float(self.melt.p_total_mbar) / 1000.0
+                        self._melt_headspace_total_pressure_bar()
                         if pressure_bar is None
                         else float(pressure_bar)
                     ),
@@ -3060,11 +3064,7 @@ class EvaporationMixin:
             max(0.0, float(value))
             for value in overhead_partials_Pa.values()
         )
-        control_floor_Pa = max(
-            0.0,
-            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) * 100.0,
-        )
-        return max(partial_sum_Pa, control_floor_Pa)
+        return partial_sum_Pa
 
     def _resolve_evaporation_vapour_batch(
         self,
@@ -3110,9 +3110,11 @@ class EvaporationMixin:
                 source_reaction_fO2_bar = None
         total_pressure_Pa = None
         try:
-            total_pressure_Pa = float(
-                getattr(self.melt, 'p_total_mbar', 0.0) or 0.0
-            ) * 100.0
+            # The activity shadow uses absolute pressure: convert the actual
+            # headspace total from bar to Pa, preserving zero-vacuum as zero.
+            total_pressure_Pa = (
+                self._melt_headspace_total_pressure_bar() * 1.0e5
+            )
         except (TypeError, ValueError):
             total_pressure_Pa = None
         try:
@@ -3504,11 +3506,9 @@ class EvaporationMixin:
             vapor_oxygen_atoms = float(
                 formula.elements.get('O', 0.0) or 0.0
             )
-            if (
-                o2_kg_hr < 0.0
-                or vapor_oxygen_atoms > 0.0
-                or oxygen_destination == 'process.overhead_gas'
-            ):
+            if reaction_oxygen_destination(
+                o2_kg_hr, vapor_oxygen_atoms, oxygen_destination,
+            ) == 'process.overhead_gas':
                 source_mol_hr['O2'] = (
                     source_mol_hr.get('O2', 0.0)
                     + o2_kg_hr / o2_molar_mass
@@ -3729,15 +3729,10 @@ class EvaporationMixin:
                 evap_flux,
                 self.melt,
             )
+            stream_partials = self._flowing_stream_partial_pressures(evap_flux, transport)
             self.condensation_model.configure_operating_conditions(
-                overhead_pressure_mbar=transport['pressure_mbar'],
-                species_partial_pressures_mbar=(
-                    self.overhead_model.species_partial_pressures(
-                        evap_flux,
-                        transport['vapor_pressure_mbar'],
-                        self.species_formula_registry,
-                    )
-                ),
+                overhead_pressure_mbar=self.overhead_model.last_stream_boundary['pressure_mbar'],
+                species_partial_pressures_mbar=stream_partials,
                 pipe_diameter_m=self.overhead_model.pipe_diameter_m,
                 # Chapman-Enskog diffusion uses bulk-gas temperature; the
                 # separate pipe temperature is a wall/liner condition.
@@ -4004,7 +3999,12 @@ class EvaporationMixin:
         rate_kg_hr = native_fe_vapor_mol * fe_molar_mass
         evap_flux = EvaporationFlux(species_kg_hr={'Fe': rate_kg_hr})
         evap_flux.update_totals()
-        self._configure_condensation_operating_conditions(evap_flux)
+        self._configure_condensation_operating_conditions(
+            evap_flux,
+            **({'source_mol_hr': {'Fe': native_fe_vapor_mol},
+                'already_credited_mol': {'Fe': native_fe_vapor_mol}}
+               if source_account == 'process.metal_phase' else {}),
+        )
         if sample_time_h is not None:
             self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
         route_result = self.condensation_model.route(evap_flux, self.melt)

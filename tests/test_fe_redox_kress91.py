@@ -719,6 +719,7 @@ def test_core_melt_redox_capacity_nonfinite_pressure_reaches_validator(
 ) -> None:
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     sim.melt = SimpleNamespace(p_total_mbar=pressure_mbar)
+    sim._install_upstream_projection({'N2': pressure_mbar})
     sim._cleaned_melt_fe_atom_mol = lambda: 1.0
     sim._melt_oxide_wt_pct = lambda: _FERROUS_ACTIVITY_COMP_WT
 
@@ -727,6 +728,24 @@ def test_core_melt_redox_capacity_nonfinite_pressure_reaches_validator(
             fO2_log=-7.5,
             T_K=1873.15,
         )
+
+
+@pytest.mark.parametrize('pressure_mbar', [float('nan'), float('inf'), float('-inf')])
+def test_core_melt_redox_ceiling_refuses_nonfinite_actual_pressure(pressure_mbar):
+    from simulator.accounting import AccountingError
+
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = SimpleNamespace()
+    sim._install_upstream_projection({'N2': pressure_mbar})
+    with pytest.raises(AccountingError, match='pressure'):
+        sim._melt_redox_fO2_upper_bound_log()
+
+
+def test_core_melt_redox_ceiling_resolves_empty_actual_headspace():
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = SimpleNamespace()
+    sim._install_upstream_projection({})
+    assert sim._melt_redox_fO2_upper_bound_log() == math.log10(sim._vacuum_floor_bar())
 
 
 @pytest.mark.parametrize('pressure_mbar', [float('nan'), float('inf'), float('-inf')])

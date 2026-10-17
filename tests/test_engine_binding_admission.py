@@ -911,7 +911,7 @@ def test_magemin_binding_probe_forwards_redox_state_to_request(
             )
 
     class FakeSimulator:
-        melt = SimpleNamespace(temperature_C=1000.0, p_total_mbar=1000.0)
+        melt = SimpleNamespace(temperature_C=1000.0, p_total_mbar=10.0)
         atom_ledger = AtomLedger()
         species_formula_registry = {}
 
@@ -923,6 +923,9 @@ def test_magemin_binding_probe_forwards_redox_state_to_request(
 
         def _dispatch_only(self, *_args, **_kwargs):
             return None
+
+        def _melt_headspace_total_pressure_bar(self):
+            return 1.585e-4
 
         def _freeze_gate_curve(self):
             return self._dispatch_only(
@@ -962,6 +965,7 @@ def test_magemin_binding_probe_forwards_redox_state_to_request(
     )
 
     assert captured[0].redox_state is state
+    assert captured[0].pressure_bar == 1.585e-4
 
 
 def test_direct_replay_only_constructor_uses_receipt_authorizer(

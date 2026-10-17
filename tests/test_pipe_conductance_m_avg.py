@@ -49,6 +49,7 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
     configured = {}
     overhead = SimpleNamespace(
         pipe_diameter_m=0.4,
+        last_stream_boundary={'pressure_mbar': 2.0},
         estimate_transport_state=lambda _flux, _melt: {
             "pipe_temperature_C": 900.0,
             "conductance_temperature_C": 1450.0,
@@ -77,6 +78,8 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
             campaign_hour=0.0,
         ),
         _resolve_condensation_carrier_gas=lambda: "N2",
+        _overhead_holdup_mol=lambda: {},
+        _flowing_stream_partial_pressures=lambda flux, transport, **kwargs: {"SiO": transport['pressure_mbar']},
     )
 
     PyrolysisSimulator._configure_condensation_operating_conditions(
@@ -111,6 +114,109 @@ def test_pure_o2_returns_o2_molar_mass():
     gives ``M_O2 / 1000 ≈ 0.032 kg/mol``."""
     M_avg = _mean_molar_mass_kg_mol({"O2": 1.0})
     assert M_avg == pytest.approx(MOLAR_MASS["O2"] / 1000.0)
+
+
+def test_complete_stream_dalton_closure_and_carrier_dilution():
+    flux = EvaporationFlux(species_kg_hr={"Fe": 0.11169}, total_kg_hr=0.11169)
+    flows = {"Fe": 2.0, "O2": 1.0, "N2": 7.0}
+    partials = OverheadGasModel.species_partial_pressures(
+        flux, 10.0, molar_flow_by_species=flows,
+    )
+    assert partials == pytest.approx({"Fe": 2.0, "O2": 1.0, "N2": 7.0})
+    assert sum(partials.values()) == pytest.approx(10.0)
+    diluted = OverheadGasModel.species_partial_pressures(
+        flux, 10.0, molar_flow_by_species={**flows, "N2": 17.0},
+    )
+    assert diluted["Fe"] == pytest.approx(1.0)
+    assert diluted["O2"] == pytest.approx(0.5)
+    assert OverheadGasModel.species_partial_pressures(
+        EvaporationFlux(), 10.0, molar_flow_by_species={"N2": 8.0},
+    ) == {"N2": 10.0}
+
+
+def test_two_species_projection_numeric_pin_before_owner_consolidation():
+    flux = EvaporationFlux(species_kg_hr={
+        'Fe': MOLAR_MASS['Fe'] / 1000.0,
+        'O2': MOLAR_MASS['O2'] / 1000.0,
+    })
+    flux.update_totals()
+    partials = OverheadGasModel.species_partial_pressures(flux, 10.0)
+    assert {species: pressure.hex() for species, pressure in partials.items()} == {
+        'Fe': '0x1.4000000000000p+2', 'O2': '0x1.4000000000000p+2',
+    }
+
+
+def test_unknown_stream_species_refuses_instead_of_mass_fraction_fallback():
+    with pytest.raises(OverheadConfigurationError, match="molar mass"):
+        OverheadGasModel.species_partial_pressures(
+            EvaporationFlux(species_kg_hr={"unknown": 1.0}, total_kg_hr=1.0), 10.0,
+        )
+
+
+def test_ideal_regulated_sweep_uses_open_duct_and_flags_inertial_domain():
+    model = OverheadGasModel({"enabled": False})
+    melt = MeltState()
+    melt.atmosphere = Atmosphere.PN2_SWEEP
+    melt.campaign = CampaignPhase.C2A
+    melt.temperature_C = 2105.0
+    melt.p_total_mbar = 10.0
+    flux = EvaporationFlux(species_kg_hr={"Fe": 0.11169}, total_kg_hr=0.11169)
+    transport = model.estimate_transport_state(flux, melt)
+    flows = model.flowing_stream_mol_hr({"Fe": 2.0, "O2": 1.0}, melt, transport)
+    assert flows["Fe"] == 2.0
+    assert flows["O2"] == 1.0
+    assert flows["N2"] > 0.0
+    assert model.last_stream_boundary["provenance"] == "ideal_regulator_open_duct"
+    assert any(n["reason"] == "stream_throughput_out_of_domain"
+               for n in model.stream_physics_notices)
+    capacity = model._pipe_conductance(
+        1000.0, 2105.0, p_downstream_Pa=0.0,
+        species_kg_for_M_avg={"N2": MOLAR_MASS["N2"] / 1000.0},
+    )
+    assert sum(flows.values()) == pytest.approx(
+        capacity * 3600.0 / (MOLAR_MASS["N2"] / 1000.0))
+
+
+def test_prior_discharge_cannot_spend_fresh_source_outlet_capacity():
+    from engines.builtin.overhead_bleed import controlled_flow_capacity
+    model = OverheadGasModel({'enabled': True, 'volume_m3': 1.0})
+    melt = MeltState()
+    melt.atmosphere = Atmosphere.CONTROLLED_O2
+    melt.temperature_C = 1500.0
+    melt.p_total_mbar = 1.0
+    fe = 1.0 / (MOLAR_MASS['Fe'] / 1000.0)
+    oxygen_stock = 1.0 / (MOLAR_MASS['O2'] / 1000.0)
+    transport = model.estimate_transport_state(EvaporationFlux(), melt)
+    capacity = controlled_flow_capacity(
+        pipe_capacity_kg_hr=2.0, equipment_capacity_kg_hr=1.0,
+        evolved_flux_kg_hr=1.0, retained_holdup_kg=1.0, upstream_pressure_bar=0.001,
+    )
+    flows = model.flowing_stream_mol_hr(
+        {'Fe': fe}, melt, transport, holdup_mol={'O2': oxygen_stock},
+        effective_transport_capacity=capacity,
+    )
+    assert flows['Fe'] == fe
+    assert flows.get('O2', 0.0) == 0.0
+
+
+def test_regulator_makeup_includes_finite_vessel_fill_and_is_idempotent():
+    model = OverheadGasModel({'enabled': True, 'volume_m3': 1.0, 'temperature_model': 'lumped'})
+    melt = MeltState()
+    melt.atmosphere = Atmosphere.PN2_SWEEP
+    melt.temperature_C = 1500.0
+    melt.p_total_mbar = 10.0
+    transport = model.estimate_transport_state(EvaporationFlux(), melt)
+    flows = model.flowing_stream_mol_hr({}, melt, transport)
+    boundary = dict(model.last_stream_boundary)
+    # Bit-identical balance pin before extracting its shared inventory owner.
+    assert boundary['carrier_inlet_makeup_mol_hr'].hex() == '0x1.37078c897adefp+13'
+    assert boundary['carrier_inventory_change_mol'].hex() == '0x1.266fa2b57da12p-4'
+    # Ideal-gas definition in a 1 m3 vessel, initially empty: n=PV/(RT).
+    expected_fill_mol = 1000.0 / (GAS_CONSTANT * (1773.15 - 100.0))
+    assert boundary['carrier_inventory_change_mol'] == pytest.approx(expected_fill_mol)
+    assert boundary['carrier_inlet_makeup_mol_hr'] - flows['N2'] == pytest.approx(expected_fill_mol)
+    model.flowing_stream_mol_hr({}, melt, transport)
+    assert model.last_stream_boundary['carrier_inlet_makeup_mol_hr'] == boundary['carrier_inlet_makeup_mol_hr']
 
 
 def test_pure_sio_returns_sio_molar_mass():

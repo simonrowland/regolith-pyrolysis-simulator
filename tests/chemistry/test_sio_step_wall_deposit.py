@@ -25,6 +25,74 @@ from simulator.runner import build_sio_yield_report
 from simulator.state import EvaporationFlux, MeltState, PipeSegment
 
 
+@pytest.mark.parametrize('inlet', [{'Fe': 2.0}, {'Fe': 2.0, 'O2': 0.0, 'N2': 0.0}])
+def test_explicit_noncondensables_survive_untracked_segment_mass_rates(inlet):
+    partials = _segment_species_partial_pressures_pa(
+        {"Fe": 200.0, "O2": 100.0, "N2": 700.0}, 1000.0,
+        inlet, {"inlet": {"Fe": 2.0}, "after_capture": {"Fe": 1.0}},
+    )
+    assert partials["inlet"] == pytest.approx({"Fe": 200.0, "O2": 100.0, "N2": 700.0})
+    assert partials["after_capture"] == pytest.approx(
+        {"Fe": 1000.0 / 9.0, "O2": 1000.0 / 9.0, "N2": 7000.0 / 9.0})
+    assert sum(partials["after_capture"].values()) == pytest.approx(1000.0)
+
+
+def test_stage_feed_uses_resolved_stage_and_wall_capture(monkeypatch):
+    model = CondensationModel(CondensationTrain.create_default())
+    model.overhead_pressure_mbar = 10.0
+    model.wall_species_partial_pressures_pa = {'Fe': 200.0, 'O2': 100.0, 'N2': 700.0}
+    model.stage_area_m2_by_stage = {str(s.stage_number): 1.0 for s in model.train.stages}
+    from types import SimpleNamespace
+    from simulator.state import MOLAR_MASS
+    fe_mass = MOLAR_MASS['Fe'] / 1000.0
+    model.pipe_segments = [SimpleNamespace(name='wall', upstream_stage='stage_1', downstream_stage='stage_2')]
+    # Independent imposed capture: actual Stage 1 removes 0.2 mol and its
+    # downstream wall removes 0.1 mol, regardless of the raw HKL candidate.
+    monkeypatch.setattr(model, '_condensation_efficiency', lambda **kwargs: 0.5)
+    monkeypatch.setattr(model, '_wall_deposit_candidates_by_segment_kg', lambda **kwargs: {'wall': fe_mass})
+    monkeypatch.setattr(condensation_module, '_regularized_capture_allocations',
+                        lambda *a: ({1: 0.2 * fe_mass}, {'wall': 0.1 * fe_mass}))
+    routes = {'Fe': {'T_cond_C': 1250.0, 'capture_budget_kg': fe_mass}}
+    model._resolve_wall_deposit_candidates_by_species_segment_kg(
+        evap_flux=EvaporationFlux(species_kg_hr={'Fe': 2.0 * fe_mass}),
+        melt=MeltState(), stage_route_by_species=routes,
+    )
+    assert model.stage_species_partial_pressures_pa[2] == pytest.approx({
+        'Fe': 1700.0 / 9.7, 'O2': 1000.0 / 9.7, 'N2': 7000.0 / 9.7,
+    })
+
+
+def test_empty_stage_routes_clear_stage_partial_pressures():
+    model = CondensationModel(CondensationTrain.create_default())
+    model.stage_species_partial_pressures_pa = {0: {'K': 0.25}}
+
+    result = model._resolve_wall_deposit_candidates_by_species_segment_kg(
+        evap_flux=EvaporationFlux(species_kg_hr={}),
+        melt=MeltState(),
+        stage_route_by_species={},
+    )
+
+    assert result == {}
+    assert model.stage_species_partial_pressures_pa == {}
+
+
+def test_complete_first_stage_capture_converges_with_two_perfect_sinks(monkeypatch):
+    model = CondensationModel(CondensationTrain.create_default())
+    model.overhead_pressure_mbar = 10.0
+    model.wall_species_partial_pressures_pa = {'Fe': 200.0, 'O2': 100.0, 'N2': 700.0}
+    model.pipe_segments = []
+    monkeypatch.setattr(model, '_condensation_efficiency',
+                        lambda **kwargs: 1.0 if kwargs['stage'].stage_number in (1, 3) else 0.0)
+    routes = {'Fe': {'T_cond_C': 1250.0, 'capture_budget_kg': 1.0}}
+    model._resolve_wall_deposit_candidates_by_species_segment_kg(
+        evap_flux=EvaporationFlux(species_kg_hr={'Fe': 1.0}),
+        melt=MeltState(), stage_route_by_species=routes,
+    )
+    assert routes['Fe']['hkl_condensed_by_stage'] == {1: 1.0}
+    assert model.stage_species_partial_pressures_pa[3]['Fe'] == 0.0
+    assert model.last_wall_capture_fixed_point_iterations <= 2
+
+
 @lru_cache(maxsize=None)
 def _report_at_wall_T(liner_temperature_c: float) -> tuple[dict[str, Any], dict[str, float]]:
     return build_sio_yield_report(

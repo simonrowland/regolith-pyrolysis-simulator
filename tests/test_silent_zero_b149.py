@@ -290,6 +290,7 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
         melt=SimpleNamespace(temperature_C=1600.0),
         setpoints={},
         vapor_pressures={"metals": {"Na": {"evaporation_alpha": {"value": 0.13}}}},
+        _melt_headspace_composition_mbar={},
         _last_vapor_pressure_diagnostic={},
         _last_vapour_batch_resolve_error={},
         _silent_zero_notes=[],

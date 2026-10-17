@@ -41,11 +41,33 @@ def test_stage0_lunar_feedstock_uses_hard_vacuum():
     )
 
     sim.load_batch("lunar")
+    assert sim._melt_headspace_total_pressure_bar() == 0.0
     sim.start_campaign(CampaignPhase.C0)
+    assert sim._melt_headspace_total_pressure_bar() == 0.0
 
     assert sim.melt.atmosphere is Atmosphere.HARD_VACUUM
     assert sim.melt.p_total_mbar == 0.0
     assert sim.melt.pO2_mbar == 0.0
+
+
+def test_initial_headspace_sizes_equipment_for_the_batch_being_loaded(monkeypatch):
+    sim = _sim({
+        "lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}},
+    })
+    sim.setpoints['overhead_headspace'] = {'enabled': True}
+    sizing_batches = []
+    original = sim._get_turbine_spec
+
+    def record_sizing_batch():
+        sizing_batches.append((sim.record.feedstock_key, sim.record.batch_mass_kg))
+        return original()
+
+    monkeypatch.setattr(sim, '_get_turbine_spec', record_sizing_batch)
+    for mass_kg in (1000.0, 10.0):
+        sizing_batches.clear()
+        sim.load_batch('lunar', mass_kg=mass_kg)
+        assert sizing_batches == [('lunar', mass_kg)]
+        assert sim._equipment is not None
 
 
 def test_stage0_mars_feedstock_uses_surface_co2_backpressure():
@@ -61,7 +83,9 @@ def test_stage0_mars_feedstock_uses_surface_co2_backpressure():
     )
 
     sim.load_batch("mars")
+    assert sim._melt_headspace_composition_mbar == {"CO2": 5.76, "ambient_other": 0.24}
     sim.start_campaign(CampaignPhase.C0)
+    assert sim._melt_headspace_composition_mbar == {"CO2": 5.76, "ambient_other": 0.24}
     snapshot = sim.step()
 
     assert sim.melt.atmosphere is Atmosphere.CO2_BACKPRESSURE
@@ -69,6 +93,8 @@ def test_stage0_mars_feedstock_uses_surface_co2_backpressure():
     assert sim.melt.pO2_mbar == 0.0
     assert snapshot.overhead.pressure_mbar == 6.0
     assert snapshot.overhead.composition["CO2"] == 5.76
+    assert snapshot.overhead.composition["ambient_other"] == 0.24
+    assert sum(snapshot.overhead.composition.values()) == 6.0
 
 
 def test_all_builtin_mars_feedstocks_define_co2_environment():
