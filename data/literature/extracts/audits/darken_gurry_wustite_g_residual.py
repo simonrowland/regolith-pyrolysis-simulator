@@ -6,7 +6,7 @@ NASA TP-2002-211556. These are the low-temperature NASA-9 coefficients
 (a1..a7,b1,b2), valid from 298.15 to 1652 K. The NASA record's composition is
 Fe0.95O (n_Fe=0.95), despite its Fe.947O label.
 
-JANAF source: Chase, NIST-JANAF 4th ed. (1998), Fe-001, printed p. 1172,
+JANAF source: Chase, NIST-JANAF 4th ed. (1998), Fe-001, printed p. 1219,
 rows listed below; the tracked machine transcription is
 data/literature/compilations/janaf/tables/Fe-001.yaml. It is Fe0.947O(cr).
 Values are T (K), S (J mol-1 K-1), H-H(298.15) (kJ mol-1).
@@ -34,7 +34,7 @@ NASA_A = (
 )
 NASA_B1, NASA_B2 = -3.417350500e4, -1.284759120e1
 JANAF_DH298_KJ_MOL = -266.270
-# (T K, S J mol-1 K-1, H-H(298.15) kJ mol-1), Fe-001, p. 1172.
+# (T K, S J mol-1 K-1, H-H(298.15) kJ mol-1), Fe-001, p. 1219.
 JANAF = {
     1000: (121.048, 37.386),
     1100: (126.510, 43.118),
