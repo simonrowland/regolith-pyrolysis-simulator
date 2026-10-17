@@ -88,6 +88,26 @@ def test_table_rows_are_source_pinned_and_migrate_with_temperature():
     assert not result.validation.hard_issues
     assert not [row for row in migrated if row.value.kind is ValueKind.UNAVAILABLE]
 
+    # Pin the values the real migrator consumes from values.points, not only
+    # the parallel source-level values.value field. These cells were checked
+    # against the page 4 render (PDF p. 4, published p. 868).
+    for _, source_id, value, _ in rendered_cells:
+        migrated_id = f"{document['source_id']}::{source_id}::points:"
+        points = [
+            row
+            for row in migrated
+            if row.observation_id.startswith(migrated_id)
+        ]
+        assert len(points) == 1, source_id
+        point = points[0]
+        assert point.value.kind is ValueKind.POINT
+        assert point.value.point == Decimal(value), (
+            f"{source_id}, PDF page 4, rendered value {value}"
+        )
+        assert point.locator.page == 4
+        assert point.locator.pdf_page_index == 3
+        assert point.locator.published_page == 868
+
     for row in migrated:
         assert row.identity.temperature_K.is_value
         assert row.identity.temperature_K.value == Decimal("2000")

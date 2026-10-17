@@ -60,6 +60,8 @@ Audit codes: (a) MinerU and pdftotext agree on the numeric characters; (b) page 
 
 For rows with a numeric value, `a` is the independent MinerU/pdftotext character match; the rendered page 4 establishes the table’s complete row and phase-column alignment. `b` marks MinerU-flagged values, all checked directly against the page 4 render. Dashes are not numeric cells and remain absent from the typed observations.
 
+The Table 1 footnote on PDF page 4 states that compounds printed in bold type were found in Ca–Al inclusions of chondrites. The boldface designation is retained as source context; it does not change the row values or phase assignments.
+
 ## Table 2 — starting compositions, PDF page 5 / published page 869
 
 | Printed row | Temperature (K) | CaO | MgO | FeO | Al2O3 | TiO2 | SiO2 | Reference |
@@ -80,9 +82,11 @@ Table 2 rows are quoted attributed model starting compositions. Their printed sa
 
 Figs. 2–3 show model residual-composition trajectories with experimental symbols and are figure-read candidates for the residue_composition rail. No figure-only values were digitized. MinerU `<details>` chart blocks were ignored.
 
+Fig. 1 (PDF page 3) plots calculated activities and mixing energy and is a figure-read candidate. No figure-only values were digitized.
+
 ## Isolated migration / store expectation
 
-Real isolated migration: 113 observations; 0 hard issues; 0 unavailable values; 113 queued method notices because no method registry is stated for these table records; 0 registry issues; 5 context rows. Every observation has identity T=2000 K and a located temperature condition of 2000 K. For the first three rows, composition, total_pressure_Pa and fO2_Pa are not_applicable in the DELTA_FG profile because the source prints none. The required standard_pressure_Pa, reaction and formation_elements axes remain unknown because Table 1 does not state them; no standard pressure or formation reaction was inferred. The 113 queue notices are not hard failures or unavailable numeric values. Focused pytest pins three render-confirmed values and all 47 source rows; a value mutation and row deletion each failed that test as intended. MinerU compare: matched=113, no-match=0, mismatch=0. The [raw compare CSV](shornikov-2019-lunar-meteorite-evaporation-model-mineru-compare.csv) is committed alongside this audit. No battery store was regenerated. Expected store delta without regeneration: 1 work, 1 experiment registry record, 113 DELTA_FG observations (47 solid, 29 liquid and 37 gas), and 5 unscored Table 2 composition-context rows; no scored residue trajectory observations. `data/literature/INDEX.*` and the battery store were not changed.
+Real isolated migration: 113 observations; 0 hard issues; 0 unavailable values; 113 queued method notices because no method registry is stated for these table records; 0 registry issues; 5 context rows. Every observation has identity T=2000 K and a located temperature condition of 2000 K. For the first three rows, composition, total_pressure_Pa and fO2_Pa are not_applicable in the DELTA_FG profile because the source prints none. The required standard_pressure_Pa, reaction and formation_elements axes remain unknown because Table 1 does not state them; no standard pressure or formation reaction was inferred. The 113 queue notices are not hard failures or unavailable numeric values. Focused pytest pins three migrated `values.points` to the page 4 render and all 47 source rows; a `-999` mutation of the solid CaO point fails while its parallel `values.value` remains unchanged, and row deletion also fails. MinerU compare: matched=113, no-match=0, mismatch=0. The compact [per-cell compare CSV](shornikov-2019-lunar-meteorite-evaporation-model-mineru-compare.csv) records each stored value, match status, PDF page, MinerU table, and matched row/column. No battery store was regenerated. Expected store delta without regeneration: 1 work, 1 experiment registry record, 113 DELTA_FG observations (47 solid, 29 liquid and 37 gas), and 5 unscored Table 2 composition-context rows; no scored residue trajectory observations. `data/literature/INDEX.*` and the battery store were not changed.
 
 The five Table 2 context rows are nested under `species.CaO.context` because context containers are species-scoped in the existing extract shape; each row records the complete multicomponent oxide melt composition.
 
@@ -96,4 +100,4 @@ The five Table 2 context rows are nested under `species.CaO.context` because con
 
 The DELTA_FG profile also requires `per`, `standard_pressure_Pa`, `reaction` and `formation_elements`: `per=mol_species` maps; the latter three remain unknown because Table 1 does not print their values. `temperature_K` is present in each observation identity and its `point_conditions.temperature_K` located state.
 
-Verification: `tests/test_shornikov_2019_extract.py` and `tests/test_yaml_flow_scalar_commas.py` passed (18 tests); the parameterized literature fidelity check for this extract passed (1 test). Temporary mutants changing the render-pinned value and deleting one Table 1 row were each rejected by the focused test.
+Verification: `tests/test_shornikov_2019_extract.py` and `tests/test_yaml_flow_scalar_commas.py` passed (18 tests); the parameterized literature fidelity check for this extract passed (1 test). The focused test pins three migrated `values.points` values to the page 4 render and rejects a `-999` mutation to the solid CaO point while leaving `values.value` unchanged; deleting one Table 1 row is also rejected.
